@@ -1,0 +1,52 @@
+{
+  "budget": {
+    "timings": {
+      "firstPaint": 1800,
+      "pageLoadTime": 2000,
+      "FirstVisualChange": 1000,
+      "LastVisualChange": 1200,
+      "SpeedIndex": 1200,
+      "PerceptualSpeedIndex":1200,
+      "VisualReadiness": 200,
+      "VisualComplete95": 1190
+    },
+    "requests": {
+      "total": 89,
+      "html": 1,
+      "javascript": 3,
+      "css": 1,
+      "image": 50,
+      "font": 10,
+      "httpErrors" : 0
+    },
+    "transferSize": {
+      "total": 1000000000000000,
+      "html": 200000,
+      "javascript": 2000000000,
+      "css": 100000000,
+      "image": 200000,
+      "font": 1000000000
+    },
+    "score": {
+      "bestpractice": 70,
+      "privacy": 70,
+      "performance": 65
+    },
+    "googleWebVitals": {
+      "firstContentfulPaint": 1800,
+      "largestContentfulPaint": 10000,
+      "totalBlockingTime": 200,
+      "cumulativeLayoutShift": 1
+    },
+    "lighthouse": {
+      "performance": 90,
+      "accessibility": 90,
+      "best-practices": 90,
+      "seo": 90,
+      "pwa": 90
+    },
+    "gpsi": {
+      "speedscore": 90
+    }
+  }
+}
