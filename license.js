@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 // this code takes only those packages from licenses.json which are present in package.json file
-const { readFileSync, writeFileSync } = require('fs');
+import { readFileSync, writeFileSync } from 'fs';
 // Read package.json and licenses.json
 const packageData = JSON.parse(readFileSync('package.json'))
 const licensesData = JSON.parse(readFileSync('licenses.json'))

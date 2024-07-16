@@ -63,8 +63,8 @@ stages:
       steps:
         - script: |
             npm install -g license-checker 
-            license-checker --json > scripts/licenses.json  
-            node scripts/license.js
+            license-checker --json > licenses.json  
+            node license.js
           displayName: 'License Compliance'
     - job: "sast"
       displayName: 'Static Application Security Testing (SAST)'
