@@ -1,12 +1,12 @@
 import React from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import QuestionnairesList from '../Pages/QuestionnairesList';
+import Login from '../Pages/auth/AuthPOC/Login.jsx'; // Import the Login component
 
 function NavigationRoutes() {
-  const location = useLocation();
-
   return (
-    <Routes location={location} key={location.pathname}>
+    <Routes>
+      <Route path="/login" element={<Login />} />
       <Route path="/QuestionnairesList" element={<QuestionnairesList />} />
       {/* Add other routes here */}
     </Routes>
@@ -14,3 +14,4 @@ function NavigationRoutes() {
 }
 
 export default NavigationRoutes;
+

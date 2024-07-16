@@ -4,7 +4,10 @@ import NavrBar from '../../Components/NavBar/NavrBar'
 
 function QuestionnairesList() {
   return (
-    <NavrBar />
+    <>
+      <NavrBar />
+      <LogoutButton />
+    </>
   )
 }
 
