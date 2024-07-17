@@ -111,7 +111,7 @@ stages:
         vmImage: "ubuntu-latest"
       steps:
         - script: |
-            sh scripts/azure_envs.sh
+            ./scripts/azure_envs.sh
           displayName: 'Copy Environment Files'
         - publish: $(System.DefaultWorkingDirectory)/.env
           artifact: Environment
