@@ -90,3 +90,4 @@ Package-lock.json
 dependency-check-bin**
 dependency-check-reports**
 logs.txt
+sitespeed-result/
