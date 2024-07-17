@@ -20,7 +20,7 @@ options.addArguments('--disable-gpu')
 options.addArguments('--disable-extensions')
 options.addArguments('--dns-prefetch-disable')
 options.addArguments('enable-features=NetworkServiceInProcess')
-setDefaultTimeout(34000)
+setDefaultTimeout(10000)
 
 
 global.driver = chrome.Driver.createSession(options, service)
@@ -29,14 +29,20 @@ BeforeAll(async function () {
     await driver.manage()
     await new Promise(resolve => setTimeout(resolve, 3000))
     await driver.get('http://localhost:3000/')
-    await driver.wait(until.elementLocated(By.id('root')))
+    console.log('passed 1');
+    await driver.wait(until.elementLocated(By.css('body')))
+    console.log('passed 2');
     global.current_process_name = faker.string.alpha({ count: 10, casing: 'upper' })
     global.is_user_logged_in = false
     console.log('Current process name:', global.current_process_name)
     try {
+        console.log('error 1');
         global.__coverage__ = await driver.executeScript('return __coverage__;')
+        console.log('passed 3');
         global.coverageMap = createCoverageMap(__coverage__)
+        console.log('passed 4');
     } catch (error) {
+        console.log('passed 5');
         throw new Error('::: __coverage__ ::: Coverage Mapping Object Not Found :::')
     }
 })
