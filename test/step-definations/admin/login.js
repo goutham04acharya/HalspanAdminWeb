@@ -1,5 +1,5 @@
 const { Given, When, Then } = require('@cucumber/cucumber');
-const { By, until } = require('selenium-webdriver');
+const { By, until, Key } = require('selenium-webdriver');
 const assert = require('assert');
 
 
@@ -30,6 +30,6 @@ When('I click the submit button', async function () {
 
 Then('I should be redirected to the questionnaire listing screen', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    
+    await driver.sleep(5000);
 });
 
