@@ -1,5 +1,8 @@
 parameter_names=(
     "DOMAIN_NAME"
+    "BUCKET_NAME"
+    "ADMIN_DISTRIBUTION_ID"
+    "ADMIN_S3_BUCKET"
 )
 
 # Loop through each parameter
