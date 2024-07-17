@@ -46,5 +46,8 @@ export default [{
         "import/prefer-default-export": "off",
         "jsx-a11y/label-has-associated-control": "off",
         "jsx-a11y/label-has-for": "off",
+
+        // Cyclomatic Complexity rule
+        "complexity": ["error", { "max": 10 }],
     },
 }];
