@@ -1,5 +1,3 @@
-#!/bin/bash
-
 parameter_names=(
     "DOMAIN_NAME"
 )
