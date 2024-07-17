@@ -43,7 +43,6 @@ stages:
           condition: ne(variables.CACHE_RESTORED, 'true')
           displayName: 'Dependencies'
         - script: |
-            npm install eslint eslint-plugin-react --save-dev
             npm run eslint
           displayName: 'Lint'
     - job: "secret"
