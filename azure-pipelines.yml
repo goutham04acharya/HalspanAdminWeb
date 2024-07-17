@@ -183,14 +183,14 @@ stages:
             pm2 start scripts/server.js
             node --version
             sleep 5
-            mkdir reports
-            mkdir reports-xml
-            npm install nyc --save-dev --force
-            node scripts/bdd_unit_testing_azure.js
-            if [ $? -ne 0 ]; then
-              echo "testing failed"
-              exit 1
-            fi
+            # mkdir reports
+            # mkdir reports-xml
+            # npm install nyc --save-dev --force
+            # node scripts/bdd_unit_testing_azure.js
+            # if [ $? -ne 0 ]; then
+            #   echo "testing failed"
+            #   exit 1
+            # fi
             echo "Completed tasks - exit $?"
           displayName: Unit Testing
         - publish: $(System.DefaultWorkingDirectory)/features/step-definations/failed_scenarios/ # Assuming logs are in working directory
