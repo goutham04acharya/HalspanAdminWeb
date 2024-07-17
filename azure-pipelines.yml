@@ -43,6 +43,7 @@ stages:
           condition: ne(variables.CACHE_RESTORED, 'true')
           displayName: 'Dependencies'
         - script: |
+            npm install eslint eslint-plugin-react --save-dev
             npm run eslint
           displayName: 'Lint'
     - job: "secret"
@@ -186,7 +187,7 @@ stages:
             mkdir reports
             mkdir reports-xml
             npm install nyc --save-dev --force
-            node scripts/bdd_unit_testing_azure1.js
+            node scripts/bdd_unit_testing_azure.js
             if [ $? -ne 0 ]; then
               echo "testing failed"
               exit 1
