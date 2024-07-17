@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { AfterAll, BeforeAll, AfterStep } = require('@cucumber/cucumber')
+const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout } = require('@cucumber/cucumber')
 const chrome = require('selenium-webdriver/chrome')
 const { By, until } = require('selenium-webdriver')
 const chromedriver = require('chromedriver')
@@ -20,6 +20,8 @@ options.addArguments('--disable-gpu')
 options.addArguments('--disable-extensions')
 options.addArguments('--dns-prefetch-disable')
 options.addArguments('enable-features=NetworkServiceInProcess')
+setDefaultTimeout(34000)
+
 
 global.driver = chrome.Driver.createSession(options, service)
 
