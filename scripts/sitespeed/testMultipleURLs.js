@@ -1,18 +1,19 @@
-module.exports = async function(context, commands) {
-    let a = 'http://localhost:5174'
-    
-    const urls = [
-        `${a}/`,
-    ]
+export default async function(context, commands) {
+    const baseUrl = 'http://localhost:5174';
+    const urls = [`${baseUrl}/`];
+
     for (let url of urls) {
-        // Do the stuff for each url that you need to do
-        // Maybe login a user or add a cookie or something
-        // Then test the URL
-        await commands.measure.start(url);
-        // When the test is finished, clear the browser cache
-        await commands.cache.clear();
-        // Navigate to a blank page so you kind of start from scratch for the next URL
-        await commands.navigate('about:blank');
+        try {
+            // Start measuring the performance for the URL
+            await commands.measure.start(url);
+
+            // Clear the browser cache after measuring
+            await commands.cache.clear();
+
+            // Navigate to a blank page to reset the state before the next measurement
+            await commands.navigate('about:blank');
+        } catch (error) {
+            console.error(`Error while processing URL ${url}:`, error);
+        }
     }
 };
-
