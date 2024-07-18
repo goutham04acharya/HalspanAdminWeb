@@ -1,7 +1,7 @@
 module.exports = {
     default: {
         paths: [
-            'test/integration-testing/1_login.feature'
+            'test/integration-testing/Flow1/1_login.feature'
         ]
     }
 }
