@@ -193,10 +193,10 @@ stages:
             fi
             echo "Completed tasks - exit $?"
           displayName: Unit Testing
-        - publish: $(System.DefaultWorkingDirectory)/features/step-definations/failed_scenarios/ # Assuming logs are in working directory
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
-        - publish: $(System.DefaultWorkingDirectory)/features/step-definations/coverageData/ # Assuming logs are in working directory
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/coverageData/ # Assuming logs are in working directory
           artifact: '1-coverageData'
         - publish: $(System.DefaultWorkingDirectory)/reports/ # Assuming logs are in working directory
           artifact: '1-living-documentation'
@@ -245,7 +245,7 @@ stages:
           name: Coverage1
           inputs:
             artifactName: '1-coverageData'
-            targetPath: '$(System.DefaultWorkingDirectory)/features/step-definations/coverageData'
+            targetPath: '$(System.DefaultWorkingDirectory)/test/step-definations/coverageData'
           displayName: 'Download coverage Documentation Artifact'
         - script: |
             echo "##vso[task.setvariable variable=RepositoryName]$BUILD_REPOSITORY_NAME"
@@ -309,7 +309,7 @@ stages:
               exit 1
             fi
           displayName: Integration Testing
-        - publish: $(System.DefaultWorkingDirectory)/features/step-definations/failed_scenarios/ # Assuming logs are in working directory
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
         # - task: PublishCodeCoverageResults@1
