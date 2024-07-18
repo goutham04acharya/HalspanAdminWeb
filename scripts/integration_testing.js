@@ -8,8 +8,8 @@ const stat = util.promisify(fs.stat);
 
 const featureDirectory = 'test/integration-testing';
 const DELAY_BETWEEN_TESTS = 1000; // 1 second
-const DELAY_BETWEEN_PARALLEL_EXECUTIONS = 20000; // 1 second
-const MAX_PARALLEL_EXECUTIONS = 14;
+const DELAY_BETWEEN_PARALLEL_EXECUTIONS = 1000; // 1 second
+const MAX_PARALLEL_EXECUTIONS = 10;
 let COUNTER = 0;
 
 const excludedFolders = ['step-definations', 'support', 'bdd_api', 'bdd_getbearertoken', 'bdd_payload', 'bdd_modules', 'unit-testing', 'unit-testing1', 'unit-testing2', 'unit-testing3', 'unit-testing4'];
@@ -71,7 +71,8 @@ async function runTestQueue() {
 async function runTest(featureFile) {
     return new Promise((resolve, reject) => {
         COUNTER = COUNTER + 1;
-        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --force-exit -f json:./reports/test-report-${featureFile}.json -f junit:./reports-xml/TEST-test-report-unit-test-${featureFile}.xml --config ${featureFile}/cucumber.js`;
+        const file = featureFile.split('/').pop().split('.').slice(0, -1).join('.');
+        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --force-exit -f json:./reports/test-report-${featureFile}.json -f junit:./reports-xml/TEST-test-report-unit-test-${file}.xml --config ${featureFile}/cucumber.js`;
 
         console.log('started executing file --', featureFile);
 

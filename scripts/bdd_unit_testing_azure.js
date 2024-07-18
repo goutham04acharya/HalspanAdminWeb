@@ -62,8 +62,8 @@ async function runTestQueue () {
 async function runTest (featureFile, isLogin) {
     return new Promise((resolve, reject) => {
         COUNTER = COUNTER + 1;
-        
-        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --import test --retry 1 --force-exit -f json:./reports/test-report.json -f junit:./reports-xml/TEST-test-report-unit-test-${featureFile}.xml ${featureFile} --world-parameters '{"login": ${isLogin}}'`;
+        const file = featureFile.split('/').pop().split('.').slice(0, -1).join('.');
+        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --import test --retry 1 --force-exit -f json:./reports/test-report.json -f junit:./reports-xml/TEST-test-report-unit-test-${file}.xml ${featureFile} --world-parameters '{"login": ${isLogin}}'`;
 
         console.log('started executing file --', featureFile);
 

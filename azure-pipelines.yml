@@ -205,7 +205,7 @@ stages:
           condition: always()
           inputs:
             testResultsFormat: 'JUnit'
-            testResultsFiles: '**/TEST-*/**.xml'
+            testResultsFiles: '**/Test-*.xml'
         - task: PublishCodeCoverageResults@1
           condition: always()
           inputs:
@@ -323,7 +323,7 @@ stages:
           condition: always()
           inputs:
             testResultsFormat: 'JUnit'
-            testResultsFiles: '**/TEST*/**.xml'
+            testResultsFiles: '**/Test-*.xml'
           
     - job: BrowserPerformanceTesting
       displayName: "Browser Performance Testing"
