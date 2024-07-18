@@ -1,0 +1,1 @@
+export const authdomain = import.meta.env.VITE_DOMAIN_NAME

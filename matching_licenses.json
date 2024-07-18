@@ -1,0 +1,121 @@
+{
+  "@alloc/quick-lru@5.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/quick-lru",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/@alloc/quick-lru",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/@alloc/quick-lru/license"
+  },
+  "cucumber@6.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/cucumber/cucumber-js",
+    "publisher": "Julien Biezemans",
+    "email": "jb@jbpros.com",
+    "url": "http://jbpros.net",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/cucumber",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/cucumber/LICENSE"
+  },
+  "framer-motion@11.3.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/framer/motion",
+    "publisher": "Framer",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/framer-motion",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/framer-motion/LICENSE.md"
+  },
+  "license-checker@25.0.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/davglass/license-checker",
+    "publisher": "Dav Glass",
+    "email": "davglass@gmail.com",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/license-checker",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/license-checker/LICENSE"
+  },
+  "react@18.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react/LICENSE"
+  },
+  "react-dom@18.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react-dom",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react-dom/LICENSE"
+  },
+  "react-router-dom@6.24.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/remix-run/react-router",
+    "publisher": "Remix Software",
+    "email": "hello@remix.run",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react-router-dom",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/react-router-dom/LICENSE.md"
+  },
+  "selenium-webdriver@4.22.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SeleniumHQ/selenium",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/selenium-webdriver",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/selenium-webdriver/LICENSE",
+    "noticeFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/selenium-webdriver/NOTICE"
+  },
+  "autoprefixer@10.4.19": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/autoprefixer",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/autoprefixer",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/autoprefixer/LICENSE"
+  },
+  "eslint@8.57.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint/eslint",
+    "publisher": "Nicholas C. Zakas",
+    "email": "nicholas+npm@nczconsulting.com",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint/LICENSE"
+  },
+  "eslint-plugin-react@7.34.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsx-eslint/eslint-plugin-react",
+    "publisher": "Yannick Croissant",
+    "email": "yannick.croissant+npm@gmail.com",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react/LICENSE"
+  },
+  "eslint-plugin-react-hooks@4.6.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react-hooks",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react-hooks/LICENSE"
+  },
+  "eslint-plugin-react-refresh@0.4.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ArnaudBarre/eslint-plugin-react-refresh",
+    "publisher": "Arnaud Barré",
+    "url": "https://github.com/ArnaudBarre",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react-refresh",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/eslint-plugin-react-refresh/LICENSE"
+  },
+  "postcss@8.4.39": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/postcss",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/postcss/LICENSE"
+  },
+  "tailwindcss@3.4.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tailwindlabs/tailwindcss",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/tailwindcss",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/tailwindcss/LICENSE"
+  },
+  "vite@5.3.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vitejs/vite",
+    "publisher": "Evan You",
+    "path": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/vite",
+    "licenseFile": "/home/nsraj_7edge/pip/halspan-admin-web-application/node_modules/vite/LICENSE.md"
+  }
+}
