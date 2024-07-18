@@ -62,7 +62,7 @@ stages:
           vmImage: "ubuntu-latest"
       steps:
         - script: |
-            npm install -g license-checker 
+            npm install -g license-checker --force
             license-checker --json > licenses.json  
             node license.js
           displayName: 'License Compliance'
