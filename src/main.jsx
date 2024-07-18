@@ -10,9 +10,9 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <Auth0Provider
     domain={import.meta.env.VITE_AUTH0_API_DOMAIN}
-    // domain="dev-hjr0lxj23dh6f5qc.uk.auth0.com"
+    
     clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-    // clientId="Tp6s9L1kHp2qU7ICnauxcKa9VKZeMnlG"
+    
     authorizationParams={{
       redirect_uri: window.location.origin
     }}
