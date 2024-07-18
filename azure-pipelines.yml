@@ -53,7 +53,7 @@ stages:
       steps:
         - script: |
             pip3 install detect-secrets
-            detect-secrets scan
+            detect-secrets scan src | jq '.results' | tee /dev/stderr | if [ "$(jq 'length')" -gt 0 ]; then echo "Secrets detected" >&2; exit 1; else echo "No secrets detected"; fi
           displayName: 'Lint'
     - job: "licence_complaiance"
       displayName: "License Compliance"
