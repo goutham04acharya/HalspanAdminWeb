@@ -185,6 +185,7 @@ stages:
             sleep 30
             mkdir reports
             mkdir reports-xml
+            mkdir -p test/step-definations/failed_scenarios
             npm install nyc --save-dev --force
             node scripts/bdd_unit_testing_azure.js
             if [ $? -ne 0 ]; then
