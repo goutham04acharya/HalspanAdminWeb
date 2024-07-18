@@ -357,7 +357,7 @@ stages:
             export NODE_OPTIONS=--max-old-space-size=8192
             pm2 start scripts/sitespeed-server.js
             sleep 30
-            sitespeed.io  --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
+            sitespeed.io --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
           displayName: BrowserPerformance
 - stage: Deploy
   jobs:
