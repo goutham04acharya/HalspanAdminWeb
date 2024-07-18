@@ -302,6 +302,7 @@ stages:
             sleep 60
             mkdir -p reports/test-report-features
             mkdir -p reports-xml
+            mkdir -p test/step-definations/failed_scenarios
             npm install nyc --save-dev --force
             mkdir reports-xml
             node scripts/integration_testing.js
