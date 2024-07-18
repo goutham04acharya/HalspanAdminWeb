@@ -28,25 +28,19 @@ BeforeAll(async function () {
     await driver.manage();
     await new Promise(resolve => setTimeout(resolve, 3000));
     await driver.get('http://localhost:3000/');
-    console.log('passed 1');
     await driver.wait(until.elementLocated(By.css('body')));
-    console.log('passed 2');
     global.current_process_name = faker.string.alpha({ count: 10, casing: 'upper' });
     global.is_user_logged_in = false;
     console.log('Current process name:', global.current_process_name);
     try {
         const currentUrl = await driver.getCurrentUrl();
         if (currentUrl.includes('localhost:3000')) {
-            console.log('error 1');
             global.__coverage__ = await driver.executeScript('return __coverage__;');
-            console.log('passed 3');
             global.coverageMap = createCoverageMap(__coverage__);
-            console.log('passed 4');
         } else {
             console.log('Skipping coverage tracking for external URL.');
         }
     } catch (error) {
-        console.log('passed 5');
         throw new Error('::: __coverage__ ::: Coverage Mapping Object Not Found :::');
     }
 });
@@ -76,6 +70,11 @@ AfterStep(async function () {
     if (currentUrl.includes('localhost:3000')) {
         const updatedCoverageData = await driver.executeScript('return __coverage__;');
         const updatedCoverageMap = createCoverageMap(updatedCoverageData);
-        global.coverageMap.merge(updatedCoverageMap);
+        try{
+            global.coverageMap.merge(updatedCoverageMap);
+        }
+        catch{
+            console.log("merge error found");
+        }
     }
 });
