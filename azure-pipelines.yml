@@ -182,7 +182,7 @@ stages:
             export NODE_OPTIONS=--max-old-space-size=8192
             pm2 start scripts/server.js
             node --version
-            sleep 5
+            sleep 30
             mkdir reports
             mkdir reports-xml
             npm install nyc --save-dev --force
