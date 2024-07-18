@@ -1,6 +1,6 @@
-const assert = require('assert');
-const { Given, When, Then, But } = require('@cucumber/cucumber');
-const webdriver = require('selenium-webdriver')
+const assert = 'assert';
+const { Given, When, Then, But } = require('@cucumber/cucumber')
+const webdriver = 'selenium-webdriver'
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
 const keys = webdriver.Key
