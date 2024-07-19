@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from '../../Components/Image/Image.jsx'
 
-function NavrBar({setModalOpen,isModalOpen}) {
+function NavrBar({setModalOpen}) {
     const handleLogoutModal= () =>{
         setModalOpen(true);
     }
