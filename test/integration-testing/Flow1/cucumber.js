@@ -1,10 +1,8 @@
 module.exports = {
     default: {
-        import: ['test/step-definations/*.js',
-            'test/step-definations/**/*js'
-        ],
+        import: ['test'],
         paths: [
-            'test/integration-testing/Flow1/welcome.feature'
+            'test/integration-testing/Flow1/1_login.feature'
         ]
     }
 }
