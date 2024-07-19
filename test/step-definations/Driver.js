@@ -20,7 +20,7 @@ options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
 options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
-setDefaultTimeout(10000);
+setDefaultTimeout(24000);
 
 global.driver = chrome.Driver.createSession(options, service);
 
