@@ -182,7 +182,7 @@ stages:
             export NODE_OPTIONS=--max-old-space-size=8192
             pm2 start scripts/server.js
             node --version
-            sleep 45
+            sleep 60
             mkdir reports
             mkdir reports-xml
             mkdir -p test/step-definations/failed_scenarios
