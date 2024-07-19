@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
-import { promisify } from 'util';
-import { readdir as _readdir, stat as _stat } from 'fs';
-import { exec } from 'child_process';
+const util = require('util');
+const fs = require('fs');
+const { exec } = require('child_process');
 
-const readdir = promisify(_readdir);
-const stat = promisify(_stat);
+const readdir = util.promisify(fs.readdir);
+const stat = util.promisify(fs.stat);
 
-const featureDirectory = 'test/unit-testing/unit-testing1';
+const featureDirectory = 'test/unit-testing';
 const DELAY_BETWEEN_TESTS = 1000; // 5 seconds
 const DELAY_BETWEEN_PARALLEL_EXECUTIONS = 1000; // 40 seconds
 const MAX_PARALLEL_EXECUTIONS = 10;
@@ -62,7 +62,8 @@ async function runTestQueue () {
 async function runTest (featureFile, isLogin) {
     return new Promise((resolve, reject) => {
         COUNTER = COUNTER + 1;
-        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --import features --retry 1 --force-exit -f json:./reports/test-report.json ${featureFile} --world-parameters '{"login": ${isLogin}}'`;
+        const file = featureFile.split('/').pop().split('.').slice(0, -1).join('.');
+        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --import test --retry 1 --force-exit -f json:./reports/test-report.json -f junit:./reports-xml/TEST-test-report-unit-test-${file}.xml ${featureFile} --world-parameters '{"login": ${isLogin}}'`;
 
         console.log('started executing file --', featureFile);
 

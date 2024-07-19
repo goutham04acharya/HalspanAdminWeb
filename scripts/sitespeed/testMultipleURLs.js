@@ -1,4 +1,4 @@
-export default async function(context, commands) {
+module.exports = async function(context, commands) {
     const baseUrl = 'http://localhost:5174';
     const urls = [`${baseUrl}/`];
 
