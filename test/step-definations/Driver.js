@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout } = require('@cucumber/cucumber');
+const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout, Before, After} = require('@cucumber/cucumber');
 const chrome = require('selenium-webdriver/chrome');
 const { By, until } = require('selenium-webdriver');
 const chromedriver = require('chromedriver');
@@ -45,6 +45,21 @@ BeforeAll(async function () {
     }
 });
 
+let loginPerformed = false
+
+Before('@login', async function () {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (!loginPerformed) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await driver.wait(until.elementLocated(By.id('username'))).sendKeys('nayana.sk@7edge.com');
+        await driver.wait(until.elementLocated(By.id('password'))).sendKeys('Auth@123');
+        await new Promise((resolve) => setTimeout(resolve, 750));
+        await driver.wait(until.elementLocated(By.css('button[type="submit"]'))).click();
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        loginPerformed = true;
+    }
+});
+
 AfterAll(async function () {
     const coverageDataDir = path.join(__dirname, 'coverageData');
     if (!fs.existsSync(coverageDataDir)) {
@@ -74,7 +89,7 @@ AfterStep(async function () {
             global.coverageMap.merge(updatedCoverageMap);
         }
         catch{
-            console.log("merge error found");
+            // console.log("merge error found");
         }
     }
 });

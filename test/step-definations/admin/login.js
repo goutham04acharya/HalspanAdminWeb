@@ -31,3 +31,32 @@ Then('I should be redirected to the questionnaire listing screen', async functio
     await driver.sleep(5000);
     await driver.wait(until.elementLocated(By.xpath('//*[text()="Questionnaires"]')));   
 });
+
+When('I enter email address as {string}', async function(string){
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.id('username'))).sendKeys(string); 
+});
+
+When('I enter password as {string}', async function(string){
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.id('password'))).sendKeys(string);
+});
+
+Then('I should read a message stating that {string}', { timeout: 35000 }, async function (message) {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    let check = false;
+    let retries = 400;
+
+    while (retries > 0) {
+        const pageSource = await driver.getPageSource();
+        check = pageSource.includes(message);
+
+        if (check) {
+            return 'passed';
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            retries--;
+        }
+    }
+    throw new Error('Failed');
+});
