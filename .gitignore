@@ -91,3 +91,4 @@ dependency-check-bin**
 dependency-check-reports**
 logs.txt
 sitespeed-result/
+reports-xml/
