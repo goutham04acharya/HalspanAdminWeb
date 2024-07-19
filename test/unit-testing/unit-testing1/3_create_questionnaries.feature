@@ -13,6 +13,13 @@ Feature: Halspan - Admin - Create the Questionnaire
         The questionnaire ID must be auto-generated once created.
         When the questionnaire is created a version must be created for that questionnaire
 
+    Scenario: Admin logs in with valid credentials
+        Given I am on the login page
+        When I enter valid email address as "nayana.sk@7edge.com"
+        * I enter valid password as "Auth@123"
+        * I click the submit button
+        Then I should be redirected to the questionnaire listing screen
+
     Scenario Outline: Admin adds invalid fields for the questionnaire
         Given I am on the dashboard screen
         When I click the create new questionnaire button
@@ -27,12 +34,12 @@ Feature: Halspan - Admin - Create the Questionnaire
         Then I should read a message stating that <ErrorMessage>
 
         Examples:
-            | UniquePublicName | InternalName    | Description                 | asset  | non-tag-questionnaire | language          | ErrorMessage              |
-            | ""               | ""              | ""                          | ""     | ""                    | "British English" | "This field is mandatory" |
-            | ""               | "InternalName2" | "Questionnaire Description" | "door" | "no"                  | "British English" | "This field is mandatory" |
-            | "test+ds1vf"     | ""              | "Questionnaire Description" | "door" | "yes"                 | "British English" | "This field is mandatory" |
-            | "test+3kz8y"     | "InternalName3" | ""                          | "door" | "no"                  | "British English" | "This field is mandatory" |
-            | "test+9mrc5"     | "InternalName4" | "Questionnaire Description" | ""     | "yes"                 | "British English" | "This field is mandatory" |
+            | UniquePublicName | InternalName   | Description                 | asset  | non-tag-questionnaire | language          | ErrorMessage              |
+            | ""               | ""             | ""                          | ""     | ""                    | "British English" | "This field is mandatory" |
+            | ""               | "Inspection+A" | "Questionnaire Description" | "door" | "no"                  | "British English" | "This field is mandatory" |
+            | "test+ds1vf"     | ""             | "Questionnaire Description" | "door" | "yes"                 | "British English" | "This field is mandatory" |
+            | "test+3kz8y"     | "Inspection+B" | ""                          | "door" | "no"                  | "British English" | "This field is mandatory" |
+            | "test+9mrc5"     | "Inspection+c" | "Questionnaire Description" | ""     | "yes"                 | "British English" | "This field is mandatory" |
 
     Scenario Outline: Admin adds all the fields for the questionnaire
         Given I am on the dashboard screen

@@ -65,7 +65,7 @@ When('I enter Unique Public Name in the public name field', async function () {
 });
 
 When('I enter internal name in the internal name field', async function () {
-    const internalName = `test+${faker.string.alphanumeric(5)}`; // Correct method for alphanumeric string   faker.company.name()
+    const internalName = `Inspection+${faker.string.alpha(4)}`; // Correct method for alphanumeric string   faker.company.name()
     await driver.wait(until.elementLocated(By.css('[data-testid = "internalName"]'))).sendKeys(internalName);
 });
 
@@ -81,7 +81,7 @@ When('I enter questionnaire description in the Description field as {string}', a
 When('I select door from the asset type dropdown', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid = "drop-btn"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid = "option1"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid = "option0"]'))).click();
 });
 
 When('I select british english from the language dropdown', async function () {
