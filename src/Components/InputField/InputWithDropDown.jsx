@@ -3,10 +3,6 @@ import React, { useState } from 'react'
 function InputWithDropDown({ className, id, placeholder, testID, setSelectedOption, selectedOption, setDropdownOpen, isDropdownOpen, options, handleOptionClick, onSelect, labelStyle, label, top }) {
 
 
-    const handleFocus = () => {
-        setDropdownOpen(true);
-    }
-
     return (
         <div className='w-auto cursor-pointer'>
             <label htmlFor={id} className={labelStyle}>{label}</label>

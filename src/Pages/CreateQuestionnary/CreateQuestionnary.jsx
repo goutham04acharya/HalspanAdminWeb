@@ -10,21 +10,25 @@ import { useNavigate } from 'react-router-dom';
 
 function CreateQuestionnary() {
     const navigate = useNavigate();
-    const [isModalOpen, setModalOpen] = useState(false);
+    const [createDetails, setCreateDetails] = useState({
+        publicName: '',
+        internalName: '',
+        description: '',
+        assetType: '',
+        language: '',
+        adHoc: '',
+    });
+    //drodown related states
+    const [openDropdown, setOpenDropdown] = useState({
+        assetdropdown: false,
+        languagedropdown: false,
+})
+
     const [selectedOption, setSelectedOption] = useState({
         AssetType: null,
         Language: null,
     });
-    const [openDropdown, setOpenDropdown] = useState(null); // Track which dropdown is open
     const dropdownRef = useRef(null); // Reference to detect outside clicks
-    const [createDetails, setCreateDetails] = useState({
-        publicName: '',
-        InternalName: '',
-        Description: '',
-        AssetType: '',
-        Language: '',
-        AdHoc: '',
-    });
 
     const options = [
         { value: 'Door', label: 'Door' }
@@ -33,18 +37,15 @@ function CreateQuestionnary() {
         { valie: 'UK- English', label: 'UK- English' }
     ]
 
-    //function to select the dropdown options
-    const handleSelect = (option, id) => {
-        setSelectedOption(prevOptions => ({
-            ...prevOptions,
-            [id]: option
-        }));
-        setCreateDetails(prevState => ({
-            ...prevState,
-            [id]: option.value
-        }));
-        setOpenDropdown(null);
-    };
+    // //function to select the dropdown options
+    // const handleSelect = (option, id) => {
+    //     console.log(options, id)
+    //     setSelectedOption(prevOptions => ({
+    //         ...prevOptions,
+    //         [id]: option.value
+    //     }));
+    //     setOpenDropdown(null);
+    // };
 
     //function for store the usetypes values
     const handleChange = (e) => {
@@ -65,6 +66,11 @@ function CreateQuestionnary() {
 
     // function to close the dropdown when we click outside
     const handleOptionClick = (option, id) => {
+        setSelectedOption(prevOptions => ({
+            ...prevOptions,
+            [id]: option.value
+        }));
+        setOpenDropdown(null);
         setSelectedOption(option);
         setOpenDropdown(null); // Close the dropdown
     };
@@ -84,7 +90,6 @@ function CreateQuestionnary() {
 
     return (
         <div className='bg-[#F4F6FA]'>
-            <NavrBar setModalOpen={setModalOpen} isModalOpen={isModalOpen} />
             <div className='m-7 bg-white py-10 px-9'>
                 <p className='font-medium text-[#2B333B] text-[28px]'>Create Questionnaire</p>
                 <p className='font-medium text-[#2B333B] text-[22px] mt-8'>Questionnaire settings</p>
@@ -98,29 +103,31 @@ function CreateQuestionnary() {
                                     id='publicName'
                                     type='text'
                                     value={createDetails?.publicName}
-                                    className='w-full'
-                                    labelStyle='font-semibold text-base text-[#2B333B] pb-2.5'
+                                    className='w-full mt-2.5'
+                                    labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Enter Public name'
                                     testId='publicName'
                                     htmlFor='publicName'
                                     maxLength={50}
                                     handleChange={handleChange}
+                                    validationError={true}
                                 />
                             </div>
                             <div className='w-1/2'>
                                 <InputField
                                     autoComplete='off'
                                     label='Internal name *'
-                                    id='Internal name'
+                                    id='internal name'
                                     type='text'
-                                    value={createDetails?.InternalName}
-                                    className='w-full'
-                                    labelStyle='font-semibold text-base text-[#2B333B] pb-2.5'
+                                    value={createDetails?.internalName}
+                                    className='w-full mt-2.5'
+                                    labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Enter Internal name'
-                                    testId='Internal name'
-                                    htmlFor='Internal name'
+                                    testId='internal name'
+                                    htmlFor='internal name'
                                     maxLength={50}
                                     handleChange={handleChange}
+                                    validationError={true}
                                 />
                             </div>
                         </div>
@@ -165,10 +172,10 @@ function CreateQuestionnary() {
                         <InputTextarea
                             className='h-[160px] w-full mt-2.5'
                             label='Description'
-                            htmlFor='Description'
-                            id='Description'
+                            htmlFor='description'
+                            id='description'
                             labelStyle='font-normal text-base text-[#2B333B]'
-                            value={createDetails?.Description}
+                            value={createDetails?.description}
                             placeholder='Enter Description'
                             testId='description'
                             maxLength={100}

@@ -1,17 +1,14 @@
 import React, { useContext, useState, useRef } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
-import NavrBar from '../../Components/NavBar/NavrBar.jsx'
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
 import InputWithDropDown from '../../Components/InputField/InputWithDropDown.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
-import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 
 
 function QuestionnairesList() {
   const { logout } = useAuth0();
-  const [isModalOpen, setModalOpen] = useState(false);
   const [isContentNotFount, setContentNotFound] = useState(true);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -33,22 +30,13 @@ function QuestionnairesList() {
     setDropdownOpen(false);
   };
 
-  const handleLogout = () => {
-    logout({ logoutParams: { returnTo: window.location.origin } });
-  };
-
-  const hadleCancel = () => {
-    setModalOpen(false);
-  }
-
   const handleCreateQue = (e) => {
     e.preventDefault();
-    navigate('/Create-Questionnary');
+    navigate('/QuestionnariesList/Create-Questionnary');
   };
 
   return (
     <div className='bg-[#F4F6FA]'>
-      <NavrBar setModalOpen={setModalOpen} isModalOpen={isModalOpen} />
       <div className='py-[33px] px-[25px]'>
         <div className='py-6 px-9 bg-white rounded-[10px]'>
           <div className='flex w-full justify-between items-center mb-[26px]'>
@@ -84,22 +72,6 @@ function QuestionnairesList() {
           }
         </div>
       </div>
-      {isModalOpen &&
-        <ConfirmationModal
-          text='Logout'
-          subText='You will be signed out of your account.'
-          button1Style='border border-[#2B333B] bg-[#2B333B]'
-          Button1text='Confirm'
-          Button2text='Cancel'
-          src='Logout-Big'
-          testIDBtn1='logout'
-          testIDBtn2='cancel'
-          isModalOpen={isModalOpen}
-          setModalOpen={setModalOpen}
-          handleButton1={handleLogout}
-          handleButton2={hadleCancel}
-        />
-      }
     </div>
   )
 }
