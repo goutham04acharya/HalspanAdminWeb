@@ -19,9 +19,9 @@ function App(props) {
     if (!isAuthenticated && !isLoading) {
       navigate("/login");
     } else if (isAuthenticated) {
-      navigate("/QuestionnairesList");
+      navigate("/QuestionnariesList");
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;

@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import QuestionnairesList from '../Pages/QuestionnairesList';
+import QuestionnariesList from '../Pages/QuestionnariesList';
 import Login from '../Pages/auth/AuthPOC/Login.jsx'; // Import the Login component
 
 function NavigationRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/QuestionnairesList" element={<QuestionnairesList />} />
+      <Route path="/QuestionnariesList" element={<QuestionnariesList />} />
       {/* Add other routes here */}
     </Routes>
   );
