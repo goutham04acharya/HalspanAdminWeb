@@ -192,6 +192,8 @@ stages:
               echo "testing failed"
               exit 1
             fi
+            npm i multiple-cucumber-html-reporter --force
+            npm run generate_report_cobertura
             echo "Completed tasks - exit $?"
           displayName: Unit Testing
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
@@ -256,9 +258,9 @@ stages:
             npm i multiple-cucumber-html-reporter --force
             mkdir coverage
             npm run generate_report
-            npm run generate_report_cobertura
             node scripts/livingdoc.js 
             ls -R reports
+            ls -R coverage-cobertura
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
             aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev
