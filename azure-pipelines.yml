@@ -256,6 +256,7 @@ stages:
             npm i multiple-cucumber-html-reporter --force
             mkdir coverage
             npm run generate_report
+            npm run generate_report_cobertura
             node scripts/livingdoc.js 
             ls -R reports
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
@@ -314,11 +315,11 @@ stages:
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
-        # - task: PublishCodeCoverageResults@1
-        #   condition: always()
-        #   inputs:
-        #     codeCoverageTool: 'Cobertura'
-        #     summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
+        - task: PublishCodeCoverageResults@1
+          condition: always()
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
         - task: PublishTestResults@2
           condition: always()
           inputs:
@@ -438,7 +439,7 @@ stages:
         - script: |
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/dast-admin/$SourceBranch/ --acl public-read
+            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/dast-admin/dev/ --acl public-read
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
           displayName: 'DAST Report documentation'
           condition: always()
