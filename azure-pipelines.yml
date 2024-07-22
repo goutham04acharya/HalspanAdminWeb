@@ -208,10 +208,9 @@ stages:
           inputs:
             testResultsFormat: 'JUnit'
             testResultsFiles: 'reports-xml/*.xml'
-        - task: PublishCodeCoverageResults@1
+        - task: PublishCodeCoverageResults@2
           condition: always()
           inputs:
-            codeCoverageTool: 'Cobertura'
             summaryFileLocation: 'coverage-cobertura/*.xml'
     
     - job: Reports
