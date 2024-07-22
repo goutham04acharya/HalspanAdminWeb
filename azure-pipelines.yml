@@ -363,6 +363,16 @@ stages:
             sleep 30
             sitespeed.io --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
           displayName: BrowserPerformance
+        - publish: $(System.DefaultWorkingDirectory)/sitespeed-result/sitespeed-result/testMultipleURLs_js # Assuming logs are in working directory
+          artifact: sitespeed_test_results
+          condition: always()
+        - script: |
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
+            aws s3 sync sitespeed-result/testMultipleURLs_js/** s3://$S3_BUCKET_NAME/browser-performance-admin/dev/
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
+          displayName: 'Sitespeed Report documentation'
+          condition: always()
 - stage: Deploy
   jobs:
     - deployment: Deployment
@@ -440,7 +450,7 @@ stages:
         - script: |
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/dast-admin/dev/ --acl public-read
+            aws s3 sync test_results s3://$S3_BUCKET_NAME/dast-admin/dev/
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
           displayName: 'DAST Report documentation'
           condition: always()
