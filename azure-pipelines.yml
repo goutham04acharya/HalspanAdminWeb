@@ -210,7 +210,7 @@ stages:
           condition: always()
           inputs:
             codeCoverageTool: 'Cobertura'
-            summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
+            summaryFileLocation: 'coverage-cobertura/*.xml'
     
     - job: Reports
       displayName: "Testing Reports"
@@ -261,8 +261,8 @@ stages:
             ls -R reports
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev --acl public-read
-            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin/dev --acl public-read
+            aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev
+            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin/dev
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
           displayName: 'BDD Coverage'
           condition: always()
