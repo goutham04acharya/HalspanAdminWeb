@@ -253,6 +253,7 @@ stages:
             echo "##vso[task.setvariable variable=SourceBranch]$SourceBranch"
             source .env
             npm install nyc --save-dev --force
+            npm i multiple-cucumber-html-reporter --force
             mkdir coverage
             npm run generate_report
             node scripts/livingdoc.js 
