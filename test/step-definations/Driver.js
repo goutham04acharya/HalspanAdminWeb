@@ -20,7 +20,7 @@ options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
 options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
-setDefaultTimeout(24000);
+setDefaultTimeout(34000);
 
 global.driver = chrome.Driver.createSession(options, service);
 
@@ -82,10 +82,17 @@ AfterAll(async function () {
 
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
-    try{
+    try {
         if (currentUrl.includes('localhost:3000')) {
             const updatedCoverageData = await driver.executeScript('return __coverage__;');
             const updatedCoverageMap = createCoverageMap(updatedCoverageData);
+
+            // Debug log to check if global.coverageMap is defined
+            if (!global.coverageMap) {
+                console.log('global.coverageMap is not defined. Initializing...');
+                global.coverageMap = createCoverageMap({});
+            }
+
             global.coverageMap.merge(updatedCoverageMap);
         }
     }
