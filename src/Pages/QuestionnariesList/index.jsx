@@ -50,19 +50,21 @@ function QuestionnairesList() {
           </div>
           <div className='flex items-center justify-between w-full'>
             <div className='w-[75%] h-[45px] rounded border border-[#AEB3B7] mr-[5%]'></div>
-            <InputWithDropDown
-              id='asset-type'
-              placeholder='Filter by asset type'
-              className='w-[400px] cursor-pointer'
-              top='20px'
-              options={options}
-              onSelect={handleSelect}
-              isDropdownOpen={isDropdownOpen}
-              setDropdownOpen={setDropdownOpen}
-              selectedOption={selectedOption}
-              setSelectedOption={setSelectedOption}
-              handleOptionClick={handleOptionClick}
-            />
+            <div className='w-[400px]'>
+              <InputWithDropDown
+                id='asset-type'
+                placeholder='Filter by asset type'
+                className='w-full cursor-pointer'
+                top='20px'
+                options={options}
+                onSelect={handleSelect}
+                isDropdownOpen={isDropdownOpen}
+                setDropdownOpen={setDropdownOpen}
+                selectedOption={selectedOption}
+                setSelectedOption={setSelectedOption}
+                handleOptionClick={handleOptionClick}
+              />
+            </div> 
           </div>
           {isContentNotFount ?
             <ContentNotFound text='No questionnaires available.' className='ml-8' /> :

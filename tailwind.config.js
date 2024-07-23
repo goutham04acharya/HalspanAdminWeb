@@ -4,7 +4,8 @@ export default {
     theme: {
         extend: {
             height:{
-                'customh1' : 'calc(100vh - 326px)'
+                'customh1' : 'calc(100vh - 326px)',
+                'customh2' : 'calc(100vh - 95px)',
             }
         },
     },

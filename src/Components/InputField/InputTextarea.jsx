@@ -14,11 +14,11 @@ function InputTextarea({
     handleChange,
     disabled,
     labelStyle,
-
+    mandatoryField,
 }) {
     return (
         <div>
-            <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null}</label>
+            <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
             <textarea
                 htmlFor={htmlFor}
                 id={id}

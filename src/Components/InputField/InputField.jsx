@@ -13,15 +13,14 @@ const InputField = ({
     validationError,
     maxLength,
     handleChange,
-
+    mandatoryField,
+    labelStyle,
 
 }) => {
 
-
-
     return (
         <div>
-            <label htmlFor={htmlFor}>{label ? label : null}</label>
+            <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
             <input
                 autoComplete={autoComplete || 'off'}
                 htmlFor={htmlFor}

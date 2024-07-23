@@ -17,6 +17,7 @@
     "@eslint/compat": "^1.1.1",
     "@eslint/js": "^9.7.0",
     "@faker-js/faker": "^8.4.1",
+    "axios": "^1.7.2",
     "babel-plugin-istanbul": "^5.1.0",
     "chromedriver": "^126.0.5",
     "cucumber": "^6.0.7",
