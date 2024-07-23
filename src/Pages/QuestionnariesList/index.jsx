@@ -42,7 +42,7 @@ function QuestionnairesList() {
           <div className='flex w-full justify-between items-center mb-[26px]'>
             <p className='text-[#2B333B] text-[28px] font-medium'>Questionnaires</p>
             <Button2
-              testId='create-questionnaires'
+              testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
               className='w-[315px] h-[50px]'
               text='Create new questionnaire'

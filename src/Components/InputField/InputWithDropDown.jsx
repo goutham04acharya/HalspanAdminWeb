@@ -15,6 +15,7 @@ function InputWithDropDown({
     top,
     dropdownRef,
     mandatoryField,
+    labeltestID,
 }) {
 
     return (
@@ -26,7 +27,7 @@ function InputWithDropDown({
                     id={id}
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
-                    data-testId={testID}
+                    data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}
                     className={`${className} border border-[#AEB3B7] outline-0 h-[45px] rounded px-[18px] placeholder:text-[#2B333B] placeholder:font-normal placeholder:text-base`}
                     readOnly
@@ -37,9 +38,11 @@ function InputWithDropDown({
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
                     {options.map(option => (
                         <li key={option.value}
+                            data-testid={labeltestID}
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
                             {option.label}
+
                         </li>
                     ))}
                 </ul>

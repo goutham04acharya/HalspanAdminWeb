@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import NavrBar from '../../Components/NavBar/NavrBar';
 import InputField from '../../Components/InputField/InputField';
 import InputTextarea from '../../Components/InputField/InputTextarea';
@@ -9,10 +9,12 @@ import ErrorMessage from '../../Components/ErrorMessage/ErrorMessage';
 import { useNavigate } from 'react-router-dom';
 import { dataService } from '../../services/data.services';
 import { useAuth0 } from "@auth0/auth0-react";
+import GlobalContext from '../../Components/Context/GlobalContext';
 
 function CreateQuestionnary() {
   const navigate = useNavigate();
   const { getIdTokenClaims } = useAuth0();
+  const { setToastError, setToastSuccess } = useContext(GlobalContext);
 
   const [createDetails, setCreateDetails] = useState({
     public_name: '',
@@ -33,12 +35,8 @@ function CreateQuestionnary() {
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
 
-  const options = [
-    { value: 'Door', label: 'Door' }
-  ];
-  const options1 = [
-    { value: 'UK- English', label: 'UK- English' }
-  ]
+  const options = [{ value: 'Door', label: 'Door' }];
+  const options1 = [{ value: 'UK- English', label: 'UK- English' }]
   const handleChange = (e, id) => {
     const { value } = e.target;
     setCreateDetails((prevState) => ({
@@ -57,16 +55,14 @@ function CreateQuestionnary() {
     navigate('/QuestionnariesList');
   };
 
-  const handleCreateQuestionnary = () => {
+  const handleCreateQuestionnary = async() => {
     const errors = {};
-    console.log(createDetails,  'details')
-    console.log(selectedOption,  'qiqiiq')
     const payload = {
       public_name: createDetails?.public_name,
       internal_name: createDetails?.internal_name,
       description: createDetails?.description,
-      asset_type: selectedOption?.asset_type.value,
-      language: selectedOption?.language.value,
+      asset_type: selectedOption?.asset_type?.value,
+      language: selectedOption?.language?.value,
       is_adhoc: createDetails?.is_adhoc,
     };
 
@@ -91,9 +87,24 @@ function CreateQuestionnary() {
     if (Object.keys(errors).length === 0) {
       console.log('Form submitted:', createDetails);
     }
-    console.log('first....')
-    dataService.PostAPI("questionnaires", payload, getIdTokenClaims)
-  };
+    try {
+      const response = await dataService.PostAPI("questionnaires", payload, getIdTokenClaims);
+      console.log(response?.data?.message)
+      if (response.status === 201) {
+        console.log('API response:', response.data);
+        setToastSuccess(response?.data?.message);
+      } else if (response.status >= 400 && response.status < 500) {
+        console.error('API error:', response.data);
+        setToastError(response?.data?.message);
+      } else if (response.status >= 500) {
+        console.error('API error:', response.data);
+        setToastError('Something went wrong');
+      }
+    } catch (error) {
+      console.error('Error posting data:', error);
+      setToastError('Something went wrong');
+    }
+  }
 
   const handleOptionClick = (option, id) => {
     setSelectedOption((prevOptions) => ({
@@ -142,7 +153,7 @@ function CreateQuestionnary() {
 
   return (
     <div className='bg-[#F4F6FA] p-7 h-customh2'>
-      <div className='bg-white py-10 px-9 rounded-[10px]'>
+      <div className='bg-white py-10 px-9 rounded-[10px] h-customh3'>
         <p className='font-medium text-[#2B333B] text-[28px]'>Create Questionnaire</p>
         <p className='font-medium text-[#2B333B] text-[22px] mt-8'>Questionnaire settings</p>
         <div className='flex items-start'>
@@ -159,7 +170,7 @@ function CreateQuestionnary() {
                   className='w-full mt-2.5'
                   labelStyle='font-semibold text-base text-[#2B333B]'
                   placeholder='Enter Public name'
-                  testId='public_name'
+                  testId='publicName'
                   htmlFor='public_name'
                   maxLength={50}
                   handleChange={handleChange}
@@ -178,7 +189,7 @@ function CreateQuestionnary() {
                   className='w-full mt-2.5'
                   labelStyle='font-semibold text-base text-[#2B333B]'
                   placeholder='Enter Internal name'
-                  testId='internal_name'
+                  testId='internalName'
                   htmlFor='internal_name'
                   maxLength={50}
                   handleChange={handleChange}
@@ -198,6 +209,8 @@ function CreateQuestionnary() {
                     placeholder='Select'
                     className='w-full cursor-pointer mt-2.5'
                     top='53px'
+                    testID='drop-btn'
+                    labeltestID='option0'
                     options={options}
                     isDropdownOpen={openDropdown === 'asset_type'}
                     setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
@@ -218,6 +231,8 @@ function CreateQuestionnary() {
                   placeholder='Select'
                   className='w-full cursor-pointer mt-2.5'
                   top='53px'
+                  testID='language-drop-btn'
+                  labeltestID='language0'
                   options={options1}
                   isDropdownOpen={openDropdown === 'language'}
                   setDropdownOpen={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
@@ -259,7 +274,7 @@ function CreateQuestionnary() {
                 value='Yes'
                 checked={createDetails.is_adhoc === 'Yes'}
                 onChange={handleadhocChange} />
-              <label htmlFor='yes' className='ml-7 font-normal text-base text-[#2B333B]'>
+              <label htmlFor='yes' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Yes
               </label>
             </div>
@@ -270,7 +285,7 @@ function CreateQuestionnary() {
                 id='no'
                 value='No' checked={createDetails.is_adhoc === 'No'}
                 onChange={handleadhocChange} />
-              <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B]'>
+              <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 No
               </label>
             </div>
@@ -279,7 +294,7 @@ function CreateQuestionnary() {
         <div className='mt-8'>
           <Button
             text='Create Questionnaire'
-            testID='Create-Questionnaire'
+            testID='createQuestionnaireBtn'
             className='w-[280px] h-[50px]'
             onClick={handleCreateQuestionnary}
           />
