@@ -82,17 +82,23 @@ AfterAll(async function () {
 
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
-    try{
+    try {
         if (currentUrl.includes('localhost:3000')) {
             const updatedCoverageData = await driver.executeScript('return __coverage__;');
             const updatedCoverageMap = createCoverageMap(updatedCoverageData);
+
+            // Debug log to check if global.coverageMap is defined
+            if (!global.coverageMap) {
+                console.log('global.coverageMap is not defined. Initializing...');
+                global.coverageMap = createCoverageMap({});
+            }
+
             global.coverageMap.merge(updatedCoverageMap);
         }
+    } catch (err) {
+        console.log(`error: ${err}`);
     }
-    catch(err){
-        console.log(`error:${err}`);
-    }
-})
+});
 After(function (scenario) {
     console.log('scenario.result.status',scenario.result.status)
     let failed_scenarios = path.join(__dirname, 'failed_scenarios');
