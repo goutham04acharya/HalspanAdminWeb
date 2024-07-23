@@ -57,7 +57,15 @@ AfterAll(async function () {
     await driver.quit()
 })
 AfterStep(async function () {
-    const updatedCoverageData = await driver.executeScript('return __coverage__;')
-    const updatedCoverageMap = createCoverageMap(updatedCoverageData)
-    global.coverageMap.merge(updatedCoverageMap)
+    const currentUrl = await driver.getCurrentUrl();
+    try{
+        if (currentUrl.includes('localhost:3000')) {
+            const updatedCoverageData = await driver.executeScript('return __coverage__;');
+            const updatedCoverageMap = createCoverageMap(updatedCoverageData);
+            global.coverageMap.merge(updatedCoverageMap);
+        }
+    }
+    catch(err){
+        console.log(`error:${err}`);
+    }
 })
