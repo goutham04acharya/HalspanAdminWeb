@@ -82,14 +82,14 @@ AfterAll(async function () {
 
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
-    if (currentUrl.includes('localhost:3000')) {
-        const updatedCoverageData = await driver.executeScript('return __coverage__;');
-        const updatedCoverageMap = createCoverageMap(updatedCoverageData);
-        try{
+    try{
+        if (currentUrl.includes('localhost:3000')) {
+            const updatedCoverageData = await driver.executeScript('return __coverage__;');
+            const updatedCoverageMap = createCoverageMap(updatedCoverageData);
             global.coverageMap.merge(updatedCoverageMap);
         }
-        catch{
-            // console.log("merge error found");
-        }
+    }
+    catch(err){
+        console.log(`error:${err}`);
     }
 });
