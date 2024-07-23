@@ -14,7 +14,6 @@
     "code_coverage": "nyc check-coverage --temp-dir ./test/step_definitions/coverageData",
     "owasp": "owasp-dependency-check --out=./dependency-check-reports --project Halspan -f JSON -f HTML --prettyPrint --failOnCVSS 8 --data=$(node -p \"require('os').homedir() + '/dependency-check-data'\") --noupdate --scan=package-lock.json --log=logs.txt && cat logs.txt",
     "generate_report_cobertura": "nyc report --temp-dir ./test/step-definations/coverageData --reporter cobertura --report-dir ./coverage-cobertura"
-
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",

@@ -192,6 +192,8 @@ stages:
               echo "testing failed"
               exit 1
             fi
+            npm i multiple-cucumber-html-reporter --force
+            npm run generate_report_cobertura
             echo "Completed tasks - exit $?"
           displayName: Unit Testing
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
@@ -205,12 +207,11 @@ stages:
           condition: always()
           inputs:
             testResultsFormat: 'JUnit'
-            testResultsFiles: '**/Test-*.xml'
-        - task: PublishCodeCoverageResults@1
+            testResultsFiles: 'reports-xml/*.xml'
+        - task: PublishCodeCoverageResults@2
           condition: always()
           inputs:
-            codeCoverageTool: 'Cobertura'
-            summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
+            summaryFileLocation: 'coverage-cobertura/*.xml'
     
     - job: Reports
       displayName: "Testing Reports"
@@ -253,15 +254,16 @@ stages:
             echo "##vso[task.setvariable variable=SourceBranch]$SourceBranch"
             source .env
             npm install nyc --save-dev --force
+            npm i multiple-cucumber-html-reporter --force
             mkdir coverage
             npm run generate_report
             node scripts/livingdoc.js 
             ls -R reports
+            ls -R coverage-cobertura
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin --acl public-read
-            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
-            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin-web-application --acl public-read
+            aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev
+            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin/dev
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
           displayName: 'BDD Coverage'
           condition: always()
@@ -314,16 +316,16 @@ stages:
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
-        # - task: PublishCodeCoverageResults@1
-        #   condition: always()
-        #   inputs:
-        #     codeCoverageTool: 'Cobertura'
-        #     summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
+        - task: PublishCodeCoverageResults@1
+          condition: always()
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
         - task: PublishTestResults@2
           condition: always()
           inputs:
             testResultsFormat: 'JUnit'
-            testResultsFiles: '**/Test-*.xml'
+            testResultsFiles: 'reports-xml/*.xml'
           
     - job: BrowserPerformanceTesting
       displayName: "Browser Performance Testing"
@@ -361,6 +363,13 @@ stages:
             sleep 30
             sitespeed.io --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
           displayName: BrowserPerformance
+        - script: |
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
+            aws s3 sync sitespeed-result/testMultipleURLs_js/** s3://$S3_BUCKET_NAME/browser-performance-admin/dev/
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
+          displayName: 'Sitespeed Report documentation'
+          condition: always()
 - stage: Deploy
   jobs:
     - deployment: Deployment
@@ -438,7 +447,7 @@ stages:
         - script: |
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/dast-admin/$SourceBranch/ --acl public-read
+            aws s3 sync test_results s3://$S3_BUCKET_NAME/dast-admin/dev/
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
           displayName: 'DAST Report documentation'
           condition: always()
