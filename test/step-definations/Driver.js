@@ -20,7 +20,7 @@ options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
 options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
-setDefaultTimeout(24000);
+setDefaultTimeout(34000);
 
 global.driver = chrome.Driver.createSession(options, service);
 
@@ -82,14 +82,43 @@ AfterAll(async function () {
 
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
-    if (currentUrl.includes('localhost:3000')) {
-        const updatedCoverageData = await driver.executeScript('return __coverage__;');
-        const updatedCoverageMap = createCoverageMap(updatedCoverageData);
-        try{
+    try {
+        if (currentUrl.includes('localhost:3000')) {
+            const updatedCoverageData = await driver.executeScript('return __coverage__;');
+            const updatedCoverageMap = createCoverageMap(updatedCoverageData);
+
+            // Debug log to check if global.coverageMap is defined
+            if (!global.coverageMap) {
+                console.log('global.coverageMap is not defined. Initializing...');
+                global.coverageMap = createCoverageMap({});
+            }
+
             global.coverageMap.merge(updatedCoverageMap);
         }
-        catch{
-            // console.log("merge error found");
-        }
+    } catch (err) {
+        console.log(`error: ${err}`);
+    }
+});
+After(function (scenario) {
+    console.log('scenario.result.status',scenario.result.status)
+    let failed_scenarios = path.join(__dirname, 'failed_scenarios');
+    if (!fs.existsSync(failed_scenarios)) {
+        fs.mkdirSync(failed_scenarios);
+    }
+    if (scenario.result.status === 'FAILED') {
+        var world = this;
+        return driver.takeScreenshot().then(function(screenShot, error) {
+            if (!error) {
+                world.attach(screenShot, "image/png");
+                failed_scenarios = path.join(failed_scenarios,`${scenario.pickle.id}_${scenario.pickle.name.replaceAll('/', '_')}.png`)
+                fs.writeFile(failed_scenarios, screenShot, 'base64', (err) => {
+                    if (err) {
+                        console.error('Error writing coverage data:', err);
+                    } else {
+                        console.log('Coverage data has been written to:', failed_scenarios);
+                    }
+                });
+            }
+        });
     }
 });

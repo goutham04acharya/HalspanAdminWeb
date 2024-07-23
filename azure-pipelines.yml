@@ -316,10 +316,9 @@ stages:
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
-        - task: PublishCodeCoverageResults@1
+        - task: PublishCodeCoverageResults@2
           condition: always()
           inputs:
-            codeCoverageTool: 'Cobertura'
             summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
         - task: PublishTestResults@2
           condition: always()
