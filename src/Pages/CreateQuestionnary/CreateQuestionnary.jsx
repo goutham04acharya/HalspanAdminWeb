@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { dataService } from '../../services/data.services';
 import { useAuth0 } from "@auth0/auth0-react";
 import GlobalContext from '../../Components/Context/GlobalContext';
+import Toast from '../../Components/Toast/Toast';
 
 function CreateQuestionnary() {
   const navigate = useNavigate();
@@ -84,24 +85,21 @@ function CreateQuestionnary() {
 
     setValidationErrors(errors);
 
-    if (Object.keys(errors).length === 0) {
-      console.log('Form submitted:', createDetails);
+    if (Object.keys(errors).length > 0) {
+      return;
     }
     try {
       const response = await dataService.PostAPI("questionnaires", payload, getIdTokenClaims);
-      console.log(response?.data?.message)
-      if (response.status === 201) {
-        console.log('API response:', response.data);
+      console.log('API response:', response?.data?.status);
+
+      if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
-      } else if (response.status >= 400 && response.status < 500) {
-        console.error('API error:', response.data);
-        setToastError(response?.data?.message);
-      } else if (response.status >= 500) {
-        console.error('API error:', response.data);
+      } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
+        setToastError(response?.data?.data?.message);
+      } else if (response?.data?.status >= 500) {
         setToastError('Something went wrong');
       }
     } catch (error) {
-      console.error('Error posting data:', error);
       setToastError('Something went wrong');
     }
   }

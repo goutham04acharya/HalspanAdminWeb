@@ -46,8 +46,8 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
                     ? 'bg-[#7D7C7C]'
                     : type === 'warning'
                         ? 'bg-[#FFA318]'
-                        : type === 'error' ? 'bg-[#FF6363]' : 'bg-accent-information'}`} >
-                    <p className="font-[400] text-[14px] leading-[24px] text-[#fff]" id="toast-message">{message}</p>
+                        : type === 'error' ? 'bg-[#FFA318]' : 'bg-accent-information'}`} >
+                    <p className={`font-[400] text-[14px] leading-[24px] ${type === 'error' ? 'text-[#000]' : 'text-[#fff]'}`} id="toast-message">{message}</p>
                     <span>
                         {<Image src={`toast-${type}`} />}
                     </span>
