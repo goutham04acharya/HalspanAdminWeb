@@ -38,25 +38,33 @@ function CreateQuestionnary() {
 
   const options = [{ value: 'Door', label: 'Door' }];
   const options1 = [{ value: 'UK- English', label: 'UK- English' }]
+
   const handleChange = (e, id) => {
     const { value } = e.target;
-    setCreateDetails((prevState) => ({
-      ...prevState,
-      [id]: value,
-    }));
 
-    // Clear the validation error for the current field
-    setValidationErrors((prevErrors) => ({
-      ...prevErrors,
-      [id]: '',
-    }));
+    // Define a regular expression to allow only alphanumeric characters and spaces
+    const regex = /^[a-zA-Z0-9 ]*$/;
+
+    if (regex.test(value)) {
+      setCreateDetails((prevState) => ({
+        ...prevState,
+        [id]: value,
+      }));
+
+      // Clear the validation error for the current field
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        [id]: '',
+      }));
+    }
   };
+
 
   const handleNavigateBack = () => {
     navigate('/QuestionnariesList');
   };
 
-  const handleCreateQuestionnary = async() => {
+  const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
       public_name: createDetails?.public_name,
@@ -170,7 +178,7 @@ function CreateQuestionnary() {
                   placeholder='Enter Public name'
                   testId='publicName'
                   htmlFor='public_name'
-                  maxLength={50}
+                  maxLength={255}
                   handleChange={handleChange}
                   validationError={validationErrors?.public_name}
                 />
@@ -189,7 +197,7 @@ function CreateQuestionnary() {
                   placeholder='Enter Internal name'
                   testId='internalName'
                   htmlFor='internal_name'
-                  maxLength={50}
+                  maxLength={255}
                   handleChange={handleChange}
                   validationError={validationErrors?.internal_name}
                 />
@@ -254,7 +262,7 @@ function CreateQuestionnary() {
               value={createDetails.description}
               placeholder='Enter Description'
               testId='description'
-              maxLength={100}
+              maxLength={500}
               handleChange={handleChange}
               validationError={validationErrors?.description}
             />
@@ -264,7 +272,8 @@ function CreateQuestionnary() {
         <div className='mt-10'>
           <p className='font-semibold text-[#2B333B] text-base'>Ad Hoc / Non TAG questionnaire</p>
           <div className='mt-2.5'>
-            <div className="relative custom-radioBlue flex items-center">
+            <div className="relative custom-radioBlue flex items-center" data-testid='yes'
+            >
               <input type='radio'
                 className='w-[17px] h-[17px]'
                 name='is_adhoc'
@@ -276,7 +285,8 @@ function CreateQuestionnary() {
                 Yes
               </label>
             </div>
-            <div className="relative custom-radioBlue flex items-center mt-[12px]">
+            <div className="relative custom-radioBlue flex items-center mt-[12px]" data-testid='no'
+            >
               <input type='radio'
                 className='w-[17px] h-[17px]'
                 name='is_adhoc'
