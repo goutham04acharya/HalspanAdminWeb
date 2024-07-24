@@ -6,7 +6,8 @@ export default {
             height:{
                 'customh1' : 'calc(100vh - 326px)',
                 'customh2' : 'calc(100vh - 95px)',
-                'customh3' : 'calc(100vh - 142px)'
+                'customh3' : 'calc(100vh - 142px)',
+                'customh4' : 'calc(100vh - 379px)',
             }
         },
     },

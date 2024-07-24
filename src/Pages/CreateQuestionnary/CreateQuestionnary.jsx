@@ -219,7 +219,7 @@ function CreateQuestionnary() {
                     labelStyle='font-semibold text-base text-[#2B333B]'
                     id='asset_type'
                     placeholder='Select'
-                    className='w-full cursor-pointer mt-2.5'
+                    className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                     top='53px'
                     testID='drop-btn'
                     labeltestID='option0'
@@ -241,7 +241,7 @@ function CreateQuestionnary() {
                   mandatoryField='true'
                   id='language'
                   placeholder='Select'
-                  className='w-full cursor-pointer mt-2.5'
+                  className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                   top='53px'
                   testID='language-drop-btn'
                   labeltestID='language0'
@@ -316,7 +316,7 @@ function CreateQuestionnary() {
           <Button2
             testId='Cancel'
             onClick={handleNavigateBack}
-            className='w-[162px] h-[50px] ml-[32px]'
+            className='w-[162px] h-[50px] ml-[32px] font-normal'
             text='Cancel'
           />
         </div>

@@ -12,6 +12,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom radio button which is used in create questionnary */
 .custom-radioBlue [type='radio']:checked,[type='radio']{
   background-image: none;
   position: absolute;
@@ -62,4 +63,25 @@ body {
 }
 .custom-radioBlue [type="radio"]:checked + label:after{
   background-color: #2B333B;
+}
+
+/* to remove the default sidebar which is use in questionnary list */
+.default-sidebar::-webkit-scrollbar,.custom-scrollbar::-webkit-scrollbar{
+  -webkit-appearance: none;
+}
+.default-sidebar::-webkit-scrollbar:vertical,.scrollbar::-webkit-scrollbar:vertical{
+  width: 0;
+  background-color: transparent;
+  border: none;
+}
+.default-sidebar::-webkit-scrollbar:horizontal,.custom-scrollbar::-webkit-scrollbar:horizontal {
+  height: 0;
+  background-color: transparent;
+  border: none;
+}
+.default-sidebar::-webkit-scrollbar-thumb,.custom-scrollbar::-webkit-scrollbar-thumb{
+  background-color:transparent;
+  border: 0;
+  border-radius: 0;
+  height: 0;
 }
