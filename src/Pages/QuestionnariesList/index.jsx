@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
 import InputWithDropDown from '../../Components/InputField/InputWithDropDown.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
+import Table from './Components/Table.jsx';
 
 
 function QuestionnairesList() {
   const { logout } = useAuth0();
-  const [isContentNotFount, setContentNotFound] = useState(true);
+  const [isContentNotFount, setContentNotFound] = useState(false);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null)
@@ -68,8 +69,10 @@ function QuestionnairesList() {
           </div>
           {isContentNotFount ?
             <ContentNotFound text='No questionnaires available.' className='ml-8' /> :
-            <div className='py-6 px-9 bg-white'>
-              llisting
+            <div className=' bg-white mt-12'>
+              <Table>
+
+              </Table>
             </div>
           }
         </div>
