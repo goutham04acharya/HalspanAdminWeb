@@ -112,9 +112,8 @@ AfterStep(async function () {
 
             global.coverageMap.merge(updatedCoverageMap);
         }
-    }
-    catch (err) {
-        console.log(`error:${err}`);
+    } catch (err) {
+        console.log(`error: ${err}`);
     }
 });
 After(function (scenario) {
