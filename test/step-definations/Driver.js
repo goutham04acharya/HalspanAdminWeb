@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout, Before, After} = require('@cucumber/cucumber');
+const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout, Before, After } = require('@cucumber/cucumber');
 const chrome = require('selenium-webdriver/chrome');
 const { By, until } = require('selenium-webdriver');
 const chromedriver = require('chromedriver');
@@ -14,7 +14,7 @@ options.addArguments('--no-sandbox');
 options.addArguments('--disable-features=VizDisplayCompositor');
 options.addArguments('enable-automation');
 options.addArguments('--disable-dev-shm-usage');
-options.addArguments('--headless'); // comment this line of code to run in local chrome browser
+// options.addArguments('--headless'); // comment this line of code to run in local chrome browser
 options.addArguments('--window-size=1920,1080');
 options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
@@ -59,13 +59,26 @@ Before('@login', async function () {
         loginPerformed = true;
     }
 });
-
 AfterAll(async function () {
     const coverageDataDir = path.join(__dirname, 'coverageData');
     if (!fs.existsSync(coverageDataDir)) {
         fs.mkdirSync(coverageDataDir);
     }
+
     const coverageDataFile = path.join(coverageDataDir, `coverage_${global.current_process_name}.json`);
+
+    try {
+        const currentUrl = await driver.getCurrentUrl();
+        if (currentUrl.includes('localhost:3000')) {
+            global.__coverage__ = await driver.executeScript('return __coverage__;');
+            global.coverageMap = createCoverageMap(__coverage__);
+        } else {
+            console.log('Skipping coverage tracking for external URL.');
+        }
+    } catch (error) {
+        throw new Error('::: __coverage__ ::: Coverage Mapping Object Not Found :::');
+    }
+
     if (global.coverageMap) {
         const coverageData = global.coverageMap.toJSON();
         // Write coverage data to file
@@ -77,6 +90,7 @@ AfterAll(async function () {
             }
         });
     }
+
     await driver.quit();
 });
 
@@ -89,7 +103,7 @@ AfterStep(async function () {
 
             // Debug log to check if global.coverageMap is defined
             if (!global.coverageMap) {
-                console.log('global.coverageMap is not defined. Initializing...');
+                // console.log('global.coverageMap is not defined. Initializing...');
                 global.coverageMap = createCoverageMap({});
             }
 

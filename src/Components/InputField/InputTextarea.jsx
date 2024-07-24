@@ -1,45 +1,42 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-const InputField = ({
-    autoComplete,
+function InputTextarea({
     label,
+    htmlFor,
     id,
     type,
     value,
     className,
+    validationError,
     placeholder,
     testId,
-    htmlFor,
-    validationError,
     maxLength,
     handleChange,
-    mandatoryField,
+    disabled,
     labelStyle,
-
-}) => {
-
+    mandatoryField,
+}) {
     return (
         <div>
             <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
-            <input
-                autoComplete={autoComplete || 'off'}
+            <textarea
                 htmlFor={htmlFor}
                 id={id}
                 type={type}
                 value={value}
                 className={`placeholder:text-[#9FACB9] placeholder:font-normal placeholder:text-base
-                    px-[10px] py-[11px] ${type === 'password' ? 'pr-[62px]' : ''}
-                    font-normal text-sm leading-[22px] focus:outline-none border border-[#AEB3B7]
+                    px-4 py-3 resize-none
+                    font-normal text-base leading-[22px] focus:outline-none border border-[#AEB3B7]
                     ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} ${className} rounded `}
                 placeholder={placeholder}
                 data-testid={testId}
                 maxLength={maxLength}
                 onChange={(e) => handleChange(e, id, type)}
-            // disabled={ }
-
-            />
+                disabled={disabled}
+            >
+            </textarea>
         </div>
     )
 }
 
-export default InputField
+export default InputTextarea
