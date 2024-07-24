@@ -7,6 +7,9 @@ const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const fs = require('fs');
 const path = require('path');
+const { createQuestionnaire } = require('../bdd_api/index');
+const {create_questionnaire_payload} = require('../bdd_payload/payload')
+
 const service = new chrome.ServiceBuilder(chromedriver.path).build();
 const options = new chrome.Options();
 options.addArguments('--disable-dev-shm-usage');
@@ -112,5 +115,16 @@ AfterStep(async function () {
     }
     catch (err) {
         console.log(`error:${err}`);
+    }
+});
+
+Before("@create_questionnaire", async function () {
+    try {
+        global.questionary_payload= await create_questionnaire_payload();
+        console.log(global.questionary_payload, "Questionary Payload")
+        let response = await createQuestionnaire(global.questionary_payload)
+        console.log(response, "Questionary Response")
+    } catch (err) {
+        console.log(err)
     }
 });
