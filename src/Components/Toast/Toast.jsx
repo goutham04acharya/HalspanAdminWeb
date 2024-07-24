@@ -47,7 +47,7 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
                     : type === 'warning'
                         ? 'bg-[#FFA318]'
                         : type === 'error' ? 'bg-[#FFA318]' : 'bg-accent-information'}`} >
-                    <p className={`font-[400] text-[14px] leading-[24px] ${type === 'error' ? 'text-[#000]' : 'text-[#fff]'}`} id="toast-message">{message}</p>
+                    <p className={`font-[400] text-[14px] leading-[24px] ${type === 'error' ? 'text-[#000]' : 'text-[#fff]'}`} id="toast-message">{message || 'Something went wrong'}</p>
                     <span>
                         {<Image src={`toast-${type}`} />}
                     </span>
@@ -58,3 +58,5 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
 };
 
 export default Toast;
+
+
