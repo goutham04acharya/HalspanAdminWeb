@@ -39,8 +39,8 @@ Feature: Halspan - Admin - Create the Questionnaire
       | ""               | "Inspection+A" | "Questionnaire Description" | "door" | "no"                  | "British English" | "This field is mandatory"                           |
       | "test+ds1vf"     | ""             | "Questionnaire Description" | "door" | "yes"                 | "British English" | "This field is mandatory"                           |
       | "test+3kz8y"     | "Inspection+B" | ""                          | "door" | "no"                  | "British English" | "This field is mandatory"                           |
-      | "test+9mrc5"     | "I"            | "Questionnaire Description" | "door" | "yes"                 | "British English" | "internal_name : Length must be between 2 and 255." |
-      | "I"              | "Inhhdhhd"     | "Questionnaire Description" | "door" | "yes"                 | "British English" | "public_name : Length must be between 2 and 255."   |
+      | "test+9mrc5"     | "I"            | "Questionnaire Description" | "door" | "yes"                 | "British English" | "Public Name requires at least 2 characters" |
+      | "I"              | "Inhhdhhd"     | "Questionnaire Description" | "door" | "yes"                 | "British English" | "Internal Name requires at least 2 characters"   |
 
   Scenario Outline: Admin adds all the fields for the questionnaire
     Given I am on the dashboard screen
