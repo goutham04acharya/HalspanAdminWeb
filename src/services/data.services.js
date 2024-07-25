@@ -24,14 +24,16 @@ async function PostAPIWithoutHeader (endpoint, body) {
  * 2. If there is an error during the API call, it returns an object with `error` set to `true` and
  * `data` containing the error
  */
-async function GetAPI (endpoint) {
+async function GetAPI (endpoint, getIdTokenClaims) {
     try {
-        const tokenClaims = await getIdTokenClaims();
-        const accessToken = tokenClaims.__raw
-        const headers = { Authorization: `Bearer ${accessToken}` };  
+        console.log('entering api call')
+        // const tokenClaims = await getIdTokenClaims();
+        // const accessToken = tokenClaims.__raw
+        // const headers = { Authorization: `Bearer ${accessToken}` };  
         const data = await axios.get(`${baseURL}${endpoint}`, {
-            headers
+            // headers
         });
+        console.log(data,'dadadaddtatat')
         return { error: false, data: data.data };
     } catch (error) {
         return { error: true, data: error.response };

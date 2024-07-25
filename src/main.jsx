@@ -7,6 +7,9 @@ import App from './App';
 import { auth0Domain } from './config/index.js';
 import { auth0ClientID } from './config/index.js'
 import './index.css';
+import { persistor, store } from './redux/store.js';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const root = createRoot(document.getElementById('root'));
 
@@ -18,8 +21,12 @@ root.render(
       redirect_uri: window.location.origin
     }}
   >
-    <Router>
-      <App />
-    </Router>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Router>
+          <App />
+        </Router>
+      </PersistGate>
+    </Provider>
   </Auth0Provider>,
 );
