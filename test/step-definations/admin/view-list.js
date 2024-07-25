@@ -4,8 +4,7 @@ const { Given, When, Then, But } = require('@cucumber/cucumber')
 const webdriver = 'selenium-webdriver'
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
-const keys = webdriver.Key
-
+const Key = webdriver.Key
 
 Given('no questionnaires exist', async function () {
     const isTablePresent = await driver.executeScript("return document.querySelector('table') !== null");
@@ -33,14 +32,14 @@ When('I select asset type as window from the filter dropdown', async function (a
     await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).click();
 });
 
-Then('I should see a paginated list of questionnaires sorted alphabetically', async function () {
+// Updated code based on chronological order
+Then('I should see a paginated list of questionnaires sorted by recently created', async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
-    let items = await driver.wait(until.elementsLocated(By.css('tbody > tr > td:nth-child(2)')));
+    let items = await driver.wait(until.elementsLocated(By.css('tbody > tr > td:nth-child(1)')));
     let item_texts = await Promise.all(items.map(item => item.getText()));
-    let sorted_item_texts = [...item_texts].sort();
-    assert.deepStrictEqual(item_texts, sorted_item_texts, 'Questionnaires are not sorted alphabetically');
+    let sorted_item_texts = [...item_texts].sort((a, b) => b - a);
+    assert.deepStrictEqual(item_texts, sorted_item_texts, 'Questionnaires are not sorted by recently created');
 });
-
 
 When('I enter a internal name in the search box', async function () {
     const name = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`)));
@@ -53,7 +52,6 @@ Then('the results should display questionnaires matching the internal name', asy
     const internalName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
     assert.strictEqual(internalName, this.internalName, 'The searched internal name does not match the expected internal name.');
 });
-
 
 When('I enter a public name in the search box', async function () {
     const publicName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
@@ -87,15 +85,12 @@ Then('the results should be refined to show questionnaires of the selected asset
     let items = await driver.wait(until.elementsLocated(By.css('tbody > tr > td:nth-child(5)'))); 
     let item_texts = await Promise.all(items.map(item => item.getText()));
     assert(item_texts.length > 0, 'No questionnaires match the selected asset type');
-    // Additional checks can be done here to ensure the filtering logic
+    item_texts.map((data) => {
+        assert.equal('Door', data);
+    });
 });
 
-When('I enter a questionnaire name in the search box', async function () {
-    let searchBox = await driver.findElement(By.css('#search-box'));
-    await searchBox.sendKeys('example'); // Replace 'example' with the specific questionnaire name if needed
-});
-
-Then('the results should display questionnaires matching the entered name and asset type', async function () {
+Then('the results should display questionnaires matching the entered internal name and asset type', async function () {
     let items = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
     let item_texts = await Promise.all(items.map(async item => {
         let name = await item.findElement(By.css('td:nth-child(2)')).getText();
@@ -103,5 +98,42 @@ Then('the results should display questionnaires matching the entered name and as
         return { name, type };
     }));
     assert(item_texts.length > 0, 'No questionnaires match your search and filter criteria');
-    // Additional checks can be done here to ensure the combined search and filtering logic
+
+    // Verify that all displayed items match the entered internal name and the asset type 'door'
+    item_texts.forEach((data) => {
+        assert.equal(data.name, this.internalName, `Expected internal name: ${this.internalName}, but found: ${data.name}`);
+        assert.equal(data.type, 'Door', `Expected asset type: 'door', but found: ${data.type}`);
+    });
+});
+
+Then('the results should display questionnaires matching the entered public name and asset type', async function () {
+    let items = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
+    let item_texts = await Promise.all(items.map(async item => {
+        let name = await item.findElement(By.css('td:nth-child(3)')).getText();
+        let type = await item.findElement(By.css('td:nth-child(5)')).getText();
+        return { name, type };
+    }));
+    assert(item_texts.length > 0, 'No questionnaires match your search and filter criteria');
+
+    // Verify that all displayed items match the entered internal name and the asset type 'door'
+    item_texts.forEach((data) => {
+        assert.equal(data.name, this.publicName, `Expected public name: ${this.publicName}, but found: ${data.name}`);
+        assert.equal(data.type, 'Door', `Expected asset type: 'door', but found: ${data.type}`);
+    });
+});
+
+Then('the results should display questionnaires matching the entered description and asset type', async function () {
+    let items = await driver.wait(until.elementsLocated(By.css('tbody > tr')));
+    let item_texts = await Promise.all(items.map(async item => {
+        let name = await item.findElement(By.css('td:nth-child(6)')).getText();
+        let type = await item.findElement(By.css('td:nth-child(5)')).getText();
+        return { name, type };
+    }));
+    assert(item_texts.length > 0, 'No questionnaires match your search and filter criteria');
+
+    // Verify that all displayed items match the entered internal name and the asset type 'door'
+    item_texts.forEach((data) => {
+        assert.equal(data.name, this.description, `Expected description: ${this.description}, but found: ${data.name}`);
+        assert.equal(data.type, 'Door', `Expected asset type: 'door', but found: ${data.type}`);
+    });
 });

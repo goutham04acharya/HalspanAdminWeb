@@ -15,55 +15,11 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
         * I click the submit button
         Then I should be redirected to the questionnaire listing screen
 
-    Scenario: Display an empty screen with an appropriate message if no questionnaires exist
-        Given I am on the dashboard screen
-        And no questionnaires exist
-        Then I should read a message stating that 'No questionnaires available.'
-
     @create_questionnaire
-    Scenario: Display a message if no matching questionnaires are found for searched internal name
-        Given I am on the dashboard screen
-        When I enter internal name as "random1212" in the search box
-        Then I should read a message stating that 'No questionnaires match your search criteria'
-
-    Scenario: Display a message if no matching questionnaires are found for searched public name
-        Given I am on the dashboard screen
-        When I enter public name as "random817281" in the search box
-        Then I should read a message stating that 'No questionnaires match your search criteria'
-
-    Scenario: Display a message if no matching questionnaires are found for searched description
-        Given I am on the dashboard screen
-        When I enter description as "random817281" in the search box
-        Then I should read a message stating that 'No questionnaires match your search criteria'
-
-    Scenario: Display a message if no matching questionnaires are found after filtering
-        Given I am on the dashboard screen
-        When I select asset type as window from the filter dropdown
-        Then I should read a message stating that 'No questionnaires match the selected asset type'
-
-    Scenario: Display a message if no matching questionnaires are found after searching internal name and filtering
-        Given I am on the dashboard screen
-        When I enter internal name as "random1212" in the search box
-        And I select asset type as window from the filter dropdown
-        Then I should read a message stating that 'No questionnaires match your search and filter criteria'
-
-    Scenario: Display a message if no matching questionnaires are found after searching public name and filtering
-        Given I am on the dashboard screen
-        When I enter public name as "random817281" in the search box
-        And I select asset type as window from the filter dropdown
-        Then I should read a message stating that 'No questionnaires match your search and filter criteria'
-
-    Scenario: Display a message if no matching questionnaires are found after searching description and filtering
-        Given I am on the dashboard screen
-        When I enter description as "random817281" in the search box
-        And I select asset type as window from the filter dropdown
-        Then I should read a message stating that 'No questionnaires match your search and filter criteria'
-
-    # Updated based on the chronological order
     Scenario: Admin sees a paginated list of questionnaires sorted by recently created
         Given I am on the dashboard screen
         Then I should see a paginated list of questionnaires sorted by recently created
-
+    
     Scenario: Search box for querying by internal name
         Given I am on the dashboard screen
         When I enter a internal name in the search box

@@ -66,12 +66,12 @@ Given('I am on the questionnaire creation screen', async function () {
 
 When('I enter Unique Public Name in the public name field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const publicName = faker.string.alphanumeric(5); // Use random.alphaNumeric
+    const publicName = `bddtest${faker.string.alphanumeric(5)}`; // Use random.alphaNumeric
     await driver.wait(until.elementLocated(By.css('[data-testid = "publicName"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), publicName);
 });
 
 When('I enter internal name in the internal name field', async function () {
-    const internalName = `Inspection+${faker.string.alpha(4)}`; // Correct method for alphanumeric string   faker.company.name()
+    const internalName = `Inspection${faker.string.alpha(4)}`; // Correct method for alphanumeric string   faker.company.name()
     await driver.wait(until.elementLocated(By.css('[data-testid = "internalName"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), internalName);
 });
 
