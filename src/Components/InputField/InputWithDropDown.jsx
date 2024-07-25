@@ -16,7 +16,14 @@ function InputWithDropDown({
     dropdownRef,
     mandatoryField,
     labeltestID,
+    validationError,
+    close,
+    setSelectedOption
 }) {
+
+    const handleRemove = ()=>{
+        setSelectedOption('');
+    }
 
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
@@ -29,10 +36,15 @@ function InputWithDropDown({
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}
-                    className={`${className} border border-[#AEB3B7] outline-0 h-[45px] rounded px-[18px] placeholder:text-[#2B333B] placeholder:font-normal placeholder:text-base`}
+                    className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
-                <img src="/Images/open-Filter.svg" alt="open-filter" className='absolute right-4' style={{ top }} />
+                {(selectedOption && close) ?
+                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-4`} onClick={()=> handleRemove()} />
+                    :
+                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                        style={{ top }} />
+                }
             </div>
             {isDropdownOpen && (
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
@@ -42,7 +54,6 @@ function InputWithDropDown({
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
                             {option.label}
-
                         </li>
                     ))}
                 </ul>

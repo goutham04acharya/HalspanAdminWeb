@@ -16,6 +16,7 @@ function CreateQuestionnary() {
   const navigate = useNavigate();
   const { getIdTokenClaims } = useAuth0();
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
+  const [isThreedotLoader, setIsThreedotLoader] = useState(false)
 
   const [createDetails, setCreateDetails] = useState({
     public_name: '',
@@ -97,18 +98,23 @@ function CreateQuestionnary() {
       return;
     }
     try {
+      setIsThreedotLoader(true)
       const response = await dataService.PostAPI("questionnaires", payload, getIdTokenClaims);
       console.log('API response:', response?.data?.status);
 
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
+        setIsThreedotLoader(false)
       } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
         setToastError(response?.data?.data?.message);
+        setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
         setToastError('Something went wrong');
+        setIsThreedotLoader(false)
       }
     } catch (error) {
       setToastError('Something went wrong');
+      setIsThreedotLoader(false)
     }
   }
 
@@ -213,7 +219,7 @@ function CreateQuestionnary() {
                     labelStyle='font-semibold text-base text-[#2B333B]'
                     id='asset_type'
                     placeholder='Select'
-                    className='w-full cursor-pointer mt-2.5'
+                    className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                     top='53px'
                     testID='drop-btn'
                     labeltestID='option0'
@@ -235,7 +241,7 @@ function CreateQuestionnary() {
                   mandatoryField='true'
                   id='language'
                   placeholder='Select'
-                  className='w-full cursor-pointer mt-2.5'
+                  className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                   top='53px'
                   testID='language-drop-btn'
                   labeltestID='language0'
@@ -305,11 +311,12 @@ function CreateQuestionnary() {
             testID='createQuestionnaireBtn'
             className='w-[280px] h-[50px]'
             onClick={handleCreateQuestionnary}
+            isThreedotLoading={isThreedotLoader}
           />
           <Button2
             testId='Cancel'
             onClick={handleNavigateBack}
-            className='w-[162px] h-[50px] ml-[32px]'
+            className='w-[162px] h-[50px] ml-[32px] font-normal'
             text='Cancel'
           />
         </div>

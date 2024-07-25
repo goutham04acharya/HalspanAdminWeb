@@ -6,6 +6,7 @@ import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.j
 import InputWithDropDown from '../../Components/InputField/InputWithDropDown.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import Table from './Components/Table.jsx';
+import Search from '../../Search/Search.jsx';
 
 
 function QuestionnairesList() {
@@ -14,13 +15,12 @@ function QuestionnairesList() {
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null)
+  const [searchDetails, setSearchDetails] = useState(null);
 
   const navigate = useNavigate();
 
   const options = [
-    { value: 'Door', label: 'Door' },
-    { value: 'Window', label: 'Window' },
-    { value: 'Fire Compartment', label: 'Fire Compartment' },
+    { value: 'Door', label: 'Door' }
   ];
 
   const handleSelect = (option) => {
@@ -36,6 +36,15 @@ function QuestionnairesList() {
     navigate('/QuestionnariesList/Create-Questionnary');
   };
 
+  const handleSearch = (e) => {
+    setSearchDetails(e.target.value);
+    console.log(searchDetails)
+  }
+
+  const handleSearchClose = () => {
+    setSearchDetails('');
+  }
+
   return (
     <div className='bg-[#F4F6FA]'>
       <div className='py-[33px] px-[25px]'>
@@ -45,17 +54,22 @@ function QuestionnairesList() {
             <Button2
               testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
-              className='w-[315px] h-[50px]'
+              className='w-[315px] h-[50px] font-semibold'
               text='Create new questionnaire'
             />
           </div>
           <div className='flex items-center justify-between w-full'>
-            <div className='w-[75%] h-[45px] rounded border border-[#AEB3B7] mr-[5%]'></div>
+            <div className='w-[75%] mr-[5%]'>
+              <Search 
+              handleSearchClose={handleSearchClose}
+              onChange={handleSearch}
+              />
+            </div>
             <div className='w-[400px]'>
               <InputWithDropDown
                 id='asset-type'
                 placeholder='Filter by asset type'
-                className='w-full cursor-pointer'
+                className='w-full cursor-pointer placeholder:text-[#2B333B] h-[50px]'
                 top='20px'
                 options={options}
                 onSelect={handleSelect}
@@ -64,15 +78,14 @@ function QuestionnairesList() {
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
                 handleOptionClick={handleOptionClick}
+                close='true'
               />
             </div> 
           </div>
           {isContentNotFount ?
             <ContentNotFound text='No questionnaires available.' className='ml-8' /> :
             <div className=' bg-white mt-12'>
-              <Table>
-
-              </Table>
+              <Table />
             </div>
           }
         </div>
