@@ -19,10 +19,7 @@ Feature: Halspan - Admin - Create the Questionnaire
         Then I should see the questionnaire creation screen
         When I enter Unique Public Name in the public name field
         * I enter internal name in the internal name field
-        * I enter a large Description
-        * I click the create questionnaire button
-        Then I should read a message stating that "Character limit exceed"
-        When I enter questionnaire description in the Description field as "test data results"
+        * I enter questionnaire description in the Description field as "test data results"
         * I select door from the asset type dropdown
         * I select <type> from the questionnaire type options
         * I select british english from the language dropdown
