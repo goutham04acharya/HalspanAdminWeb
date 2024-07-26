@@ -3,7 +3,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
-import InputWithDropDown from '../../Components/InputField/InputWithDropDown.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import Table from './Components/Table.jsx';
 import Search from '../../Search/Search.jsx';
@@ -12,6 +11,7 @@ import Debounce from '../../CommonMethods/debounce.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import PageNavigation from '../../Components/PageNavigation/PageNavigation.jsx';
 import { handleCurrentPage, handlePagination } from '../../redux/paginationSlice.js';
+import FilterDropdown from '../../Components/InputField/FilterDropdown.jsx';
 
 
 function QuestionnairesList() {
@@ -20,6 +20,7 @@ function QuestionnairesList() {
   const [isContentNotFount, setContentNotFound] = useState(false);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isFilterDropdown, setFilterDropdown] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null)
   const [searchDetails, setSearchDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -112,9 +113,9 @@ function QuestionnairesList() {
   );
   const handleSearch = (e, key, value) => {
     e.preventDefault();
-    // setNextPage(true)
-    // setPrevPage(false)
-    // dispatch(handleCurrentPage(1))
+    setNextPage(true)
+    setPrevPage(false)
+    dispatch(handleCurrentPage(1))
     let params = Object.fromEntries(searchParams);
     delete params.last_evaluated_key;
     if (key === 'keyword') {
@@ -124,6 +125,52 @@ function QuestionnairesList() {
     }
     if (params['keyword'] === '') delete params.keyword
     setSearchParams({ ...params })
+  }
+
+  // filter related states
+  const [filterData, setFilterData] = useState({
+    asset_type: searchParams.get('asset_type') !== null ?
+      decodeURIComponent(searchParams.get('asset_type')) : ''
+  });
+  const [filterError, setFilterError] = useState({
+    country: ""
+  });
+  const [isFilterApplied,setIsFilterApplied] = useState(false)
+
+  console.log(filterData, 'kkkkkkk')
+
+
+  const handleFilter = () => {
+    setNextPage(true)
+    setPrevPage(false)
+    dispatch(handleCurrentPage(1))
+    let params = Object.fromEntries(searchParams);
+    delete params.last_evaluated_key;
+    params['page'] = 1
+    params['filter'] = 'true'
+    setSearchParams({ ...params, page: 1 })
+    if (filterData.asset_type !== '') {
+      params['asset_type'] = filterData?.asset_type;
+      setIsFilterApplied(true);
+    } else {
+      setIsFilterApplied(false)
+      delete params.asset_type;
+    }
+    setDropdownOpen(false)
+    setSearchParams({ ...params })
+  }
+
+  const clearFilters = () => {
+    let params = Object.fromEntries(searchParams);
+    setFilterData((prevState) => ({
+      ...prevState,
+      ['asset_type']: '',
+    }));
+    delete params.country;
+    delete params.filter;
+    setIsfilteropen(false)
+    setSearchParams({ ...params })
+    setIsFilterApplied(false)
   }
 
 
@@ -195,18 +242,20 @@ function QuestionnairesList() {
               />
             </div>
             <div className='w-[400px]'>
-              <InputWithDropDown
+              <FilterDropdown
                 id='asset-type'
                 placeholder='Filter by asset type'
                 className='w-full cursor-pointer placeholder:text-[#2B333B] h-[50px]'
                 top='20px'
                 options={options}
                 onSelect={handleSelect}
+                isFilterDropdown={isFilterDropdown}
+                setIsFilterDropdown={isFilterDropdown}
                 isDropdownOpen={isDropdownOpen}
                 setDropdownOpen={setDropdownOpen}
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
-                handleOptionClick={handleOptionClick}
+                handleOptionClick={handleFilter}
                 close='true'
               />
             </div>
