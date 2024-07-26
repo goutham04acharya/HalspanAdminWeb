@@ -13,17 +13,17 @@ Given('no questionnaires exist', async function () {
 
 When('I enter internal name as {string} in the search box', async function (internalName) {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), internalName);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), internalName);
 });
 
 When('I enter public name as {string} in the search box', async function (publicName) {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), publicName);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), publicName);
 });
 
 When('I enter description as {string} in the search box', async function (description) {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), description);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), description);
 });
 
 When('I select asset type as window from the filter dropdown', async function (assetType) {
@@ -45,7 +45,7 @@ When('I enter a internal name in the search box', async function () {
     const name = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`)));
     const internalName = await name.getText();
     this.internalName = internalName;
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.internalName);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.internalName);
 });
 
 Then('the results should display questionnaires matching the internal name', async function () {
@@ -56,7 +56,7 @@ Then('the results should display questionnaires matching the internal name', asy
 When('I enter a public name in the search box', async function () {
     const publicName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
     this.publicName = publicName;
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.publicName);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.publicName);
 });
 
 Then('the results should display questionnaires matching the public name', async function () {
@@ -67,7 +67,7 @@ Then('the results should display questionnaires matching the public name', async
 When('I enter description in the search box', async function () {
     const description = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[6]`))).getText();
     this.description = description;
-    await driver.wait(until.elementLocated(By.css('[data-testid = "search-box"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.description);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.description);
 });
 
 Then('the results should display questionnaires matching the description', async function () {

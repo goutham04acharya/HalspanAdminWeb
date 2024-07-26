@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import Image from '../../Image/Image'
-import useOnClickOutside from '../../../CommonMethods/outSideClick.jsx'
+import useOnClickOutside from '../../../CommonMethods/outSideClick.js'
 
 function ConfirmationModal({ text, subText, Button1text, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2 }) {
     

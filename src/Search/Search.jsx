@@ -1,11 +1,12 @@
 import React from 'react'
 
-function Search({ className, onChange, handleSearchClose,searchValue,optimizedFn,changeHandler }) {
+function Search({ className, onChange, handleSearchClose, searchValue, optimizedFn, changeHandler, testId }) {
     return (
         <div className='w-full border border-[#AEB3B7] rounded px-5 py-3'>
             <div className='flex items-center relative'>
                 <img src="/Images/search.svg" alt="search" className='w-auto h-auto mr-2' />
                 <input
+                    data-testid={testId}
                     type="text"
                     value={searchValue}
                     placeholder='Search by Name and Description'

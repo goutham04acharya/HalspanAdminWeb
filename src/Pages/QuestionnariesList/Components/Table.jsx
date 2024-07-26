@@ -41,7 +41,7 @@ function Table({ loading, QueList }) {
                 <thead>
                     <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>ID</th>
                     <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>Internal Name</th>
-                    <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>Public Name</th>
+                    <th className='min-w-[400px] text-start py-6 font-medium text-base text-[#2B333B]'>Public Name</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>Status</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>asset type</th>
                     <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>Description</th>
@@ -52,11 +52,11 @@ function Table({ loading, QueList }) {
                         {QueList?.items?.map((QueInfo, index) => (
                             <><tr key={index} className='rounded-[10px] mt-[18px]'>
                                 <td className='pl-10 py-6 text-start bg-[#F4F6FA]'>{QueInfo?.questionnaire_id}</td>
-                                <td className=' py-6 text-start font-semibold text-base text-[#2B333B] cursor-pointer bg-[#F4F6FA]'><u>{QueInfo?.internal_name}</u></td>
-                                <td className=' py-6 text-start truncate w-[100px] bg-[#F4F6FA]' title={QueInfo?.public_name}>{QueInfo?.public_name}</td>
+                                <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]' title={QueInfo?.internal_name}><u>{QueInfo?.internal_name}</u></td>
+                                <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] pr-6' title={QueInfo?.public_name}>{QueInfo?.public_name}</td>
                                 <td className={`py-6 text-start bg-[#F4F6FA] ${getStatusStyles(QueInfo.status)}`} title={`${getStatusText(QueInfo.status)}`}>{getStatusText(QueInfo?.status) || '-'}</td>
-                                <td className=' py-6 text-start bg-[#F4F6FA]'>{QueInfo?.asset_type}</td>
-                                <td className=' py-6 text-start bg-[#F4F6FA]'>{QueInfo?.description}</td>
+                                <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_type}</td>
+                                <td className=' py-6 text-start bg-[#F4F6FA] pr-6 truncate max-w-[200px]'>{QueInfo?.description}</td>
                             </tr><tr className='h-4 bg-white'></tr></>))}
                     </tbody>}
             </table>
