@@ -1,6 +1,6 @@
-import React, { useContext, useState, useRef, useEffect, useCallback } from 'react'
+
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
-import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
@@ -8,39 +8,31 @@ import Table from './Components/Table.jsx';
 import Search from '../../Search/Search.jsx';
 import Debounce from '../../CommonMethods/debounce.js';
 import { useDispatch, useSelector } from 'react-redux';
-import PageNavigation from '../../Components/PageNavigation/PageNavigation.jsx';
 import { handleCurrentPage, handlePagination } from '../../redux/paginationSlice.js';
 import FilterDropdown from '../../Components/InputField/FilterDropdown.jsx';
 import useApi from '../../services/CustomHook/useApi.js';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString.js';
 
-function QuestionnairesList() {
-  const dispatch = useDispatch()
+function Questionnaries() {
+  const dispatch = useDispatch();
   const { logout } = useAuth0();
   const { getAPI } = useApi();
-  const [isContentNotFount, setContentNotFound] = useState(false);
-  const { setToastError, setToastSuccess } = useContext(GlobalContext);
+  const [isContentNotFound, setContentNotFound] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isFilterDropdown, setFilterDropdown] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null)
-  const [searchDetails, setSearchDetails] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [loading, setLoading] = useState(false);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
-    decodeURIComponent(searchParams.get('search')) : '')
-  const [nextPage, setNextPage] = useState(true)
-  const [prevPageExist, setPrevPage] = useState(false)
+    decodeURIComponent(searchParams.get('search')) : '');
+  const [nextPage, setNextPage] = useState(true);
   const currentPage = useSelector((state) => state.paginationConfig?.currentPage);
   const paginationData = useSelector((state) => state.paginationConfig?.paginationData);
-
-  let endpoint = `questionnaires?`
-
   const navigate = useNavigate();
 
   const options = [
     { value: 'Door', label: 'Door' },
-    { value: 'Window', label: 'Window' }
   ];
 
   const handleSelect = (option) => {
@@ -49,92 +41,49 @@ function QuestionnairesList() {
 
   const handleCreateQue = (e) => {
     e.preventDefault();
-    navigate('/QuestionnariesList/Create-Questionnary');
-  };
-
-
-  const handlePrevPage = async () => {
-    setNextPage(true);
-    let params = Object.fromEntries(searchParams);
-    if (currentPage === 2) {
-      setPrevPage(false);
-      dispatch(handleCurrentPage(currentPage - 1));
-      delete params.start_key;
-      setSearchParams({ ...params });
-    } else {
-      dispatch(handleCurrentPage(currentPage - 1));
-      setPrevPage(true);
-      const lastKey = paginationData[currentPage - 1];
-      if (lastKey) {
-        console.log(lastKey, 'yuty');
-        params['start_key'] = encodeURIComponent(JSON.stringify(lastKey));
-        setSearchParams({ ...params });
-      }
-    }
-  };
-
-  const handleNextPage = async () => {
-    let params = Object.fromEntries(searchParams);
-    if (currentPage >= 1) {
-      setPrevPage(true);
-    }
-    dispatch(handleCurrentPage(currentPage + 1));
-    const nextKey = paginationData[currentPage + 1];
-    if (nextKey) {
-      params['start_key'] = encodeURIComponent(JSON.stringify(nextKey));
-      setSearchParams({ ...params });
-    }
+    navigate('/questionnaries/Create-Questionnary');
   };
 
   const handleSearchClose = () => {
     let params = Object.fromEntries(searchParams);
-    if (params['search'] !== '') delete params.search
-    setSearchParams({ ...params })
-    setSearchValue('')
-  }
+    if (params['search'] !== '') delete params.search;
+    setSearchParams({ ...params });
+    setSearchValue('');
+  };
 
-  // search related functions
+  // Search related functions
   const handleChange = (e, value) => {
     handleSearch(e, "search", value);
   };
+
   const changeHandler = (e) => {
     setSearchValue(e.target.value);
   };
+
   const optimizedFn = useCallback(
     Debounce((e, value) => handleChange(e, value)),
     [searchParams]
   );
+
   const handleSearch = (e, key, value) => {
     e.preventDefault();
-    setNextPage(true)
-    setPrevPage(false)
-    dispatch(handleCurrentPage(1))
+    setNextPage(true);
+    dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
-    delete params.start_key;
+    delete params.start_key; // Reset the start_key when initiating a new search
     if (key === 'search') {
-      params[key] = encodeURIComponent(value);
+      params[key] = value.trim(); // Trim the value before encoding
     } else {
-      params[key] = value
+      params[key] = value;
     }
-    if (params['search'] === '') delete params.search
-    setSearchParams({ ...params })
-  }
-
-  // filter related states
-  const [filterData, setFilterData] = useState({
-    asset_type: searchParams.get('asset_type') !== null ?
-      decodeURIComponent(searchParams.get('asset_type')) : ''
-  });
-  const [filterError, setFilterError] = useState({
-    country: ""
-  });
-  const [isFilterApplied, setIsFilterApplied] = useState(false)
-
-
+    if (params['search'] === '') delete params.search;
+    // setQueList([])
+    setSearchParams({ ...params });
+  };
+  
   const handleFilter = (option) => {
     setSelectedOption(option);
     setNextPage(true);
-    setPrevPage(false);
     dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
     delete params.last_evaluated_key;
@@ -144,6 +93,7 @@ function QuestionnairesList() {
       delete params.asset_type;
     }
     setDropdownOpen(false);
+    // setQueList([])
     setSearchParams({ ...params });
   };
 
@@ -155,71 +105,56 @@ function QuestionnairesList() {
     setSelectedOption(null); // Reset selected option
   };
 
-
-  // const fetchQuestionnaryList = useCallback(async () => {
-  //   setLoading(true)
-  //   if (searchParams.get('search') !== null) {
-  //     endpoint += `&search=${searchParams.get('search')}`
-  //   }
-  //   // if (searchParams.get('start_key') !== null) {
-  //   //   endpoint += `&last_element=${searchParams.get('start_key')}`
-  //   // }
-  //   const params = Object.fromEntries(searchParams);
-  //   const response = await getAPI(`questionnaires${objectToQueryString(params)}`)
-  //   console.log(response, 'questionnaires')
-  //   if (response.data.data.items == 0) {
-  //     setQueList(response?.data?.data);
-  //     setLoading(false)
-  //   }
-  //   if (searchValue == '' && response.data?.data?.items?.length == 0) {
-  //     setNextPage(false)
-  //   }
-  //   else {
-  //     setQueList(response?.data?.data);
-  //     setNextPage(true)
-  //     setLoading(false)
-  //   }
-  //   if (response.data.data.last_evaluated_key === undefined || response.data.data.last_evaluated_key === null) {
-  //     setNextPage(false)
-  //   }
-  //   else {
-  //     setNextPage(true)
-  //     dispatch(handlePagination({
-  //       ...paginationData,
-  //       [currentPage + 1]: response.data.data.last_evaluated_key,
-  //     }));
-  //   }
-  // }, [searchParams])
-
-  const fetchQuestionnaryList = useCallback(async () => {
+  const fetchQuestionnaryList = useCallback(async (isNextPageFetch = false) => {    
     setLoading(true);
     const params = Object.fromEntries(searchParams);
-    const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
-    console.log(response, 'questionnaires');
-
-    if (response.data.data.items.length === 0) {
-      setQueList(response?.data?.data);
-      setLoading(false);
-    } else {
-      setQueList(response?.data?.data);
-      setNextPage(true);
-      setLoading(false);
+    
+    if (isNextPageFetch && paginationData[currentPage + 1]) {
+      params['start_key'] = encodeURIComponent(JSON.stringify(paginationData[currentPage + 1]));
     }
-
-    if (response.data.data.last_evaluated_key === undefined || response.data.data.last_evaluated_key === null) {
-      setNextPage(false);
-    } else {
-      setNextPage(true);
-      dispatch(handlePagination({
-        [currentPage + 1]: response.data.data.last_evaluated_key,
-      }));
+    
+    try {
+      const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
+      console.log(response, 'Questionnaires');
+      
+      const newItems = response?.data?.data?.items || [];
+      if (newItems.length === 0) {
+        setNextPage(false);
+      } else {
+        setQueList((prevList) => [...prevList, ...newItems]);
+        setNextPage(true);
+      }
+      
+      if (response?.data?.data?.last_evaluated_key) {
+        dispatch(handlePagination({
+          [currentPage + 1]: response?.data?.data?.last_evaluated_key,
+        }));
+      } else {
+        setNextPage(false);
+      }
+    } catch (error) {
+      console.error('Error fetching questionnaries:', error);
     }
-  }, [searchParams, dispatch, currentPage]);
-
-
+    
+    setLoading(false);
+  }, [searchParams]);
+  
+  const observer = useRef();
+  const lastElementRef = useCallback((node) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && nextPage) {
+        dispatch(handleCurrentPage(currentPage + 1)); // Increment current page
+        fetchQuestionnaryList(true); // Fetch the next page
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, nextPage, currentPage,]);
+  
   useEffect(() => {
-    fetchQuestionnaryList()
-  }, [fetchQuestionnaryList])
+    fetchQuestionnaryList();
+  }, [fetchQuestionnaryList]);
 
 
   return (
@@ -227,7 +162,7 @@ function QuestionnairesList() {
       <div className='py-[33px] px-[25px]'>
         <div className='py-6 px-9 bg-white rounded-[10px] h-customh7'>
           <div className='flex w-full justify-between items-center mb-[26px]'>
-            <p className='text-[#2B333B] text-[28px] font-medium'>Questionnaires</p>
+            <p className='text-[#2B333B] text-[28px] font-medium'>Questionnaries</p>
             <Button2
               testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
@@ -267,28 +202,21 @@ function QuestionnairesList() {
               />
             </div>
           </div>
-          {(isContentNotFount || QueList?.items?.length === 0) ?
-            <ContentNotFound text='No questionnaires available.' className='ml-8' /> :
-            <div className=' bg-white mt-12'>
+          {(isContentNotFound || QueList?.length === 0 || QueList?.items?.length === 0) ?
+            <ContentNotFound text='No questionnaries available.' className='ml-8' /> :
+            <div className='bg-white mt-12'>
               <Table
                 loading={loading}
                 setQueList={setQueList}
                 QueList={QueList}
-              />
-              <PageNavigation
-                handlePrevPage={handlePrevPage}
-                handleNextPage={handleNextPage}
-                prevPageExist={prevPageExist}
-                nextPage={nextPage}
-                currentPage={currentPage}
-                loading={loading}
+                lastElementRef={lastElementRef}
               />
             </div>
           }
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default QuestionnairesList
+export default Questionnaries;

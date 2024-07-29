@@ -7,7 +7,7 @@ async function createQuestionnaire(payload) {
     let API_HEADERS = await getToken()
     try{
         for(i = 0; i <= 15; i++){
-            const response = await axios.post(`${process.env.VITE_DOMAIN_NAME}/v1/questionnaires`, payload, { 
+            const response = await axios.post(`${process.env.VITE_DOMAIN_NAME}/v1/questionnaries`, payload, { 
                 headers: API_HEADERS
             })
             return response

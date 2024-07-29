@@ -16,7 +16,14 @@ function Search({ className, onChange, handleSearchClose, searchValue, optimized
                         changeHandler(e);
                     }}
                     className={`w-full outline-0 ${className} pr-10 placeholder:text-[#2B333B] placeholder:text-base placeholder:font-normal`} />
-                <img src="/Images/gray-close.svg" alt="gray-close" className='absolute right-2 top-0 cursor-pointer' onClick={handleSearchClose} />
+                {searchValue && (
+                    <img
+                        src="/Images/gray-close.svg"
+                        alt="gray-close"
+                        className='absolute right-2 top-0 cursor-pointer'
+                        onClick={handleSearchClose}
+                    />
+                )}
             </div>
         </div>
     )

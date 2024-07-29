@@ -61,7 +61,7 @@ function CreateQuestionnary() {
 
 
   const handleNavigateBack = () => {
-    navigate('/QuestionnariesList');
+    navigate('/questionnaries');
   };
 
   const handleCreateQuestionnary = async () => {
@@ -99,7 +99,6 @@ function CreateQuestionnary() {
     try {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
-      console.log('API response:', response?.data?.status);
 
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);

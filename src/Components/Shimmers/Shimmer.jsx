@@ -3,7 +3,7 @@ import React from 'react';
 
 function Shimmer ({ column, row, firstIndex, hight }) {
     return (
-        <tbody className=''>
+        <tbody className='h-customh4 relative z-[9]'>
             {[...Array(row)].map((_, index) => (
                 <tr className="animate-pulse z-0" key={index}>
                     {[...Array(column)].map((_, ind) => (

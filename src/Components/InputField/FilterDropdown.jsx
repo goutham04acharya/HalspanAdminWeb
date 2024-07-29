@@ -45,7 +45,7 @@ function FilterDropdown({
                 }
             </div>
             {isDropdownOpen && (
-                <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
+                <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-[100]">
                     {options.map(option => (
                         <li key={option.value}
                             data-testid={labeltestID}
