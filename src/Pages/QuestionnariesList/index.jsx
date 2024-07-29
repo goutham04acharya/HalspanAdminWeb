@@ -21,7 +21,7 @@ function Questionnaries() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isFilterDropdown, setFilterDropdown] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
@@ -45,10 +45,13 @@ function Questionnaries() {
   };
 
   const handleSearchClose = () => {
+    setLoading(true);
     let params = Object.fromEntries(searchParams);
     if (params['search'] !== '') delete params.search;
+    setQueList([])
     setSearchParams({ ...params });
     setSearchValue('');
+    setLoading(false);
   };
 
   // Search related functions
@@ -77,7 +80,7 @@ function Questionnaries() {
       params[key] = value;
     }
     if (params['search'] === '') delete params.search;
-    // setQueList([])
+    setQueList([])
     setSearchParams({ ...params });
   };
   
@@ -202,7 +205,7 @@ function Questionnaries() {
               />
             </div>
           </div>
-          {(isContentNotFound || QueList?.length === 0 || QueList?.items?.length === 0) ?
+          {((isContentNotFound || QueList?.length === 0 || QueList?.items?.length === 0) && !loading) ?
             <ContentNotFound text='No questionnaries available.' className='ml-8' /> :
             <div className='bg-white mt-12'>
               <Table
