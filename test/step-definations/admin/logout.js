@@ -7,7 +7,7 @@ const keys = webdriver.Key
 
 Given('I am on the dashboard screen', async function(){
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Questionnaires"]')));  
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="questionnaries"]')));  
 });
 
 When('I click the log out button', async function() {
@@ -33,7 +33,7 @@ When('I click the close button', async function (){
 
 Then('I should be on the dashboard screen', async function (){
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Questionnaires"]'))); 
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="questionnaries"]'))); 
 });
 
 When('I click the confirm button', async function(){

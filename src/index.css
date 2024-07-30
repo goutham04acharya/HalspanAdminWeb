@@ -85,3 +85,9 @@ body {
   border-radius: 0;
   height: 0;
 }
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

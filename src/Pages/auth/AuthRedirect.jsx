@@ -9,7 +9,7 @@ function AuthRedirect({ isAuthenticated, isLoading }) {
       if (!isAuthenticated) {
         navigate("/login");
       } else if (isAuthenticated && window.location.pathname === '/') {
-        navigate("/QuestionnariesList");
+        navigate("/questionnaries");
       }
     }
   }, [isAuthenticated, isLoading]);

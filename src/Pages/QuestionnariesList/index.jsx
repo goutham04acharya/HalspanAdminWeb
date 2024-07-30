@@ -1,230 +1,171 @@
-import React, { useContext, useState, useRef, useEffect, useCallback } from 'react'
+
+import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
-import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import Table from './Components/Table.jsx';
 import Search from '../../Search/Search.jsx';
-import { dataService } from '../../services/data.services';
-import Debounce from '../../CommonMethods/debounce.jsx';
+import Debounce from '../../CommonMethods/debounce.js';
 import { useDispatch, useSelector } from 'react-redux';
-import PageNavigation from '../../Components/PageNavigation/PageNavigation.jsx';
 import { handleCurrentPage, handlePagination } from '../../redux/paginationSlice.js';
 import FilterDropdown from '../../Components/InputField/FilterDropdown.jsx';
+import useApi from '../../services/CustomHook/useApi.js';
+import objectToQueryString from '../../CommonMethods/ObjectToQueryString.js';
 
-
-function QuestionnairesList() {
-  const dispatch = useDispatch()
+function Questionnaries() {
+  const dispatch = useDispatch();
   const { logout } = useAuth0();
-  const [isContentNotFount, setContentNotFound] = useState(false);
-  const { setToastError, setToastSuccess } = useContext(GlobalContext);
+  const { getAPI } = useApi();
+  const [isContentNotFound, setContentNotFound] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isFilterDropdown, setFilterDropdown] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null)
-  const [searchDetails, setSearchDetails] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
-  const [searchParams, setSearchParams] = useSearchParams({ limit: 10, });
-  const [searchValue, setSearchValue] = useState(searchParams.get('keyword') !== null ?
-    decodeURIComponent(searchParams.get('keyword')) : '')
-
-  let endpoint = `questionnaires?`
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
+    decodeURIComponent(searchParams.get('search')) : '');
+  const [nextPage, setNextPage] = useState(true);
+  const currentPage = useSelector((state) => state.paginationConfig?.currentPage);
+  const paginationData = useSelector((state) => state.paginationConfig?.paginationData);
   const navigate = useNavigate();
 
   const options = [
-    { value: 'Door', label: 'Door' }
+    { value: 'Door', label: 'Door' },
   ];
 
   const handleSelect = (option) => {
     console.log('Selected option:', option);
   };
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
-    setDropdownOpen(false);
-  };
 
   const handleCreateQue = (e) => {
     e.preventDefault();
-    navigate('/QuestionnariesList/Create-Questionnary');
+    navigate('/questionnaries/Create-Questionnary');
   };
-
-  const [nextPage, setNextPage] = useState(true)
-  const [prevPageExist, setPrevPage] = useState(false)
-  const currentPage = useSelector((state) => state.paginationConfig?.currentPage);
-  const paginationData = useSelector((state) => state.paginationConfig?.paginationData);
-
-
-  /**
-    * The above functions handle pagination by updating the current page and search parameters for
-    * fetching data in a React application.
-    */
-  const handlePrevPage = async () => {
-    setNextPage(true)
-    let params = Object.fromEntries(searchParams);
-    if (currentPage === 2) {
-      setPrevPage(false)
-      dispatch(handleCurrentPage(currentPage - 1))
-      delete params.last_evaluated_key
-      setSearchParams({ ...params })
-    }
-    else {
-      dispatch(handleCurrentPage(currentPage - 1))
-      setPrevPage(true)
-      const lastKey = paginationData[currentPage - 1]
-      if (lastKey) {
-        params['last_evaluated_key'] = lastKey
-        setSearchParams({ ...params })
-      }
-    }
-  }
-  /**
-  * The function `handleNextPage` increments the current page number, sets a flag for the previous
-  * page if the current page is greater than or equal to 1, and updates search parameters with
-  * pagination data for the next page.
-  */
-  const handleNextPage = async () => {
-    let params = Object.fromEntries(searchParams);
-    if (currentPage >= 1) {
-      setPrevPage(true)
-    }
-    dispatch(handleCurrentPage(currentPage + 1))
-    params['last_evaluated_key'] = paginationData[currentPage + 1]
-    setSearchParams({ ...params })
-  }
 
   const handleSearchClose = () => {
+    setLoading(true);
     let params = Object.fromEntries(searchParams);
-    if (params['keyword'] !== '') delete params.keyword
-    setSearchParams({ ...params })
-    setSearchValue('')
-  }
-
-  const handleChange = (e, value) => {
-    handleSearch(e, "keyword", value);
+    if (params['search'] !== '') delete params.search;
+    setQueList([])
+    setSearchParams({ ...params });
+    setSearchValue('');
+    setLoading(false);
   };
+
+  // Search related functions
+  const handleChange = (e, value) => {
+    handleSearch(e, "search", value);
+  };
+
   const changeHandler = (e) => {
     setSearchValue(e.target.value);
   };
+
   const optimizedFn = useCallback(
     Debounce((e, value) => handleChange(e, value)),
     [searchParams]
   );
+
   const handleSearch = (e, key, value) => {
     e.preventDefault();
-    setNextPage(true)
-    setPrevPage(false)
-    dispatch(handleCurrentPage(1))
+    setNextPage(true);
+    dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
-    delete params.last_evaluated_key;
-    if (key === 'keyword') {
-      params[key] = encodeURIComponent(value);
+    delete params.start_key; // Reset the start_key when initiating a new search
+    if (key === 'search') {
+      params[key] = value.trim(); // Trim the value before encoding
     } else {
-      params[key] = value
+      params[key] = value;
     }
-    if (params['keyword'] === '') delete params.keyword
-    setSearchParams({ ...params })
-  }
-
-  // filter related states
-  const [filterData, setFilterData] = useState({
-    asset_type: searchParams.get('asset_type') !== null ?
-      decodeURIComponent(searchParams.get('asset_type')) : ''
-  });
-  const [filterError, setFilterError] = useState({
-    country: ""
-  });
-  const [isFilterApplied,setIsFilterApplied] = useState(false)
-
-  console.log(filterData, 'kkkkkkk')
-
-
-  const handleFilter = () => {
-    setNextPage(true)
-    setPrevPage(false)
-    dispatch(handleCurrentPage(1))
+    if (params['search'] === '') delete params.search;
+    setQueList([])
+    setSearchParams({ ...params });
+  };
+  
+  const handleFilter = (option) => {
+    setSelectedOption(option);
+    setNextPage(true);
+    dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
     delete params.last_evaluated_key;
-    params['page'] = 1
-    params['filter'] = 'true'
-    setSearchParams({ ...params, page: 1 })
-    if (filterData.asset_type !== '') {
-      params['asset_type'] = filterData?.asset_type;
-      setIsFilterApplied(true);
+    if (option) {
+      params['asset_type'] = option.value;
     } else {
-      setIsFilterApplied(false)
       delete params.asset_type;
     }
-    setDropdownOpen(false)
-    setSearchParams({ ...params })
-  }
+    setDropdownOpen(false);
+    // setQueList([])
+    setSearchParams({ ...params });
+  };
 
   const clearFilters = () => {
     let params = Object.fromEntries(searchParams);
-    setFilterData((prevState) => ({
-      ...prevState,
-      ['asset_type']: '',
-    }));
-    delete params.country;
-    delete params.filter;
-    setIsfilteropen(false)
-    setSearchParams({ ...params })
-    setIsFilterApplied(false)
-  }
+    delete params.asset_type;
+    setDropdownOpen(false);
+    setSearchParams({ ...params });
+    setSelectedOption(null); // Reset selected option
+  };
 
-
-  const fetchQuestionnaryList = useCallback(async () => {
-    setLoading(true)
-    if (searchParams.get('keyword') !== null) {
-      endpoint += `&search=${searchParams.get('keyword')}`
+  const fetchQuestionnaryList = useCallback(async (isNextPageFetch = false) => {    
+    setLoading(true);
+    const params = Object.fromEntries(searchParams);
+    
+    if (isNextPageFetch && paginationData[currentPage + 1]) {
+      params['start_key'] = encodeURIComponent(JSON.stringify(paginationData[currentPage + 1]));
     }
-    // if (searchParams.get('last_evaluated_key') !== null) {
-    //   endpoint += `&last_element=${searchParams.get('last_evaluated_key')}`
-    // }
-    const response = await dataService.GetAPI(endpoint)
-    console.log(response, 'questionnaires')
-    // if(response?.data?.data.status === true){
-    //   setQueList(response?.data?.data);
-    //   setLoading(false)
-
-    // }
-    if (response.data.data.items == 0) {
-      setQueList(response?.data?.data);
-      setLoading(false)
+    
+    try {
+      const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
+      console.log(response, 'Questionnaires');
+      
+      const newItems = response?.data?.data?.items || [];
+      if (newItems.length === 0) {
+        setNextPage(false);
+      } else {
+        setQueList((prevList) => [...prevList, ...newItems]);
+        setNextPage(true);
+      }
+      
+      if (response?.data?.data?.last_evaluated_key) {
+        dispatch(handlePagination({
+          [currentPage + 1]: response?.data?.data?.last_evaluated_key,
+        }));
+      } else {
+        setNextPage(false);
+      }
+    } catch (error) {
+      console.error('Error fetching questionnaries:', error);
     }
-    if (searchValue == '' && response.data.data.items.length == 0) {
-      setNextPage(false)
-    }
-    else {
-      setQueList(response?.data?.data);
-      setNextPage(true)
-      setLoading(false)
-    }
-    if (response.data.data.last_evaluated_key === undefined || response.data.data.last_evaluated_key === null) {
-      setNextPage(false)
-    }
-    else {
-      setNextPage(true)
-      dispatch(handlePagination({
-        ...paginationData,
-        [currentPage + 1]: response.data.data.last_evaluated_key,
-      }));
-    }
-  }, [searchParams])
-
-
+    
+    setLoading(false);
+  }, [searchParams]);
+  
+  const observer = useRef();
+  const lastElementRef = useCallback((node) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && nextPage) {
+        dispatch(handleCurrentPage(currentPage + 1)); // Increment current page
+        fetchQuestionnaryList(true); // Fetch the next page
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, nextPage, currentPage,]);
+  
   useEffect(() => {
-    fetchQuestionnaryList()
-  }, [fetchQuestionnaryList])
+    fetchQuestionnaryList();
+  }, [fetchQuestionnaryList]);
 
 
   return (
     <div className='bg-[#F4F6FA]'>
       <div className='py-[33px] px-[25px]'>
-        <div className='py-6 px-9 bg-white rounded-[10px]'>
+        <div className='py-6 px-9 bg-white rounded-[10px] h-customh7'>
           <div className='flex w-full justify-between items-center mb-[26px]'>
-            <p className='text-[#2B333B] text-[28px] font-medium'>Questionnaires</p>
+            <p className='text-[#2B333B] text-[28px] font-medium'>Questionnaries</p>
             <Button2
               testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
@@ -235,6 +176,7 @@ function QuestionnairesList() {
           <div className='flex items-center justify-between w-full'>
             <div className='w-[75%] mr-[5%]'>
               <Search
+                testId='searchBox'
                 changeHandler={changeHandler}
                 optimizedFn={optimizedFn}
                 searchValue={searchValue}
@@ -247,6 +189,8 @@ function QuestionnairesList() {
                 placeholder='Filter by asset type'
                 className='w-full cursor-pointer placeholder:text-[#2B333B] h-[50px]'
                 top='20px'
+                testID='drop-btn'
+                labeltestID='option2'
                 options={options}
                 onSelect={handleSelect}
                 isFilterDropdown={isFilterDropdown}
@@ -256,32 +200,26 @@ function QuestionnairesList() {
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
                 handleOptionClick={handleFilter}
+                handleRemove={clearFilters}
                 close='true'
               />
             </div>
           </div>
-          {isContentNotFount ?
-            <ContentNotFound text='No questionnaires available.' className='ml-8' /> :
-            <div className=' bg-white mt-12'>
+          {((isContentNotFound || QueList?.length === 0 || QueList?.items?.length === 0) && !loading) ?
+            <ContentNotFound text='No questionnaries available.' className='ml-8' /> :
+            <div className='bg-white mt-12'>
               <Table
                 loading={loading}
                 setQueList={setQueList}
                 QueList={QueList}
-              />
-              <PageNavigation
-                handlePrevPage={handlePrevPage}
-                handleNextPage={handleNextPage}
-                prevPageExist={prevPageExist}
-                nextPage={nextPage}
-                currentPage={currentPage}
-                loading={loading}
+                lastElementRef={lastElementRef}
               />
             </div>
           }
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default QuestionnairesList
+export default Questionnaries;
