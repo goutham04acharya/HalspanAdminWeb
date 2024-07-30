@@ -1,12 +1,13 @@
 import React from 'react'
 import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout'
+import { useNavigate } from 'react-router-dom'
 // import Form from './Componenets/form'
 // import AddFields from './Componenets/AddFieldsComponent/AddFieldsFields'
 // import fieldsneeded from './Componenets/AddFieldsComponent/fields'
 // import TestFieldSetting from './Componenets/TestFieldSetting/TestFieldSetting'
 
 function QuestionnaryForm() {
-
+    const navigate = useNavigate();
     return (
         <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
             <div className='w-[20%]'>
@@ -52,7 +53,7 @@ function QuestionnaryForm() {
             </div>
             <div className='w-[30%]'>
                 <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                    <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                    <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={()=> navigate('/questionnaries/create-questionnary')}>
                     <img src="/public/Images/cancle.png" className='pr-2.5' alt="cancle" />
                         Cancle
                     </button>

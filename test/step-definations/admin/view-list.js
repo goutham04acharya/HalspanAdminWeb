@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-const assert = 'assert';
+const assert = require('assert');
 const { Given, When, Then, But } = require('@cucumber/cucumber')
 const webdriver = 'selenium-webdriver'
 const until = require('selenium-webdriver').until
@@ -51,16 +51,20 @@ Then('I should see a paginated list of questionnaries sorted by recently created
     assert.deepStrictEqual(item_texts, sorted_item_texts, 'questionnaries are not sorted by recently created');
 });
 
-When('I enter a internal name in the search box', async function () {
-    const name = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`)));
-    const internalName = await name.getText();
-    this.internalName = internalName;
-    await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), this.internalName);
+When('I search by internal name', async function () {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let internalNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[2]/td[2]`)), 10000);
+    this.internal_name = await internalNameElement.getText();
+    console.log(this.internal_name, "1234");
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
+    await searchBox.sendKeys(this.internal_name);
 });
 
 Then('the results should display questionnaries matching the internal name', async function () {
-    const internalName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
-    assert.strictEqual(internalName, this.internalName, 'The searched internal name does not match the expected internal name.');
+    internalName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
+    console.log(internalName,"2345")
+    assert.equal(this.internalName, internalName);
 });
 
 When('I enter a public name in the search box', async function () {

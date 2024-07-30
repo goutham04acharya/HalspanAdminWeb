@@ -102,7 +102,7 @@ function CreateQuestionnary() {
 
        if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
-        navigate('/QuestionnariesList/Create-Questionnary/QuestionnaryForm')
+        navigate('/questionnaries/create-questionnary/questionnary-form')
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
         setToastError(response?.data?.data?.message);

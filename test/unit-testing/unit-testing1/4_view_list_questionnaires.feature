@@ -27,38 +27,10 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
       | "562563576g" |
       | "!@#$%^&*"   |
 
-  # Scenario: Display a message if no matching questionnaries are found after filtering
-  #   Given I am in questionnaire listing screen
-  #   When I select asset type as window from the filter dropdown
-  #   Then I should read a message stating that 'No questionnaries match the selected asset type'
-
-#   Scenario: Display a message if no matching questionnaries are found after searching internal name and filtering
-#     Given I am in questionnaire listing screen
-#     When I enter internal name as "random1212" in the search box
-#     And I select asset type as window from the filter dropdown
-#     Then I should read a message stating that 'No questionnaries match your search and filter criteria'
-
-#   Scenario: Display a message if no matching questionnaries are found after searching public name and filtering
-#     Given I am in questionnaire listing screen
-#     When I enter public name as "random817281" in the search box
-#     And I select asset type as window from the filter dropdown
-#     Then I should read a message stating that 'No questionnaries match your search and filter criteria'
-
-#   Scenario: Display a message if no matching questionnaries are found after searching description and filtering
-#     Given I am in questionnaire listing screen
-#     When I enter description as "random817281" in the search box
-#     And I select asset type as window from the filter dropdown
-#     Then I should read a message stating that 'No questionnaries match your search and filter criteria'
-#     # Updated based on the chronological order
-
-#   Scenario: Admin sees a paginated list of questionnaries sorted by recently created
-#     Given I am in questionnaire listing screen
-#     Then I should see a paginated list of questionnaries sorted by recently created
-
-#   Scenario: Search box for querying by internal name
-#     Given I am in questionnaire listing screen
-#     When I enter a internal name in the search box
-#     Then the results should display questionnaries matching the internal name
+  Scenario: Search box for querying by internal name
+    Given I am in questionnaire listing screen
+    When I search by internal name
+    Then the results should display questionnaries matching the internal name
 
 #   Scenario: Search box for querying by public name
 #     Given I am in questionnaire listing screen

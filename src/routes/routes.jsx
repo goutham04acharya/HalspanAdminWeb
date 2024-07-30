@@ -16,7 +16,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
         <Route element={<Layout {...props} />}>
           <Route path="/questionnaries" element={<Questionnaries />} />
           <Route path="/questionnaries/create-questionnary" element={<CreateQuestionnary />} />
-          <Route path="/QuestionnariesList/Create-Questionnary/QuestionnaryForm" element={<QuestionnaryForm/>}/>
+          <Route path="/questionnaries/create-questionnary/questionnary-form" element={<QuestionnaryForm/>}/>
         </Route>
         {/* Add other routes here */}
       </Routes>
