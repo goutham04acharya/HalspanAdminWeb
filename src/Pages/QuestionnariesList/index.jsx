@@ -26,10 +26,11 @@ function Questionnaries() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
     decodeURIComponent(searchParams.get('search')) : '');
-  const [nextPage, setNextPage] = useState(true);
-  const currentPage = useSelector((state) => state.paginationConfig?.currentPage);
-  const paginationData = useSelector((state) => state.paginationConfig?.paginationData);
   const navigate = useNavigate();
+  let observer = useRef();
+  const lastEvaluatedKeyRef = useRef(null);
+
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const options = [
     { value: 'Door', label: 'Door' },
@@ -44,23 +45,15 @@ function Questionnaries() {
     navigate('/questionnaries/Create-Questionnary');
   };
 
-  // const handleSearchClose = () => {
-  //   setLoading(true);
-  //   let params = Object.fromEntries(searchParams);
-  //   if (params['search'] !== '') delete params.search;
-  //   setQueList([])
-  //   setSearchParams({ ...params });
-  //   setSearchValue('');
-  //   setLoading(false);
-  // };
-
   // Search related functions
   const handleChange = (e, value) => {
     handleSearch(e, "search", value);
   };
 
   const changeHandler = (e) => {
-    setSearchValue(e.target.value);
+    const value = e.target.value;
+    setSearchValue(value);
+    optimizedFn(e, value); // This should call handleSearch with the current value
   };
 
   const optimizedFn = useCallback(
@@ -69,32 +62,27 @@ function Questionnaries() {
   );
 
   const handleSearch = (e, key, value) => {
-    e.preventDefault();
-    setNextPage(true);
-    dispatch(handleCurrentPage(1));
+    e.preventDefault();    
     let params = Object.fromEntries(searchParams);
     delete params.start_key; // Reset the start_key when initiating a new search
-  
+    
     const trimmedValue = value.trim();
     const specialCharRegex = /^[^a-zA-Z0-9]+$/;
   
     if (key === 'search') {
-      params[key] = trimmedValue; // Trim the value before encoding
+      if (specialCharRegex.test(trimmedValue) || trimmedValue === '') {
+        // If search contains only special characters or is empty, clear the search parameter
+        delete params[key];
+      } else {
+        params[key] = trimmedValue; // Trim the value before encoding
+      }
     } else {
       params[key] = value;
     }
   
-    if (specialCharRegex.test(trimmedValue) || trimmedValue === '') {
-      // If search contains only special characters or is empty, set the search value as an empty string
-      params[key] = '';
-    }
-  
     setQueList([]);
     setSearchParams({ ...params });
-  
-    // Simulate API call
-    // You can call your API function here
-    console.log("API called with params:", params);
+
   };
   
   const handleSearchClose = () => {
@@ -109,8 +97,6 @@ function Questionnaries() {
   
   const handleFilter = (option) => {
     setSelectedOption(option);
-    setNextPage(true);
-    dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
     delete params.last_evaluated_key;
     if (option) {
@@ -131,60 +117,49 @@ function Questionnaries() {
     setSelectedOption(null); // Reset selected option
   };
 
-  const fetchQuestionnaryList = useCallback(async (isNextPageFetch = false) => {    
-    setLoading(true);
-    
-    const params = Object.fromEntries(searchParams);
-    
-    if (isNextPageFetch && paginationData[currentPage + 1]) {
-      params['start_key'] = encodeURIComponent(JSON.stringify(paginationData[currentPage + 1]));
-    }
+const fetchQuestionnaryList = useCallback(async () => {
+  setLoading(true);
+  console.log('Fetching questionnaires...');
+  const params = Object.fromEntries(searchParams);
+  console.log(searchParams.get('asset_type'), 'dadadadad')
+  if (lastEvaluatedKeyRef.current) {
+    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+  }
+  if(params.asset_type !== ''){
+    setSelectedOption(params.asset_type)
+  }
+  console.log('Params being sent to API:', params);
+  try {
+    const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
+    const newItems = response?.data?.data?.items || [];
+    setQueList(prevItems => [...prevItems, ...newItems]);
+    lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+  } catch (error) {
+    console.error('Error fetching questionnaires:', error);
+  }
 
-    try {
-      const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
-      console.log(response, 'Questionnaires');
-      
-      const newItems = response?.data?.data?.items || [];
-      if (newItems.length === 0) {
-        setNextPage(false);
-      } else {
-        setQueList((prevList) => [...prevList, ...newItems]);
-        setNextPage(true);
-      }
-      
-      if (response?.data?.data?.last_evaluated_key) {
-        console.log('response..............', currentPage)
-        dispatch(handlePagination({
-          [currentPage + 1]: response?.data?.data?.last_evaluated_key,
-        }));
-      } else {
-        setNextPage(false);
-      }
-    } catch (error) {
-      console.error('Error fetching questionnaries:', error);
-    }
-    
-    setLoading(false);
-  }, [searchParams]);
+  setLoading(false);
+  setIsFetchingMore(false);
+}, [searchParams]);
 
-  console.log(paginationData, 'paginationData')
-  
-  const observer = useRef();
-  const lastElementRef = useCallback((node) => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && nextPage) {
-        dispatch(handleCurrentPage(currentPage + 1)); // Increment current page
-        fetchQuestionnaryList(true); // Fetch the next page
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loading, nextPage, currentPage,]);
-  
-  useEffect(() => {
-    fetchQuestionnaryList();
-  }, [fetchQuestionnaryList]);
+console.log(selectedOption, 'kkkakmaslkamslkamsdlkkmaslkmalksddmlaskm')
+
+const lastElementRef = useCallback(node => {
+  if (loading || isFetchingMore) return;
+  if (observer.current) observer.current.disconnect();
+  observer.current = new IntersectionObserver(entries => {
+    if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
+      console.log('Element is intersecting, fetching more...');
+      setIsFetchingMore(true);
+      fetchQuestionnaryList();
+    }
+  });
+  if (node) observer.current.observe(node);
+}, [loading, isFetchingMore, fetchQuestionnaryList]);
+
+useEffect(() => {
+  fetchQuestionnaryList();
+}, [fetchQuestionnaryList]);
 
 
   return (

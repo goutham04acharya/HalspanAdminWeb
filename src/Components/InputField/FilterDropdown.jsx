@@ -33,7 +33,7 @@ function FilterDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
-                    value={selectedOption ? selectedOption.label : ''}
+                    value={selectedOption ? selectedOption.label || selectedOption : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
