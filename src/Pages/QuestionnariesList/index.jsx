@@ -44,15 +44,15 @@ function Questionnaries() {
     navigate('/questionnaries/Create-Questionnary');
   };
 
-  const handleSearchClose = () => {
-    setLoading(true);
-    let params = Object.fromEntries(searchParams);
-    if (params['search'] !== '') delete params.search;
-    setQueList([])
-    setSearchParams({ ...params });
-    setSearchValue('');
-    setLoading(false);
-  };
+  // const handleSearchClose = () => {
+  //   setLoading(true);
+  //   let params = Object.fromEntries(searchParams);
+  //   if (params['search'] !== '') delete params.search;
+  //   setQueList([])
+  //   setSearchParams({ ...params });
+  //   setSearchValue('');
+  //   setLoading(false);
+  // };
 
   // Search related functions
   const handleChange = (e, value) => {
@@ -74,14 +74,37 @@ function Questionnaries() {
     dispatch(handleCurrentPage(1));
     let params = Object.fromEntries(searchParams);
     delete params.start_key; // Reset the start_key when initiating a new search
+  
+    const trimmedValue = value.trim();
+    const specialCharRegex = /^[^a-zA-Z0-9]+$/;
+  
     if (key === 'search') {
-      params[key] = value.trim(); // Trim the value before encoding
+      params[key] = trimmedValue; // Trim the value before encoding
     } else {
       params[key] = value;
     }
-    if (params['search'] === '') delete params.search;
-    setQueList([])
+  
+    if (specialCharRegex.test(trimmedValue) || trimmedValue === '') {
+      // If search contains only special characters or is empty, set the search value as an empty string
+      params[key] = '';
+    }
+  
+    setQueList([]);
     setSearchParams({ ...params });
+  
+    // Simulate API call
+    // You can call your API function here
+    console.log("API called with params:", params);
+  };
+  
+  const handleSearchClose = () => {
+    setLoading(true);
+    let params = Object.fromEntries(searchParams);
+    if (params['search'] !== '') delete params.search;
+    setQueList([]);
+    setSearchParams({ ...params });
+    setSearchValue('');
+    setLoading(false);
   };
   
   const handleFilter = (option) => {
@@ -110,12 +133,13 @@ function Questionnaries() {
 
   const fetchQuestionnaryList = useCallback(async (isNextPageFetch = false) => {    
     setLoading(true);
+    
     const params = Object.fromEntries(searchParams);
     
     if (isNextPageFetch && paginationData[currentPage + 1]) {
       params['start_key'] = encodeURIComponent(JSON.stringify(paginationData[currentPage + 1]));
     }
-    
+
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
       console.log(response, 'Questionnaires');
@@ -129,6 +153,7 @@ function Questionnaries() {
       }
       
       if (response?.data?.data?.last_evaluated_key) {
+        console.log('response..............', currentPage)
         dispatch(handlePagination({
           [currentPage + 1]: response?.data?.data?.last_evaluated_key,
         }));
@@ -141,6 +166,8 @@ function Questionnaries() {
     
     setLoading(false);
   }, [searchParams]);
+
+  console.log(paginationData, 'paginationData')
   
   const observer = useRef();
   const lastElementRef = useCallback((node) => {

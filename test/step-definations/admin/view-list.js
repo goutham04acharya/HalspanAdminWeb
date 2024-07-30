@@ -6,6 +6,16 @@ const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
 const Key = webdriver.Key
 
+Given('I am in questionnaire listing screen', async function(){
+    await driver.get('http://localhost:3000/questionnaries');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));
+});
+
+When('I enter search term as {string}', async function(string){
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]'))).sendKeys(string);
+})
 Given('no questionnaries exist', async function () {
     const isTablePresent = await driver.executeScript("return document.querySelector('table') !== null");
     assert.strictEqual(isTablePresent, false, 'Expected no questionnaries table to be present');
