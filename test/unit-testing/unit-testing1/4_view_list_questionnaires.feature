@@ -27,40 +27,24 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
       | "562563576g" |
       | "!@#$%^&*"   |
 
-  Scenario: Search box for querying by internal name
+  Scenario: Searching by internal name
     Given I am in questionnaire listing screen
     When I search by internal name
-    Then the results should display questionnaries matching the internal name
+    Then The results should display questionnaries matching the internal name
 
-#   Scenario: Search box for querying by public name
-#     Given I am in questionnaire listing screen
-#     When I enter a public name in the search box
-#     Then the results should display questionnaries matching the public name
+  Scenario: Searching by public name
+    Given I am in questionnaire listing screen
+    When I search by public name
+    Then The results should display questionnaries matching the public name
 
-#   Scenario: Search box for querying by description
-#     Given I am in questionnaire listing screen
-#     When I enter description in the search box
-#     Then the results should display questionnaries matching the description
+  Scenario: Searching by description
+    Given I am in questionnaire listing screen
+    When I search by description
+    Then The results should display questionnaries matching the description
 
-#   Scenario: Filter dropdown for asset types to refine results
-#     Given I am in questionnaire listing screen
-#     When I select an asset type from the filter dropdown
-#     Then the results should be refined to show questionnaries of the selected asset type
+  Scenario: Filter by asset type
+    Given I am in questionnaire listing screen
+    When I select asset type from the filter dropdown
+    Then The results should be refined to show questionnaries of the selected asset type
 
-#   Scenario: Search internal name and filter simultaneously to refine results accurately
-#     Given I am in questionnaire listing screen
-#     When I enter a internal name in the search box
-#     And I select an asset type from the filter dropdown
-#     Then the results should display questionnaries matching the entered internal name and asset type
 
-#   Scenario: Search public name and filter simultaneously to refine results accurately
-#     Given I am in questionnaire listing screen
-#     When I enter a public name in the search box
-#     And I select an asset type from the filter dropdown
-#     Then the results should display questionnaries matching the entered public name and asset type
-
-#   Scenario: Search description and filter simultaneously to refine results accurately
-#     Given I am in questionnaire listing screen
-#     When I enter description in the search box
-#     And I select an asset type from the filter dropdown
-#     Then the results should display questionnaries matching the entered description and asset type
