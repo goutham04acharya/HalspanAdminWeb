@@ -16,44 +16,44 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
         Then I should be redirected to the questionnaire listing screen
 
     @create_questionnaire
-    Scenario: Admin sees a paginated list of questionnaries sorted by recently created
-        Given I am on the dashboard screen
-        Then I should see a paginated list of questionnaries sorted by recently created
+    Scenario: List all questionnaire
+        Given I am on the questionnaire listing screen
+        Then I should see the table header containing '["ID", "INTERNAL NAME", "PUBLIC NAME", "ASSET TYPE", "STATUS", "DESCRIPTION"]'
     
     Scenario: Search box for querying by internal name
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter a internal name in the search box
         Then the results should display questionnaries matching the internal name
 
     Scenario: Search box for querying by public name
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter a public name in the search box
         Then the results should display questionnaries matching the public name
 
     Scenario: Search box for querying by description
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter description in the search box
         Then the results should display questionnaries matching the description
 
     Scenario: Filter dropdown for asset types to refine results
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I select an asset type from the filter dropdown
         Then the results should be refined to show questionnaries of the selected asset type
 
     Scenario: Search internal name and filter simultaneously to refine results accurately
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter a internal name in the search box
         And I select an asset type from the filter dropdown
         Then the results should display questionnaries matching the entered internal name and asset type
 
     Scenario: Search public name and filter simultaneously to refine results accurately
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter a public name in the search box
         And I select an asset type from the filter dropdown
         Then the results should display questionnaries matching the entered public name and asset type
 
     Scenario: Search description and filter simultaneously to refine results accurately
-        Given I am on the dashboard screen
+        Given I am on the questionnaire listing screen
         When I enter description in the search box
         And I select an asset type from the filter dropdown
         Then the results should display questionnaries matching the entered description and asset type

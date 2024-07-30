@@ -29,7 +29,7 @@ When('I click the submit button', async function () {
 Then('I should be redirected to the questionnaire listing screen', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.sleep(5000);
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="questionnaries"]')));   
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));   
 });
 
 When('I enter email address as {string}', async function(string){
