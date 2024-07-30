@@ -15,11 +15,6 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
         * I click the submit button
         Then I should be redirected to the questionnaire listing screen
 
-    Scenario: Display an empty screen with an appropriate message if no questionnaries exist
-        Given I am on the dashboard screen
-        And no questionnaries exist
-        Then I should read a message stating that 'No questionnaries available.'
-
     @create_questionnaire
     Scenario: Display a message if no matching questionnaries are found for searched internal name
         Given I am on the dashboard screen

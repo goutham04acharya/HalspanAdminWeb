@@ -5,6 +5,7 @@ import CreateQuestionnary from '../Pages/CreateQuestionnary/CreateQuestionnary.j
 import AuthRedirect from '../Pages/auth/AuthRedirect.jsx';
 import Layout from '../Components/Layout/index.jsx';
 import Questionnaries from '../Pages/QuestionnariesList/index.jsx';
+import QuestionnaryForm from '../Pages/QuestionnaryForm/index.jsx';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   return (
@@ -15,6 +16,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
         <Route element={<Layout {...props} />}>
           <Route path="/questionnaries" element={<Questionnaries />} />
           <Route path="/questionnaries/create-questionnary" element={<CreateQuestionnary />} />
+          <Route path="/QuestionnariesList/Create-Questionnary/QuestionnaryForm" element={<QuestionnaryForm/>}/>
         </Route>
         {/* Add other routes here */}
       </Routes>

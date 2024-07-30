@@ -63,6 +63,7 @@ Before('@login', async function () {
     }
 });
 AfterAll(async function () {
+    await authHeader()
     const coverageDataDir = path.join(__dirname, 'coverageData');
     if (!fs.existsSync(coverageDataDir)) {
         fs.mkdirSync(coverageDataDir);
