@@ -22,17 +22,17 @@ function QuestionnaryForm() {
                 </div>
                 <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6'>
                     <p className='font-semibold text-[22px] text-[#2B333B]'>Inspection A</p>
-                    <div className='mt-[25px] p-4'>
+                    <div className='mt-[25px] p-4 hover:border-[#2B333B] hover:border rounded-[10px]'>
                         <div className='flex items-center w-full justify-between'>
                             <p className='text-[#2B333B] font-medium text-[22px]'>Section 1</p>
                             <img src="/public/Images/save.svg" alt="save" />
                         </div>
-                        <div className='mt-7 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px]'>
+                        <div className='mt-7 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'>
                             <p className='text-[#2B333B] font-medium text-[22px]'>Page 1</p>
                             <div className='bg-[#EFF1F8] mt-7 rounded-[10px] p-4'>
                                 <p className='mb-5 font-medium text-base text-[#000000]'>Question 1</p>
                             </div>
-                            <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3'>
+                            <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border rounded-[10px]'>
                                 <button type='button' className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                     +
                                     <span className='ml-[4]'>Add question</span>

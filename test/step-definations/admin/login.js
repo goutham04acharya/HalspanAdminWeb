@@ -11,6 +11,12 @@ Given('I am on the login page', async function () {
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Log in"]')));
 });
 
+Given('I am on the dashboard screen', async function(){
+    await driver.get('http://localhost:3000/questionnaries');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));
+});
+
 When('I enter valid email address as {string}', async function (string) {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.id('username'))).sendKeys(string);
