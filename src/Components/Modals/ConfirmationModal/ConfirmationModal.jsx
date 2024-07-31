@@ -14,7 +14,7 @@ function ConfirmationModal({ text, subText, Button1text, Button2text, src, class
   });
 
     return (
-        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[9]'>
+        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[512px] h-[245px] mx-auto bg-white rounded-[14px] relative pt-10 px-6 pb-6 '>
                 <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} />
                 <Image src={src} className={`${className} mx-auto`} />

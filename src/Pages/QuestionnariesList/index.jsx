@@ -64,6 +64,8 @@ function Questionnaries() {
   const handleSearch = (e, key, value) => {
     e.preventDefault();    
     let params = Object.fromEntries(searchParams);
+
+    console.log(params, 'paaa')
     delete params.start_key; // Reset the start_key when initiating a new search
     
     const trimmedValue = value.trim();
@@ -105,7 +107,7 @@ function Questionnaries() {
       delete params.asset_type;
     }
     setDropdownOpen(false);
-    // setQueList([])
+    setQueList([])
     setSearchParams({ ...params });
   };
 
@@ -128,6 +130,9 @@ const fetchQuestionnaryList = useCallback(async () => {
   if(params.asset_type !== ''){
     setSelectedOption(params.asset_type)
   }
+  // if(params.search !== ''){
+  //   delete params.start_key
+  // }
   console.log('Params being sent to API:', params);
   try {
     const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
@@ -155,7 +160,7 @@ const lastElementRef = useCallback(node => {
     }
   });
   if (node) observer.current.observe(node);
-}, [loading, isFetchingMore, fetchQuestionnaryList]);
+}, [loading, isFetchingMore]);
 
 useEffect(() => {
   fetchQuestionnaryList();
