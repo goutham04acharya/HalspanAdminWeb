@@ -25,6 +25,7 @@
     "babel-plugin-istanbul": "^5.1.0",
     "chromedriver": "^126.0.5",
     "cucumber": "^6.0.7",
+    "detect-secrets": "^1.0.6",
     "dotenv": "^16.4.5",
     "eslint": "^9.7.0",
     "eslint-plugin-react": "^7.34.4",

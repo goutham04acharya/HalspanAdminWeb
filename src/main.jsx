@@ -16,8 +16,6 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <Auth0Provider
     domain={auth0Domain}
-    // domain="dev-hjr0lxj23dh6f5qc.uk.auth0.com"
-    // clientId="Tp6s9L1kHp2qU7ICnauxcKa9VKZeMnlG"
     cacheLocation="localstorage"
     clientId={auth0ClientID}
     authorizationParams={{
