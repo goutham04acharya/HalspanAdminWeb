@@ -25,7 +25,7 @@ function Questionnaries() {
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
-    decodeURIComponent(searchParams.get('search')) : '');
+    encodeURIComponent(searchParams.get('search')) : '');
   const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
@@ -71,10 +71,10 @@ function Questionnaries() {
     delete params.start_key; // Reset the start_key when initiating a new search
 
     const trimmedValue = value.trim();
-    const specialCharRegex = /^[^a-zA-Z0-9]+$/;
+    // const specialCharRegex = /^[^a-zA-Z0-9]+$/;
 
     if (key === 'search') {
-      if (specialCharRegex.test(trimmedValue) || trimmedValue === '') {
+      if (trimmedValue === '') {
         // If search contains only special characters or is empty, clear the search parameter
         delete params[key];
       } else {
@@ -86,7 +86,6 @@ function Questionnaries() {
 
     setQueList([]);
     setSearchParams({ ...params });
-
   };
 
   const handleSearchClose = () => {
@@ -102,8 +101,14 @@ function Questionnaries() {
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
-    delete params.last_evaluated_key;
-    setQueList([])
+    console.log(option, params.asset_type, 'optios')
+    if (params.asset_type === option?.value) {
+      setDropdownOpen(false);
+      return;
+    } else {
+      delete params.start_key;
+      setQueList([])
+    }
     if (option) {
       params['asset_type'] = option.value;
     } else {
@@ -115,7 +120,10 @@ function Questionnaries() {
 
   const clearFilters = () => {
     let params = Object.fromEntries(searchParams);
-    delete params.asset_type;
+    console.log(params, 'params')
+    delete params?.start_key;
+    delete params?.asset_type;
+    lastEvaluatedKeyRef.current = null
     setQueList([])
     setDropdownOpen(false);
     setSearchParams({ ...params });
@@ -133,7 +141,6 @@ function Questionnaries() {
     }
     if (searchValue !== '') {
       delete params.start_key
-      //setSearchParams(params)
     }
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);

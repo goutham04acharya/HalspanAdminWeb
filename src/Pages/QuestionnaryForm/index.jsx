@@ -32,7 +32,7 @@ function QuestionnaryForm() {
                             <div className='bg-[#EFF1F8] mt-7 rounded-[10px] p-4'>
                                 <p className='mb-5 font-medium text-base text-[#000000]'>Question 1</p>
                             </div>
-                            <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border rounded-[10px]'>
+                            <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border'>
                                 <button type='button' className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                     +
                                     <span className='ml-[4]'>Add question</span>
