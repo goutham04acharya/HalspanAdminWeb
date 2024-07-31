@@ -52,8 +52,11 @@ function Questionnaries() {
 
   const changeHandler = (e) => {
     const value = e.target.value;
+    let params = Object.fromEntries(searchParams)
+    delete params.start_key;
+console.log(params, 'paramsss')
     setSearchValue(value);
-    optimizedFn(e, value); // This should call handleSearch with the current value
+   optimizedFn(e, value); // This should call handleSearch with the current value
   };
 
   const optimizedFn = useCallback(
@@ -65,7 +68,6 @@ function Questionnaries() {
     e.preventDefault();    
     let params = Object.fromEntries(searchParams);
 
-    console.log(params, 'paaa')
     delete params.start_key; // Reset the start_key when initiating a new search
     
     const trimmedValue = value.trim();
@@ -101,19 +103,20 @@ function Questionnaries() {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
     delete params.last_evaluated_key;
+    setQueList([])
     if (option) {
       params['asset_type'] = option.value;
     } else {
       delete params.asset_type;
     }
     setDropdownOpen(false);
-    setQueList([])
     setSearchParams({ ...params });
   };
 
   const clearFilters = () => {
     let params = Object.fromEntries(searchParams);
     delete params.asset_type;
+    setQueList([])
     setDropdownOpen(false);
     setSearchParams({ ...params });
     setSelectedOption(null); // Reset selected option
@@ -121,19 +124,17 @@ function Questionnaries() {
 
 const fetchQuestionnaryList = useCallback(async () => {
   setLoading(true);
-  console.log('Fetching questionnaires...');
   const params = Object.fromEntries(searchParams);
-  console.log(searchParams.get('asset_type'), 'dadadadad')
   if (lastEvaluatedKeyRef.current) {
     params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
   }
   if(params.asset_type !== ''){
     setSelectedOption(params.asset_type)
   }
-  // if(params.search !== ''){
-  //   delete params.start_key
-  // }
-  console.log('Params being sent to API:', params);
+  if(searchValue !== ''){
+    delete params.start_key
+    //setSearchParams(params)
+  }
   try {
     const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
     const newItems = response?.data?.data?.items || [];
@@ -147,14 +148,11 @@ const fetchQuestionnaryList = useCallback(async () => {
   setIsFetchingMore(false);
 }, [searchParams]);
 
-console.log(selectedOption, 'kkkakmaslkamslkamsdlkkmaslkmalksddmlaskm')
-
 const lastElementRef = useCallback(node => {
   if (loading || isFetchingMore) return;
   if (observer.current) observer.current.disconnect();
   observer.current = new IntersectionObserver(entries => {
     if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
-      console.log('Element is intersecting, fetching more...');
       setIsFetchingMore(true);
       fetchQuestionnaryList();
     }
