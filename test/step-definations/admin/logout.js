@@ -21,10 +21,6 @@ Then('I should see a confirmation prompt stating to logout', async function(){
     await driver.wait(until.elementLocated(By.xpath('//*[text()="You will be signed out of your account."]')));
 });
 
-When('I click the cancel button', async function (){
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click();
-});
 
 When('I click the close button', async function (){
     await new Promise((resolve) => setTimeout(resolve, 2000));
