@@ -32,6 +32,7 @@ BeforeAll(async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
     await driver.get('http://localhost:3000/');
     await driver.wait(until.elementLocated(By.css('body')));
+    await new Promise(resolve => setTimeout(resolve, 3000));
     global.current_process_name = faker.string.alpha({ count: 10, casing: 'upper' });
     global.is_user_logged_in = false;
     console.log('Current process name:', global.current_process_name);
