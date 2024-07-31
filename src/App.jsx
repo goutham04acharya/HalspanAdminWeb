@@ -18,7 +18,7 @@
 //     if (!isAuthenticated && !isLoading) {
 //       navigate("/login");
 //     } else if (isAuthenticated) {
-//       navigate("/QuestionnariesList");
+//       navigate("/questionnaries");
 //     }
 //   }, [isAuthenticated, isLoading, navigate]);
 

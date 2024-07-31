@@ -11,6 +11,12 @@ Given('I am on the login page', async function () {
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Log in"]')));
 });
 
+Given('I am on the dashboard screen', async function(){
+    await driver.get('http://localhost:3000/questionnaries');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));
+});
+
 When('I enter valid email address as {string}', async function (string) {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.id('username'))).sendKeys(string);
@@ -29,7 +35,7 @@ When('I click the submit button', async function () {
 Then('I should be redirected to the questionnaire listing screen', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.sleep(5000);
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Questionnaires"]')));   
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));   
 });
 
 When('I enter email address as {string}', async function(string){

@@ -72,6 +72,7 @@ When('I enter Unique Public Name in the public name field', async function () {
 
 When('I enter internal name in the internal name field', async function () {
     const internalName = `Inspection${faker.string.alpha(4)}`; // Correct method for alphanumeric string   faker.company.name()
+    global.internalName = internalName;
     await driver.wait(until.elementLocated(By.css('[data-testid = "internalName"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), internalName);
 });
 

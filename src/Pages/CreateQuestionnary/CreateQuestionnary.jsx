@@ -7,14 +7,13 @@ import Button from '../../Components/Button/button';
 import Button2 from '../../Components/Button2/ButtonLight';
 import ErrorMessage from '../../Components/ErrorMessage/ErrorMessage';
 import { useNavigate } from 'react-router-dom';
-import { dataService } from '../../services/data.services';
-import { useAuth0 } from "@auth0/auth0-react";
 import GlobalContext from '../../Components/Context/GlobalContext';
 import Toast from '../../Components/Toast/Toast';
+import useApi from '../../services/CustomHook/useApi';
 
 function CreateQuestionnary() {
   const navigate = useNavigate();
-  const { getIdTokenClaims } = useAuth0();
+  const { PostAPI } = useApi();
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isThreedotLoader, setIsThreedotLoader] = useState(false)
 
@@ -62,7 +61,7 @@ function CreateQuestionnary() {
 
 
   const handleNavigateBack = () => {
-    navigate('/QuestionnariesList');
+    navigate('/questionnaries');
   };
 
   const handleCreateQuestionnary = async () => {
@@ -99,11 +98,11 @@ function CreateQuestionnary() {
     }
     try {
       setIsThreedotLoader(true)
-      const response = await dataService.PostAPI("questionnaires", payload, getIdTokenClaims);
-      console.log('API response:', response?.data?.status);
+      const response = await PostAPI("questionnaires", payload);
 
-      if (response?.data?.status === true) {
+       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
+        navigate('/questionnaries/create-questionnary/questionnary-form')
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
         setToastError(response?.data?.data?.message);
@@ -113,6 +112,7 @@ function CreateQuestionnary() {
         setIsThreedotLoader(false)
       }
     } catch (error) {
+      console.log(error)
       setToastError('Something went wrong');
       setIsThreedotLoader(false)
     }
@@ -184,7 +184,7 @@ function CreateQuestionnary() {
                   placeholder='Enter Public name'
                   testId='publicName'
                   htmlFor='public_name'
-                  maxLength={255}
+                  maxLength={100}
                   handleChange={handleChange}
                   validationError={validationErrors?.public_name}
                 />
@@ -203,7 +203,7 @@ function CreateQuestionnary() {
                   placeholder='Enter Internal name'
                   testId='internalName'
                   htmlFor='internal_name'
-                  maxLength={255}
+                  maxLength={100}
                   handleChange={handleChange}
                   validationError={validationErrors?.internal_name}
                 />
@@ -219,7 +219,7 @@ function CreateQuestionnary() {
                     labelStyle='font-semibold text-base text-[#2B333B]'
                     id='asset_type'
                     placeholder='Select'
-                    className='w-full cursor-pointer mt-2.5'
+                    className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                     top='53px'
                     testID='drop-btn'
                     labeltestID='option0'
@@ -241,7 +241,7 @@ function CreateQuestionnary() {
                   mandatoryField='true'
                   id='language'
                   placeholder='Select'
-                  className='w-full cursor-pointer mt-2.5'
+                  className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                   top='53px'
                   testID='language-drop-btn'
                   labeltestID='language0'
@@ -316,7 +316,7 @@ function CreateQuestionnary() {
           <Button2
             testId='Cancel'
             onClick={handleNavigateBack}
-            className='w-[162px] h-[50px] ml-[32px]'
+            className='w-[162px] h-[50px] ml-[32px] font-normal'
             text='Cancel'
           />
         </div>
