@@ -54,9 +54,9 @@ function Questionnaries() {
     const value = e.target.value;
     let params = Object.fromEntries(searchParams)
     delete params.start_key;
-console.log(params, 'paramsss')
+    console.log(params, 'paramsss')
     setSearchValue(value);
-   optimizedFn(e, value); // This should call handleSearch with the current value
+    optimizedFn(e, value); // This should call handleSearch with the current value
   };
 
   const optimizedFn = useCallback(
@@ -65,14 +65,14 @@ console.log(params, 'paramsss')
   );
 
   const handleSearch = (e, key, value) => {
-    e.preventDefault();    
+    e.preventDefault();
     let params = Object.fromEntries(searchParams);
 
     delete params.start_key; // Reset the start_key when initiating a new search
-    
+
     const trimmedValue = value.trim();
     const specialCharRegex = /^[^a-zA-Z0-9]+$/;
-  
+
     if (key === 'search') {
       if (specialCharRegex.test(trimmedValue) || trimmedValue === '') {
         // If search contains only special characters or is empty, clear the search parameter
@@ -83,12 +83,12 @@ console.log(params, 'paramsss')
     } else {
       params[key] = value;
     }
-  
+
     setQueList([]);
     setSearchParams({ ...params });
 
   };
-  
+
   const handleSearchClose = () => {
     setLoading(true);
     let params = Object.fromEntries(searchParams);
@@ -98,7 +98,7 @@ console.log(params, 'paramsss')
     setSearchValue('');
     setLoading(false);
   };
-  
+
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
@@ -122,47 +122,47 @@ console.log(params, 'paramsss')
     setSelectedOption(null); // Reset selected option
   };
 
-const fetchQuestionnaryList = useCallback(async () => {
-  setLoading(true);
-  const params = Object.fromEntries(searchParams);
-  if (lastEvaluatedKeyRef.current) {
-    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-  }
-  if(params.asset_type !== ''){
-    setSelectedOption(params.asset_type)
-  }
-  if(searchValue !== ''){
-    delete params.start_key
-    //setSearchParams(params)
-  }
-  try {
-    const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
-    const newItems = response?.data?.data?.items || [];
-    setQueList(prevItems => [...prevItems, ...newItems]);
-    lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
-  } catch (error) {
-    console.error('Error fetching questionnaires:', error);
-  }
-
-  setLoading(false);
-  setIsFetchingMore(false);
-}, [searchParams]);
-
-const lastElementRef = useCallback(node => {
-  if (loading || isFetchingMore) return;
-  if (observer.current) observer.current.disconnect();
-  observer.current = new IntersectionObserver(entries => {
-    if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
-      setIsFetchingMore(true);
-      fetchQuestionnaryList();
+  const fetchQuestionnaryList = useCallback(async () => {
+    setLoading(true);
+    const params = Object.fromEntries(searchParams);
+    if (lastEvaluatedKeyRef.current) {
+      params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
-  });
-  if (node) observer.current.observe(node);
-}, [loading, isFetchingMore]);
+    if (params.asset_type !== '') {
+      setSelectedOption(params.asset_type)
+    }
+    if (searchValue !== '') {
+      delete params.start_key
+      //setSearchParams(params)
+    }
+    try {
+      const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
+      const newItems = response?.data?.data?.items || [];
+      setQueList(prevItems => [...prevItems, ...newItems]);
+      lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+    } catch (error) {
+      console.error('Error fetching questionnaires:', error);
+    }
 
-useEffect(() => {
-  fetchQuestionnaryList();
-}, [fetchQuestionnaryList]);
+    setLoading(false);
+    setIsFetchingMore(false);
+  }, [searchParams]);
+
+  const lastElementRef = useCallback(node => {
+    if (loading || isFetchingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
+        setIsFetchingMore(true);
+        fetchQuestionnaryList();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, isFetchingMore]);
+
+  useEffect(() => {
+    fetchQuestionnaryList();
+  }, [fetchQuestionnaryList]);
 
 
   return (
@@ -210,16 +210,23 @@ useEffect(() => {
               />
             </div>
           </div>
-          {((isContentNotFound || QueList?.length === 0 || QueList?.items?.length === 0) && !loading) ?
-            <ContentNotFound text='No questionnaries available.' className='ml-8' /> :
-            <div className='bg-white mt-12'>
-              <Table
-                loading={loading}
-                setQueList={setQueList}
-                QueList={QueList}
-                lastElementRef={lastElementRef}
+          {
+            !loading && (isContentNotFound || (QueList?.length === 0 || QueList?.items?.length === 0)) ? (
+              <ContentNotFound
+                src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
+                text={searchValue !== '' ? "We couldn't find any items matching your filter criteria." : 'No questionnaires available.'}
+                className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'}
               />
-            </div>
+            ) : (
+              <div className='bg-white mt-12'>
+                <Table
+                  loading={loading}
+                  setQueList={setQueList}
+                  QueList={QueList}
+                  lastElementRef={lastElementRef}
+                />
+              </div>
+            )
           }
         </div>
       </div>
