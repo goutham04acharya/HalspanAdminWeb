@@ -40,8 +40,8 @@ function Table({ loading, QueList, lastElementRef }) {
                     <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>ID</th>
                     <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>INTERNAL NAME</th>
                     <th className='min-w-[400px] text-start py-6 font-medium text-base text-[#2B333B]'>PUBLIC NAME</th>
-                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>STATUS</th>
-                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>ASSET TYPE type</th>
+                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] pl-[18px]'>STATUS</th>
+                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>ASSET TYPE</th>
                     <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
                 </thead>
                 {loading
