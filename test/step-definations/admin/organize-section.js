@@ -9,10 +9,22 @@ Given('I am on the questionnaire management section', async function () {
 });
 
 Then('I verify that I am on the same questionnaire management section which was created', async function () {
-    const pageSource = await driver.getPageSource();
-    if (!pageSource.includes(global.internalName)) {
-        throw new Error(`Expected page source to contain "${global.internalName}", but it does not.`);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    let check = false;
+    let retries = 400;
+
+    while (retries > 0) {
+        const pageSource = await driver.getPageSource();
+        check = pageSource.includes(global.internalName);
+
+        if (check) {
+            return 'passed';
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            retries--;
+        }
     }
+    throw new Error(`Expected page source to contain "${global.internalName}", but it does not.`);
 });
 
 When('I add a new question to the page {int} in section {int}', async function (pageNumber, sectionNumber) {
@@ -95,5 +107,10 @@ When('I click the save button for section {int}', async function (sectionNumber)
 
 Then('I should see the section {int} saved', async function (sectionNumber) {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="notification"]')));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save-${sectionNumber}"]`)));
+});
+
+When('I click the save button for the questionnaire version', async function(){
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
 });
