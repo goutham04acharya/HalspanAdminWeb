@@ -95,3 +95,8 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
         Given I am on the questionnaire management section
         When I click the save button for section 2
         Then I should see the section 2 saved
+
+    Scenario: Admin saves the questionnaire vesion
+        Given I am on the questionnaire management section
+        When I click the save button for the questionnaire version
+        Then I should read a message stating that "Questionnaire saved successfully"
