@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
+import AddFields from './Components/AddFieldComponents/AddFields.jsx';
+import fieldsneeded from './Components/AddFieldComponents/Field.js';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -150,6 +152,7 @@ function QuestionnaryForm() {
 
     const handleSave = async () => {
         let body = JSON.parse(JSON.stringify(sections));
+        console.log( typeof body, 'bodyyy')
 
         // Recursive function to remove specified keys
         const removeKeys = (obj) => {
@@ -171,7 +174,6 @@ function QuestionnaryForm() {
 
     }
 
-
     useEffect(() => {
         formDefaultDetails();
     }, []);
@@ -184,7 +186,7 @@ function QuestionnaryForm() {
             (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} />
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -259,7 +261,7 @@ function QuestionnaryForm() {
                                 Save
                             </button>
                         </div>
-                        {/* <AddFields buttons={fieldsneeded} /> */}
+                        <AddFields buttons={fieldsneeded} />
                         {/* <TestFieldSetting/> */}
                     </div>
                 </div>
