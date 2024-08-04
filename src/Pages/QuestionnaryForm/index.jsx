@@ -1,20 +1,15 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
-import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout';
+import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
 
-
-// import Form from './Componenets/form'
-// import AddFields from './Componenets/AddFieldsComponent/AddFieldsFields'
-// import fieldsneeded from './Componenets/AddFieldsComponent/fields'
-// import TestFieldSetting from './Componenets/TestFieldSetting/TestFieldSetting'
-
 function QuestionnaryForm() {
-    const { questionnaire_id, version_number } = useParams()
+    const { questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
     const { getAPI } = useApi();
+    const { PatchAPI } = useApi();
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: 'SEC1',
@@ -23,9 +18,9 @@ function QuestionnaryForm() {
             page_name: 'Page 1',
             questions: []
         }]
-    }])
-    const [pageLoding, setPageLoading] = useState(false);
-    const [formDefaultInfo, setFormDefaultInfo] = useState([])
+    }]);
+    const [pageLoading, setPageLoading] = useState(false);
+    const [formDefaultInfo, setFormDefaultInfo] = useState([]);
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -38,7 +33,7 @@ function QuestionnaryForm() {
             case 'Retired':
                 return 'bg-[#E8D7D7] text-[#2B333B]';
             default:
-                return '-'; // Default styles when status doesn't match any condition
+                return '-';
         }
     };
 
@@ -53,16 +48,13 @@ function QuestionnaryForm() {
             case 'Retired':
                 return 'Retired';
             default:
-                return '-'; // Default text when status doesn't match any condition
+                return '-';
         }
     };
 
-    //form related codes are starts here
-    const containerRef = useRef(null);
+    // Form related code
     const handleAddRemoveSection = (event, sectionIndex) => {
-        console.log(sectionIndex, 'sec')
         if (event === 'add') {
-            console.log(sections, 'hhh')
             setSections([...sections, {
                 section_name: `Section ${sections.length + 1}`,
                 section_id: `SEC${sections.length + 1}`,
@@ -71,16 +63,15 @@ function QuestionnaryForm() {
                     page_name: 'Page 1',
                     questions: []
                 }]
-            }])
+            }]);
         } else if (event === 'remove') {
-            // Remove the section at the specified index
             const updatedSections = sections.filter((_, index) => index !== sectionIndex);
             setSections(updatedSections);
         } else {
             sections = sections.splice(0, sectionIndex);
             setSections([...sections]);
         }
-    }
+    };
 
     const handleAddRemovePage = (event, sectionIndex, pageIndex) => {
         let currentSectionData = sections[sectionIndex];
@@ -95,7 +86,6 @@ function QuestionnaryForm() {
                 }
             ];
         } else if (event === 'remove') {
-            // Remove the page at the specified index
             currentSectionData.pages = currentSectionData?.pages?.filter((_, index) => index !== pageIndex);
         }
 
@@ -103,35 +93,31 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
-    const handleAddRemoveQuestion = (event, sectionIndex, pageIndex) => {
-        console.log(sectionIndex, event, 'sectionIndex')
+    const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
-        console.log(currentPageData, 'hhhfhfhf')
         if (event === 'add') {
             currentPageData.questions = [...currentPageData.questions, {
-                question_id: `SEC${sectionIndex + 1}_PG${pageIndex + 1}_QUES${currentPageData.questions.length + 1}`,
+                question_id: `SEC${sectionIndex + 1}_PG${pageIndex + 1}_QUES${currentPageData?.questions.length + 1}`,
                 question_name: `Question ${currentPageData.questions.length + 1}`,
-            }]
-        } else {
-
+            }];
+        } else if (event === 'remove') {
+            currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
         }
         sections[sectionIndex].pages[pageIndex] = currentPageData;
-        setSections([...sections])
-    }
+        setSections([...sections]);
+    };
 
-    //function for drag the questions
+    // Function for dragging questions
     const Item = ({ item, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
 
         return (
-            <div
-                className="disable-select select-none w-full flex items-center justify-between"
-            >
+            <div className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] flex justify-between items-start">
+                <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
                 <div className='flex items-center'>
                     <div
                         className="disable-select dragHandle"
                         onMouseDown={(e) => {
-                            console.log("mouseDown");
                             document.body.style.overflow = "hidden";
                             onMouseDown(e);
                         }}
@@ -139,38 +125,59 @@ function QuestionnaryForm() {
                             document.body.style.overflow = "visible";
                         }}
                     >
-                        <img className='cursor-grab' src="/Images/drag.svg" />
+                        <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                     </div>
-                    {/* Other item content goes here */}
+                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                 </div>
             </div>
         );
     };
 
-
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
-        setSections([...sections])
-    }
+        setSections([...sections]);
+    };
 
-    //Api calling fun
+    // API calling function
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
         setFormDefaultInfo(response?.data?.data);
-        setSections(response?.data?.data?.sections)
+        setSections(response?.data?.data?.sections);
         setPageLoading(false);
-        console.log(formDefaultInfo?.sections);
     }, [getAPI, questionnaire_id, version_number]);
+
+
+    const handleSave = async () => {
+        let body = JSON.parse(JSON.stringify(sections));
+
+        // Recursive function to remove specified keys
+        const removeKeys = (obj) => {
+            if (Array.isArray(obj)) {
+                obj.forEach(removeKeys);
+            } else if (typeof obj === 'object' && obj !== null) {
+                delete obj.created_at;
+                delete obj.updated_at;
+                Object.values(obj).forEach(removeKeys);
+            }
+        };
+
+        // Remove keys from the cloned body
+        removeKeys(body);
+
+        console.log(body, 'body')
+        const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+        console.log(response, 'updatedSections')
+
+    }
+
 
     useEffect(() => {
         formDefaultDetails();
-    }, [])
-
-    console.log(sections, 'sectionssections')
+    }, []);
 
     return (
-        pageLoding
+        pageLoading
             ?
             <FormShimmer />
             :
@@ -194,7 +201,7 @@ function QuestionnaryForm() {
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' />
+                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleSave()} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -202,72 +209,62 @@ function QuestionnaryForm() {
                                             <div className='flex items-center justify-between'>
                                                 <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
                                                 <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
                                             </div>
-                                            {console.log(sectionData, 'sections')}
-                                            {sectionData?.pages[pageIndex]?.questions && sectionData?.pages[pageIndex]?.questions.map((questionData) => (
-                                                <div key={questionData?.question_id} className='bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] flex justify-between items-start'>
-                                                    <p className='mb-5 font-medium text-base text-[#000000]'>{questionData?.question_name}</p>
-                                                    <div className='flex items-start'>
-                                                        <DraggableList
-                                                            itemKey="question_id"
-                                                            template={Item}
-                                                            list={pageData.questions}
-                                                            onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
-                                                            container={() => containerRef.current}
-                                                        />
-                                                        <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer' />
-                                                    </div>
-                                                </div>
-                                            ))}
+                                            <DraggableList
+                                                itemKey="question_id"
+                                                template={Item}
+                                                list={pageData.questions.map((questionData, questionIndex) => ({
+                                                    ...questionData,
+                                                    sectionIndex,
+                                                    pageIndex,
+                                                    index: questionIndex
+                                                }))}
+                                                onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
+                                                container={() => document.body}
+                                            />
                                             <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
-                                                <button
-                                                    type='button'
-                                                    onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex)}
-                                                    className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     +
                                                     <span className='ml-[4]'>Add question</span>
                                                 </button>
                                             </div>
                                         </div>
                                     ))}
-                                    <div>
-                                        <button
-                                            type='button'
-                                            onClick={() => handleAddRemovePage('add', sectionIndex)}
-                                            className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                            +
-                                            <span className='ml-[4]'>Add Page</span>
-                                        </button>
-                                    </div>
+                                    <button onClick={() => handleAddRemovePage('add', sectionIndex)} className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                        +
+                                        <span className='ml-[4]'>Add Page</span>
+                                    </button>
                                 </div>
                             ))}
-                            <button className='flex items-center mt-8 font-semibold text-[#2B333B] text-base' onClick={() => handleAddRemoveSection('add')}>
+                            <button onClick={() => handleAddRemoveSection('add')} className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
                                 + Add section
                             </button>
                         </div>
-                    </div><div className='w-[30%]'>
+                    </div>
+                    <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
                             <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
-                                <img src="/Images/cancle.png" className='pr-2.5' alt="cancle" />
-                                Cancle
+                                <img src="/Images/cancle.png" className='pr-2.5' alt="canc" />
+                                Cancel
                             </button>
                             <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
                                 <img src="/Images/preview.png" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
+                                onClick={() => handleSave()}
+                            >
                                 Save
                             </button>
                         </div>
                         {/* <AddFields buttons={fieldsneeded} /> */}
                         {/* <TestFieldSetting/> */}
                     </div>
-                </div >
+                </div>
             )
-
-    )
+    );
 }
 
-export default QuestionnaryForm
+export default QuestionnaryForm;
