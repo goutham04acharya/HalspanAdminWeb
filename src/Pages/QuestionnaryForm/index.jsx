@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef, useContext } from 'react';
 import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout';
 import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
+import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -19,6 +20,7 @@ function QuestionnaryForm() {
             questions: []
         }]
     }]);
+    const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
 
@@ -148,29 +150,63 @@ function QuestionnaryForm() {
     }, [getAPI, questionnaire_id, version_number]);
 
 
-    const handleSave = async () => {
-        let body = JSON.parse(JSON.stringify(sections));
+    const handleSaveSection = async (sectionId) => {
+        // Find the section to save
+        const sectionToSave = sections.find(section => section.id === sectionId);
+        console.log(sectionToSave, 'sectionToSave')
 
-        // Recursive function to remove specified keys
-        const removeKeys = (obj) => {
-            if (Array.isArray(obj)) {
-                obj.forEach(removeKeys);
-            } else if (typeof obj === 'object' && obj !== null) {
-                delete obj.created_at;
-                delete obj.updated_at;
-                Object.values(obj).forEach(removeKeys);
+        if (sectionToSave) {
+            // Create a new object containing only the selected section's necessary fields
+            let body = {
+                section_id: sectionToSave.section_id,
+                section_name: sectionToSave.section_name,
+                pages: sectionToSave.pages.map(page => ({
+                    page_id: page.page_id,
+                    page_name: page.page_name,
+                    questions: page.questions.map(question => ({
+                        question_id: question.question_id,
+                        question_text: question.question_name,
+                        // Include other necessary fields for questions here
+                    }))
+                }))
+            };
+
+            // Recursive function to remove specified keys
+            const removeKeys = (obj) => {
+                if (Array.isArray(obj)) {
+                    obj.forEach(removeKeys);
+                } else if (typeof obj === 'object' && obj !== null) {
+                    delete obj.created_at;
+                    delete obj.updated_at;
+                    delete obj.questionnaire_id;
+                    delete obj.version_number;
+                    Object.values(obj).forEach(removeKeys);
+                }
+            };
+
+            // Remove keys from the cloned body
+            removeKeys(body);
+
+            console.log(body, 'body');
+
+            try {
+                setPageLoading(true);
+                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                console.log(response, 'updatedSections');
+                setPageLoading(false);
+                if (response?.data?.status === true) {
+                    setToastSuccess('Section Updated successfully');
+                }
+                else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
+                    setToastError(response?.data?.data?.message);
+                } else if (response?.data?.status >= 500) {
+                    setToastError('Something went wrong');
+                }
+            } catch (error) {
+                setToastError('Something went wrong');
             }
-        };
-
-        // Remove keys from the cloned body
-        removeKeys(body);
-
-        console.log(body, 'body')
-        const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-        console.log(response, 'updatedSections')
-
-    }
-
+        }
+    };
 
     useEffect(() => {
         formDefaultDetails();
@@ -201,7 +237,7 @@ function QuestionnaryForm() {
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleSave()} />
+                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleSaveSection()} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -254,7 +290,7 @@ function QuestionnaryForm() {
                                 Preview
                             </button>
                             <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
-                                onClick={() => handleSave()}
+                                onClick={() => handleSaveSection()}
                             >
                                 Save
                             </button>
