@@ -153,3 +153,14 @@ Before("@create_questionnaire", async function () {
         console.log(err)
     }
 });
+
+Before("@create_lookup_dataset", async function () {
+    try {
+        global.lookup_dataset_payload = await lookup_dataset_payload();
+        console.log(global.lookup_dataset_payload, "lookup dataset payload")
+        let response = await createLookupDataset(global.lookup_dataset_payload)
+        console.log(response, "lookup dataset payload Response")
+    } catch (err) {
+        console.log(err)
+    }
+});
