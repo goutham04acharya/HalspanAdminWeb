@@ -5,6 +5,7 @@ import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
+import { isAllObjectValuesEqual } from '../../CommonMethods/CompareObjects.js';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -23,6 +24,7 @@ function QuestionnaryForm() {
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
+    const [savedSection, setSavedSection] = useState([])
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -56,7 +58,10 @@ function QuestionnaryForm() {
 
     // Form related code
     const handleAddRemoveSection = (event, sectionIndex) => {
+
         if (event === 'add') {
+            const len = sections.length
+            handleSaveSection(sections[len - 1]?.section_id);
             setSections([...sections, {
                 section_name: `Section ${sections.length + 1}`,
                 section_id: `SEC${sections.length + 1}`,
@@ -129,7 +134,7 @@ function QuestionnaryForm() {
                     >
                         <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                     </div>
-                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
+                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                 </div>
             </div>
         );
@@ -142,6 +147,7 @@ function QuestionnaryForm() {
 
     // API calling function
     const formDefaultDetails = useCallback(async () => {
+        console.log('first......')
         setPageLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
         setFormDefaultInfo(response?.data?.data);
@@ -151,8 +157,9 @@ function QuestionnaryForm() {
 
 
     const handleSaveSection = async (sectionId) => {
+        console.log(sectionId, 'secionId')
         // Find the section to save
-        const sectionToSave = sections.find(section => section.id === sectionId);
+        const sectionToSave = sections.find(section => section.section_id === sectionId);
         console.log(sectionToSave, 'sectionToSave')
 
         if (sectionToSave) {
@@ -194,22 +201,34 @@ function QuestionnaryForm() {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 console.log(response, 'updatedSections');
                 setPageLoading(false);
-                if (response?.data?.status === true) {
-                    setToastSuccess('Section Updated successfully');
+                console.log(response, 'res')
+                if (!(response?.data?.error)) {
+                    setSavedSection(sections);
+                    setToastSuccess(response?.data?.message);
                 }
-                else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
-                    setToastError(response?.data?.data?.message);
-                } else if (response?.data?.status >= 500) {
+                else {
                     setToastError('Something went wrong');
                 }
             } catch (error) {
+                console.log(error, 'error')
                 setToastError('Something went wrong');
             }
         }
     };
 
     useEffect(() => {
+        if(sections[0]){
+            console.log(isAllObjectValuesEqual(savedSection, sections), 'hfhfhhffhfdjdkfj');
+        }
+        console.log(savedSection[0],'savedSectionsavedSectionsavedSection');
+        console.log(sections[0], 'savedSection1111')
+    }, [savedSection, sections])
+
+
+    useEffect(() => {
         formDefaultDetails();
+        console.log('first....................', sections)
+        setSavedSection(sections);
     }, []);
 
     return (
@@ -236,8 +255,8 @@ function QuestionnaryForm() {
                                     <div className='flex items-center w-full justify-between'>
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
-                                            <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleSaveSection()} />
+                                            <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                            <img src="/Images/save.svg" alt="save" className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${isAllObjectValuesEqual(sectionData, savedSection[sectionIndex]) ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => handleSaveSection(sectionData?.section_id)} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -245,7 +264,7 @@ function QuestionnaryForm() {
                                             <div className='flex items-center justify-between'>
                                                 <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
                                                 <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
+                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
                                             </div>
                                             <DraggableList
@@ -281,19 +300,19 @@ function QuestionnaryForm() {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
                                 <img src="/Images/cancle.png" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
                                 <img src="/Images/preview.png" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
+                            {/* <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
                                 onClick={() => handleSaveSection()}
                             >
                                 Save
-                            </button>
+                            </button> */}
                         </div>
                         {/* <AddFields buttons={fieldsneeded} /> */}
                         {/* <TestFieldSetting/> */}
