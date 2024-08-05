@@ -29,6 +29,7 @@ Feature: Halspan - Admin- Lookup data set
         Deleting an item will not remove it from a previously completed Questionnaires data but will remove it as an option in the future. (It will only remove from offline when the next sync is performed)
         Lookup dataset is applicable for Single line, Multi line and Dropdown.
         There must be an option to view and select the previously added lookup dataset.
+        
         Information to display
         Lookup Dataset ID
         Lookup Dataset Name
