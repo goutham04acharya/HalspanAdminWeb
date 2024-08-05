@@ -192,12 +192,10 @@ function QuestionnaryForm() {
             console.log(body, 'body');
 
             try {
-                setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 console.log(response, 'updatedSections');
-                setPageLoading(false);
-                if (response?.data?.status === true) {
-                    setToastSuccess('Section Updated successfully');
+                if (response?.data?.status === 200) {
+                    setToastSuccess(response?.data?.message);
                 }
                 else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
                     setToastError(response?.data?.data?.message);
