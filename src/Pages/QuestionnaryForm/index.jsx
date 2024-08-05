@@ -12,6 +12,7 @@ function QuestionnaryForm() {
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
+    const { DeleteAPI } = useApi();
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: 'SEC1',
@@ -21,10 +22,13 @@ function QuestionnaryForm() {
             questions: []
         }]
     }]);
+    const [dataIsSame, setDataIsSame] = useState({});
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([])
+
+
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -58,7 +62,7 @@ function QuestionnaryForm() {
 
     // Form related code
     const handleAddRemoveSection = (event, sectionIndex) => {
-
+        const sectionId = sections[sectionIndex]?.section_id;
         if (event === 'add') {
             const len = sections.length
             handleSaveSection(sections[len - 1]?.section_id);
@@ -69,9 +73,13 @@ function QuestionnaryForm() {
                     page_id: `SEC${sections.length + 1}_PG1`,
                     page_name: 'Page 1',
                     questions: []
-                }]
+                }],
             }]);
         } else if (event === 'remove') {
+            const isSaved = savedSection.find(section => section.section_id === sections[sectionIndex].section_id);
+            if (isSaved) {
+                handleDeleteSection(sectionId);
+            }
             const updatedSections = sections.filter((_, index) => index !== sectionIndex);
             setSections(updatedSections);
         } else {
@@ -82,7 +90,9 @@ function QuestionnaryForm() {
 
     const handleAddRemovePage = (event, sectionIndex, pageIndex) => {
         let currentSectionData = sections[sectionIndex];
-
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
         if (event === 'add') {
             currentSectionData.pages = [
                 ...currentSectionData.pages,
@@ -102,6 +112,10 @@ function QuestionnaryForm() {
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
+
         if (event === 'add') {
             currentPageData.questions = [...currentPageData.questions, {
                 question_id: `SEC${sectionIndex + 1}_PG${pageIndex + 1}_QUES${currentPageData?.questions.length + 1}`,
@@ -147,20 +161,47 @@ function QuestionnaryForm() {
 
     // API calling function
     const formDefaultDetails = useCallback(async () => {
-        console.log('first......')
         setPageLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
         setFormDefaultInfo(response?.data?.data);
         setSections(response?.data?.data?.sections);
+        const sections = response?.data?.data?.sections || [];
+
+        // Map through the sections and add a property with a value of true
+        const updatedSections = sections.map((section, index) => ({
+            [index]: true // Add a new property or update an existing one
+        }));
+        setDataIsSame(updatedSections);
+
         setPageLoading(false);
     }, [getAPI, questionnaire_id, version_number]);
 
+    //API for deleteing the section
+    const handleDeleteSection = async (sectionId) => {
+        try {
+            sections?.section_id
+            const response = await DeleteAPI(`questionnaires/${questionnaire_id}/${version_number}?section_id=${sectionId}`);
+            if (response?.data?.status === 200) {
+                setToastSuccess(response?.data?.data?.message)
+            }
+            else {
+                setToastError('Something went wrong');
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+        }
+
+    }
 
     const handleSaveSection = async (sectionId) => {
-        console.log(sectionId, 'secionId')
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
-        console.log(sectionToSave, 'sectionToSave')
+        const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+
+        console.log(sectionIndex, 'yrewtwtrwtwtrwrtwtr');
+        const update = { ...dataIsSame }
+        update[sectionIndex] = true;
+        setDataIsSame(update)
 
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
@@ -194,40 +235,30 @@ function QuestionnaryForm() {
             // Remove keys from the cloned body
             removeKeys(body);
 
-            console.log(body, 'body');
-
             try {
                 setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                console.log(response, 'updatedSections');
                 setPageLoading(false);
-                console.log(response, 'res')
                 if (!(response?.data?.error)) {
-                    setSavedSection(sections);
                     setToastSuccess(response?.data?.message);
                 }
                 else {
                     setToastError('Something went wrong');
                 }
             } catch (error) {
-                console.log(error, 'error')
                 setToastError('Something went wrong');
             }
         }
     };
 
     useEffect(() => {
-        if(sections[0]){
-            console.log(isAllObjectValuesEqual(savedSection, sections), 'hfhfhhffhfdjdkfj');
-        }
-        console.log(savedSection[0],'savedSectionsavedSectionsavedSection');
-        console.log(sections[0], 'savedSection1111')
-    }, [savedSection, sections])
+        console.log(sections, 'rrrr')
+        console.log(savedSection, 'trtetr')
+    }, [sections, savedSection]);
 
 
     useEffect(() => {
         formDefaultDetails();
-        console.log('first....................', sections)
         setSavedSection(sections);
     }, []);
 
@@ -243,20 +274,20 @@ function QuestionnaryForm() {
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
-                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.asset_type}</p>
+                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
                             <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                 {getStatusText(formDefaultInfo?.status)}
                             </button>
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p className='font-semibold text-[22px] text-[#2B333B]'>{formDefaultInfo?.internal_name}</p>
+                            <p className='font-semibold text-[22px] text-[#2B333B]' data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
                             {sections?.map((sectionData, sectionIndex) => (
                                 <div key={sectionData?.section_id} className='my-[25px] p-4 hover:border-[#2B333B] hover:border rounded-[10px]'>
                                     <div className='flex items-center w-full justify-between'>
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${isAllObjectValuesEqual(sectionData, savedSection[sectionIndex]) ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => handleSaveSection(sectionData?.section_id)} />
+                                            <img src="/Images/save.svg" alt="save" className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionIndex] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionIndex]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -287,13 +318,19 @@ function QuestionnaryForm() {
                                             </div>
                                         </div>
                                     ))}
-                                    <button onClick={() => handleAddRemovePage('add', sectionIndex)} className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                    <button
+                                        onClick={() => handleAddRemovePage('add', sectionIndex)}
+                                        data-testid={`add-page-button-${sectionIndex}`}
+                                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
                                         +
                                         <span className='ml-[4]'>Add Page</span>
                                     </button>
                                 </div>
                             ))}
-                            <button onClick={() => handleAddRemoveSection('add')} className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
+                            <button
+                                onClick={() => handleAddRemoveSection('add')}
+                                data-testid="add-section-button"
+                                className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
                                 + Add section
                             </button>
                         </div>

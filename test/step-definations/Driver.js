@@ -7,7 +7,7 @@ const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const fs = require('fs');
 const path = require('path');
-const { createQuestionnaire } = require('../bdd_api/index');
+const { createQuestionnaire, Questionnaire } = require('../bdd_api/index');
 const {create_questionnaire_payload} = require('../bdd_payload/payload')
 
 const service = new chrome.ServiceBuilder(chromedriver.path).build();
@@ -17,7 +17,7 @@ options.addArguments('--no-sandbox');
 options.addArguments('--disable-features=VizDisplayCompositor');
 options.addArguments('enable-automation');
 options.addArguments('--disable-dev-shm-usage');
-options.addArguments('--headless'); // comment this line of code to run in local chrome browser
+// options.addArguments('--headless'); // comment this line of code to run in local chrome browser
 options.addArguments('--window-size=1920,1080');
 options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
@@ -151,5 +151,16 @@ Before("@create_questionnaire", async function () {
         console.log(response, "Questionary Response")
     } catch (err) {
         console.log(err)
+    }
+});
+
+Before("@create_question", async function () {
+    try {
+        global.questionary_payload = await create_questionnaire_payload();
+        console.log(global.questionary_payload, "Questionary Payload");
+        global.response = await Questionnaire(global.questionary_payload);
+        console.log(global.response, "Questionary Response");
+    } catch (err) {
+        console.log(err);
     }
 });

@@ -16,6 +16,20 @@ async function createQuestionnaire(payload) {
     }
 }
 
+async function Questionnaire(payload) {
+    let API_HEADERS = await authHeader()
+    console.log('auth headers', API_HEADERS)
+    try{
+        response = await axios.post(`https://${process.env.VITE_DOMAIN_NAME}/v1/questionnaires`, payload, {headers: API_HEADERS })
+        console.log('response', response)
+        return response
+    }catch(err){
+        console.log('err', err)
+    }
+}
+
+
 module.exports = {
     createQuestionnaire,
+    Questionnaire
 }

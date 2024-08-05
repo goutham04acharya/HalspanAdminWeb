@@ -3,9 +3,15 @@ const { Given, When, Then, But } = require('@cucumber/cucumber');
 const { By, until, Key } = require('selenium-webdriver')
 
 Given('I am on the questionnaire management section', async function () {
-    await driver.get('http://example.com/questionnaire-management'); // Replace with actual URL
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="questionnaire-management-section"]')));
+    const questionnaireId = global.response?.data?.data?.questionnaire_id;
+    const versionNumber = global.response?.data?.data?.version_number;
+
+    if (questionnaireId && versionNumber) {
+        await driver.get(`http://localhost:3000/questionnaries/create-questionnary/questionnary-form/${questionnaireId}/${versionNumber}`); // Replace with actual URL
+        await new Promise((resolve) => setTimeout(resolve, 500));
+    } else {
+        throw new Error('Questionnaire ID or version number is missing.');
+    }
 });
 
 Then('I verify that I am on the same questionnaire management section which was created', async function () {
@@ -110,7 +116,7 @@ Then('I should see the section {int} saved', async function (sectionNumber) {
     await driver.wait(until.elementLocated(By.css(`[data-testid="save-${sectionNumber}"]`)));
 });
 
-When('I click the save button for the questionnaire version', async function(){
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
-});
+// When('I click the save button for the questionnaire version', async function(){
+//     await new Promise((resolve) => setTimeout(resolve, 500));
+//     await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
+// });
