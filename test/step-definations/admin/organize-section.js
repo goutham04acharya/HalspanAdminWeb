@@ -3,16 +3,97 @@ const { Given, When, Then, But } = require('@cucumber/cucumber');
 const { By, until, Key } = require('selenium-webdriver')
 
 Given('I am on the questionnaire management section', async function () {
-    await driver.get('http://example.com/questionnaire-management'); // Replace with actual URL
+    const questionnaireId = global.response?.data?.data?.questionnaire_id;
+    const versionNumber = global.response?.data?.data?.version_number;
+
+    if (questionnaireId && versionNumber) {
+        await driver.get(`http://localhost:3000/questionnaries/create-questionnary/questionnary-form/${questionnaireId}/${versionNumber}`); // Replace with actual URL
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const pageSource = await driver.getPageSource();
+        check = pageSource.includes(global.internalName);
+    } else {
+        throw new Error('Questionnaire ID or version number is missing.');
+    }
+});
+
+When('I click on add new section', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
+});
+
+Then("I should see the new section added", async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Section 2"]')))
+});
+
+When('I click on add new page', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="questionnaire-management-section"]')));
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-page-sec-0"]'))).click()
+});
+
+Then('I should see the new pages added', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Page 1"]')))
+});
+
+When('I click on save button for section 2', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="save-btn-1"]'))).click()
+});
+
+When('I click on save button for section 1', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="save-btn-0"]'))).click()
+});
+
+When('I click on delete page from section 1', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-page-sec-0-0"]'))).click()
+});
+
+Then('The page should be deleted from section', async function() {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+        const element = await driver.findElement(By.xpath('//p[text()="Page 1"]'));
+        await driver.wait(until.stalenessOf(element), 10000);
+    } catch (error) {
+        if (error.name === 'NoSuchElementError') {
+            // Element is already not present, which means it has been deleted
+            return;
+        } else {
+            // Re-throw the error if it's not a NoSuchElementError
+            throw error;
+        }
+    }
+});
+
+When('I click on delete section 2', async function(){
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-btn-1"]'))).click()
+});
+
+When('I click on delete section 1', async function(){
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-btn-0"]'))).click()
 });
 
 Then('I verify that I am on the same questionnaire management section which was created', async function () {
-    const pageSource = await driver.getPageSource();
-    if (!pageSource.includes(global.internalName)) {
-        throw new Error(`Expected page source to contain "${global.internalName}", but it does not.`);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    let check = false;
+    let retries = 400;
+
+    while (retries > 0) {
+        const pageSource = await driver.getPageSource();
+        check = pageSource.includes(global.internalName);
+
+        if (check) {
+            return 'passed';
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            retries--;
+        }
     }
+    throw new Error(`Expected page source to contain "${global.internalName}", but it does not.`);
 });
 
 When('I add a new question to the page {int} in section {int}', async function (pageNumber, sectionNumber) {
@@ -95,5 +176,10 @@ When('I click the save button for section {int}', async function (sectionNumber)
 
 Then('I should see the section {int} saved', async function (sectionNumber) {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="notification"]')));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save-${sectionNumber}"]`)));
 });
+
+// When('I click the save button for the questionnaire version', async function(){
+//     await new Promise((resolve) => setTimeout(resolve, 500));
+//     await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
+// });
