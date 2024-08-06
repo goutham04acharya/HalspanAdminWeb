@@ -74,7 +74,7 @@ When('I click on delete section 2', async function(){
 
 When('I click on delete section 1', async function(){
     await new Promise((resolve) => setTimeout(resolve, 10000));
-    // await driver.wait(until.elementLocated(By.css('[data-testid="delete-btn-0"]'))).click()
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-btn-0"]'))).click()
 });
 
 Then('I verify that I am on the same questionnaire management section which was created', async function () {
