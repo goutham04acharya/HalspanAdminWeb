@@ -59,6 +59,63 @@ function QuestionnaryForm() {
 
     // Form related code
 
+    // const handleAddRemoveSection = (event, sectionIndex) => {
+    //     if (event === 'add') {
+    //         const len = sections.length;
+    //         if (len > 0) {
+    //             handleSaveSection(sections[len - 1].section_id);
+    //         }
+    //         const newSection = {
+    //             section_name: `Section ${sections.length + 1}`,
+    //             section_id: `SEC${sections.length + 1}`,
+    //             pages: [{
+    //                 page_id: `SEC${sections.length + 1}_PG1`,
+    //                 page_name: 'Page 1',
+    //                 questions: []
+    //             }],
+    //         };
+    //         setSections([...sections, newSection]);
+    
+    //         // Enable save button for the new section
+    //         const update = { ...dataIsSame };
+    //         update[len] = false; // Mark the new section as not saved
+    //         setDataIsSame(update);
+    
+    //     } else if (event === 'remove') {
+    //         const isSaved = dataIsSame[sectionIndex];
+    //         if (isSaved) {
+    //             handleDeleteSection(sections[sectionIndex].section_id);
+    //         }
+    //         const updatedSections = sections.filter((_, index) => index !== sectionIndex);
+    //         setSections(updatedSections);
+    
+    //         // Update the saved status
+    //         const update = { ...dataIsSame };
+    //         update.splice(sectionIndex, 1);
+    //         setDataIsSame(update);
+    //     } else {
+    //         sections = sections.splice(0, sectionIndex);
+    //         setSections([...sections]);
+    //     }
+    // };
+
+    const removeIndexAndShift = (indexToRemove) => {
+        setDataIsSame((prevState) => {
+            const newState = {};
+            let currentIndex = 0;
+    
+            for (const [index, value] of Object.entries(prevState)) {
+                const numIndex = parseInt(index);
+                if (numIndex !== indexToRemove) {
+                    newState[currentIndex] = value;
+                    currentIndex++;
+                }
+            }
+    
+            return newState;
+        });
+    };
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const len = sections.length;
@@ -88,6 +145,11 @@ function QuestionnaryForm() {
             }
             const updatedSections = sections.filter((_, index) => index !== sectionIndex);
             setSections(updatedSections);
+
+            const updatedSavdSections = savedSection.filter((_, index) => index !== sectionIndex);
+            setSavedSection(updatedSavdSections);
+
+            removeIndexAndShift(sectionIndex);
     
             // Update the saved status
             const update = { ...dataIsSame };
