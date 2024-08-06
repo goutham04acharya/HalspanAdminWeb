@@ -198,7 +198,6 @@ function QuestionnaryForm() {
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
-        console.log(sectionIndex, 'yrewtwtrwtwtrwrtwtr');
         const update = { ...dataIsSame }
         update[sectionIndex] = true;
         setDataIsSame(update)
@@ -286,8 +285,15 @@ function QuestionnaryForm() {
                                     <div className='flex items-center w-full justify-between'>
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
-                                            <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionIndex] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionIndex]) handleSaveSection(sectionData?.section_id) }} />
+                                            <img src="/Images/trash-black.svg" 
+                                            alt="save" 
+                                            data-testid={`delete-btn-${sectionIndex}`}
+                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' 
+                                            onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                            <img src="/Images/save.svg"
+                                                alt="save"
+                                                data-testid={`save-btn-${sectionIndex}`}
+                                                className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionIndex] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionIndex]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -295,7 +301,10 @@ function QuestionnaryForm() {
                                             <div className='flex items-center justify-between'>
                                                 <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
                                                 <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
+                                                    <img src="/Images/trash-black.svg" 
+                                                    alt="save" 
+                                                    data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                                    className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
                                             </div>
                                             <DraggableList
@@ -320,7 +329,7 @@ function QuestionnaryForm() {
                                     ))}
                                     <button
                                         onClick={() => handleAddRemovePage('add', sectionIndex)}
-                                        data-testid={`add-page-button-${sectionIndex}`}
+                                        data-testid={`add-page-sec-${sectionIndex}`}
                                         className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
                                         +
                                         <span className='ml-[4]'>Add Page</span>
@@ -329,7 +338,7 @@ function QuestionnaryForm() {
                             ))}
                             <button
                                 onClick={() => handleAddRemoveSection('add')}
-                                data-testid="add-section-button"
+                                data-testid="add-section"
                                 className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
                                 + Add section
                             </button>
