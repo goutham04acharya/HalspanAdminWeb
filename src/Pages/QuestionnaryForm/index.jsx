@@ -5,7 +5,6 @@ import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
-import { isAllObjectValuesEqual } from '../../CommonMethods/CompareObjects.js';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -27,8 +26,6 @@ function QuestionnaryForm() {
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([])
-
-
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -61,12 +58,14 @@ function QuestionnaryForm() {
     };
 
     // Form related code
+
     const handleAddRemoveSection = (event, sectionIndex) => {
-        const sectionId = sections[sectionIndex]?.section_id;
         if (event === 'add') {
-            const len = sections.length
-            handleSaveSection(sections[len - 1]?.section_id);
-            setSections([...sections, {
+            const len = sections.length;
+            if (len > 0) {
+                handleSaveSection(sections[len - 1].section_id);
+            }
+            const newSection = {
                 section_name: `Section ${sections.length + 1}`,
                 section_id: `SEC${sections.length + 1}`,
                 pages: [{
@@ -74,14 +73,26 @@ function QuestionnaryForm() {
                     page_name: 'Page 1',
                     questions: []
                 }],
-            }]);
+            };
+            setSections([...sections, newSection]);
+    
+            // Enable save button for the new section
+            const update = { ...dataIsSame };
+            update[len] = false; // Mark the new section as not saved
+            setDataIsSame(update);
+    
         } else if (event === 'remove') {
-            const isSaved = savedSection.find(section => section.section_id === sections[sectionIndex].section_id);
+            const isSaved = dataIsSame[sectionIndex];
             if (isSaved) {
-                handleDeleteSection(sectionId);
+                handleDeleteSection(sections[sectionIndex].section_id);
             }
             const updatedSections = sections.filter((_, index) => index !== sectionIndex);
             setSections(updatedSections);
+    
+            // Update the saved status
+            const update = { ...dataIsSame };
+            update.splice(sectionIndex, 1);
+            setDataIsSame(update);
         } else {
             sections = sections.splice(0, sectionIndex);
             setSections([...sections]);
@@ -177,31 +188,25 @@ function QuestionnaryForm() {
     }, [getAPI, questionnaire_id, version_number]);
 
     //API for deleteing the section
+
     const handleDeleteSection = async (sectionId) => {
         try {
-            sections?.section_id
             const response = await DeleteAPI(`questionnaires/${questionnaire_id}/${version_number}?section_id=${sectionId}`);
             if (response?.data?.status === 200) {
-                setToastSuccess(response?.data?.data?.message)
-            }
-            else {
+                setToastSuccess(response?.data?.data?.message);
+            } else {
                 setToastError('Something went wrong');
             }
         } catch (error) {
             setToastError('Something went wrong');
         }
-
-    }
+    };
 
     const handleSaveSection = async (sectionId) => {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
-        const update = { ...dataIsSame }
-        update[sectionIndex] = true;
-        setDataIsSame(update)
-
+    
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -217,7 +222,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-
+    
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -230,18 +235,22 @@ function QuestionnaryForm() {
                     Object.values(obj).forEach(removeKeys);
                 }
             };
-
+    
             // Remove keys from the cloned body
             removeKeys(body);
-
+    
             try {
                 setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 setPageLoading(false);
                 if (!(response?.data?.error)) {
                     setToastSuccess(response?.data?.message);
-                }
-                else {
+    
+                    // Update the saved status
+                    const update = { ...dataIsSame };
+                    update[sectionIndex] = true;
+                    setDataIsSame(update);
+                } else {
                     setToastError('Something went wrong');
                 }
             } catch (error) {
@@ -249,12 +258,7 @@ function QuestionnaryForm() {
             }
         }
     };
-
-    useEffect(() => {
-        console.log(sections, 'rrrr')
-        console.log(savedSection, 'trtetr')
-    }, [sections, savedSection]);
-
+    
 
     useEffect(() => {
         formDefaultDetails();
@@ -285,11 +289,11 @@ function QuestionnaryForm() {
                                     <div className='flex items-center w-full justify-between'>
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
-                                            <img src="/Images/trash-black.svg" 
-                                            alt="save" 
-                                            data-testid={`delete-btn-${sectionIndex}`}
-                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' 
-                                            onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                            <img src="/Images/trash-black.svg"
+                                                alt="delete"
+                                                data-testid={`delete-btn-${sectionIndex}`}
+                                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                                                onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
                                             <img src="/Images/save.svg"
                                                 alt="save"
                                                 data-testid={`save-btn-${sectionIndex}`}
@@ -301,10 +305,10 @@ function QuestionnaryForm() {
                                             <div className='flex items-center justify-between'>
                                                 <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
                                                 <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg" 
-                                                    alt="save" 
-                                                    data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                    className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
+                                                    <img src="/Images/trash-black.svg"
+                                                        alt="save"
+                                                        data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
                                             </div>
                                             <DraggableList
