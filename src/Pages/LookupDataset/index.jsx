@@ -187,7 +187,7 @@ const LookupDataset = () => {
                 <div className='py-[33px] px-[25px]'>
                     <div className='py-6 px-9 bg-white rounded-[10px] h-customh7'>
                         <div className='flex w-full justify-between items-center mb-[26px]'>
-                            <p className='text-[#2B333B] text-[28px] font-medium'>Lookup Dataset</p>
+                            <h1 className='text-[#2B333B] text-[28px] font-medium'>Lookup Dataset</h1>
                             <Button2
                                 testId='create-lookup-dataset'
                                 onClick={() => setIsCreateModalOpen(true)}

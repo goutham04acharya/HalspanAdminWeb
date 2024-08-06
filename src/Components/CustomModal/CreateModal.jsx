@@ -9,7 +9,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal flex flex-col gap-5 w-[352px] relative'>
-                <Image onClick={handleClose} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
+                <Image testId="cancel" onClick={handleClose} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
                 <h1 className='font-[600] text-[22px] leading-[33px]'>Create Lookup Dataset</h1>
                 <InputField
                     autoComplete='off'

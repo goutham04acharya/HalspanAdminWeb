@@ -21,6 +21,7 @@ function NavrBar({setModalOpen}) {
                     </p>
                 </div>
                 <div 
+                data-testid="lookup-dataset"
                 onClick={()=> navigate('/lookup-dataset')}
                 className='flex items-center cursor-pointer h-[35px]'>
                     <Image src="LookupDataset" className="w-auto" />

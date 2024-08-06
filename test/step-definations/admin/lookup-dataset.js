@@ -16,7 +16,8 @@ Then('I should be redirected to the lookup dataset listing screen', async functi
 });
 
 Given('I am on the lookup dataset listing screen', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.get('http://localhost:3000/lookup-dataset');
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Lookup Dataset"]')));
 });
 
@@ -36,12 +37,12 @@ When('I click the create lookup dataset button', async function () {
 
 Then('I should see a popup window to create lookup dataset', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Lookup Dataset"]')));
+    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Create Lookup Dataset"]')));
 });
 
 When('I enter the name of the lookup dataset', async function () {
     const name = `lookup${faker.string.alphanumeric(5)}`;
-    await driver.wait(until.elementLocated(By.css('[data-testid = "internalName"]'))).sendKeys(name);
+    await driver.wait(until.elementLocated(By.css('[data-testid = "name"]'))).sendKeys(name);
 });
 
 Given('I enter the choices in csv format', async function () {
