@@ -31,6 +31,7 @@ const LookupDataset = () => {
     const [data, setData] = useObjects(initialState)
     const [errors, setErrors] = useObjects(initialState)
     const [isCreateLoading, setIsCreateLoading] = useState(false);
+    const [isImportLoading, setIsImportLoading] = useState(false);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [isView, setIsView] = useState(false);
 
@@ -71,13 +72,19 @@ const LookupDataset = () => {
     }
 
     const handleClose = () => {
-        setErrors(initialState);
-        setData(initialState);
         setIsCreateModalOpen(false);
-        setIsView(false);
+        setTimeout(() => {
+            setErrors(initialState);
+            setData(initialState);
+            setIsView(false);
+        }, 200);
     }
 
     const handleCreate = async (file) => {
+        if(isView && !file ){
+            console.log('update in the view');
+            return;
+        }
         setErrors(initialState);
         // Only perform validation if there's no file
         if (!file && !isNotEmptyValidation(data, setErrors)) {
@@ -85,9 +92,11 @@ const LookupDataset = () => {
         }
         const payload = {
             "name": file?.name || data?.name,
-            "choices": file?.choice || data?.choices.split(',').map(choice => choice.trim())
+            "choices": file?.choices || data?.choices.split(',').map(choice => choice.trim())
         }
-        setIsCreateLoading(true);
+        if (!file) {
+            setIsCreateLoading(true);
+        }
         try {
             const response = await PostAPI("lookup-data", payload);
             if (!response?.error) {
@@ -97,10 +106,17 @@ const LookupDataset = () => {
                 setData(initialState);
                 setTimeout(() => {
                     setIsCreateLoading(false);
+                    setIsImportLoading(false);
                 }, 500);
             } else if (response?.data?.status === 409) {
-                setErrors('name', response?.data?.data?.message)
-                setIsCreateLoading(false);
+                if (!file) {
+                    setErrors('name', response?.data?.data?.message)
+                    setIsCreateLoading(false);
+                } else {
+                    setToastError('This lookup data name already exists')
+                    handleClose();
+                    setIsImportLoading(false);
+                }
                 return
             } else {
                 console.log(response, 'error response');
@@ -108,6 +124,7 @@ const LookupDataset = () => {
                 setData(initialState);
                 setTimeout(() => {
                     setIsCreateLoading(false);
+                    setIsImportLoading(false);
                 }, 500);
             }
             setIsCreateModalOpen(false);
@@ -116,6 +133,7 @@ const LookupDataset = () => {
             setToastError('Something went wrong!')
             setTimeout(() => {
                 setIsCreateLoading(false);
+                setIsImportLoading(false);
             }, 500);
         }
     }
@@ -127,6 +145,7 @@ const LookupDataset = () => {
             setToastError('Please upload a CSV file.');
             return;
         }
+        setIsImportLoading(true);
         Papa.parse(file, {
             header: false,
             complete: (results) => {
@@ -141,6 +160,7 @@ const LookupDataset = () => {
                         choices: flatData
                     }
 
+                    console.log(payload);
                     handleCreate(payload);
                 }
             },
@@ -235,6 +255,7 @@ const LookupDataset = () => {
                 handleCreate={handleCreate}
                 handleImport={handleImport}
                 isCreateLoading={isCreateLoading}
+                isImportLoading={isImportLoading}
                 isView={isView}
             />
         </>

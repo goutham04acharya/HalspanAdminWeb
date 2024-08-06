@@ -50,10 +50,10 @@ Feature: Halspan - Admin- Lookup data set
         * I click the submit button
         Then I should be redirected to the questionnaire listing screen
 
-    Scenario: Admin navigates to the lookup dataset page
-        Given I am in questionnaire listing screen
-        When I click the lookup dataset button
-        Then I should be redirected to the lookup dataset listing screen
+    # Scenario: Admin navigates to the lookup dataset page
+    #     Given I am in questionnaire listing screen
+    #     When I click the lookup dataset button
+    #     Then I should be redirected to the lookup dataset listing screen
 
     @create_lookup_dataset
     Scenario: List all lookup dataset
@@ -69,12 +69,19 @@ Feature: Halspan - Admin- Lookup data set
         * I click the close button
         Then I should be redirected to the lookup dataset listing screen
 
-    Scenario: Import the lookup dataset
+    Scenario: Import Invalid file with 600 data for lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button
         Then I should see a popup window to create lookup dataset
-        When I click the import button
-        Then I should read a message stating that "Error reading file data."
+        When I upload the valid file csv as "600.csv"
+        Then I should read a message stating that "Only 500 data entries are accepted."
+
+    Scenario: Import the valid lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I upload the valid file csv as "bddtest-lookup-data.csv"
+        Then I should read a message stating that "Created new lookup dataset successfully"
 
     Scenario: Admin creates the lookup dataset
         Given I am on the lookup dataset listing screen

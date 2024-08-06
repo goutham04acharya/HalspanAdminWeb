@@ -7,8 +7,8 @@ const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const fs = require('fs');
 const path = require('path');
-const { createQuestionnaire } = require('../bdd_api/index');
-const {create_questionnaire_payload} = require('../bdd_payload/payload')
+const { createQuestionnaire, createLookupDataset } = require('../bdd_api/index');
+const {create_questionnaire_payload, lookup_dataset_payload} = require('../bdd_payload/payload')
 
 const service = new chrome.ServiceBuilder(chromedriver.path).build();
 const options = new chrome.Options();

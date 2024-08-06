@@ -4,8 +4,9 @@ import InputField from '../InputField/InputField';
 import InputTextarea from '../InputField/InputTextarea';
 import Button2 from '../Button2/ButtonLight';
 import Image from '../Image/Image';
+import { BeatLoader } from 'react-spinners';
 
-const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView }) => {
+const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading }) => {
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal flex flex-col gap-5 w-[352px] relative'>
@@ -40,26 +41,33 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                 />
                 <div className='flex justify-between'>
                     <Button2
-                        text={`${isView ? 'Update' :'Create'}`}
-                        testID='create-btn'
+                        text={`${isView ? 'Update' : 'Create'}`}
+                        testId='create'
                         className='w-[156px] font-[600]'
                         onClick={() => handleCreate('')}
                         isThreedotLoading={isCreateLoading}
                     />
                     <>
                         <input
+                            data-testid="import-file"
                             type="file"
                             accept=".csv"
                             onChange={handleImport}
+                            disabled={isImportLoading}
                             id="file-upload"
                             style={{ display: 'none' }} // Hide the actual input field
                         />
-                        <label 
-                        htmlFor="file-upload" 
-                        data-testid='file-upload'
-                        className='bg-[#fff] h-[50px] border border-[#2B333B] text-base cursor-pointer
-                            leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center '>
-                                Import
+                        <label
+                            htmlFor="file-upload"
+                            className={`bg-[#fff] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
+                            leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center`}>
+                            {isImportLoading ? (
+                                <BeatLoader color="#2B333B" size='10px' />
+                            ) : (
+                                <>
+                                    Import
+                                </>
+                            )}
                         </label>
                     </>
                 </div>
