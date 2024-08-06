@@ -7,7 +7,7 @@ const Button2 = ({ className, text, type, onClick, testId, icon, disabled }) => 
             data-testid={testId}
             onClick={onClick}
             type={type || 'button'}
-            className={`bg-[#fff] border border-[#2B333B] text-base  text-center
+            className={`bg-[#fff] h-[50px] border border-[#2B333B] text-base  text-center
                 leading-[24px] py-2 rounded ${className}`}
             disabled={disabled}>
             <div className='flex justify-center items-center gap-2'>

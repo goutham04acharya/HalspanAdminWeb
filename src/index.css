@@ -12,6 +12,50 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.react-responsive-modal-modal:has(.customModal) {
+  min-width: 424px !important;
+  border-radius: 10px !important;
+  padding: 36px !important;
+}
+
+.scrollBar::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+.scrollHide::-webkit-scrollbar  {
+  -webkit-appearance: none;
+}
+
+.scrollBar::-webkit-scrollbar:vertical {
+  position: relative;
+  width: 4px;
+  background-color: white;
+}
+.whiteScrollBar::-webkit-scrollbar:vertical {
+  position: relative;
+  width: 4px;
+  background-color: #3B2A6F;
+}
+
+.scrollBar::-webkit-scrollbar:horizontal {
+  height: 4px;
+  background-color: transparent;
+  border-radius: 0px !important;
+}
+
+.scrollBar::-webkit-scrollbar-thumb {
+  background-color: #A79FBE;
+  border: transparent;
+  border-radius: 22px;
+  width: 4px;
+  height: 45px;
+  right: 20px;
+}
+
+.react-responsive-modal-modal {
+  padding: 0 !important;
+}
+
 /* Custom radio button which is used in create questionnary */
 .custom-radioBlue [type='radio']:checked,[type='radio']{
   background-image: none;

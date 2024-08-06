@@ -45,59 +45,6 @@ function Questionnaries() {
     navigate('/questionnaries/Create-Questionnary');
   };
 
-  // Search related functions
-  const handleChange = (e, value) => {
-    handleSearch(e, "search", value);
-  };
-
-  const changeHandler = (e) => {
-    const value = e.target.value;
-    let params = Object.fromEntries(searchParams)
-    delete params.start_key;
-    console.log(params, 'paramsss')
-    setSearchValue(value);
-    optimizedFn(e, value); // This should call handleSearch with the current value
-  };
-
-  const optimizedFn = useCallback(
-    Debounce((e, value) => handleChange(e, value)),
-    [searchParams]
-  );
-
-  const handleSearch = (e, key, value) => {
-    e.preventDefault();
-    let params = Object.fromEntries(searchParams);
-
-    delete params.start_key; // Reset the start_key when initiating a new search
-
-    const trimmedValue = value.trim();
-    // const specialCharRegex = /^[^a-zA-Z0-9]+$/;
-
-    if (key === 'search') {
-      if (trimmedValue === '') {
-        // If search contains only special characters or is empty, clear the search parameter
-        delete params[key];
-      } else {
-        params[key] = trimmedValue; // Trim the value before encoding
-      }
-    } else {
-      params[key] = value;
-    }
-
-    setQueList([]);
-    setSearchParams({ ...params });
-  };
-
-  const handleSearchClose = () => {
-    setLoading(true);
-    let params = Object.fromEntries(searchParams);
-    if (params['search'] !== '') delete params.search;
-    setQueList([]);
-    setSearchParams({ ...params });
-    setSearchValue('');
-    setLoading(false);
-  };
-
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
@@ -189,10 +136,12 @@ function Questionnaries() {
             <div className='w-[75%] mr-[5%]'>
               <Search
                 testId='searchBox'
-                changeHandler={changeHandler}
-                optimizedFn={optimizedFn}
+                searchParams={searchParams}
+                setSearchValue={setSearchValue}
                 searchValue={searchValue}
-                handleSearchClose={handleSearchClose}
+                setQueList={setQueList}
+                setSearchParams={setSearchParams}
+                setLoading={setLoading}
               />
             </div>
             <div className='w-[400px]'>
