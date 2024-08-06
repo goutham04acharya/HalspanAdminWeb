@@ -16,7 +16,7 @@ async function lookup_dataset_payload() {
     let name = `lookup${faker.string.alphanumeric(5)}`;
     return {
         "name" : name,
-        "choices": "India, China, Iran, United states, Russia, United Kingdom",
+        "choices": ["India", "China", "Iran", "United states", "Russia", "United Kingdom"],
     };
 }
 

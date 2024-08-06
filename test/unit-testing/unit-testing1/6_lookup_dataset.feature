@@ -50,10 +50,10 @@ Feature: Halspan - Admin- Lookup data set
         * I click the submit button
         Then I should be redirected to the questionnaire listing screen
 
-    # Scenario: Admin navigates to the lookup dataset page
-    #     Given I am in questionnaire listing screen
-    #     When I click the lookup dataset button
-    #     Then I should be redirected to the lookup dataset listing screen
+    Scenario: Admin navigates to the lookup dataset page
+        Given I am in questionnaire listing screen
+        When I click the lookup dataset button
+        Then I should be redirected to the lookup dataset listing screen
 
     @create_lookup_dataset
     Scenario: List all lookup dataset

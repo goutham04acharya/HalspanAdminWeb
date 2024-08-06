@@ -42,39 +42,33 @@ Feature: Halspan - Admin- Lookup data set
         page 1
         Questionnaire 1
 
-    Scenario: Admin navigates to the lookup dataset page
-        Given I am in questionnaire listing screen
-        When I click the lookup dataset button
-        Then I should be redirected to the lookup dataset listing screen
+  Scenario: Admin navigates to the lookup dataset page
+    Given I am in questionnaire listing screen
+    When I click the lookup dataset button
+    Then I should be redirected to the lookup dataset listing screen
 
-    @create_lookup_dataset
-    Scenario: List all lookup dataset
-        Given I am on the lookup dataset listing screen
-        Then I should see the table header containing '["ID", "NAME", "ACTION"]'
+  @create_lookup_dataset
+  Scenario: List all lookup dataset
+    Given I am on the lookup dataset listing screen
+    Then I should see the table header containing '["ID", "NAME", "ACTION"]'
 
-    Scenario: Import the lookup dataset
-        Given I am on the lookup dataset listing screen
-        When I click the create lookup dataset button
-        Then I should see a popup window to create lookup dataset
-        When I click the import button
-        Then I should read a message stating that "Error reading file data."
+  Scenario: Import the valid lookup dataset
+    Given I am on the lookup dataset listing screen
+    When I click the create lookup dataset button
+    Then I should see a popup window to create lookup dataset
+    When I upload the valid file csv as "bddtest-lookup-data.csv"
+    Then I should read a message stating that "Created new lookup dataset successfully"
 
-    Scenario: Admin creates the lookup dataset
-        Given I am on the lookup dataset listing screen
-        When I click the create lookup dataset button
-        Then I should see a popup window to create lookup dataset
-        When I enter the name of the lookup dataset
-        * I enter the choices in csv format
-        * I click the create button
-        Then I should read a message stating that "Created new lookup dataset successfully"
+  Scenario: Admin creates the lookup dataset
+    Given I am on the lookup dataset listing screen
+    When I click the create lookup dataset button
+    Then I should see a popup window to create lookup dataset
+    When I enter the name of the lookup dataset
+    * I enter the choices in csv format
+    * I click the create button
+    Then I should read a message stating that "Created new lookup dataset successfully"
 
-    Scenario: Searching by lookup dataset name
-        Given I am on the lookup dataset listing screen
-        When I search by the name
-        Then The results should display lookup dataset matching the name
-
-
-
-
-
-
+  Scenario: Searching by lookup dataset name
+    Given I am on the lookup dataset listing screen
+    When I search by the name
+    Then The results should display lookup dataset matching the name
