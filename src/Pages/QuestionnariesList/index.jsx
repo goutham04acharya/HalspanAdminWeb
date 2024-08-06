@@ -139,9 +139,10 @@ function Questionnaries() {
                 searchParams={searchParams}
                 setSearchValue={setSearchValue}
                 searchValue={searchValue}
-                setQueList={setQueList}
                 setSearchParams={setSearchParams}
                 setLoading={setLoading}
+                placeholder='Search by Name and Description'
+                setQueList={setQueList}
               />
             </div>
             <div className='w-[400px]'>

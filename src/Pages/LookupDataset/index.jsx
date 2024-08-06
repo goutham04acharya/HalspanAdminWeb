@@ -32,6 +32,7 @@ const LookupDataset = () => {
     const [errors, setErrors] = useObjects(initialState)
     const [isCreateLoading, setIsCreateLoading] = useState(false);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [isView, setIsView] = useState(false);
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -69,9 +70,15 @@ const LookupDataset = () => {
         setData(id, value);
     }
 
+    const handleClose = () => {
+        setErrors(initialState);
+        setData(initialState);
+        setIsCreateModalOpen(false);
+        setIsView(false);
+    }
+
     const handleCreate = async (file) => {
         setErrors(initialState);
-        console.log(file, 'qwertyuiopoiujhgf')
         // Only perform validation if there's no file
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
@@ -84,23 +91,39 @@ const LookupDataset = () => {
         try {
             const response = await PostAPI("lookup-data", payload);
             if (!response?.error) {
+                setLookupList([])
+                fetchLookupList();
                 setToastSuccess('Created new lookup dataset successfully');
+                setData(initialState);
+                setTimeout(() => {
+                    setIsCreateLoading(false);
+                }, 500);
+            } else if (response?.data?.status === 409) {
+                setErrors('name', response?.data?.data?.message)
+                setIsCreateLoading(false);
+                return
             } else {
+                console.log(response, 'error response');
                 setToastError('Something went wrong!')
+                setData(initialState);
+                setTimeout(() => {
+                    setIsCreateLoading(false);
+                }, 500);
             }
             setIsCreateModalOpen(false);
-            setIsCreateLoading(false);
         } catch (error) {
-            setIsCreateModalOpen(false);
+            handleClose();
             setToastError('Something went wrong!')
-            setIsCreateLoading(false);
+            setTimeout(() => {
+                setIsCreateLoading(false);
+            }, 500);
         }
     }
 
     const handleImport = (event) => {
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
-            setIsCreateModalOpen(false);
+            handleClose();
             setToastError('Please upload a CSV file.');
             return;
         }
@@ -109,7 +132,7 @@ const LookupDataset = () => {
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
                 if (flatData.length > 500) {
-                    setIsCreateModalOpen(false);
+                    handleClose();
                     setToastError('Only 500 data entries are accepted.');
                 } else {
                     const fileName = file.name.replace('.csv', '');
@@ -129,10 +152,22 @@ const LookupDataset = () => {
         event.target.value = ''; // Reset the input to allow re-uploading the same file
     };
 
+    // View Functions
+    const handleView = (name, choices) => {
+        console.log(name, 'lookuplist');
+        console.log(choices, 'lookuplist');
+        setIsView(true);
+        setData({
+            name,
+            choices: choices.join(',')
+        })
+        setIsCreateModalOpen(true);
+    }
+
     // Hooks
     useEffect(() => {
         fetchLookupList();
-    }, [])
+    }, [fetchLookupList])
 
     const lastElementRef = useCallback(node => {
         if (loading || isFetchingMore) return;
@@ -162,13 +197,15 @@ const LookupDataset = () => {
                         <div className='flex items-center justify-between w-full'>
                             <div className='w-[75%] mr-[5%]'>
                                 <Search
+                                    setQueList={setLookupList}
                                     testId='searchBox'
                                     searchParams={searchParams}
                                     setSearchValue={setSearchValue}
                                     searchValue={searchValue}
-                                    setLookupList={setLookupList}
                                     setSearchParams={setSearchParams}
-                                    setLoading={setLoading} />
+                                    setLoading={setLoading}
+                                    placeholder='Search by Name...'
+                                />
                             </div>
                         </div>
                         {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
@@ -182,6 +219,7 @@ const LookupDataset = () => {
                                     loading={loading}
                                     LookupList={LookupList}
                                     lastElementRef={lastElementRef}
+                                    handleView={handleView}
                                 />
                             </div>
                         )}
@@ -190,13 +228,14 @@ const LookupDataset = () => {
             </div>
             <CreateModal
                 isModalOpen={isCreateModalOpen}
-                setIsModalOpen={setIsCreateModalOpen}
+                handleClose={handleClose}
                 data={data}
                 errors={errors}
                 handleChange={handleChange}
                 handleCreate={handleCreate}
                 handleImport={handleImport}
                 isCreateLoading={isCreateLoading}
+                isView={isView}
             />
         </>
     )

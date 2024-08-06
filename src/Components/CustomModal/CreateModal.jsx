@@ -5,11 +5,11 @@ import InputTextarea from '../InputField/InputTextarea';
 import Button2 from '../Button2/ButtonLight';
 import Image from '../Image/Image';
 
-const CreateModal = ({ isModalOpen, setIsModalOpen, data, errors, handleChange, handleCreate, isCreateLoading, handleImport }) => {
+const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView }) => {
     return (
-        <Modal center open={isModalOpen} onClose={() => setIsModalOpen(false)} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
+        <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal flex flex-col gap-5 w-[352px] relative'>
-                <Image onClick={() => setIsModalOpen(false)} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
+                <Image onClick={handleClose} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
                 <h1 className='font-[600] text-[22px] leading-[33px]'>Create Lookup Dataset</h1>
                 <InputField
                     autoComplete='off'
@@ -40,7 +40,7 @@ const CreateModal = ({ isModalOpen, setIsModalOpen, data, errors, handleChange, 
                 />
                 <div className='flex justify-between'>
                     <Button2
-                        text='Create'
+                        text={`${isView ? 'Update' :'Create'}`}
                         testID='create-btn'
                         className='w-[156px] font-[600]'
                         onClick={() => handleCreate('')}

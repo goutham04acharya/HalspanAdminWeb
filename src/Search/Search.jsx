@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import Debounce from '../CommonMethods/debounce';
 
-function Search({ className, onChange, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading }) {
+function Search({ className, onChange, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder }) {
 
     // Search related functions
     const handleChange = (e, value) => {
@@ -64,7 +64,7 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
                     data-testid={testId}
                     type="text"
                     value={searchValue}
-                    placeholder='Search by Name and Description'
+                    placeholder={placeholder}
                     onChange={(e) => {
                         e.preventDefault();
                         // optimizedFn(e, e.target.value);
