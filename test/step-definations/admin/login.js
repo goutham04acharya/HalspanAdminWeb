@@ -49,7 +49,7 @@ When('I enter password as {string}', async function(string){
 });
 
 Then('I should read a message stating that {string}', { timeout: 35000 }, async function (message) {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 3000));
     let check = false;
     let retries = 400;
 
@@ -60,7 +60,7 @@ Then('I should read a message stating that {string}', { timeout: 35000 }, async 
         if (check) {
             return 'passed';
         } else {
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 3000));
             retries--;
         }
     }
