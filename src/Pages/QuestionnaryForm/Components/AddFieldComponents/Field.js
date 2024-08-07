@@ -1,4 +1,4 @@
-const fieldsneeded = [
+const Fieldsneeded = [
     {
         buttonName: "Textbox",
         buttonNumber:1,
@@ -72,4 +72,4 @@ const fieldsneeded = [
 
 ]
 
-export default fieldsneeded
+export default Fieldsneeded

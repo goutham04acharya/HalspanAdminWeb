@@ -1,17 +1,18 @@
 import React from 'react'
 
-function SideLayout({ formDefaultInfo, sections }) {
+function SideLayout({ formDefaultInfo, sections, handleSection, handlePage }) {
     console.log(sections, 'naan')
     return (
         <div className='py-4'>
-            <div className='flex items-center'>
+            <div className='flex items-center px-9'>
                 <img src="/Images/form-name.svg" alt="form-name" />
-                <p className='ml-3 font-semibold text-base text-[#2B333B] px-9'>{formDefaultInfo?.internal_name}</p>
+                <p className='ml-3 font-semibold text-base text-[#2B333B]'>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
                 {sections.length > 0 && sections.map((sectionItem) => (
                     <div key={sectionItem?.section_id}>
-                        <div className='flex items-center px-11 hover:bg-[#EFF1F8] cursor-pointer'>
+                        <div className='flex items-center px-11 hover:bg-[#EFF1F8] cursor-pointer'
+                        >
                             <img src="/Images/down-arrow.svg" alt="down-arrow" />
                             <p className='font-normal text-base text-[#2B333B] ml-3 py-[14px]'>{sectionItem?.section_name}</p>
                         </div>
