@@ -13,6 +13,7 @@ function QuestionnaryForm() {
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
+    const { DeleteAPI } = useApi();
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: 'SEC1',
@@ -22,9 +23,11 @@ function QuestionnaryForm() {
             questions: []
         }]
     }]);
+    const [dataIsSame, setDataIsSame] = useState({});
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
+    const [savedSection, setSavedSection] = useState([])
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -57,20 +60,103 @@ function QuestionnaryForm() {
     };
 
     // Form related code
+
+    // const handleAddRemoveSection = (event, sectionIndex) => {
+    //     if (event === 'add') {
+    //         const len = sections.length;
+    //         if (len > 0) {
+    //             handleSaveSection(sections[len - 1].section_id);
+    //         }
+    //         const newSection = {
+    //             section_name: `Section ${sections.length + 1}`,
+    //             section_id: `SEC${sections.length + 1}`,
+    //             pages: [{
+    //                 page_id: `SEC${sections.length + 1}_PG1`,
+    //                 page_name: 'Page 1',
+    //                 questions: []
+    //             }],
+    //         };
+    //         setSections([...sections, newSection]);
+    
+    //         // Enable save button for the new section
+    //         const update = { ...dataIsSame };
+    //         update[len] = false; // Mark the new section as not saved
+    //         setDataIsSame(update);
+    
+    //     } else if (event === 'remove') {
+    //         const isSaved = dataIsSame[sectionIndex];
+    //         if (isSaved) {
+    //             handleDeleteSection(sections[sectionIndex].section_id);
+    //         }
+    //         const updatedSections = sections.filter((_, index) => index !== sectionIndex);
+    //         setSections(updatedSections);
+    
+    //         // Update the saved status
+    //         const update = { ...dataIsSame };
+    //         update.splice(sectionIndex, 1);
+    //         setDataIsSame(update);
+    //     } else {
+    //         sections = sections.splice(0, sectionIndex);
+    //         setSections([...sections]);
+    //     }
+    // };
+
+    const removeIndexAndShift = (indexToRemove) => {
+        setDataIsSame((prevState) => {
+            const newState = {};
+            let currentIndex = 0;
+    
+            for (const [index, value] of Object.entries(prevState)) {
+                const numIndex = parseInt(index);
+                if (numIndex !== indexToRemove) {
+                    newState[currentIndex] = value;
+                    currentIndex++;
+                }
+            }
+    
+            return newState;
+        });
+    };
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
-            setSections([...sections, {
+            const len = sections.length;
+            if (len > 0) {
+                handleSaveSection(sections[len - 1].section_id);
+            }
+            const newSection = {
                 section_name: `Section ${sections.length + 1}`,
                 section_id: `SEC${sections.length + 1}`,
                 pages: [{
                     page_id: `SEC${sections.length + 1}_PG1`,
                     page_name: 'Page 1',
                     questions: []
-                }]
-            }]);
+                }],
+            };
+            setSections([...sections, newSection]);
+    
+            // Enable save button for the new section
+            const update = { ...dataIsSame };
+            update[len] = false; // Mark the new section as not saved
+            setDataIsSame(update);
+    
         } else if (event === 'remove') {
+            const isSaved = dataIsSame[sectionIndex];
+            if (isSaved) {
+                handleDeleteSection(sections[sectionIndex].section_id);
+            }
             const updatedSections = sections.filter((_, index) => index !== sectionIndex);
             setSections(updatedSections);
+
+            const updatedSavdSections = savedSection.filter((_, index) => index !== sectionIndex);
+            setSavedSection(updatedSavdSections);
+
+            removeIndexAndShift(sectionIndex);
+    
+            // Update the saved status
+            const update = { ...dataIsSame };
+            update.splice(sectionIndex, 1);
+            setDataIsSame(update);
         } else {
             sections = sections.splice(0, sectionIndex);
             setSections([...sections]);
@@ -79,7 +165,9 @@ function QuestionnaryForm() {
 
     const handleAddRemovePage = (event, sectionIndex, pageIndex) => {
         let currentSectionData = sections[sectionIndex];
-
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
         if (event === 'add') {
             currentSectionData.pages = [
                 ...currentSectionData.pages,
@@ -99,6 +187,10 @@ function QuestionnaryForm() {
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
+
         if (event === 'add') {
             currentPageData.questions = [...currentPageData.questions, {
                 question_id: `SEC${sectionIndex + 1}_PG${pageIndex + 1}_QUES${currentPageData?.questions.length + 1}`,
@@ -131,7 +223,7 @@ function QuestionnaryForm() {
                     >
                         <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                     </div>
-                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
+                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                 </div>
             </div>
         );
@@ -148,15 +240,37 @@ function QuestionnaryForm() {
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
         setFormDefaultInfo(response?.data?.data);
         setSections(response?.data?.data?.sections);
+        const sections = response?.data?.data?.sections || [];
+
+        // Map through the sections and add a property with a value of true
+        const updatedSections = sections.map((section, index) => ({
+            [index]: true // Add a new property or update an existing one
+        }));
+        setDataIsSame(updatedSections);
+
         setPageLoading(false);
     }, [getAPI, questionnaire_id, version_number]);
 
+    //API for deleteing the section
+
+    const handleDeleteSection = async (sectionId) => {
+        try {
+            const response = await DeleteAPI(`questionnaires/${questionnaire_id}/${version_number}?section_id=${sectionId}`);
+            if (response?.data?.status === 200) {
+                setToastSuccess(response?.data?.data?.message);
+            } else {
+                setToastError('Something went wrong');
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+        }
+    };
 
     const handleSaveSection = async (sectionId) => {
         // Find the section to save
-        const sectionToSave = sections.find(section => section.id === sectionId);
-        console.log(sectionToSave, 'sectionToSave')
-
+        const sectionToSave = sections.find(section => section.section_id === sectionId);
+        const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+    
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -172,7 +286,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-
+    
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -185,12 +299,10 @@ function QuestionnaryForm() {
                     Object.values(obj).forEach(removeKeys);
                 }
             };
-
+    
             // Remove keys from the cloned body
             removeKeys(body);
-
-            console.log(body, 'body');
-
+    
             try {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 console.log(response, 'updatedSections');
@@ -207,9 +319,11 @@ function QuestionnaryForm() {
             }
         }
     };
+    
 
     useEffect(() => {
         formDefaultDetails();
+        setSavedSection(sections);
     }, []);
 
     return (
@@ -224,20 +338,27 @@ function QuestionnaryForm() {
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
-                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.asset_type}</p>
+                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
                             <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                 {getStatusText(formDefaultInfo?.status)}
                             </button>
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p className='font-semibold text-[22px] text-[#2B333B]'>{formDefaultInfo?.internal_name}</p>
+                            <p className='font-semibold text-[22px] text-[#2B333B]' data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
                             {sections?.map((sectionData, sectionIndex) => (
                                 <div key={sectionData?.section_id} className='my-[25px] p-4 hover:border-[#2B333B] hover:border rounded-[10px]'>
                                     <div className='flex items-center w-full justify-between'>
                                         <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
                                         <div className='flex items-center justify-end'>
-                                            <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
-                                            <img src="/Images/save.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleSaveSection()} />
+                                            <img src="/Images/trash-black.svg"
+                                                alt="delete"
+                                                data-testid={`delete-btn-${sectionIndex}`}
+                                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                                                onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                            <img src="/Images/save.svg"
+                                                alt="save"
+                                                data-testid={`save-btn-${sectionIndex}`}
+                                                className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionIndex] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionIndex]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
@@ -245,7 +366,10 @@ function QuestionnaryForm() {
                                             <div className='flex items-center justify-between'>
                                                 <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
                                                 <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg" alt="save" className='pl-2.5 cursor-pointer' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
+                                                    <img src="/Images/trash-black.svg"
+                                                        alt="save"
+                                                        data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
                                             </div>
                                             <DraggableList
@@ -268,32 +392,38 @@ function QuestionnaryForm() {
                                             </div>
                                         </div>
                                     ))}
-                                    <button onClick={() => handleAddRemovePage('add', sectionIndex)} className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                    <button
+                                        onClick={() => handleAddRemovePage('add', sectionIndex)}
+                                        data-testid={`add-page-sec-${sectionIndex}`}
+                                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
                                         +
                                         <span className='ml-[4]'>Add Page</span>
                                     </button>
                                 </div>
                             ))}
-                            <button onClick={() => handleAddRemoveSection('add')} className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
+                            <button
+                                onClick={() => handleAddRemoveSection('add')}
+                                data-testid="add-section"
+                                className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
                                 + Add section
                             </button>
                         </div>
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
                                 <img src="/Images/cancle.png" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
                                 <img src="/Images/preview.png" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
+                            {/* <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
                                 onClick={() => handleSaveSection()}
                             >
                                 Save
-                            </button>
+                            </button> */}
                         </div>
                         <AddFields buttons={fieldsneeded} />
                         {/* <TestFieldSetting/> */}
