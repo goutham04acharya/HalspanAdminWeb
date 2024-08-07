@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ErrorMessage from '../ErrorMessage/ErrorMessage'
 
 const InputField = ({
     autoComplete,
@@ -20,7 +21,7 @@ const InputField = ({
 
     return (
         <div>
-            <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
+            <label htmlFor={htmlFor} className={`font-semibold text-base text-[#2B333B] ${labelStyle}`}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
             <input
                 autoComplete={autoComplete || 'off'}
                 htmlFor={htmlFor}
@@ -36,8 +37,8 @@ const InputField = ({
                 maxLength={maxLength}
                 onChange={(e) => handleChange(e, id, type)}
             // disabled={ }
-
             />
+            {validationError && <ErrorMessage error={validationError} />}
         </div>
     )
 }

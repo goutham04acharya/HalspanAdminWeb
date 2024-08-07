@@ -1,6 +1,61 @@
-import React from 'react'
+import React, { useCallback } from 'react'
+import Debounce from '../CommonMethods/debounce';
 
-function Search({ className, onChange, handleSearchClose, searchValue, optimizedFn, changeHandler, testId }) {
+function Search({ className, onChange, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder }) {
+
+    // Search related functions
+    const handleChange = (e, value) => {
+        handleSearch(e, "search", value);
+    };
+
+    const handleSearch = (e, key, value) => {
+        e.preventDefault();
+        let params = Object.fromEntries(searchParams);
+    
+        delete params.start_key; // Reset the start_key when initiating a new search
+    
+        const trimmedValue = value.trim();
+        // const specialCharRegex = /^[^a-zA-Z0-9]+$/;
+    
+        if (key === 'search') {
+          if (trimmedValue === '') {
+            // If search contains only special characters or is empty, clear the search parameter
+            delete params[key];
+          } else {
+            params[key] = trimmedValue; // Trim the value before encoding
+          }
+        } else {
+          params[key] = value;
+        }
+    
+        setQueList([]);
+        setSearchParams({ ...params });
+      };
+
+    const optimizedFn = useCallback(
+        Debounce((e, value) => handleChange(e, value)),
+        [searchParams]
+    );
+
+    const changeHandler = (e) => {
+        const value = e.target.value;
+        let params = Object.fromEntries(searchParams)
+        delete params.start_key;
+        console.log(params, 'paramsss')
+        setSearchValue(value);
+        optimizedFn(e, value); // This should call handleSearch with the current value
+    };
+
+    const handleSearchClose = () => {
+        setLoading(true);
+        let params = Object.fromEntries(searchParams);
+        if (params['search'] !== '') delete params.search;
+        setQueList([]);
+        setSearchParams({ ...params });
+        setSearchValue('');
+        setLoading(false);
+      };
+
     return (
         <div className='w-full border border-[#AEB3B7] rounded px-5 py-3'>
             <div className='flex items-center relative'>
@@ -9,10 +64,10 @@ function Search({ className, onChange, handleSearchClose, searchValue, optimized
                     data-testid={testId}
                     type="text"
                     value={searchValue}
-                    placeholder='Search by Name and Description'
+                    placeholder={placeholder}
                     onChange={(e) => {
                         e.preventDefault();
-                        optimizedFn(e, e.target.value);
+                        // optimizedFn(e, e.target.value);
                         changeHandler(e);
                     }}
                     className={`w-full outline-0 ${className} pr-10 placeholder:text-[#2B333B] placeholder:text-base placeholder:font-normal`} />

@@ -270,7 +270,7 @@ stages:
     
     - job: IntegrationTesting
       displayName: "Integration Testing"
-      condition: and(succeeded(), contains(variables['build.SourceBranch'], 'qa'))
+      condition: and(succeeded(), contains(variables['build.SourceBranch'], 'develop'))
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -378,7 +378,7 @@ stages:
         vmImage: 'macos-latest'
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
           environment: 'Production'
-      ${{ elseif eq(variables['Build.SourceBranchName'], 'qa') }}:
+      ${{ elseif eq(variables['Build.SourceBranchName'], 'develop') }}:
           environment: 'Testing'
       ${{ else }}:
           environment: 'Development'

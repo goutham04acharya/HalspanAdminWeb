@@ -102,7 +102,7 @@ function CreateQuestionnary() {
 
        if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
-        navigate('/questionnaries/create-questionnary/questionnary-form')
+        navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
         setToastError(response?.data?.data?.message);
@@ -188,7 +188,6 @@ function CreateQuestionnary() {
                   handleChange={handleChange}
                   validationError={validationErrors?.public_name}
                 />
-                {validationErrors?.public_name && <ErrorMessage error={validationErrors?.public_name} />}
               </div>
               <div className='w-1/2'>
                 <InputField
@@ -207,7 +206,6 @@ function CreateQuestionnary() {
                   handleChange={handleChange}
                   validationError={validationErrors?.internal_name}
                 />
-                {validationErrors?.internal_name && <ErrorMessage error={validationErrors?.internal_name} />}
               </div>
             </div>
             <div className='mt-8 flex items-start'>
@@ -272,7 +270,6 @@ function CreateQuestionnary() {
               handleChange={handleChange}
               validationError={validationErrors?.description}
             />
-            {validationErrors?.description && <ErrorMessage error={validationErrors?.description} />}
           </div>
         </div>
         <div className='mt-10'>

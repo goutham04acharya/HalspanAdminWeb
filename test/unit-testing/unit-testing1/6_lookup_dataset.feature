@@ -29,6 +29,7 @@ Feature: Halspan - Admin- Lookup data set
         Deleting an item will not remove it from a previously completed Questionnaires data but will remove it as an option in the future. (It will only remove from offline when the next sync is performed)
         Lookup dataset is applicable for Single line, Multi line and Dropdown.
         There must be an option to view and select the previously added lookup dataset.
+        
         Information to display
         Lookup Dataset ID
         Lookup Dataset Name
@@ -68,12 +69,19 @@ Feature: Halspan - Admin- Lookup data set
         * I click the close button
         Then I should be redirected to the lookup dataset listing screen
 
-    Scenario: Import the lookup dataset
+    Scenario: Import Invalid file with 600 data for lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button
         Then I should see a popup window to create lookup dataset
-        When I click the import button
-        Then I should read a message stating that "Error reading file data."
+        When I upload the valid file csv as "600.csv"
+        Then I should read a message stating that "Only 500 data entries are accepted."
+
+    Scenario: Import the valid lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I upload the valid file csv as "bddtest-lookup-data.csv"
+        Then I should read a message stating that "Created new lookup dataset successfully"
 
     Scenario: Admin creates the lookup dataset
         Given I am on the lookup dataset listing screen

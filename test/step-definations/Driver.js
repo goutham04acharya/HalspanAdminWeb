@@ -7,8 +7,8 @@ const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const fs = require('fs');
 const path = require('path');
-const { createQuestionnaire } = require('../bdd_api/index');
-const {create_questionnaire_payload} = require('../bdd_payload/payload')
+const { createQuestionnaire, createLookupDataset, Questionnaire } = require('../bdd_api/index');
+const {create_questionnaire_payload, lookup_dataset_payload} = require('../bdd_payload/payload')
 
 const service = new chrome.ServiceBuilder(chromedriver.path).build();
 const options = new chrome.Options();
@@ -162,5 +162,16 @@ Before("@create_lookup_dataset", async function () {
         console.log(response, "lookup dataset payload Response")
     } catch (err) {
         console.log(err)
+    }
+});
+
+Before("@create_question", async function () {
+    try {
+        global.questionary_payload = await create_questionnaire_payload();
+        console.log(global.questionary_payload, "Questionary Payload");
+        global.response = await Questionnaire(global.questionary_payload);
+        console.log(global.response, "Questionary Response");
+    } catch (err) {
+        console.log(err);
     }
 });
