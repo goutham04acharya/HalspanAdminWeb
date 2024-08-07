@@ -6,12 +6,12 @@ import Button2 from '../Button2/ButtonLight';
 import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 
-const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading }) => {
+const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title }) => {
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal flex flex-col gap-5 w-[352px] relative'>
                 <Image testId="cancel" onClick={handleClose} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
-                <h1 className='font-[600] text-[22px] leading-[33px]'>Create Lookup Dataset</h1>
+                <h1 className='font-[600] text-[22px] leading-[33px]'>{title}</h1>
                 <InputField
                     autoComplete='off'
                     label='Name'
