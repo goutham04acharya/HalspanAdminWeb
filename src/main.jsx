@@ -10,6 +10,7 @@ import './index.css';
 import { persistor, store } from './redux/store.js';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import 'react-responsive-modal/styles.css';
 
 const root = createRoot(document.getElementById('root'));
 

@@ -21,6 +21,15 @@ async function create_questionnaire_payload() {
     };
 }
 
+async function lookup_dataset_payload() {
+    let name = `lookup${faker.string.alphanumeric(5)}`;
+    return {
+        "name" : name,
+        "choices": ["India", "China", "Iran", "United states", "Russia", "United Kingdom"],
+    };
+}
+
 module.exports = {
     create_questionnaire_payload,
+    lookup_dataset_payload,
 }

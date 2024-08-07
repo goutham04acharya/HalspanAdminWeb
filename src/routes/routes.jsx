@@ -6,6 +6,7 @@ import AuthRedirect from '../Pages/auth/AuthRedirect.jsx';
 import Layout from '../Components/Layout/index.jsx';
 import Questionnaries from '../Pages/QuestionnariesList/index.jsx';
 import QuestionnaryForm from '../Pages/QuestionnaryForm/index.jsx';
+import LookupDataset from '../Pages/LookupDataset/index.jsx';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   return (
@@ -16,6 +17,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
         <Route element={<Layout {...props} />}>
           <Route path="/questionnaries" element={<Questionnaries />} />
           <Route path="/questionnaries/create-questionnary" element={<CreateQuestionnary />} />
+          <Route path="/lookup-dataset" element={<LookupDataset />} />
           <Route path="/questionnaries/create-questionnary/questionnary-form/:questionnaire_id/:version_number" element={<QuestionnaryForm/>}/>
         </Route>
         {/* Add other routes here */}
