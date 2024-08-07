@@ -18,6 +18,12 @@ body {
   padding: 36px !important;
 }
 
+.react-responsive-modal-modal:has(.confirmModal) {
+  min-width: 512px !important;
+  border-radius: 10px !important;
+  padding: 39px 18px 1.5rem 18px !important;
+}
+
 .scrollBar::-webkit-scrollbar {
   -webkit-appearance: none;
 }

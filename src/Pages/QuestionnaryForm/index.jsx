@@ -413,11 +413,11 @@ function QuestionnaryForm() {
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
                             <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
-                                <img src="/Images/cancle.png" className='pr-2.5' alt="canc" />
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
                             <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
-                                <img src="/Images/preview.png" className='pr-2.5' alt="preview" />
+                                <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
                             {/* <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'

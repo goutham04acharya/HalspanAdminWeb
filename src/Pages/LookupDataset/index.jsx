@@ -13,10 +13,11 @@ import GlobalContext from '../../Components/Context/GlobalContext'
 import Papa from 'papaparse';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString'
 import LookupTable from './components/LookupTable'
+import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
 
 
 const LookupDataset = () => {
-    const { getAPI, PostAPI } = useApi();
+    const { getAPI, PostAPI, DeleteAPI, PatchAPI } = useApi();
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
@@ -33,7 +34,15 @@ const LookupDataset = () => {
     const [isCreateLoading, setIsCreateLoading] = useState(false);
     const [isImportLoading, setIsImportLoading] = useState(false);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
-    const [isView, setIsView] = useState(false);
+    const [isView, setIsView] = useState({
+        open: false,
+        id: ''
+    });
+    const [deleteModal, setDeleteModal] = useObjects({
+        open: false,
+        id: ''
+    });
+    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -76,67 +85,67 @@ const LookupDataset = () => {
         setTimeout(() => {
             setErrors(initialState);
             setData(initialState);
-            setIsView(false);
+            setIsCreateLoading(false);
+            setIsImportLoading(false);
+            setIsView({
+                open: false,
+                id: ''
+            });
         }, 200);
     }
 
-    const handleCreate = async (file) => {
-        if(isView && !file ){
-            console.log('update in the view');
-            return;
-        }
+    const handleSubmit = async (file) => {
+        const isUpdate = isView?.open;
+
         setErrors(initialState);
-        // Only perform validation if there's no file
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
         }
+
         const payload = {
-            "name": file?.name || data?.name,
-            "choices": file?.choices || data?.choices.split(',').map(choice => choice.trim())
-        }
+            name: file?.name || data?.name,
+            choices: file?.choices || data?.choices.split(',').map(choice => choice.trim())
+        };
+
         if (!file) {
             setIsCreateLoading(true);
         }
+
+        const apiFunction = isUpdate ? PatchAPI : PostAPI;
+        const endpoint = isUpdate ? `lookup-data/${isView?.id}` : "lookup-data";
+
         try {
-            const response = await PostAPI("lookup-data", payload);
+            const response = await apiFunction(endpoint, payload);
             if (!response?.error) {
-                setLookupList([])
+                setLookupList([]);
                 fetchLookupList();
-                setToastSuccess('Created new lookup dataset successfully');
-                setData(initialState);
-                setTimeout(() => {
-                    setIsCreateLoading(false);
-                    setIsImportLoading(false);
-                }, 500);
+                const successMessage = isUpdate
+                    ? `Updated lookup dataset ID ${isView?.id} successfully`
+                    : 'Created new lookup dataset successfully';
+                setToastSuccess(successMessage);
+                handleClose();
             } else if (response?.data?.status === 409) {
+                const errorMessage = response?.data?.data?.message;
                 if (!file) {
-                    setErrors('name', response?.data?.data?.message)
+                    setErrors('name', errorMessage);
                     setIsCreateLoading(false);
                 } else {
-                    setToastError('This lookup data name already exists')
+                    setToastError(errorMessage);
                     handleClose();
                     setIsImportLoading(false);
                 }
-                return
+                return;
             } else {
-                console.log(response, 'error response');
-                setToastError('Something went wrong!')
-                setData(initialState);
-                setTimeout(() => {
-                    setIsCreateLoading(false);
-                    setIsImportLoading(false);
-                }, 500);
+                console.error(response, 'error response');
+                setToastError(response?.data?.data?.message);
+                handleClose();
             }
-            setIsCreateModalOpen(false);
         } catch (error) {
             handleClose();
-            setToastError('Something went wrong!')
-            setTimeout(() => {
-                setIsCreateLoading(false);
-                setIsImportLoading(false);
-            }, 500);
+            setToastError('Something went wrong!');
         }
-    }
+    };
+
 
     const handleImport = (event) => {
         const file = event.target.files[0];
@@ -152,6 +161,7 @@ const LookupDataset = () => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
                 if (flatData.length > 500) {
                     handleClose();
+                    setIsImportLoading(false);
                     setToastError('Only 500 data entries are accepted.');
                 } else {
                     const fileName = file.name.replace('.csv', '');
@@ -161,7 +171,7 @@ const LookupDataset = () => {
                     }
 
                     console.log(payload);
-                    handleCreate(payload);
+                    handleSubmit(payload);
                 }
             },
             error: (error) => {
@@ -173,15 +183,41 @@ const LookupDataset = () => {
     };
 
     // View Functions
-    const handleView = (name, choices) => {
+    const handleView = (id, name, choices) => {
         console.log(name, 'lookuplist');
         console.log(choices, 'lookuplist');
-        setIsView(true);
+        setIsView({
+            open: true,
+            id: id
+        });
         setData({
             name,
             choices: choices.join(',')
         })
         setIsCreateModalOpen(true);
+    }
+
+    // Delete Functions
+    const handleDelete = async () => {
+        try {
+            if (!deleteModal?.id) {
+                throw 'error'
+            }
+            setIsDeleteLoading(true);
+            const response = await DeleteAPI(`lookup-data/${deleteModal?.id}`);
+            if (!response?.error) {
+                setToastSuccess(`Deleted ID ${deleteModal?.id} successfully`)
+                setLookupList([])
+                fetchLookupList();
+            } else {
+                setToastError('Something went wrong!')
+            }
+        } catch (error) {
+            setToastError('Something went wrong!')
+        } finally {
+            setIsDeleteLoading(false);
+            setDeleteModal('open', false);
+        }
     }
 
     // Hooks
@@ -231,7 +267,7 @@ const LookupDataset = () => {
                         {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
                             <ContentNotFound
                                 src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                                text={searchValue !== '' ? "We couldn't find any items matching your filter criteria." : 'No questionnaires available.'}
+                                text={searchValue !== '' ? "We couldn't find any items matching your filter criteria." : 'No lookup dataset available.'}
                                 className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
                         ) : (
                             <div className='bg-white mt-12'>
@@ -240,6 +276,7 @@ const LookupDataset = () => {
                                     LookupList={LookupList}
                                     lastElementRef={lastElementRef}
                                     handleView={handleView}
+                                    setDeleteModal={setDeleteModal}
                                 />
                             </div>
                         )}
@@ -252,11 +289,29 @@ const LookupDataset = () => {
                 data={data}
                 errors={errors}
                 handleChange={handleChange}
-                handleCreate={handleCreate}
+                handleCreate={handleSubmit}
                 handleImport={handleImport}
                 isCreateLoading={isCreateLoading}
                 isImportLoading={isImportLoading}
-                isView={isView}
+                isView={isView?.open}
+                title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
+            />
+            <ConfirmModal
+                text='Delete Lookup Dataset'
+                subText={`Are you sure you want to delete the lookup dataset with ID ${deleteModal.id || '-'}?`}
+                button1Style='border border-[#2B333B] bg-[#2B333B] !w-[156px]'
+                button2Style='!w-[162px]'
+                Button1text='Delete'
+                Button2text='Cancel'
+                src='delete-gray'
+                // className
+                isModalOpen={deleteModal.open}
+                handleButton1={handleDelete}
+                handleButton2={() => setDeleteModal('open', false)}
+                testIDBtn1='confirm'
+                testIDBtn2='cancel'
+                handleClose={() => setDeleteModal('open', false)}
+                isLoading={isDeleteLoading}
             />
         </>
     )

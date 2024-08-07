@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
 import Image from '../../../Components/Image/Image';
 
-function LookupTable({ loading, LookupList, lastElementRef, handleView }) {
+function LookupTable({ loading, LookupList, lastElementRef, handleView, setDeleteModal }) {
 
     return (
         <div className='overflow-auto default-sidebar h-customh4'>
@@ -25,11 +25,11 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView }) {
                                     <td className='py-5 text-center bg-[#F4F6FA] pl-4 flex justify-start items-center gap-4'>
                                         <p
                                             className='underline cursor-pointer'
-                                            onClick={() => handleView(LookupInfo?.name, LookupInfo?.choices)}
+                                            onClick={() => handleView(LookupInfo?.lookup_id, LookupInfo?.name, LookupInfo?.choices)}
                                         >
                                             View
                                         </p>
-                                        <Image src='delete' className='cursor-pointer' />
+                                        <Image testId="delete" onClick={() => setDeleteModal({ id: LookupInfo?.lookup_id, open: true})} src='delete' className='cursor-pointer' />
                                     </td>
                                 </tr>
                                 <tr className='h-4 bg-white'></tr>
