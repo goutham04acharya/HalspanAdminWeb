@@ -267,7 +267,7 @@ const LookupDataset = () => {
                         {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
                             <ContentNotFound
                                 src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                                text={searchValue !== '' ? "We couldn't find any items matching your filter criteria." : 'No lookup dataset available.'}
+                                text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No lookup dataset available.'}
                                 className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
                         ) : (
                             <div className='bg-white mt-12'>
