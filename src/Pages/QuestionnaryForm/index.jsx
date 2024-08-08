@@ -15,7 +15,7 @@ function QuestionnaryForm() {
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
-    const { DeleteAPI } = useApi();Section
+    const { DeleteAPI } = useApi();
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: 'SEC1',
