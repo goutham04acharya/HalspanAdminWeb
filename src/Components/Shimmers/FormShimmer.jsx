@@ -85,8 +85,55 @@ function FormShimmer() {
                         Save
                     </button>
                 </div>
-                {/* <AddFields buttons={fieldsneeded} /> */}
-                {/* <TestFieldSetting/> */}
+                <div>
+                    <div className="p-[34px] w-full">
+                        <p className='font-semibold text-[22px] text-[#2B333B] pb-[26px]'>Add Field</p>
+                        <div className='-mx-4 flex flex-wrap'>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                            <div className='px-4 w-1/2'>
+                                <div className=' h-12 rounded animate-pulse bg-slate-200  mb-6'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div >
     )
