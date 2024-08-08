@@ -125,7 +125,7 @@ function QuestionnaryForm() {
             setSections([...sections]);
         }
     };
-   
+
     const handleAddRemovePage = (event, sectionIndex, pageIndex) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -237,7 +237,7 @@ function QuestionnaryForm() {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-    
+
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -253,7 +253,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-    
+
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -266,17 +266,17 @@ function QuestionnaryForm() {
                     Object.values(obj).forEach(removeKeys);
                 }
             };
-    
+
             // Remove keys from the cloned body
             removeKeys(body);
-    
+
             try {
                 setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 setPageLoading(false);
                 if (!(response?.data?.error)) {
                     setToastSuccess(response?.data?.message);
-    
+
                     // Update the saved status
                     const update = { ...dataIsSame };
                     update[sectionIndex] = true;
@@ -356,8 +356,8 @@ function QuestionnaryForm() {
                                             />
                                             <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
                                                 <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                                    +
-                                                    <span className='ml-[4]'>Add question</span>
+                                                    <span className='mr-[15px]'>+</span>
+                                                    <span>Add question</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -366,8 +366,8 @@ function QuestionnaryForm() {
                                         onClick={() => handleAddRemovePage('add', sectionIndex)}
                                         data-testid={`add-page-sec-${sectionIndex}`}
                                         className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                        +
-                                        <span className='ml-[4]'>Add Page</span>
+                                        <span className='mr-[15px]'>+</span>
+                                        <span>Add Page</span>
                                     </button>
                                 </div>
                             ))}
@@ -375,7 +375,8 @@ function QuestionnaryForm() {
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
                                 className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
-                                + Add section
+                                <span className='mr-[15px]'>+</span>
+                                Add section
                             </button>
                         </div>
                     </div>
@@ -396,7 +397,7 @@ function QuestionnaryForm() {
                             </button> */}
                         </div>
                         {/* <AddFields buttons={Fieldsneeded} /> */}
-                        <TestFieldSetting/>
+                        <TestFieldSetting />
                     </div>
                 </div>
             )
