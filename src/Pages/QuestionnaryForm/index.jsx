@@ -125,7 +125,7 @@ function QuestionnaryForm() {
             setSections([...sections]);
         }
     };
-
+   
     const handleAddRemovePage = (event, sectionIndex, pageIndex) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -233,11 +233,67 @@ function QuestionnaryForm() {
         }
     };
 
+    // const handleSaveSection = async (sectionId) => {
+    //     // Find the section to save
+    //     const sectionToSave = sections.find(section => section.section_id === sectionId);
+    //     const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+
+    //     if (sectionToSave) {
+    //         // Create a new object containing only the selected section's necessary fields
+    //         let body = {
+    //             section_id: sectionToSave.section_id,
+    //             section_name: sectionToSave.section_name,
+    //             pages: sectionToSave.pages.map(page => ({
+    //                 page_id: page.page_id,
+    //                 page_name: page.page_name,
+    //                 questions: page.questions.map(question => ({
+    //                     question_id: question.question_id,
+    //                     question_text: question.question_name,
+    //                     // Include other necessary fields for questions here
+    //                 }))
+    //             }))
+    //         };
+
+    //         // Recursive function to remove specified keys
+    //         const removeKeys = (obj) => {
+    //             if (Array.isArray(obj)) {
+    //                 obj.forEach(removeKeys);
+    //             } else if (typeof obj === 'object' && obj !== null) {
+    //                 delete obj.created_at;
+    //                 delete obj.updated_at;
+    //                 delete obj.questionnaire_id;
+    //                 delete obj.version_number;
+    //                 Object.values(obj).forEach(removeKeys);
+    //             }
+    //         };
+
+    //         // Remove keys from the cloned body
+    //         removeKeys(body);
+
+    //         try {
+    //             const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+    //             console.log(response, 'updatedSections');
+    //             if (response?.data?.status === 200) {
+    //                 setToastSuccess(response?.data?.message);
+    //             }
+    //             else if (response?.data?.status >= 400 && response?.data?.status < 500) {
+    //                 setToastError(response?.data?.data?.message);
+    //             } else if (response?.data?.status >= 500) {
+    //                 setToastError('Something went wrong........');
+    //             }
+    //         } catch (error) {
+    //             setToastError('Something went wrongqwertyui');
+    //         }
+    //     }
+    // };
+
+    //function for sidebar
+
     const handleSaveSection = async (sectionId) => {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
+    
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -253,7 +309,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-
+    
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -266,19 +322,22 @@ function QuestionnaryForm() {
                     Object.values(obj).forEach(removeKeys);
                 }
             };
-
+    
             // Remove keys from the cloned body
             removeKeys(body);
-
+    
             try {
+                setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                console.log(response, 'updatedSections');
-                if (response?.data?.status === 200) {
+                setPageLoading(false);
+                if (!(response?.data?.error)) {
                     setToastSuccess(response?.data?.message);
-                }
-                else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
-                    setToastError(response?.data?.data?.message);
-                } else if (response?.data?.status >= 500) {
+    
+                    // Update the saved status
+                    const update = { ...dataIsSame };
+                    update[sectionIndex] = true;
+                    setDataIsSame(update);
+                } else {
                     setToastError('Something went wrong');
                 }
             } catch (error) {
@@ -287,10 +346,6 @@ function QuestionnaryForm() {
         }
     };
 
-    //function for sidebar
-    const handleSection = () => {
-
-    }
 
     useEffect(() => {
         formDefaultDetails();
@@ -305,7 +360,7 @@ function QuestionnaryForm() {
             (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSection={handleSection} />
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
