@@ -29,4 +29,4 @@ Feature: Halspan - Admin - View All Type of Fields to Create the Forms
     Scenario: Admin views all types of field to create the form
         Given I am on the questionnaire management section
         Then I should see the add field
-        * I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
+        And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
