@@ -19,7 +19,7 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
   Scenario: Invalid search attempt
     Given I am in questionnaire listing screen
     When I enter search term as <search_term>
-    Then I should read a message stating that "We couldn't find any items matching your filter criteria."
+    Then I should read a message stating that "We're sorry, but we couldn't find any results matching your search query."
 
     Examples:
       | search_term  |
