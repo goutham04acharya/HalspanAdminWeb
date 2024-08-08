@@ -15,7 +15,7 @@ function QuestionnaryForm() {
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
-    const { DeleteAPI } = useApi();
+    const { DeleteAPI } = useApi();Section
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: 'SEC1',
@@ -451,8 +451,8 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        {/* <AddFields buttons={Fieldsneeded} /> */}
-                        <TestFieldSetting/>
+                        <AddFields buttons={Fieldsneeded} />
+                        {/* <TestFieldSetting/> */}
                     </div>
                 </div>
             )
