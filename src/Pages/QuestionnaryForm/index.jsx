@@ -396,8 +396,8 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        <AddFields buttons={Fieldsneeded} />
-                        {/* <TestFieldSetting /> */}
+                        {/* <AddFields buttons={Fieldsneeded} /> */}
+                        <TestFieldSetting />
                     </div>
                 </div>
             )
