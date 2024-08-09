@@ -10,6 +10,7 @@ module.exports = {
             'test/integration-testing/Flow1/7_delete_lookup_dataset.feature',
             'test/integration-testing/Flow1/10_edit_questionnaire_section_page_name.feature',
             'test/integration-testing/Flow1/9_view_type_of_fields.feature',
+            'test/integration-testing/Flow1/8_create_text_box_field.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

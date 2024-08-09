@@ -37,6 +37,11 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     - Admin field notes
 
     @create_question
+    Scenario: Admin views all types of field to create the form
+        Given I am on the questionnaire management section
+        Then I should see the add field
+        And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
+        
     Scenario: Admin adds textbox from the add field section
         Given I am on the questionnaire management section
         Then I should see an add field section
