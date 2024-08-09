@@ -32,37 +32,37 @@ const Fieldsneeded = [
     {
         buttonName: "Photo",
         buttonNumber: 1,
-        buttonIcon: '/public/Images/cameraField.svg',
+        buttonIcon: '/Images/cameraField.svg',
         testId: 'photo'
     },
     {
         buttonName: "Video",
         buttonNumber: 2,
-        buttonIcon: '/public/Images/videoField.svg',
+        buttonIcon: '/Images/videoField.svg',
         testId: 'video'
     },
     {
         buttonName: "File",
         buttonNumber: 1,
-        buttonIcon: '/public/Images/fileField.svg',
+        buttonIcon: '/Images/fileField.svg',
         testId: 'file'
     },
     {
         buttonName: "GPS",
         buttonNumber: 2,
-        buttonIcon: '/public/Images/map-pinField.svg',
+        buttonIcon: '/Images/map-pinField.svg',
         testId: 'gps'
     },
     {
         buttonName: "Number",
         buttonNumber: 1,
-        buttonIcon: '/public/Images/NumberField.svg',
+        buttonIcon: '/Images/NumberField.svg',
         testId: 'number'
     },
     {
         buttonName: "Display",
         buttonNumber: 2,
-        buttonIcon: '/public/Images/DisplayField.svg',
+        buttonIcon: '/Images/DisplayField.svg',
         testId: 'display'
     },
     {

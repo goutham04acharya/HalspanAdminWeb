@@ -6,7 +6,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage }) {
         <div className='py-4'>
             <div className='flex items-center px-9'>
                 <img src="/Images/form-name.svg" alt="form-name" />
-                <p className='ml-3 font-semibold text-base text-[#2B333B]'>{formDefaultInfo?.internal_name}</p>
+                <p className='ml-3 font-semibold text-base text-[#2B333B] '>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
                 {sections.length > 0 && sections.map((sectionItem) => (
