@@ -9,6 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
+import EditableField from '../../Components/EditableField/EditableField.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -31,6 +32,21 @@ function QuestionnaryForm() {
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([]);
     const [isOpenSidebar, setIsOpenSidebar] = useState(false);
+    const sectionRefs = useRef([]);
+    const pageRefs = useRef({});
+
+    const scrollToSection = (index) => {
+        if (sectionRefs.current[index]) {
+            sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+    const scrollToPage = (sectionIndex, pageIndex) => {
+        console.log(sectionIndex, 'ppppppp', pageIndex)
+        const pageRefKey = `${sectionIndex}-${pageIndex}`;
+        if (pageRefs.current[pageRefKey]) {
+            pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -97,6 +113,10 @@ function QuestionnaryForm() {
                 }],
             };
             setSections([...sections, newSection]);
+
+            setTimeout(() => {
+                sectionRefs.current[sections.length - 1]?.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
 
             // Enable save button for the new section
             const update = { ...dataIsSame };
@@ -290,6 +310,77 @@ function QuestionnaryForm() {
         }
     };
 
+    // Save the section and page name
+    const handleSaveSectionName = (value, index, secondIndex) => {
+        console.log(value, 'value')
+        console.log(index, 'index')
+        console.log(secondIndex, 'index')
+        if (secondIndex !== undefined && secondIndex !== null) {
+            const updatedSections = [...sections];
+            updatedSections[index].pages[secondIndex].page_name = value;
+            setSections(updatedSections);
+            handleAutoSave(updatedSections[index]?.section_id, updatedSections);
+            return;
+        }
+        console.log('first');
+        const updatedSections = [...sections];
+        updatedSections[index].section_name = value;
+        setSections(updatedSections);
+        handleAutoSave(updatedSections[index]?.section_id, updatedSections);
+    }
+
+    const handleAutoSave = async (sectionId, updatedData) => {
+        // Find the section to save
+        const sectionToSave = updatedData.find(section => section.section_id === sectionId);
+        const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
+
+        if (sectionToSave) {
+            // Create a new object containing only the selected section's necessary fields
+            let body = {
+                section_id: sectionToSave.section_id,
+                section_name: sectionToSave.section_name,
+                pages: sectionToSave.pages.map(page => ({
+                    page_id: page.page_id,
+                    page_name: page.page_name,
+                    questions: page.questions.map(question => ({
+                        question_id: question.question_id,
+                        question_text: question.question_name,
+                        // Include other necessary fields for questions here
+                    }))
+                }))
+            };
+
+            // Recursive function to remove specified keys
+            const removeKeys = (obj) => {
+                if (Array.isArray(obj)) {
+                    obj.forEach(removeKeys);
+                } else if (typeof obj === 'object' && obj !== null) {
+                    delete obj.created_at;
+                    delete obj.updated_at;
+                    delete obj.questionnaire_id;
+                    delete obj.version_number;
+                    Object.values(obj).forEach(removeKeys);
+                }
+            };
+
+            // Remove keys from the cloned body
+            removeKeys(body);
+
+            try {
+                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                if (!(response?.data?.error)) {
+                    // Update the saved status
+                    const update = { ...dataIsSame };
+                    update[sectionIndex] = true;
+                    setDataIsSame(update);
+                } else {
+                    setToastError('Something went wrong');
+                }
+            } catch (error) {
+                setToastError('Something went wrong');
+            }
+        }
+    };
 
     useEffect(() => {
         formDefaultDetails();
@@ -304,7 +395,7 @@ function QuestionnaryForm() {
             (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} />
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -316,9 +407,19 @@ function QuestionnaryForm() {
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p className='font-semibold text-[22px] text-[#2B333B]' data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
                             {sections?.map((sectionData, sectionIndex) => (
-                                <div key={sectionData?.section_id} className='my-[25px] p-4 hover:border-[#2B333B] hover:border rounded-[10px]'>
-                                    <div className='flex items-center w-full justify-between'>
-                                        <p className='text-[#2B333B] font-medium text-[22px]'>{sectionData?.section_name}</p>
+                                <div
+                                    key={sectionData?.section_id}
+                                    ref={el => sectionRefs.current[sectionIndex] = el}
+                                    className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
+                                >
+                                    <div className='flex items-center w-full justify-between gap-7'>
+                                        <EditableField
+                                            name={sectionData?.section_name}
+                                            index={sectionIndex}
+                                            handleSave={handleSaveSectionName}
+                                            section={true}
+                                            testId={`section-${sectionIndex}-name`}
+                                        />
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg"
                                                 alt="delete"
@@ -332,9 +433,19 @@ function QuestionnaryForm() {
                                         </div>
                                     </div>
                                     {sectionData?.pages.map((pageData, pageIndex) => (
-                                        <div key={pageData?.page_id} className='mt-7 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'>
-                                            <div className='flex items-center justify-between'>
-                                                <p className='text-[#2B333B] font-medium text-[22px]'>{pageData?.page_name}</p>
+                                        <div
+                                            key={pageData?.page_id}
+                                            ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
+                                            className='mt-7 mx-1 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
+                                        >
+                                            <div className='flex items-center justify-between gap-7'>
+                                                <EditableField
+                                                    name={pageData?.page_name}
+                                                    index={sectionIndex}
+                                                    secondIndex={pageIndex}
+                                                    handleSave={handleSaveSectionName}
+                                                    testId={`page-${pageIndex}-name`}
+                                                />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"
                                                         alt="save"
