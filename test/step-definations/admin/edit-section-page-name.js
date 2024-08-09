@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const { Given, When, Then } = require('@cucumber/cucumber');
 const { By, until, Key } = require('selenium-webdriver');
 const assert = require('assert');
@@ -11,47 +12,55 @@ async function doubleClick(driver, element) {
 
 When('I double click the section {int} name', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)));
-    await doubleClick(driver, sectionElement);
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`))).click();
+    // await doubleClick(driver, sectionElement);
 });
 
 When('I enter the section {int} name', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)));
     await sectionElement.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
-    this.sectionName = await sectionElement.sendKeys(`New Section ${sectionNumber}`);
+    await sectionElement.sendKeys(`New Section ${sectionNumber}`);
+    await sectionElement.sendKeys(Key.chord(Key.ENTER));
+    this.sectionName = `New Section ${sectionNumber}`
 });
 
 When('I double click the page {int} name', async function (pageNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const pageElement = await driver.wait(until.elementLocated(By.css(`[data-testid="page-${pageNumber}-name"]`)));
-    await doubleClick(driver, pageElement);
+    const pageElement = await driver.wait(until.elementLocated(By.css(`[data-testid="page-${pageNumber}-name"]`))).click();
+    // await doubleClick(driver, pageElement);
 });
 
 When('I enter the page {int} name', async function (pageNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const pageElement = await driver.wait(until.elementLocated(By.css(`[data-testid="page-${pageNumber}-name"]`)));
     await pageElement.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
-    this.pageName = await pageElement.sendKeys(`New Page ${pageNumber}`);
+    await pageElement.sendKeys(`New Page ${pageNumber}`);
+    await pageElement.sendKeys(Key.chord(Key.ENTER));
+    this.pageName = `New Page ${pageNumber}`
 });
 
 Then('I should see the updated section {int} name on the sidebar', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const sectionName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${sectionNumber}"]`)));
+    const sectionName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${sectionNumber}"]`))).getText();
+    console.log(sectionName, 'actual')
+    console.log(this.sectionName, 'expected')
     assert.equal(sectionName, this.sectionName);
 });
 
 Then('I should see the updated page {int} name on the sidebar', async function (pageNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const pageName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-page-${pageNumber}"]`)));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${pageNumber}"]`))).click();
+    const pageName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-page-${pageNumber}"]`))).getText();
     assert.equal(pageName, this.pageName);
 });
 
 When('I click on add new section {int} times', async function (times) {
-    await new Promise(resolve => setTimeout(resolve, 750));
-    const addSectionButton = await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]')));
     for (let i = 0; i < times; i++) {
+        // Refetch the element in each iteration
+        const addSectionButton = await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]')));
         await addSectionButton.click();
+        await new Promise(resolve => setTimeout(resolve, 750)); // Add delay if necessary for the UI to stabilize
     }
 });
 

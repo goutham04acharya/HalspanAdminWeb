@@ -114,6 +114,10 @@ function QuestionnaryForm() {
             };
             setSections([...sections, newSection]);
 
+            setTimeout(() => {
+                sectionRefs.current[sections.length - 1]?.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+
             // Enable save button for the new section
             const update = { ...dataIsSame };
             update[len] = false; // Mark the new section as not saved
@@ -421,8 +425,6 @@ function QuestionnaryForm() {
             try {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 if (!(response?.data?.error)) {
-                    setToastSuccess(response?.data?.message);
-
                     // Update the saved status
                     const update = { ...dataIsSame };
                     update[sectionIndex] = true;
@@ -435,8 +437,6 @@ function QuestionnaryForm() {
             }
         }
     };
-
-
 
     useEffect(() => {
         formDefaultDetails();

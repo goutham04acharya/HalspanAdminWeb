@@ -35,7 +35,8 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                             <img src="/Images/down-arrow.svg" alt="down-arrow" />
                             <p
                                 data-testid={`sidebar-section-${sectionIndex}`}
-                                className='font-normal text-base text-[#2B333B] ml-3 py-[14px]'
+                                title={sectionItem?.section_name}
+                                className='font-normal text-base text-[#2B333B] ml-3 py-[14px] truncate'
                             >
                                 {sectionItem?.section_name}
                             </p>
@@ -45,12 +46,13 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                 <div
                                     key={sectionItem?.page_id}
                                     onClick={() => handlePageScroll(sectionIndex, pageIndex)}
-                                    className='flex items-center pl-14 hover:bg-[#EFF1F8] cursor-pointer'
+                                    className='flex items-center pl-14 hover:bg-[#EFF1F8] cursor-pointer truncate'
                                 >
-                                    <p className='rounded-full w-2 h-2 bg-black mr-4'></p>
+                                    <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>
                                     <p
                                         data-testid={`sidebar-page-${pageIndex}`}
-                                        className='font-normal text-base text-[#2B333B] cursor-pointer py-[14px]'
+                                        title={pageItem?.page_name}
+                                        className='font-normal text-base text-[#2B333B] cursor-pointer py-[14px] truncate'
                                     >
                                         {pageItem?.page_name}
                                     </p>

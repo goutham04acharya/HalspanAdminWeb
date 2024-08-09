@@ -16,12 +16,12 @@ Feature: Halspan - Admin - Edit the Questionnaire(section name and page)
     @create_question
     Scenario: Admin edits section name
         Given I am on the questionnaire management section
-        When I double click the section 1 name
-        When I enter the section 1 name
-        When I double click the page 1 name
-        When I enter the page 1 name
-        Then I should see the updated section 1 name on the sidebar
-        Then I should see the updated page 1 name on the sidebar
+        When I double click the section 0 name
+        When I enter the section 0 name
+        When I double click the page 0 name
+        When I enter the page 0 name
+        Then I should see the updated section 0 name on the sidebar
+        Then I should see the updated page 0 name on the sidebar
 
     Scenario: Admin creates multiple new section
         Given I am on the questionnaire management section
