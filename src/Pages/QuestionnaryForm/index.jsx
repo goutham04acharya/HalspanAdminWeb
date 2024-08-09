@@ -253,62 +253,6 @@ function QuestionnaryForm() {
         }
     };
 
-    // const handleSaveSection = async (sectionId) => {
-    //     // Find the section to save
-    //     const sectionToSave = sections.find(section => section.section_id === sectionId);
-    //     const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
-    //     if (sectionToSave) {
-    //         // Create a new object containing only the selected section's necessary fields
-    //         let body = {
-    //             section_id: sectionToSave.section_id,
-    //             section_name: sectionToSave.section_name,
-    //             pages: sectionToSave.pages.map(page => ({
-    //                 page_id: page.page_id,
-    //                 page_name: page.page_name,
-    //                 questions: page.questions.map(question => ({
-    //                     question_id: question.question_id,
-    //                     question_text: question.question_name,
-    //                     // Include other necessary fields for questions here
-    //                 }))
-    //             }))
-    //         };
-
-    //         // Recursive function to remove specified keys
-    //         const removeKeys = (obj) => {
-    //             if (Array.isArray(obj)) {
-    //                 obj.forEach(removeKeys);
-    //             } else if (typeof obj === 'object' && obj !== null) {
-    //                 delete obj.created_at;
-    //                 delete obj.updated_at;
-    //                 delete obj.questionnaire_id;
-    //                 delete obj.version_number;
-    //                 Object.values(obj).forEach(removeKeys);
-    //             }
-    //         };
-
-    //         // Remove keys from the cloned body
-    //         removeKeys(body);
-
-    //         try {
-    //             const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-    //             console.log(response, 'updatedSections');
-    //             if (response?.data?.status === 200) {
-    //                 setToastSuccess(response?.data?.message);
-    //             }
-    //             else if (response?.data?.status >= 400 && response?.data?.status < 500) {
-    //                 setToastError(response?.data?.data?.message);
-    //             } else if (response?.data?.status >= 500) {
-    //                 setToastError('Something went wrong........');
-    //             }
-    //         } catch (error) {
-    //             setToastError('Something went wrongqwertyui');
-    //         }
-    //     }
-    // };
-
-    //function for sidebar
-
     const handleSaveSection = async (sectionId) => {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
@@ -523,8 +467,8 @@ function QuestionnaryForm() {
                                             />
                                             <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
                                                 <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                                    +
-                                                    <span className='ml-[4]'>Add question</span>
+                                                    <span className='mr-[15px]'>+</span>
+                                                    <span>Add question</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -532,9 +476,9 @@ function QuestionnaryForm() {
                                     <button
                                         onClick={() => handleAddRemovePage('add', sectionIndex)}
                                         data-testid={`add-page-sec-${sectionIndex}`}
-                                        className='mx-1 flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                        +
-                                        <span className='ml-[4]'>Add Page</span>
+                                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                        <span className='mr-[15px]'>+</span>
+                                        <span>Add Page</span>
                                     </button>
                                 </div>
                             ))}
@@ -542,7 +486,8 @@ function QuestionnaryForm() {
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
                                 className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
-                                + Add section
+                                <span className='mr-[15px]'>+</span>
+                                Add section
                             </button>
                         </div>
                     </div>
@@ -563,7 +508,7 @@ function QuestionnaryForm() {
                             </button> */}
                         </div>
                         <AddFields buttons={Fieldsneeded} />
-                        {/* <TestFieldSetting/> */}
+                        {/* <TestFieldSetting /> */}
                     </div>
                 </div>
             )
