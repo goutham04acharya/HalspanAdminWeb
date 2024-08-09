@@ -4,7 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import DraggableList from 'react-draggable-list';
+import AddFields from './Components/AddFieldComponents/AddFields.jsx';
+import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
+import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
+import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -25,7 +29,8 @@ function QuestionnaryForm() {
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
-    const [savedSection, setSavedSection] = useState([])
+    const [savedSection, setSavedSection] = useState([]);
+    const [isOpenSidebar, setIsOpenSidebar] = useState(false);
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -59,51 +64,11 @@ function QuestionnaryForm() {
 
     // Form related code
 
-    // const handleAddRemoveSection = (event, sectionIndex) => {
-    //     if (event === 'add') {
-    //         const len = sections.length;
-    //         if (len > 0) {
-    //             handleSaveSection(sections[len - 1].section_id);
-    //         }
-    //         const newSection = {
-    //             section_name: `Section ${sections.length + 1}`,
-    //             section_id: `SEC${sections.length + 1}`,
-    //             pages: [{
-    //                 page_id: `SEC${sections.length + 1}_PG1`,
-    //                 page_name: 'Page 1',
-    //                 questions: []
-    //             }],
-    //         };
-    //         setSections([...sections, newSection]);
-    
-    //         // Enable save button for the new section
-    //         const update = { ...dataIsSame };
-    //         update[len] = false; // Mark the new section as not saved
-    //         setDataIsSame(update);
-    
-    //     } else if (event === 'remove') {
-    //         const isSaved = dataIsSame[sectionIndex];
-    //         if (isSaved) {
-    //             handleDeleteSection(sections[sectionIndex].section_id);
-    //         }
-    //         const updatedSections = sections.filter((_, index) => index !== sectionIndex);
-    //         setSections(updatedSections);
-    
-    //         // Update the saved status
-    //         const update = { ...dataIsSame };
-    //         update.splice(sectionIndex, 1);
-    //         setDataIsSame(update);
-    //     } else {
-    //         sections = sections.splice(0, sectionIndex);
-    //         setSections([...sections]);
-    //     }
-    // };
-
     const removeIndexAndShift = (indexToRemove) => {
         setDataIsSame((prevState) => {
             const newState = {};
             let currentIndex = 0;
-    
+
             for (const [index, value] of Object.entries(prevState)) {
                 const numIndex = parseInt(index);
                 if (numIndex !== indexToRemove) {
@@ -111,7 +76,7 @@ function QuestionnaryForm() {
                     currentIndex++;
                 }
             }
-    
+
             return newState;
         });
     };
@@ -132,12 +97,12 @@ function QuestionnaryForm() {
                 }],
             };
             setSections([...sections, newSection]);
-    
+
             // Enable save button for the new section
             const update = { ...dataIsSame };
             update[len] = false; // Mark the new section as not saved
             setDataIsSame(update);
-    
+
         } else if (event === 'remove') {
             const isSaved = dataIsSame[sectionIndex];
             if (isSaved) {
@@ -150,7 +115,7 @@ function QuestionnaryForm() {
             setSavedSection(updatedSavdSections);
 
             removeIndexAndShift(sectionIndex);
-    
+
             // Update the saved status
             const update = { ...dataIsSame };
             update.splice(sectionIndex, 1);
@@ -206,23 +171,27 @@ function QuestionnaryForm() {
         const { onMouseDown, onTouchStart } = dragHandleProps;
 
         return (
-            <div className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] flex justify-between items-start">
-                <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
-                <div className='flex items-center'>
-                    <div
-                        className="disable-select dragHandle"
-                        onMouseDown={(e) => {
-                            document.body.style.overflow = "hidden";
-                            onMouseDown(e);
-                        }}
-                        onMouseUp={() => {
-                            document.body.style.overflow = "visible";
-                        }}
-                    >
-                        <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+            <div className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
+                <div className='flex justify-between items-start'>
+                    {console.log(item, 'naananaynaynayaynayanyan')}
+                    <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
+                    <div className='flex items-center'>
+                        <div
+                            className="disable-select dragHandle"
+                            onMouseDown={(e) => {
+                                document.body.style.overflow = "hidden";
+                                onMouseDown(e);
+                            }}
+                            onMouseUp={() => {
+                                document.body.style.overflow = "visible";
+                            }}
+                        >
+                            <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+                        </div>
+                        <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                     </div>
-                    <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                 </div>
+                <TextBoxField />
             </div>
         );
     };
@@ -268,7 +237,7 @@ function QuestionnaryForm() {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-    
+
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -284,7 +253,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-    
+
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -297,17 +266,17 @@ function QuestionnaryForm() {
                     Object.values(obj).forEach(removeKeys);
                 }
             };
-    
+
             // Remove keys from the cloned body
             removeKeys(body);
-    
+
             try {
                 setPageLoading(true);
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 setPageLoading(false);
                 if (!(response?.data?.error)) {
                     setToastSuccess(response?.data?.message);
-    
+
                     // Update the saved status
                     const update = { ...dataIsSame };
                     update[sectionIndex] = true;
@@ -320,7 +289,7 @@ function QuestionnaryForm() {
             }
         }
     };
-    
+
 
     useEffect(() => {
         formDefaultDetails();
@@ -335,7 +304,7 @@ function QuestionnaryForm() {
             (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} />
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -387,8 +356,8 @@ function QuestionnaryForm() {
                                             />
                                             <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
                                                 <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                                    +
-                                                    <span className='ml-[4]'>Add question</span>
+                                                    <span className='mr-[15px]'>+</span>
+                                                    <span>Add question</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -397,8 +366,8 @@ function QuestionnaryForm() {
                                         onClick={() => handleAddRemovePage('add', sectionIndex)}
                                         data-testid={`add-page-sec-${sectionIndex}`}
                                         className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                        +
-                                        <span className='ml-[4]'>Add Page</span>
+                                        <span className='mr-[15px]'>+</span>
+                                        <span>Add Page</span>
                                     </button>
                                 </div>
                             ))}
@@ -406,7 +375,8 @@ function QuestionnaryForm() {
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
                                 className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
-                                + Add section
+                                <span className='mr-[15px]'>+</span>
+                                Add section
                             </button>
                         </div>
                     </div>
@@ -426,8 +396,8 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        {/* <AddFields buttons={fieldsneeded} /> */}
-                        {/* <TestFieldSetting/> */}
+                        <AddFields buttons={Fieldsneeded} />
+                        {/* <TestFieldSetting /> */}
                     </div>
                 </div>
             )
