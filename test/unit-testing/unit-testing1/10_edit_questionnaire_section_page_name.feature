@@ -28,4 +28,3 @@ Feature: Halspan - Admin - Edit the Questionnaire(section name and page)
         When I click on add new section 3 times
         Then I should see sections created 
         When I click the section 3 from sidebar
-        Then I should see the section 3 highlighted

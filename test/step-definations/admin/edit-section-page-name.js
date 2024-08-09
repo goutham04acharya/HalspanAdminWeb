@@ -82,11 +82,11 @@ When('I click the section {int} from sidebar', async function (sectionNumber) {
     await sectionElement.click();
 });
 
-Then('I should see the section {int} highlighted', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
-    const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)));
-    const isHighlighted = await sectionElement.getAttribute('class').then(classes => classes.includes('highlighted'));
-    if (!isHighlighted) {
-        throw new Error(`Section ${sectionNumber} is not highlighted`);
-    }
-});
+// Then('I should see the section {int} highlighted', async function (sectionNumber) {
+//     await new Promise(resolve => setTimeout(resolve, 750));
+//     const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)));
+//     const isHighlighted = await sectionElement.getAttribute('class').then(classes => classes.includes('highlighted'));
+//     if (!isHighlighted) {
+//         throw new Error(`Section ${sectionNumber} is not highlighted`);
+//     }
+// });

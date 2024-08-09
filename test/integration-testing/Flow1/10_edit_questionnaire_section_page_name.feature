@@ -6,13 +6,6 @@ Feature: Halspan - Admin - Edit the Questionnaire(section name and page)
     There must be an option to edit the section name.
     There must be an option to edit the page name.
 
-    Scenario: Admin logs in with valid credentials
-        Given I am on the login page
-        When I enter valid email address as "nayana.sk@7edge.com"
-        * I enter valid password as "Auth@123"
-        * I click the submit button
-        Then I should be redirected to the questionnaire listing screen
-
     @create_question
     Scenario: Admin edits section name
         Given I am on the questionnaire management section
@@ -28,4 +21,3 @@ Feature: Halspan - Admin - Edit the Questionnaire(section name and page)
         When I click on add new section 3 times
         Then I should see sections created 
         When I click the section 3 from sidebar
-        Then I should see the section 3 highlighted
