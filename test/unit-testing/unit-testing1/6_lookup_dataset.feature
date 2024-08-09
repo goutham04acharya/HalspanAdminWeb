@@ -95,7 +95,7 @@ Feature: Halspan - Admin- Lookup data set
     Scenario: Invalid search attempt
         Given I am on the lookup dataset listing screen
         When I search by the name "random12321"
-        Then I should read a message stating that "We couldn't find any items matching your filter criteria."
+        Then I should read a message stating that "We're sorry, but we couldn't find any results matching your search query."
 
     Scenario: Searching by lookup dataset name
         Given I am on the lookup dataset listing screen

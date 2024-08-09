@@ -171,7 +171,7 @@ function Questionnaries() {
             !loading && (isContentNotFound || (QueList?.length === 0 || QueList?.items?.length === 0)) ? (
               <ContentNotFound
                 src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                text={searchValue !== '' ? "We couldn't find any items matching your filter criteria." : 'No questionnaires available.'}
+                text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No questionnaires available.'}
                 className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'}
               />
             ) : (
