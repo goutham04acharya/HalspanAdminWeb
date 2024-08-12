@@ -417,8 +417,6 @@ function QuestionnaryForm() {
         });
     };
 
-
-
     const handleClick = (functionName) => {
         console.log(functionName, 'functionmnaeee')
         const functionMap = {
@@ -485,7 +483,7 @@ function QuestionnaryForm() {
                                         <div
                                             key={pageData?.page_id}
                                             ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                                            className='mt-7 mx-1 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
+                                            className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
                                         >
                                             <div className='flex items-center justify-between gap-7'>
                                                 <EditableField
