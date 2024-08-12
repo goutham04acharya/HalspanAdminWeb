@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown'
 import InputField from '../../../../../../Components/InputField/InputField';
+import OptionsComponent from './OptionalComponent/OptionalComponent';
 
 function TestFieldSetting() {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -142,7 +143,7 @@ function TestFieldSetting() {
                 />
               </div>
             </div>
-            <div className='mt-7 w-[97%]'>
+            {/* <div className='mt-7 w-[97%]'>
               <p className='font-semibold text-base text-[#2B333B]'>Options</p>
               <div className="status custom-toggle-switch flex items-center justify-between">
                 <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
@@ -192,7 +193,9 @@ function TestFieldSetting() {
                   <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
                 </label>
               </div>
-            </div>
+            </div> */}
+             {/* OptionsComponent added here */}
+             <OptionsComponent />
             <div className='mt-7'>
               <InputField
                 autoComplete='off'
