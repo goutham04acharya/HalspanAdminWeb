@@ -3,13 +3,17 @@ const Fieldsneeded = [
         buttonName: "Textbox",
         buttonNumber: 1,
         buttonIcon: '/Images/TextField.svg',
-        testId: 'textbox'
+        testId: 'textbox',
+        onClick: 'handleTextboxClick'
+
     },
     {
         buttonName: "Choice",
         buttonNumber: 2,
         buttonIcon: '/Images/choiceField.svg',
-        testId: 'choice'
+        testId: 'choice',
+        onClick: 'handleChoiceClick'
+
     },
     {
         buttonName: "Date / Time",

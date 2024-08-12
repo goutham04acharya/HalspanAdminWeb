@@ -31,9 +31,19 @@ function QuestionnaryForm() {
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([]);
-    const [isOpenSidebar, setIsOpenSidebar] = useState(false);
+    const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
+    const [inputVisibility, setInputVisibility] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
+    const [selectedComponent, setSelectedComponent] = useState(null);
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
+    const questionRefs = useRef([]);
+
+    const componentMap = {
+        textboxfield: (props) => <TextBoxField {...props} />,
+        // checkbox: (props) => <CheckboxField {...props} />,
+        // video: (props) => <VideoField {...props} />,
+        // audio: (props) => <AudioField {...props} />,
+    };
 
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
@@ -41,7 +51,6 @@ function QuestionnaryForm() {
         }
     };
     const scrollToPage = (sectionIndex, pageIndex) => {
-        console.log(sectionIndex, 'ppppppp', pageIndex)
         const pageRefKey = `${sectionIndex}-${pageIndex}`;
         if (pageRefs.current[pageRefKey]) {
             pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
@@ -186,14 +195,18 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
+
+    const handleQuestionIndexCapture = (question) => {
+        setSelectedQuestionDetails(question);
+    };
+
     // Function for dragging questions
-    const Item = ({ item, itemSelected, dragHandleProps }) => {
+    const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
 
         return (
-            <div className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
-                <div className='flex justify-between items-start'>
-                    {console.log(item, 'naananaynaynayaynayanyan')}
+            <div onClick={() => handleQuestionIndexCapture(item)} className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
+                <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
                     <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
                     <div className='flex items-center'>
                         <div
@@ -211,7 +224,14 @@ function QuestionnaryForm() {
                         <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                     </div>
                 </div>
-                <TextBoxField />
+                {/* Conditionally render the input */}
+                {inputVisibility.sectionIndex === item.sectionIndex &&
+                    inputVisibility.pageIndex === item.pageIndex &&
+                    inputVisibility.questionIndex === item.index && (
+                        <>
+                            {React.createElement(componentMap[selectedComponent])}
+                        </>
+                    )}
             </div>
         );
     };
@@ -312,9 +332,6 @@ function QuestionnaryForm() {
 
     // Save the section and page name
     const handleSaveSectionName = (value, index, secondIndex) => {
-        console.log(value, 'value')
-        console.log(index, 'index')
-        console.log(secondIndex, 'index')
         if (secondIndex !== undefined && secondIndex !== null) {
             const updatedSections = [...sections];
             updatedSections[index].pages[secondIndex].page_name = value;
@@ -322,7 +339,6 @@ function QuestionnaryForm() {
             handleAutoSave(updatedSections[index]?.section_id, updatedSections);
             return;
         }
-        console.log('first');
         const updatedSections = [...sections];
         updatedSections[index].section_name = value;
         setSections(updatedSections);
@@ -379,6 +395,39 @@ function QuestionnaryForm() {
             } catch (error) {
                 setToastError('Something went wrong');
             }
+        }
+    };
+
+    const handleTextboxClick = () => {
+        console.log("Textbox clicked");
+        setSelectedComponent('textboxfield')
+        setInputVisibility({
+            sectionIndex: selectedQuestionDetails.sectionIndex,
+            pageIndex: selectedQuestionDetails.pageIndex,
+            questionIndex: selectedQuestionDetails.index
+        });
+    };
+
+    const handleChoiceClick = () => {
+        console.log("Textbox clicked");
+        setInputVisibility({
+            sectionIndex: selectedQuestionDetails.sectionIndex,
+            pageIndex: selectedQuestionDetails.pageIndex,
+            questionIndex: selectedQuestionDetails.index
+        });
+    };
+
+
+
+    const handleClick = (functionName) => {
+        console.log(functionName, 'functionmnaeee')
+        const functionMap = {
+            handleTextboxClick,
+            handleChoiceClick,
+        };
+
+        if (functionMap[functionName]) {
+            functionMap[functionName]();
         }
     };
 
@@ -507,8 +556,11 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        {/* <AddFields buttons={Fieldsneeded} /> */}
-                        <TestFieldSetting />
+                        <AddFields
+                            buttons={Fieldsneeded}
+                            handleClick={handleClick}
+                        />
+                        {/* <TestFieldSetting /> */}
                     </div>
                 </div>
             )
