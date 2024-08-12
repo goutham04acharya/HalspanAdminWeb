@@ -32,7 +32,8 @@ function QuestionnaryForm() {
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([]);
     const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
-    const [inputVisibility, setInputVisibility] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
+    const [inputVisibility, setInputVisibility] = useState({});
+    console.log(inputVisibility, 'innpuvistiblit')
     const [selectedComponent, setSelectedComponent] = useState(null);
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
@@ -224,14 +225,13 @@ function QuestionnaryForm() {
                         <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                     </div>
                 </div>
-                {/* Conditionally render the input */}
-                {inputVisibility.sectionIndex === item.sectionIndex &&
-                    inputVisibility.pageIndex === item.pageIndex &&
-                    inputVisibility.questionIndex === item.index && (
-                        <>
-                            {React.createElement(componentMap[selectedComponent])}
-                        </>
-                    )}
+                {/* Render the selected component if the question is visible */}
+                {inputVisibility[item.question_id] && (
+                    <>
+                        {React.createElement(componentMap[selectedComponent])}
+                    </>
+                )}
+
             </div>
         );
     };
@@ -399,26 +399,19 @@ function QuestionnaryForm() {
     };
 
     const handleTextboxClick = () => {
-        console.log("Textbox clicked");
-        setSelectedComponent('textboxfield')
-        setInputVisibility({
-            sectionIndex: selectedQuestionDetails.sectionIndex,
-            pageIndex: selectedQuestionDetails.pageIndex,
-            questionIndex: selectedQuestionDetails.index
-        });
+        setSelectedComponent('textboxfield');
+        // Toggle visibility for the selected question
+        setInputVisibility(prevState => ({
+            ...prevState,
+            [selectedQuestionDetails.question_id]: true,
+        }));
     };
 
     const handleChoiceClick = () => {
-        console.log("Textbox clicked");
-        setInputVisibility({
-            sectionIndex: selectedQuestionDetails.sectionIndex,
-            pageIndex: selectedQuestionDetails.pageIndex,
-            questionIndex: selectedQuestionDetails.index
-        });
+        
     };
 
     const handleClick = (functionName) => {
-        console.log(functionName, 'functionmnaeee')
         const functionMap = {
             handleTextboxClick,
             handleChoiceClick,

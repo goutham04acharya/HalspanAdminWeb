@@ -136,7 +136,6 @@ const LookupDataset = () => {
                 }
                 return;
             } else {
-                console.error(response, 'error response');
                 setToastError(response?.data?.data?.message);
                 handleClose();
             }
@@ -170,7 +169,6 @@ const LookupDataset = () => {
                         choices: flatData
                     }
 
-                    console.log(payload);
                     handleSubmit(payload);
                 }
             },
@@ -184,8 +182,6 @@ const LookupDataset = () => {
 
     // View Functions
     const handleView = (id, name, choices) => {
-        console.log(name, 'lookuplist');
-        console.log(choices, 'lookuplist');
         setIsView({
             open: true,
             id: id

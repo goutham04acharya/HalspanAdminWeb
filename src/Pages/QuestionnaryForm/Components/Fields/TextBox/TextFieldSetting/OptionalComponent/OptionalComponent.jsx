@@ -25,7 +25,6 @@ function OptionsComponent() {
 
     // Handle toggle click logic
     const handleToggleClick = (label) => {
-        console.log(`${label} clicked`);
         // Add specific logic here
     };
 
