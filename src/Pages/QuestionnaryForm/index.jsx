@@ -10,6 +10,7 @@ import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -40,14 +41,9 @@ function QuestionnaryForm() {
 
     // text field related states
     const [textFieldSettings, setTextFieldSettings] = useState(false)
-    const [textFieldSettingParameters, setTextFieldSettingParameters] = useState({
-        label: '',
-        helptext: '',
-        placeholderContent: '',
-        defaultContent: '',
-        type: '',
-        format: ''
-    })
+    const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
+
+    console.log(fieldSettingParameters, 'VfieldSettingParametersfieldSettingParametersfieldSettingParameters')
 
     const handleInputClick = () => {
         console.log('inside tija')
@@ -56,7 +52,7 @@ function QuestionnaryForm() {
 
     const handleInputChange = (e) => {
         const { id, value } = e.target
-        setTextFieldSettingParameters((prevState) => ({
+        setFieldSettingParameters((prevState) => ({
             ...prevState,
             [id]: value,
         }));
@@ -68,7 +64,7 @@ function QuestionnaryForm() {
                 {...props}
                 handleChange={handleInputClick}
                 textFieldSettings={textFieldSettings}
-                textFieldSettingParameters={textFieldSettingParameters}
+                fieldSettingParameters={fieldSettingParameters}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
@@ -76,7 +72,7 @@ function QuestionnaryForm() {
     };
 
 
-    
+
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
             sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
@@ -239,8 +235,10 @@ function QuestionnaryForm() {
         return (
             <div onClick={() => handleQuestionIndexCapture(item)} className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
                 <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
-                    <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
-                    <div className='flex items-center'>
+                    {!fieldSettingParameters &&
+                        <p className='mb-5 font-medium text-base text-[#000000]'>{item?.question_name}</p>
+                    }
+                    <div className='flex items-center justify-end w-full'>
                         <div
                             className="disable-select dragHandle"
                             onMouseDown={(e) => {
@@ -320,11 +318,24 @@ function QuestionnaryForm() {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_text: question.question_name,
+                        component_type: Fieldsneeded[0]?.type,
+                        label: globalStates[0]?.label,
+                        help_text: globalStates[0]?.help_text,
+                        // "placeholder_content": "e.g., johndoe123",
+                        // "default_content": "johndoe123",
+                        // "type": "single-line",
+                        // "format": "alphanumeric",
+                        // "number_of_characters": {
+                        //     "min": 5,
+                        //     "max": 20
+                        // },
+                        // "admin_field_notes": "This field is required for user registration."
                         // Include other necessary fields for questions here
                     }))
                 }))
             };
 
+            console.log(body, 'bodybodybodybody')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -582,7 +593,7 @@ function QuestionnaryForm() {
                             {textFieldSettings ?
                                 <TestFieldSetting
                                     handleInputChange={handleInputChange}
-                                    formParameters={textFieldSettingParameters}
+                                    formParameters={fieldSettingParameters}
                                 /> :
                                 (<AddFields
                                     buttons={Fieldsneeded}

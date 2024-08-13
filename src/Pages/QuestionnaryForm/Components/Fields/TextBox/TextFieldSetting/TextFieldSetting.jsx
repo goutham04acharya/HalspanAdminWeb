@@ -4,8 +4,22 @@ import InputWithDropDown from '../../../../../../Components/InputField/InputWith
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from './OptionalComponent/OptionalComponent';
 
-function TestFieldSetting({handleInputChange,formParameters}) {
+function TestFieldSetting({ handleInputChange, formParameters }) {
   const [selectedOption, setSelectedOption] = useState(null);
+  const { type } = formParameters; // Destructure the type from formParameters
+
+  const renderTypeSpecificFields = (type) => {
+    switch (type) {
+      case 'Single-line':
+        return 'signle-line'; // No additional fields for Singleline
+      case 'Multi-line':
+        return 'Multi-line'; // No additional fields for SingleChoice
+      case 'Lookup':
+        return 'Lookup'; // Add logic for Lookup here
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className='py-[34px] px-[32px] h-customh10'>
@@ -36,66 +50,70 @@ function TestFieldSetting({handleInputChange,formParameters}) {
         <div className='mt-7'>
           <p className='font-semibold text-base text-[#2B333B]'>Type</p>
           <div className='mt-2.5'>
-            <div className="relative custom-radioBlue flex items-center" data-testid='yes'
-            >
-              <input type='radio'
+            <div className="relative custom-radioBlue flex items-center" data-testid='yes'>
+              <input
+                type='radio'
                 className='w-[17px] h-[17px]'
                 name='type'
                 id='Singleline'
                 value='Singleline'
-              // checked={createDetails.type === 'Yes'}
-              // onChange={handleadhocChange} 
+              // checked={createDetails.type === 'Singleline'}
+              // onChange={handleadhocChange}
               />
-              <label htmlFor='yes' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+              <label htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Single line
               </label>
             </div>
-            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='no'
-            >
-              <input type='radio'
+
+            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='single-choice'>
+              <input
+                type='radio'
                 className='w-[17px] h-[17px]'
                 name='type'
-                id=' Single Choice'
-                value=' Single Choice'
-              //  checked={createDetails.is_adhoc === 'No'}
-              // onChange={handleadhocChange} 
+                id='SingleChoice'
+                value='SingleChoice'
+              // checked={createDetails.type === 'SingleChoice'}
+              // onChange={handleadhocChange}
               />
-              <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+              <label htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Multi-line
               </label>
             </div>
-            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='no'
-            >
-              <input type='radio'
+            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+              <input
+                type='radio'
                 className='w-[17px] h-[17px]'
                 name='type'
-                id='no'
-              // value='No' checked={createDetails.is_adhoc === 'No'}
-              // onChange={handleadhocChange} 
+                id='Lookup'
+                value='Lookup'
+              // checked={createDetails.type === 'Lookup'}
+              // onChange={handleadhocChange}
               />
-              <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+              <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Lookup
               </label>
             </div>
-            <div className='w-full flex items-center'>
-              <div className='w-[90%] mt-3'>
-                <InputWithDropDown
-                  label=''
-                  id='lookup'
-                  placeholder='Select the file'
-                  className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                  testID='lookup-dropdown'
-                  labeltestID='option0'
-                  selectedOption={selectedOption}
-                  top='20px'
-                // close='true'
-                // options={options}
-                />
+            {type === 'lookup' &&
+              <div className='w-full flex items-center'>
+                <div className='w-[90%] mt-3'>
+                  <InputWithDropDown
+                    label=''
+                    id='lookup'
+                    placeholder='Select the file'
+                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
+                    testID='lookup-dropdown'
+                    labeltestID='option0'
+                    selectedOption={selectedOption}
+                    top='20px'
+                  // close='true'
+                  // options={options}
+                  />
+                </div>
+                <button className='ml-4'>
+                  <img src="/Images/plus.svg" alt="plus" />
+                </button>
               </div>
-              <button className='ml-4'>
-                <img src="/Images/plus.svg" alt="plus" />
-              </button>
-            </div>
+            }
             <div className='mt-7'>
               <InputWithDropDown
                 label='Format'
@@ -145,59 +163,8 @@ function TestFieldSetting({handleInputChange,formParameters}) {
                 />
               </div>
             </div>
-            {/* <div className='mt-7 w-[97%]'>
-              <p className='font-semibold text-base text-[#2B333B]'>Options</p>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Load from previously entered data
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Read only
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Visible
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Optional
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Remember allowed
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-              <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal  text-[#000000] mr-4 mt-3">
-                  Field Validation
-                </p>
-                <label className="switch" style={{ marginLeft: '1px' }}>
-                  <input type="checkbox" id="user_status" /><span className="slider round mr-5 mt-1"></span>
-                </label>
-              </div>
-            </div> */}
-             {/* OptionsComponent added here */}
-             <OptionsComponent />
+            {/* OptionsComponent added here */}
+            <OptionsComponent />
             <div className='mt-7'>
               <InputField
                 autoComplete='off'
