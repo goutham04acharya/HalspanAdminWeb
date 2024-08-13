@@ -464,6 +464,40 @@ function QuestionnaryForm() {
         }
     };
 
+    //function for handle radio button
+    const handleRadiobtn = (type) => {
+        setFieldSettingParameters((prevState) => ({
+            ...prevState,
+            ['type']: type,
+        }));
+    }
+
+    //function to save the field setting
+    const handleSaveSettings = async () => {
+        let body = {
+            component_type: fieldSettingParameters?.Component_type,
+            label: fieldSettingParameters?.label,
+            help_text: fieldSettingParameters?.helptext,
+            placeholder_content: fieldSettingParameters?.placeholderContent,
+            default_content: fieldSettingParameters?.defaultContent,
+            type: fieldSettingParameters?.type,
+            format: fieldSettingParameters?.format,
+            number_of_characters: {
+                min: fieldSettingParameters?.min,
+                max: fieldSettingParameters?.max,
+            },
+            admin_field_notes: fieldSettingParameters?.note,
+        };
+    
+        try {
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
+            console.log(response);
+        } catch (error) {
+            console.error(error); // Properly handle the error
+        }
+    };
+    
+
     useEffect(() => {
         formDefaultDetails();
         setSavedSection(sections);
@@ -594,6 +628,10 @@ function QuestionnaryForm() {
                                 <TestFieldSetting
                                     handleInputChange={handleInputChange}
                                     formParameters={fieldSettingParameters}
+                                    handleRadiobtn={handleRadiobtn}
+                                    fieldSettingParameters={fieldSettingParameters}
+                                    setFieldSettingParameters={setFieldSettingParameters}
+                                    handleSaveSettings={handleSaveSettings}
                                 /> :
                                 (<AddFields
                                     buttons={Fieldsneeded}

@@ -1,11 +1,17 @@
+import { Component } from "react";
+
 const globalStates = {
     textbox: {
+        Component_type:'textbox',
         label: '',
         helptext: '',
         placeholderContent: '',
-        defaultContent: '',
+        defaultContent: 'null',
         type: '',
-        format: ''
+        format: '',
+        min:'',
+        max:'',
+        note:''
     },
     choice: {
         label: '',

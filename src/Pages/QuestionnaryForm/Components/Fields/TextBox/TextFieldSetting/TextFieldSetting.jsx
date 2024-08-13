@@ -4,21 +4,23 @@ import InputWithDropDown from '../../../../../../Components/InputField/InputWith
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from './OptionalComponent/OptionalComponent';
 
-function TestFieldSetting({ handleInputChange, formParameters }) {
+function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, fieldSettingParameters, setFieldSettingParameters, handleSaveSettings }) {
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const { type } = formParameters; // Destructure the type from formParameters
 
-  const renderTypeSpecificFields = (type) => {
-    switch (type) {
-      case 'Single-line':
-        return 'signle-line'; // No additional fields for Singleline
-      case 'Multi-line':
-        return 'Multi-line'; // No additional fields for SingleChoice
-      case 'Lookup':
-        return 'Lookup'; // Add logic for Lookup here
-      default:
-        return null;
-    }
+  const options = [
+    { value: 'Alpha', label: 'Alpha' },
+    { value: 'Alphanumeric', label: 'Alphanumeric' },
+    { value: 'Numeric', label: 'Numeric' },
+    { value: 'Custom Regular Expression', label: 'Custom Regular Expression' }
+  ];
+
+  const handleOptionClick = (option) => {
+    setFieldSettingParameters((prevState) => ({
+      ...prevState,
+      format: option.value,
+    }));
+    setDropdownOpen(false);
   };
 
   return (
@@ -57,8 +59,8 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
                 name='type'
                 id='Singleline'
                 value='Singleline'
-              // checked={createDetails.type === 'Singleline'}
-              // onChange={handleadhocChange}
+                checked={fieldSettingParameters.type === 'single_line'}
+                onClick={() => handleRadiobtn('single_line')}
               />
               <label htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Single line
@@ -72,8 +74,8 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
                 name='type'
                 id='SingleChoice'
                 value='SingleChoice'
-              // checked={createDetails.type === 'SingleChoice'}
-              // onChange={handleadhocChange}
+                checked={fieldSettingParameters.type === 'multi_line'}
+                onClick={() => handleRadiobtn('multi_line')}
               />
               <label htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Multi-line
@@ -86,16 +88,16 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
                 name='type'
                 id='Lookup'
                 value='Lookup'
-              // checked={createDetails.type === 'Lookup'}
-              // onChange={handleadhocChange}
+                checked={fieldSettingParameters.type === 'lookup'}
+                onClick={() => handleRadiobtn('lookup')}
               />
               <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Lookup
               </label>
             </div>
-            {type === 'lookup' &&
-              <div className='w-full flex items-center'>
-                <div className='w-[90%] mt-3'>
+            {fieldSettingParameters?.type === 'lookup' &&
+              <div className='w-full flex items-center mt-3'>
+                <div className='w-[90%]'>
                   <InputWithDropDown
                     label=''
                     id='lookup'
@@ -118,15 +120,17 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
               <InputWithDropDown
                 label='Format'
                 labelStyle='font-semibold text-[#2B333B] text-base'
-                id='lookup'
+                id='format'
+                top='55px'
                 placeholder='Select'
                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                testID='lookup-dropdown'
+                testID='format-dropdown'
                 labeltestID='option0'
-                selectedOption={selectedOption}
-                top='55px'
-              // close='true'
-              // options={options}
+                selectedOption={options.find(option => option.value === fieldSettingParameters.format)}
+                handleOptionClick={handleOptionClick}
+                isDropdownOpen={isDropdownOpen}
+                setDropdownOpen={setDropdownOpen}
+                options={options}
               />
             </div>
             <div className='mt-7'>
@@ -135,31 +139,31 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
                 <InputField
                   autoComplete='off'
                   label=''
-                  id='minChar'
+                  id='min'
                   type='text'
-                  // value={createDetails.internal_name}
+                  value={fieldSettingParameters.min}
                   className='w-full mt-2.5'
                   labelStyle=''
                   placeholder='Minimum'
                   testId='minChar'
-                  htmlFor='minChar'
-                  maxLength={100}
-                // handleChange={handleChange}
+                  htmlFor='min'
+                  maxLength={10}
+                  handleChange={(e) => handleInputChange(e)}
                 />
                 <p className='mx-3 font-normal text-base text-[#2B333B] mt-2'> to</p>
                 <InputField
                   autoComplete='off'
                   label=''
-                  id='maxChar'
+                  id='max'
                   type='text'
-                  // value={createDetails.internal_name}
+                  value={fieldSettingParameters.max}
                   className='w-full mt-2.5'
                   labelStyle=''
                   placeholder='Maximum'
                   testId='maxChar'
-                  htmlFor='maxChar'
-                  maxLength={100}
-                // handleChange={handleChange}
+                  htmlFor='max'
+                  maxLength={10}
+                  handleChange={(e) => handleInputChange(e)}
                 />
               </div>
             </div>
@@ -169,20 +173,24 @@ function TestFieldSetting({ handleInputChange, formParameters }) {
               <InputField
                 autoComplete='off'
                 label='Admin Field Notes'
-                id='Notes'
+                id='note'
                 type='text'
-                // value={createDetails.internal_name}
+                value={fieldSettingParameters.note}
                 className='w-full mt-2.5'
                 labelStyle='font-semibold text-base text-[#2B333B]'
                 placeholder='Notes'
                 testId='Notes'
-                htmlFor='Notes'
-              // maxLength={100}
-              // handleChange={handleChange}
-              // validationError={validationErrors?.internal_name}
+                htmlFor='note'
+                maxLength={250}
+                handleChange={(e) => handleInputChange(e)}
               />
             </div>
             <div className='mx-auto w-[80%] mt-7 flex items-center justify-center'>
+              <button className='border border-black py-[13px] mr-3 rounded'
+              onClick={handleSaveSettings}
+              >
+                Save
+              </button>
               <button type='button' className='py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] w-full'>
                 Add Conditional Logic
               </button>
