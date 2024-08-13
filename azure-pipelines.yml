@@ -423,7 +423,7 @@ stages:
       displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      environment: $[[] parameters['environment'] ]]
+      environment: $[[ parameters['environment'] ]]
       strategy:
         runOnce:
           deploy:
