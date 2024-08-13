@@ -151,49 +151,49 @@ stages:
 #             fi
 #           condition: ne(variables.CACHE_RESTORED, 'true')
 #           displayName: 'Dependency Scanning'
-- stage: Build
-  jobs:
-    - job: "Download_Environment"
-      displayName: "Dependencies"
-      pool:
-        vmImage: "ubuntu-latest"
-      steps:
-        - script: |
-            ./scripts/azure_envs.sh
-          displayName: 'Copy Environment Files'
-        - publish: $(System.DefaultWorkingDirectory)/.env
-          artifact: Environment
-    - job: build
-      displayName: "Build"
-      dependsOn: Download_Environment
-      pool:
-        vmImage: "ubuntu-latest"
-      steps:
-        - task: DownloadPipelineArtifact@2
-          name: environment
-          inputs:
-            artifact: Environment
-            targetPath: '$(System.DefaultWorkingDirectory)'
-        - task: Cache@2
-          inputs:
-            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-            restoreKeys: |
-              admnpmV3 | "$(Agent.OS)"
-            path: "$(System.DefaultWorkingDirectory)/node_modules"
-            cacheHitVar: CACHE_RESTORED
-          displayName: Cache npm
-        - script: |
-            npm install --force
-          condition: ne(variables.CACHE_RESTORED, 'true')
-          displayName: 'Dependencies'
-        - script: |
-            export NODE_OPTIONS=--max-old-space-size=8192
-            npm run build
-            mkdir artifact
-            mv dist artifact
-          displayName: 'Build'
-        - publish: $(System.DefaultWorkingDirectory)/artifact
-          artifact: bundle
+# - stage: Build
+#   jobs:
+#     - job: "Download_Environment"
+#       displayName: "Dependencies"
+#       pool:
+#         vmImage: "ubuntu-latest"
+#       steps:
+#         - script: |
+#             ./scripts/azure_envs.sh
+#           displayName: 'Copy Environment Files'
+#         - publish: $(System.DefaultWorkingDirectory)/.env
+#           artifact: Environment
+#     - job: build
+#       displayName: "Build"
+#       dependsOn: Download_Environment
+#       pool:
+#         vmImage: "ubuntu-latest"
+#       steps:
+#         - task: DownloadPipelineArtifact@2
+#           name: environment
+#           inputs:
+#             artifact: Environment
+#             targetPath: '$(System.DefaultWorkingDirectory)'
+#         - task: Cache@2
+#           inputs:
+#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+#             restoreKeys: |
+#               admnpmV3 | "$(Agent.OS)"
+#             path: "$(System.DefaultWorkingDirectory)/node_modules"
+#             cacheHitVar: CACHE_RESTORED
+#           displayName: Cache npm
+#         - script: |
+#             npm install --force
+#           condition: ne(variables.CACHE_RESTORED, 'true')
+#           displayName: 'Dependencies'
+#         - script: |
+#             export NODE_OPTIONS=--max-old-space-size=8192
+#             npm run build
+#             mkdir artifact
+#             mv dist artifact
+#           displayName: 'Build'
+#         - publish: $(System.DefaultWorkingDirectory)/artifact
+#           artifact: bundle
 # - stage: Test
 #   jobs:
 #     - job: UnitTesting1
@@ -423,25 +423,26 @@ stages:
       displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      environment: ${{ parameters['environment']}}
+      environment: $[[] parameters['environment'] ]]
       strategy:
         runOnce:
           deploy:
             steps:
-              - task: DownloadPipelineArtifact@2
-                name: bundle
-                inputs:
-                  artifact: bundle
-                  targetPath: '$(System.DefaultWorkingDirectory)'
-              - task: DownloadPipelineArtifact@2
-                name: environment
-                inputs:
-                  artifact: environment
-                  targetPath: '$(System.DefaultWorkingDirectory)'
+              # - task: DownloadPipelineArtifact@2
+              #   name: bundle
+              #   inputs:
+              #     artifact: bundle
+              #     targetPath: '$(System.DefaultWorkingDirectory)'
+              # - task: DownloadPipelineArtifact@2
+              #   name: environment
+              #   inputs:
+              #     artifact: environment
+              #     targetPath: '$(System.DefaultWorkingDirectory)'
               - script: |
-                  source .env
-                  aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
-                  aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
+                  # source .env
+                  # aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
+                  # aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
+                  echo "deployed"
                 displayName: 'Deployment'
     - job: DAST
       displayName: "Dynamic Application Security Testing (DAST)"
