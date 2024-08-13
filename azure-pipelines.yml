@@ -29,386 +29,386 @@ variables:
 
 
 stages:
-# - stage: CodeQuality
-#   jobs:
-#     - job: "lint"
-#       displayName: "Code Quality"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#           vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#             node scripts/licences_complaince.js
-#             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
-#             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-#             aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/licenses.json
-#           condition: ne(variables.CACHE_RESTORED, 'true')
+- stage: CodeQuality
+  jobs:
+    - job: "lint"
+      displayName: "Code Quality"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+            node scripts/licences_complaince.js
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
+            aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/licenses.json
+          condition: ne(variables.CACHE_RESTORED, 'true')
 
-#     - job: MegaLinter
-#       displayName: "Run MegaLinter"
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'npmV2 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               npmV2 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#         - script: |
-#             docker run -v $(System.DefaultWorkingDirectory):/tmp/lint \
-#               --env-file <(env | grep -e SYSTEM_ -e BUILD_ -e TF_ -e AGENT_) \
-#               -e SYSTEM_ACCESSTOKEN=$(System.AccessToken) \
-#               -e GIT_AUTHORIZATION_BEARER=$(System.AccessToken) \
-#               oxsecurity/megalinter:v7
-#           displayName: Run MegaLinter
-#         - task: PublishPipelineArtifact@1
-#           inputs:
-#             targetPath: "$(System.DefaultWorkingDirectory)/megalinter-reports/"
-#             artifact: 'megalinter-reports'
-#           displayName: 'Publish MegaLinter Reports'
-#         #   displayName: 'Dependencies'
-#         # - script: |
-#         #     npm run eslint
-#         #   displayName: 'Lint'
-#     - job: "secret"
-#       displayName: "Secret Checking"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#           vmImage: "ubuntu-latest"
-#       steps:
-#         - script: |
-#             pip3 install detect-secrets
-#             detect-secrets scan src | jq '.results' | tee /dev/stderr | if [ "$(jq 'length')" -gt 0 ]; then echo "Secrets detected" >&2; exit 1; else echo "No secrets detected"; fi
-#           displayName: 'Lint'
-#     - job: "licence_complaiance"
-#       displayName: "License Compliance"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#           vmImage: "ubuntu-latest"
-#       steps:
-#         - script: |
-#             npm install -g license-checker --force
-#             license-checker --json > licenses.json  
-#             node license.js
-#           displayName: 'License Compliance'
-#     - job: "sast"
-#       displayName: 'Static Application Security Testing (SAST)'
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#           vmImage: "ubuntu-latest"
-#       steps:
-#         - script: |
-#             pip3 install njsscan
-#             njsscan -w .
-#           displayName: 'Static Application Security Testing (SAST)'
-#     - job: "DependencyScanning"
-#       displayName: "Dependency Scanning"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#           vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#             npm install -g retire
-#             retire --path node_modules --outputformat json --severity critical
-#             if [ $? -eq 0 ]; then
-#               echo "Dependency scanning passed!"
-#             else
-#               echo "Dependency scanning failed (exit code: $?)"
-#               echo "##vso[task.complete result=Failed;]Make step fail"
-#               exit 1
-#             fi
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#           displayName: 'Dependency Scanning'
-# - stage: Build
-#   jobs:
-#     - job: "Download_Environment"
-#       displayName: "Dependencies"
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - script: |
-#             ./scripts/azure_envs.sh
-#           displayName: 'Copy Environment Files'
-#         - publish: $(System.DefaultWorkingDirectory)/.env
-#           artifact: Environment
-#     - job: build
-#       displayName: "Build"
-#       dependsOn: Download_Environment
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: DownloadPipelineArtifact@2
-#           name: environment
-#           inputs:
-#             artifact: Environment
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#           displayName: 'Dependencies'
-#         - script: |
-#             export NODE_OPTIONS=--max-old-space-size=8192
-#             npm run build
-#             mkdir artifact
-#             mv dist artifact
-#           displayName: 'Build'
-#         - publish: $(System.DefaultWorkingDirectory)/artifact
-#           artifact: bundle
-# - stage: Test
-#   jobs:
-#     - job: UnitTesting1
-#       displayName: "Unit Testing 1"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#         - task: DownloadPipelineArtifact@2
-#           name: environment
-#           inputs:
-#             artifact: Environment
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - task: DownloadPipelineArtifact@2
-#           name: bundle
-#           inputs:
-#             artifact: bundle
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - script: |
-#             npm install pm2@5.3.0 -g
-#             source .env
-#             npm install express --force
-#             export NODE_OPTIONS=--max-old-space-size=8192
-#             pm2 start scripts/server.js
-#             node --version
-#             sleep 60
-#             mkdir reports
-#             mkdir reports-xml
-#             mkdir -p test/step-definations/failed_scenarios
-#             npm install nyc --save-dev --force
-#             node scripts/bdd_unit_testing_azure.js
-#             if [ $? -ne 0 ]; then
-#               echo "testing failed"
-#               exit 1
-#             fi
-#             npm i multiple-cucumber-html-reporter --force
-#             npm run generate_report_cobertura
-#             echo "Completed tasks - exit $?"
-#           displayName: Unit Testing
-#         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
-#           artifact: '$(system.JobId)-failedScenarios'
-#           condition: always()
-#         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/coverageData/ # Assuming logs are in working directory
-#           artifact: '1-coverageData'
-#         - publish: $(System.DefaultWorkingDirectory)/reports/ # Assuming logs are in working directory
-#           artifact: '1-living-documentation'
-#         - task: PublishTestResults@2
-#           condition: always()
-#           inputs:
-#             testResultsFormat: 'JUnit'
-#             testResultsFiles: 'reports-xml/*.xml'
-#         - task: PublishCodeCoverageResults@2
-#           condition: always()
-#           inputs:
-#             summaryFileLocation: 'coverage-cobertura/*.xml'
+    - job: MegaLinter
+      displayName: "Run MegaLinter"
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'npmV2 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              npmV2 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - script: |
+            docker run -v $(System.DefaultWorkingDirectory):/tmp/lint \
+              --env-file <(env | grep -e SYSTEM_ -e BUILD_ -e TF_ -e AGENT_) \
+              -e SYSTEM_ACCESSTOKEN=$(System.AccessToken) \
+              -e GIT_AUTHORIZATION_BEARER=$(System.AccessToken) \
+              oxsecurity/megalinter:v7
+          displayName: Run MegaLinter
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: "$(System.DefaultWorkingDirectory)/megalinter-reports/"
+            artifact: 'megalinter-reports'
+          displayName: 'Publish MegaLinter Reports'
+        #   displayName: 'Dependencies'
+        # - script: |
+        #     npm run eslint
+        #   displayName: 'Lint'
+    - job: "secret"
+      displayName: "Secret Checking"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - script: |
+            pip3 install detect-secrets
+            detect-secrets scan src | jq '.results' | tee /dev/stderr | if [ "$(jq 'length')" -gt 0 ]; then echo "Secrets detected" >&2; exit 1; else echo "No secrets detected"; fi
+          displayName: 'Lint'
+    - job: "licence_complaiance"
+      displayName: "License Compliance"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - script: |
+            npm install -g license-checker --force
+            license-checker --json > licenses.json  
+            node license.js
+          displayName: 'License Compliance'
+    - job: "sast"
+      displayName: 'Static Application Security Testing (SAST)'
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - script: |
+            pip3 install njsscan
+            njsscan -w .
+          displayName: 'Static Application Security Testing (SAST)'
+    - job: "DependencyScanning"
+      displayName: "Dependency Scanning"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+            npm install -g retire
+            retire --path node_modules --outputformat json --severity critical
+            if [ $? -eq 0 ]; then
+              echo "Dependency scanning passed!"
+            else
+              echo "Dependency scanning failed (exit code: $?)"
+              echo "##vso[task.complete result=Failed;]Make step fail"
+              exit 1
+            fi
+          condition: ne(variables.CACHE_RESTORED, 'true')
+          displayName: 'Dependency Scanning'
+- stage: Build
+  jobs:
+    - job: "Download_Environment"
+      displayName: "Dependencies"
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - script: |
+            ./scripts/azure_envs.sh
+          displayName: 'Copy Environment Files'
+        - publish: $(System.DefaultWorkingDirectory)/.env
+          artifact: Environment
+    - job: build
+      displayName: "Build"
+      dependsOn: Download_Environment
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: DownloadPipelineArtifact@2
+          name: environment
+          inputs:
+            artifact: Environment
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+          displayName: 'Dependencies'
+        - script: |
+            export NODE_OPTIONS=--max-old-space-size=8192
+            npm run build
+            mkdir artifact
+            mv dist artifact
+          displayName: 'Build'
+        - publish: $(System.DefaultWorkingDirectory)/artifact
+          artifact: bundle
+- stage: Test
+  jobs:
+    - job: UnitTesting1
+      displayName: "Unit Testing 1"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - task: DownloadPipelineArtifact@2
+          name: environment
+          inputs:
+            artifact: Environment
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - task: DownloadPipelineArtifact@2
+          name: bundle
+          inputs:
+            artifact: bundle
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - script: |
+            npm install pm2@5.3.0 -g
+            source .env
+            npm install express --force
+            export NODE_OPTIONS=--max-old-space-size=8192
+            pm2 start scripts/server.js
+            node --version
+            sleep 60
+            mkdir reports
+            mkdir reports-xml
+            mkdir -p test/step-definations/failed_scenarios
+            npm install nyc --save-dev --force
+            node scripts/bdd_unit_testing_azure.js
+            if [ $? -ne 0 ]; then
+              echo "testing failed"
+              exit 1
+            fi
+            npm i multiple-cucumber-html-reporter --force
+            npm run generate_report_cobertura
+            echo "Completed tasks - exit $?"
+          displayName: Unit Testing
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
+          artifact: '$(system.JobId)-failedScenarios'
+          condition: always()
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/coverageData/ # Assuming logs are in working directory
+          artifact: '1-coverageData'
+        - publish: $(System.DefaultWorkingDirectory)/reports/ # Assuming logs are in working directory
+          artifact: '1-living-documentation'
+        - task: PublishTestResults@2
+          condition: always()
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: 'reports-xml/*.xml'
+        - task: PublishCodeCoverageResults@2
+          condition: always()
+          inputs:
+            summaryFileLocation: 'coverage-cobertura/*.xml'
     
-#     - job: Reports
-#       displayName: "Testing Reports"
-#       dependsOn:
-#         - UnitTesting1
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#         - task: DownloadPipelineArtifact@2
-#           name: environment
-#           inputs:
-#             artifact: Environment
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - task: DownloadPipelineArtifact@2
-#           name: LivingDoc1
-#           inputs:
-#             artifactName: '1-living-documentation'
-#             targetPath: '$(System.DefaultWorkingDirectory)/reports'
-#           displayName: 'Download Living Documentation Artifact'
-#         - task: DownloadPipelineArtifact@2
-#           name: Coverage1
-#           inputs:
-#             artifactName: '1-coverageData'
-#             targetPath: '$(System.DefaultWorkingDirectory)/test/step-definations/coverageData'
-#           displayName: 'Download coverage Documentation Artifact'
-#         - script: |
-#             echo "##vso[task.setvariable variable=RepositoryName]$BUILD_REPOSITORY_NAME"
-#             echo "##vso[task.setvariable variable=SourceBranch]$SourceBranch"
-#             source .env
-#             npm install nyc --save-dev --force
-#             npm i multiple-cucumber-html-reporter --force
-#             mkdir coverage
-#             npm run generate_report
-#             node scripts/livingdoc.js 
-#             ls -R reports
-#             ls -R coverage-cobertura
-#             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
-#             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-#             aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev
-#             aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin/dev
-#             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
-#           displayName: 'BDD Coverage'
-#           condition: always()
+    - job: Reports
+      displayName: "Testing Reports"
+      dependsOn:
+        - UnitTesting1
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - task: DownloadPipelineArtifact@2
+          name: environment
+          inputs:
+            artifact: Environment
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - task: DownloadPipelineArtifact@2
+          name: LivingDoc1
+          inputs:
+            artifactName: '1-living-documentation'
+            targetPath: '$(System.DefaultWorkingDirectory)/reports'
+          displayName: 'Download Living Documentation Artifact'
+        - task: DownloadPipelineArtifact@2
+          name: Coverage1
+          inputs:
+            artifactName: '1-coverageData'
+            targetPath: '$(System.DefaultWorkingDirectory)/test/step-definations/coverageData'
+          displayName: 'Download coverage Documentation Artifact'
+        - script: |
+            echo "##vso[task.setvariable variable=RepositoryName]$BUILD_REPOSITORY_NAME"
+            echo "##vso[task.setvariable variable=SourceBranch]$SourceBranch"
+            source .env
+            npm install nyc --save-dev --force
+            npm i multiple-cucumber-html-reporter --force
+            mkdir coverage
+            npm run generate_report
+            node scripts/livingdoc.js 
+            ls -R reports
+            ls -R coverage-cobertura
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
+            aws s3 sync coverage s3://$S3_BUCKET_NAME/coverage-admin/dev
+            aws s3 sync living-documentation s3://$S3_BUCKET_NAME/living-documentation-admin/dev
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
+          displayName: 'BDD Coverage'
+          condition: always()
     
-#     - job: IntegrationTesting
-#       displayName: "Integration Testing"
-#       condition: and(succeeded(), contains(variables['build.SourceBranch'], 'develop'))
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#         - task: DownloadPipelineArtifact@2
-#           name: environment
-#           inputs:
-#             artifact: Environment
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - task: DownloadPipelineArtifact@2
-#           name: bundle
-#           inputs:
-#             artifact: bundle
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - script: |
-#             npm install -g pm2
-#             source .env
-#             export NODE_OPTIONS=--max-old-space-size=8192
-#             npm install express --force
-#             pm2 start scripts/server.js
-#             sleep 60
-#             mkdir -p reports/test-report-features
-#             mkdir -p reports-xml
-#             mkdir -p test/step-definations/failed_scenarios
-#             npm install nyc --save-dev --force
-#             mkdir reports-xml
-#             node scripts/integration_testing.js
-#             if [ $? -ne 0 ]; then
-#               echo "Integration Testing failed"
-#               exit 1
-#             fi
-#           displayName: Integration Testing
-#         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
-#           artifact: '$(system.JobId)-failedScenarios'
-#           condition: always()
-#         - task: PublishCodeCoverageResults@2
-#           condition: always()
-#           inputs:
-#             summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
-#         - task: PublishTestResults@2
-#           condition: always()
-#           inputs:
-#             testResultsFormat: 'JUnit'
-#             testResultsFiles: 'reports-xml/*.xml'
+    - job: IntegrationTesting
+      displayName: "Integration Testing"
+      condition: and(succeeded(), contains(variables['build.SourceBranch'], 'develop'))
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - task: DownloadPipelineArtifact@2
+          name: environment
+          inputs:
+            artifact: Environment
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - task: DownloadPipelineArtifact@2
+          name: bundle
+          inputs:
+            artifact: bundle
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - script: |
+            npm install -g pm2
+            source .env
+            export NODE_OPTIONS=--max-old-space-size=8192
+            npm install express --force
+            pm2 start scripts/server.js
+            sleep 60
+            mkdir -p reports/test-report-features
+            mkdir -p reports-xml
+            mkdir -p test/step-definations/failed_scenarios
+            npm install nyc --save-dev --force
+            mkdir reports-xml
+            node scripts/integration_testing.js
+            if [ $? -ne 0 ]; then
+              echo "Integration Testing failed"
+              exit 1
+            fi
+          displayName: Integration Testing
+        - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
+          artifact: '$(system.JobId)-failedScenarios'
+          condition: always()
+        - task: PublishCodeCoverageResults@2
+          condition: always()
+          inputs:
+            summaryFileLocation: 'coverage-cobertura/cobertura-coverage.xml'
+        - task: PublishTestResults@2
+          condition: always()
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: 'reports-xml/*.xml'
           
-#     - job: BrowserPerformanceTesting
-#       displayName: "Browser Performance Testing"
-#       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
-#       pool:
-#         vmImage: "ubuntu-latest"
-#       steps:
-#         - task: Cache@2
-#           inputs:
-#             key: 'admnpmV3 | "$(Agent.OS)" | package.json'
-#             restoreKeys: |
-#               admnpmV3 | "$(Agent.OS)"
-#             path: "$(System.DefaultWorkingDirectory)/node_modules"
-#             cacheHitVar: CACHE_RESTORED
-#           displayName: Cache npm
-#         - script: |
-#             npm install --force
-#           condition: ne(variables.CACHE_RESTORED, 'true')
-#         - task: DownloadPipelineArtifact@2
-#           name: environment
-#           inputs:
-#             artifact: Environment
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - task: DownloadPipelineArtifact@2
-#           name: bundle
-#           inputs:
-#             artifact: bundle
-#             targetPath: '$(System.DefaultWorkingDirectory)'
-#         - script: |
-#             source .env
-#             npm install express --force
-#             npm install pm2 sitespeed.io -g
-#             export NODE_OPTIONS=--max-old-space-size=8192
-#             pm2 start scripts/sitespeed-server.js
-#             sleep 30
-#             sitespeed.io --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
-#           displayName: BrowserPerformance
-#         - script: |
-#             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
-#             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-#             aws s3 sync sitespeed-result/testMultipleURLs_js/** s3://$S3_BUCKET_NAME/browser-performance-admin/dev/
-#             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
-#           displayName: 'Sitespeed Report documentation'
-#           condition: always()
+    - job: BrowserPerformanceTesting
+      displayName: "Browser Performance Testing"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              admnpmV3 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
+        - script: |
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - task: DownloadPipelineArtifact@2
+          name: environment
+          inputs:
+            artifact: Environment
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - task: DownloadPipelineArtifact@2
+          name: bundle
+          inputs:
+            artifact: bundle
+            targetPath: '$(System.DefaultWorkingDirectory)'
+        - script: |
+            source .env
+            npm install express --force
+            npm install pm2 sitespeed.io -g
+            export NODE_OPTIONS=--max-old-space-size=8192
+            pm2 start scripts/sitespeed-server.js
+            sleep 30
+            sitespeed.io --multi scripts/sitespeed/testMultipleURLs.js --preScript scripts/sitespeed/login.js --budget.configPath scripts/budget.json -n 1 --firstParty ".amazon.com" --firstParty "sdk.relicx.ai" --headless true --browsertime.chrome.args no-sandbox
+          displayName: BrowserPerformance
+        - script: |
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
+            aws s3 sync sitespeed-result/testMultipleURLs_js/** s3://$S3_BUCKET_NAME/browser-performance-admin/dev/
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID_DOCS --paths "/*"
+          displayName: 'Sitespeed Report documentation'
+          condition: always()
 - stage: Deploy
   jobs:
     - deployment: Deployment
@@ -425,20 +425,20 @@ stages:
         runOnce:
           deploy:
             steps:
-              # - task: DownloadPipelineArtifact@2
-              #   name: bundle
-              #   inputs:
-              #     artifact: bundle
-              #     targetPath: '$(System.DefaultWorkingDirectory)'
-              # - task: DownloadPipelineArtifact@2
-              #   name: environment
-              #   inputs:
-              #     artifact: environment
-              #     targetPath: '$(System.DefaultWorkingDirectory)'
+              - task: DownloadPipelineArtifact@2
+                name: bundle
+                inputs:
+                  artifact: bundle
+                  targetPath: '$(System.DefaultWorkingDirectory)'
+              - task: DownloadPipelineArtifact@2
+                name: environment
+                inputs:
+                  artifact: environment
+                  targetPath: '$(System.DefaultWorkingDirectory)'
               - script: |
-                  # source .env
-                  # aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
-                  # aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
+                  source .env
+                  aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
+                  aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
                   echo "deployed"
                 displayName: 'Deployment'
     - job: DAST
