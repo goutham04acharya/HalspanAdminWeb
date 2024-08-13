@@ -424,8 +424,8 @@ stages:
       pool:
         vmImage: 'macos-latest'
       ${{ if eq( variables['ENV'] , 'Develasdopment') }}:
-        environment: 'Test'
-      ${{ elseif ne( variables['ENV'] , 'Development') }}:
+          environment: 'Test'
+      ${{ elseif eq( variables['ENV'] , 'Development') }}:
         environment: 'Devlopment'
       strategy:
         runOnce:
