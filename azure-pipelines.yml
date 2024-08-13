@@ -424,7 +424,7 @@ stages:
       pool:
         vmImage: 'macos-latest'
       environment: 
-        name: 'Development'
+        name: Development
       strategy:
         runOnce:
           deploy:
