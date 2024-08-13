@@ -33,14 +33,43 @@ function QuestionnaryForm() {
     const [savedSection, setSavedSection] = useState([]);
     const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
     const [inputVisibility, setInputVisibility] = useState({});
-    console.log(inputVisibility, 'innpuvistiblit')
     const [selectedComponent, setSelectedComponent] = useState(null);
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
     const questionRefs = useRef([]);
 
+    // text field related states
+    const [textFieldSettings, setTextFieldSettings] = useState(false)
+    const [textFieldSettingParameters, setTextFieldSettingParameters] = useState({
+        label: '',
+        helptext: '',
+        placeholderContent: '',
+        defaultContent: '',
+        type: '',
+        format: ''
+    })
+
+    const handleInputClick = () => {
+        console.log('inside tija')
+        setTextFieldSettings(true)
+    }
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target
+        setTextFieldSettingParameters((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    }
+
     const componentMap = {
-        textboxfield: (props) => <TextBoxField {...props} />,
+        textboxfield: (props) =>
+            <TextBoxField
+                {...props}
+                handleChange={handleInputClick}
+                textFieldSettings={textFieldSettings}
+                textFieldSettingParameters={textFieldSettingParameters}
+            />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
         // audio: (props) => <AudioField {...props} />,
@@ -408,7 +437,7 @@ function QuestionnaryForm() {
     };
 
     const handleChoiceClick = () => {
-        
+
     };
 
     const handleClick = (functionName) => {
@@ -547,11 +576,18 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        <AddFields
-                            buttons={Fieldsneeded}
-                            handleClick={handleClick}
-                        />
-                        {/* <TestFieldSetting /> */}
+                        <div>
+                            {textFieldSettings ?
+                                <TestFieldSetting
+                                    handleInputChange={handleInputChange}
+                                    formParameters={textFieldSettingParameters}
+                                /> :
+                                (<AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                />)
+                            }
+                        </div>
                     </div>
                 </div>
             )

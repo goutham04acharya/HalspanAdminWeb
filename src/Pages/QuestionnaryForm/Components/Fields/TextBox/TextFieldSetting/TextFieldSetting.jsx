@@ -4,7 +4,7 @@ import InputWithDropDown from '../../../../../../Components/InputField/InputWith
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from './OptionalComponent/OptionalComponent';
 
-function TestFieldSetting() {
+function TestFieldSetting({handleInputChange,formParameters}) {
   const [selectedOption, setSelectedOption] = useState(null);
 
   return (
@@ -21,6 +21,8 @@ function TestFieldSetting() {
           placeholderContentId='placeholder'
           placeholder='Placeholder Content'
           placeholderContent='Text Displayed in the field'
+          handleInputChange={handleInputChange}
+          formParameters={formParameters}
         />
         <div className='flex flex-col justify-start mt-7 w-full relative'>
           <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
