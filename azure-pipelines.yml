@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
       - develop
+      - pre-production
       - master
 pr:
   branches:
@@ -9,12 +10,22 @@ pr:
       - develop
 variables:
   - group: general
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    - group: develop
+    - name: ENV
+      value: 'Development'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
     - group: master
+    - name: ENV
+      value: 'Production'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
     - group: qa
-  - ${{ if or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')) }}:
-    - group: develop
+    - name: ENV
+      value: 'Testing'
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/pre-production') }}:
+    - group: pre-production
+    - name: ENV
+      value: 'Production'
 
 
 stages:
@@ -22,7 +33,7 @@ stages:
   jobs:
     - job: "lint"
       displayName: "Code Quality"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -41,13 +52,42 @@ stages:
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
             aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/licenses.json
           condition: ne(variables.CACHE_RESTORED, 'true')
-          displayName: 'Dependencies'
+
+    - job: MegaLinter
+      displayName: "Run MegaLinter"
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: Cache@2
+          inputs:
+            key: 'npmV2 | "$(Agent.OS)" | package.json'
+            restoreKeys: |
+              npmV2 | "$(Agent.OS)"
+            path: "$(System.DefaultWorkingDirectory)/node_modules"
+            cacheHitVar: CACHE_RESTORED
+          displayName: Cache npm
         - script: |
-            npm run eslint
-          displayName: 'Lint'
+            npm install --force
+          condition: ne(variables.CACHE_RESTORED, 'true')
+        - script: |
+            docker run -v $(System.DefaultWorkingDirectory):/tmp/lint \
+              --env-file <(env | grep -e SYSTEM_ -e BUILD_ -e TF_ -e AGENT_) \
+              -e SYSTEM_ACCESSTOKEN=$(System.AccessToken) \
+              -e GIT_AUTHORIZATION_BEARER=$(System.AccessToken) \
+              oxsecurity/megalinter:v7
+          displayName: Run MegaLinter
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: "$(System.DefaultWorkingDirectory)/megalinter-reports/"
+            artifact: 'megalinter-reports'
+          displayName: 'Publish MegaLinter Reports'
+        #   displayName: 'Dependencies'
+        # - script: |
+        #     npm run eslint
+        #   displayName: 'Lint'
     - job: "secret"
       displayName: "Secret Checking"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -57,7 +97,7 @@ stages:
           displayName: 'Lint'
     - job: "licence_complaiance"
       displayName: "License Compliance"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -68,7 +108,7 @@ stages:
           displayName: 'License Compliance'
     - job: "sast"
       displayName: 'Static Application Security Testing (SAST)'
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -78,7 +118,7 @@ stages:
           displayName: 'Static Application Security Testing (SAST)'
     - job: "DependencyScanning"
       displayName: "Dependency Scanning"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -150,7 +190,7 @@ stages:
   jobs:
     - job: UnitTesting1
       displayName: "Unit Testing 1"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -217,7 +257,7 @@ stages:
       displayName: "Testing Reports"
       dependsOn:
         - UnitTesting1
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -328,7 +368,7 @@ stages:
           
     - job: BrowserPerformanceTesting
       displayName: "Browser Performance Testing"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -372,18 +412,16 @@ stages:
 - stage: Deploy
   jobs:
     - deployment: Deployment
-      condition: succeeded()
-      displayName: Deployment
+      displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-          environment: 'Production'
-      ${{ elseif eq(variables['Build.SourceBranchName'], 'develop') }}:
-          environment: 'Testing'
-      ${{ else }}:
+      ${{ if eq( variables['ENV'] , 'Development') }}:
           environment: 'Development'
+      ${{ elseif eq( variables['ENV'] , 'Production') }}:
+        environment: 'Development'
+      ${{ elseif eq( variables['ENV'] , 'Testing') }}:
+        environment: 'Testing'
       strategy:
-        # Default deployment strategy, more coming...
         runOnce:
           deploy:
             steps:
@@ -401,10 +439,11 @@ stages:
                   source .env
                   aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
                   aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
+                  echo "deployed"
                 displayName: 'Deployment'
     - job: DAST
       displayName: "Dynamic Application Security Testing (DAST)"
-      condition: and(or(contains(variables['build.SourceBranch'], 'feature'), contains(variables['build.SourceBranch'], 'bugfix'), contains(variables['build.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
