@@ -423,7 +423,7 @@ stages:
       displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      ${{ if eq( variables['ENV'] , 'Development') }}:
+      ${{ if eq( variables['ENV'] , 'Develasdopment') }}:
         environment: 'Test'
       ${{ if ne( variables['ENV'] , 'Development') }}:
         environment: 'Devlopment'
