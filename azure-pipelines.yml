@@ -2,18 +2,26 @@ trigger:
   branches:
     include:
       - develop
-      - pre-production
       - master
+
 pr:
   branches:
     include:
       - develop
+
+parameters:
+  - name: environment
+    type: string
+    default: 'Development'
+
 variables:
   - group: general
-  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
-    - group: develop
-    - name: ENV
-      value: 'Development'
+  - group: develop
+
+  # Determine the environment based on the branch
+  - name: ENV
+    value: ${{ parameters.environment }}
+
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
     - group: master
     - name: ENV
@@ -415,9 +423,7 @@ stages:
       displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      environment: 
-        ${{ if eq(variables['ENV'], 'Development') }}:
-          name: 'Development'
+      environment: ${{ parameters['environment']}}
       strategy:
         runOnce:
           deploy:
