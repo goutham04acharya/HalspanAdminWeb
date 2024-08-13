@@ -75,6 +75,8 @@ function QuestionnaryForm() {
         // audio: (props) => <AudioField {...props} />,
     };
 
+
+    
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
             sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
