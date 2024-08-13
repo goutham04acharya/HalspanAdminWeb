@@ -423,8 +423,10 @@ stages:
       displayName: 'Deployment'
       pool:
         vmImage: 'macos-latest'
-      environment: 
-        name: Development
+      ${{ if eq( ${{ variables.ENV }} , 'Development') }}:
+        environment: 'Test'
+      ${{ if ne( ${{ variables.ENV }} , 'Development') }}:
+        environment: 'Devlopment'
       strategy:
         runOnce:
           deploy:
