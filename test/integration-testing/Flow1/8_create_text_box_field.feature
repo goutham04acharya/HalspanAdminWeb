@@ -36,50 +36,57 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     - Field mask
     - Admin field notes
 
-    @create_question
-    Scenario: Admin views all types of field to create the form
-        Given I am on the questionnaire management section
-        Then I should see the add field
-        And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
-        
-    Scenario: Admin adds textbox from the add field section
-        Given I am on the questionnaire management section
-        Then I should see an add field section
-        When I click the textbox button
-        Then I should see field settings
-        And I should see the text box added to the section 1
+  @create_question
+  Scenario: Admin views all types of field to create the form
+    Given I am on the questionnaire management section
+    Then I should see the add field
+    And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
-    Scenario Outline: Admin adds the field values
-        Given I am on the questionnaire management section
-        When I enter the label name
-        Then I should see the label name updated in the section 1
-        When I enter the help text
-        Then I should see the help text updated in the section 1
-        When I enter the placeholder content
-        Then I should see the placeholder content updated in the section 1
-        When I select the type as <type>
-        * I select the format as <format>
-        * I enter the minimum and maximum number of characters
-        * I enter the admin field notes
+  @create_question
+  Scenario: Admin adds textbox from the add field section
+    Given I am on the questionnaire management section
+    Then I should see an add field section
+    When I click the textbox button
+    Then I should see field settings
+    And I should see the text box added to the section 1
 
-        Examples:
-            | type          | format         |
-            | "single_line" | "alpha"        |
-            | "multi_line"  | "numeric"      |
-            | "multi_line"  | "alphanumeric" |
+  @create_question
+  Scenario Outline: Admin adds the field values
+    Given I am on the questionnaire management section
+    When I click the textbox button
+    Then I should see field settings
+    When I enter the label name for textbox
+    Then I should see the label name updated in the section 1
+    When I enter the help text for textbox
+    Then I should see the help text updated in the section 1
+    When I enter the placeholder content for textbox
+    Then I should see the placeholder content updated in the section 1
+    When I select the type as <type>
+    * I select the format as <format>
+    * I enter the minimum and maximum number of characters
+    * I enter the admin field notes
 
-    Scenario Outline: Admin adds the lookup dataset from the dropdown
-        Given I am on the questionnaire management section
-        When I enter the label name
-        Then I should see the label name updated in the section 1
-        When I enter the help text
-        Then I should see the help text updated in the section 1
-        When I enter the placeholder content
-        Then I should see the placeholder content updated in the section 1
-        When I select the type as "lookup"
-        And I select a lookup data from the dropdown
-        When I select the format as "alphanumeric"
-        * I enter the minimum and maximum number of characters
-        * I enter the admin field notes
-        * I click on save button for section 1
-        Then I should read a message stating that "Section 1 saved successfully"
+    Examples:
+      | type          | format         |
+      | "single_line" | "alpha"        |
+      | "multi_line"  | "numeric"      |
+      | "multi_line"  | "alphanumeric" |
+
+  @create_question
+  Scenario Outline: Admin adds the lookup dataset from the dropdown
+    Given I am on the questionnaire management section
+    When I click the textbox button
+    Then I should see field settings
+    When I enter the label name for textbox
+    Then I should see the label name updated in the section 1
+    When I enter the help text for textbox
+    Then I should see the help text updated in the section 1
+    When I enter the placeholder content for textbox
+    Then I should see the placeholder content updated in the section 1
+    When I select the type as "lookup"
+    And I select a lookup data from the dropdown
+    When I select the format as "alphanumeric"
+    * I enter the minimum and maximum number of characters
+    * I enter the admin field notes
+    * I click on save button for section 1
+    Then I should read a message stating that "Section 1 saved successfully"

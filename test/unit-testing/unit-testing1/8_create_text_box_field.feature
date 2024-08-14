@@ -49,6 +49,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
         Then I should see the add field
         And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
         
+    @create_question
     Scenario: Admin adds textbox from the add field section
         Given I am on the questionnaire management section
         Then I should see an add field section
@@ -56,13 +57,14 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
         Then I should see field settings
         And I should see the text box added to the section 1
 
+    @create_question
     Scenario Outline: Admin adds the field values
         Given I am on the questionnaire management section
-        When I enter the label name
+        When I enter the label name for textbox
         Then I should see the label name updated in the section 1
-        When I enter the help text
+        When I enter the help text for textbox
         Then I should see the help text updated in the section 1
-        When I enter the placeholder content
+        When I enter the placeholder content for textbox
         Then I should see the placeholder content updated in the section 1
         When I select the type as <type>
         * I select the format as <format>
@@ -75,13 +77,14 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
             | "multi_line"  | "numeric"      |
             | "multi_line"  | "alphanumeric" |
 
+
     Scenario Outline: Admin adds the lookup dataset from the dropdown
         Given I am on the questionnaire management section
-        When I enter the label name
+        When I enter the label name for textbox
         Then I should see the label name updated in the section 1
-        When I enter the help text
+        When I enter the help text for textbox
         Then I should see the help text updated in the section 1
-        When I enter the placeholder content
+        When I enter the placeholder content for textbox
         Then I should see the placeholder content updated in the section 1
         When I select the type as "lookup"
         And I select a lookup data from the dropdown
