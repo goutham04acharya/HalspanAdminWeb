@@ -1,5 +1,7 @@
 const assert = require('assert');
-const { Given, When, Then, But } = require('@cucumber/cucumber')
+const { Given, When, Then, But } = require('@cucumber/cucumber');
+const { format } = require('path');
+const { text } = require('express');
 const webdriver = 'selenium-webdriver'
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
@@ -74,11 +76,29 @@ When('I select the format as {string}', async function (format) {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="format"]`))).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="format-${format}"]`))).click();
+    this.format = format;
 });
 
-Then('I should see the format reflected on the text box', async function () {
+Then('I should see the format reflected on the text box section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    // Add assertion to check format on the text box
+    const textBox = await driver.wait(until.elementLocated(By.css(`[data-testid="textbox-${sectionNumber}"]`)));
+    await textBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+
+    if (this.format === 'alpha') {
+        await textBox.sendKeys(`alpha12121212`);
+        const text = await textBox.getText();
+        assert(/^[a-zA-Z]+$/.test(text), 'Textbox contains non-alphabetic characters');
+    } 
+    else if (this.format === 'numeric') {
+        await textBox.sendKeys(`1234alpha`);
+        const text = await textBox.getText();
+        assert(/^\d+$/.test(text), 'Textbox contains non-numeric characters');
+    } 
+    else if (this.format === 'alphanumeric') {
+        await textBox.sendKeys(`alpha1234@@##`);
+        const text = await textBox.getText();
+        assert(/^[a-zA-Z0-9]+$/.test(text), 'Textbox contains non-alphanumeric characters');
+    }
 });
 
 When('I enter the minimum and maximum number of characters', async function () {
@@ -96,4 +116,9 @@ When('I select a lookup data from the dropdown', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid="lookup-dropdown"]')));
     await driver.wait(until.elementLocated(By.css('[data-testid="lookup-1"]')));
+});
+
+When('I click on save button for field settings', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.stalenessOf(driver.findElement(By.css(`[data-testid="save-field-settings"]`)))).click();
 });
