@@ -71,11 +71,6 @@ Then('I should see the choices updated on the section {int}', async function (se
     }
 });
 
-When('I click on save button for field settings', async function () {
-    await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.stalenessOf(driver.findElement(By.css(`[data-testid="save-field-settings"]`)))).click();
-});
-
 When('I click on the choices based on {string}', async function (choiceType) {
     await new Promise(resolve => setTimeout(resolve, 750));
 

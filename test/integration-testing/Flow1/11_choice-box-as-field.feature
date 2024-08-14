@@ -92,4 +92,4 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Then I should see field settings
     When I enter the admin field notes
     * I click on save button for field settings
-    Then I should read a message stating that "Field settings saved successfully"
+    Then I should read a message stating that "Field settings data updated successfully"
