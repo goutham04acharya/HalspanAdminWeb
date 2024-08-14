@@ -26,7 +26,7 @@ Then('I should see the text box added to the section {int}', async function (sec
     await driver.wait(until.elementLocated(By.css(`[data-testid="textbox-${sectionNumber}"]`)));
 });
 
-When('I enter the label name', async function () {
+When('I enter the label name for textbox', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     this.labelName = await labelNameInput.sendKeys('Sample Label Name');
@@ -39,7 +39,7 @@ Then('I should see the label name updated in the section {int}', async function 
     assert.equal(labelNameText, this.labelName);
 });
 
-When('I enter the help text', async function () {
+When('I enter the help text for textbox', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
     this.helpText = await helpTextInput.sendKeys('Sample Help Text');
@@ -52,7 +52,7 @@ Then('I should see the help text updated in the section {int}', async function (
     assert.equal(helpTextText, this.helpText);
 });
 
-When('I enter the placeholder content', async function () {
+When('I enter the placeholder content for textbox', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
     this.placeholder = await placeholderInput.sendKeys('Sample Placeholder');
