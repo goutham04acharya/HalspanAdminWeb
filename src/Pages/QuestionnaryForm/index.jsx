@@ -260,7 +260,6 @@ function QuestionnaryForm() {
                         {React.createElement(componentMap[selectedComponent])}
                     </>
                 )}
-
             </div>
         );
     };
@@ -268,6 +267,9 @@ function QuestionnaryForm() {
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
         setSections([...sections]);
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
     };
 
     // API calling function
@@ -482,6 +484,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParameters?.defaultContent,
             type: fieldSettingParameters?.type,
             format: fieldSettingParameters?.format,
+            lookup_id: fieldSettingParameters?.lookupOption,
             number_of_characters: {
                 min: fieldSettingParameters?.min,
                 max: fieldSettingParameters?.max,

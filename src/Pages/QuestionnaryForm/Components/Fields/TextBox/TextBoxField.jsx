@@ -16,7 +16,7 @@ const TextBoxField = ({
 
     return (
         <div>
-            <label htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label}</label>
+            <label htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label || 'Question 1'}</label>
             {fieldSettingParameters?.type === 'multi_line' ?
                 <textarea
                     data-testid={testId}
