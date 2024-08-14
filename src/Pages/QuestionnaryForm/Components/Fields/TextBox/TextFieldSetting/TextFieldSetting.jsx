@@ -1,13 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown'
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from './OptionalComponent/OptionalComponent';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import useApi from '../../../../../../services/CustomHook/useApi';
+import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
+import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
 
 function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, fieldSettingParameters, setFieldSettingParameters, handleSaveSettings }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+  const [selectedLookup, setSelectedLookup] = useState(null);
   const [optionData, setOptionData] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const lastEvaluatedKeyRef = useRef(null);
+  const observer = useRef();
+
+  const navigate = useNavigate();
+  const { getAPI } = useApi();
+
 
   const options = [
     { value: 'Alpha', label: 'Alpha' },
@@ -24,20 +41,62 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
     setDropdownOpen(false);
   };
 
-  useEffect(() => {
-    const fetchLookupData = async () => {
-      if (fieldSettingParameters?.type === 'lookup') {
-        try {
-          const response = await getAPI(`lookup-data`);
-          setOptionData(response.data); // Assuming response.data contains the options array
-        } catch (error) {
-          console.error('Error fetching lookup data:', error);
-        }
-      }
-    };
+  const handleLookupOption = (option) => {
+    setFieldSettingParameters((prevState) => ({
+      ...prevState,
+      lookupOption: option.value,
+    }));
+    setIsLookupOpen(false);
+  };
 
-    fetchLookupData();
-  }, [fieldSettingParameters?.type]);
+const handleRemoveOption = () => {
+  setFieldSettingParameters((prevState) => ({
+    ...prevState,
+    lookupOption: '',
+  }));
+}
+
+  // List Functions
+  const fetchLookupList = useCallback(async () => {
+    setLoading(true);
+    const params = Object.fromEntries(searchParams);
+    if (lastEvaluatedKeyRef.current) {
+      params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+    }
+    try {
+      const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+      // Transform the items array
+      const transformedArray = response.data.data.items.map(item => ({
+        value: item.lookup_id,
+        label: item.name
+      }));
+      setOptionData(prevState => [...prevState, ...transformedArray]);
+      lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+    } catch (error) {
+      console.error('Error fetching questionnaires:', error);
+    }
+
+    setLoading(false);
+    setIsFetchingMore(false);
+  }, [searchParams]);
+
+  //funtion for infinate scrooling of dropdown
+  const lastElementRef = useCallback(node => {
+    if (loading || isFetchingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
+        setIsFetchingMore(true);
+        fetchLookupList();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, isFetchingMore, fieldSettingParameters?.type]);
+
+
+  useEffect(() => {
+    fetchLookupList();
+  }, [fetchLookupList]);
 
   return (
     <><div className='py-[34px] px-[32px] h-customh10'>
@@ -109,20 +168,24 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
             {fieldSettingParameters?.type === 'lookup' &&
               <div className='w-full flex items-center mt-3'>
                 <div className='w-[90%]'>
-                  <InputWithDropDown
+                  <InfinateDropdown
                     label=''
                     id='lookup'
                     placeholder='Select the file'
                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                     testID='lookup-dropdown'
                     labeltestID='option0'
-                    selectedOption={selectedOption}
-                    setSelectedOption={setSelectedOption}
+                    selectedOption={optionData.find(option => option.value === fieldSettingParameters.lookupOption)}
+                    handleRemoveOption={handleRemoveOption}
+                    isDropdownOpen={isLookupOpen}
+                    setDropdownOpen={setIsLookupOpen}
+                    handleOptionClick={handleLookupOption}
                     top='20px'
                     close='true'
-                    options={optionData} />
+                    options={optionData}
+                    lastElementRef={lastElementRef} />
                 </div>
-                <button className='ml-4'>
+                <button onClick={() => navigate('/lookup-dataset', { state: { create: true } })} className='ml-4'>
                   <img src="/Images/plus.svg" alt="plus" />
                 </button>
               </div>}
@@ -191,13 +254,13 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 maxLength={250}
                 handleChange={(e) => handleInputChange(e)} />
             </div>
-            <div className='mx-auto w-[80%] mt-7 flex items-center justify-center'>
-              <button className='border border-black py-[13px] mr-3 rounded'
+            <div className='mx-auto mt-7 flex items-center w-full'>
+              <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
                 onClick={handleSaveSettings}
               >
                 Save
               </button>
-              <button type='button' className='py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] w-full'>
+              <button type='button' className='w-[70%] py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                 Add Conditional Logic
               </button>
             </div>

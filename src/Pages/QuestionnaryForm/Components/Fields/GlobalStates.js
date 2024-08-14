@@ -8,6 +8,7 @@ const globalStates = {
         placeholderContent: '',
         defaultContent: 'null',
         type: '',
+        lookupOption:'',
         format: '',
         min:'',
         max:'',
