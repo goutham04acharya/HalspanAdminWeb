@@ -7,38 +7,38 @@ const By = require('selenium-webdriver').By
 const Key = webdriver.Key
 
 When('I click the choice button', async function () {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="choiceBox"]`))).click();
 });
 
 Then('I should see the choice field added to the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choiceBox"]`)));
 });
 
 When('I select the type as {string}', async function (choiceType) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     const choice = await driver.wait(until.elementLocated(By.css(`[data-testid="${choiceType}"]`))).click();
     this.choiceType = choice;
 });
 
 Given('I add the {int}th choice field', async function (choiceNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="add-choice-${choiceNumber}"]`))).click();
 });
 
 Then('I should see the choice {int} added', async function (choiceNumber) {
-    await new promise(resolve => setTimeout(resolve, 1000));
+    await new promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="choice-${choiceNumber}"]`)));
 });
 
 When('I delete the {int}th choice field', async function (choiceNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="delete-choice-${choiceNumber}"]`))).click();
 });
 
 Then('I should see the {int}th choice deleted', async function (choiceNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.stalenessOf(driver.findElement(By.css(`[data-testid="choice-${choiceNumber}"]`))));
 });
 
@@ -72,12 +72,12 @@ Then('I should see the choices updated on the section {int}', async function (se
 });
 
 When('I click on save button for field settings', async function () {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.stalenessOf(driver.findElement(By.css(`[data-testid="save-field-settings"]`)))).click();
 });
 
 When('I click on the choices based on {string}', async function (choiceType) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
 
     if (choiceType === 'single_choice') {
         const choiceElement = await driver.wait(until.elementLocated(By.css('[data-testid="choice-1"]')));
@@ -92,10 +92,28 @@ When('I click on the choices based on {string}', async function (choiceType) {
             const dropdownChoiceElement = await driver.wait(until.elementLocated(By.css('[data-testid="dropdown-choice"]')));
             await dropdownChoiceElement.click();
         }
-        
+
         const choiceElement = await driver.wait(until.elementLocated(By.css('[data-testid="choice-1"]')));
         await choiceElement.click();
     } else {
         throw new Error(`Unknown choice type: ${choiceType}`);
     }
+});
+
+When('I enter the label name for choice', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
+    this.labelName = await labelNameInput.sendKeys('Sample Choice Label Name');
+});
+
+When('I enter the help text for choice', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
+    this.labelName = await labelNameInput.sendKeys('Sample Choice help Name');
+});
+
+When('I enter the placeholder content for choice', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
+    this.labelName = await labelNameInput.sendKeys('Sample Choice placeholder Name');
 });

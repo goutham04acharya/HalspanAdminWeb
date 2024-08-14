@@ -56,16 +56,20 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario: Admin adds the label, help text and placeholder content
     Given I am on the questionnaire management section
-    When I enter the label name
+    When I click the choice button
+    Then I should see field settings
+    When I enter the label name for choice
     Then I should see the label name updated in the section 1
-    When I enter the help text
+    When I enter the help text for choice
     Then I should see the help text updated in the section 1
-    When I enter the placeholder content
+    When I enter the placeholder content for choice
     Then I should see the placeholder content updated in the section 1
 
   @create_question
   Scenario: Admin adds and deletes thes choices
     Given I am on the questionnaire management section
+    When I click the choice button
+    Then I should see field settings
     When I select the type as "single_choice"
     * I add the 4th choice field
     Then I should see the choice 4 added
@@ -74,6 +78,9 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
 
   @create_question
   Scenario Outline: Admin selects the type of choice
+    Given I am on the questionnaire management section
+    When I click the choice button
+    Then I should see field settings
     When I select the type as <type>
     * I enter the text for choices as <choices>
     * I click on the choices based on <type>
@@ -88,7 +95,8 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario: Admin saves the section with the changes
     Given I am on the questionnaire management section
-    When I enter the minimum and maximum number of characters
-    * I enter the admin field notes
+    When I click the choice button
+    Then I should see field settings
+    When I enter the admin field notes
     * I click on save button for field settings
     Then I should read a message stating that "Field settings saved successfully"
