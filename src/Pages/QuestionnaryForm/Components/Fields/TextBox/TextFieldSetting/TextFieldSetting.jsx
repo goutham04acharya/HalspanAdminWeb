@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown'
 import InputField from '../../../../../../Components/InputField/InputField';
@@ -7,6 +7,7 @@ import OptionsComponent from './OptionalComponent/OptionalComponent';
 function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, fieldSettingParameters, setFieldSettingParameters, handleSaveSettings }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [optionData, setOptionData] = useState([]);
 
   const options = [
     { value: 'Alpha', label: 'Alpha' },
@@ -23,8 +24,23 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
     setDropdownOpen(false);
   };
 
+  useEffect(() => {
+    const fetchLookupData = async () => {
+      if (fieldSettingParameters?.type === 'lookup') {
+        try {
+          const response = await getAPI(`lookup-data`);
+          setOptionData(response.data); // Assuming response.data contains the options array
+        } catch (error) {
+          console.error('Error fetching lookup data:', error);
+        }
+      }
+    };
+
+    fetchLookupData();
+  }, [fieldSettingParameters?.type]);
+
   return (
-    <div className='py-[34px] px-[32px] h-customh10'>
+    <><div className='py-[34px] px-[32px] h-customh10'>
       <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
       <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
         <CommonComponents
@@ -38,14 +54,12 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
           placeholder='Placeholder Content'
           placeholderContent='Text Displayed in the field'
           handleInputChange={handleInputChange}
-          formParameters={formParameters}
-        />
+          formParameters={formParameters} />
         <div className='flex flex-col justify-start mt-7 w-full relative'>
           <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
           <div className='relative w-full'>
             <input type="text" id='Label' className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-              placeholder='Populates the content'
-            />
+              placeholder='Populates the content' />
             <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' />
           </div>
         </div>
@@ -60,8 +74,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 id='Singleline'
                 value='Singleline'
                 checked={fieldSettingParameters.type === 'single_line'}
-                onClick={() => handleRadiobtn('single_line')}
-              />
+                onClick={() => handleRadiobtn('single_line')} />
               <label htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Single line
               </label>
@@ -75,8 +88,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 id='SingleChoice'
                 value='SingleChoice'
                 checked={fieldSettingParameters.type === 'multi_line'}
-                onClick={() => handleRadiobtn('multi_line')}
-              />
+                onClick={() => handleRadiobtn('multi_line')} />
               <label htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Multi-line
               </label>
@@ -89,8 +101,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 id='Lookup'
                 value='Lookup'
                 checked={fieldSettingParameters.type === 'lookup'}
-                onClick={() => handleRadiobtn('lookup')}
-              />
+                onClick={() => handleRadiobtn('lookup')} />
               <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Lookup
               </label>
@@ -106,16 +117,15 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                     testID='lookup-dropdown'
                     labeltestID='option0'
                     selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
                     top='20px'
-                  // close='true'
-                  // options={options}
-                  />
+                    close='true'
+                    options={optionData} />
                 </div>
                 <button className='ml-4'>
                   <img src="/Images/plus.svg" alt="plus" />
                 </button>
-              </div>
-            }
+              </div>}
             <div className='mt-7'>
               <InputWithDropDown
                 label='Format'
@@ -130,8 +140,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 handleOptionClick={handleOptionClick}
                 isDropdownOpen={isDropdownOpen}
                 setDropdownOpen={setDropdownOpen}
-                options={options}
-              />
+                options={options} />
             </div>
             <div className='mt-7'>
               <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>
@@ -148,8 +157,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                   testId='minChar'
                   htmlFor='min'
                   maxLength={10}
-                  handleChange={(e) => handleInputChange(e)}
-                />
+                  handleChange={(e) => handleInputChange(e)} />
                 <p className='mx-3 font-normal text-base text-[#2B333B] mt-2'> to</p>
                 <InputField
                   autoComplete='off'
@@ -163,8 +171,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                   testId='maxChar'
                   htmlFor='max'
                   maxLength={10}
-                  handleChange={(e) => handleInputChange(e)}
-                />
+                  handleChange={(e) => handleInputChange(e)} />
               </div>
             </div>
             {/* OptionsComponent added here */}
@@ -182,12 +189,11 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
                 testId='Notes'
                 htmlFor='note'
                 maxLength={250}
-                handleChange={(e) => handleInputChange(e)}
-              />
+                handleChange={(e) => handleInputChange(e)} />
             </div>
             <div className='mx-auto w-[80%] mt-7 flex items-center justify-center'>
               <button className='border border-black py-[13px] mr-3 rounded'
-              onClick={handleSaveSettings}
+                onClick={handleSaveSettings}
               >
                 Save
               </button>
@@ -199,6 +205,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
         </div>
       </div>
     </div>
+    </>
   )
 }
 
