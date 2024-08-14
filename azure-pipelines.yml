@@ -416,9 +416,9 @@ stages:
       pool:
         vmImage: 'macos-latest'
       ${{ if eq( variables['ENV'] , 'Development') }}:
-          environment: 'Development'
-      ${{ elseif eq( variables['ENV'] , 'Production') }}:
         environment: 'Development'
+      ${{ elseif eq( variables['ENV'] , 'Production') }}:
+        environment: 'Production'
       ${{ elseif eq( variables['ENV'] , 'Testing') }}:
         environment: 'Testing'
       strategy:
