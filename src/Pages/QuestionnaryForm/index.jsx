@@ -11,6 +11,9 @@ import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
+import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
+import { useDispatch, useSelector } from 'react-redux';
+import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -43,10 +46,10 @@ function QuestionnaryForm() {
     const [textFieldSettings, setTextFieldSettings] = useState(false)
     const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
 
-    console.log(fieldSettingParameters, 'VfieldSettingParametersfieldSettingParametersfieldSettingParameters')
+    const dispatch = useDispatch();
+    const fieldSettingParams = useSelector(state => state.fieldSettingParams);
 
     const handleInputClick = () => {
-        console.log('inside tija')
         setTextFieldSettings(true)
     }
 
@@ -56,15 +59,29 @@ function QuestionnaryForm() {
             ...prevState,
             [id]: value,
         }));
+        console.log(selectedComponent, 'hello');
+        console.log(selectedQuestionDetails, 'selectedQuestionDetails');
+        dispatch(setNewComponent({ id, value, questionId: selectedQuestionDetails?.question_id }));
     }
+
+    useEffect(() => {
+        console.log(fieldSettingParams, 'field');
+    }, [fieldSettingParams])
 
     const componentMap = {
         textboxfield: (props) =>
             <TextBoxField
                 {...props}
-                handleChange={handleInputClick}
-                textFieldSettings={textFieldSettings}
-                fieldSettingParameters={fieldSettingParameters}
+                // handleChange={handleInputClick}
+                // textFieldSettings={textFieldSettings}
+                // fieldSettingParameters={fieldSettingParameters}
+            />,
+        choiceboxfield: (props) =>
+            <ChoiceBoxField
+                {...props}
+                // handleChange={handleInputClick}
+                // textFieldSettings={textFieldSettings}
+                // fieldSettingParameters={fieldSettingParameters}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
@@ -225,6 +242,7 @@ function QuestionnaryForm() {
 
 
     const handleQuestionIndexCapture = (question) => {
+        console.log(question, 'question qqq')
         setSelectedQuestionDetails(question);
     };
 
@@ -233,7 +251,10 @@ function QuestionnaryForm() {
         const { onMouseDown, onTouchStart } = dragHandleProps;
 
         return (
-            <div onClick={() => handleQuestionIndexCapture(item)} className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
+            <div
+                onClick={() => handleQuestionIndexCapture(item)}
+                className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionDetails.question_id ? 'border-black border' : ''}`}
+            >
                 <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
                     {!fieldSettingParameters &&
                         <p className='mb-5 font-medium text-base text-[#000000]'>{item?.question_name}</p>
@@ -257,9 +278,17 @@ function QuestionnaryForm() {
                 {/* Render the selected component if the question is visible */}
                 {inputVisibility[item.question_id] && (
                     <>
-                        {React.createElement(componentMap[selectedComponent])}
+                        {React.createElement(
+                            componentMap[fieldSettingParams[item.question_id]?.componentType],
+                            {
+                                // Pass the specific field settings to the component
+                                handleChange: handleInputClick,
+                                fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
+                            }
+                        )}
                     </>
                 )}
+
             </div>
         );
     };
@@ -444,6 +473,7 @@ function QuestionnaryForm() {
 
     const handleTextboxClick = () => {
         setSelectedComponent('textboxfield');
+        dispatch(setNewComponent({ id: 'componentType', value: 'textboxfield', questionId: selectedQuestionDetails?.question_id }));
         // Toggle visibility for the selected question
         setInputVisibility(prevState => ({
             ...prevState,
@@ -452,7 +482,13 @@ function QuestionnaryForm() {
     };
 
     const handleChoiceClick = () => {
-
+        setSelectedComponent('choiceboxfield');
+        dispatch(setNewComponent({ id: 'componentType', value: 'choiceboxfield', questionId: selectedQuestionDetails?.question_id }));
+        // Toggle visibility for the selected question
+        setInputVisibility(prevState => ({
+            ...prevState,
+            [selectedQuestionDetails.question_id]: true,
+        }));
     };
 
     const handleClick = (functionName) => {
@@ -476,6 +512,7 @@ function QuestionnaryForm() {
 
     //function to save the field setting
     const handleSaveSettings = async () => {
+        console.log('saving.......')
         let body = {
             component_type: fieldSettingParameters?.Component_type,
             label: fieldSettingParameters?.label,
@@ -491,15 +528,16 @@ function QuestionnaryForm() {
             },
             admin_field_notes: fieldSettingParameters?.note,
         };
-    
+
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
             console.log(response);
+            setTextFieldSettings(false)
         } catch (error) {
             console.error(error); // Properly handle the error
         }
     };
-    
+
 
     useEffect(() => {
         formDefaultDetails();
@@ -630,9 +668,9 @@ function QuestionnaryForm() {
                             {textFieldSettings ?
                                 <TestFieldSetting
                                     handleInputChange={handleInputChange}
-                                    formParameters={fieldSettingParameters}
+                                    formParameters={fieldSettingParams[selectedQuestionDetails.question_id]}
                                     handleRadiobtn={handleRadiobtn}
-                                    fieldSettingParameters={fieldSettingParameters}
+                                    fieldSettingParameters={fieldSettingParams[selectedQuestionDetails.question_id]}
                                     setFieldSettingParameters={setFieldSettingParameters}
                                     handleSaveSettings={handleSaveSettings}
                                 /> :
