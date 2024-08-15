@@ -10,6 +10,7 @@ import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -31,9 +32,46 @@ function QuestionnaryForm() {
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([]);
-    const [isOpenSidebar, setIsOpenSidebar] = useState(false);
+    const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
+    const [inputVisibility, setInputVisibility] = useState({});
+    const [selectedComponent, setSelectedComponent] = useState(null);
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
+    const questionRefs = useRef([]);
+
+    // text field related states
+    const [textFieldSettings, setTextFieldSettings] = useState(false)
+    const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
+
+    console.log(fieldSettingParameters, 'VfieldSettingParametersfieldSettingParametersfieldSettingParameters')
+
+    const handleInputClick = () => {
+        console.log('inside tija')
+        setTextFieldSettings(true)
+    }
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target
+        setFieldSettingParameters((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    }
+
+    const componentMap = {
+        textboxfield: (props) =>
+            <TextBoxField
+                {...props}
+                handleChange={handleInputClick}
+                textFieldSettings={textFieldSettings}
+                fieldSettingParameters={fieldSettingParameters}
+            />,
+        // checkbox: (props) => <CheckboxField {...props} />,
+        // video: (props) => <VideoField {...props} />,
+        // audio: (props) => <AudioField {...props} />,
+    };
+
+
 
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
@@ -41,7 +79,6 @@ function QuestionnaryForm() {
         }
     };
     const scrollToPage = (sectionIndex, pageIndex) => {
-        console.log(sectionIndex, 'ppppppp', pageIndex)
         const pageRefKey = `${sectionIndex}-${pageIndex}`;
         if (pageRefs.current[pageRefKey]) {
             pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
@@ -186,16 +223,22 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
+
+    const handleQuestionIndexCapture = (question) => {
+        setSelectedQuestionDetails(question);
+    };
+
     // Function for dragging questions
-    const Item = ({ item, itemSelected, dragHandleProps }) => {
+    const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
 
         return (
-            <div className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
-                <div className='flex justify-between items-start'>
-                    {console.log(item, 'naananaynaynayaynayanyan')}
-                    <p className='mb-5 font-medium text-base text-[#000000]'>{item.question_name}</p>
-                    <div className='flex items-center'>
+            <div onClick={() => handleQuestionIndexCapture(item)} className="disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B]">
+                <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
+                    {!fieldSettingParameters &&
+                        <p className='mb-5 font-medium text-base text-[#000000]'>{item?.question_name}</p>
+                    }
+                    <div className='flex items-center justify-end w-full'>
                         <div
                             className="disable-select dragHandle"
                             onMouseDown={(e) => {
@@ -211,7 +254,12 @@ function QuestionnaryForm() {
                         <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                     </div>
                 </div>
-                <TextBoxField />
+                {/* Render the selected component if the question is visible */}
+                {inputVisibility[item.question_id] && (
+                    <>
+                        {React.createElement(componentMap[selectedComponent])}
+                    </>
+                )}
             </div>
         );
     };
@@ -219,6 +267,9 @@ function QuestionnaryForm() {
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
         setSections([...sections]);
+        const update = { ...dataIsSame }
+        update[sectionIndex] = false;
+        setDataIsSame(update)
     };
 
     // API calling function
@@ -269,11 +320,24 @@ function QuestionnaryForm() {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_text: question.question_name,
+                        component_type: Fieldsneeded[0]?.type,
+                        label: globalStates[0]?.label,
+                        help_text: globalStates[0]?.help_text,
+                        // "placeholder_content": "e.g., johndoe123",
+                        // "default_content": "johndoe123",
+                        // "type": "single-line",
+                        // "format": "alphanumeric",
+                        // "number_of_characters": {
+                        //     "min": 5,
+                        //     "max": 20
+                        // },
+                        // "admin_field_notes": "This field is required for user registration."
                         // Include other necessary fields for questions here
                     }))
                 }))
             };
 
+            console.log(body, 'bodybodybodybody')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -312,9 +376,6 @@ function QuestionnaryForm() {
 
     // Save the section and page name
     const handleSaveSectionName = (value, index, secondIndex) => {
-        console.log(value, 'value')
-        console.log(index, 'index')
-        console.log(secondIndex, 'index')
         if (secondIndex !== undefined && secondIndex !== null) {
             const updatedSections = [...sections];
             updatedSections[index].pages[secondIndex].page_name = value;
@@ -322,7 +383,6 @@ function QuestionnaryForm() {
             handleAutoSave(updatedSections[index]?.section_id, updatedSections);
             return;
         }
-        console.log('first');
         const updatedSections = [...sections];
         updatedSections[index].section_name = value;
         setSections(updatedSections);
@@ -382,6 +442,65 @@ function QuestionnaryForm() {
         }
     };
 
+    const handleTextboxClick = () => {
+        setSelectedComponent('textboxfield');
+        // Toggle visibility for the selected question
+        setInputVisibility(prevState => ({
+            ...prevState,
+            [selectedQuestionDetails.question_id]: true,
+        }));
+    };
+
+    const handleChoiceClick = () => {
+
+    };
+
+    const handleClick = (functionName) => {
+        const functionMap = {
+            handleTextboxClick,
+            handleChoiceClick,
+        };
+
+        if (functionMap[functionName]) {
+            functionMap[functionName]();
+        }
+    };
+
+    //function for handle radio button
+    const handleRadiobtn = (type) => {
+        setFieldSettingParameters((prevState) => ({
+            ...prevState,
+            ['type']: type,
+        }));
+    }
+
+    //function to save the field setting
+    const handleSaveSettings = async () => {
+        let body = {
+            component_type: fieldSettingParameters?.Component_type,
+            label: fieldSettingParameters?.label,
+            help_text: fieldSettingParameters?.helptext,
+            placeholder_content: fieldSettingParameters?.placeholderContent,
+            default_content: fieldSettingParameters?.defaultContent,
+            type: fieldSettingParameters?.type,
+            format: fieldSettingParameters?.format,
+            lookup_id: fieldSettingParameters?.lookupOption,
+            number_of_characters: {
+                min: fieldSettingParameters?.min,
+                max: fieldSettingParameters?.max,
+            },
+            admin_field_notes: fieldSettingParameters?.note,
+        };
+    
+        try {
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
+            console.log(response);
+        } catch (error) {
+            console.error(error); // Properly handle the error
+        }
+    };
+    
+
     useEffect(() => {
         formDefaultDetails();
         setSavedSection(sections);
@@ -436,7 +555,7 @@ function QuestionnaryForm() {
                                         <div
                                             key={pageData?.page_id}
                                             ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                                            className='mt-7 mx-1 w-full bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
+                                            className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
                                         >
                                             <div className='flex items-center justify-between gap-7'>
                                                 <EditableField
@@ -507,8 +626,22 @@ function QuestionnaryForm() {
                                 Save
                             </button> */}
                         </div>
-                        <AddFields buttons={Fieldsneeded} />
-                        {/* <TestFieldSetting /> */}
+                        <div>
+                            {textFieldSettings ?
+                                <TestFieldSetting
+                                    handleInputChange={handleInputChange}
+                                    formParameters={fieldSettingParameters}
+                                    handleRadiobtn={handleRadiobtn}
+                                    fieldSettingParameters={fieldSettingParameters}
+                                    setFieldSettingParameters={setFieldSettingParameters}
+                                    handleSaveSettings={handleSaveSettings}
+                                /> :
+                                (<AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                />)
+                            }
+                        </div>
                     </div>
                 </div>
             )

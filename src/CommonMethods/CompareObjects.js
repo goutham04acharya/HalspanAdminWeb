@@ -49,8 +49,6 @@ export function isAllObjectValuesEqual(obj1, obj2) {
 }
 
 export function isArrayEqual(array1, array2) {
-    console.log(array1, 'arr1')
-    console.log(array2, 'arr2')
     if (array1?.length !== array2.length) {
         return false;
     }

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const AddFields = ({ buttons, testId }) => {
+const AddFields = ({ buttons, testId , handleClick}) => {
     return (
         <div className="p-[34px] w-full">
             <p className='font-semibold text-[22px] text-[#2B333B] pb-[26px]'>Add Field</p>
@@ -10,9 +10,10 @@ const AddFields = ({ buttons, testId }) => {
                         <button
                             data-testid={`${button?.testId}`}
                             className={`border border-[#2B333B] py-[14px] px-5 rounded text-base text-[#2B333B] font-semibold flex items-center w-full mb-[26px]`}
+                            onClick={() => handleClick(button.onClick)}
                         >
                             <div className='mr-4'>
-                                <img src={button?.buttonIcon} alt="" />
+                                <img src={button?.buttonIcon} alt="" className='w-6 h-6' />
                             </div>
                             {button?.buttonName}
                         </button>

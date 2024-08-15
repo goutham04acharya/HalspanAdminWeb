@@ -48,7 +48,6 @@ function Questionnaries() {
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
-    console.log(option, params.asset_type, 'optios')
     if (params.asset_type === option?.value) {
       setDropdownOpen(false);
       return;
@@ -67,7 +66,6 @@ function Questionnaries() {
 
   const clearFilters = () => {
     let params = Object.fromEntries(searchParams);
-    console.log(params, 'params')
     delete params?.start_key;
     delete params?.asset_type;
     lastEvaluatedKeyRef.current = null

@@ -3,85 +3,105 @@ const Fieldsneeded = [
         buttonName: "Textbox",
         buttonNumber: 1,
         buttonIcon: '/Images/TextField.svg',
-        testId: 'textbox'
+        testId: 'textbox',
+        onClick: 'handleTextboxClick',
+        type: 'textbox',
+
     },
     {
         buttonName: "Choice",
         buttonNumber: 2,
         buttonIcon: '/Images/choiceField.svg',
-        testId: 'choice'
+        testId: 'choice',
+        onClick: 'handleChoiceClick',
+        type: 'choice',
+
     },
     {
         buttonName: "Date / Time",
         buttonNumber: 1,
         buttonIcon: '/Images/calendarField.svg',
-        testId: 'date-/-time'
+        testId: 'date-/-time',
+        type: 'datetime'
     },
     {
         buttonName: "Tag Scan",
         buttonNumber: 2,
         buttonIcon: '/Images/TagField.svg',
-        testId: 'tag-scan'
+        testId: 'tag-scan',
+        type: 'tagscan'
     },
     {
         buttonName: "Floorplan",
         buttonNumber: 1,
         buttonIcon: '/Images/FlorPrintField.svg',
-        testId: 'floorplan'
+        testId: 'floorplan',
+        type: 'floorplan',
     },
     {
         buttonName: "Photo",
         buttonNumber: 1,
         buttonIcon: '/Images/cameraField.svg',
-        testId: 'photo'
+        testId: 'photo',
+        type: 'photo'
     },
     {
         buttonName: "Video",
         buttonNumber: 2,
         buttonIcon: '/Images/videoField.svg',
-        testId: 'video'
+        testId: 'video',
+        type: 'video'
     },
     {
         buttonName: "File",
         buttonNumber: 1,
         buttonIcon: '/Images/fileField.svg',
-        testId: 'file'
+        testId: 'file',
+        type: 'file'
+
     },
     {
         buttonName: "GPS",
         buttonNumber: 2,
         buttonIcon: '/Images/map-pinField.svg',
-        testId: 'gps'
+        testId: 'gps',
+        type: 'gps'
+
     },
     {
         buttonName: "Number",
         buttonNumber: 1,
         buttonIcon: '/Images/NumberField.svg',
-        testId: 'number'
+        testId: 'number',
+        type: 'number'
     },
     {
         buttonName: "Display",
         buttonNumber: 2,
         buttonIcon: '/Images/DisplayField.svg',
-        testId: 'display'
+        testId: 'display',
+        type: 'display'
     },
     {
         buttonName: "Signature",
         buttonNumber: 1,
         buttonIcon: '/Images/signature.svg',
-        testId: 'signature'
+        testId: 'signature',
+        type: 'signature'
     },
     {
         buttonName: "Asset Location",
         buttonNumber: 2,
         buttonIcon: '/Images/LocationField.svg',
-        testId: 'asset-location'
+        testId: 'asset-location',
+        type: 'assetlocation'
     },
     {
         buttonName: "Compliance",
         buttonNumber: 2,
         buttonIcon: '/Images/complianceField.svg',
-        testId: 'compliance'
+        testId: 'compliance',
+        type: 'compliance'
     },
 
 ]

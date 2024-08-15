@@ -4,7 +4,7 @@ import Search from '../../Search/Search'
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound'
 import Table from '../QuestionnariesList/Components/Table'
 import useApi from '../../services/CustomHook/useApi'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import CreateModal from '../../Components/CustomModal/CreateModal'
 import { data } from 'autoprefixer'
 import useObjects from '../../customHooks/useObjects'
@@ -136,7 +136,6 @@ const LookupDataset = () => {
                 }
                 return;
             } else {
-                console.error(response, 'error response');
                 setToastError(response?.data?.data?.message);
                 handleClose();
             }
@@ -170,7 +169,6 @@ const LookupDataset = () => {
                         choices: flatData
                     }
 
-                    console.log(payload);
                     handleSubmit(payload);
                 }
             },
@@ -184,8 +182,6 @@ const LookupDataset = () => {
 
     // View Functions
     const handleView = (id, name, choices) => {
-        console.log(name, 'lookuplist');
-        console.log(choices, 'lookuplist');
         setIsView({
             open: true,
             id: id
@@ -221,9 +217,16 @@ const LookupDataset = () => {
     }
 
     // Hooks
+    const location = useLocation();  // Get the state from the navigation
     useEffect(() => {
         fetchLookupList();
-    }, [fetchLookupList])
+
+        // Check if the create flag is set and open the modal
+        if (location.state?.create) {
+            setIsCreateModalOpen(true);
+        }
+    }, [fetchLookupList, location.state]);
+
 
     const lastElementRef = useCallback(node => {
         if (loading || isFetchingMore) return;

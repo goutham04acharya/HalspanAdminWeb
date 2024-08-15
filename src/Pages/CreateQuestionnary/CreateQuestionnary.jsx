@@ -112,7 +112,6 @@ function CreateQuestionnary() {
         setIsThreedotLoader(false)
       }
     } catch (error) {
-      console.log(error)
       setToastError('Something went wrong');
       setIsThreedotLoader(false)
     }

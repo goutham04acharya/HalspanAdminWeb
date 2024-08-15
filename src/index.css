@@ -141,4 +141,68 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* customized radio button */
+
+.custom-toggle-switch .switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 21px;
+  margin-bottom: 0;
+}
+.custom-toggle-switch .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.custom-toggle-switch .slider.round {
+  border-radius: 11px;
+}
+.custom-toggle-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #D6DDEC;
+  transition: .4s;
+  border: 1px solid #D6DDEC;
+  width: 43px;
+  height: 24px;
+}
+
+/* th:has(button.sortedIcon){
+  cursor:pointer;
+} */
+.custom-toggle-switch .slider.slider1{
+  cursor: default !important;
+}
+.custom-toggle-switch .slider.round::before {
+  border-radius: 55%;
+}
+.custom-toggle-switch .slider::before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 2.5px;
+  bottom: 2px;
+  background-color: #FFFFFF;
+  transition: .4s;
+}
+custom-toggle-switch input:checked+.slider::before {
+  transform: translateX(18px);
+  background-color: #000000;
+}
+.custom-toggle-switch input:checked+.slider::before {
+  -webkit-transform: translateX(18px);
+  transform: translateX(18px);
+  background-color: #FFFFFF;
+}
+.custom-toggle-switch input:checked+.slider {
+  background-color: #000000;
+  border: 1px solid #000000;
+}
+
 
