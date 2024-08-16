@@ -101,14 +101,35 @@ When('I enter the label name for choice', async function () {
     this.labelName = await labelNameInput.sendKeys('Sample Choice Label Name');
 });
 
+Then('I should see the label name for choice updated in the section {int}', async function (sectionNumber) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="label-name-${sectionNumber}"]`)));
+    const labelNameText = await labelName.getText();
+    assert.equal(labelNameText, this.labelName);
+});
+
 When('I enter the help text for choice', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.labelName = await labelNameInput.sendKeys('Sample Choice help Name');
+    const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
+    this.helpText = await helpTextInput.sendKeys('Sample Choice help Name');
+});
+
+Then('I should see the help text for choice updated in the section {int}', async function (sectionNumber) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="help-text-${sectionNumber}"]`)));
+    const helpTextText = await helpText.getText();
+    assert.equal(helpTextText, this.helpText);
 });
 
 When('I enter the placeholder content for choice', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
-    this.labelName = await labelNameInput.sendKeys('Sample Choice placeholder Name');
+    const placeholderTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
+    this.placeholder = await placeholderTextInput.sendKeys('Sample Choice placeholder Name');
+});
+
+Then('I should see the placeholder content for choice updated in the section {int}', async function (sectionNumber) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="placeholder-${sectionNumber}"]`)));
+    const placeholderText = await placeholder.getText();
+    assert.equal(placeholderText, this.placeholder);
 });
