@@ -59,11 +59,11 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     When I click the choice button
     Then I should see field settings
     When I enter the label name for choice
-    Then I should see the label name updated in the section 1
+    Then I should see the label name for choice updated in the section 1
     When I enter the help text for choice
-    Then I should see the help text updated in the section 1
+    Then I should see the help text for choice updated in the section 1
     When I enter the placeholder content for choice
-    Then I should see the placeholder content updated in the section 1
+    Then I should see the placeholder content for choice updated in the section 1
 
   @create_question
   Scenario: Admin adds and deletes thes choices
