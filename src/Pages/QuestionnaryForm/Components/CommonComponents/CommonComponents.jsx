@@ -27,7 +27,7 @@ function CommonComponents({
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
                     onChange={(e) => handleInputChange(e)}
-                    value={formParameters.label}
+                    value={formParameters?.label}
                     id='label'
                 />
             </div>
@@ -42,7 +42,7 @@ function CommonComponents({
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={helpTextPlaceholder}
                     onChange={(e) => handleInputChange(e)}
-                    value={formParameters.helptext}
+                    value={formParameters?.helptext}
                     id='helptext'
 
                 />
@@ -57,7 +57,7 @@ function CommonComponents({
                     // id={placeholderContentId}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={placeholderContent}
-                    value={formParameters.placeholderContent}
+                    value={formParameters?.placeholderContent}
                     onChange={(e) => handleInputChange(e)}
                     id='placeholderContent'
                 />

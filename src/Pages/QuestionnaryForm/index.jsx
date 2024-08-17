@@ -14,6 +14,7 @@ import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalS
 import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -49,8 +50,10 @@ function QuestionnaryForm() {
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams);
 
-    const handleInputClick = () => {
-        setTextFieldSettings(true)
+    const handleInputClick = (fieldSettingParameters) => {
+        console.log(fieldSettingParameters, 'fieldSettingParameters.........')
+        // setTextFieldSettings(true)
+        setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id].componentType || false)
     }
 
     const handleInputChange = (e) => {
@@ -72,23 +75,28 @@ function QuestionnaryForm() {
         textboxfield: (props) =>
             <TextBoxField
                 {...props}
-                // handleChange={handleInputClick}
-                // textFieldSettings={textFieldSettings}
-                // fieldSettingParameters={fieldSettingParameters}
+            // handleChange={handleInputClick}
+            // textFieldSettings={textFieldSettings}
+            // fieldSettingParameters={fieldSettingParameters}
             />,
         choiceboxfield: (props) =>
             <ChoiceBoxField
                 {...props}
-                // handleChange={handleInputClick}
-                // textFieldSettings={textFieldSettings}
-                // fieldSettingParameters={fieldSettingParameters}
+            // handleChange={handleInputClick}
+            // textFieldSettings={textFieldSettings}
+            // fieldSettingParameters={fieldSettingParameters}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
         // audio: (props) => <AudioField {...props} />,
     };
 
-
+    const sideComponentMap = {
+        "textboxfield": TestFieldSetting,
+        "choiceboxfield": ChoiceFieldSetting,
+        // Add other mappings here...
+    };
+    
 
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
@@ -243,6 +251,10 @@ function QuestionnaryForm() {
 
     const handleQuestionIndexCapture = (question) => {
         console.log(question, 'question qqq')
+        if(selectedComponent){
+            setToastError('Please save!')
+            return;
+        }
         setSelectedQuestionDetails(question);
     };
 
@@ -504,10 +516,15 @@ function QuestionnaryForm() {
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
+        dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionDetails?.question_id }));
         setFieldSettingParameters((prevState) => ({
             ...prevState,
             ['type']: type,
         }));
+    }
+
+    const handleSource = (source) => {
+
     }
 
     //function to save the field setting
@@ -532,7 +549,7 @@ function QuestionnaryForm() {
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
             console.log(response);
-            setTextFieldSettings(false)
+            setSelectedComponent(false)
         } catch (error) {
             console.error(error); // Properly handle the error
         }
@@ -665,20 +682,27 @@ function QuestionnaryForm() {
                             </button> */}
                         </div>
                         <div>
-                            {textFieldSettings ?
-                                <TestFieldSetting
-                                    handleInputChange={handleInputChange}
-                                    formParameters={fieldSettingParams[selectedQuestionDetails.question_id]}
-                                    handleRadiobtn={handleRadiobtn}
-                                    fieldSettingParameters={fieldSettingParams[selectedQuestionDetails.question_id]}
-                                    setFieldSettingParameters={setFieldSettingParameters}
-                                    handleSaveSettings={handleSaveSettings}
-                                /> :
-                                (<AddFields
+                            {selectedComponent ? (
+                                React.createElement(
+                                    sideComponentMap[selectedComponent],  // Dynamically select the component
+                                    {
+                                        handleInputChange: handleInputChange,
+                                        formParameters: fieldSettingParams[selectedQuestionDetails.question_id],
+                                        handleRadiobtn: handleRadiobtn,
+                                        fieldSettingParameters: fieldSettingParams[selectedQuestionDetails.question_id],
+                                        setFieldSettingParameters: setFieldSettingParameters,
+                                        handleSaveSettings: handleSaveSettings,
+                                        handleSource: handleSource,
+                                        selectedQuestionDetails: selectedQuestionDetails
+                                    }
+                                )
+                            ) : (
+                                <AddFields
                                     buttons={Fieldsneeded}
                                     handleClick={handleClick}
-                                />)
-                            }
+                                />
+                            )}
+
                         </div>
                     </div>
                 </div>

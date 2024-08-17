@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from '../../../../../Components/Image/Image'
 
 const ChoiceBoxField = ({
     label,
@@ -24,13 +25,13 @@ const ChoiceBoxField = ({
                         type={type}
                         id={textId}
                         value={value}
-                        className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={fieldSettingParameters?.placeholderContent}
                         onClick={() => handleChange()}
                     />
-                    <p className='absolute right-0 top-0'>
-                        a
-                    </p>
+                    <div className='absolute right-4 top-1/2 -translate-y-1/2'>
+                        <Image src='down' />
+                    </div>
                 </div>
                 :
                 <div className='relative'>
@@ -43,9 +44,7 @@ const ChoiceBoxField = ({
                         placeholder={fieldSettingParameters?.placeholderContent}
                         onClick={() => handleChange()}
                     />
-                    <p className='absolute right-0 top-0'>
-                        a
-                    </p>
+                    need to create mapping based on the source and  then based on type either radio button or checkbox
                 </div>
             }
             <p className='mt-2 font-normal text-sm text-[#2B333B]'>{fieldSettingParameters?.helptext}</p>

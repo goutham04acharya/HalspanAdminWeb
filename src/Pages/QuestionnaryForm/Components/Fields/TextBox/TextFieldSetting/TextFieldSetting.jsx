@@ -132,7 +132,7 @@ const handleRemoveOption = () => {
                 name='type'
                 id='Singleline'
                 value='Singleline'
-                checked={fieldSettingParameters.type === 'single_line'}
+                checked={fieldSettingParameters?.type === 'single_line'}
                 onClick={() => handleRadiobtn('single_line')} />
               <label htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Single line
@@ -146,7 +146,7 @@ const handleRemoveOption = () => {
                 name='type'
                 id='SingleChoice'
                 value='SingleChoice'
-                checked={fieldSettingParameters.type === 'multi_line'}
+                checked={fieldSettingParameters?.type === 'multi_line'}
                 onClick={() => handleRadiobtn('multi_line')} />
               <label htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Multi-line
@@ -159,7 +159,7 @@ const handleRemoveOption = () => {
                 name='type'
                 id='Lookup'
                 value='Lookup'
-                checked={fieldSettingParameters.type === 'lookup'}
+                checked={fieldSettingParameters?.type === 'lookup'}
                 onClick={() => handleRadiobtn('lookup')} />
               <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                 Lookup
@@ -175,7 +175,7 @@ const handleRemoveOption = () => {
                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                     testID='lookup-dropdown'
                     labeltestID='option0'
-                    selectedOption={optionData.find(option => option.value === fieldSettingParameters.lookupOption)}
+                    selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
                     handleRemoveOption={handleRemoveOption}
                     isDropdownOpen={isLookupOpen}
                     setDropdownOpen={setIsLookupOpen}
@@ -199,7 +199,7 @@ const handleRemoveOption = () => {
                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                 testID='format-dropdown'
                 labeltestID='option0'
-                selectedOption={options.find(option => option.value === fieldSettingParameters.format)}
+                selectedOption={options.find(option => option.value === fieldSettingParameters?.format)}
                 handleOptionClick={handleOptionClick}
                 isDropdownOpen={isDropdownOpen}
                 setDropdownOpen={setDropdownOpen}
@@ -213,7 +213,7 @@ const handleRemoveOption = () => {
                   label=''
                   id='min'
                   type='text'
-                  value={fieldSettingParameters.min}
+                  value={fieldSettingParameters?.min}
                   className='w-full mt-2.5'
                   labelStyle=''
                   placeholder='Minimum'
@@ -227,7 +227,7 @@ const handleRemoveOption = () => {
                   label=''
                   id='max'
                   type='text'
-                  value={fieldSettingParameters.max}
+                  value={fieldSettingParameters?.max}
                   className='w-full mt-2.5'
                   labelStyle=''
                   placeholder='Maximum'
@@ -245,7 +245,7 @@ const handleRemoveOption = () => {
                 label='Admin Field Notes'
                 id='note'
                 type='text'
-                value={fieldSettingParameters.note}
+                value={fieldSettingParameters?.note}
                 className='w-full mt-2.5'
                 labelStyle='font-semibold text-base text-[#2B333B]'
                 placeholder='Notes'

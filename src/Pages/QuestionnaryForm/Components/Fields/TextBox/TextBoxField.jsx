@@ -25,7 +25,7 @@ const TextBoxField = ({
                     value={value}
                     className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange()}
+                    onClick={() => handleChange(fieldSettingParameters)}
                 />
                 :
                 <input
@@ -35,7 +35,7 @@ const TextBoxField = ({
                     value={value}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange()}
+                    onClick={() => handleChange(fieldSettingParameters)}
                 />
             }
             <p className='mt-2 font-normal text-sm text-[#2B333B]'>{fieldSettingParameters?.helptext}</p>
