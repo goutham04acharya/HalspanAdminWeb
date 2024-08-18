@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const RadioButtonGroup = ({ values, name, onChange }) => {
+const CheckboxButtonGroup = ({ values, name, onChange }) => {
     const [selectedValue, setSelectedValue] = useState(values[0]);
 
     // Handle radio button change
@@ -12,11 +12,10 @@ const RadioButtonGroup = ({ values, name, onChange }) => {
     return (
         <div className="space-y-2">
             {values.map((value, index) => (
-                <div key={index} className="relative custom-radioBlue py-2">
+                <div key={index} className="relative checkbox py-2">
                     <input
                         id={`radio-${index}`}
-                        type="radio"
-                        name={name}
+                        type="checkbox"
                         value={value}
                         onChange={handleChange}
                         checked={selectedValue === value}
@@ -24,7 +23,7 @@ const RadioButtonGroup = ({ values, name, onChange }) => {
                     />
                     <label
                         htmlFor={`radio-${index}`}
-                        className="h-5 flex items-center cursor-pointer relative pl-6 text-neutral-primary text-[16px] leading-[20px] font-normal"
+                        className="h-5 flex items-center cursor-pointer relative pl-8 text-neutral-primary text-[16px] leading-[20px] font-normal"
                     >
                         {value}
                     </label>
@@ -34,4 +33,4 @@ const RadioButtonGroup = ({ values, name, onChange }) => {
     );
 };
 
-export default RadioButtonGroup;
+export default CheckboxButtonGroup;

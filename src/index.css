@@ -28,7 +28,7 @@ body {
   -webkit-appearance: none;
 }
 
-.scrollHide::-webkit-scrollbar  {
+.scrollHide::-webkit-scrollbar {
   -webkit-appearance: none;
 }
 
@@ -37,10 +37,11 @@ body {
   width: 4px;
   background-color: white;
 }
+
 .whiteScrollBar::-webkit-scrollbar:vertical {
   position: relative;
   width: 4px;
-  background-color: #3B2A6F;
+  background-color: #2B333B;
 }
 
 .scrollBar::-webkit-scrollbar:horizontal {
@@ -63,13 +64,16 @@ body {
 }
 
 /* Custom radio button which is used in create questionnary */
-.custom-radioBlue [type='radio']:checked,[type='radio']{
+.custom-radioBlue [type='radio']:checked,
+[type='radio'] {
   background-image: none;
   position: absolute;
   top: 3px;
   cursor: pointer;
 }
-.custom-radioBlue [type="radio"]:checked + label::before, .custom-radioBlue [type="radio"]:not(:checked) + label::before {
+
+.custom-radioBlue [type="radio"]:checked+label::before,
+.custom-radioBlue [type="radio"]:not(:checked)+label::before {
   content: '';
   position: absolute;
   left: 0;
@@ -81,24 +85,30 @@ body {
   background: #FFFFFF;
   cursor: pointer;
 }
-.custom-radioBlue [type="radio"]:not(:checked) + label::before{
+
+.custom-radioBlue [type="radio"]:not(:checked)+label::before {
   background-color: #FFFFFF;
 }
-.custom-radioBlue [type="radio"]:checked + label::before {
+
+.custom-radioBlue [type="radio"]:checked+label::before {
   border: 1px solid #AEB3B7;
   background-color: #FFFFFF;
 }
-.custom-radioBlue [type="radio"]:not(:checked) + label::after {
+
+.custom-radioBlue [type="radio"]:not(:checked)+label::after {
   opacity: 0;
   -webkit-transform: scale(0);
   transform: scale(0);
 }
-.custom-radioBlue [type="radio"]:checked + label::after {
+
+.custom-radioBlue [type="radio"]:checked+label::after {
   opacity: 1;
   -webkit-transform: scale(1);
   transform: scale(1);
 }
-.custom-radioBlue [type="radio"]:checked + label::after, .custom-radioBlue [type="radio"]:not(:checked) + label::after {
+
+.custom-radioBlue [type="radio"]:checked+label::after,
+.custom-radioBlue [type="radio"]:not(:checked)+label::after {
   width: 9px;
   height: 9px;
   position: absolute;
@@ -111,26 +121,34 @@ body {
   transition: all 0.2s ease;
   cursor: pointer;
 }
-.custom-radioBlue [type="radio"]:checked + label:after{
+
+.custom-radioBlue [type="radio"]:checked+label:after {
   background-color: #2B333B;
 }
 
 /* to remove the default sidebar which is use in questionnary list */
-.default-sidebar::-webkit-scrollbar,.custom-scrollbar::-webkit-scrollbar{
+.default-sidebar::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
   -webkit-appearance: none;
 }
-.default-sidebar::-webkit-scrollbar:vertical,.scrollbar::-webkit-scrollbar:vertical{
+
+.default-sidebar::-webkit-scrollbar:vertical,
+.scrollbar::-webkit-scrollbar:vertical {
   width: 0;
   background-color: transparent;
   border: none;
 }
-.default-sidebar::-webkit-scrollbar:horizontal,.custom-scrollbar::-webkit-scrollbar:horizontal {
+
+.default-sidebar::-webkit-scrollbar:horizontal,
+.custom-scrollbar::-webkit-scrollbar:horizontal {
   height: 0;
   background-color: transparent;
   border: none;
 }
-.default-sidebar::-webkit-scrollbar-thumb,.custom-scrollbar::-webkit-scrollbar-thumb{
-  background-color:transparent;
+
+.default-sidebar::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
   border: 0;
   border-radius: 0;
   height: 0;
@@ -141,6 +159,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 /* customized radio button */
 
 .custom-toggle-switch .switch {
@@ -150,14 +169,17 @@ body {
   height: 21px;
   margin-bottom: 0;
 }
+
 .custom-toggle-switch .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .custom-toggle-switch .slider.round {
   border-radius: 11px;
 }
+
 .custom-toggle-switch .slider {
   position: absolute;
   cursor: pointer;
@@ -175,12 +197,14 @@ body {
 /* th:has(button.sortedIcon){
   cursor:pointer;
 } */
-.custom-toggle-switch .slider.slider1{
+.custom-toggle-switch .slider.slider1 {
   cursor: default !important;
 }
+
 .custom-toggle-switch .slider.round::before {
   border-radius: 55%;
 }
+
 .custom-toggle-switch .slider::before {
   position: absolute;
   content: "";
@@ -191,15 +215,18 @@ body {
   background-color: #FFFFFF;
   transition: .4s;
 }
+
 custom-toggle-switch input:checked+.slider::before {
   transform: translateX(18px);
   background-color: #000000;
 }
+
 .custom-toggle-switch input:checked+.slider::before {
   -webkit-transform: translateX(18px);
   transform: translateX(18px);
   background-color: #FFFFFF;
 }
+
 .custom-toggle-switch input:checked+.slider {
   background-color: #000000;
   border: 1px solid #000000;
@@ -221,9 +248,11 @@ custom-toggle-switch input:checked+.slider::before {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 20px; /* Adjust size as needed */
-  height: 20px; /* Adjust size as needed */
-  border: 1px solid #3B2A6F;
+  width: 20px;
+  /* Adjust size as needed */
+  height: 20px;
+  /* Adjust size as needed */
+  border: 1px solid #2B333B;
   border-radius: 50%;
   background: #FFFFFF;
   cursor: pointer;
@@ -232,10 +261,12 @@ custom-toggle-switch input:checked+.slider::before {
 .custom-radioBlue label span::after {
   content: '';
   position: absolute;
-  width: 10px; /* Adjust size as needed */
-  height: 10px; /* Adjust size as needed */
+  width: 10px;
+  /* Adjust size as needed */
+  height: 10px;
+  /* Adjust size as needed */
   border-radius: 50%;
-  background-color: #3B2A6F;
+  background-color: #2B333B;
   opacity: 0;
   top: 50%;
   left: 50%;
@@ -243,6 +274,51 @@ custom-toggle-switch input:checked+.slider::before {
   transition: opacity 0.2s ease;
 }
 
-.custom-radioBlue input[type="radio"]:checked + label span::after {
+.custom-radioBlue input[type="radio"]:checked+label span::after {
   opacity: 1;
+}
+
+/* check box  */
+.checkbox input {
+  opacity: 0;
+  position: relative;
+}
+
+.checkbox input[type="checkbox"]:checked~label::before {
+  background-color: #2B333B !important;
+  border-radius: 0px;
+  border: 1px solid #AEB3B7;
+}
+
+.checkbox label::before {
+  content: '';
+  position: absolute;
+  top: 35%;
+  left: 0;
+  margin: 0;
+  height: 24px;
+  width: 24px;
+  border-radius: 0px;
+  transition: transform 0.28s ease;
+  transform: translateY(-50%);
+  border: 1px solid #AEB3B7;
+}
+
+.checkbox input[type="checkbox"]:checked~label::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+.checkbox label::after {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 7px;
+  border-bottom: 2px solid #fff;
+  border-left: 2px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transition: transform ease 0.25s;
+  will-change: transform;
+  position: absolute;
+  top: 2px;
+  left: 4px;
 }
