@@ -52,7 +52,6 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams);
 
     const handleInputClick = (fieldSettingParameters) => {
-        console.log(fieldSettingParameters, 'fieldSettingParameters.........')
         // setTextFieldSettings(true)
         setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id].componentType || false)
     }
@@ -63,14 +62,8 @@ function QuestionnaryForm() {
             ...prevState,
             [id]: value,
         }));
-        console.log(selectedComponent, 'hello');
-        console.log(selectedQuestionDetails, 'selectedQuestionDetails');
         dispatch(setNewComponent({ id, value, questionId: selectedQuestionDetails?.question_id }));
     }
-
-    useEffect(() => {
-        console.log(fieldSettingParams, 'field');
-    }, [fieldSettingParams])
 
     const componentMap = {
         textboxfield: (props) =>
@@ -251,9 +244,7 @@ function QuestionnaryForm() {
 
 
     const handleQuestionIndexCapture = (question) => {
-        console.log(question, 'question qqq')
         if(selectedComponent){
-            setToastError('Please save!')
             return;
         }
         setSelectedQuestionDetails(question);
@@ -270,7 +261,8 @@ function QuestionnaryForm() {
             >
                 <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
                     {!fieldSettingParameters &&
-                        <p className='mb-5 font-medium text-base text-[#000000]'>{item?.question_name}</p>
+                        <p className='mb-5 font-medium text-base text-[#000000] w-[25%]'>{item?.question_text}</p>
+                    
                     }
                     <div className='flex items-center justify-end w-full'>
                         <div
