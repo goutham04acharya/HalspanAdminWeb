@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from '../../../../../Components/Image/Image'
 import RadioButtonGroup from '../../../../../Components/RadioButtonGroup/RadioButtonGroup'
+import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/CheckboxButtonGroup';
 
 const ChoiceBoxField = ({
     label,
@@ -26,14 +27,27 @@ const ChoiceBoxField = ({
             <label htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label || 'Question 1'}</label>
             {/* need to create mapping based on the source and  then based on type either radio button or checkbox */}
             {fieldSettingParameters?.type === 'single_choice' ?
-                <div className='relative'>
+                <div className='relative single_choice'>
                     {fieldSettingParameters?.source === 'fixedList' && <RadioButtonGroup
-                        values={fieldSettingParameters?.fixedChoiceArray?.map(choice => choice.value)}
+                        values={fieldSettingParameters?.fixedChoiceArray?.map(choice => choice.value) || []}
                         name="fixedChoice"
                         onChange={handleRadioChange}
                     />}
                     {fieldSettingParameters?.source === 'lookup' && <RadioButtonGroup
-                        values={fieldSettingParameters?.lookupOptionChoice}
+                        values={fieldSettingParameters?.lookupOptionChoice || []}
+                        name="lookupChoice"
+                        onChange={handleRadioChange}
+                    />}
+                </div>
+            : fieldSettingParameters?.type === 'multi_choice' ?
+                <div className='relative multi_choice'>
+                    {fieldSettingParameters?.source === 'fixedList' && <CheckboxButtonGroup
+                        values={fieldSettingParameters?.fixedChoiceArray?.map(choice => choice.value) || []}
+                        name="fixedChoice"
+                        onChange={handleRadioChange}
+                    />}
+                    {fieldSettingParameters?.source === 'lookup' && <CheckboxButtonGroup
+                        values={fieldSettingParameters?.lookupOptionChoice || []}
                         name="lookupChoice"
                         onChange={handleRadioChange}
                     />}
