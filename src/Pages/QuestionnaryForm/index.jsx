@@ -15,6 +15,7 @@ import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
+import { v4 as uuidv4 } from 'uuid';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -167,7 +168,7 @@ function QuestionnaryForm() {
             }
             const newSection = {
                 section_name: `Section ${sections.length + 1}`,
-                section_id: `SEC${sections.length + 1}`,
+                section_id: `SEC-${uuidv4()}`,
                 pages: [{
                     page_id: `SEC${sections.length + 1}_PG1`,
                     page_name: 'Page 1',
@@ -531,17 +532,17 @@ function QuestionnaryForm() {
     const handleSaveSettings = async () => {
         console.log('saving.......')
         let body = {
-            component_type: fieldSettingParameters?.Component_type,
-            label: fieldSettingParameters?.label,
-            help_text: fieldSettingParameters?.helptext,
-            placeholder_content: fieldSettingParameters?.placeholderContent,
-            default_content: fieldSettingParameters?.defaultContent,
-            type: fieldSettingParameters?.type,
-            format: fieldSettingParameters?.format,
-            lookup_id: fieldSettingParameters?.lookupOption,
+            component_type: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.componentType,
+            label: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.label,
+            help_text: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.helptext,
+            placeholder_content: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.placeholderContent,
+            default_content: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.defaultContent,
+            type: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.type,
+            format: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.format,
+            lookup_id: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.lookupOption,
             number_of_characters: {
-                min: fieldSettingParameters?.min,
-                max: fieldSettingParameters?.max,
+                min: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.min,
+                max: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.max,
             },
             admin_field_notes: fieldSettingParameters?.note,
         };

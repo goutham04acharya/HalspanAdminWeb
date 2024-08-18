@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown'
 import InputField from '../../../../../../Components/InputField/InputField';
@@ -7,10 +7,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useApi from '../../../../../../services/CustomHook/useApi';
 import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
-import { useDispatch } from 'react-redux';
-import { setNewComponent } from '../../fieldSettingParamsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceValue, setNewComponent, updateFixedChoiceArray } from '../../fieldSettingParamsSlice';
 import DraggableList from 'react-draggable-list';
-import { v4 as uuidv4 } from 'uuid';
+import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -31,12 +31,6 @@ function ChoiceFieldSetting({
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [fixedChoiceArray, setFixedChoiceArray] = useState([
-        { id: `C-${uuidv4()}`, value: '' },
-        { id: `C-${uuidv4()}`, value: '' },
-        { id: `C-${uuidv4()}`, value: '' }
-    ]);
-
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
 
@@ -44,20 +38,8 @@ function ChoiceFieldSetting({
     const { getAPI } = useApi();
     const dispatch = useDispatch();
 
-    const options = [
-        { value: 'Alpha', label: 'Alpha' },
-        { value: 'Alphanumeric', label: 'Alphanumeric' },
-        { value: 'Numeric', label: 'Numeric' },
-        { value: 'Custom Regular Expression', label: 'Custom Regular Expression' }
-    ];
-
-    const handleOptionClick = (option) => {
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            format: option.value,
-        }));
-        setDropdownOpen(false);
-    };
+    // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
+    const fixedChoiceArray = useSelector(state => state.fieldSettingParams[selectedQuestionDetails.question_id]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
         setFieldSettingParameters((prevState) => ({
@@ -65,6 +47,8 @@ function ChoiceFieldSetting({
             lookupOption: option.value,
         }));
         setIsLookupOpen(false);
+        dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionDetails?.question_id }))
+        dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionDetails?.question_id }))
     };
 
     const handleRemoveOption = () => {
@@ -86,7 +70,8 @@ function ChoiceFieldSetting({
             // Transform the items array
             const transformedArray = response.data.data.items.map(item => ({
                 value: item.lookup_id,
-                label: item.name
+                label: item.name,
+                choices: item.choices
             }));
             setOptionData(prevState => [...prevState, ...transformedArray]);
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
@@ -113,49 +98,57 @@ function ChoiceFieldSetting({
 
     const handleAddRemoveFixedChoice = (event, id) => {
         if (event === 'add') {
-            // Add a new object with a unique id
-            setFixedChoiceArray(prevArray => [
-                ...prevArray,
-                { id: `C-${uuidv4()}`, value: '' }
-            ]);
+            dispatch(addNewFixedChoice({ questionId: selectedQuestionDetails?.question_id }))
         } else if (event === 'remove') {
-            // Remove the object with the given id
-            setFixedChoiceArray(prevArray =>
-                prevArray.filter(item => item.id !== id)
-            );
+            dispatch(removeFixedChoice({ id, questionId: selectedQuestionDetails?.question_id }))
         }
     };
 
-    const handleFixedChoiceChange = (e, item) => {
-        const { value } = e.target;
-        const updatedArray = fixedChoiceArray.map((choice) => {
-            if (choice.id === item.id) {
-                return { ...choice, value: value };
-            }
-            return choice;
-        });
-    
-        setFixedChoiceArray(updatedArray);
-        console.log(updatedArray, 'updated fixedChoiceArray');
+    // Create a ref map to store input refs
+    const inputRefs = useRef({});
+
+    // Function to handle focusing an input
+    const focusInput = (id) => {
+        console.log('first')
+        if (inputRefs.current[id]) {
+            console.log('first.................')
+            inputRefs.current[id].focus();
+        }
     };
-    
 
     // Function for dragging Choices
-    const Item = ({ item, dragHandleProps }) => {
-        console.log(item, 'item')
-        const { onMouseDown, onTouchStart } = dragHandleProps;
-
+    const Item = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
+        const dispatch = useDispatch();
+        const [localValue, setLocalValue] = useState(item.value || '');
+    
+        // Handle input change
+        const handleFixedChoiceChange = useCallback((e) => {
+            const { value } = e.target;
+            setLocalValue(value);
+            dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionDetails?.question_id }));
+        }, [dispatch, item.id, selectedQuestionDetails?.question_id]);
+    
+        // Focus input when required
+        useEffect(() => {
+            console.log('second')
+            console.log(ref)
+            console.log(focusInput, 'focusInput')
+            console.log(item.id === focusInput, 'yes')
+            if (item.id === focusInput && ref.current) {
+                console.log('second......')
+                ref.current.focus();
+            }
+        }, [item.id, focusInput, ref, localValue]);
+    
         return (
-            <div
-                className={`disable-select select-none w-full mt-7 rounded-[10px] `}
-            >
+            <div className={`disable-select select-none w-full mt-7 rounded-[10px]`}>
                 <div className='flex justify-between items-start cursor-pointer'>
                     <div className='flex items-center justify-center w-full'>
                         <div
                             className="disable-select dragHandle"
                             onMouseDown={(e) => {
                                 document.body.style.overflow = "hidden";
-                                onMouseDown(e);
+                                dragHandleProps.onMouseDown(e);
                             }}
                             onMouseUp={() => {
                                 document.body.style.overflow = "visible";
@@ -165,26 +158,35 @@ function ChoiceFieldSetting({
                         </div>
                         <input
                             type="text"
-                            // id={labelID}
+                            ref={ref}
                             className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder={`index ${item?.index}`}
-                            onChange={(e) => handleFixedChoiceChange(e, item)}
-                            value={fixedChoiceArray.find(choice => choice.id === item.id)?.value || ''}
+                            placeholder={`${getOrdinal(item?.index + 1)} Choice`}
+                            onChange={handleFixedChoiceChange}
+                            value={localValue}
                             id='choice'
+                            onClick={() => focusInput(item.id)} // Call focusInput on click
                         />
-                        <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveFixedChoice('remove', item.id)} />
-                        <img src="/Images/add.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveFixedChoice('add', item.id)} />
+                        <img
+                            src="/Images/trash-black.svg"
+                            alt="delete"
+                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                            onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
+                        />
+                        <img
+                            src="/Images/add.svg"
+                            alt="add"
+                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                            onClick={() => handleAddRemoveFixedChoice('add', item.id)}
+                        />
                     </div>
                 </div>
             </div>
         );
-    };
+    }));
 
     const handleMoveEnd = (newList) => {
-        console.log(newList, 'newList')
-        setFixedChoiceArray(newList);
+        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionDetails.question_id, newList }));
     };
-
 
     useEffect(() => {
         fetchLookupList();
@@ -267,20 +269,32 @@ function ChoiceFieldSetting({
                                 id='FixedList'
                                 value='FixedList'
                                 checked={fieldSettingParameters?.source === 'fixedList'}
-                                onClick={() => dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionDetails?.question_id }))} />  {/* handleSource('fixedList') */}
+                                onClick={() => {
+                                    dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionDetails?.question_id }))
+                                    dispatch(resetFixedChoice({ questionId: selectedQuestionDetails?.question_id }))
+                                }
+                                } />  {/* handleSource('fixedList') */}
                             <label htmlFor='FixedList' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Fixed List
                             </label>
                         </div>
                         {fieldSettingParameters?.source === 'fixedList' &&
                             <DraggableList
-                                itemKey="question_id"
-                                template={Item}
+                                itemKey="id" // Adjust itemKey according to your unique identifier
+                                template={(props) => (
+                                    <Item
+                                        {...props}
+                                        focusInput={focusInput}
+                                        ref={(ref) => {
+                                            inputRefs.current[props.item.id] = ref;
+                                        }}
+                                    />
+                                )}
                                 list={fixedChoiceArray.map((data, choiceIndex) => ({
                                     ...data,
-                                    index: choiceIndex
+                                    index: choiceIndex,
                                 }))}
-                                onMoveEnd={(newList) => handleMoveEnd(newList)}
+                                onMoveEnd={handleMoveEnd}
                                 container={() => document.body}
                             />}
                         <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>

@@ -205,4 +205,44 @@ custom-toggle-switch input:checked+.slider::before {
   border: 1px solid #000000;
 }
 
+/* custom radio button  */
+/* Custom styling */
+.custom-radioBlue .hidden {
+  display: none;
+}
 
+.custom-radioBlue label {
+  display: flex;
+  align-items: center;
+}
+
+.custom-radioBlue label span {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  border: 1px solid #3B2A6F;
+  border-radius: 50%;
+  background: #FFFFFF;
+  cursor: pointer;
+}
+
+.custom-radioBlue label span::after {
+  content: '';
+  position: absolute;
+  width: 10px; /* Adjust size as needed */
+  height: 10px; /* Adjust size as needed */
+  border-radius: 50%;
+  background-color: #3B2A6F;
+  opacity: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+}
+
+.custom-radioBlue input[type="radio"]:checked + label span::after {
+  opacity: 1;
+}
