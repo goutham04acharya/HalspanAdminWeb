@@ -350,6 +350,7 @@ function QuestionnaryForm() {
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
         if (sectionToSave) {
+            console.log(sectionToSave.section_id, 'sectionToSave.section_i')
             // Create a new object containing only the selected section's necessary fields
             let body = {
                 section_id: sectionToSave.section_id,
@@ -359,20 +360,6 @@ function QuestionnaryForm() {
                     page_name: page.page_name,
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
-                        question_text: question.question_name,
-                        component_type: Fieldsneeded[0]?.type,
-                        label: globalStates[0]?.label,
-                        help_text: globalStates[0]?.help_text,
-                        // "placeholder_content": "e.g., johndoe123",
-                        // "default_content": "johndoe123",
-                        // "type": "single-line",
-                        // "format": "alphanumeric",
-                        // "number_of_characters": {
-                        //     "min": 5,
-                        //     "max": 20
-                        // },
-                        // "admin_field_notes": "This field is required for user registration."
-                        // Include other necessary fields for questions here
                     }))
                 }))
             };
@@ -439,7 +426,6 @@ function QuestionnaryForm() {
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
-
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
