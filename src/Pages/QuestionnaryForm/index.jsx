@@ -160,7 +160,7 @@ function QuestionnaryForm() {
             }
 
             return newState;
-        });
+        });;
     };
 
     const handleAddRemoveSection = (event, sectionIndex) => {
@@ -572,13 +572,11 @@ function QuestionnaryForm() {
             },
             admin_field_notes: fieldSettingParams?.note,
             source: {
-                [fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source]:
+                [fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
                     fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'lookup' ?
                         fieldSettingParams?.[selectedQuestionDetails?.question_id]?.lookupOptionChoice :
                         fieldSettingParams?.[selectedQuestionDetails?.question_id]?.fixedChoiceArray
-
             },
-
         };
 
         try {
