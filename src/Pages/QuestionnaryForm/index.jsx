@@ -535,6 +535,10 @@ function QuestionnaryForm() {
     //function to save the field setting
     const handleSaveSettings = async () => {
         setIsThreedotLoader(true);
+        const len = sections.length;
+        if (len > 0) {
+            handleSaveSection(sections[len - 1].section_id, false);
+        }
         console.log('saving.......')
         let body = {
             component_type: fieldSettingParameters?.[selectedQuestionDetails?.question_id]?.componentType,
@@ -568,7 +572,6 @@ function QuestionnaryForm() {
             setSelectedComponent(false);
         }
     };
-
 
     useEffect(() => {
         formDefaultDetails();
