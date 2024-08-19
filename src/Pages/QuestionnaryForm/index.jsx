@@ -82,9 +82,6 @@ function QuestionnaryForm() {
         setDataIsSame(update)
     }
 
-        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionDetails?.question_id }));
-    };
-
     const componentMap = {
         textboxfield: (props) =>
             <TextBoxField
