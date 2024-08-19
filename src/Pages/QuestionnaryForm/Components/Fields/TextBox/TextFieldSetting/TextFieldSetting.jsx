@@ -7,8 +7,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useApi from '../../../../../../services/CustomHook/useApi';
 import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
+import { useDispatch } from 'react-redux';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
 
-function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, fieldSettingParameters, setFieldSettingParameters, handleSaveSettings }) {
+function TestFieldSetting({
+  handleInputChange,
+  formParameters,
+  handleRadiobtn,
+  fieldSettingParameters,
+  setFieldSettingParameters,
+  handleSaveSettings,
+  selectedQuestionDetails }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -25,6 +34,8 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
   const navigate = useNavigate();
   const { getAPI } = useApi();
 
+  const dispatch = useDispatch();
+
 
   const options = [
     { value: 'Alpha', label: 'Alpha' },
@@ -39,6 +50,7 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
       format: option.value,
     }));
     setDropdownOpen(false);
+    dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionDetails?.question_id }));
   };
 
   const handleLookupOption = (option) => {
@@ -47,14 +59,16 @@ function TestFieldSetting({ handleInputChange, formParameters, handleRadiobtn, f
       lookupOption: option.value,
     }));
     setIsLookupOpen(false);
+    dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionDetails?.question_id }));
   };
 
-const handleRemoveOption = () => {
-  setFieldSettingParameters((prevState) => ({
-    ...prevState,
-    lookupOption: '',
-  }));
-}
+  const handleRemoveOption = () => {
+    setFieldSettingParameters((prevState) => ({
+      ...prevState,
+      lookupOption: '',
+    }));
+    dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionDetails?.question_id }));
+  }
 
   // List Functions
   const fetchLookupList = useCallback(async () => {
