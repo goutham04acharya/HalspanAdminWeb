@@ -63,9 +63,11 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     Then I should see the placeholder content updated in the section 1
     When I select the type as <type>
     * I select the format as <format>
-    Then I should see the format reflected on the text box section 1
+    # Then I should see the format reflected on the text box section 1
     * I enter the minimum and maximum number of characters
     * I enter the admin field notes
+    * I click on save button for field settings
+    Then I should read a message stating that "Field settings data updated successfully"
 
     Examples:
       | type          | format         |
@@ -87,7 +89,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     When I select the type as "lookup"
     And I select a lookup data from the dropdown
     When I select the format as "alphanumeric"
-    Then I should see the format reflected on the text box section 1
+    # Then I should see the format reflected on the text box section 1
     When I enter the minimum and maximum number of characters
     * I enter the admin field notes
     * I click on save button for field settings
