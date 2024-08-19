@@ -39,7 +39,7 @@ function ChoiceFieldSetting({
     const dispatch = useDispatch();
 
     // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
-    const fixedChoiceArray = useSelector(state => state.fieldSettingParams[selectedQuestionDetails.question_id]?.fixedChoiceArray || []);
+    const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionDetails.question_id]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
         setFieldSettingParameters((prevState) => ({

@@ -157,8 +157,8 @@ function QuestionnaryForm() {
             const newState = { ...prevState };
 
             // Check if the key exists, and if so, delete it
-            if (newState[uuidToRemove]) {
-                delete newState[uuidToRemove];
+            if (newState.hasOwnProperty(indexToRemove)) {
+                delete newState[indexToRemove];
             }
 
             return newState;
@@ -194,7 +194,13 @@ function QuestionnaryForm() {
             setDataIsSame(update);
 
         } else if (event === 'remove') {
-            const isSaved = dataIsSame[sections[sectionIndex].section_id];
+            console.log(dataIsSame, 'dataIsSame');
+
+            // Retrieve the boolean value associated with the sectionId
+            const sectionId = sections?.[sectionIndex]?.section_id;
+            const isSaved = dataIsSame?.[sectionId] || false;
+
+            console.log(isSaved, 'isSaved');
             if (isSaved) {
                 handleDeleteSection(sections[sectionIndex].section_id);
             }
@@ -241,6 +247,7 @@ function QuestionnaryForm() {
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
         const update = { ...dataIsSame }
+        console.log(sections[sectionIndex].section_id, 'ooooooooooooooooooooooo sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
@@ -330,6 +337,7 @@ function QuestionnaryForm() {
         sections[sectionIndex].pages[pageIndex].questions = newList;
         setSections([...sections]);
         const update = { ...dataIsSame }
+        console.log(sections[sectionIndex].section_id, 'zzzzzzzzzzzzzzzzzzzzz sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
     };
@@ -342,10 +350,13 @@ function QuestionnaryForm() {
         setSections(response?.data?.data?.sections);
         const sections = response?.data?.data?.sections || [];
 
-        // Map through the sections and add a property with a value of true
-        const updatedSections = sections.map((section, index) => ({
-            [section.section_id]: true // Add a new property or update an existing one
-        }));
+        // Create an object with section_id as the key and true as the value
+        const updatedSections = sections.reduce((acc, section) => {
+            acc[section.section_id] = true;
+            return acc;
+        }, {});
+
+        console.log(updatedSections, 'bbbbbbbbbbbbbbbbbbbb, updatedSections'); // Output: { "SEC-d4dc4fe9-d61a-46e0-b475-ce939f7074f5": true, "SEC1": true }
         setDataIsSame(updatedSections);
 
         setPageLoading(false);
@@ -384,9 +395,9 @@ function QuestionnaryForm() {
                         question_id: question.question_id,
                     }))
                 }))
-            };
+            }
 
-            console.log(body, 'bodybodybodybody')
+            console.log(body, 'body body body body')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -418,6 +429,7 @@ function QuestionnaryForm() {
 
                     // Update the saved status
                     const update = { ...dataIsSame };
+                    console.log(sections[sectionIndex].section_id, 'nnnnnnnnnnnnnnnnnnnnnnnnn sections[sectionIndex].section_id')
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -485,6 +497,7 @@ function QuestionnaryForm() {
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
+                    console.log(sections[sectionIndex].section_id, 'mmmmmmmmmmmmmmmmm sections[sectionIndex].section_id')
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -570,9 +583,12 @@ function QuestionnaryForm() {
                 max: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.max,
             },
             admin_field_notes: fieldSettingParams?.note,
-            source: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source,
-            lookup_choice: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.lookupOptionChoice,
-            
+            source: {
+                [fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                    fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'lookup' ?
+                        fieldSettingParams?.[selectedQuestionDetails?.question_id]?.lookupOptionChoice :
+                        fieldSettingParams?.[selectedQuestionDetails?.question_id]?.fixedChoiceArray
+            },
         };
 
         try {
