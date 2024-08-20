@@ -82,6 +82,28 @@ const fieldSettingParamsSlice = createSlice({
         // Function to update savedData with currentData
         saveCurrentData: (state) => {
             state.savedData = { ...state.currentData };
+        },
+        setInitialData: (state, action) => {
+            const data = action.payload;
+
+            data.forEach(item => {
+                const questionId = item.question_id;
+
+                // Customize keys for storing in currentData and savedData
+                const customizedData = {
+                    componentType: item.component_type,
+                    helpText: item.help_text,
+                    label: item.label,
+                    placeholderContent: item.placeholder_content,
+                    numberOfCharacters: item.number_of_characters,
+                    source: item.source,
+                    questionnaireId: item.questionnaire_id
+                };
+
+                // Store in both currentData and savedData
+                state.currentData[questionId] = customizedData;
+                state.savedData[questionId] = customizedData;
+            });
         }
     }
 });
@@ -118,7 +140,8 @@ export const {
     resetFixedChoice,
     setFixedChoiceValue,
     updateFixedChoiceArray,
-    saveCurrentData
+    saveCurrentData,
+    setInitialData
 } = fieldSettingParamsSlice.actions;
 
 export default fieldSettingParamsSlice.reducer;

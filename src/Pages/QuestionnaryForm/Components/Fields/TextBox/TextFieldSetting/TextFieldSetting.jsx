@@ -18,7 +18,7 @@ function TestFieldSetting({
   fieldSettingParameters,
   setFieldSettingParameters,
   handleSaveSettings,
-  selectedQuestionDetails,
+  selectedQuestionId,
   isThreedotLoader }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -53,7 +53,7 @@ function TestFieldSetting({
       format: option.value,
     }));
     setDropdownOpen(false);
-    dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionDetails?.question_id }));
+    dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
   };
 
   const handleLookupOption = (option) => {
@@ -62,7 +62,7 @@ function TestFieldSetting({
       lookupOption: option.value,
     }));
     setIsLookupOpen(false);
-    dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionDetails?.question_id }));
+    dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
   };
 
   const handleRemoveOption = () => {
@@ -70,7 +70,7 @@ function TestFieldSetting({
       ...prevState,
       lookupOption: '',
     }));
-    dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionDetails?.question_id }));
+    dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
   }
 
   // List Functions
