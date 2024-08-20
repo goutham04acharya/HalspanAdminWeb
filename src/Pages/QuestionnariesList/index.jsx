@@ -127,7 +127,7 @@ function Questionnaries() {
               testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
               className='w-[315px] h-[50px] font-semibold'
-              text='Create new questionnaire'
+              text='Create New Questionnaire'
             />
           </div>
           <div className='flex items-center justify-between w-full'>

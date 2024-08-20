@@ -104,15 +104,15 @@ function CreateQuestionnary() {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
-      } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong') {
+      } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong.') {
         setToastError(response?.data?.data?.message);
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
-        setToastError('Something went wrong');
+        setToastError('Something went wrong.');
         setIsThreedotLoader(false)
       }
     } catch (error) {
-      setToastError('Something went wrong');
+      setToastError('Something went wrong.');
       setIsThreedotLoader(false)
     }
   }
@@ -166,7 +166,6 @@ function CreateQuestionnary() {
     <div className='bg-[#F4F6FA] p-7 h-customh2'>
       <div className='bg-white py-10 px-9 rounded-[10px] h-customh3'>
         <p className='font-medium text-[#2B333B] text-[28px]'>Create Questionnaire</p>
-        <p className='font-medium text-[#2B333B] text-[22px] mt-8'>Questionnaire settings</p>
         <div className='flex items-start'>
           <div className='w-[70%]'>
             <div className='mt-8 flex items-start w-full'>

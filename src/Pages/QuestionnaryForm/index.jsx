@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { compareData, saveCurrentData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
+import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -46,6 +47,12 @@ function QuestionnaryForm() {
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
     const questionRefs = useRef([]);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [sectionToDelete, setSectionToDelete] = useState(null); // Track the section to delete
+    const [showPageDeleteModal, setShowPageDeleteModal] = useState(false);
+    const [pageToDelete, setPageToDelete] = useState({ sectionIndex: null, pageIndex: null });
+
+
 
     // text field related states
     const [textFieldSettings, setTextFieldSettings] = useState(false)
@@ -55,6 +62,22 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
 
+    const handleCancel = () => {
+        setModalOpen(false);
+        setSectionToDelete(null); // Reset the section to delete
+    }
+
+    const handleDeleteModal = (sectionIndex) => {
+        setSectionToDelete(sectionIndex); // Set the section to delete
+        setModalOpen(true);
+    }
+
+    const confirmDeleteSection = () => {
+        if (sectionToDelete !== null) {
+            handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
+            setModalOpen(false); // Close the modal
+        }
+    }
 
     const handleInputClick = (fieldSettingParameters) => {
         // setTextFieldSettings(true)
@@ -358,10 +381,10 @@ function QuestionnaryForm() {
             if (response?.data?.status === 200) {
                 setToastSuccess(response?.data?.data?.message);
             } else {
-                setToastError('Something went wrong');
+                setToastError('Something went wrong.');
             }
         } catch (error) {
-            setToastError('Something went wrong');
+            setToastError('Something went wrong.');
         }
     };
 
@@ -419,10 +442,10 @@ function QuestionnaryForm() {
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
-                    setToastError('Something went wrong');
+                    setToastError('Something went wrong.');
                 }
             } catch (error) {
-                setToastError('Something went wrong');
+                setToastError('Something went wrong.');
             }
         }
     };
@@ -582,14 +605,14 @@ function QuestionnaryForm() {
             setIsThreedotLoader(false);
             setToastSuccess(response?.data?.message)
             if (response?.data?.status >= 400) {
-                setToastError(response?.data?.data?.message || 'Something went wrong');
+                setToastError(response?.data?.data?.message || 'Something went wrong.');
             }
             setSelectedComponent(false)
             dispatch(saveCurrentData());
         } catch (error) {
             console.error(error);
             setIsThreedotLoader(false);
-            setToastError('Failed to update field settings'); // Provide a user-friendly error message
+            setToastError('Failed to update field settings.'); // Provide a user-friendly error message
             setSelectedComponent(false);
         }
     };
@@ -600,11 +623,10 @@ function QuestionnaryForm() {
     }, []);
 
     return (
-        pageLoading
-            ?
-            <FormShimmer />
-            :
-            (
+        <>
+            {pageLoading ? (
+                <FormShimmer />
+            ) : (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
                         <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
@@ -638,7 +660,9 @@ function QuestionnaryForm() {
                                                 title='Delete'
                                                 data-testid={`delete-btn-${sectionIndex}`}
                                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                                                onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
+                                                // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
+                                                onClick={() => handleDeleteModal(sectionIndex)} // Open modal instead of directly deleting
+                                            />
                                             <img src="/Images/save.svg"
                                                 alt="save"
                                                 title='Save'
@@ -665,7 +689,13 @@ function QuestionnaryForm() {
                                                         title='Delete'
                                                         alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]'
+                                                        // onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} 
+                                                        onClick={() => {
+                                                            setPageToDelete({ sectionIndex, pageIndex });
+                                                            setShowPageDeleteModal(true);
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                             <DraggableList
@@ -751,8 +781,46 @@ function QuestionnaryForm() {
                         </div>
                     </div>
                 </div>
-            )
+            )}
+            {isModalOpen && (
+                <ConfirmationModal
+                    text='Delete Section'
+                    subText='Are you sure you want to delete this section?'
+                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={isModalOpen}
+                    setModalOpen={setModalOpen}
+                    handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
+                    handleButton2={handleCancel} // Handle cancel button
+                />
+            )}
+            {showPageDeleteModal && (
+                <ConfirmationModal
+                    text='Delete Page'
+                    subText='Are you sure you want to delete this page?'
+                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={showPageDeleteModal} 
+                    setModalOpen={setShowPageDeleteModal} 
+                    handleButton1={() => {
+                        handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex);
+                        setShowPageDeleteModal(false);
+                    }} // Call handleAddRemovePage and close modal on confirmation
+                    handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
+                />
+            )}
+
+        </>
     );
 }
+
 
 export default QuestionnaryForm;
