@@ -445,6 +445,7 @@ function QuestionnaryForm() {
 
                     // Update the saved status
                     const update = { ...dataIsSame };
+
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -516,6 +517,7 @@ function QuestionnaryForm() {
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
+
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {

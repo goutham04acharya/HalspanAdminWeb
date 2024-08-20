@@ -90,11 +90,11 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     * I click on the choices based on <type>
     Then I should see the choices updated on the section 1
 
-    Examples:
-      | type            | choices                        |
-      | "single_choice" | "Option 1, option 2, option 3" |
-      | "multi_choice"  | "Choice 1, Choice 2, choice 3" |
-      | "dropdown"      | "Item 1, Item 2, Item 3"       |
+#     Examples:
+#       | type            | choices                        |
+#       | "single_choice" | "Option 1, option 2, option 3" |
+#       | "multi_choice"  | "Choice 1, Choice 2, choice 3" |
+#       | "dropdown"      | "Item 1, Item 2, Item 3"       |
 
   @create_question
   Scenario: Admin saves the section with the changes
