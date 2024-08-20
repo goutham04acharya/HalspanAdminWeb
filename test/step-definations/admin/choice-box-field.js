@@ -16,7 +16,7 @@ Then('I should see the choice field added to the section {int}', async function 
     await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choiceBox"]`)));
 });
 
-When('I select the type as {string}', async function (choiceType) {
+When('I select the choice type as {string}', async function (choiceType) {
     await new Promise(resolve => setTimeout(resolve, 750));
     const choice = await driver.wait(until.elementLocated(By.css(`[data-testid="${choiceType}"]`))).click();
     this.choiceType = choice;
