@@ -55,21 +55,17 @@ When('I enter the text for choices as {string}', async function (choicesText) {
 });
 
 Then('I should see the choices updated on the section {int}', async function (sectionNumber) {
-    if (this.choiceType === 'dropdown') {
-        const dropdownChoiceElement = await driver.wait(
-            until.elementLocated(By.css('[data-testid="dropdown-choice"]'))
-        );
-        await dropdownChoiceElement.click();
-    }
-
-    const sectionChoices = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choices"]`)));
-    for (let i = 0; i < this.enteredChoices.length; i++) {
-        const choiceNumber = i + 1;
-        // eslint-disable-next-line max-len
-        const choiceElement = await sectionChoices.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choice-${choiceNumber}"]`)));
-        const choiceText = await choiceElement.getText();
-        assert.equal(choiceText, this.enteredChoices[i]);
-    }
+    if (this.choiceType !== 'dropdown') {
+        const sectionChoices = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choices"]`)));
+        
+        for (let i = 0; i < this.enteredChoices.length; i++) {
+            const choiceNumber = i + 1;
+            // eslint-disable-next-line max-len
+            const choiceElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1-choice-${choiceNumber}"]`))); 
+            const choiceText = await choiceElement.getText();
+            assert.equal(choiceText, this.enteredChoices[i]);
+        }
+    }    
 });
 
 When('I click on the choices based on {string}', async function (choiceType) {
