@@ -58,13 +58,6 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
 
-
-    const handleInputClick = (fieldSettingParameters) => {
-        // setTextFieldSettings(true)
-        console.log(fieldSettingParams, 'fieldSettingParams')
-        console.log(fieldSettingParams[selectedQuestionId], '[selectedQuestionId]?')
-    }
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
@@ -88,16 +81,10 @@ function QuestionnaryForm() {
         textboxfield: (props) =>
             <TextBoxField
                 {...props}
-            // handleChange={handleInputClick}
-            // textFieldSettings={textFieldSettings}
-            // fieldSettingParameters={fieldSettingParameters}
             />,
         choiceboxfield: (props) =>
             <ChoiceBoxField
                 {...props}
-            // handleChange={handleInputClick}
-            // textFieldSettings={textFieldSettings}
-            // fieldSettingParameters={fieldSettingParameters}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
@@ -196,13 +183,10 @@ function QuestionnaryForm() {
             setDataIsSame(update);
 
         } else if (event === 'remove') {
-            console.log(dataIsSame, 'dataIsSame');
-
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
             const isSaved = dataIsSame?.[sectionId] || false;
 
-            console.log(isSaved, 'isSaved');
             if (isSaved) {
                 handleDeleteSection(sections[sectionIndex].section_id);
             }
@@ -246,14 +230,9 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
-    useEffect(() => {
-        console.log('first')
-    }, [])
-
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
         const update = { ...dataIsSame }
-        console.log(sections[sectionIndex].section_id, 'ooooooooooooooooooooooo sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
@@ -268,17 +247,10 @@ function QuestionnaryForm() {
     };
 
     const handleQuestionIndexCapture = (question) => {
-        console.log('Function called...');
-        console.log('Question:', question);
-        console.log('Field Setting Parameters:', fieldSettingParams);
-        console.log('fieldSettingParams[question.questionId]', fieldSettingParams[question.question_id]);
-        console.log('componentType', fieldSettingParams[question.question_id]?.componentType);
-
         // Update state for selected question and reset component state
         setSelectedQuestionId(question.question_id);
         setSelectedAddQuestion({ questionId: question.question_id });
         const componentType = fieldSettingParams[question.question_id]?.componentType;
-        console.log(componentType, 'componentType')
         setSelectedComponent(componentType);
     };
 
@@ -331,7 +303,6 @@ function QuestionnaryForm() {
                             componentMap[fieldSettingParams[item.question_id]?.componentType],
                             {
                                 // Pass the specific field settings to the component
-                                handleChange: handleInputClick,
                                 fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
                             }
                         )}
@@ -346,7 +317,6 @@ function QuestionnaryForm() {
         sections[sectionIndex].pages[pageIndex].questions = newList;
         setSections([...sections]);
         const update = { ...dataIsSame }
-        console.log(sections[sectionIndex].section_id, 'zzzzzzzzzzzzzzzzzzzzz sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
     };
@@ -354,7 +324,6 @@ function QuestionnaryForm() {
     // API to get the fieldSettingData 
     const getFieldSetting = async () => {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
-        console.log(response, 'response.......')
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
         } else {
@@ -376,7 +345,6 @@ function QuestionnaryForm() {
             return acc;
         }, {});
 
-        console.log(updatedSections, 'bbbbbbbbbbbbbbbbbbbb, updatedSections'); // Output: { "SEC-d4dc4fe9-d61a-46e0-b475-ce939f7074f5": true, "SEC1": true }
         setDataIsSame(updatedSections);
 
         setPageLoading(false);
@@ -402,7 +370,6 @@ function QuestionnaryForm() {
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
         if (sectionToSave) {
-            console.log(sectionToSave.section_id, 'sectionToSave.section_i')
             // Create a new object containing only the selected section's necessary fields
             let body = {
                 section_id: sectionToSave.section_id,
@@ -416,7 +383,6 @@ function QuestionnaryForm() {
                 }))
             }
 
-            console.log(body, 'body body body body')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -448,7 +414,6 @@ function QuestionnaryForm() {
 
                     // Update the saved status
                     const update = { ...dataIsSame };
-                    console.log(sections[sectionIndex].section_id, 'nnnnnnnnnnnnnnnnnnnnnnnnn sections[sectionIndex].section_id')
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -520,7 +485,6 @@ function QuestionnaryForm() {
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
-                    console.log(sections[sectionIndex].section_id, 'mmmmmmmmmmmmmmmmm sections[sectionIndex].section_id')
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -539,7 +503,6 @@ function QuestionnaryForm() {
 
         // Generate a unique question ID
         const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
-        console.log(questionId, 'questionId');
 
         // Set the selected component and question ID
         setSelectedComponent(componentType);
@@ -548,7 +511,6 @@ function QuestionnaryForm() {
 
         // Retrieve the current page data based on the selected section and page index
         const currentPageData = sections[selectedAddQuestion.sectionIndex].pages[selectedAddQuestion.pageIndex];
-        console.log(currentPageData, 'currentPageData');
 
         // Create a new question object and add it to the current page's questions array
         currentPageData.questions = [
@@ -591,7 +553,6 @@ function QuestionnaryForm() {
         if (len > 0) {
             handleSaveSection(sections[len - 1].section_id, false);
         }
-        console.log('saving.......')
         const payload = {
             component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
             label: fieldSettingParams?.[selectedQuestionId]?.label,
@@ -614,7 +575,6 @@ function QuestionnaryForm() {
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-            console.log(response?.data?.status);
             setIsThreedotLoader(false);
             setToastSuccess(response?.data?.message)
             if (response?.data?.status >= 400) {
@@ -630,16 +590,6 @@ function QuestionnaryForm() {
     };
 
     const handleAutoSaveSettings = async () => {
-        console.log('auto saving.......')
-        console.log(fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup', 'source.......')
-        console.log(fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray, '123.......')
-        console.log(fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice, '0987.......')
-        console.log({
-            [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                    fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                    fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-        }, 'qwertyui.......')
         const payload = {
             component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
             label: fieldSettingParams?.[selectedQuestionId]?.label,
@@ -663,7 +613,6 @@ function QuestionnaryForm() {
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-            console.log(response?.data?.status);
             if (response?.data?.status >= 400) {
                 setToastError(response?.data?.data?.message || 'Something went wrong');
             }
@@ -677,8 +626,6 @@ function QuestionnaryForm() {
     const handleBlur = (e) => {
         handleAutoSaveSettings();
         const sectionId = selectedQuestionId.split('_')[0]
-        console.log(sectionId, 'sectionId,,,,,,,,,........')
-        console.log('handleBlur api call........')
         handleAutoSave(sectionId, sections);
     }
 
@@ -775,7 +722,7 @@ function QuestionnaryForm() {
                                                 container={() => document.body}
                                             />
                                             <div className={`mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border' : ''}`}>
-                                                <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                <button data-testid="add-question" onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     <span className='mr-[15px]'>+</span>
                                                     <span>Add question</span>
                                                 </button>

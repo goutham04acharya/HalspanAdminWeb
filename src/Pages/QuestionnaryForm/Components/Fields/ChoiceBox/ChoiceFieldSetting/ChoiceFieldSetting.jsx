@@ -56,7 +56,6 @@ function ChoiceFieldSetting({
     };
 
     const handleRemoveLookup = () => {
-        console.log('first............,,,,,,,,,,,')
         dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
         setShouldAutoSave(true);
     }

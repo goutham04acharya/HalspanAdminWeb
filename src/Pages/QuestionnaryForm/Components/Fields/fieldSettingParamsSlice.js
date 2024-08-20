@@ -12,8 +12,6 @@ const fieldSettingParamsSlice = createSlice({
     reducers: {
         setNewComponent: (state, action) => {
             const { questionId, id, value } = action.payload;
-
-            console.log(questionId);
             // Ensure that the questionId exists in the currentData
             if (!state.currentData?.[questionId]) {
                 state.currentData[questionId] = {};
