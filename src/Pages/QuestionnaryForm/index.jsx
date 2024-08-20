@@ -261,6 +261,7 @@ function QuestionnaryForm() {
 
         return (
             <div
+                data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
                 onClick={() => handleQuestionIndexCapture(item)}
                 className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border-black border' : ''}`}
             >
@@ -722,7 +723,7 @@ function QuestionnaryForm() {
                                                 container={() => document.body}
                                             />
                                             <div className={`mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border' : ''}`}>
-                                                <button data-testid="add-question" onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     <span className='mr-[15px]'>+</span>
                                                     <span>Add question</span>
                                                 </button>

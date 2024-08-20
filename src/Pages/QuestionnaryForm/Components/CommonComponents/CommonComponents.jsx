@@ -30,6 +30,7 @@ function CommonComponents({
                     value={formParameters?.label}
                     id='label'
                     onBlur={(e) => handleBlur(e)}
+                    data-testid="label-name-input"
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -46,6 +47,7 @@ function CommonComponents({
                     value={formParameters?.helptext}
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
+                    data-testid="help-text-input"
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
