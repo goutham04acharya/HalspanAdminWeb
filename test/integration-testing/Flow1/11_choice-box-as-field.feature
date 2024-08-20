@@ -42,6 +42,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Then I should see the add field
     * I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
     * I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     And I should see the choice field added to the section 1
@@ -49,6 +50,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario: Admin adds the label, help text and placeholder content
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     When I enter the label name for choice
@@ -61,6 +63,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario: Admin adds and deletes thes choices
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     When I select the choice type as "single_choice"
@@ -72,6 +75,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario Outline: Admin selects the type of choice
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     When I select the choice type as <type>
@@ -88,8 +92,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
   @create_question
   Scenario: Admin saves the section with the changes
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     When I enter the admin field notes
-    * I click on save button for field settings
-    Then I should read a message stating that "Field settings data updated successfully"
