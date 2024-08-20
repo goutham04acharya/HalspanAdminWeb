@@ -10,8 +10,6 @@ const TextBoxField = ({
     className,
     handleChange,
     fieldSettingParameters,
-
-
 }) => {
 
     return (
