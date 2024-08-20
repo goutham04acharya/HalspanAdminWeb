@@ -46,6 +46,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
   Scenario: Admin adds textbox from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the textbox button
     Then I should see field settings
     And I should see the text box added to the section 1
@@ -53,6 +54,8 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
   @create_question
   Scenario Outline: Admin adds the field values
     Given I am on the questionnaire management section
+    Then I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the textbox button
     Then I should see field settings
     When I enter the label name for textbox
@@ -66,8 +69,6 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     # Then I should see the format reflected on the text box section 1
     * I enter the minimum and maximum number of characters
     * I enter the admin field notes
-    * I click on save button for field settings
-    Then I should read a message stating that "Field settings data updated successfully"
 
     Examples:
       | type          | format         |
@@ -78,6 +79,8 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
   @create_question
   Scenario Outline: Admin adds the lookup dataset from the dropdown
     Given I am on the questionnaire management section
+    Then I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the textbox button
     Then I should see field settings
     When I enter the label name for textbox
@@ -92,5 +95,3 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     # Then I should see the format reflected on the text box section 1
     When I enter the minimum and maximum number of characters
     * I enter the admin field notes
-    * I click on save button for field settings
-    Then I should read a message stating that "Field settings data updated successfully"

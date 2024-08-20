@@ -8,19 +8,19 @@ const Key = webdriver.Key
 
 When('I click the choice button', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="choiceBox"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="choice"]`))).click();
 });
 
 Then('I should see the choice field added to the section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choiceBox"]`)));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-choice"]`)));
 });
 
-// When('I select the type as {string}', async function (choiceType) {
-//     await new Promise(resolve => setTimeout(resolve, 750));
-//     const choice = await driver.wait(until.elementLocated(By.css(`[data-testid="${choiceType}"]`))).click();
-//     this.choiceType = choice;
-// });
+When('I select the choice type as {string}', async function (choiceType) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const choice = await driver.wait(until.elementLocated(By.css(`[data-testid="${choiceType}"]`))).click();
+    this.choiceType = choice;
+});
 
 Given('I add the {int}th choice field', async function (choiceNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));

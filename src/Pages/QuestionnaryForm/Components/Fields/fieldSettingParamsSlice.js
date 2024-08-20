@@ -12,8 +12,6 @@ const fieldSettingParamsSlice = createSlice({
     reducers: {
         setNewComponent: (state, action) => {
             const { questionId, id, value } = action.payload;
-
-            console.log(questionId);
             // Ensure that the questionId exists in the currentData
             if (!state.currentData?.[questionId]) {
                 state.currentData[questionId] = {};
@@ -82,7 +80,49 @@ const fieldSettingParamsSlice = createSlice({
         // Function to update savedData with currentData
         saveCurrentData: (state) => {
             state.savedData = { ...state.currentData };
-        }
+        },
+        setInitialData: (state, action) => {
+            const data = action.payload;
+        
+            data.forEach(item => {
+                const questionId = item.question_id;
+        
+                // Initialize the customizedData object
+                const customizedData = {
+                    componentType: item.component_type,
+                    label: item.label,
+                    helptext: item.help_text,
+                    placeholderContent: item.placeholder_content,
+                    defaultContent: item.default_content,
+                    type: item.type,
+                    format: item.format,
+                    numberOfCharacters: {
+                        min: item.number_of_characters?.min,
+                        max: item.number_of_characters?.max,
+                    },
+                    note: item.admin_field_notes,
+                    questionnaireId: item.questionnaire_id,
+                    lookupOption: item.lookup_id,
+                };
+                
+                // Handle the source object and assign values based on the key
+                if (item.source) {
+                    const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
+
+                    if (sourceKey === 'fixed_list') {
+                        customizedData.source = 'fixedList'
+                        customizedData.fixedChoiceArray = item.source[sourceKey];
+                    } else if (sourceKey === 'lookup') {
+                        customizedData.source = sourceKey
+                        customizedData.lookupOptionChoice = item.source[sourceKey];
+                    }
+                }
+        
+                // Store in both currentData and savedData
+                state.currentData[questionId] = customizedData;
+                state.savedData[questionId] = customizedData;
+            });
+        }        
     }
 });
 
@@ -118,7 +158,8 @@ export const {
     resetFixedChoice,
     setFixedChoiceValue,
     updateFixedChoiceArray,
-    saveCurrentData
+    saveCurrentData,
+    setInitialData
 } = fieldSettingParamsSlice.actions;
 
 export default fieldSettingParamsSlice.reducer;
