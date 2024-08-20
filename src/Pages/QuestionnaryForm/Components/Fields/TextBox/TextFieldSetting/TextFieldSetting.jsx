@@ -18,8 +18,11 @@ function TestFieldSetting({
   fieldSettingParameters,
   setFieldSettingParameters,
   handleSaveSettings,
-  selectedQuestionDetails,
-  isThreedotLoader }) {
+  selectedQuestionId,
+  isThreedotLoader,
+  handleBlur,
+  setShouldAutoSave
+}) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -53,7 +56,8 @@ function TestFieldSetting({
       format: option.value,
     }));
     setDropdownOpen(false);
-    dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionDetails?.question_id }));
+    dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
+    setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
@@ -62,15 +66,13 @@ function TestFieldSetting({
       lookupOption: option.value,
     }));
     setIsLookupOpen(false);
-    dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionDetails?.question_id }));
+    dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
+    setShouldAutoSave(true)
   };
 
-  const handleRemoveOption = () => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      lookupOption: '',
-    }));
-    dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionDetails?.question_id }));
+  const handleRemoveLookup = () => {
+    dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
+    setShouldAutoSave(true)
   }
 
   // List Functions
@@ -131,7 +133,9 @@ function TestFieldSetting({
           placeholder='Placeholder Content'
           placeholderContent='Text Displayed in the field'
           handleInputChange={handleInputChange}
-          formParameters={formParameters} />
+          formParameters={formParameters}
+          handleBlur={handleBlur}
+        />
         <div className='flex flex-col justify-start mt-7 w-full relative'>
           <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
           <div className='relative w-full'>
@@ -194,14 +198,15 @@ function TestFieldSetting({
                     testID='lookup-dropdown'
                     labeltestID='option0'
                     selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                    handleRemoveOption={handleRemoveOption}
+                    handleRemoveLookup={handleRemoveLookup}
                     isDropdownOpen={isLookupOpen}
                     setDropdownOpen={setIsLookupOpen}
                     handleOptionClick={handleLookupOption}
                     top='20px'
                     close='true'
                     options={optionData}
-                    lastElementRef={lastElementRef} />
+                    lastElementRef={lastElementRef}
+                  />
                 </div>
                 <button onClick={() => navigate('/lookup-dataset', { state: { create: true } })} className='ml-4'>
                   <img src="/Images/plus.svg" alt="plus" />
@@ -274,11 +279,11 @@ function TestFieldSetting({
             </div>
             <div className='mx-auto mt-7 flex items-center w-full'>
               <Button
-               text='Save'
-               testID='Save'
-               className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
-               onClick={handleSaveSettings}
-               isThreedotLoading={isThreedotLoader}
+                text='Save'
+                testID='Save'
+                className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
+                onClick={handleSaveSettings}
+                isThreedotLoading={isThreedotLoader}
               >
               </Button>
               <button type='button' className='w-[70%] py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
