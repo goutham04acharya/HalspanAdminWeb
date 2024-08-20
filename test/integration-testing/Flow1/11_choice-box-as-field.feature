@@ -63,7 +63,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Given I am on the questionnaire management section
     When I click the choice button
     Then I should see field settings
-    When I select the type as "single_choice"
+    When I select the choice type as "single_choice"
     * I add the 4th choice field
     Then I should see the choice 4 added
     When I delete the 4th choice field
@@ -74,7 +74,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Given I am on the questionnaire management section
     When I click the choice button
     Then I should see field settings
-    When I select the type as <type>
+    When I select the choice type as <type>
     * I enter the text for choices as <choices>
     * I click on the choices based on <type>
     Then I should see the choices updated on the section 1
