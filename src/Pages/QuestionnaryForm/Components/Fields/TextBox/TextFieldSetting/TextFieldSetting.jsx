@@ -261,7 +261,7 @@ function TestFieldSetting({
               </div>
             </div>
             {/* OptionsComponent added here */}
-            <OptionsComponent selectedQuestionId={selectedQuestionDetails?.question_id} />
+            <OptionsComponent selectedQuestionId={selectedQuestionId} />
             <div className='mt-7'>
               <InputField
                 autoComplete='off'

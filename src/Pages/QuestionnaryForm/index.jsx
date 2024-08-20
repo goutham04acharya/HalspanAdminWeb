@@ -672,7 +672,7 @@ function QuestionnaryForm() {
             setShouldAutoSave(false); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-    
+
 
     return (
         <>
@@ -741,7 +741,7 @@ function QuestionnaryForm() {
                                                         title='Delete'
                                                         alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]'
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[50px]'
                                                         // onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} 
                                                         onClick={() => {
                                                             setPageToDelete({ sectionIndex, pageIndex });
@@ -858,8 +858,8 @@ function QuestionnaryForm() {
                     src='delete-gray'
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
-                    isModalOpen={showPageDeleteModal} 
-                    setModalOpen={setShowPageDeleteModal} 
+                    isModalOpen={showPageDeleteModal}
+                    setModalOpen={setShowPageDeleteModal}
                     handleButton1={() => {
                         handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex);
                         setShowPageDeleteModal(false);
