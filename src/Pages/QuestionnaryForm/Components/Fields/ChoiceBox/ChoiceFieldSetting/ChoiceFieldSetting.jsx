@@ -19,7 +19,7 @@ function ChoiceFieldSetting({
     fieldSettingParameters,
     setFieldSettingParameters,
     handleSaveSettings,
-    selectedQuestionDetails
+    selectedQuestionId
 }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -39,7 +39,7 @@ function ChoiceFieldSetting({
     const dispatch = useDispatch();
 
     // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
-    const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionDetails.question_id]?.fixedChoiceArray || []);
+    const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
         setFieldSettingParameters((prevState) => ({
@@ -47,8 +47,8 @@ function ChoiceFieldSetting({
             lookupOption: option.value,
         }));
         setIsLookupOpen(false);
-        dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionDetails?.question_id }))
-        dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionDetails?.question_id }))
+        dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
+        dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
     };
 
     const handleRemoveOption = () => {
@@ -98,9 +98,9 @@ function ChoiceFieldSetting({
 
     const handleAddRemoveFixedChoice = (event, id) => {
         if (event === 'add') {
-            dispatch(addNewFixedChoice({ questionId: selectedQuestionDetails?.question_id }))
+            dispatch(addNewFixedChoice({ questionId: selectedQuestionId }))
         } else if (event === 'remove') {
-            dispatch(removeFixedChoice({ id, questionId: selectedQuestionDetails?.question_id }))
+            dispatch(removeFixedChoice({ id, questionId: selectedQuestionId }))
         }
     };
 
@@ -117,7 +117,7 @@ function ChoiceFieldSetting({
     };
 
     // Function for dragging Choices
-    const Item = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
+    const Item2 = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
         const dispatch = useDispatch();
         const [localValue, setLocalValue] = useState(item.value || '');
     
@@ -125,8 +125,8 @@ function ChoiceFieldSetting({
         const handleFixedChoiceChange = useCallback((e) => {
             const { value } = e.target;
             setLocalValue(value);
-            dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionDetails?.question_id }));
-        }, [dispatch, item.id, selectedQuestionDetails?.question_id]);
+            dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionId }));
+        }, [dispatch, item.id, selectedQuestionId]);
     
         // Focus input when required
         useEffect(() => {
@@ -166,12 +166,12 @@ function ChoiceFieldSetting({
                             id='choice'
                             onClick={() => focusInput(item.id)} // Call focusInput on click
                         />
-                        <img
+                        {fixedChoiceArray.length > 1 && <img
                             src="/Images/trash-black.svg"
                             alt="delete"
                             className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
-                        />
+                        />}
                         <img
                             src="/Images/add.svg"
                             alt="add"
@@ -185,7 +185,7 @@ function ChoiceFieldSetting({
     }));
 
     const handleMoveEnd = (newList) => {
-        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionDetails.question_id, newList }));
+        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
     };
 
     useEffect(() => {
@@ -270,8 +270,8 @@ function ChoiceFieldSetting({
                                 value='FixedList'
                                 checked={fieldSettingParameters?.source === 'fixedList'}
                                 onClick={() => {
-                                    dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionDetails?.question_id }))
-                                    dispatch(resetFixedChoice({ questionId: selectedQuestionDetails?.question_id }))
+                                    dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionId }))
+                                    dispatch(resetFixedChoice({ questionId: selectedQuestionId }))
                                 }
                                 } />  {/* handleSource('fixedList') */}
                             <label htmlFor='FixedList' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -282,7 +282,7 @@ function ChoiceFieldSetting({
                             <DraggableList
                                 itemKey="id" // Adjust itemKey according to your unique identifier
                                 template={(props) => (
-                                    <Item
+                                    <Item2
                                         {...props}
                                         focusInput={focusInput}
                                         ref={(ref) => {
@@ -305,7 +305,7 @@ function ChoiceFieldSetting({
                                 id='Lookup'
                                 value='Lookup'
                                 checked={fieldSettingParameters?.source === 'lookup'}
-                                onClick={() => dispatch(setNewComponent({ id: 'source', value: 'lookup', questionId: selectedQuestionDetails?.question_id }))} />  {/* handleSource('lookup') */}
+                                onClick={() => dispatch(setNewComponent({ id: 'source', value: 'lookup', questionId: selectedQuestionId }))} />  {/* handleSource('lookup') */}
                             <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Lookup
                             </label>

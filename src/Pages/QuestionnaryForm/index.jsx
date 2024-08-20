@@ -13,7 +13,7 @@ import EditableField from '../../Components/EditableField/EditableField.jsx';
 import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, saveCurrentData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -49,6 +49,8 @@ function QuestionnaryForm() {
 
     // text field related states
     const [textFieldSettings, setTextFieldSettings] = useState(false)
+    const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
+    const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
 
     const dispatch = useDispatch();
@@ -59,8 +61,7 @@ function QuestionnaryForm() {
     const handleInputClick = (fieldSettingParameters) => {
         // setTextFieldSettings(true)
         console.log(fieldSettingParams, 'fieldSettingParams')
-        console.log(fieldSettingParams[selectedQuestionDetails.question_id], '[selectedQuestionDetails.question_id]?')
-        // setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id]?.componentType || false)
+        console.log(fieldSettingParams[selectedQuestionId], '[selectedQuestionId]?')
     }
 
     const handleInputChange = (e) => {
@@ -75,8 +76,8 @@ function QuestionnaryForm() {
             ...prevState,
             [id]: updatedValue,
         }));
-        dispatch(setNewComponent({ id, value, questionId: selectedQuestionDetails?.question_id }));
-        const data = selectedQuestionDetails?.question_id?.split('_')
+        dispatch(setNewComponent({ id, value, questionId: selectedQuestionId }));
+        const data = selectedQuestionId?.split('_')
         const update = { ...dataIsSame }
         update[data[0]] = false;
         setDataIsSame(update)
@@ -244,6 +245,10 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
+    useEffect(() => {
+        console.log('first')
+    }, [])
+
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
         const update = { ...dataIsSame }
@@ -251,10 +256,9 @@ function QuestionnaryForm() {
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
-            currentPageData.questions = [...currentPageData.questions, {
-                question_id: `${pageId}_QUES-${uuidv4()}`,
-                question_name: `Question ${currentPageData.questions.length + 1}`,
-            }];
+            setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
+            setSelectedComponent(false);
+            setSelectedQuestionId('');
         } else if (event === 'remove') {
             currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
         }
@@ -263,42 +267,35 @@ function QuestionnaryForm() {
     };
 
     const handleQuestionIndexCapture = (question) => {
-        console.log('its getting called.......')
-        console.log(question, 'question qqq')
-        console.log(fieldSettingParams, 'fieldSettingParams')
-        console.log(savedData, 'savedData')
-        console.log(selectedQuestionDetails?.question_id, 'selectedQuestionDetails?.question_id')
-        const isQuestionExists = fieldSettingParams && fieldSettingParams.hasOwnProperty(question.question_id);
-        console.log(isQuestionExists, 'isQuestionExists');
+        console.log('Function called...');
+        console.log('Question:', question);
+        console.log('Field Setting Parameters:', fieldSettingParams);
+        console.log('fieldSettingParams[question.questionId]', fieldSettingParams[question.question_id]);
+        console.log('componentType', fieldSettingParams[question.question_id]?.componentType);
 
-        if (!isQuestionExists) {
-            setSelectedComponent(false)
-            setSelectedQuestionDetails(question);
-            return;
-        }
-
-        if (compareData(fieldSettingParams, savedData)) {
-            setSelectedQuestionDetails(question);
-            setSelectedComponent(fieldSettingParams[question.question_id].componentType || false)
-            return;
-        }
-        setToastError('Please save!');
+        // Update state for selected question and reset component state
+        setSelectedQuestionId(question.question_id);
+        setSelectedAddQuestion({ questionId: question.question_id });
+        const componentType = fieldSettingParams[question.question_id]?.componentType;
+        console.log(componentType, 'componentType')
+        setSelectedComponent(componentType);
     };
+
 
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
+        console.log(item, 'this is the item');
 
         return (
             <div
                 onClick={() => handleQuestionIndexCapture(item)}
-                className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionDetails.question_id ? 'border-black border' : ''}`}
+                className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border-black border' : ''}`}
             >
-                <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
-                    {!fieldSettingParameters &&
+                <div className='flex justify-between items-start cursor-pointer'>
+                    {!fieldSettingParameters && (
                         <p className='mb-5 font-medium text-base text-[#000000] w-[25%]'>{item?.question_text}</p>
-
-                    }
+                    )}
                     <div className='flex items-center justify-end w-full'>
                         <div
                             className="disable-select dragHandle"
@@ -309,14 +306,26 @@ function QuestionnaryForm() {
                             onMouseUp={() => {
                                 document.body.style.overflow = "visible";
                             }}
+                            onTouchStart={(e) => {
+                                document.body.style.overflow = "hidden";
+                                onTouchStart(e);
+                            }}
+                            onTouchEnd={() => {
+                                document.body.style.overflow = "visible";
+                            }}
                         >
                             <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
-                        <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
+                        <img
+                            src="/Images/trash-black.svg"
+                            alt="delete"
+                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                            onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)}
+                        />
                     </div>
                 </div>
                 {/* Render the selected component if the question is visible */}
-                {inputVisibility[item.question_id] && (
+                {fieldSettingParams[item.question_id] && (
                     <>
                         {React.createElement(
                             componentMap[fieldSettingParams[item.question_id]?.componentType],
@@ -328,10 +337,10 @@ function QuestionnaryForm() {
                         )}
                     </>
                 )}
-
             </div>
         );
     };
+
 
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
@@ -341,6 +350,17 @@ function QuestionnaryForm() {
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
     };
+
+    // API to get the fieldSettingData 
+    const getFieldSetting = async () => {
+        const response = await getAPI(`field-settings/${questionnaire_id}`);
+        console.log(response, 'response.......')
+        if (!response.error) {
+            dispatch(setInitialData(response?.data?.data?.items))
+        } else {
+            setToastError('Something went wrong!')
+        }
+    }
 
     // API calling function
     const formDefaultDetails = useCallback(async () => {
@@ -363,7 +383,6 @@ function QuestionnaryForm() {
     }, [getAPI, questionnaire_id, version_number]);
 
     //API for deleteing the section
-
     const handleDeleteSection = async (sectionId) => {
         try {
             const response = await DeleteAPI(`questionnaires/${questionnaire_id}/${version_number}?section_id=${sectionId}`);
@@ -509,33 +528,40 @@ function QuestionnaryForm() {
         }
     };
 
-    const handleTextboxClick = () => {
-        // Check if selectedQuestionDetails is not empty
-        if (!selectedQuestionDetails || Object.keys(selectedQuestionDetails).length === 0) {
+    const addNewQuestion = (componentType, questionPrefix) => {
+        if (!selectedAddQuestion.pageId) {
             return;
         }
-        setSelectedComponent('textboxfield');
-        dispatch(setNewComponent({ id: 'componentType', value: 'textboxfield', questionId: selectedQuestionDetails?.question_id }));
-        // Toggle visibility for the selected question
-        setInputVisibility(prevState => ({
-            ...prevState,
-            [selectedQuestionDetails.question_id]: true,
-        }));
+
+        // Generate a unique question ID
+        const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
+        console.log(questionId, 'questionId');
+
+        // Set the selected component and question ID
+        setSelectedComponent(componentType);
+        setSelectedQuestionId(questionId);
+        setSelectedAddQuestion({ questionId: questionId });
+
+        // Retrieve the current page data based on the selected section and page index
+        const currentPageData = sections[selectedAddQuestion.sectionIndex].pages[selectedAddQuestion.pageIndex];
+        console.log(currentPageData, 'currentPageData');
+
+        // Create a new question object and add it to the current page's questions array
+        currentPageData.questions = [
+            ...currentPageData.questions,
+            {
+                question_id: questionId,
+                question_name: `Question ${currentPageData.questions.length}`,
+            }
+        ];
+
+        // Dispatch actions to set the new component's properties
+        dispatch(setNewComponent({ id: 'label', value: `Question ${currentPageData.questions.length}`, questionId }));
+        dispatch(setNewComponent({ id: 'componentType', value: componentType, questionId }));
     };
 
-    const handleChoiceClick = () => {
-        // Check if selectedQuestionDetails is not empty
-        if (!selectedQuestionDetails || Object.keys(selectedQuestionDetails).length === 0) {
-            return;
-        }
-        setSelectedComponent('choiceboxfield');
-        dispatch(setNewComponent({ id: 'componentType', value: 'choiceboxfield', questionId: selectedQuestionDetails?.question_id }));
-        // Toggle visibility for the selected question
-        setInputVisibility(prevState => ({
-            ...prevState,
-            [selectedQuestionDetails.question_id]: true,
-        }));
-    };
+    const handleTextboxClick = () => addNewQuestion('textboxfield');
+    const handleChoiceClick = () => addNewQuestion('choiceboxfield');
 
     const handleClick = (functionName) => {
         const functionMap = {
@@ -543,14 +569,14 @@ function QuestionnaryForm() {
             handleChoiceClick,
         };
 
-        if (functionMap[functionName]) {
-            functionMap[functionName]();
-        }
+        // Call the corresponding function from the map
+        functionMap[functionName]?.();
     };
+
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
-        dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionDetails?.question_id }));
+        dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
         setFieldSettingParameters((prevState) => ({
             ...prevState,
             ['type']: type,
@@ -570,36 +596,34 @@ function QuestionnaryForm() {
         }
         console.log('saving.......')
         let body = {
-            component_type: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.componentType,
-            label: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.label,
-            help_text: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.helptext,
-            placeholder_content: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.placeholderContent,
-            default_content: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.defaultContent,
-            type: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.type,
-            format: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.format,
-            lookup_id: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.lookupOption,
+            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+            label: fieldSettingParams?.[selectedQuestionId]?.label,
+            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+            type: fieldSettingParams?.[selectedQuestionId]?.type,
+            format: fieldSettingParams?.[selectedQuestionId]?.format,
             number_of_characters: {
-                min: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.min,
-                max: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.max,
+                min: fieldSettingParams?.[selectedQuestionId]?.min,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.note,
             source: {
-                [fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                    fieldSettingParams?.[selectedQuestionDetails?.question_id]?.source === 'lookup' ?
-                        fieldSettingParams?.[selectedQuestionDetails?.question_id]?.lookupOptionChoice :
-                        fieldSettingParams?.[selectedQuestionDetails?.question_id]?.fixedChoiceArray
+                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
         };
 
         try {
-            const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, body);
             console.log(response?.data?.status);
             setIsThreedotLoader(false);
             setToastSuccess(response?.data?.message)
             if (response?.data?.status >= 400) {
                 setToastError(response?.data?.data?.message || 'Something went wrong');
             }
-            setSelectedComponent(false)
             dispatch(saveCurrentData());
         } catch (error) {
             console.error(error);
@@ -611,6 +635,7 @@ function QuestionnaryForm() {
 
     useEffect(() => {
         formDefaultDetails();
+        getFieldSetting();
         setSavedSection(sections);
     }, []);
 
@@ -692,7 +717,7 @@ function QuestionnaryForm() {
                                                 onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
                                                 container={() => document.body}
                                             />
-                                            <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
+                                            <div className={`mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border' : ''}`}>
                                                 <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     <span className='mr-[15px]'>+</span>
                                                     <span>Add question</span>
@@ -740,14 +765,14 @@ function QuestionnaryForm() {
                                     sideComponentMap[selectedComponent],  // Dynamically select the component
                                     {
                                         handleInputChange: handleInputChange,
-                                        formParameters: fieldSettingParams[selectedQuestionDetails.question_id],
+                                        formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
-                                        fieldSettingParameters: fieldSettingParams[selectedQuestionDetails.question_id],
+                                        fieldSettingParameters: fieldSettingParams[selectedQuestionId],
                                         setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         handleSource: handleSource,
-                                        selectedQuestionDetails: selectedQuestionDetails
+                                        selectedQuestionId: selectedQuestionId
                                     }
                                 )
                             ) : (
