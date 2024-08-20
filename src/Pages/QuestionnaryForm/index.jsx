@@ -51,6 +51,7 @@ function QuestionnaryForm() {
     const [textFieldSettings, setTextFieldSettings] = useState(false)
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
+    const [shouldAutoSave, setShouldAutoSave] = useState(false);
     const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
 
     const dispatch = useDispatch();
@@ -285,7 +286,6 @@ function QuestionnaryForm() {
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
-        console.log(item, 'this is the item');
 
         return (
             <div
@@ -462,18 +462,22 @@ function QuestionnaryForm() {
 
     // Save the section and page name
     const handleSaveSectionName = (value, index, secondIndex) => {
-        if (secondIndex !== undefined && secondIndex !== null) {
-            const updatedSections = [...sections];
-            updatedSections[index].pages[secondIndex].page_name = value;
-            setSections(updatedSections);
-            handleAutoSave(updatedSections[index]?.section_id, updatedSections);
-            return;
-        }
         const updatedSections = [...sections];
-        updatedSections[index].section_name = value;
+
+        // Check if secondIndex is provided to update a page name or a section name
+        if (secondIndex !== undefined && secondIndex !== null) {
+            updatedSections[index].pages[secondIndex].page_name = value;
+        } else {
+            updatedSections[index].section_name = value;
+        }
+
+        // Update the sections state
         setSections(updatedSections);
+
+        // Call handleAutoSave with the section ID and updated sections
         handleAutoSave(updatedSections[index]?.section_id, updatedSections);
-    }
+    };
+
 
     const handleAutoSave = async (sectionId, updatedData) => {
         // Find the section to save
@@ -577,14 +581,7 @@ function QuestionnaryForm() {
     //function for handle radio button
     const handleRadiobtn = (type) => {
         dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            ['type']: type,
-        }));
-    }
-
-    const handleSource = (source) => {
-
+        handleAutoSaveSettings();
     }
 
     //function to save the field setting
@@ -595,7 +592,7 @@ function QuestionnaryForm() {
             handleSaveSection(sections[len - 1].section_id, false);
         }
         console.log('saving.......')
-        let body = {
+        const payload = {
             component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
             label: fieldSettingParams?.[selectedQuestionId]?.label,
             help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
@@ -607,7 +604,7 @@ function QuestionnaryForm() {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
-            admin_field_notes: fieldSettingParams?.note,
+            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: {
                 [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
                     fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
@@ -615,9 +612,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
         };
-
         try {
-            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, body);
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
             console.log(response?.data?.status);
             setIsThreedotLoader(false);
             setToastSuccess(response?.data?.message)
@@ -633,11 +629,72 @@ function QuestionnaryForm() {
         }
     };
 
+    const handleAutoSaveSettings = async () => {
+        console.log('auto saving.......')
+        console.log(fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup', 'source.......')
+        console.log(fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray, '123.......')
+        console.log(fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice, '0987.......')
+        console.log({
+            [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                    fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                    fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+        }, 'qwertyui.......')
+        const payload = {
+            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+            label: fieldSettingParams?.[selectedQuestionId]?.label,
+            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+            type: fieldSettingParams?.[selectedQuestionId]?.type,
+            format: fieldSettingParams?.[selectedQuestionId]?.format,
+            number_of_characters: {
+                min: fieldSettingParams?.[selectedQuestionId]?.min,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
+            },
+            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
+            source: {
+                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+            },
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption
+        };
+        try {
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
+            console.log(response?.data?.status);
+            if (response?.data?.status >= 400) {
+                setToastError(response?.data?.data?.message || 'Something went wrong');
+            }
+            dispatch(saveCurrentData());
+        } catch (error) {
+            console.error(error);
+            setToastError('Failed to update field settings');
+        }
+    };
+
+    const handleBlur = (e) => {
+        handleAutoSaveSettings();
+        const sectionId = selectedQuestionId.split('_')[0]
+        console.log(sectionId, 'sectionId,,,,,,,,,........')
+        console.log('handleBlur api call........')
+        handleAutoSave(sectionId, sections);
+    }
+
     useEffect(() => {
         formDefaultDetails();
         getFieldSetting();
         setSavedSection(sections);
     }, []);
+
+    useEffect(() => {
+        if (shouldAutoSave) {
+            handleAutoSaveSettings();
+            setShouldAutoSave(false); // Reset the flag after auto-saving
+        }
+    }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
+    
 
     return (
         pageLoading
@@ -771,8 +828,9 @@ function QuestionnaryForm() {
                                         setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
-                                        handleSource: handleSource,
-                                        selectedQuestionId: selectedQuestionId
+                                        selectedQuestionId: selectedQuestionId,
+                                        handleBlur: handleBlur,
+                                        setShouldAutoSave: setShouldAutoSave
                                     }
                                 )
                             ) : (

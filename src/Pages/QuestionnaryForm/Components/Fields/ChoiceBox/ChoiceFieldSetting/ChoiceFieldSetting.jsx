@@ -19,7 +19,9 @@ function ChoiceFieldSetting({
     fieldSettingParameters,
     setFieldSettingParameters,
     handleSaveSettings,
-    selectedQuestionId
+    selectedQuestionId,
+    handleBlur,
+    setShouldAutoSave
 }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -30,6 +32,7 @@ function ChoiceFieldSetting({
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [focusInput, setFocusInput] = useState('');
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -49,13 +52,13 @@ function ChoiceFieldSetting({
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
+        setShouldAutoSave(true);
     };
 
-    const handleRemoveOption = () => {
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            lookupOption: '',
-        }));
+    const handleRemoveLookup = () => {
+        console.log('first............,,,,,,,,,,,')
+        dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
+        setShouldAutoSave(true);
     }
 
     // List Functions
@@ -102,44 +105,32 @@ function ChoiceFieldSetting({
         } else if (event === 'remove') {
             dispatch(removeFixedChoice({ id, questionId: selectedQuestionId }))
         }
+        setShouldAutoSave(true);
     };
 
     // Create a ref map to store input refs
     const inputRefs = useRef({});
 
-    // Function to handle focusing an input
-    const focusInput = (id) => {
-        console.log('first')
-        if (inputRefs.current[id]) {
-            console.log('first.................')
-            inputRefs.current[id].focus();
-        }
-    };
-
     // Function for dragging Choices
     const Item2 = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
         const dispatch = useDispatch();
         const [localValue, setLocalValue] = useState(item.value || '');
-    
+
         // Handle input change
         const handleFixedChoiceChange = useCallback((e) => {
             const { value } = e.target;
             setLocalValue(value);
             dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionId }));
         }, [dispatch, item.id, selectedQuestionId]);
-    
+
         // Focus input when required
         useEffect(() => {
-            console.log('second')
-            console.log(ref)
-            console.log(focusInput, 'focusInput')
-            console.log(item.id === focusInput, 'yes')
-            if (item.id === focusInput && ref.current) {
-                console.log('second......')
-                ref.current.focus();
+            const element = document.getElementById(focusInput);
+            if (element) {
+                element.focus();
             }
-        }, [item.id, focusInput, ref, localValue]);
-    
+        }, [item.id, focusInput, localValue]);
+
         return (
             <div className={`disable-select select-none w-full mt-7 rounded-[10px]`}>
                 <div className='flex justify-between items-start cursor-pointer'>
@@ -158,13 +149,13 @@ function ChoiceFieldSetting({
                         </div>
                         <input
                             type="text"
-                            ref={ref}
                             className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             placeholder={`${getOrdinal(item?.index + 1)} Choice`}
                             onChange={handleFixedChoiceChange}
                             value={localValue}
-                            id='choice'
-                            onClick={() => focusInput(item.id)} // Call focusInput on click
+                            id={item.id}
+                            onClick={() => setFocusInput(item.id)} // Call focusInput on click
+                            onBlur={handleBlur}
                         />
                         {fixedChoiceArray.length > 1 && <img
                             src="/Images/trash-black.svg"
@@ -207,7 +198,9 @@ function ChoiceFieldSetting({
                     placeholder='Placeholder Content'
                     placeholderContent='Text Displayed in the field'
                     handleInputChange={handleInputChange}
-                    formParameters={formParameters} />
+                    formParameters={formParameters}
+                    handleBlur={handleBlur}
+                />
                 <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                     <div className='relative w-full'>
@@ -272,8 +265,8 @@ function ChoiceFieldSetting({
                                 onClick={() => {
                                     dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionId }))
                                     dispatch(resetFixedChoice({ questionId: selectedQuestionId }))
-                                }
-                                } />  {/* handleSource('fixedList') */}
+                                    setShouldAutoSave(true);
+                                }} />  {/* handleSource('fixedList') */}
                             <label htmlFor='FixedList' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Fixed List
                             </label>
@@ -305,7 +298,12 @@ function ChoiceFieldSetting({
                                 id='Lookup'
                                 value='Lookup'
                                 checked={fieldSettingParameters?.source === 'lookup'}
-                                onClick={() => dispatch(setNewComponent({ id: 'source', value: 'lookup', questionId: selectedQuestionId }))} />  {/* handleSource('lookup') */}
+                                onClick={() => {
+                                    dispatch(setNewComponent({
+                                        id: 'source', value: 'lookup', questionId: selectedQuestionId
+                                    }))
+                                    setShouldAutoSave(true);
+                                }} />  {/* handleSource('lookup') */}
                             <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Lookup
                             </label>
@@ -322,14 +320,15 @@ function ChoiceFieldSetting({
                                         testID='lookup-dropdown'
                                         labeltestID='option0'
                                         selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                                        handleRemoveOption={handleRemoveOption}
+                                        handleRemoveLookup={handleRemoveLookup}
                                         isDropdownOpen={isLookupOpen}
                                         setDropdownOpen={setIsLookupOpen}
                                         handleOptionClick={handleLookupOption}
                                         top='20px'
                                         close='true'
                                         options={optionData}
-                                        lastElementRef={lastElementRef} />
+                                        lastElementRef={lastElementRef}
+                                    />
                                 </div>
                                 <button onClick={() => navigate('/lookup-dataset', { state: { create: true } })} className='ml-4'>
                                     <img src="/Images/plus.svg" alt="plus" />
@@ -350,7 +349,9 @@ function ChoiceFieldSetting({
                                 testId='Notes'
                                 htmlFor='note'
                                 maxLength={250}
-                                handleChange={(e) => handleInputChange(e)} />
+                                handleChange={(e) => handleInputChange(e)}
+                                handleBlur={handleBlur}
+                            />
                         </div>
                         <div className='mx-auto mt-7 flex items-center w-full'>
                             <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'

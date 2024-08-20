@@ -11,8 +11,8 @@ function CommonComponents({
     placeholder,
     placeholderContent,
     handleInputChange,
-    formParameters
-
+    formParameters,
+    handleBlur
 }) {
     return (
         <div>
@@ -29,6 +29,7 @@ function CommonComponents({
                     onChange={(e) => handleInputChange(e)}
                     value={formParameters?.label}
                     id='label'
+                    onBlur={(e) => handleBlur(e)}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -44,7 +45,7 @@ function CommonComponents({
                     onChange={(e) => handleInputChange(e)}
                     value={formParameters?.helptext}
                     id='helptext'
-
+                    onBlur={(e) => handleBlur(e)}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -60,6 +61,7 @@ function CommonComponents({
                     value={formParameters?.placeholderContent}
                     onChange={(e) => handleInputChange(e)}
                     id='placeholderContent'
+                    onBlur={(e) => handleBlur(e)}
                 />
             </div>
         </div>

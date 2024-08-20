@@ -85,26 +85,46 @@ const fieldSettingParamsSlice = createSlice({
         },
         setInitialData: (state, action) => {
             const data = action.payload;
-
+        
             data.forEach(item => {
                 const questionId = item.question_id;
-
-                // Customize keys for storing in currentData and savedData
+        
+                // Initialize the customizedData object
                 const customizedData = {
                     componentType: item.component_type,
-                    helpText: item.help_text,
                     label: item.label,
+                    helptext: item.help_text,
                     placeholderContent: item.placeholder_content,
-                    numberOfCharacters: item.number_of_characters,
-                    source: item.source,
-                    questionnaireId: item.questionnaire_id
+                    defaultContent: item.default_content,
+                    type: item.type,
+                    format: item.format,
+                    numberOfCharacters: {
+                        min: item.number_of_characters?.min,
+                        max: item.number_of_characters?.max,
+                    },
+                    note: item.admin_field_notes,
+                    questionnaireId: item.questionnaire_id,
+                    lookupOption: item.lookup_id,
                 };
+                
+                // Handle the source object and assign values based on the key
+                if (item.source) {
+                    const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
 
+                    if (sourceKey === 'fixed_list') {
+                        customizedData.source = 'fixedList'
+                        customizedData.fixedChoiceArray = item.source[sourceKey];
+                    } else if (sourceKey === 'lookup') {
+                        customizedData.source = sourceKey
+                        customizedData.lookupOptionChoice = item.source[sourceKey];
+                    }
+                }
+        
                 // Store in both currentData and savedData
                 state.currentData[questionId] = customizedData;
                 state.savedData[questionId] = customizedData;
             });
-        }
+        }        
     }
 });
 

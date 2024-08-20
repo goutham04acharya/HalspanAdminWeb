@@ -16,7 +16,7 @@ const InputField = ({
     handleChange,
     mandatoryField,
     labelStyle,
-
+    handleBlur
 }) => {
 
     return (
@@ -36,6 +36,9 @@ const InputField = ({
                 data-testid={testId}
                 maxLength={maxLength}
                 onChange={(e) => handleChange(e, id, type)}
+                onBlur={(e) => {
+                    if(handleBlur) handleBlur(e)
+                }}
             // disabled={ }
             />
             {validationError && <ErrorMessage error={validationError} />}
