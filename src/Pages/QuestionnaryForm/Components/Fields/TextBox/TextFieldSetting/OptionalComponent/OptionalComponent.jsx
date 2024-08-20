@@ -97,6 +97,7 @@ function OptionsComponent({ selectedQuestionId }) {
                     key={option}
                     checked={toggleStates[option]}
                     label={option}
+                    data-testid = {`${option}`}
                     onChange={() => handleToggleClick(option)}
                 />
             ))}

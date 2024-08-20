@@ -24,7 +24,7 @@ Feature: Halspan - Admin - Variety of options available for each Field Type
   @create_question
   Scenario: Admin views all types of field to create the form
     Given I am on the questionnaire management section
-    Then I should see the add field
+    Then I should see an add field section
     And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
   @create_question
