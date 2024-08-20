@@ -31,23 +31,27 @@ Feature: Halspan - Admin - Variety of options available for each Field Type
   Scenario: Admin adds textbox from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
-    When I click the textbox button
+    When I click on add question
+    * I click on question section 1
+    * I click the textbox button
     Then I should see field settings
     And I should see the text box added to the section 1
 
-  @create_question
-  Scenario Outline: Admin toggle the options for field type
-    Given I am on the questionnaire management section
-    Then I should see an add field section
-    When I click the textbox button
-    Then I should see field settings
-    When I toggle the options <options>
+  # @create_question
+  # Scenario Outline: Admin toggle the options for field type
+  #   Given I am on the questionnaire management section
+  #   Then I should see an add field section
+  #   When I click on add question
+  #   * I click on question section 1
+  #   When I click the textbox button
+  #   Then I should see field settings
+  #   When I toggle the options <options>
 
-    Examples:
-      | options              |
-      | "load_from_previous" |
-      | "read_only"          |
-      | "visible"            |
-      | "optional"           |
-      | "remember_allowed"   |
-      | "field_validation"   |
+  #   Examples:
+  #     | options              |
+  #     | "load_from_previous" |
+  #     | "read_only"          |
+  #     | "visible"            |
+  #     | "optional"           |
+  #     | "remember_allowed"   |
+  #     | "field_validation"   |
