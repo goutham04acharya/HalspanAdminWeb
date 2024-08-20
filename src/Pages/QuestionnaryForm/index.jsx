@@ -58,8 +58,6 @@ function QuestionnaryForm() {
 
     const handleInputClick = (fieldSettingParameters) => {
         // setTextFieldSettings(true)
-        console.log(fieldSettingParams, 'fieldSettingParams')
-        console.log(fieldSettingParams[selectedQuestionDetails.question_id], '[selectedQuestionDetails.question_id]?')
         // setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id]?.componentType || false)
     }
 
@@ -194,13 +192,11 @@ function QuestionnaryForm() {
             setDataIsSame(update);
 
         } else if (event === 'remove') {
-            console.log(dataIsSame, 'dataIsSame');
 
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
             const isSaved = dataIsSame?.[sectionId] || false;
 
-            console.log(isSaved, 'isSaved');
             if (isSaved) {
                 handleDeleteSection(sections[sectionIndex].section_id);
             }
@@ -247,7 +243,6 @@ function QuestionnaryForm() {
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
         const update = { ...dataIsSame }
-        console.log(sections[sectionIndex].section_id, 'ooooooooooooooooooooooo sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
@@ -263,13 +258,7 @@ function QuestionnaryForm() {
     };
 
     const handleQuestionIndexCapture = (question) => {
-        console.log('its getting called.......')
-        console.log(question, 'question qqq')
-        console.log(fieldSettingParams, 'fieldSettingParams')
-        console.log(savedData, 'savedData')
-        console.log(selectedQuestionDetails?.question_id, 'selectedQuestionDetails?.question_id')
         const isQuestionExists = fieldSettingParams && fieldSettingParams.hasOwnProperty(question.question_id);
-        console.log(isQuestionExists, 'isQuestionExists');
 
         if (!isQuestionExists) {
             setSelectedComponent(false)
@@ -291,6 +280,7 @@ function QuestionnaryForm() {
 
         return (
             <div
+                data-testid={`question-sec`}
                 onClick={() => handleQuestionIndexCapture(item)}
                 className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionDetails.question_id ? 'border-black border' : ''}`}
             >
@@ -310,9 +300,9 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
-                        <img src="/Images/trash-black.svg" alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
+                        <img src="/Images/trash-black.svg" title='Delete' alt="delete" className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]' onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)} />
                     </div>
                 </div>
                 {/* Render the selected component if the question is visible */}
@@ -337,7 +327,6 @@ function QuestionnaryForm() {
         sections[sectionIndex].pages[pageIndex].questions = newList;
         setSections([...sections]);
         const update = { ...dataIsSame }
-        console.log(sections[sectionIndex].section_id, 'zzzzzzzzzzzzzzzzzzzzz sections[sectionIndex].section_id')
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
     };
@@ -356,7 +345,6 @@ function QuestionnaryForm() {
             return acc;
         }, {});
 
-        console.log(updatedSections, 'bbbbbbbbbbbbbbbbbbbb, updatedSections'); // Output: { "SEC-d4dc4fe9-d61a-46e0-b475-ce939f7074f5": true, "SEC1": true }
         setDataIsSame(updatedSections);
 
         setPageLoading(false);
@@ -383,7 +371,6 @@ function QuestionnaryForm() {
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
         if (sectionToSave) {
-            console.log(sectionToSave.section_id, 'sectionToSave.section_i')
             // Create a new object containing only the selected section's necessary fields
             let body = {
                 section_id: sectionToSave.section_id,
@@ -397,7 +384,6 @@ function QuestionnaryForm() {
                 }))
             }
 
-            console.log(body, 'body body body body')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -429,7 +415,7 @@ function QuestionnaryForm() {
 
                     // Update the saved status
                     const update = { ...dataIsSame };
-                    console.log(sections[sectionIndex].section_id, 'nnnnnnnnnnnnnnnnnnnnnnnnn sections[sectionIndex].section_id')
+
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -497,7 +483,7 @@ function QuestionnaryForm() {
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
-                    console.log(sections[sectionIndex].section_id, 'mmmmmmmmmmmmmmmmm sections[sectionIndex].section_id')
+
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -568,7 +554,6 @@ function QuestionnaryForm() {
         if (len > 0) {
             handleSaveSection(sections[len - 1].section_id, false);
         }
-        console.log('saving.......')
         let body = {
             component_type: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.componentType,
             label: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.label,
@@ -650,11 +635,13 @@ function QuestionnaryForm() {
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg"
                                                 alt="delete"
+                                                title='Delete'
                                                 data-testid={`delete-btn-${sectionIndex}`}
                                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                                                 onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
                                             <img src="/Images/save.svg"
                                                 alt="save"
+                                                title='Save'
                                                 data-testid={`save-btn-${sectionIndex}`}
                                                 className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
@@ -675,7 +662,8 @@ function QuestionnaryForm() {
                                                 />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"
-                                                        alt="save"
+                                                        title='Delete'
+                                                        alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
                                                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
@@ -693,7 +681,10 @@ function QuestionnaryForm() {
                                                 container={() => document.body}
                                             />
                                             <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
-                                                <button onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                <button
+                                                    data-testid={`add-question-${sectionIndex}`}
+                                                    onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)}
+                                                    className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     <span className='mr-[15px]'>+</span>
                                                     <span>Add question</span>
                                                 </button>

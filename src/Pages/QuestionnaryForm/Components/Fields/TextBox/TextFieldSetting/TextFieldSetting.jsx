@@ -18,7 +18,9 @@ function TestFieldSetting({
   fieldSettingParameters,
   setFieldSettingParameters,
   handleSaveSettings,
-  selectedQuestionDetails, isThreedotLoader }) {
+  selectedQuestionDetails,
+  isThreedotLoader }) {
+
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -114,7 +116,8 @@ function TestFieldSetting({
   }, [fetchLookupList]);
 
   return (
-    <><div className='py-[34px] px-[32px] h-customh10'>
+    <>
+    <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
       <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
       <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
         <CommonComponents
@@ -253,7 +256,7 @@ function TestFieldSetting({
               </div>
             </div>
             {/* OptionsComponent added here */}
-            <OptionsComponent />
+            <OptionsComponent selectedQuestionId={selectedQuestionDetails?.question_id} />
             <div className='mt-7'>
               <InputField
                 autoComplete='off'

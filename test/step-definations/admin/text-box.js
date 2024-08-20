@@ -8,8 +8,8 @@ const By = require('selenium-webdriver').By
 const Key = webdriver.Key
 
 Then('I should see an add field section', async function () {
-    await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="add-field"]')));
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Add Field"]')));
 });
 
 When('I click the textbox button', async function () {
@@ -88,12 +88,12 @@ Then('I should see the format reflected on the text box section {int}', async fu
         await textBox.sendKeys(`alpha12121212`);
         const text = await textBox.getText();
         assert(/^[a-zA-Z]+$/.test(text), 'Textbox contains non-alphabetic characters');
-    } 
+    }
     else if (this.format === 'numeric') {
         await textBox.sendKeys(`1234alpha`);
         const text = await textBox.getText();
         assert(/^\d+$/.test(text), 'Textbox contains non-numeric characters');
-    } 
+    }
     else if (this.format === 'alphanumeric') {
         await textBox.sendKeys(`alpha1234@@##`);
         const text = await textBox.getText();
