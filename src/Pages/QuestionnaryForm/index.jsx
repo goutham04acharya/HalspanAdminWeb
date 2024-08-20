@@ -42,6 +42,7 @@ function QuestionnaryForm() {
     const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
     const [inputVisibility, setInputVisibility] = useState({});
     const [selectedComponent, setSelectedComponent] = useState(null);
+    const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
     const questionRefs = useRef([]);
@@ -63,10 +64,16 @@ function QuestionnaryForm() {
     }
 
     const handleInputChange = (e) => {
-        const { id, value } = e.target
+        const { id, value } = e.target;
+
+        // Check if the input field is 'min' or 'max' and restrict to numbers
+        const updatedValue = (id === 'min' || id === 'max')
+            ? value.replace(/[^0-9]/g, '')  // Allow only numeric input
+            : value;
+
         setFieldSettingParameters((prevState) => ({
             ...prevState,
-            [id]: value,
+            [id]: updatedValue,
         }));
         dispatch(setNewComponent({ id, value, questionId: selectedQuestionDetails?.question_id }));
         const data = selectedQuestionDetails?.question_id?.split('_')
@@ -74,11 +81,6 @@ function QuestionnaryForm() {
         update[data[0]] = false;
         setDataIsSame(update)
     }
-
-    useEffect(() => {
-        console.log(fieldSettingParams, 'field');
-        console.log(dataIsSame, 'dataIsSame');
-    }, [fieldSettingParams, dataIsSame])
 
     const componentMap = {
         textboxfield: (props) =>
@@ -106,12 +108,12 @@ function QuestionnaryForm() {
         // Add other mappings here...
     };
 
-
     const scrollToSection = (index) => {
         if (sectionRefs.current[index]) {
             sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
         }
     };
+
     const scrollToPage = (sectionIndex, pageIndex) => {
         const pageRefKey = `${sectionIndex}-${pageIndex}`;
         if (pageRefs.current[pageRefKey]) {
@@ -167,8 +169,7 @@ function QuestionnaryForm() {
         if (event === 'add') {
             const len = sections.length;
             if (len > 0) {
-                handleSaveSection(sections[len - 1].section_id);
-                // handleAutoSave(sections[len - 1].section_id, )
+                handleSaveSection(sections[len - 1].section_id, false);
             }
             const sectionId = `SEC-${uuidv4()}`;
             const pageId = `${sectionId}_PG-${uuidv4()}`;
@@ -261,7 +262,6 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
-
     const handleQuestionIndexCapture = (question) => {
         console.log('its getting called.......')
         console.log(question, 'question qqq')
@@ -296,7 +296,8 @@ function QuestionnaryForm() {
             >
                 <div ref={questionRefs} className='flex justify-between items-start cursor-pointer'>
                     {!fieldSettingParameters &&
-                        <p className='mb-5 font-medium text-base text-[#000000]'>{item?.question_name}</p>
+                        <p className='mb-5 font-medium text-base text-[#000000] w-[25%]'>{item?.question_text}</p>
+
                     }
                     <div className='flex items-center justify-end w-full'>
                         <div
@@ -376,12 +377,13 @@ function QuestionnaryForm() {
         }
     };
 
-    const handleSaveSection = async (sectionId) => {
+    const handleSaveSection = async (sectionId, showShimmer = true) => {
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
         if (sectionToSave) {
+            console.log(sectionToSave.section_id, 'sectionToSave.section_i')
             // Create a new object containing only the selected section's necessary fields
             let body = {
                 section_id: sectionToSave.section_id,
@@ -413,11 +415,17 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-                setPageLoading(true);
+                if (showShimmer) {
+                    setPageLoading(true);
+                }
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                setPageLoading(false);
+                if (showShimmer) {
+                    setPageLoading(false);
+                }
                 if (!(response?.data?.error)) {
-                    setToastSuccess(response?.data?.message);
+                    if (showShimmer) {
+                        setToastSuccess(response?.data?.message);
+                    }
 
                     // Update the saved status
                     const update = { ...dataIsSame };
@@ -452,7 +460,6 @@ function QuestionnaryForm() {
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
-
         if (sectionToSave) {
             // Create a new object containing only the selected section's necessary fields
             let body = {
@@ -556,6 +563,11 @@ function QuestionnaryForm() {
 
     //function to save the field setting
     const handleSaveSettings = async () => {
+        setIsThreedotLoader(true);
+        const len = sections.length;
+        if (len > 0) {
+            handleSaveSection(sections[len - 1].section_id, false);
+        }
         console.log('saving.......')
         let body = {
             component_type: fieldSettingParams?.[selectedQuestionDetails?.question_id]?.componentType,
@@ -581,14 +593,21 @@ function QuestionnaryForm() {
 
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${version_number}`, body);
-            console.log(response);
+            console.log(response?.data?.status);
+            setIsThreedotLoader(false);
+            setToastSuccess(response?.data?.message)
+            if (response?.data?.status >= 400) {
+                setToastError(response?.data?.data?.message || 'Something went wrong');
+            }
             setSelectedComponent(false)
             dispatch(saveCurrentData());
         } catch (error) {
-            console.error(error); // Properly handle the error
+            console.error(error);
+            setIsThreedotLoader(false);
+            setToastError('Failed to update field settings'); // Provide a user-friendly error message
+            setSelectedComponent(false);
         }
     };
-
 
     useEffect(() => {
         formDefaultDetails();
@@ -726,6 +745,8 @@ function QuestionnaryForm() {
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionDetails.question_id],
                                         setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
+                                        isThreedotLoader: isThreedotLoader,
+                                        handleSource: handleSource,
                                         selectedQuestionDetails: selectedQuestionDetails
                                     }
                                 )
