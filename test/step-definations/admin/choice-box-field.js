@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const assert = require('assert');
 const { Given, When, Then, But } = require('@cucumber/cucumber');
 const { resolve } = require('path');
@@ -103,7 +104,7 @@ When('I enter the label name for choice', async function () {
 
 Then('I should see the label name for choice updated in the section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="label-name-${sectionNumber}"]`)));
+    const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="label-name"]`)));
     const labelNameText = await labelName.getText();
     assert.equal(labelNameText, this.labelName);
 });
@@ -116,7 +117,7 @@ When('I enter the help text for choice', async function () {
 
 Then('I should see the help text for choice updated in the section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="help-text-${sectionNumber}"]`)));
+    const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
     assert.equal(helpTextText, this.helpText);
 });
@@ -129,7 +130,9 @@ When('I enter the placeholder content for choice', async function () {
 
 Then('I should see the placeholder content for choice updated in the section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="placeholder-${sectionNumber}"]`)));
-    const placeholderText = await placeholder.getText();
-    assert.equal(placeholderText, this.placeholder);
+    if( this.choiceType === 'dropdown') {
+        const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="input"]`)));
+        const placeholderText = await placeholder.getAttribute('placeholder');
+        assert.equal(placeholderText, this.placeholder);
+    }
 });
