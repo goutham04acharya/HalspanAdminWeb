@@ -17,8 +17,10 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <Auth0Provider
     domain={auth0Domain}
+    // domain='dev-hjr0lxj23dh6f5qc.uk.auth0.com'
     cacheLocation="localstorage"
     clientId={auth0ClientID}
+    // clientId='Tp6s9L1kHp2qU7ICnauxcKa9VKZeMnlG'
     authorizationParams={{
       redirect_uri: window.location.origin
     }}
