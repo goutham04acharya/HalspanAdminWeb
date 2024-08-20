@@ -120,8 +120,8 @@ const LookupDataset = () => {
                 setLookupList([]);
                 fetchLookupList();
                 const successMessage = isUpdate
-                    ? `Updated lookup dataset ID ${isView?.id} successfully`
-                    : 'Created new lookup dataset successfully';
+                    ? `Updated lookup dataset ID ${isView?.id} successfully.`
+                    : 'Created new lookup dataset successfully.';
                 setToastSuccess(successMessage);
                 handleClose();
             } else if (response?.data?.status === 409) {
@@ -141,7 +141,7 @@ const LookupDataset = () => {
             }
         } catch (error) {
             handleClose();
-            setToastError('Something went wrong!');
+            setToastError('Something went wrong.');
         }
     };
 
@@ -173,7 +173,7 @@ const LookupDataset = () => {
                 }
             },
             error: (error) => {
-                setToastError('Something went wrong');
+                setToastError('Something went wrong.');
                 console.error('Error parsing CSV:', error);
             }
         });
@@ -202,14 +202,14 @@ const LookupDataset = () => {
             setIsDeleteLoading(true);
             const response = await DeleteAPI(`lookup-data/${deleteModal?.id}`);
             if (!response?.error) {
-                setToastSuccess(`Deleted ID ${deleteModal?.id} successfully`)
+                setToastSuccess(`Deleted ID ${deleteModal?.id} successfully.`)
                 setLookupList([])
                 fetchLookupList();
             } else {
-                setToastError('Something went wrong!')
+                setToastError('Something went wrong.')
             }
         } catch (error) {
-            setToastError('Something went wrong!')
+            setToastError('Something went wrong.')
         } finally {
             setIsDeleteLoading(false);
             setDeleteModal('open', false);
@@ -263,7 +263,7 @@ const LookupDataset = () => {
                                     searchValue={searchValue}
                                     setSearchParams={setSearchParams}
                                     setLoading={setLoading}
-                                    placeholder='Search by Name...'
+                                    placeholder='Search by Name'
                                 />
                             </div>
                         </div>
