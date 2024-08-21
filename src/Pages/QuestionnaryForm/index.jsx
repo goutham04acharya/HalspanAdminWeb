@@ -301,7 +301,7 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
                         <img
                             src="/Images/trash-black.svg"
@@ -593,6 +593,15 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: {
+                load_from_previous: newToggleStates['Load from previously entered data'],
+                read_only: newToggleStates['Read only'],
+                visible: newToggleStates['Visible'],
+                optional: newToggleStates['Optional'],
+                remember_allowed: newToggleStates['Remember allowed'],
+                field_validation: newToggleStates['Field Validation'],
+            }
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -702,11 +711,13 @@ function QuestionnaryForm() {
                                         <div className='flex items-center justify-end'>
                                             <img src="/Images/trash-black.svg"
                                                 alt="delete"
+                                                title='Delete'
                                                 data-testid={`delete-btn-${sectionIndex}`}
                                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                                                 onClick={() => handleAddRemoveSection('remove', sectionIndex)} />
                                             <img src="/Images/save.svg"
                                                 alt="save"
+                                                title='Save'
                                                 data-testid={`save-btn-${sectionIndex}`}
                                                 className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
@@ -727,7 +738,8 @@ function QuestionnaryForm() {
                                                 />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"
-                                                        alt="save"
+                                                        title='Delete'
+                                                        alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
                                                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8]' onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} />
                                                 </div>
