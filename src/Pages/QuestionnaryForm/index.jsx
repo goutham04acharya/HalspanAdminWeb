@@ -64,6 +64,7 @@ function QuestionnaryForm() {
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
+    const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
     const handleCancel = () => {
         setModalOpen(false);
@@ -81,13 +82,6 @@ function QuestionnaryForm() {
             setModalOpen(false); // Close the modal
         }
     }
-
-    const handleInputClick = (fieldSettingParameters) => {
-        // setTextFieldSettings(true)
-        // setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id]?.componentType || false)
-    }
-
-    const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -357,7 +351,6 @@ function QuestionnaryForm() {
             </div>
         );
     };
-
 
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
@@ -766,7 +759,7 @@ function QuestionnaryForm() {
                                                         title='Delete'
                                                         alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[50px]'
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
                                                         // onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} 
                                                         onClick={() => {
                                                             setPageToDelete({ sectionIndex, pageIndex });
