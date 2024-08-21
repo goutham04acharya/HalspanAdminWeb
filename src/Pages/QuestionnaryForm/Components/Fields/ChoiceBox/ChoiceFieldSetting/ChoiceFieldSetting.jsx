@@ -338,7 +338,7 @@ function ChoiceFieldSetting({
                                 </button>
                             </div>}
                         {/* OptionsComponent added here */}
-                        <OptionsComponent />
+                        <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'

@@ -103,6 +103,7 @@ const fieldSettingParamsSlice = createSlice({
                     note: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
+                    options: item?.options
                 };
                 
                 // Handle the source object and assign values based on the key

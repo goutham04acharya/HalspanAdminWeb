@@ -594,14 +594,7 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: {
-                load_from_previous: newToggleStates['Load from previously entered data'],
-                read_only: newToggleStates['Read only'],
-                visible: newToggleStates['Visible'],
-                optional: newToggleStates['Optional'],
-                remember_allowed: newToggleStates['Remember allowed'],
-                field_validation: newToggleStates['Field Validation'],
-            }
+            options: fieldSettingParams?.[selectedQuestionId]?.options
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -639,7 +632,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
-            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: fieldSettingParams?.[selectedQuestionId]?.options
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
