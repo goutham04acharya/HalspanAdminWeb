@@ -155,16 +155,19 @@ function ChoiceFieldSetting({
                             id={item.id}
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
                             onBlur={handleBlur}
+                            data-testid={`choice-${item.index + 1}`}
                         />
                         {fixedChoiceArray.length > 1 && <img
                             src="/Images/trash-black.svg"
                             alt="delete"
                             className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
+                            data-testid={`delete-choice-${item.index + 1}`}
                         />}
                         <img
                             src="/Images/add.svg"
                             alt="add"
+                            data-testid={`add-choice-${item.index + 2}`}
                             className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={() => handleAddRemoveFixedChoice('add', item.id)}
                         />
@@ -220,7 +223,7 @@ function ChoiceFieldSetting({
                                 value='Singleline'
                                 checked={fieldSettingParameters?.type === 'dropdown'}
                                 onClick={() => handleRadiobtn('dropdown')} />
-                            <label htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                            <label data-testid='dropdown' htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Dropdown
                             </label>
                         </div>
@@ -233,8 +236,9 @@ function ChoiceFieldSetting({
                                 id='SingleChoice'
                                 value='SingleChoice'
                                 checked={fieldSettingParameters?.type === 'single_choice'}
-                                onClick={() => handleRadiobtn('single_choice')} />
-                            <label htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                onClick={() => handleRadiobtn('single_choice')}
+                            />
+                            <label data-testid='single_choice' htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Single Choice
                             </label>
                         </div>
@@ -247,7 +251,7 @@ function ChoiceFieldSetting({
                                 value='MultiChoice'
                                 checked={fieldSettingParameters?.type === 'multi_choice'}
                                 onClick={() => handleRadiobtn('multi_choice')} />
-                            <label htmlFor='MultiChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                            <label data-testid='multi_choice' htmlFor='MultiChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Multi Choice
                             </label>
                         </div>
@@ -345,7 +349,7 @@ function ChoiceFieldSetting({
                                 className='w-full mt-2.5'
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
-                                testId='Notes'
+                                testId='admin-notes-input'
                                 htmlFor='note'
                                 maxLength={250}
                                 handleChange={(e) => handleInputChange(e)}

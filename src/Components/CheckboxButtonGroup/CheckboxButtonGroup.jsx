@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const CheckboxButtonGroup = ({ values, name, onChange }) => {
+const CheckboxButtonGroup = ({ values, name, onChange, testId }) => {
     const [selectedValue, setSelectedValue] = useState(values[0]);
 
     // Handle radio button change
@@ -23,6 +23,7 @@ const CheckboxButtonGroup = ({ values, name, onChange }) => {
                     />
                     <label
                         htmlFor={`radio-${index}`}
+                        data-testid={`${testId}-choice-${index + 1}`}
                         className="h-5 flex items-center cursor-pointer relative pl-8 text-neutral-primary text-[16px] leading-[20px] font-normal"
                     >
                         {value}
