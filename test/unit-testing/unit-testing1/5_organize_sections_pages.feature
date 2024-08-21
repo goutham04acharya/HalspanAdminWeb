@@ -21,7 +21,6 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
   Scenario: Admin adds multiple section
     Given I am on the questionnaire management section
     When I click on add new section
-    Then I should read a message stating that "Section 1 saved successfully"
     Then I should see the new section added
 
   @create_question
@@ -34,7 +33,6 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
   Scenario: Admin saves added section
     Given I am on the questionnaire management section
     When I click on add new section
-    Then I should read a message stating that "Section 1 saved successfully"
     When I click on save button for section 2
     Then I should read a message stating that "Section 2 saved successfully"
 

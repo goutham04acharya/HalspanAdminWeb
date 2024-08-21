@@ -3,7 +3,19 @@ import React from 'react'
 function FormShimmer() {
     return (
         <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
-            <div className='w-[20%]'>
+            <div className='w-[20%] p-6'>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
+                <div className='animate-pulse bg-slate-200 h-10 rounded mb-5'></div>
             </div>
             <div className='w-[50%] animate-pulse bg-slate-200'>
                 <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -31,14 +43,12 @@ function FormShimmer() {
                                 </div>
                                 <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
                                     <button type='button' className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-
                                         <span className='ml-[4]'></span>
                                     </button>
                                 </div>
                             </div>
                             <div>
                                 <button type='button' className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-
                                     <span className='ml-[4]'></span>
                                 </button>
                             </div>
@@ -54,14 +64,12 @@ function FormShimmer() {
                                 </div>
                                 <div className='mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border hover:border-[#2B333B]'>
                                     <button type='button' className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-
                                         <span className='ml-[4]'></span>
                                     </button>
                                 </div>
                             </div>
                             <div>
                                 <button type='button' className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-
                                     <span className='ml-[4]'></span>
                                 </button>
                             </div>
@@ -73,16 +81,12 @@ function FormShimmer() {
             </div>
             <div className='w-[30%]'>
                 <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                    <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
-                        <img src="/Images/cancle.png" className='pr-2.5' alt="cancle" />
-                        Cancle
+                    <button className='w-1/3 h-[45px] px-[29px] animate-pulse bg-slate-200 flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
                     </button>
-                    <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
-                        <img src="/Images/preview.png" className='pr-2.5' alt="preview" />
-                        Preview
+                    <button className='w-1/3 h-[45px] px-[29px] animate-pulse bg-slate-200 flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                       
                     </button>
-                    <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'>
-                        Save
+                    <button className='w-1/3 h-[45px] px-[29px] animate-pulse bg-slate-200 font-semibold text-base text-[#FFFFFF] border-l border-r border-[#EFF1F8]'>
                     </button>
                 </div>
                 <div>

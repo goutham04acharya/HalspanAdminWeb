@@ -2,7 +2,6 @@ import React from 'react'
 import useObjects from '../../../customHooks/useObjects'
 
 function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handleSectionScroll, handlePageScroll }) {
-    console.log(sections, 'naan')
 
     // Create the initial dropdown state
     const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
