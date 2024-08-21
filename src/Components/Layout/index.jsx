@@ -27,8 +27,8 @@ function Layout() {
                     Button1text='Confirm'
                     Button2text='Cancel'
                     src='Logout-Big'
-                    testIDBtn1='Confirm'
-                    testIDBtn2='Cancel'
+                    testIDBtn1='confirm'
+                    testIDBtn2='cancel'
                     isModalOpen={isModalOpen}
                     setModalOpen={setModalOpen}
                     handleButton1={handleLogout}
