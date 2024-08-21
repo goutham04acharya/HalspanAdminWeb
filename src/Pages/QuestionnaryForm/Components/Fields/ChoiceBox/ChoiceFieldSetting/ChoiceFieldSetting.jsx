@@ -357,12 +357,12 @@ function ChoiceFieldSetting({
                             />
                         </div>
                         <div className='mx-auto mt-7 flex items-center w-full'>
-                            <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
+                            {/* <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
                                 onClick={handleSaveSettings}
                             >
                                 Save
-                            </button>
-                            <button type='button' className='w-[70%] py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            </button> */}
+                            <button type='button' className='w-full py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>
                         </div>
