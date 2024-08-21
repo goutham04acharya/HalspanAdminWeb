@@ -58,7 +58,8 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
 
-    let debounceTimer;
+    const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
@@ -80,14 +81,15 @@ function QuestionnaryForm() {
         setDataIsSame(update);
 
         // Clear any existing debounce timer
-        clearTimeout(debounceTimer);
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
 
         // Set a new debounce timer
-        debounceTimer = setTimeout(() => {
+        debounceTimerRef.current = setTimeout(() => {
             setShouldAutoSave(true);
         }, 1000); // 1000ms delay before auto-saving
     };
-
 
     const componentMap = {
         textboxfield: (props) =>
@@ -657,6 +659,8 @@ function QuestionnaryForm() {
     useEffect(() => {
         if (shouldAutoSave) {
             handleAutoSaveSettings();
+            const sectionId = selectedQuestionId.split('_')[0]
+            handleAutoSave(sectionId, sections);
             setShouldAutoSave(false); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
