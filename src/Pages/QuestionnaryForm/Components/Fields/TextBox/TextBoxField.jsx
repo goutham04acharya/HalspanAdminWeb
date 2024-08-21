@@ -2,7 +2,6 @@ import React from 'react'
 
 const TextBoxField = ({
     label,
-    testId,
     type,
     textId,
     HelpText,
@@ -10,16 +9,18 @@ const TextBoxField = ({
     className,
     handleChange,
     fieldSettingParameters,
-
+    testId
 
 }) => {
 
+    console.log(testId, 'testbox asdfghjkl');
+
     return (
         <div>
-            <label htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label}</label>
+            <label data-testid="label-name" htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label}</label>
             {fieldSettingParameters?.type === 'multi_line' ?
                 <textarea
-                    data-testid={testId}
+                    data-testid='input'
                     type={type}
                     id={textId}
                     value={value}
@@ -29,7 +30,7 @@ const TextBoxField = ({
                 />
                 :
                 <input
-                    data-testid={testId}
+                    data-testid='input'
                     type={type}
                     id={textId}
                     value={value}
@@ -38,7 +39,7 @@ const TextBoxField = ({
                     onClick={() => handleChange(fieldSettingParameters)}
                 />
             }
-            <p className='mt-2 font-normal text-sm text-[#2B333B]'>{fieldSettingParameters?.helptext}</p>
+            <p data-testid="help-text" className='mt-2 font-normal text-sm text-[#2B333B]'>{fieldSettingParameters?.helptext}</p>
         </div>
     )
 }

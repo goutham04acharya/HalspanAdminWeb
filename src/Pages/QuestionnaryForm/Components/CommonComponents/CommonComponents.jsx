@@ -64,6 +64,7 @@ function CommonComponents({
                     onChange={(e) => handleInputChange(e)}
                     id='placeholderContent'
                     onBlur={(e) => handleBlur(e)}
+                    data-testid="placeholder-input"
                 />
             </div>
         </div>

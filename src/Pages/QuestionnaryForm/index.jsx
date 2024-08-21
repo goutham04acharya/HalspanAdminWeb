@@ -13,7 +13,7 @@ import EditableField from '../../Components/EditableField/EditableField.jsx';
 import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -87,6 +87,8 @@ function QuestionnaryForm() {
         // setSelectedComponent(fieldSettingParams[selectedQuestionDetails.question_id]?.componentType || false)
     }
 
+    const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
@@ -99,12 +101,24 @@ function QuestionnaryForm() {
             ...prevState,
             [id]: updatedValue,
         }));
-        dispatch(setNewComponent({ id, value, questionId: selectedQuestionId }));
-        const data = selectedQuestionId?.split('_')
-        const update = { ...dataIsSame }
+
+        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+
+        const data = selectedQuestionId?.split('_');
+        const update = { ...dataIsSame };
         update[data[0]] = false;
-        setDataIsSame(update)
-    }
+        setDataIsSame(update);
+
+        // Clear any existing debounce timer
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        // Set a new debounce timer
+        debounceTimerRef.current = setTimeout(() => {
+            setShouldAutoSave(true);
+        }, 1000); // 1000ms delay before auto-saving
+    };
 
     const componentMap = {
         textboxfield: (props) =>
@@ -334,6 +348,7 @@ function QuestionnaryForm() {
                             componentMap[fieldSettingParams[item.question_id]?.componentType],
                             {
                                 // Pass the specific field settings to the component
+                                testId: `section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`,
                                 fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
                             }
                         )}
@@ -445,7 +460,6 @@ function QuestionnaryForm() {
 
                     // Update the saved status
                     const update = { ...dataIsSame };
-
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -517,7 +531,6 @@ function QuestionnaryForm() {
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
-
                     update[sections[sectionIndex].section_id] = true;
                     setDataIsSame(update);
                 } else {
@@ -529,10 +542,8 @@ function QuestionnaryForm() {
         }
     };
 
-    const addNewQuestion = (componentType, questionPrefix) => {
-        if (!selectedAddQuestion.pageId) {
-            return;
-        }
+    const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
+        if (!selectedAddQuestion.pageId) return;
 
         // Generate a unique question ID
         const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
@@ -540,37 +551,44 @@ function QuestionnaryForm() {
         // Set the selected component and question ID
         setSelectedComponent(componentType);
         setSelectedQuestionId(questionId);
-        setSelectedAddQuestion({ questionId: questionId });
+        setSelectedAddQuestion({ questionId });
 
-        // Retrieve the current page data based on the selected section and page index
+        // Retrieve the current page data
         const currentPageData = sections[selectedAddQuestion.sectionIndex].pages[selectedAddQuestion.pageIndex];
 
         // Create a new question object and add it to the current page's questions array
-        currentPageData.questions = [
-            ...currentPageData.questions,
-            {
-                question_id: questionId,
-                question_name: `Question ${currentPageData.questions.length}`,
-            }
-        ];
+        const newQuestion = {
+            question_id: questionId,
+            question_name: `Question ${currentPageData.questions.length}`,
+        };
+        currentPageData.questions = [...currentPageData.questions, newQuestion];
 
         // Dispatch actions to set the new component's properties
-        dispatch(setNewComponent({ id: 'label', value: `Question ${currentPageData.questions.length}`, questionId }));
+        dispatch(setNewComponent({ id: 'label', value: newQuestion.question_name, questionId }));
         dispatch(setNewComponent({ id: 'componentType', value: componentType, questionId }));
-    };
 
-    const handleTextboxClick = () => addNewQuestion('textboxfield');
-    const handleChoiceClick = () => addNewQuestion('choiceboxfield');
+        // Execute any additional actions specific to the question type
+        additionalActions(questionId);
+    }, [dispatch, sections, selectedAddQuestion, setSelectedComponent, setSelectedQuestionId, setSelectedAddQuestion]);
 
-    const handleClick = (functionName) => {
+    const handleTextboxClick = useCallback(() => addNewQuestion('textboxfield'), [addNewQuestion]);
+
+    const handleChoiceClick = useCallback(() => {
+        addNewQuestion('choiceboxfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId }));
+            dispatch(resetFixedChoice({ questionId }));
+            dispatch(setNewComponent({ id: 'type', value: 'dropdown', questionId }));
+        });
+    }, [addNewQuestion, dispatch]);
+
+    const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
             handleChoiceClick,
         };
 
-        // Call the corresponding function from the map
         functionMap[functionName]?.();
-    };
+    }, [handleTextboxClick, handleChoiceClick]);
 
 
     //function for handle radio button
@@ -605,6 +623,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: fieldSettingParams?.[selectedQuestionId]?.options
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -642,7 +662,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
-            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: fieldSettingParams?.[selectedQuestionId]?.options
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -671,6 +692,8 @@ function QuestionnaryForm() {
     useEffect(() => {
         if (shouldAutoSave) {
             handleAutoSaveSettings();
+            const sectionId = selectedQuestionId.split('_')[0]
+            handleAutoSave(sectionId, sections);
             setShouldAutoSave(false); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed

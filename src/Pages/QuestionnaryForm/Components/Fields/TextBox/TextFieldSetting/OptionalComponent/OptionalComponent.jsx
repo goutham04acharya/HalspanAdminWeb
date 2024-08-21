@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
-function OptionsComponent({ selectedQuestionId }) {
+function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     const dispatch = useDispatch();
 
@@ -31,18 +31,18 @@ function OptionsComponent({ selectedQuestionId }) {
 
     // Sync local state with Redux state when the component mounts or fieldSettingParams change
     useEffect(() => {
-        console.log('useEffect triggered:', fieldSettingParams);
-        if (fieldSettingParams) {
+        console.log('useEffect triggered:', fieldSettingParams[selectedQuestionId]);
+        if (fieldSettingParams[selectedQuestionId]) {
             setToggleStates({
-                'Load from previously entered data': fieldSettingParams.Load_from_previous || false,
-                'Read only': fieldSettingParams.Read_only || false,
-                'Visible': fieldSettingParams.Visible || false,
-                'Optional': fieldSettingParams.Optional || false,
-                'Remember allowed': fieldSettingParams.Remember_allowed || false,
-                'Field Validation': fieldSettingParams.Field_Validation || false,
+                'Load from previously entered data': fieldSettingParams?.[selectedQuestionId]?.options?.load_from_previous || false,
+                'Read only': fieldSettingParams?.[selectedQuestionId]?.options?.read_only || false,
+                'Visible': fieldSettingParams?.[selectedQuestionId]?.options?.visible || false,
+                'Optional': fieldSettingParams?.[selectedQuestionId]?.options?.optional || false,
+                'Remember allowed': fieldSettingParams?.[selectedQuestionId]?.options?.remember_allowed || false,
+                'Field Validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_Validation || false,
             });
         }
-    }, []);
+    }, [fieldSettingParams]);
 
     // ToggleSwitch Component
     const ToggleSwitch = ({ label, onChange, checked }) => {
@@ -73,12 +73,12 @@ function OptionsComponent({ selectedQuestionId }) {
 
         // Prepare the object for the backend request
         const payload = {
-            Load_from_previous: newToggleStates['Load from previously entered data'],
-            Read_only: newToggleStates['Read only'],
-            Visible: newToggleStates['Visible'],
-            Optional: newToggleStates['Optional'],
-            Remember_allowed: newToggleStates['Remember allowed'],
-            Field_Validation: newToggleStates['Field Validation'],
+            load_from_previous: newToggleStates['Load from previously entered data'],
+            read_only: newToggleStates['Read only'],
+            visible: newToggleStates['Visible'],
+            optional: newToggleStates['Optional'],
+            remember_allowed: newToggleStates['Remember allowed'],
+            field_Validation: newToggleStates['Field Validation'],
         };
 
         // Dispatch the updated state to the store or backend
@@ -87,6 +87,7 @@ function OptionsComponent({ selectedQuestionId }) {
             value: payload,
             questionId: selectedQuestionId
         }));
+        setShouldAutoSave(true);
     };
 
     return (

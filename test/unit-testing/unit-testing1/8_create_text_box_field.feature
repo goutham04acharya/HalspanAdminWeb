@@ -58,6 +58,18 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     Then I should see field settings
     And I should see the text box added to the section 1
 
+    Then I should see the label name updated in the section 1
+    When I enter the help text for textbox
+    Then I should see the help text updated in the section 1
+    When I enter the placeholder content for textbox
+    Then I should see the placeholder content updated in the section 1
+    When I select the type as "lookup"
+    And I select a lookup data from the dropdown
+    When I select the format as "alphanumeric"
+    # Then I should see the format reflected on the text box section 1
+    When I enter the minimum and maximum number of characters
+    * I enter the admin field notes
+
   @create_question
   Scenario Outline: Admin adds the field values
     Given I am on the questionnaire management section
@@ -82,23 +94,3 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
       | "single_line" | "alpha"        |
       | "multi_line"  | "numeric"      |
       | "multi_line"  | "alphanumeric" |
-
-  @create_question
-  Scenario Outline: Admin adds the lookup dataset from the dropdown
-    Given I am on the questionnaire management section
-    Then I should see an add field section
-    When I add a new question to the page 1 in section 1
-    When I click the textbox button
-    Then I should see field settings
-    When I enter the label name for textbox
-    Then I should see the label name updated in the section 1
-    When I enter the help text for textbox
-    Then I should see the help text updated in the section 1
-    When I enter the placeholder content for textbox
-    Then I should see the placeholder content updated in the section 1
-    When I select the type as "lookup"
-    And I select a lookup data from the dropdown
-    When I select the format as "alphanumeric"
-    # Then I should see the format reflected on the text box section 1
-    When I enter the minimum and maximum number of characters
-    * I enter the admin field notes

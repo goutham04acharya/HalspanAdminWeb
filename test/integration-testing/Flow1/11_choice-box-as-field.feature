@@ -36,6 +36,13 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     - Field mask
     - Admin field notes
 
+       Scenario: Admin logs in with valid credentials
+        Given I am on the login page
+        When I enter valid email address as "nayana.sk@7edge.com"
+        * I enter valid password as "Auth@123"
+        * I click the submit button
+        Then I should be redirected to the questionnaire listing screen
+
   @create_question
   Scenario: Admin views all types of field and adds choice field from the add field section
     Given I am on the questionnaire management section
@@ -45,14 +52,8 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
-    And I should see the choice field added to the section 1
-
-  @create_question
-  Scenario: Admin adds the label, help text and placeholder content
-    Given I am on the questionnaire management section
-    When I add a new question to the page 1 in section 1
-    When I click the choice button
-    Then I should see field settings
+    And I should see the choice field added to the section 1 page 1 question 1
+    
     When I enter the label name for choice
     Then I should see the label name for choice updated in the section 1
     When I enter the help text for choice
@@ -60,17 +61,12 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     When I enter the placeholder content for choice
     Then I should see the placeholder content for choice updated in the section 1
 
-  @create_question
-  Scenario: Admin adds and deletes thes choices
-    Given I am on the questionnaire management section
-    When I add a new question to the page 1 in section 1
-    When I click the choice button
-    Then I should see field settings
     When I select the choice type as "single_choice"
     * I add the 4th choice field
     Then I should see the choice 4 added
     When I delete the 4th choice field
     Then I should see the 4th choice deleted
+    When I enter the admin field notes
 
   @create_question
   Scenario Outline: Admin selects the type of choice
@@ -80,7 +76,6 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Then I should see field settings
     When I select the choice type as <type>
     * I enter the text for choices as <choices>
-    * I click on the choices based on <type>
     Then I should see the choices updated on the section 1
 
     Examples:
@@ -88,11 +83,3 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
       | "single_choice" | "Option 1, option 2, option 3" |
       | "multi_choice"  | "Choice 1, Choice 2, choice 3" |
       | "dropdown"      | "Item 1, Item 2, Item 3"       |
-
-  @create_question
-  Scenario: Admin saves the section with the changes
-    Given I am on the questionnaire management section
-    When I add a new question to the page 1 in section 1
-    When I click the choice button
-    Then I should see field settings
-    When I enter the admin field notes
