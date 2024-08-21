@@ -218,7 +218,7 @@ function CreateQuestionnary() {
                     className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                     top='53px'
                     testID='drop-btn'
-                    labeltestID='option0'
+                    labeltestID='asset'
                     options={options}
                     isDropdownOpen={openDropdown === 'asset_type'}
                     setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
@@ -240,7 +240,7 @@ function CreateQuestionnary() {
                   className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                   top='53px'
                   testID='language-drop-btn'
-                  labeltestID='language0'
+                  labeltestID='language'
                   options={options1}
                   isDropdownOpen={openDropdown === 'language'}
                   setDropdownOpen={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
