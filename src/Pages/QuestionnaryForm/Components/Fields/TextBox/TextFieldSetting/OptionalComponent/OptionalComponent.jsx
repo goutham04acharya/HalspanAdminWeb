@@ -60,7 +60,6 @@ function OptionsComponent({ selectedQuestionId }) {
         );
     };
 
-
     // Handle toggle click logic
     const handleToggleClick = (label) => {
         const newToggleStates = {
@@ -73,12 +72,12 @@ function OptionsComponent({ selectedQuestionId }) {
 
         // Prepare the object for the backend request
         const payload = {
-            Load_from_previous: newToggleStates['Load from previously entered data'],
-            Read_only: newToggleStates['Read only'],
-            Visible: newToggleStates['Visible'],
-            Optional: newToggleStates['Optional'],
-            Remember_allowed: newToggleStates['Remember allowed'],
-            Field_Validation: newToggleStates['Field Validation'],
+            load_from_previous: newToggleStates['Load from previously entered data'],
+            read_only: newToggleStates['Read only'],
+            visible: newToggleStates['Visible'],
+            optional: newToggleStates['Optional'],
+            remember_allowed: newToggleStates['Remember allowed'],
+            field_validation: newToggleStates['Field Validation'],
         };
 
         // Dispatch the updated state to the store or backend

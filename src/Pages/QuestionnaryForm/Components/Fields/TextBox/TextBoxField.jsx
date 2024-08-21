@@ -13,8 +13,6 @@ const TextBoxField = ({
 
 }) => {
 
-    console.log(testId, 'testbox asdfghjkl');
-
     return (
         <div>
             <label data-testid="label-name" htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label}</label>
