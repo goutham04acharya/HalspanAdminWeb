@@ -58,6 +58,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Text Box as a Field
     Then I should see field settings
     And I should see the text box added to the section 1
 
+    When I enter the label name for textbox
     Then I should see the label name updated in the section 1
     When I enter the help text for textbox
     Then I should see the help text updated in the section 1

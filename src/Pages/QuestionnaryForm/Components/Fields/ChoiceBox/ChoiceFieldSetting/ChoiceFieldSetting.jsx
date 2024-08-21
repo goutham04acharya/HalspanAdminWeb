@@ -228,7 +228,7 @@ function ChoiceFieldSetting({
                             </label>
                         </div>
 
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='single-choice'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -242,7 +242,7 @@ function ChoiceFieldSetting({
                                 Single Choice
                             </label>
                         </div>
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -257,7 +257,7 @@ function ChoiceFieldSetting({
                         </div>
 
                         <p className='font-semibold text-base text-[#2B333B] mt-8'>Source</p>
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -293,7 +293,7 @@ function ChoiceFieldSetting({
                                 onMoveEnd={handleMoveEnd}
                                 container={() => document.body}
                             />}
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -321,7 +321,7 @@ function ChoiceFieldSetting({
                                         placeholder='Select the file'
                                         className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                         testID='lookup-dropdown'
-                                        labeltestID='option0'
+                                        labeltestID='lookup-list'
                                         selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
                                         handleRemoveLookup={handleRemoveLookup}
                                         isDropdownOpen={isLookupOpen}
@@ -349,7 +349,7 @@ function ChoiceFieldSetting({
                                 className='w-full mt-2.5'
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
-                                testId='admin-notes-input'
+                                testId='Notes'
                                 htmlFor='note'
                                 maxLength={250}
                                 handleChange={(e) => handleInputChange(e)}
