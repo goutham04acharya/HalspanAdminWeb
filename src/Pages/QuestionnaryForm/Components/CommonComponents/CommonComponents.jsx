@@ -31,6 +31,7 @@ function CommonComponents({
                     id='label'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="label-name-input"
+                    maxLength={50}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -48,6 +49,7 @@ function CommonComponents({
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="help-text-input"
+                    maxLength={150}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -65,6 +67,7 @@ function CommonComponents({
                     id='placeholderContent'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="placeholder-input"
+                    maxLength={150}
                 />
             </div>
         </div>

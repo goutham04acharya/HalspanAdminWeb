@@ -220,6 +220,10 @@ function QuestionnaryForm() {
             setDataIsSame(update);
 
         } else if (event === 'remove') {
+            // After any delete we remove focus on add question and change the field setting
+            setSelectedQuestionId(false)
+            setSelectedAddQuestion({});
+            setSelectedComponent('');
 
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
@@ -250,8 +254,13 @@ function QuestionnaryForm() {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
         update[sectionId] = false;
-        setDataIsSame(update)
+        setDataIsSame(update);
+
         if (event === 'add') {
+            const SectionData = [...sections];  // Create a copy of the sections array
+            const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
+
+            // Add a new page to the current section's pages array
             currentSectionData.pages = [
                 ...currentSectionData.pages,
                 {
@@ -260,13 +269,42 @@ function QuestionnaryForm() {
                     questions: []
                 }
             ];
-        } else if (event === 'remove') {
-            currentSectionData.pages = currentSectionData?.pages?.filter((_, index) => index !== pageIndex);
-        }
 
-        sections[sectionIndex] = currentSectionData;
-        setSections([...sections]);
+            // Save the updated section back to the sections array
+            SectionData[sectionIndex] = currentSectionData;
+
+            // Update the state with the new sections array
+            setSections(SectionData);
+
+            // Call handleAutoSave with the updated section data
+            handleAutoSave(sectionId, SectionData);
+
+        } else if (event === 'remove') {
+            // After any delete we remove focus on add question and change the field setting
+            setSelectedQuestionId(false);
+            setSelectedAddQuestion({});
+            setSelectedComponent('');
+
+            const SectionData = [...sections];  // Create a copy of the sections array
+            const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
+
+            const sectionId = currentSectionData.pages[pageIndex].page_id.split('_')[0];
+            const pageId = currentSectionData.pages[pageIndex].page_id
+
+            // Update the pages array by filtering out the page at the specified index
+            currentSectionData.pages = currentSectionData.pages.filter((_, index) => index !== pageIndex);
+
+            // Save the updated section back to the sections array
+            SectionData[sectionIndex] = currentSectionData;
+
+            // Update the state with the new sections array
+            setSections(SectionData);
+
+            // Call handleAutoSave with the updated section data
+            handleAutoSave(sectionId, SectionData, pageId);
+        }
     };
+
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
@@ -275,11 +313,19 @@ function QuestionnaryForm() {
         setDataIsSame(update)
         if (event === 'add') {
             setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-            setSelectedComponent(false);
             setSelectedQuestionId('');
         } else if (event === 'remove') {
+            setSelectedQuestionId(false)
+            setSelectedAddQuestion({});
+            const questionId = currentPageData.questions[questionIndex].question_id
+            const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
             currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
+            const currentSectionData = [...sections]
+            currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
+            handleAutoSave(sectionId, currentSectionData, '', questionId);
+            // After any delete we remove focus on add question and change the field setting
         }
+        setSelectedComponent(false);
         sections[sectionIndex].pages[pageIndex] = currentPageData;
         setSections([...sections]);
     };
@@ -301,7 +347,7 @@ function QuestionnaryForm() {
             <div
                 data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
                 onClick={() => handleQuestionIndexCapture(item)}
-                className={`disable-select select-none w-full bg-[#EFF1F8] mt-7 rounded-[10px] p-4 hover:border hover:border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border-black border' : ''}`}
+                className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
             >
                 <div className='flex justify-between items-start cursor-pointer'>
                     {!fieldSettingParameters && (
@@ -325,13 +371,17 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab p-2 mb-2 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
                         <img
                             src="/Images/trash-black.svg"
                             alt="delete"
-                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                            onClick={() => handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)}
+                            title='Delete'
+                            className='pl-2.5 cursor-pointer p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)
+                            }}
                         />
                     </div>
                 </div>
@@ -483,7 +533,7 @@ function QuestionnaryForm() {
     };
 
 
-    const handleAutoSave = async (sectionId, updatedData) => {
+    const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
@@ -519,8 +569,20 @@ function QuestionnaryForm() {
             // Remove keys from the cloned body
             removeKeys(body);
 
+            const queryParams = [];
+
+            if (pageId) {
+                queryParams.push(`page_deleted=${pageId}`);
+            }
+
+            if (questionId) {
+                queryParams.push(`question_deleted=${questionId}`);
+            }
+
+            const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+
             try {
-                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}${queryString}`, body);
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
@@ -536,7 +598,7 @@ function QuestionnaryForm() {
     };
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
-        if (!selectedAddQuestion.pageId) return;
+        if (!selectedAddQuestion?.pageId) return;
 
         // Generate a unique question ID
         const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
@@ -552,7 +614,7 @@ function QuestionnaryForm() {
         // Create a new question object and add it to the current page's questions array
         const newQuestion = {
             question_id: questionId,
-            question_name: `Question ${currentPageData.questions.length}`,
+            question_name: `Question ${currentPageData.questions.length + 1}`,
         };
         currentPageData.questions = [...currentPageData.questions, newQuestion];
 
@@ -560,11 +622,17 @@ function QuestionnaryForm() {
         dispatch(setNewComponent({ id: 'label', value: newQuestion.question_name, questionId }));
         dispatch(setNewComponent({ id: 'componentType', value: componentType, questionId }));
 
+        setShouldAutoSave(true);
+
         // Execute any additional actions specific to the question type
         additionalActions(questionId);
     }, [dispatch, sections, selectedAddQuestion, setSelectedComponent, setSelectedQuestionId, setSelectedAddQuestion]);
 
-    const handleTextboxClick = useCallback(() => addNewQuestion('textboxfield'), [addNewQuestion]);
+    const handleTextboxClick = useCallback(() => {
+        addNewQuestion('textboxfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'single_line', questionId }));
+        });
+    }, [addNewQuestion]);
 
     const handleChoiceClick = useCallback(() => {
         addNewQuestion('choiceboxfield', (questionId) => {
@@ -709,7 +777,7 @@ function QuestionnaryForm() {
                             </button>
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p className='font-semibold text-[22px] text-[#2B333B]' data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
+                            <p className={`font-semibold text-[22px] text-[#2B333B] ${sections.length === 0 ? 'mb-3' : ''}`} data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
                             {sections?.map((sectionData, sectionIndex) => (
                                 <div
                                     key={sectionData?.section_id}
@@ -780,7 +848,7 @@ function QuestionnaryForm() {
                                                 onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
                                                 container={() => document.body}
                                             />
-                                            <div className={`mt-7 bg-[#EFF1F8] rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border' : ''}`}>
+                                            <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
                                                 <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
                                                     <span className='mr-[15px]'>+</span>
                                                     <span>Add question</span>
@@ -793,14 +861,14 @@ function QuestionnaryForm() {
                                         data-testid={`add-page-sec-${sectionIndex}`}
                                         className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
                                         <span className='mr-[15px]'>+</span>
-                                        <span>Add Page</span>
+                                        <span>Add page</span>
                                     </button>
                                 </div>
                             ))}
                             <button
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
-                                className='lex items-center mt-8 font-semibold text-[#2B333B] text-base'>
+                                className='lex items-center font-semibold text-[#2B333B] text-base'>
                                 <span className='mr-[15px]'>+</span>
                                 Add section
                             </button>
@@ -816,11 +884,11 @@ function QuestionnaryForm() {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            {/* <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
-                                onClick={() => handleSaveSection()}
+                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
+                            // onClick={() => handleSaveSection()}
                             >
                                 Save
-                            </button> */}
+                            </button>
                         </div>
                         <div>
                             {selectedComponent ? (

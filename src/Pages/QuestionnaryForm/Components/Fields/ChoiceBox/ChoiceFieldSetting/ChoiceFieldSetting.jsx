@@ -131,7 +131,7 @@ function ChoiceFieldSetting({
         }, [item.id, focusInput, localValue]);
 
         return (
-            <div className={`disable-select select-none w-full mt-7 rounded-[10px]`}>
+            <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
                 <div className='flex justify-between items-start cursor-pointer'>
                     <div className='flex items-center justify-center w-full'>
                         <div
@@ -195,10 +195,10 @@ function ChoiceFieldSetting({
                     labelPlaceholder='Question 1'
                     helpTextId='Help Text'
                     helpText='Help Text'
-                    helpTextPlaceholder='Enter Help Text'
+                    helpTextPlaceholder='Enter help text'
                     placeholderContentId='placeholder'
-                    placeholder='Placeholder Content'
-                    placeholderContent='Text Displayed in the field'
+                    placeholder='Placeholder content'
+                    placeholderContent='Text displayed in the field'
                     handleInputChange={handleInputChange}
                     formParameters={formParameters}
                     handleBlur={handleBlur}
@@ -351,7 +351,7 @@ function ChoiceFieldSetting({
                                 placeholder='Notes'
                                 testId='Notes'
                                 htmlFor='note'
-                                maxLength={250}
+                                maxLength={500}
                                 handleChange={(e) => handleInputChange(e)}
                                 handleBlur={handleBlur}
                             />
@@ -362,7 +362,7 @@ function ChoiceFieldSetting({
                             >
                                 Save
                             </button> */}
-                            <button type='button' className='w-full py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>
                         </div>

@@ -35,14 +35,13 @@ Feature: Halspan - Admin - Variety of options available for each Field Type
     When I click the textbox button
     Then I should see field settings
     And I should see the text box added to the section 1
-
     When I toggle the options <options>
 
     Examples:
-      | options              |
+      | options                             |
       | "Load from previously entered data" |
-      | "Read only"          |
-      | "Visible"            |
-      | "Optional"           |
-      | "Remember allowed"   |
-      | "Field Validation"   |
+      | "Read only"                         |
+      | "Visible"                           |
+      | "Optional"                          |
+      | "Remember allowed"                  |
+      | "Field validation"                  |

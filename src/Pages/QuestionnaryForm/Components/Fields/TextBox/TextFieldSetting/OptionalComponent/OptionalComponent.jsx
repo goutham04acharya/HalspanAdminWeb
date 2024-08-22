@@ -16,7 +16,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         'Visible',
         'Optional',
         'Remember allowed',
-        'Field Validation',
+        'Field validation',
     ];
 
     // Initialize the state for the toggles
@@ -26,7 +26,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         'Visible': false,
         'Optional': false,
         'Remember allowed': false,
-        'Field Validation': false,
+        'Field validation': false,
     });
 
     // Sync local state with Redux state when the component mounts or fieldSettingParams change
@@ -39,7 +39,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 'Visible': fieldSettingParams?.[selectedQuestionId]?.options?.visible || false,
                 'Optional': fieldSettingParams?.[selectedQuestionId]?.options?.optional || false,
                 'Remember allowed': fieldSettingParams?.[selectedQuestionId]?.options?.remember_allowed || false,
-                'Field Validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_Validation || false,
+                'Field validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_Validation || false,
             });
         }
     }, [fieldSettingParams]);
@@ -78,7 +78,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
             visible: newToggleStates['Visible'],
             optional: newToggleStates['Optional'],
             remember_allowed: newToggleStates['Remember allowed'],
-            field_Validation: newToggleStates['Field Validation'],
+            field_validation: newToggleStates['Field validation'],
         };
 
         // Dispatch the updated state to the store or backend

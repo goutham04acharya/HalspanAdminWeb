@@ -127,10 +127,10 @@ function TestFieldSetting({
             labelPlaceholder='Question 1'
             helpTextId='Help Text'
             helpText='Help Text'
-            helpTextPlaceholder='Enter Help Text'
+            helpTextPlaceholder='Enter help text'
             placeholderContentId='placeholder'
-            placeholder='Placeholder Content'
-            placeholderContent='Text Displayed in the field'
+            placeholder='Placeholder content'
+            placeholderContent='Text displayed in the field'
             handleInputChange={handleInputChange}
             formParameters={formParameters}
             handleBlur={handleBlur}
@@ -278,7 +278,7 @@ function TestFieldSetting({
                   placeholder='Notes'
                   testId='Notes'
                   htmlFor='note'
-                  maxLength={255}
+                  maxLength={500}
                   handleChange={(e) => handleInputChange(e)} />
               </div>
               <div className='mx-auto mt-7 flex items-center w-full'>
@@ -290,7 +290,7 @@ function TestFieldSetting({
                 isThreedotLoading={isThreedotLoader}
               >
               </Button> */}
-                <button type='button' className='w-full py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                   Add Conditional Logic
                 </button>
               </div>
