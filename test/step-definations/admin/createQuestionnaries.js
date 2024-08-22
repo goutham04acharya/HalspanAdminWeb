@@ -35,7 +35,7 @@ When('I select {string} from the asset type dropdown', async function (asset) {
     await new Promise((resolve) => setTimeout(resolve, 750));
     if (asset != '') {
         await driver.wait(until.elementLocated(By.css('[data-testid = "drop-btn"]'))).click();
-        await driver.wait(until.elementLocated(By.css('[data-testid = "option0"]'))).click();
+        await driver.wait(until.elementLocated(By.css('[data-testid = "asset-0"]'))).click();
     }
 });
 
@@ -51,7 +51,7 @@ When('I select {string} from the questionnaire type options', async function (st
 When('I select {string} from the Language dropdown', async function (language) {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid = "language-drop-btn"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid = "language0"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="language-0"]'))).click();
 });
 
 When('I click the create questionnaire button', async function () {
@@ -83,11 +83,11 @@ When('I enter questionnaire description in the Description field as {string}', a
 When('I select door from the asset type dropdown', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid = "drop-btn"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid = "option0"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid = "asset-0"]'))).click();
 });
 
 When('I select british english from the language dropdown', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid = "language-drop-btn"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid = "language0"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid = "language-0"]'))).click();
 });

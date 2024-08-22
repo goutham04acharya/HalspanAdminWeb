@@ -36,10 +36,14 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     When I click on add new page
     Then I should see the new pages added
     When I click on delete page from section 1
+    Then I should see confirmation prompt for delete page
+    When I click on confirm delete page button
     Then The page should be deleted from section
 
   @create_question
   Scenario: Admin deletes added section
     Given I am on the questionnaire management section
     When I click on delete section 1
+    Then I should see confirmation prompt for delete section
+    When I click on confirm delete section button
     Then I should read a message stating that "Section 1 deleted successfully"

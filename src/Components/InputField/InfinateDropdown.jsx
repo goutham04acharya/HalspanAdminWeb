@@ -46,9 +46,9 @@ function InfinateDropdown({
             </div>
             {isDropdownOpen && (
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10 max-h-[300px] overflow-auto scrollBar">
-                    {options.map(option => (
+                    {options.map((option, index) => (
                         <li key={option.value}
-                            data-testid={labeltestID}
+                            data-testid={`${labeltestID}-${index}`}
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
                             {option.label}

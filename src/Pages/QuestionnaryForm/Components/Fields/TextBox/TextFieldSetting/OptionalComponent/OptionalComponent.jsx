@@ -45,7 +45,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
     }, [fieldSettingParams]);
 
     // ToggleSwitch Component
-    const ToggleSwitch = ({ label, onChange, checked }) => {
+    const ToggleSwitch = ({ label, onChange, checked, testId }) => {
         console.log(`${label} checked:`, checked);
         return (
             <div className="status custom-toggle-switch flex items-center justify-between">
@@ -54,7 +54,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 </p>
                 <label className="switch" style={{ marginLeft: '1px' }}>
                     <input type="checkbox" checked={checked} onChange={onChange} />
-                    <span className="slider round mr-5 mt-1"></span>
+                    <span data-testid={testId} className="slider round mr-5 mt-1"></span>
                 </label>
             </div>
         );
@@ -98,7 +98,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                     key={option}
                     checked={toggleStates[option]}
                     label={option}
-                    data-testid = {`${option}`}
+                    testId = {`${option}`}
                     onChange={() => handleToggleClick(option)}
                 />
             ))}
