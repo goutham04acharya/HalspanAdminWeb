@@ -9,7 +9,6 @@ import InfinateDropdown from '../../../../../../Components/InputField/InfinateDr
 import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
-import Button from '../../../../../../Components/Button/button';
 
 function TestFieldSetting({
   handleInputChange,
