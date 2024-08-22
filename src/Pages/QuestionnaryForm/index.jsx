@@ -255,11 +255,11 @@ function QuestionnaryForm() {
         const update = { ...dataIsSame }
         update[sectionId] = false;
         setDataIsSame(update);
-    
+
         if (event === 'add') {
             const SectionData = [...sections];  // Create a copy of the sections array
             const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
-    
+
             // Add a new page to the current section's pages array
             currentSectionData.pages = [
                 ...currentSectionData.pages,
@@ -269,47 +269,42 @@ function QuestionnaryForm() {
                     questions: []
                 }
             ];
-    
+
             // Save the updated section back to the sections array
             SectionData[sectionIndex] = currentSectionData;
-    
+
             // Update the state with the new sections array
             setSections(SectionData);
-    
-            // Log the updated SectionData
-            console.log('Updated Section Data:', SectionData);
-    
+
             // Call handleAutoSave with the updated section data
             handleAutoSave(sectionId, SectionData);
-            
+
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             setSelectedQuestionId(false);
             setSelectedAddQuestion({});
             setSelectedComponent('');
-    
+
             const SectionData = [...sections];  // Create a copy of the sections array
             const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
-    
+
             const sectionId = currentSectionData.pages[pageIndex].page_id.split('_')[0];
-    
+            const pageId = currentSectionData.pages[pageIndex].page_id
+
             // Update the pages array by filtering out the page at the specified index
             currentSectionData.pages = currentSectionData.pages.filter((_, index) => index !== pageIndex);
-    
+
             // Save the updated section back to the sections array
             SectionData[sectionIndex] = currentSectionData;
-    
+
             // Update the state with the new sections array
             setSections(SectionData);
-    
-            // Log the updated SectionData
-            console.log('Updated Section Data:', SectionData);
-    
+
             // Call handleAutoSave with the updated section data
-            handleAutoSave(sectionId, SectionData);
+            handleAutoSave(sectionId, SectionData, pageId);
         }
     };
-    
+
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
@@ -320,14 +315,14 @@ function QuestionnaryForm() {
             setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
             setSelectedQuestionId('');
         } else if (event === 'remove') {
-            console.log('removing....')
             setSelectedQuestionId(false)
             setSelectedAddQuestion({});
+            const questionId = currentPageData.questions[questionIndex].question_id
             const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
             currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
             const currentSectionData = [...sections]
             currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
-            handleAutoSave(sectionId, currentSectionData);
+            handleAutoSave(sectionId, currentSectionData, '', questionId);
             // After any delete we remove focus on add question and change the field setting
         }
         setSelectedComponent(false);
@@ -335,13 +330,8 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
-    useEffect(() => {
-        console.log(selectedComponent, 'selectedComponent')
-    }, [selectedComponent])
-
     const handleQuestionIndexCapture = (question) => {
         // Update state for selected question and reset component state
-        console.log('..............................asdfghjklkjhg..............')
         setSelectedQuestionId(question.question_id);
         setSelectedAddQuestion({ questionId: question.question_id });
         const componentType = fieldSettingParams[question.question_id]?.componentType;
@@ -543,7 +533,7 @@ function QuestionnaryForm() {
     };
 
 
-    const handleAutoSave = async (sectionId, updatedData) => {
+    const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
@@ -579,8 +569,20 @@ function QuestionnaryForm() {
             // Remove keys from the cloned body
             removeKeys(body);
 
+            const queryParams = [];
+
+            if (pageId) {
+                queryParams.push(`page_deleted=${pageId}`);
+            }
+
+            if (questionId) {
+                queryParams.push(`question_deleted=${questionId}`);
+            }
+
+            const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+
             try {
-                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}${queryString}`, body);
                 if (!(response?.data?.error)) {
                     // Update the saved status
                     const update = { ...dataIsSame };
@@ -596,8 +598,6 @@ function QuestionnaryForm() {
     };
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
-        console.log(selectedAddQuestion?.pageId, 'selectedAddQuestion?.pageId')
-        console.log(selectedAddQuestion, 'selectedAddQuestion............')
         if (!selectedAddQuestion?.pageId) return;
 
         // Generate a unique question ID
