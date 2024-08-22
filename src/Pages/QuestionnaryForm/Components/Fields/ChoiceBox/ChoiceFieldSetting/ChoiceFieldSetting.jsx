@@ -131,7 +131,7 @@ function ChoiceFieldSetting({
         }, [item.id, focusInput, localValue]);
 
         return (
-            <div className={`disable-select select-none w-full mt-7 rounded-[10px]`}>
+            <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
                 <div className='flex justify-between items-start cursor-pointer'>
                     <div className='flex items-center justify-center w-full'>
                         <div
