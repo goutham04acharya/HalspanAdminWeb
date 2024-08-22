@@ -13,11 +13,15 @@ const TextBoxField = ({
 
 }) => {
 
-    console.log(testId, 'testbox asdfghjkl');
-
     return (
         <div>
-            <label data-testid="label-name" htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>{fieldSettingParameters?.label}</label>
+            <label
+                data-testid="label-name"
+                htmlFor={textId}
+                title={fieldSettingParameters?.label}
+                className='font-medium text-base text-[#000000] absolute top-[25px] break-words w-[76%] truncate'>
+                {fieldSettingParameters?.label}
+            </label>
             {fieldSettingParameters?.type === 'multi_line' ?
                 <textarea
                     data-testid='input'
@@ -39,7 +43,12 @@ const TextBoxField = ({
                     onClick={() => handleChange(fieldSettingParameters)}
                 />
             }
-            <p data-testid="help-text" className='mt-2 font-normal text-sm text-[#2B333B]'>{fieldSettingParameters?.helptext}</p>
+            <p
+                data-testid="help-text"
+                className='italic mt-2 font-normal text-sm text-[#2B333B] truncate'
+                title={fieldSettingParameters?.helptext}
+            >
+                {fieldSettingParameters?.helptext}</p>
         </div>
     )
 }

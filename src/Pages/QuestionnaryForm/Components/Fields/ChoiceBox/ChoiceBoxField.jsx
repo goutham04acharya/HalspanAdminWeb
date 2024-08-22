@@ -23,7 +23,7 @@ const ChoiceBoxField = ({
     const renderInputGroup = () => {
         const { source, type, fixedChoiceArray, lookupOptionChoice } = fieldSettingParameters;
 
-        const values = source === 'fixedList' 
+        const values = source === 'fixedList'
             ? fixedChoiceArray?.map(choice => choice.value) || []
             : lookupOptionChoice || [];
 
@@ -36,10 +36,15 @@ const ChoiceBoxField = ({
 
     return (
         <div>
-            <label data-testid="label-name" htmlFor={textId} className='font-medium text-base text-[#000000] absolute top-5'>
+            <label
+                data-testid="label-name"
+                htmlFor={textId}
+                title={fieldSettingParameters?.label}
+                className='font-medium text-base text-[#000000] absolute top-[25px] break-words w-[76%] truncate'
+            >
                 {fieldSettingParameters?.label}
             </label>
-            
+
             {['single_choice', 'multi_choice'].includes(fieldSettingParameters?.type) ? (
                 <div className={`relative ${fieldSettingParameters?.type}`}>
                     {renderInputGroup()}
@@ -60,8 +65,12 @@ const ChoiceBoxField = ({
                     </div>
                 </div>
             )}
-            
-            <p data-testid="help-text" className='mt-2 font-normal text-sm text-[#2B333B]'>
+
+            <p
+                data-testid="help-text"
+                className='italic mt-2 font-normal text-sm text-[#2B333B] truncate'
+                title={fieldSettingParameters?.helptext}
+            >
                 {fieldSettingParameters?.helptext}
             </p>
         </div>
