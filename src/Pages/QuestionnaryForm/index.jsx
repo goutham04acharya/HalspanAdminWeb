@@ -347,7 +347,7 @@ function QuestionnaryForm() {
             <div
                 data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
                 onClick={() => handleQuestionIndexCapture(item)}
-                className={`disable-select select-none w-full mt-7 rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
+                className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
             >
                 <div className='flex justify-between items-start cursor-pointer'>
                     {!fieldSettingParameters && (
