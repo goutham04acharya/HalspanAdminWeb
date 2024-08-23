@@ -4,7 +4,7 @@ import Search from '../../Search/Search'
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound'
 import Table from '../QuestionnariesList/Components/Table'
 import useApi from '../../services/CustomHook/useApi'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import CreateModal from '../../Components/CustomModal/CreateModal'
 import { data } from 'autoprefixer'
 import useObjects from '../../customHooks/useObjects'
@@ -120,8 +120,8 @@ const LookupDataset = () => {
                 setLookupList([]);
                 fetchLookupList();
                 const successMessage = isUpdate
-                    ? `Updated lookup dataset ID ${isView?.id} successfully`
-                    : 'Created new lookup dataset successfully';
+                    ? `Updated lookup dataset ID ${isView?.id} successfully.`
+                    : 'Created new lookup dataset successfully.';
                 setToastSuccess(successMessage);
                 handleClose();
             } else if (response?.data?.status === 409) {
@@ -136,13 +136,12 @@ const LookupDataset = () => {
                 }
                 return;
             } else {
-                console.error(response, 'error response');
                 setToastError(response?.data?.data?.message);
                 handleClose();
             }
         } catch (error) {
             handleClose();
-            setToastError('Something went wrong!');
+            setToastError('Something went wrong.');
         }
     };
 
@@ -170,12 +169,11 @@ const LookupDataset = () => {
                         choices: flatData
                     }
 
-                    console.log(payload);
                     handleSubmit(payload);
                 }
             },
             error: (error) => {
-                setToastError('Something went wrong');
+                setToastError('Something went wrong.');
                 console.error('Error parsing CSV:', error);
             }
         });
@@ -184,8 +182,6 @@ const LookupDataset = () => {
 
     // View Functions
     const handleView = (id, name, choices) => {
-        console.log(name, 'lookuplist');
-        console.log(choices, 'lookuplist');
         setIsView({
             open: true,
             id: id
@@ -206,14 +202,14 @@ const LookupDataset = () => {
             setIsDeleteLoading(true);
             const response = await DeleteAPI(`lookup-data/${deleteModal?.id}`);
             if (!response?.error) {
-                setToastSuccess(`Deleted ID ${deleteModal?.id} successfully`)
+                setToastSuccess(`Deleted ID ${deleteModal?.id} successfully.`)
                 setLookupList([])
                 fetchLookupList();
             } else {
-                setToastError('Something went wrong!')
+                setToastError('Something went wrong.')
             }
         } catch (error) {
-            setToastError('Something went wrong!')
+            setToastError('Something went wrong.')
         } finally {
             setIsDeleteLoading(false);
             setDeleteModal('open', false);
@@ -221,9 +217,16 @@ const LookupDataset = () => {
     }
 
     // Hooks
+    const location = useLocation();  // Get the state from the navigation
     useEffect(() => {
         fetchLookupList();
-    }, [fetchLookupList])
+
+        // Check if the create flag is set and open the modal
+        if (location.state?.create) {
+            setIsCreateModalOpen(true);
+        }
+    }, [fetchLookupList, location.state]);
+
 
     const lastElementRef = useCallback(node => {
         if (loading || isFetchingMore) return;
@@ -260,7 +263,7 @@ const LookupDataset = () => {
                                     searchValue={searchValue}
                                     setSearchParams={setSearchParams}
                                     setLoading={setLoading}
-                                    placeholder='Search by Name...'
+                                    placeholder='Search by Name'
                                 />
                             </div>
                         </div>

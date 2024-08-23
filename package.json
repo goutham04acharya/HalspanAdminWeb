@@ -47,6 +47,7 @@
     "react-spinners": "^0.14.1",
     "redux-persist": "^6.0.0",
     "selenium-webdriver": "^4.22.0",
+    "uuid": "^10.0.0",
     "vite-plugin-istanbul": "^6.0.2"
   },
   "devDependencies": {

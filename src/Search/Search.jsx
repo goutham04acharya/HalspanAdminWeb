@@ -41,7 +41,6 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
         const value = e.target.value;
         let params = Object.fromEntries(searchParams)
         delete params.start_key;
-        console.log(params, 'paramsss')
         setSearchValue(value);
         optimizedFn(e, value); // This should call handleSearch with the current value
     };

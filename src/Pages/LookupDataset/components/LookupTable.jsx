@@ -11,7 +11,7 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView, setDelet
                     <tr>
                         <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B] uppercase'>ID</th>
                         <th className='min-w-[400px] text-start py-6 font-medium text-base text-[#2B333B] uppercase'>NAME</th>
-                        <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] uppercase'>ACTION</th>
+                        <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] uppercase'>ACTIONS</th>
                     </tr>
                 </thead>
                 {loading
@@ -22,7 +22,7 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView, setDelet
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-5 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{LookupInfo?.lookup_id}</td>
                                     <td className='py-5 text-start font-semibold max-w-[100px] text-base text-[#2B333B] pr-6 bg-[#F4F6FA]' title={LookupInfo?.name}>{LookupInfo?.name}</td>
-                                    <td className='py-5 text-center bg-[#F4F6FA] pl-4 flex justify-start items-center gap-4'>
+                                    <td className='py-5 text-center bg-[#F4F6FA] flex justify-start items-center gap-4'>
                                         <p
                                             className='underline cursor-pointer'
                                             onClick={() => handleView(LookupInfo?.lookup_id, LookupInfo?.name, LookupInfo?.choices)}

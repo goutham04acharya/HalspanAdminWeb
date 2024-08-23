@@ -1,6 +1,6 @@
 import React from 'react';
 
-function InputWithDropDown({
+function InfinateDropdown({
     className,
     id,
     placeholder,
@@ -18,14 +18,11 @@ function InputWithDropDown({
     labeltestID,
     validationError,
     close,
-    setSelectedOption
+    setSelectedOption,
+    lastElementRef,
+    handleRemoveLookup
 }) {
 
-    const handleRemove = ()=>{
-        setSelectedOption('');
-    }
-
-    console.log(options, 'fjhhjhfjhjdfhhhhhhh')
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>{label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
@@ -41,26 +38,27 @@ function InputWithDropDown({
                     readOnly
                 />
                 {(selectedOption && close) ?
-                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-4`} onClick={()=> handleRemove()} />
+                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[11px]`} onClick={() => handleRemoveLookup()} />
                     :
                     <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />
                 }
             </div>
             {isDropdownOpen && (
-                <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
+                <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10 max-h-[300px] overflow-auto scrollBar">
                     {options.map((option, index) => (
                         <li key={option.value}
-                            data-testid={`${labeltestID}-${index}`}                            
+                            data-testid={`${labeltestID}-${index}`}
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
                             {option.label}
                         </li>
                     ))}
+                    <li ref={lastElementRef} className='h-1'></li>
                 </ul>
             )}
         </div>
     );
 }
 
-export default InputWithDropDown;
+export default InfinateDropdown;

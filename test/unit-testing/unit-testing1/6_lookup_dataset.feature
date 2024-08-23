@@ -83,6 +83,14 @@ Feature: Halspan - Admin- Lookup data set
         When I upload the valid file csv as "bddtest-lookup-data.csv"
         Then I should read a message stating that "Created new lookup dataset successfully"
 
+    Scenario: Delete the uploaded dataset
+        Given I am on the lookup dataset listing screen
+        When I search by the name "bddtest-lookup-data"
+        When I click the delete option for a lookup dataset
+        Then I should see a confirmation prompt for deletion
+        When I click the confirm button
+        Then I should read success message for delete user
+
     Scenario: Admin creates the lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button

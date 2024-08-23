@@ -48,7 +48,6 @@ function Questionnaries() {
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
-    console.log(option, params.asset_type, 'optios')
     if (params.asset_type === option?.value) {
       setDropdownOpen(false);
       return;
@@ -67,7 +66,6 @@ function Questionnaries() {
 
   const clearFilters = () => {
     let params = Object.fromEntries(searchParams);
-    console.log(params, 'params')
     delete params?.start_key;
     delete params?.asset_type;
     lastEvaluatedKeyRef.current = null
@@ -129,7 +127,7 @@ function Questionnaries() {
               testId='createQuestionnaireBtn'
               onClick={handleCreateQue}
               className='w-[315px] h-[50px] font-semibold'
-              text='Create new questionnaire'
+              text='Create New Questionnaire'
             />
           </div>
           <div className='flex items-center justify-between w-full'>
