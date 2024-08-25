@@ -12,6 +12,7 @@ const TextBoxField = ({
     testId
 
 }) => {
+    console.log(fieldSettingParameters?.label, 'fieldsSEE')
 
     return (
         <div>

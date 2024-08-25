@@ -37,7 +37,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                             <p
                                 data-testid={`sidebar-section-${sectionIndex}`}
                                 title={sectionItem?.section_name}
-                                className='font-normal text-base text-[#2B333B] ml-3 py-[14px] truncate'
+                                className='font-normal text-base text-[#2B333B] ml-3 py-2 truncate'
                             >
                                 {sectionItem?.section_name}
                             </p>
@@ -53,7 +53,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                     <p
                                         data-testid={`sidebar-page-${pageIndex}`}
                                         title={pageItem?.page_name}
-                                        className='font-normal text-base text-[#2B333B] cursor-pointer py-[14px] truncate'
+                                        className='font-normal text-base text-[#2B333B] cursor-pointer py-2 truncate'
                                     >
                                         {pageItem?.page_name}
                                     </p>

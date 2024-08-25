@@ -145,8 +145,11 @@ const LookupDataset = () => {
         }
     };
 
-
     const handleImport = (event) => {
+        console.log( 'am here')
+        if(!data?.choices === ''){
+            handleDelete();
+        }else{
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
@@ -178,6 +181,7 @@ const LookupDataset = () => {
             }
         });
         event.target.value = ''; // Reset the input to allow re-uploading the same file
+    }
     };
 
     // View Functions

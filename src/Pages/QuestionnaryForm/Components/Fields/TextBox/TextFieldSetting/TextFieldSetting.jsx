@@ -197,7 +197,7 @@ function TestFieldSetting({
                     <InfinateDropdown
                       label=''
                       id='lookup'
-                      placeholder='Select the file'
+                      placeholder='Select the lookup list'
                       className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'

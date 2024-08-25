@@ -31,7 +31,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     // Sync local state with Redux state when the component mounts or fieldSettingParams change
     useEffect(() => {
-        console.log('useEffect triggered:', fieldSettingParams[selectedQuestionId]);
         if (fieldSettingParams[selectedQuestionId]) {
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams?.[selectedQuestionId]?.options?.load_from_previous || false,
@@ -46,7 +45,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     // ToggleSwitch Component
     const ToggleSwitch = ({ label, onChange, checked, testId }) => {
-        console.log(`${label} checked:`, checked);
         return (
             <div className="status custom-toggle-switch flex items-center justify-between">
                 <p className="text-sm font-normal text-[#000000] mr-4 mt-3">
@@ -68,8 +66,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
             [label]: !toggleStates[label],
         };
         setToggleStates(newToggleStates);
-
-        console.log(newToggleStates, 'newToggleStates');
 
         // Prepare the object for the backend request
         const payload = {
