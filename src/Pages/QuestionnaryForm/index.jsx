@@ -17,6 +17,8 @@ import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewC
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
+import DateTimeField from './Components/Fields/DateTime/DateTimeField.jsx';
+import DateTimeFieldSetting from './Components/Fields/DateTime/DateTimeFieldSetting/DateTimeFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -123,6 +125,10 @@ function QuestionnaryForm() {
             <ChoiceBoxField
                 {...props}
             />,
+        DateTimefield: (props) =>
+            <DateTimeField
+            {...props}
+            />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
         // audio: (props) => <AudioField {...props} />,
@@ -131,6 +137,7 @@ function QuestionnaryForm() {
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
+        "DateTimefield": DateTimeFieldSetting,
         // Add other mappings here...
     };
 
@@ -350,9 +357,9 @@ function QuestionnaryForm() {
                 className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
             >
                 <div className='flex justify-between items-start cursor-pointer'>
-                    {!fieldSettingParameters && (
+                    {/* {!fieldSettingParameters && (
                         <p className='mb-5 font-medium text-base text-[#000000] w-[25%]'>{item?.question_text}</p>
-                    )}
+                    )} */}
                     <div className='flex items-center justify-end w-full'>
                         <div
                             className="disable-select dragHandle"
@@ -777,7 +784,11 @@ function QuestionnaryForm() {
                             </button>
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p className={`font-semibold text-[22px] text-[#2B333B] ${sections.length === 0 ? 'mb-3' : ''}`} data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}</p>
+                            <p 
+                            title={formDefaultInfo?.internal_name}
+                            className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`} 
+                            data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                            </p>
                             {sections?.map((sectionData, sectionIndex) => (
                                 <div
                                     key={sectionData?.section_id}
@@ -876,11 +887,11 @@ function QuestionnaryForm() {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/2 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>

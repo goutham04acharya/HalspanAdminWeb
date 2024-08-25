@@ -20,7 +20,9 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
         <div className='py-4'>
             <div className='flex items-center px-9'>
                 <img src="/Images/form-name.svg" alt="form-name" />
-                <p className='ml-3 font-semibold text-base text-[#2B333B] '>{formDefaultInfo?.internal_name}</p>
+                <p 
+                title={formDefaultInfo?.internal_name}
+                className='ml-3 font-semibold text-base text-[#2B333B] truncate w-[90%]'>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
                 {sections?.length > 0 && sections?.map((sectionItem, sectionIndex) => (
@@ -30,7 +32,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                 handleDropdown(sectionIndex)
                                 handleSectionScroll(sectionIndex)
                             }}
-                            className='flex items-center px-11 hover:bg-[#EFF1F8] cursor-pointer'>
+                            className={` ${(sectionItem?.section_id) ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-11 pr-3 cursor-pointer`}>
                             <img src="/Images/down-arrow.svg" alt="down-arrow" />
                             <p
                                 data-testid={`sidebar-section-${sectionIndex}`}
@@ -45,7 +47,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                 <div
                                     key={sectionItem?.page_id}
                                     onClick={() => handlePageScroll(sectionIndex, pageIndex)}
-                                    className='flex items-center pl-14 hover:bg-[#EFF1F8] cursor-pointer truncate'
+                                    className='flex items-center pl-14 pr-2 hover:bg-[#EFF1F8] cursor-pointer truncate'
                                 >
                                     <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>
                                     <p
