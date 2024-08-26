@@ -153,6 +153,7 @@ const LookupDataset = () => {
         if(!data?.choices === ''){
             showlookupReplaceModal(true);
     }
+}
 
     const handleImport = (event) => {
         console.log( 'am here')
