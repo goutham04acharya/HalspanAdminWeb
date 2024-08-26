@@ -979,7 +979,7 @@ function QuestionnaryForm() {
                     Button1text='Delete'
                     Button2text='Cancel'
                     src='delete-gray'
-                    testIDBtn1='confirm-delete'
+                    testIDBtn1='confirm-delete-page'
                     testIDBtn2='cancel-delete'
                     isModalOpen={showPageDeleteModal}
                     setModalOpen={setShowPageDeleteModal}
