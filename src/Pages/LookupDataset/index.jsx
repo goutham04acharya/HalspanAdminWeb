@@ -50,7 +50,6 @@ const LookupDataset = () => {
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [showlookupReplaceModal, setShowLookupReplaceModal] = useState(false);
-    const fileInputRef = useRef(null);  // Add a ref for the file input
 
 
 
@@ -150,11 +149,13 @@ const LookupDataset = () => {
         }
     };
 
-    const handleImport = (event) => {
-        console.log( 'am here')
+    const handleImportConfirmationModal = () => {
         if(!data?.choices === ''){
             showlookupReplaceModal(true);
-        }else{
+    }
+
+    const handleImport = (event) => {
+        console.log( 'am here')
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
@@ -186,7 +187,6 @@ const LookupDataset = () => {
             }
         });
         event.target.value = ''; // Reset the input to allow re-uploading the same file
-    }
     };
 
     // View Functions
@@ -325,15 +325,23 @@ const LookupDataset = () => {
                 handleClose={() => setDeleteModal('open', false)}
                 isLoading={isDeleteLoading}
             />
-            {showlookupReplaceModal && (
+           {showlookupReplaceModal && (
                 <ConfirmationModal
+                    text='Replace Lookup Dataset'
+                    subText='You are about to import new data into the lookup dataset. This action will replace the existing choices with the new ones.'
+                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    Button1text='Confirm'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
                     isOpen={showlookupReplaceModal}
                     onClose={() => setShowLookupReplaceModal(false)}
-                    onConfirm={handleConfirmImport}
-                    title="Replace Existing Data"
-                    message="Importing this dataset will replace the existing data. Do you want to proceed?"
-                    confirmText="Yes, Replace"
-                    cancelText="Cancel" />
+                    handleButton1={handleConfirmImport}
+                    handleButton2={() => setShowLookupReplaceModal(false)}
+                    isOpenFileUpload={true}
+                    isImportLoading={isImportLoading}
+                />
             )}
         </>
     )
