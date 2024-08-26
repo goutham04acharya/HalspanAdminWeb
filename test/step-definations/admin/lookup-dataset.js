@@ -91,7 +91,7 @@ Then('The results should display lookup dataset matching the name', async functi
     await driver.wait(until.elementIsVisible(tbody))
 
     datasetName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`))).getText();
-    console.log(datasetName,"2345")
+    console.log(datasetName, "2345")
     assert.equal(this.name, datasetName);
 });
 
@@ -124,4 +124,14 @@ When('I click on the view dataset', async function () {
 Then('I should see a popup window to view lookup dataset', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="View Lookup Dataset"]')));
+});
+
+When('I click the import button', async function () {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="import-btn"]'))).click();
+});
+
+Then('I should see a confirmation model to replacing existing dataset', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.xpath('//p[text()="Replace Lookup Dataset"]')));
 });

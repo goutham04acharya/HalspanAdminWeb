@@ -86,6 +86,8 @@ Feature: Halspan - Admin- Lookup data set
         When I search by the name
         * I click on the view dataset
         Then I should see a popup window to view lookup dataset
+        When I click the import button
+        Then I should see a confirmation model to replacing existing dataset
         When I upload the valid file csv as "bddtest-lookup-data.csv"
         Then I should read success message for updating dataset by importing the dataset
         When I search by the name "bddtest-lookup-data"
