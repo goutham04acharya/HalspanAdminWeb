@@ -14,6 +14,7 @@ import Papa from 'papaparse';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString'
 import LookupTable from './components/LookupTable'
 import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
+import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal'
 
 
 const LookupDataset = () => {
@@ -48,6 +49,10 @@ const LookupDataset = () => {
     const observer = useRef();
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const [showlookupReplaceModal, setShowLookupReplaceModal] = useState(false);
+    const fileInputRef = useRef(null);  // Add a ref for the file input
+
+
 
     // Functions
     // List Functions
@@ -148,7 +153,7 @@ const LookupDataset = () => {
     const handleImport = (event) => {
         console.log( 'am here')
         if(!data?.choices === ''){
-            handleDelete();
+            showlookupReplaceModal(true);
         }else{
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
@@ -320,6 +325,16 @@ const LookupDataset = () => {
                 handleClose={() => setDeleteModal('open', false)}
                 isLoading={isDeleteLoading}
             />
+            {showlookupReplaceModal && (
+                <ConfirmationModal
+                    isOpen={showlookupReplaceModal}
+                    onClose={() => setShowLookupReplaceModal(false)}
+                    onConfirm={handleConfirmImport}
+                    title="Replace Existing Data"
+                    message="Importing this dataset will replace the existing data. Do you want to proceed?"
+                    confirmText="Yes, Replace"
+                    cancelText="Cancel" />
+            )}
         </>
     )
 }

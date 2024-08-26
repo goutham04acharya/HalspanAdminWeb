@@ -57,7 +57,7 @@ function QuestionnaryForm() {
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    // const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
+    const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
 
     const dispatch = useDispatch();
@@ -287,6 +287,8 @@ function QuestionnaryForm() {
         setDataIsSame(update);
 
         if (event === 'add') {
+            if (currentSectionData.pages.length < 20) {
+
             const SectionData = [...sections];  // Create a copy of the sections array
             const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
 
@@ -308,7 +310,10 @@ function QuestionnaryForm() {
 
             // Call handleAutoSave with the updated section data
             handleAutoSave(sectionId, SectionData);
-
+        } else {
+            setToastError("Limit reached: Maximum of 20 pages allowed.");
+            return; // Exit the function if the limit is reached
+        }
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             setSelectedQuestionId(false);
@@ -341,8 +346,13 @@ function QuestionnaryForm() {
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
-            setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-            setSelectedQuestionId('');
+            if (currentPageData.questions.length < 20) {
+                setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
+                setSelectedQuestionId('');
+            } else {
+                setToastError("Limit reached: Maximum of 20 questions allowed.");
+                return; // Exit the function if the limit is reached
+            }
         } else if (event === 'remove') {
             setSelectedQuestionId(false)
             setSelectedAddQuestion({});
@@ -784,8 +794,6 @@ function QuestionnaryForm() {
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
 
-
-
     return (
         <>
             {pageLoading ? (
@@ -928,7 +936,7 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        // setFieldSettingParameters: setFieldSettingParameters,
+                                        setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
