@@ -191,7 +191,7 @@ Then('I should see confirmation prompt for delete page', async function () {
   
 When('I click on confirm delete page button', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    const deleteButton = await driver.wait(until.elementLocated(By.css(`[data-testid="confirm-delete"]`)));
+    const deleteButton = await driver.wait(until.elementLocated(By.css(`[data-testid="confirm-delete-page"]`)));
     await deleteButton.click();
 });
 

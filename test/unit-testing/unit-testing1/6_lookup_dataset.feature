@@ -110,8 +110,15 @@ Feature: Halspan - Admin- Lookup data set
         When I search by the name
         Then The results should display lookup dataset matching the name
 
-
-
-
-
-
+    Scenario: Confirm replacing the lookup dataset with existing dataset
+        Given I am on the lookup dataset listing screen
+        When I search by the name
+        * I click on the view dataset
+        Then I should see a popup window to view lookup dataset
+        When I upload the valid file csv as "bddtest-lookup-data.csv"
+        Then I should read success message for updating dataset by importing the dataset
+        When I search by the name "bddtest-lookup-data"
+        When I click the delete option for a lookup dataset
+        Then I should see a confirmation prompt for deletion
+        When I click the confirm button
+        Then I should read success message for delete user
