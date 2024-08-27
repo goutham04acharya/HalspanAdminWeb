@@ -129,7 +129,7 @@ function TestFieldSetting({
             helpText='Help Text'
             helpTextPlaceholder='Enter help text'
             placeholderContentId='placeholder'
-            placeholder='Placeholder content'
+            placeholder='Placeholder Content'
             placeholderContent='Text displayed in the field'
             handleInputChange={handleInputChange}
             formParameters={formParameters}
@@ -158,7 +158,7 @@ function TestFieldSetting({
                 <label htmlFor='Singleline'
                   data-testid='single_line'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                  Single line
+                  Single-line
                 </label>
               </div>
 
@@ -197,7 +197,7 @@ function TestFieldSetting({
                     <InfinateDropdown
                       label=''
                       id='lookup'
-                      placeholder='Select the file'
+                      placeholder='Select the lookup list'
                       className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'
