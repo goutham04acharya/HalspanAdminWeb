@@ -631,7 +631,7 @@ function QuestionnaryForm() {
             }
         }
     };
-
+    
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
         if (!selectedAddQuestion?.pageId) return;
 
