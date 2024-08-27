@@ -383,6 +383,7 @@ function QuestionnaryForm() {
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         setSelectedComponent(componentType);
     };
+    
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
@@ -412,13 +413,13 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab p-2 mb-2 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab p-2 mb-2 absolute top-0 right-6 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
                         <img
                             src="/Images/trash-black.svg"
                             alt="delete"
                             title='Delete'
-                            className='pl-2.5 cursor-pointer p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
+                            className='pl-2.5 cursor-pointer absolute top-0 right-0 p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
