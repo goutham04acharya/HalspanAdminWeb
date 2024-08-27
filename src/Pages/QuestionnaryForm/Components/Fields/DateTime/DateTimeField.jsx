@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TextBoxField = ({
+function DateTimeField({
     label,
     type,
     textId,
@@ -10,9 +10,7 @@ const TextBoxField = ({
     handleChange,
     fieldSettingParameters,
     testId
-
-}) => {
-    
+}) {
     return (
         <div>
             <label
@@ -53,4 +51,4 @@ const TextBoxField = ({
     )
 }
 
-export default TextBoxField
+export default DateTimeField

@@ -8,45 +8,52 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     // Get the current field settings from Redux
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingPArams')
 
-    // List of options
-    const options = [
-        'Load from previously entered data',
-        'Read only',
-        'Visible',
-        'Optional',
-        'Remember allowed',
-        'Field validation',
-    ];
+     // Define options based on componentType
+     const getOptions = (componentType) => {
+        if (componentType === 'textboxfield') {
+            return [
+                'Load from previously entered data',
+                'Read only',
+                'Visible',
+                'Optional',
+                'Remember allowed',
+                'Field validation',
+            ];
+        } else {
+            return [
+                'Load from previously entered data',
+                'Read only',
+                'Visible',
+                'Optional',
+                'Remember allowed',
+            ];
+        }
+    };
 
-    // Initialize the state for the toggles
-    const [toggleStates, setToggleStates] = useState({
-        'Load from previously entered data': false,
-        'Read only': false,
-        'Visible': false,
-        'Optional': false,
-        'Remember allowed': false,
-        'Field validation': false,
-    });
+     // Initialize the state for the toggles
+     const [toggleStates, setToggleStates] = useState({});
 
-    // Sync local state with Redux state when the component mounts or fieldSettingParams change
-    useEffect(() => {
-        console.log('useEffect triggered:', fieldSettingParams[selectedQuestionId]);
+     // Sync local state with Redux state when the component mounts or fieldSettingParams change
+     useEffect(() => {
         if (fieldSettingParams[selectedQuestionId]) {
+            const componentType = fieldSettingParams[selectedQuestionId]?.componentType;
+            const options = getOptions(componentType);
+
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams?.[selectedQuestionId]?.options?.load_from_previous || false,
                 'Read only': fieldSettingParams?.[selectedQuestionId]?.options?.read_only || false,
                 'Visible': fieldSettingParams?.[selectedQuestionId]?.options?.visible || false,
                 'Optional': fieldSettingParams?.[selectedQuestionId]?.options?.optional || false,
                 'Remember allowed': fieldSettingParams?.[selectedQuestionId]?.options?.remember_allowed || false,
-                'Field validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_Validation || false,
+                'Field validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_validation || false,
             });
         }
-    }, [fieldSettingParams]);
+    }, [fieldSettingParams, selectedQuestionId]);
 
     // ToggleSwitch Component
     const ToggleSwitch = ({ label, onChange, checked, testId }) => {
-        console.log(`${label} checked:`, checked);
         return (
             <div className="status custom-toggle-switch flex items-center justify-between">
                 <p className="text-sm font-normal text-[#000000] mr-4 mt-3">
@@ -69,8 +76,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         };
         setToggleStates(newToggleStates);
 
-        console.log(newToggleStates, 'newToggleStates');
-
         // Prepare the object for the backend request
         const payload = {
             load_from_previous: newToggleStates['Load from previously entered data'],
@@ -89,6 +94,10 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         }));
         setShouldAutoSave(true);
     };
+
+        // Get options based on current componentType
+        const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
+        const options = getOptions(componentType);
 
     return (
         <div className='mt-7 w-[97%]'>

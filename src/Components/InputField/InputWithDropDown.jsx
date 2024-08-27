@@ -25,7 +25,6 @@ function InputWithDropDown({
         setSelectedOption('');
     }
 
-    console.log(options, 'fjhhjhfjhjdfhhhhhhh')
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>{label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>

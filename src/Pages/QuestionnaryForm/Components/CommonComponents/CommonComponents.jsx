@@ -67,7 +67,7 @@ function CommonComponents({
                     id='placeholderContent'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="placeholder-input"
-                    maxLength={150}
+                    maxLength={50}
                 />
             </div>
         </div>
