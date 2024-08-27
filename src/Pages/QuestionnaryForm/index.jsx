@@ -57,7 +57,7 @@ function QuestionnaryForm() {
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    const [fieldSettingParameters, setFieldSettingParameters] = useState({});
+    // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
 
     const dispatch = useDispatch();
@@ -945,7 +945,7 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        setFieldSettingParameters: setFieldSettingParameters,
+                                        // setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,

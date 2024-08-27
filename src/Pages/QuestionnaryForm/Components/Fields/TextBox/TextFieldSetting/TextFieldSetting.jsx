@@ -15,7 +15,7 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  setFieldSettingParameters,
+  // setFieldSettingParameters,
   handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
@@ -50,20 +50,20 @@ function TestFieldSetting({
   ];
 
   const handleOptionClick = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      format: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   format: option.value,
+    // }));
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      lookupOption: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   lookupOption: option.value,
+    // }));
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
