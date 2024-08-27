@@ -21,11 +21,13 @@ const RadioButtonGroup = ({ values, name, onChange, testId }) => {
                         onChange={handleChange}
                         checked={selectedValue === value}
                         className="hidden"
+                        maxLength={100}
                     />
                     <label
                         htmlFor={`radio-${index}`}
                         data-testid={`${testId}-choice-${index + 1}`}
-                        className="h-5 flex items-center cursor-pointer relative pl-6 text-neutral-primary text-[16px] leading-[20px] font-normal"
+                        maxLength={50}
+                        className="h-5 flex items-center cursor-pointer relative pl-6 text-neutral-primary text-[16px] leading-[20px] font-normal break-words flex-wrap overflow-hidden"
                     >
                         {value}
                     </label>

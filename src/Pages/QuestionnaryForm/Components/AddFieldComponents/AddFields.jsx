@@ -9,7 +9,7 @@ const AddFields = ({ buttons, testId , handleClick}) => {
                     <div key={index} className='px-4 w-1/2'>
                         <button
                             data-testid={`${button?.testId}`}
-                            className={`border border-[#2B333B] py-[14px] px-5 rounded text-base text-[#2B333B] font-semibold flex items-center w-full mb-[26px]`}
+                            className={`border border-[#2B333B] bg-white hover:bg-[#EFF1F8] py-[14px] px-5 rounded text-base text-[#2B333B] font-semibold flex items-center w-full mb-[26px]`}
                             onClick={() => handleClick(button.onClick)}
                         >
                             <div className='mr-4'>
