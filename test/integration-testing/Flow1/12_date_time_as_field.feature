@@ -21,6 +21,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Date/Time as a Field
     Then I should see the add field
     * I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
     * I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the date/time button
     Then I should see field settings
     And I should see the date/time field added to the section 1
