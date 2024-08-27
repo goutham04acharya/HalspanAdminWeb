@@ -319,7 +319,7 @@ const LookupDataset = () => {
             <ConfirmModal
                 text='Delete Lookup Dataset'
                 subText={`Are you sure you want to delete the lookup dataset with ID ${deleteModal.id || '-'}?`}
-                button1Style='border border-[#2B333B] bg-[#2B333B] !w-[156px]'
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000] !w-[156px]'
                 button2Style='!w-[162px]'
                 Button1text='Delete'
                 Button2text='Cancel'
@@ -337,7 +337,7 @@ const LookupDataset = () => {
                 <ConfirmationModal
                     text='Replace Lookup Dataset'
                     subText='You are about to import new data into the lookup dataset. This action will replace the existing choices with the new ones.'
-                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Confirm'
                     Button2text='Cancel'
                     src='delete-gray'

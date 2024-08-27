@@ -59,7 +59,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                         />
                         {data?.choices === '' ? <label
                             htmlFor="file-upload"
-                            className={`bg-[#fff] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
+                            className={`bg-[#fff] hover:bg-[#EFF1F8] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
                             leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center`}>
                             {isImportLoading ? (
                                 <BeatLoader color="#2B333B" size='10px' />

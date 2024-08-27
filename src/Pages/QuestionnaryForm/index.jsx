@@ -631,7 +631,7 @@ function QuestionnaryForm() {
             }
         }
     };
-    
+
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
         if (!selectedAddQuestion?.pageId) return;
 
@@ -913,15 +913,15 @@ function QuestionnaryForm() {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8]'>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] border-l border-r border-[#EFF1F8]'
+                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
                             // onClick={() => handleSaveSection()}
                             >
                                 Save
@@ -959,7 +959,7 @@ function QuestionnaryForm() {
                 <ConfirmationModal
                     text='Delete Section'
                     subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
                     src='delete-gray'
@@ -975,7 +975,7 @@ function QuestionnaryForm() {
                 <ConfirmationModal
                     text='Delete Page'
                     subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
                     src='delete-gray'
@@ -991,7 +991,7 @@ function QuestionnaryForm() {
                 <ConfirmationModal
                     text='Delete Question'
                     subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
                     src='delete-gray'

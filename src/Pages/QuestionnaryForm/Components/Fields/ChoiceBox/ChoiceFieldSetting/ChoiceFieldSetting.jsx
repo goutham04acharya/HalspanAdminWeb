@@ -156,6 +156,7 @@ function ChoiceFieldSetting({
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
                             onBlur={handleBlur}
                             data-testid={`choice-${item.index + 1}`}
+                            maxLength={50}
                         />
                         {fixedChoiceArray.length > 1 && <img
                             src="/Images/trash-black.svg"
@@ -362,7 +363,7 @@ function ChoiceFieldSetting({
                             >
                                 Save
                             </button> */}
-                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>
                         </div>
