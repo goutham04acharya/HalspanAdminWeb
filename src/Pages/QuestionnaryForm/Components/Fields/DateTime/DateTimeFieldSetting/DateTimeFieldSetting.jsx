@@ -107,7 +107,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           </div>
-          {(fieldSettingParameters?.type === 'time') &&
+          {((fieldSettingParameters?.type === 'time') || (fieldSettingParameters?.type === 'datetime')) &&
             <div className='mt-7'>
               <p className='font-semibold text-base text-[#2B333B]'>Format</p>
               <div className="relative custom-radioBlue flex items-center mt-3" data-testid='yes'>
