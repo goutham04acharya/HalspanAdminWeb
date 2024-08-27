@@ -10,7 +10,7 @@ import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import EditableField from '../../Components/EditableField/EditableField.jsx';
-import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
+// import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
@@ -42,30 +42,27 @@ function QuestionnaryForm() {
     const [pageLoading, setPageLoading] = useState(false);
     const [formDefaultInfo, setFormDefaultInfo] = useState([]);
     const [savedSection, setSavedSection] = useState([]);
-    const [selectedQuestionDetails, setSelectedQuestionDetails] = useState({})
-    const [inputVisibility, setInputVisibility] = useState({});
     const [selectedComponent, setSelectedComponent] = useState(null);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
-    const questionRefs = useRef([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [sectionToDelete, setSectionToDelete] = useState(null); // Track the section to delete
     const [showPageDeleteModal, setShowPageDeleteModal] = useState(false);
+    const [showquestionDeleteModal, setShowquestionDeleteModal] = useState(false);
     const [pageToDelete, setPageToDelete] = useState({ sectionIndex: null, pageIndex: null });
-
-
+    const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
 
     // text field related states
-    const [textFieldSettings, setTextFieldSettings] = useState(false)
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    const [fieldSettingParameters, setFieldSettingParameters] = useState(globalStates.textbox);
+    const [fieldSettingParameters, setFieldSettingParameters] = useState({});
+    const [selectedSectionData, setSelectedSectionData] = useState({})
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const savedData = useSelector(state => state.fieldSettingParams.savedData);
+    // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
     const handleCancel = () => {
@@ -73,10 +70,22 @@ function QuestionnaryForm() {
         setSectionToDelete(null); // Reset the section to delete
     }
 
-    const handleDeleteModal = (sectionIndex) => {
+    const handleDeleteModal = (sectionIndex, sectionData) => {
         setSectionToDelete(sectionIndex); // Set the section to delete
+        setSelectedSectionData(sectionData)
         setModalOpen(true);
     }
+    const handleDeletePgaeModal = (sectionIndex, pageIndex, pageData) => {
+        setPageToDelete({ sectionIndex, pageIndex }); // Ensure you're setting both sectionIndex and pageIndex correctly
+        setSelectedSectionData(pageData);
+        setModalOpen(true);
+    }
+
+    const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
+        setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index });
+        setSelectedSectionData(fieldSettingParams[selectedQuestionId]);
+        setShowquestionDeleteModal(true);
+    };
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
@@ -84,6 +93,20 @@ function QuestionnaryForm() {
             setModalOpen(false); // Close the modal
         }
     }
+
+    const confirmDeletePage = () => {
+        if (pageToDelete.sectionIndex !== null && pageToDelete.pageIndex !== null) { // Check if indices are valid
+            handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex, selectedSectionData); // Pass selectedSectionData instead of undefined pageData
+            setShowPageDeleteModal(false);
+        }
+    }
+
+    const confirmDeleteQuestion = () => {
+        if (questionToDelete.sectionIndex !== null && questionToDelete.pageIndex !== null && questionToDelete.questionIndex !== null) {
+            handleAddRemoveQuestion('remove', questionToDelete.sectionIndex, questionToDelete.pageIndex, questionToDelete.questionIndex);
+            setShowquestionDeleteModal(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -93,10 +116,10 @@ function QuestionnaryForm() {
             ? value.replace(/[^0-9]/g, '')  // Allow only numeric input
             : value;
 
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            [id]: updatedValue,
-        }));
+        // setFieldSettingParameters((prevState) => ({
+        //     ...prevState,
+        //     [id]: updatedValue,
+        // }));
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
@@ -127,7 +150,7 @@ function QuestionnaryForm() {
             />,
         dateTimefield: (props) =>
             <DateTimeField
-            {...props}
+                {...props}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
@@ -264,6 +287,8 @@ function QuestionnaryForm() {
         setDataIsSame(update);
 
         if (event === 'add') {
+            if (currentSectionData.pages.length < 20) {
+
             const SectionData = [...sections];  // Create a copy of the sections array
             const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
 
@@ -285,7 +310,10 @@ function QuestionnaryForm() {
 
             // Call handleAutoSave with the updated section data
             handleAutoSave(sectionId, SectionData);
-
+        } else {
+            setToastError("Limit reached: Maximum of 20 pages allowed.");
+            return; // Exit the function if the limit is reached
+        }
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             setSelectedQuestionId(false);
@@ -312,15 +340,19 @@ function QuestionnaryForm() {
         }
     };
 
-
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
         let currentPageData = sections[sectionIndex].pages[pageIndex];
         const update = { ...dataIsSame }
         update[sections[sectionIndex].section_id] = false;
         setDataIsSame(update)
         if (event === 'add') {
-            setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-            setSelectedQuestionId('');
+            if (currentPageData.questions.length < 20) {
+                setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
+                setSelectedQuestionId('');
+            } else {
+                setToastError("Limit reached: Maximum of 20 questions allowed.");
+                return; // Exit the function if the limit is reached
+            }
         } else if (event === 'remove') {
             setSelectedQuestionId(false)
             setSelectedAddQuestion({});
@@ -344,8 +376,6 @@ function QuestionnaryForm() {
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         setSelectedComponent(componentType);
     };
-
-
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
@@ -357,9 +387,6 @@ function QuestionnaryForm() {
                 className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
             >
                 <div className='flex justify-between items-start cursor-pointer'>
-                    {/* {!fieldSettingParameters && (
-                        <p className='mb-5 font-medium text-base text-[#000000] w-[25%]'>{item?.question_text}</p>
-                    )} */}
                     <div className='flex items-center justify-end w-full'>
                         <div
                             className="disable-select dragHandle"
@@ -387,7 +414,8 @@ function QuestionnaryForm() {
                             className='pl-2.5 cursor-pointer p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleAddRemoveQuestion('remove', item.sectionIndex, item.pageIndex, item.index)
+                                handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
+                                setShowquestionDeleteModal(true);
                             }}
                         />
                     </div>
@@ -404,7 +432,8 @@ function QuestionnaryForm() {
                             }
                         )}
                     </>
-                )}
+                )
+                }
             </div>
         );
     };
@@ -538,7 +567,6 @@ function QuestionnaryForm() {
         // Call handleAutoSave with the section ID and updated sections
         handleAutoSave(updatedSections[index]?.section_id, updatedSections);
     };
-
 
     const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
         // Find the section to save
@@ -775,7 +803,6 @@ function QuestionnaryForm() {
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
 
-
     return (
         <>
             {pageLoading ? (
@@ -793,10 +820,10 @@ function QuestionnaryForm() {
                             </button>
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p 
-                            title={formDefaultInfo?.internal_name}
-                            className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`} 
-                            data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                            <p
+                                title={formDefaultInfo?.internal_name}
+                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`}
+                                data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
                             </p>
                             {sections?.map((sectionData, sectionIndex) => (
                                 <div
@@ -819,7 +846,7 @@ function QuestionnaryForm() {
                                                 data-testid={`delete-btn-${sectionIndex}`}
                                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
                                                 // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                                                onClick={() => handleDeleteModal(sectionIndex)} // Open modal instead of directly deleting
+                                                onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
                                             />
                                             <img src="/Images/save.svg"
                                                 alt="save"
@@ -848,10 +875,9 @@ function QuestionnaryForm() {
                                                         alt="Delete"
                                                         data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
                                                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                                        // onClick={() => handleAddRemovePage('remove', sectionIndex, pageIndex)} 
                                                         onClick={() => {
-                                                            setPageToDelete({ sectionIndex, pageIndex });
-                                                            setShowPageDeleteModal(true);
+                                                            handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
+                                                                setShowPageDeleteModal(true)
                                                         }}
                                                     />
                                                 </div>
@@ -863,7 +889,7 @@ function QuestionnaryForm() {
                                                     ...questionData,
                                                     sectionIndex,
                                                     pageIndex,
-                                                    index: questionIndex
+                                                    index: questionIndex,
                                                 }))}
                                                 onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
                                                 container={() => document.body}
@@ -941,7 +967,7 @@ function QuestionnaryForm() {
             {isModalOpen && (
                 <ConfirmationModal
                     text='Delete Section'
-                    subText='Are you sure you want to delete this section?'
+                    subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -957,23 +983,35 @@ function QuestionnaryForm() {
             {showPageDeleteModal && (
                 <ConfirmationModal
                     text='Delete Page'
-                    subText='Are you sure you want to delete this page?'
+                    subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete-page'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={showPageDeleteModal}
+                    setModalOpen={setShowPageDeleteModal}
+                    handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
+                    handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
+                />
+            )}
+            {showquestionDeleteModal && (
+                <ConfirmationModal
+                    text='Delete Question'
+                    subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B]'
                     Button1text='Delete'
                     Button2text='Cancel'
                     src='delete-gray'
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
-                    isModalOpen={showPageDeleteModal}
-                    setModalOpen={setShowPageDeleteModal}
-                    handleButton1={() => {
-                        handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex);
-                        setShowPageDeleteModal(false);
-                    }} // Call handleAddRemovePage and close modal on confirmation
-                    handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
+                    isModalOpen={showquestionDeleteModal}
+                    setModalOpen={setShowquestionDeleteModal}
+                    handleButton1={confirmDeleteQuestion}
+                    handleButton2={() => setShowquestionDeleteModal(false)}
                 />
             )}
-
         </>
     );
 }
