@@ -126,7 +126,9 @@ function ChoiceFieldSetting({
 
         // Focus input when required
         useEffect(() => {
+            console.log('helllo')
             const element = document.getElementById(focusInput);
+            console.log(focusInput, 'aaa');
             if (element) {
                 element.focus();
             }

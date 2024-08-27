@@ -20,7 +20,7 @@ function ConfirmationModal({ text, subText, Button1text, Button2text, src, class
                 <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} />
                 <Image src={src} className={`${className} mx-auto`} />
                 <p className='text-center text-lg text-[#2B333B] font-semibold mt-5'>{text}</p>
-                <p className='font-normal text-base text-[#2B333B] mt-2 text-center'>{subText}</p>
+                <p className='font-normal text-base text-[#2B333B] mt-2 text-center break-words'>{subText}</p>
                 <div className='mt-5 flex items-center justify-between'>
                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
                         {Button1text}

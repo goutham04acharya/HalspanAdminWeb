@@ -869,6 +869,7 @@ function QuestionnaryForm() {
                                                     secondIndex={pageIndex}
                                                     handleSave={handleSaveSectionName}
                                                     testId={`page-${pageIndex}-name`}
+                                                    maxLength={1}
                                                 />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"

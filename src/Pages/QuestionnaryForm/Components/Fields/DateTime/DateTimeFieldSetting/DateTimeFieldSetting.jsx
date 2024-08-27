@@ -2,6 +2,8 @@ import React from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
+import { useDispatch } from 'react-redux';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -13,11 +15,18 @@ function DateTimeFieldSetting({
   selectedQuestionId,
 
 }) {
+  const dispatch = useDispatch();
 
-  const handleTime = ()=>{
+  const handletimeradiobtn = (format) => {
+    dispatch(setNewComponent({ id: 'format', value: format, questionId: selectedQuestionId }));
+    handleAutoSaveSettings();
+}
 
+  const handleTime = () => {
+    dispatch(setNewComponent({ id: 'format', value: '12', questionId: selectedQuestionId }));
+    setShouldAutoSave(true)
   }
-  
+
   return (
     <>
       <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -71,7 +80,10 @@ function DateTimeFieldSetting({
                   id='time'
                   value='time'
                   checked={fieldSettingParameters?.type === 'time'}
-                  onClick={() => handleRadiobtn('time')} />
+                  onClick={() => {
+                    handleRadiobtn('time');
+                    handleTime();
+                  }} />
                 <label htmlFor='time'
                   data-testid='time'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -102,11 +114,13 @@ function DateTimeFieldSetting({
                 <input
                   type='radio'
                   className='w-[17px] h-[17px]'
-                  name='type'
+                  name='format'
                   id='format12'
                   value='format12'
-                  checked={fieldSettingParameters?.type === 'format12'}
-                  onClick={() => handleRadiobtn('format12')} />
+                  checked={fieldSettingParameters?.format === '12'}
+                  onClick={() => {
+                    handletimeradiobtn('12')
+                  }} />
                 <label htmlFor='format12'
                   data-testid='format-12'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -117,15 +131,15 @@ function DateTimeFieldSetting({
                 <input
                   type='radio'
                   className='w-[17px] h-[17px]'
-                  name='type'
+                  name='format'
                   id='format24'
                   value='format24'
-                  checked={fieldSettingParameters?.type === 'format24'}
-                  onClick={() => handleRadiobtn('format24')} />
+                  checked={fieldSettingParameters?.format === '24'}
+                  onClick={() => handletimeradiobtn('24')} />
                 <label htmlFor='format24'
                   data-testid='format-24'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                    24
+                  24
                 </label>
               </div>
             </div>
