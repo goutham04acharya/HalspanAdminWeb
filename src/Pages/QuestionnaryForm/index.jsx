@@ -729,7 +729,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            default_value : fieldSettingParams?.[selectedQuestionId]?.defaultValue,
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);

@@ -282,14 +282,6 @@ function TestFieldSetting({
                   handleChange={(e) => handleInputChange(e)} />
               </div>
               <div className='mx-auto mt-7 flex items-center w-full'>
-                {/* <Button
-                text='Save'
-                testID='Save'
-                className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
-                onClick={handleSaveSettings}
-                isThreedotLoading={isThreedotLoader}
-              >
-              </Button> */}
                 <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                   Add Conditional Logic
                 </button>
