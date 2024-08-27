@@ -413,13 +413,13 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab p-2 mb-2 absolute top-0 right-6 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab p-2 mb-2 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
                         <img
                             src="/Images/trash-black.svg"
                             alt="delete"
                             title='Delete'
-                            className='pl-2.5 cursor-pointer absolute top-0 right-0 p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
+                            className='pl-2.5 cursor-pointer p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
@@ -533,13 +533,13 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-                if (showShimmer) {
-                    setPageLoading(true);
-                }
+                // if (showShimmer) {
+                //     setPageLoading(true);
+                // }
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                if (showShimmer) {
-                    setPageLoading(false);
-                }
+                // if (showShimmer) {
+                //     setPageLoading(false);
+                // }
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);

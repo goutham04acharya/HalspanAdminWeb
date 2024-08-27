@@ -24,7 +24,7 @@ const CheckboxButtonGroup = ({ values, name, onChange, testId }) => {
                     <label
                         htmlFor={`radio-${index}`}
                         data-testid={`${testId}-choice-${index + 1}`}
-                        className="h-5 flex items-center cursor-pointer relative pl-8 text-neutral-primary text-[16px] leading-[20px] font-normal break-words overflow-auto flex-wrap truncate"
+                        className="h-5 flex items-center cursor-pointer relative pl-8 text-neutral-primary text-[16px] leading-[20px] font-normal break-words z-[9]"
                         maxLength={50}
 
                     >
