@@ -125,7 +125,7 @@ function QuestionnaryForm() {
             <ChoiceBoxField
                 {...props}
             />,
-        DateTimefield: (props) =>
+        dateTimefield: (props) =>
             <DateTimeField
             {...props}
             />,
@@ -137,7 +137,7 @@ function QuestionnaryForm() {
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
-        "DateTimefield": DateTimeFieldSetting,
+        "dateTimefield": DateTimeFieldSetting,
         // Add other mappings here...
     };
 
@@ -649,14 +649,23 @@ function QuestionnaryForm() {
         });
     }, [addNewQuestion, dispatch]);
 
+    const handleDateTimeClick = useCallback(() => {
+        addNewQuestion('dateTimefield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
+            dispatch(setNewComponent({ id: 'format', value: '12', questionId }));
+
+        })
+    })
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
             handleChoiceClick,
+            handleDateTimeClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick]);
 
 
     //function for handle radio button
