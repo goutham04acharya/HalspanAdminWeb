@@ -22,6 +22,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/calendarField.svg',
         testId: 'date-/-time',
+        onClick: 'handleDateTimeClick',
         type: 'datetime'
     },
     {

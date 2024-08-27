@@ -47,8 +47,8 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
                     : type === 'warning'
                         ? 'bg-[#FFA318]'
                         : type === 'error' ? 'bg-[#FFA318]' : 'bg-accent-information'}`} >
-                    <p className={`font-[400] text-[14px] leading-[24px] ${type === 'error' ? 'text-[#000]' : 'text-[#fff]'}`} id="toast-message">{message || 'Something went wrong'}</p>
-                    <span>
+                    <p className={`font-[400] text-[14px] leading-[24px] break-words w-[90%] ${type === 'error' ? 'text-[#000]' : 'text-[#fff]'}`} id="toast-message">{message || 'Something went wrong'}</p>
+                    <span className='w-[10%]'>
                         {<Image src={`toast-${type}`} />}
                     </span>
                 </motion.div>
