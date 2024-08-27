@@ -2,6 +2,7 @@
 const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout, Before, After } = require('@cucumber/cucumber');
 const chrome = require('selenium-webdriver/chrome');
 const { By, until } = require('selenium-webdriver');
+const { Browser, Builder  } = require('selenium-webdriver');
 const chromedriver = require('chromedriver');
 const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
@@ -25,7 +26,10 @@ options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
 setDefaultTimeout(34000);
 
-global.driver = chrome.Driver.createSession(options, service);
+global.driver = new Builder()
+    .forBrowser(Browser.CHROME)
+    .setChromeOptions(options)
+    .build();
 
 BeforeAll(async function () {
     await driver.manage();

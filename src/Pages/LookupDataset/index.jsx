@@ -14,6 +14,7 @@ import Papa from 'papaparse';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString'
 import LookupTable from './components/LookupTable'
 import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
+import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal'
 
 
 const LookupDataset = () => {
@@ -48,6 +49,9 @@ const LookupDataset = () => {
     const observer = useRef();
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const [showlookupReplaceModal, setShowLookupReplaceModal] = useState(false);
+
+
 
     // Functions
     // List Functions
@@ -87,6 +91,7 @@ const LookupDataset = () => {
             setData(initialState);
             setIsCreateLoading(false);
             setIsImportLoading(false);
+            setShowLookupReplaceModal(false);
             setIsView({
                 open: false,
                 id: ''
@@ -145,8 +150,19 @@ const LookupDataset = () => {
         }
     };
 
+    const handleImportConfirmationModal = () => {
+        if (!data?.choices === '') {
+            showlookupReplaceModal(true);
+        }
+    }
 
     const handleImport = (event) => {
+        if (data?.choices !== '' && !showlookupReplaceModal) {
+            setShowLookupReplaceModal(true);
+            setIsCreateModalOpen(false);
+            setData(initialState)
+            return;
+        }
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
@@ -161,6 +177,7 @@ const LookupDataset = () => {
                 if (flatData.length > 500) {
                     handleClose();
                     setIsImportLoading(false);
+                    setShowLookupReplaceModal(false);
                     setToastError('Only 500 data entries are accepted.');
                 } else {
                     const fileName = file.name.replace('.csv', '');
@@ -302,7 +319,7 @@ const LookupDataset = () => {
             <ConfirmModal
                 text='Delete Lookup Dataset'
                 subText={`Are you sure you want to delete the lookup dataset with ID ${deleteModal.id || '-'}?`}
-                button1Style='border border-[#2B333B] bg-[#2B333B] !w-[156px]'
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000] !w-[156px]'
                 button2Style='!w-[162px]'
                 Button1text='Delete'
                 Button2text='Cancel'
@@ -316,6 +333,25 @@ const LookupDataset = () => {
                 handleClose={() => setDeleteModal('open', false)}
                 isLoading={isDeleteLoading}
             />
+            {showlookupReplaceModal && (
+                <ConfirmationModal
+                    text='Replace Lookup Dataset'
+                    subText='You are about to import new data into the lookup dataset. This action will replace the existing choices with the new ones.'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Confirm'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isOpen={showlookupReplaceModal}
+                    handleButton1={handleImport}
+                    handleButton2={() => setShowLookupReplaceModal(false)}
+                    isOpenFileUpload={true}
+                    isImportLoading={isImportLoading}
+                    setModalOpen={setShowLookupReplaceModal}
+                    showLabel
+                />
+            )}
         </>
     )
 }

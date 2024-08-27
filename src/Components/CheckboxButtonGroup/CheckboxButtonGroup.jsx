@@ -6,7 +6,6 @@ const CheckboxButtonGroup = ({ values, name, onChange, testId }) => {
     // Handle radio button change
     const handleChange = (event) => {
         const newValue = event.target.value;
-        console.log(newValue);
     };
 
     return (
