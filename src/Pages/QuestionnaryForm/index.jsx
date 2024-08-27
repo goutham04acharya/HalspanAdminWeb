@@ -57,7 +57,7 @@ function QuestionnaryForm() {
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    const [fieldSettingParameters, setFieldSettingParameters] = useState({});
+    // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
 
     const dispatch = useDispatch();
@@ -148,7 +148,7 @@ function QuestionnaryForm() {
             <ChoiceBoxField
                 {...props}
             />,
-        DateTimefield: (props) =>
+        dateTimefield: (props) =>
             <DateTimeField
                 {...props}
             />,
@@ -160,7 +160,7 @@ function QuestionnaryForm() {
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
-        "DateTimefield": DateTimeFieldSetting,
+        "dateTimefield": DateTimeFieldSetting,
         // Add other mappings here...
     };
 
@@ -677,14 +677,23 @@ function QuestionnaryForm() {
         });
     }, [addNewQuestion, dispatch]);
 
+    const handleDateTimeClick = useCallback(() => {
+        addNewQuestion('dateTimefield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
+            dispatch(setNewComponent({ id: 'format', value: '12', questionId }));
+
+        })
+    })
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
             handleChoiceClick,
+            handleDateTimeClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick]);
 
 
     //function for handle radio button
@@ -720,7 +729,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            default_value : fieldSettingParams?.[selectedQuestionId]?.defaultValue,
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -859,6 +869,7 @@ function QuestionnaryForm() {
                                                     secondIndex={pageIndex}
                                                     handleSave={handleSaveSectionName}
                                                     testId={`page-${pageIndex}-name`}
+                                                    maxLength={1}
                                                 />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"
@@ -936,7 +947,7 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        setFieldSettingParameters: setFieldSettingParameters,
+                                        // setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,

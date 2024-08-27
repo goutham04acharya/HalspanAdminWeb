@@ -8,7 +8,7 @@ const { faker } = require('@faker-js/faker');
 const path = require('path');
 
 When('I click the lookup dataset button', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid="lookup-dataset"]'))).click();
 });
 
