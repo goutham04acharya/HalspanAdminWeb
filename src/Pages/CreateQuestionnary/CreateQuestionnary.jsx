@@ -106,7 +106,7 @@ function CreateQuestionnary() {
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 400 && response?.data?.status < 450 || 'Something Went wrong.') {
-        setToastError(response?.data?.data?.message);
+        // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
