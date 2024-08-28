@@ -19,6 +19,8 @@ import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 import DateTimeField from './Components/Fields/DateTime/DateTimeField.jsx';
 import DateTimeFieldSetting from './Components/Fields/DateTime/DateTimeFieldSetting/DateTimeFieldSetting.jsx';
+import AssetLocationField from './Components/Fields/AssetLocation/AssetLocationField.jsx';
+import AssetLocationFieldSetting from './Components/Fields/AssetLocation/AssetLocationFieldSetting/AssetLocationFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -57,7 +59,7 @@ function QuestionnaryForm() {
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    const [fieldSettingParameters, setFieldSettingParameters] = useState({});
+    // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
 
     const dispatch = useDispatch();
@@ -148,8 +150,12 @@ function QuestionnaryForm() {
             <ChoiceBoxField
                 {...props}
             />,
-        DateTimefield: (props) =>
+        dateTimefield: (props) =>
             <DateTimeField
+                {...props}
+            />,
+        assetLocationfield: (props) =>
+            <AssetLocationField
                 {...props}
             />,
         // checkbox: (props) => <CheckboxField {...props} />,
@@ -160,7 +166,8 @@ function QuestionnaryForm() {
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
-        "DateTimefield": DateTimeFieldSetting,
+        "dateTimefield": DateTimeFieldSetting,
+        "assetLocationfield": AssetLocationFieldSetting
         // Add other mappings here...
     };
 
@@ -289,31 +296,31 @@ function QuestionnaryForm() {
         if (event === 'add') {
             if (currentSectionData.pages.length < 20) {
 
-            const SectionData = [...sections];  // Create a copy of the sections array
-            const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
+                const SectionData = [...sections];  // Create a copy of the sections array
+                const currentSectionData = { ...SectionData[sectionIndex] };  // Copy the specific section data
 
-            // Add a new page to the current section's pages array
-            currentSectionData.pages = [
-                ...currentSectionData.pages,
-                {
-                    page_id: `${sectionId}_PG-${uuidv4()}`,
-                    page_name: `Page ${currentSectionData?.pages.length + 1}`,
-                    questions: []
-                }
-            ];
+                // Add a new page to the current section's pages array
+                currentSectionData.pages = [
+                    ...currentSectionData.pages,
+                    {
+                        page_id: `${sectionId}_PG-${uuidv4()}`,
+                        page_name: `Page ${currentSectionData?.pages.length + 1}`,
+                        questions: []
+                    }
+                ];
 
-            // Save the updated section back to the sections array
-            SectionData[sectionIndex] = currentSectionData;
+                // Save the updated section back to the sections array
+                SectionData[sectionIndex] = currentSectionData;
 
-            // Update the state with the new sections array
-            setSections(SectionData);
+                // Update the state with the new sections array
+                setSections(SectionData);
 
-            // Call handleAutoSave with the updated section data
-            handleAutoSave(sectionId, SectionData);
-        } else {
-            setToastError("Limit reached: Maximum of 20 pages allowed.");
-            return; // Exit the function if the limit is reached
-        }
+                // Call handleAutoSave with the updated section data
+                handleAutoSave(sectionId, SectionData);
+            } else {
+                setToastError("Limit reached: Maximum of 20 pages allowed.");
+                return; // Exit the function if the limit is reached
+            }
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             setSelectedQuestionId(false);
@@ -376,6 +383,7 @@ function QuestionnaryForm() {
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         setSelectedComponent(componentType);
     };
+    
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
@@ -405,13 +413,13 @@ function QuestionnaryForm() {
                                 document.body.style.overflow = "visible";
                             }}
                         >
-                            <img className='cursor-grab p-2 mb-2 rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
+                            <img className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
                         <img
                             src="/Images/trash-black.svg"
                             alt="delete"
                             title='Delete'
-                            className='pl-2.5 cursor-pointer p-2 mb-2 rounded-full hover:bg-[#FFFFFF]'
+                            className={`pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]`}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
@@ -525,13 +533,13 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-                if (showShimmer) {
-                    setPageLoading(true);
-                }
+                // if (showShimmer) {
+                //     setPageLoading(true);
+                // }
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                if (showShimmer) {
-                    setPageLoading(false);
-                }
+                // if (showShimmer) {
+                //     setPageLoading(false);
+                // }
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -677,14 +685,29 @@ function QuestionnaryForm() {
         });
     }, [addNewQuestion, dispatch]);
 
+    const handleDateTimeClick = useCallback(() => {
+        addNewQuestion('dateTimefield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
+            dispatch(setNewComponent({ id: 'format', value: '12', questionId }));
+
+        })
+    })
+
+    const handleAssetLocationClick = useCallback(() => {
+        addNewQuestion('assetLocationfield', (questionId) => {
+        })
+    })
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
             handleChoiceClick,
+            handleDateTimeClick,
+            handleAssetLocationClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick]);
 
 
     //function for handle radio button
@@ -720,7 +743,8 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -737,6 +761,7 @@ function QuestionnaryForm() {
             setSelectedComponent(false);
         }
     };
+    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingParams?.[selectedQuestionId]?.componentType')
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -859,6 +884,7 @@ function QuestionnaryForm() {
                                                     secondIndex={pageIndex}
                                                     handleSave={handleSaveSectionName}
                                                     testId={`page-${pageIndex}-name`}
+                                                    maxLength={1}
                                                 />
                                                 <div className='flex items-center justify-end'>
                                                     <img src="/Images/trash-black.svg"
@@ -936,7 +962,7 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        setFieldSettingParameters: setFieldSettingParameters,
+                                        // setFieldSettingParameters: setFieldSettingParameters,
                                         handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,

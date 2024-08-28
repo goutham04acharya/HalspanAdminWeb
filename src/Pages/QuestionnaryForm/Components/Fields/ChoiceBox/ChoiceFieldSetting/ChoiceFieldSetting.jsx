@@ -17,7 +17,7 @@ function ChoiceFieldSetting({
     formParameters,
     handleRadiobtn,
     fieldSettingParameters,
-    setFieldSettingParameters,
+    // setFieldSettingParameters,
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
@@ -45,10 +45,10 @@ function ChoiceFieldSetting({
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            lookupOption: option.value,
-        }));
+        // setFieldSettingParameters((prevState) => ({
+        //     ...prevState,
+        //     lookupOption: option.value,
+        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -57,6 +57,8 @@ function ChoiceFieldSetting({
 
     const handleRemoveLookup = () => {
         dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
+
         setShouldAutoSave(true);
     }
 
@@ -124,7 +126,9 @@ function ChoiceFieldSetting({
 
         // Focus input when required
         useEffect(() => {
+            console.log('helllo')
             const element = document.getElementById(focusInput);
+            console.log(focusInput, 'aaa');
             if (element) {
                 element.focus();
             }
@@ -146,7 +150,7 @@ function ChoiceFieldSetting({
                         >
                             <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
-                        <input
+                        {/* <input
                             type="text"
                             className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             placeholder={`${getOrdinal(item?.index + 1)} Choice`}
@@ -155,6 +159,22 @@ function ChoiceFieldSetting({
                             id={item.id}
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
                             onBlur={handleBlur}
+                            data-testid={`choice-${item.index + 1}`}
+                            maxLength={50}
+                        /> */}
+                        <input
+                            type="text"
+                            className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                            placeholder={`${getOrdinal(item?.index + 1)} Choice`}
+                            onChange={handleFixedChoiceChange}
+                            value={localValue}
+                            id={item.id}
+                            onClick={() => setFocusInput(item.id)} // Call focusInput on click
+                            onBlur={() => {
+                                handleBlur();
+                                console.log('first i am here')
+                                setFocusInput('')
+                            }}
                             data-testid={`choice-${item.index + 1}`}
                             maxLength={50}
                         />
