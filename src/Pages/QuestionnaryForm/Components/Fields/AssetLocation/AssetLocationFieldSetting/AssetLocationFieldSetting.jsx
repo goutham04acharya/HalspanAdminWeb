@@ -14,6 +14,9 @@ function AssetLocationFieldSetting({
                 <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
                 <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
                     <CommonComponents
+                        labelID='label'
+                        labelName='Label'
+                        labelPlaceholder='Question 1'
                         helpTextId='Help Text'
                         helpText='Help Text'
                         helpTextPlaceholder='Enter help text'

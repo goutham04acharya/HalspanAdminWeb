@@ -17,27 +17,25 @@ function CommonComponents({
 }) {
     return (
         <div>
-            {!assetLocation &&
-                <div className='flex flex-col justify-start'>
-                    <label
-                        htmlFor={labelID}
-                        className='font-semibold text-base text-[#2B333B]'>{labelName}
-                    </label>
-                    <input
-                        type="text"
-                        // id={labelID}
-                        className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                        placeholder={labelPlaceholder}
-                        onChange={(e) => handleInputChange(e)}
-                        value={formParameters?.label}
-                        id='label'
-                        onBlur={(e) => handleBlur(e)}
-                        data-testid="label-name-input"
-                        maxLength={100}
-                    />
-                </div>
-            }
-            <div className={`flex flex-col justify-start ${assetLocation ? 'mt-0' : 'mt-7'}`}>
+            <div className='flex flex-col justify-start'>
+                <label
+                    htmlFor={labelID}
+                    className='font-semibold text-base text-[#2B333B]'>{labelName}
+                </label>
+                <input
+                    type="text"
+                    // id={labelID}
+                    className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                    placeholder={labelPlaceholder}
+                    onChange={(e) => handleInputChange(e)}
+                    value={formParameters?.label}
+                    id='label'
+                    onBlur={(e) => handleBlur(e)}
+                    data-testid="label-name-input"
+                    maxLength={100}
+                />
+            </div>
+            <div className={`flex flex-col justify-start mt-7`}>
                 <label
                     htmlFor={helpTextId}
                     className='font-semibold text-base text-[#2B333B]'>{helpText}

@@ -16,9 +16,17 @@ const AssetLocationField = ({
 
     return (
         <div>
-            <div className='relative'>
-            <label htmlFor={textId} className='font-medium text-base text-black'>Site</label>
-            <input
+            <label
+                data-testid="label-name"
+                htmlFor={textId}
+                title={fieldSettingParameters?.label}
+                className='font-medium text-base text-[#000000] break-words w-[76%] truncate'
+            >
+                {fieldSettingParameters?.label}
+            </label>
+            <div className='relative mt-5'>
+                <label htmlFor={textId} className='font-medium text-base text-black'>Site</label>
+                <input
                     data-testid='input'
                     type={type}
                     id={textId}
@@ -32,8 +40,8 @@ const AssetLocationField = ({
                 </div>
             </div>
             <div className='relative mt-8'>
-            <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
-            <input
+                <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
+                <input
                     data-testid='input'
                     type={type}
                     id={textId}
@@ -58,7 +66,7 @@ const AssetLocationField = ({
                     onClick={handleChange}
                 />
                 <div className='absolute right-4 top-[74%] -translate-y-1/2'>
-                    <Image src='down'/>
+                    <Image src='down' />
                 </div>
             </div>
             <p
