@@ -15,7 +15,7 @@ const AssetLocationField = ({
 }) => {
 
     return (
-        <div>
+        <div data-testid="asset-location">
             <label
                 data-testid="label-name"
                 htmlFor={textId}
