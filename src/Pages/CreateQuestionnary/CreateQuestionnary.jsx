@@ -105,7 +105,10 @@ function CreateQuestionnary() {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
-      } else if (response?.data?.status >= 400 && response?.data?.status < 450 || 'Something Went wrong.') {
+      } else if (response?.data?.status === 400) {
+        setToastError(response?.data?.data?.message);
+        setIsThreedotLoader(false)
+      } else if (response?.data?.status === 409) {
         // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
