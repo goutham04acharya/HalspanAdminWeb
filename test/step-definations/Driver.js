@@ -26,7 +26,10 @@ options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
 setDefaultTimeout(34000);
 
-global.driver = chrome.Driver.createSession(options, service);
+global.driver = new Builder()
+    .forBrowser(Browser.CHROME)
+    .setChromeOptions(options)
+    .build();
 
 BeforeAll(async function () {
     await driver.manage();
