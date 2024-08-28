@@ -18,7 +18,8 @@ function NumberField({
                 data-testid="label-name"
                 htmlFor={textId}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] break-words w-[76%] truncate'>
+                maxLength={100}
+                className='font-medium text-base text-[#000000] break-words w-[90%] truncate'>
                 {fieldSettingParameters?.label}
             </label>
             <input

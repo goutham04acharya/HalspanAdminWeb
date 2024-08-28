@@ -777,7 +777,6 @@ function QuestionnaryForm() {
             setSelectedComponent(false);
         }
     };
-    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingParams?.[selectedQuestionId]?.componentType')
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -800,7 +799,12 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            increment_by:fieldSettingParams?.[selectedQuestionId]?.incrementby,
+            field_texts: {
+                pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+                post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
+                }
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
