@@ -20,7 +20,8 @@ const AssetLocationField = ({
                 data-testid="label-name"
                 htmlFor={textId}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] break-words w-[76%] truncate'
+                className='font-medium text-base text-[#000000] break-words w-[90%] !truncate flex flex-wrap'
+                maxLength={100}
             >
                 {fieldSettingParameters?.label}
             </label>
