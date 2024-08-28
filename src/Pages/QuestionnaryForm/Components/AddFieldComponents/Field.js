@@ -95,6 +95,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/LocationField.svg',
         testId: 'asset-location',
+        onClick: 'handleAssetLocationClick',
         type: 'assetlocation'
     },
     {
