@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 function Table({ loading, QueList, lastElementRef }) {
+    const navigate = useNavigate();
+    console.log(QueList, 'QueList')
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -33,6 +36,10 @@ function Table({ loading, QueList, lastElementRef }) {
         }
     };
 
+    const navigateToVersionList = (publicName) => {
+        navigate(`/questionnaries/version-list/${publicName}`);
+    };
+
     return (
         <div className='overflow-auto default-sidebar h-customh4'>
             <table>
@@ -51,7 +58,11 @@ function Table({ loading, QueList, lastElementRef }) {
                             <React.Fragment key={index}>
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-6 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{QueInfo?.questionnaire_id}</td>
-                                    <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]' title={QueInfo?.internal_name}><u>{QueInfo?.internal_name}</u></td>
+                                    <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]'
+                                        onClick={() => navigateToVersionList(QueInfo?.public_name)}
+                                        title={QueInfo?.internal_name}><u>
+                                            {QueInfo?.internal_name}</u>
+                                    </td>
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] pr-6' title={QueInfo?.public_name}>{QueInfo?.public_name}</td>
                                     <td data-testid="status" className='py-2 px-[10px] bg-[#F4F6FA]'>
                                         {QueInfo?.status

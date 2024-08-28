@@ -7,6 +7,7 @@ import Layout from '../Components/Layout/index.jsx';
 import Questionnaries from '../Pages/QuestionnariesList/index.jsx';
 import QuestionnaryForm from '../Pages/QuestionnaryForm/index.jsx';
 import LookupDataset from '../Pages/LookupDataset/index.jsx';
+import VersionList from '../Pages/VersionList/VersionList.jsx';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   return (
@@ -19,6 +20,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           <Route path="/questionnaries/create-questionnary" element={<CreateQuestionnary />} />
           <Route path="/lookup-dataset" element={<LookupDataset />} />
           <Route path="/questionnaries/create-questionnary/questionnary-form/:questionnaire_id/:version_number" element={<QuestionnaryForm/>}/>
+          <Route path="/questionnaries/version-list/:public_name" element={<VersionList/>} />
         </Route>
         {/* Add other routes here */}
       </Routes>
