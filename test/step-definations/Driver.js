@@ -3,7 +3,6 @@ const { AfterAll, BeforeAll, AfterStep, setDefaultTimeout, Before, After } = req
 const chrome = require('selenium-webdriver/chrome');
 const { By, until } = require('selenium-webdriver');
 const { Browser, Builder  } = require('selenium-webdriver');
-const chromedriver = require('chromedriver');
 const { faker } = require('@faker-js/faker');
 const { createCoverageMap } = require('istanbul-lib-coverage');
 const fs = require('fs');
@@ -11,7 +10,6 @@ const path = require('path');
 const { createQuestionnaire, createLookupDataset, Questionnaire } = require('../bdd_api/index');
 const {create_questionnaire_payload, lookup_dataset_payload} = require('../bdd_payload/payload')
 
-const service = new chrome.ServiceBuilder(chromedriver.path).build();
 const options = new chrome.Options();
 options.addArguments('--disable-dev-shm-usage');
 options.addArguments('--no-sandbox');
