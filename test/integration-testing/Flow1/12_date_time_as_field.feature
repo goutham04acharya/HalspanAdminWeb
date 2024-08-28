@@ -21,13 +21,15 @@ Feature: Halspan - Admin - Create a Questionnaire using Date/Time as a Field
     Then I should see the add field
     * I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
     * I should see an add field section
+    When I add a new question to the page 1 in section 1
     When I click the date/time button
     Then I should see field settings
-    And I should see the date/time field added to the section 1
+    And I should see the date/time field added to the section 1 page 1 question 1
 
   @create_question
   Scenario: Admin adds the label, help text and placeholder content
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the date/time button
     Then I should see field settings
     When I enter the label name for date/time
@@ -36,26 +38,19 @@ Feature: Halspan - Admin - Create a Questionnaire using Date/Time as a Field
     Then I should see the help text for date/time updated in the section 1
     When I enter the placeholder content for date/time
     Then I should see the placeholder content for date/time updated in the section 1
+    When I enter the admin field notes
 
   @create_question
   Scenario Outline: Admin adds the type for date / time
     Given I am on the questionnaire management section
-    When I click the type as <type>
-    * I click the time format as <time>
-    * I click on save button for field settings
-    Then I should read a message stating that "Field settings data updated successfully"
-
-    Examples:
-      | type          | time |
-      | "date"        | ""   |
-      | "time"        | "12" |
-      | "date_&_time" | "24" |
-
-  @create_question
-  Scenario: Admin saves the section with the changes
-    Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
     When I click the date/time button
     Then I should see field settings
-    When I enter the admin field notes
-    * I click on save button for field settings
-    Then I should read a message stating that "Field settings data updated successfully"
+    When I click the type as <type>
+    * I click the time format as <time>
+
+    Examples:
+      | type        | time |
+      | "date"      | ""   |
+      | "time"      | "12" |
+      | "date-time" | "24" |

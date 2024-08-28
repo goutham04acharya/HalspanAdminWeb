@@ -14,6 +14,7 @@ module.exports = {
             'test/integration-testing/Flow1/13_options_for_fields.feature',
             'test/integration-testing/Flow1/11_choice-box-as-field.feature',
             'test/integration-testing/Flow1/15_asset_location.feature',
+            'test/integration-testing/Flow1/12_date_time_as_field.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

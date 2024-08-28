@@ -9,7 +9,7 @@ const RadioButtonGroup = ({ values, name, onChange, testId }) => {
     };
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4">
             {values.map((value, index) => (
                 <div key={index} className="relative custom-radioBlue py-2">
                     <input

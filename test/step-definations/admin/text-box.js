@@ -49,7 +49,7 @@ When('I enter the help text for textbox', async function () {
 });
 
 Then('I should see the help text updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
     assert.equal(helpTextText, this.helpText);
@@ -65,7 +65,7 @@ When('I enter the placeholder content for textbox', async function () {
 });
 
 Then('I should see the placeholder content updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
     assert.equal(placeholderText, this.placeholder);
