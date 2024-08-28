@@ -40,7 +40,7 @@ When('I enter the label name for date\\/time', async function () {
 });
 
 Then('I should see the label name for date\\/time updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));           
+    await new Promise(resolve => setTimeout(resolve, 1500));           
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
@@ -56,7 +56,7 @@ When('I enter the help text for date\\/time', async function () {
 });
 
 Then('I should see the help text for date\\/time updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
     assert.equal(helpTextText, this.helpText);
@@ -70,7 +70,7 @@ When('I enter the placeholder content for date\\/time', async function () {
 });
 
 Then('I should see the placeholder content for date\\/time updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
     assert.equal(placeholderText, this.placeholder);

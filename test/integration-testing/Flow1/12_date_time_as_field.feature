@@ -15,13 +15,6 @@ Feature: Halspan - Admin - Create a Questionnaire using Date/Time as a Field
   There must be an option to enable or disable the Field mask
   There must be an option to enter the Admin field notes
 
-  Scenario: Admin logs in with valid credentials
-    Given I am on the login page
-    When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "Auth@123"
-    * I click the submit button
-    Then I should be redirected to the questionnaire listing screen
-
   @create_question
   Scenario: Admin views all types of field and adds date/time field from the add field section
     Given I am on the questionnaire management section
