@@ -15,7 +15,7 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  setFieldSettingParameters,
+  // setFieldSettingParameters,
   handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
@@ -50,20 +50,20 @@ function TestFieldSetting({
   ];
 
   const handleOptionClick = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      format: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   format: option.value,
+    // }));
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      lookupOption: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   lookupOption: option.value,
+    // }));
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
@@ -129,7 +129,7 @@ function TestFieldSetting({
             helpText='Help Text'
             helpTextPlaceholder='Enter help text'
             placeholderContentId='placeholder'
-            placeholder='Placeholder content'
+            placeholder='Placeholder Content'
             placeholderContent='Text displayed in the field'
             handleInputChange={handleInputChange}
             formParameters={formParameters}
@@ -158,7 +158,7 @@ function TestFieldSetting({
                 <label htmlFor='Singleline'
                   data-testid='single_line'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                  Single line
+                  Single-line
                 </label>
               </div>
 
@@ -197,7 +197,7 @@ function TestFieldSetting({
                     <InfinateDropdown
                       label=''
                       id='lookup'
-                      placeholder='Select the file'
+                      placeholder='Select the lookup list'
                       className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'
@@ -282,14 +282,6 @@ function TestFieldSetting({
                   handleChange={(e) => handleInputChange(e)} />
               </div>
               <div className='mx-auto mt-7 flex items-center w-full'>
-                {/* <Button
-                text='Save'
-                testID='Save'
-                className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
-                onClick={handleSaveSettings}
-                isThreedotLoading={isThreedotLoader}
-              >
-              </Button> */}
                 <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                   Add Conditional Logic
                 </button>
