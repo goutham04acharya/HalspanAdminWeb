@@ -761,7 +761,6 @@ function QuestionnaryForm() {
             setSelectedComponent(false);
         }
     };
-    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingParams?.[selectedQuestionId]?.componentType')
 
     const handleAutoSaveSettings = async () => {
         const payload = {

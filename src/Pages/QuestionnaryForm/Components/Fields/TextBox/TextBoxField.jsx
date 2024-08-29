@@ -20,7 +20,7 @@ const TextBoxField = ({
                 htmlFor={textId}
                 maxLength={100}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] break-words w-[90%] truncate flex flex-wrap'>
+                className='font-medium text-base text-[#000000] overflow-hidden text-ellipsis whitespace-nowrap block w-full max-w-[90%] truncate'>
                 {fieldSettingParameters?.label}
             </label>
             {fieldSettingParameters?.type === 'multi_line' ?

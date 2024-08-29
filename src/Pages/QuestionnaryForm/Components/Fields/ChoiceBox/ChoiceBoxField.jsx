@@ -40,7 +40,7 @@ const ChoiceBoxField = ({
                 data-testid="label-name"
                 htmlFor={textId}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] break-words w-[76%] truncate'
+                className='font-medium text-base text-[#000000] overflow-hidden text-ellipsis whitespace-nowrap block w-full max-w-[90%] truncate'
             >
                 {fieldSettingParameters?.label}
             </label>
@@ -56,7 +56,7 @@ const ChoiceBoxField = ({
                         type={type}
                         id={textId}
                         value={value}
-                        className={`w-full h-auto break-words border border-[#AEB3B7] mt-5 rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-auto break-words border border-[#AEB3B7] mt-5 rounded-lg bg-white py-3 pl-4 pr-12 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={fieldSettingParameters?.placeholderContent}
                         onClick={handleChange}
                     />
