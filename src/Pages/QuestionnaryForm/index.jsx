@@ -255,8 +255,8 @@ function QuestionnaryForm() {
             setSections([...sections, newSection]);
 
             setTimeout(() => {
-                sectionRefs.current[sections.length - 1]?.scrollIntoView({ behavior: 'smooth' });
-            }, 800);
+                sectionRefs.current[sections.length]?.scrollIntoView({ behavior: 'smooth' });
+            }, 400);
 
             // Enable save button for the new section
             const update = { ...dataIsSame };
