@@ -14,7 +14,7 @@ When('I click on the internal name of a questionnaire from the list', async func
 
 Then('I should be redirected to the questionnaire version listing screen', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.xpath(`//h1[text()="${this.internalName}"]`)));
+    await driver.wait(until.elementLocated(By.xpath(`//p[text()="${this.internalName}"]`)));
 });
 
 Given('I should see the versions of the questionnaire', async function () {

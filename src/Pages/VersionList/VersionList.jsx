@@ -58,7 +58,7 @@ function VersionList() {
                             // lastElementRef={lastElementRef}
                         />
                         <Button2
-                            testId='Back-to-all-Questionnaires'
+                            testId='back-to-questionnaire'
                             onClick={() => navigate('/questionnaries')}
                             className='w-[315px] h-[50px] mt-5 font-semibold'
                             text='Back to all Questionnaires'
