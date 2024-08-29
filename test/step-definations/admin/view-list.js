@@ -39,7 +39,7 @@ Then('The results should display questionnaries matching the internal name', asy
 
 When('I search by public name', async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
-    let publicNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[3]/td[3]`)), 10000);
+    let publicNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]`)), 10000);
     this.public_name = await publicNameElement.getText();
     console.log(this.public_name, "1234");
     let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
