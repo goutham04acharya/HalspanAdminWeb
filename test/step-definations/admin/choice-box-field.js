@@ -122,7 +122,7 @@ When('I enter the label name for choice', async function () {
 });
 
 Then('I should see the label name for choice updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     // Retry locating the element to avoid stale element reference
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="label-name"]`)), 5000);
     // Wait for the element to be visible and stable
@@ -141,7 +141,7 @@ When('I enter the help text for choice', async function () {
 });
 
 Then('I should see the help text for choice updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
     assert.equal(helpTextText, this.helpText);
@@ -155,7 +155,7 @@ When('I enter the placeholder content for choice', async function () {
 });
 
 Then('I should see the placeholder content for choice updated in the section {int}', async function (sectionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     if (this.choiceType === 'dropdown') {
         const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="input"]`)));
         const placeholderText = await placeholder.getAttribute('placeholder');

@@ -15,7 +15,7 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  setFieldSettingParameters,
+  // setFieldSettingParameters,
   handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
@@ -50,20 +50,20 @@ function TestFieldSetting({
   ];
 
   const handleOptionClick = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      format: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   format: option.value,
+    // }));
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
-    setFieldSettingParameters((prevState) => ({
-      ...prevState,
-      lookupOption: option.value,
-    }));
+    // setFieldSettingParameters((prevState) => ({
+    //   ...prevState,
+    //   lookupOption: option.value,
+    // }));
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
@@ -282,14 +282,6 @@ function TestFieldSetting({
                   handleChange={(e) => handleInputChange(e)} />
               </div>
               <div className='mx-auto mt-7 flex items-center w-full'>
-                {/* <Button
-                text='Save'
-                testID='Save'
-                className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
-                onClick={handleSaveSettings}
-                isThreedotLoading={isThreedotLoader}
-              >
-              </Button> */}
                 <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                   Add Conditional Logic
                 </button>

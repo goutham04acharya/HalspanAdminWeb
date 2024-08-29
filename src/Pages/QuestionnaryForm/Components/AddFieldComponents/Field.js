@@ -22,6 +22,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/calendarField.svg',
         testId: 'date-/-time',
+        onClick: 'handleDateTimeClick',
         type: 'datetime'
     },
     {
@@ -73,6 +74,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/NumberField.svg',
         testId: 'number',
+        onClick: 'handleNumberClick',
         type: 'number'
     },
     {
@@ -94,6 +96,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/LocationField.svg',
         testId: 'asset-location',
+        onClick: 'handleAssetLocationClick',
         type: 'assetlocation'
     },
     {
