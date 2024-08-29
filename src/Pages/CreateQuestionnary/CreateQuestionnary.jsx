@@ -101,11 +101,29 @@ function CreateQuestionnary() {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
 
-       if (response?.data?.status === true) {
+      if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
-      } else if (response?.data?.status >= 400 && response?.data?.status < 450 || 'Something Went wrong.') {
+      } else if (response?.data?.status === 400) {
+        // Check each field separately to determine which error message(s) to display
+        const fieldErrors = {};
+
+        // Check if public_name is too short and set the appropriate error
+        if (createDetails?.public_name?.length < 2) {
+          fieldErrors.public_name = 'Public name requires at least 2 characters';
+        }
+
+        // Check if internal_name is too short and set the appropriate error
+        if (createDetails?.internal_name?.length < 2) {
+          fieldErrors.internal_name = 'Internal name requires at least 2 characters';
+        }
+
+        // Set validation errors for the specific failing fields
+        setValidationErrors({ ...errors, ...fieldErrors });
+
+        setIsThreedotLoader(false);
+      } else if (response?.data?.status === 409) {
         // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)

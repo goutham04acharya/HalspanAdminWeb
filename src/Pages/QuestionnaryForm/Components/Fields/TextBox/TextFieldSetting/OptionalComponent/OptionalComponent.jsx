@@ -56,7 +56,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
     const ToggleSwitch = ({ label, onChange, checked, testId }) => {
         return (
             <div className="status custom-toggle-switch flex items-center justify-between">
-                <p className="text-sm font-normal text-[#000000] mr-4 mt-3">
+                <p className="text-base font-normal text-[#000000] mr-4 mt-3">
                     {label}
                 </p>
                 <label className="switch" style={{ marginLeft: '1px' }}>

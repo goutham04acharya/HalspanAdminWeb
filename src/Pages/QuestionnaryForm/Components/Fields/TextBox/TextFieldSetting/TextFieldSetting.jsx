@@ -241,21 +241,21 @@ function TestFieldSetting({
                     id='min'
                     type='text'
                     value={fieldSettingParameters?.min}
-                    className='w-full mt-2.5'
+                    className='w-full'
                     labelStyle=''
                     placeholder='Minimum'
                     testId='minChar'
                     htmlFor='min'
                     maxLength={10}
                     handleChange={(e) => handleInputChange(e)} />
-                  <p className='mx-3 font-normal text-base text-[#2B333B] mt-2'> to</p>
+                  <p className='mx-3 font-normal text-base text-[#2B333B]'>to</p>
                   <InputField
                     autoComplete='off'
                     label=''
                     id='max'
                     type='text'
                     value={fieldSettingParameters?.max}
-                    className='w-full mt-2.5'
+                    className='w-full'
                     labelStyle=''
                     placeholder='Maximum'
                     testId='maxChar'
