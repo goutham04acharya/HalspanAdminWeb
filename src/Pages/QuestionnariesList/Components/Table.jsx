@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
-import { Navigate, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 
 function Table({ loading, QueList, lastElementRef }) {
     const navigate = useNavigate();
@@ -36,8 +36,8 @@ function Table({ loading, QueList, lastElementRef }) {
         }
     };
 
-    const navigateToVersionList = (publicName) => {
-        navigate(`/questionnaries/version-list/${publicName}`);
+    const navigateToVersionList = (publicName,questionnaire_id) => {
+        navigate(`/questionnaries/version-list/${publicName}/${questionnaire_id}`);
     };
 
     return (
@@ -59,7 +59,7 @@ function Table({ loading, QueList, lastElementRef }) {
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-6 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{QueInfo?.questionnaire_id}</td>
                                     <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]'
-                                        onClick={() => navigateToVersionList(QueInfo?.public_name)}
+                                        onClick={() => navigateToVersionList(QueInfo?.public_name, QueInfo?.questionnaire_id)}
                                         title={QueInfo?.internal_name}><u>
                                             {QueInfo?.internal_name}</u>
                                     </td>
