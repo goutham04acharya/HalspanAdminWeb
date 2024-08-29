@@ -17,7 +17,7 @@ function DateTimeField({
                 data-testid="label-name"
                 htmlFor={textId}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] break-words w-[76%] truncate'>
+                className='font-medium text-base text-[#000000] overflow-hidden text-ellipsis whitespace-nowrap block w-full max-w-[90%] truncate'>
                 {fieldSettingParameters?.label}
             </label>
                 <input
