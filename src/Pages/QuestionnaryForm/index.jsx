@@ -21,6 +21,8 @@ import DateTimeField from './Components/Fields/DateTime/DateTimeField.jsx';
 import DateTimeFieldSetting from './Components/Fields/DateTime/DateTimeFieldSetting/DateTimeFieldSetting.jsx';
 import AssetLocationField from './Components/Fields/AssetLocation/AssetLocationField.jsx';
 import AssetLocationFieldSetting from './Components/Fields/AssetLocation/AssetLocationFieldSetting/AssetLocationFieldSetting.jsx';
+import NumberField from './Components/Fields/Number/NumberField.jsx';
+import NumberFieldSetting from './Components/Fields/Number/NumberFieldSetting/NumberFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -158,6 +160,10 @@ function QuestionnaryForm() {
             <AssetLocationField
                 {...props}
             />,
+        numberfield: (props) => 
+            <NumberField
+            {...props}
+            />
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
         // audio: (props) => <AudioField {...props} />,
@@ -167,7 +173,8 @@ function QuestionnaryForm() {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
         "dateTimefield": DateTimeFieldSetting,
-        "assetLocationfield": AssetLocationFieldSetting
+        "assetLocationfield": AssetLocationFieldSetting,
+        "numberfield": NumberFieldSetting,
         // Add other mappings here...
     };
 
@@ -692,6 +699,14 @@ function QuestionnaryForm() {
 
         })
     })
+     
+    const handleNumberClick = useCallback(() => {
+        addNewQuestion('numberfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'integer', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId }));
+
+        });
+    }, [addNewQuestion]);
 
     const handleAssetLocationClick = useCallback(() => {
         addNewQuestion('assetLocationfield', (questionId) => {
@@ -704,10 +719,11 @@ function QuestionnaryForm() {
             handleChoiceClick,
             handleDateTimeClick,
             handleAssetLocationClick,
+            handleNumberClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick]);
 
 
     //function for handle radio button
@@ -731,7 +747,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
+            field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
@@ -771,7 +787,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
+            field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
@@ -783,7 +799,12 @@ function QuestionnaryForm() {
                         fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            increment_by:fieldSettingParams?.[selectedQuestionId]?.incrementby,
+            field_texts: {
+                pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+                post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
+                }
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);

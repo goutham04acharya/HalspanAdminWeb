@@ -96,14 +96,16 @@ const fieldSettingParamsSlice = createSlice({
                     defaultContent: item.default_content,
                     type: item.type,
                     format: item.format,
-                    numberOfCharacters: {
-                        min: item.number_of_characters?.min,
-                        max: item.number_of_characters?.max,
+                    field_range: {
+                        min: item.field_range?.min,
+                        max: item.field_range?.max,
                     },
                     note: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
-                    options: item?.options
+                    options: item?.options,
+                    postField: item?.postField,
+                    preField: item?.preField,
                 };
                 
                 // Handle the source object and assign values based on the key

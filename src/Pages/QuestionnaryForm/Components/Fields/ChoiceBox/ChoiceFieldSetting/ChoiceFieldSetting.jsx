@@ -150,18 +150,6 @@ function ChoiceFieldSetting({
                         >
                             <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
-                        {/* <input
-                            type="text"
-                            className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder={`${getOrdinal(item?.index + 1)} Choice`}
-                            onChange={handleFixedChoiceChange}
-                            value={localValue}
-                            id={item.id}
-                            onClick={() => setFocusInput(item.id)} // Call focusInput on click
-                            onBlur={handleBlur}
-                            data-testid={`choice-${item.index + 1}`}
-                            maxLength={50}
-                        /> */}
                         <input
                             type="text"
                             className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
@@ -172,7 +160,6 @@ function ChoiceFieldSetting({
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
                             onBlur={() => {
                                 handleBlur();
-                                console.log('first i am here')
                                 setFocusInput('')
                             }}
                             data-testid={`choice-${item.index + 1}`}

@@ -74,6 +74,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/NumberField.svg',
         testId: 'number',
+        onClick: 'handleNumberClick',
         type: 'number'
     },
     {
