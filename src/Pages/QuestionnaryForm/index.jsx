@@ -702,8 +702,8 @@ function QuestionnaryForm() {
      
     const handleNumberClick = useCallback(() => {
         addNewQuestion('numberfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'type', value: 'Integer', questionId }));
-            dispatch(setNewComponent({ id: 'source', value: 'Entry Field', questionId }));
+            dispatch(setNewComponent({ id: 'type', value: 'integer', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId }));
 
         });
     }, [addNewQuestion]);
@@ -747,7 +747,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
+            field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
@@ -787,7 +787,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
+            field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },

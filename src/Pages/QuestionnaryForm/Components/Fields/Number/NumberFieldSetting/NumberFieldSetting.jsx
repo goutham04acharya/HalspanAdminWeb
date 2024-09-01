@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents';
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
+import { useDispatch } from 'react-redux';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
 
 function NumberFieldSetting({
     handleInputChange,
@@ -11,9 +13,11 @@ function NumberFieldSetting({
     handleRadiobtn,
     setShouldAutoSave,
     selectedQuestionId,
-    
+    handleAutoSaveSettings,
+
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
+    const dispatch = useDispatch();
 
     // Handlers to switch tabs
     const handleTabClick = (tab) => {
@@ -109,10 +113,12 @@ function NumberFieldSetting({
                                     name='source'
                                     id='entryfield'
                                     value='entryfield'
-                                    checked={fieldSettingParameters?.type === 'entryfield'}
+                                    checked={fieldSettingParameters?.source === 'entryfield'}
                                     onClick={() => {
-                                        handleRadiobtn('entryfield');
-                                    }} />
+                                        dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }}
+                                />
                                 <label htmlFor='entryfield'
                                     data-testid='entryfield'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -126,8 +132,11 @@ function NumberFieldSetting({
                                     name='source'
                                     id='slider'
                                     value='slider'
-                                    checked={fieldSettingParameters?.type === 'slider'}
-                                    onClick={() => handleRadiobtn('slider')} />
+                                    checked={fieldSettingParameters?.source === 'slider'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'source', value: 'slider', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }} />
                                 <label htmlFor='slider'
                                     data-testid='slider'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -141,8 +150,11 @@ function NumberFieldSetting({
                                     name='source'
                                     id='both'
                                     value='both'
-                                    checked={fieldSettingParameters?.type === 'both'}
-                                    onClick={() => handleRadiobtn('both')} />
+                                    checked={fieldSettingParameters?.source === 'both'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }} />
                                 <label htmlFor='both'
                                     data-testid='both'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -159,7 +171,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='min'
                                 type='text'
-                                value={fieldSettingParameters?.min}
+                                value={fieldSettingParameters?.field_range?.min}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Minimum'
@@ -173,7 +185,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max}
+                                value={fieldSettingParameters?.field_range?.max}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -229,11 +241,10 @@ function NumberFieldSetting({
                                     testId='preField'
                                     htmlFor='preField'
                                     maxLength={500}
-                                    onChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
+                                    handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
                                 />
                             </div>
                         )}
-
                         {/* Display the Post-field input if postField is active */}
                         {activeTab === 'postField' && (
                             <div className='mt-3'>
@@ -248,39 +259,39 @@ function NumberFieldSetting({
                                     testId='postField'
                                     htmlFor='postField'
                                     maxLength={500}
-                                    onChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
+                                    handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
                                 />
                             </div>
                         )}
                     </div>
                     <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
-                        <div className='mt-7'>
-                            <InputField
-                                autoComplete='off'
-                                label='Admin Field Notes'
-                                id='note'
-                                type='text'
-                                value={fieldSettingParameters?.note}
-                                className='w-full mt-2.5'
-                                labelStyle='font-semibold text-base text-[#2B333B]'
-                                placeholder='Notes'
-                                testId='Notes'
-                                htmlFor='note'
-                                maxLength={500}
-                                handleChange={(e) => handleInputChange(e)}
-                                handleBlur={handleBlur}
-                            />
-                        </div>
-                        <div className='mx-auto mt-7 flex items-center w-full'>
-                            {/* <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
+                    <div className='mt-7'>
+                        <InputField
+                            autoComplete='off'
+                            label='Admin Field Notes'
+                            id='note'
+                            type='text'
+                            value={fieldSettingParameters?.note}
+                            className='w-full mt-2.5'
+                            labelStyle='font-semibold text-base text-[#2B333B]'
+                            placeholder='Notes'
+                            testId='Notes'
+                            htmlFor='note'
+                            maxLength={500}
+                            handleChange={handleInputChange}
+                            handleBlur={handleBlur}
+                        />
+                    </div>
+                    <div className='mx-auto mt-7 flex items-center w-full'>
+                        {/* <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
                                 onClick={handleSaveSettings}
                             >
                                 Save
                             </button> */}
-                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
-                                Add Conditional Logic
-                            </button>
-                        </div>
+                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            Add Conditional Logic
+                        </button>
+                    </div>
                 </div>
             </div>
         </>
