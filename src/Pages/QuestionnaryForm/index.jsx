@@ -23,8 +23,8 @@ import AssetLocationField from './Components/Fields/AssetLocation/AssetLocationF
 import AssetLocationFieldSetting from './Components/Fields/AssetLocation/AssetLocationFieldSetting/AssetLocationFieldSetting.jsx';
 import NumberField from './Components/Fields/Number/NumberField.jsx';
 import NumberFieldSetting from './Components/Fields/Number/NumberFieldSetting/NumberFieldSetting.jsx';
-import FloorPrintField from './Components/Fields/FloorPrint/FloorPrintField.jsx';
-import FloorPrintSettings from './Components/Fields/FloorPrint/FloorPrintSettings/FloorPrintSettings.jsx';
+import FloorPlanField from './Components/Fields/FloorPlan/FloorPlanField.jsx';
+import FloorPlanSettings from './Components/Fields/FloorPlan/FloorPlanSettings/FloorPlanSettings.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -166,8 +166,8 @@ function QuestionnaryForm() {
             <NumberField
                 {...props}
             />,
-        floorPrintfield: (props) =>
-            <FloorPrintField
+        floorPlanfield: (props) =>
+            <FloorPlanField
                 {...props}
             />,
 
@@ -182,7 +182,7 @@ function QuestionnaryForm() {
         "dateTimefield": DateTimeFieldSetting,
         "assetLocationfield": AssetLocationFieldSetting,
         "numberfield": NumberFieldSetting,
-        "floorPrintfield": FloorPrintSettings,
+        "floorPlanfield": FloorPlanSettings,
         // Add other mappings here...
     };
 
@@ -721,10 +721,10 @@ function QuestionnaryForm() {
         })
     })
 
-    const handleFloorPrintClick = useCallback(() => {
-        addNewQuestion('floorPrintfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'Pin Drop', value: 'pin_drop_no', questionId }));
-            dispatch(setNewComponent({ id: 'Draw on Image', value: 'draw_image_no', questionId }));
+    const handleFloorPlanClick = useCallback(() => {
+        addNewQuestion('floorPlanfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_no', questionId }));
+            dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId }));
 
         });
         }, [addNewQuestion]);
@@ -736,11 +736,11 @@ function QuestionnaryForm() {
                 handleDateTimeClick,
                 handleAssetLocationClick,
                 handleNumberClick,
-                handleFloorPrintClick,
+                handleFloorPlanClick,
             };
 
             functionMap[functionName]?.();
-        }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPrintClick]);
+        }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick]);
 
 
         //function for handle radio button

@@ -37,7 +37,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/FlorPrintField.svg',
         testId: 'floorplan',
-        onClick: 'handleFloorPrintClick',
+        onClick: 'handleFloorPlanClick',
         type: 'floorplan',
     },
     {

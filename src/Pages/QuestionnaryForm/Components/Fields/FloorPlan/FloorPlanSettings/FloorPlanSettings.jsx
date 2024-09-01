@@ -5,7 +5,7 @@ import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/O
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
 
-function FloorPrintSettings({ handleInputChange,
+function FloorPlanSettings({ handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
@@ -45,8 +45,12 @@ function FloorPrintSettings({ handleInputChange,
                                     name='pin_drop'
                                     id='pin_drop_yes'
                                     value='pin_drop'
-                                    checked={fieldSettingParameters?.type === 'pin_drop_yes'}
-                                    onClick={() => handleRadiobtn('pin_drop_yes')} />
+                                    checked={fieldSettingParameters?.pin_drop === 'pin_drop_yes'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_yes', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }}
+                                />
                                 <label htmlFor='pin_drop_yes'
                                     data-testid='pin_drop_yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -60,8 +64,12 @@ function FloorPrintSettings({ handleInputChange,
                                     name='pin_drop'
                                     id='pin_drop_no'
                                     value='pin_drop_no'
-                                    checked={fieldSettingParameters?.type === 'pin_drop_no'}
-                                    onClick={() => handleRadiobtn('pin_drop_no')} />
+                                    checked={fieldSettingParameters?.pin_drop === 'pin_drop_no'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_no', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }}
+                                />
                                 <label htmlFor='pin_drop_no'
                                     data-testid='dat'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -78,9 +86,9 @@ function FloorPrintSettings({ handleInputChange,
                                     name='draw_image'
                                     id='draw_image_yes'
                                     value='draw_image_yes'
-                                    checked={fieldSettingParameters?.type === 'draw_image_yes'}
+                                    checked={fieldSettingParameters?.draw_image === 'draw_image_yes'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'Draw on Image', value: 'draw_image_yes', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_yes', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }} />
                                 <label htmlFor='draw_image_yes'
@@ -96,9 +104,9 @@ function FloorPrintSettings({ handleInputChange,
                                     name='draw_image'
                                     id='draw_image_no'
                                     value='draw_image_no'
-                                    checked={fieldSettingParameters?.type === 'draw_image_no'}
+                                    checked={fieldSettingParameters?.draw_image === 'draw_image_no'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'Draw on Image', value: 'draw_image_no', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }}
                                 />
@@ -138,4 +146,4 @@ function FloorPrintSettings({ handleInputChange,
         </>
     )
 }
-export default FloorPrintSettings
+export default FloorPlanSettings

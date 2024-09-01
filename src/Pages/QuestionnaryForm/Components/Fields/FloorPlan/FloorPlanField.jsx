@@ -1,6 +1,6 @@
 import React from 'react'
 
-function FloorPrintField({
+function FloorPlanField({
     type,
     textId,
     value,
@@ -20,7 +20,7 @@ function FloorPrintField({
                 {fieldSettingParameters?.label}
             </label>
             <div className='mt-2'>
-                <img src="/public/Images/HalspanGrayLogo.svg" alt="image" />
+                <img src="/Images/HalspanGrayLogo.svg" alt="image" />
             </div>
             <p
                 data-testid="help-text"
@@ -32,4 +32,4 @@ function FloorPrintField({
     )
 }
 
-export default FloorPrintField
+export default FloorPlanField
