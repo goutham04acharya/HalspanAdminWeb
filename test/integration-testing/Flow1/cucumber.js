@@ -16,6 +16,7 @@ module.exports = {
             'test/integration-testing/Flow1/15_asset_location.feature',
             'test/integration-testing/Flow1/12_date_time_as_field.feature',
             'test/integration-testing/Flow1/16_view_list_of_questionnaire_versions.feature',
+            'test/integration-testing/Flow1/20_files_as_field.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }
