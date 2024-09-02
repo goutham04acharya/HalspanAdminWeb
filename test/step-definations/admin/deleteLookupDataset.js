@@ -8,10 +8,10 @@ When('I click the delete option for a lookup dataset', async function () {
     tbody = await driver.wait(until.elementLocated(By.css(`tbody`)));
     await driver.wait(until.elementIsVisible(tbody))
 
-    const id = await driver.wait(until.elementLocated(By.css(`tbody tr td:nth-child(1)`))).getText();
+    const id = await driver.wait(until.elementLocated(By.css(`tbody tr:nth-child(4) td:nth-child(1)`))).getText();
     console.log(id, 'pppooo')
     this.id = id
-    await driver.wait(until.elementLocated(By.css('[data-testid="delete"]'))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="delete-${this.id}"]`))).click();
 });
 
 Then('I should see a confirmation prompt for deletion', async function () {
@@ -28,7 +28,7 @@ Then('I should read success message for delete user', { timeout: 35000 }, async 
         const pageSource = await driver.getPageSource();
         console.log(this.id, 'the id');
         check = pageSource.includes(`Deleted ID ${this.id} successfully`);
-
+        console.log(check);
         if (check) {
             return 'passed';
         } else {
