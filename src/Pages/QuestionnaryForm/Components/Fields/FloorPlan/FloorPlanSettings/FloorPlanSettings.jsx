@@ -52,7 +52,7 @@ function FloorPlanSettings({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='pin_drop_yes'
-                                    data-testid='pin_drop_yes'
+                                    data-testid='pindrop-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Yes
                                 </label>
@@ -71,7 +71,7 @@ function FloorPlanSettings({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='pin_drop_no'
-                                    data-testid='dat'
+                                    data-testid='pindrop-no'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     No
                                 </label>
@@ -92,7 +92,7 @@ function FloorPlanSettings({ handleInputChange,
                                         setShouldAutoSave(true);
                                     }} />
                                 <label htmlFor='draw_image_yes'
-                                    data-testid='draw_image_yes'
+                                    data-testid='draw-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Yes
                                 </label>
@@ -111,7 +111,7 @@ function FloorPlanSettings({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='draw_image_no'
-                                    data-testid='dat'
+                                    data-testid='draw-no'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     No
                                 </label>
