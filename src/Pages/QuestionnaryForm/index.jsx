@@ -172,7 +172,7 @@ function QuestionnaryForm() {
             <FloorPlanField
                 {...props}
             />,
-            photofield: (props) =>
+        photofield: (props) =>
             <PhotoField
                 {...props}
             />,
@@ -847,9 +847,11 @@ function QuestionnaryForm() {
                 pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
                 post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
             },
-            draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
-            pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
-            include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
+            asset_extras: {
+                draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+                pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+                include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
+            }
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);

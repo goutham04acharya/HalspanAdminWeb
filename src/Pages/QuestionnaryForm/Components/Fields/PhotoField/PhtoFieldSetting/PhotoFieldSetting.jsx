@@ -84,7 +84,7 @@ function PhotoFieldSetting({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='draw_image_yes'
-                                    data-testid='draw_image-yes'
+                                    data-testid='draw-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Yes
                                 </label>
@@ -103,7 +103,7 @@ function PhotoFieldSetting({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='draw_image_no'
-                                    data-testid='draw_image-no'
+                                    data-testid='draw-no'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     No
                                 </label>
@@ -124,7 +124,7 @@ function PhotoFieldSetting({ handleInputChange,
                                         setShouldAutoSave(true);
                                     }} />
                                 <label htmlFor='include_metadata_yes'
-                                    data-testid='draw-yes'
+                                    data-testid='metadata-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Yes
                                 </label>
@@ -143,7 +143,7 @@ function PhotoFieldSetting({ handleInputChange,
                                     }}
                                 />
                                 <label htmlFor='include_metadata_no'
-                                    data-testid='draw-no'
+                                    data-testid='metadata-no'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     No
                                 </label>
