@@ -29,7 +29,7 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView, setDelet
                                         >
                                             View
                                         </p>
-                                        <Image testId={`delete-${LookupInfo?.lookup_id}`}  onClick={() => setDeleteModal({ id: LookupInfo?.lookup_id, open: true})} src='delete' className='cursor-pointer hover:bg-[#FFFFFF] rounded-full p-2' />
+                                        <Image testId={`delete-${LookupInfo?.lookup_id}`} onClick={() => setDeleteModal({ id: LookupInfo?.lookup_id, open: true})} src='delete' className='cursor-pointer hover:bg-[#FFFFFF] rounded-full p-2' />
                                     </td>
                                 </tr>
                                 <tr className='h-4 bg-white'></tr>
