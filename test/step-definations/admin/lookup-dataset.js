@@ -135,3 +135,14 @@ Then('I should see a confirmation model to replacing existing dataset', async fu
     await new Promise((resolve) => setTimeout(resolve, 500));
     await driver.wait(until.elementLocated(By.xpath('//p[text()="Replace Lookup Dataset"]')));
 });
+
+When('I click the delete option for a searched lookup dataset', async function () {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    tbody = await driver.wait(until.elementLocated(By.css(`tbody`)));
+    await driver.wait(until.elementIsVisible(tbody))
+
+    const id = await driver.wait(until.elementLocated(By.css(`tbody tr:nth-child(1) td:nth-child(1)`))).getText();
+    console.log(id, 'pppooo')
+    this.id = id
+    await driver.wait(until.elementLocated(By.css(`[data-testid="delete-${this.id}"]`))).click();
+});
