@@ -1,14 +1,14 @@
 /* eslint-disable max-len */
 const assert = require('assert');
 const {When, Then } = require('@cucumber/cucumber');
-const webdriver = 'selenium-webdriver'
+const webdriver = require('selenium-webdriver');
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
-const Key = webdriver.Key
+const Keys = webdriver.Key
 
 When('I click the floorplan button', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="date-/-time"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan"]`))).click();
 });
 
 Then('I should see the floorplan field added to the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, questionNumber) {
