@@ -144,7 +144,7 @@ function QuestionnaryForm() {
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
             setShouldAutoSave(true);
-        }, 1000); // 1000ms delay before auto-saving
+        }, 500); // 1000ms delay before auto-saving
     };
 
     const componentMap = {
