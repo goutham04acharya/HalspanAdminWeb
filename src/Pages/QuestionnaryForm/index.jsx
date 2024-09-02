@@ -886,7 +886,7 @@ function QuestionnaryForm() {
                                         ref={el => sectionRefs.current[sectionIndex] = el}
                                         className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
                                     >
-                                        <div className='flex items-center w-full justify-between gap-7'>
+                                        <div className='flex items-start w-full justify-between gap-7'>
                                             <EditableField
                                                 name={sectionData?.section_name}
                                                 index={sectionIndex}
@@ -916,7 +916,7 @@ function QuestionnaryForm() {
                                                 ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
                                                 className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
                                             >
-                                                <div className='flex items-center justify-between gap-7'>
+                                                <div className='flex items-start justify-between gap-7'>
                                                     <EditableField
                                                         name={pageData?.page_name}
                                                         index={sectionIndex}

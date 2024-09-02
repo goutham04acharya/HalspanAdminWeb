@@ -17,7 +17,7 @@ function NumberField({
                 htmlFor={textId}
                 title={fieldSettingParameters?.label}
                 maxLength={100}
-                className='font-medium text-base text-[#000000] text-ellipsis whitespace-nowrap block w-full max-w-[90%] truncate'>
+                className='font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%]'>
                 {fieldSettingParameters?.label}
             </label>
             {((fieldSettingParameters?.source === 'entryfield') || (fieldSettingParameters?.source === 'both')) &&

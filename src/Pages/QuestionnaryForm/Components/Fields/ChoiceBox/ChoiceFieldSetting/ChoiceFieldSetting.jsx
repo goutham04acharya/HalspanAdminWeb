@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceValue, setNewComponent, updateFixedChoiceArray } from '../../fieldSettingParamsSlice';
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
+import FixedChoiceDraggable from './FixedChoiceDraggable';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -185,8 +186,16 @@ function ChoiceFieldSetting({
         );
     }));
 
+    // const handleMoveEnd = (newList) => {
+    //     dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+    // };
     const handleMoveEnd = (newList) => {
-        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+        // Remove any non-serializable values before dispatching
+        const sanitizedNewList = newList.map(item => {
+            const { setShouldAutoSave, ...rest } = item;
+            return rest;
+        });
+        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList: sanitizedNewList }));
     };
 
     useEffect(() => {
@@ -282,7 +291,7 @@ function ChoiceFieldSetting({
                                 Fixed List
                             </label>
                         </div>
-                        {fieldSettingParameters?.source === 'fixedList' &&
+                        {/* {fieldSettingParameters?.source === 'fixedList' &&
                             <DraggableList
                                 itemKey="id" // Adjust itemKey according to your unique identifier
                                 template={(props) => (
@@ -297,6 +306,19 @@ function ChoiceFieldSetting({
                                 list={fixedChoiceArray.map((data, choiceIndex) => ({
                                     ...data,
                                     index: choiceIndex,
+                                }))}
+                                onMoveEnd={handleMoveEnd}
+                                container={() => document.body}
+                            />} */}
+                        {fieldSettingParameters?.source === 'fixedList' &&
+                            <DraggableList
+                                itemKey="id" // Adjust itemKey according to your unique identifier
+                                template={FixedChoiceDraggable}
+                                list={fixedChoiceArray.map((data, choiceIndex) => ({
+                                    ...data,
+                                    index: choiceIndex,
+                                    setShouldAutoSave: setShouldAutoSave,
+                                    selectedQuestionId: selectedQuestionId
                                 }))}
                                 onMoveEnd={handleMoveEnd}
                                 container={() => document.body}

@@ -171,7 +171,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='min'
                                 type='text'
-                                value={fieldSettingParameters?.field_range?.min}
+                                value={fieldSettingParameters?.min}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Minimum'
@@ -185,7 +185,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.field_range?.max}
+                                value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
