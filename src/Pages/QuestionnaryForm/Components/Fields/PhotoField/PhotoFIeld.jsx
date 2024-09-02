@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 function PhotoField({ label,
     type,
@@ -11,6 +11,15 @@ function PhotoField({ label,
     testId
 
 }) {
+
+    const [fileName, setFileName] = useState('');
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setFileName(file ? file.name : '');
+        handleChange(fieldSettingParameters);
+    };
+
     return (
         <div>
             <label
@@ -21,15 +30,24 @@ function PhotoField({ label,
                 className='font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%]'>
                 {fieldSettingParameters?.label}
             </label>
+            <div className="custom-file-input-wrapper w-full h-auto mt-5 flex items-center bg-white border border-[#AEB3B7] p-2 rounded-lg">
+                <label
+                    htmlFor={textId}
+                    className={`custom-file-label flex-1 py-3 px-4 border border-[#AEB3B7] bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
+                >
+                    {fileName ? `Upload Photo (${fileName})` : 'Upload Photo(X)'}
+                </label>
                 <input
-                    data-testid='input'
-                    type='file'
+                    data-testid="input"
+                    type="file"
                     id={textId}
-                    value={value}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-5 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange(fieldSettingParameters)}
+                    className="hidden-input"
+                    onChange={handleFileChange}
                 />
+                <span className="placeholder ml-5 text-base font-normal text-[#9FACB9]">
+                    {fileName || fieldSettingParameters?.placeholderContent || 'No file chosen'}
+                </span>
+            </div>
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] truncate'

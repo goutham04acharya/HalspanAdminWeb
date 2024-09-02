@@ -45,9 +45,9 @@ function FloorPlanSettings({ handleInputChange,
                                     name='pin_drop'
                                     id='pin_drop_yes'
                                     value='pin_drop'
-                                    checked={fieldSettingParameters?.pin_drop === 'pin_drop_yes'}
+                                    checked={fieldSettingParameters?.pin_drop === 'yes'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_yes', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }}
                                 />
@@ -64,9 +64,9 @@ function FloorPlanSettings({ handleInputChange,
                                     name='pin_drop'
                                     id='pin_drop_no'
                                     value='pin_drop_no'
-                                    checked={fieldSettingParameters?.pin_drop === 'pin_drop_no'}
+                                    checked={fieldSettingParameters?.pin_drop === 'no'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_no', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }}
                                 />
@@ -86,9 +86,9 @@ function FloorPlanSettings({ handleInputChange,
                                     name='draw_image'
                                     id='draw_image_yes'
                                     value='draw_image_yes'
-                                    checked={fieldSettingParameters?.draw_image === 'draw_image_yes'}
+                                    checked={fieldSettingParameters?.draw_image === 'yes'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_yes', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }} />
                                 <label htmlFor='draw_image_yes'
@@ -104,9 +104,9 @@ function FloorPlanSettings({ handleInputChange,
                                     name='draw_image'
                                     id='draw_image_no'
                                     value='draw_image_no'
-                                    checked={fieldSettingParameters?.draw_image === 'draw_image_no'}
+                                    checked={fieldSettingParameters?.draw_image === 'no'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId: selectedQuestionId }));
+                                        dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
                                     }}
                                 />
@@ -135,7 +135,7 @@ function FloorPlanSettings({ handleInputChange,
                                 handleBlur={handleBlur}
                             />
                         </div>
-                        <div className='mx-auto mt-7 flex items-center w-full'>S
+                        <div className='mx-auto mt-7 flex items-center w-full'>
                             <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>

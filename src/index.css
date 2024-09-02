@@ -322,3 +322,22 @@ custom-toggle-switch input:checked+.slider::before {
   top: 2px;
   left: 4px;
 }
+
+/* Hide the default file input */
+.hidden-input {
+  display: none;
+}
+
+/* Style the custom label as a file upload button */
+.custom-file-label {
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+
+/* Style the placeholder text */
+.placeholder {
+  margin-left: 10px;
+  color: #9FACB9;
+  font-size: 1rem;
+}

@@ -730,16 +730,16 @@ function QuestionnaryForm() {
 
     const handleFloorPlanClick = useCallback(() => {
         addNewQuestion('floorPlanfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'pin_drop', value: 'pin_drop_no', questionId }));
-            dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId }));
+            dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
 
         });
     }, [addNewQuestion]);
 
     const handlePhotoClick = useCallback(() => {
         addNewQuestion('photofield', (questionId) => {
-            dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId }));
-            dispatch(setNewComponent({ id: 'include_metadata', value: 'include_metadata_no', questionId }));
+            dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
 
         });
     }, [addNewQuestion])
@@ -766,52 +766,58 @@ function QuestionnaryForm() {
     }
 
     //function to save the field setting
-    const handleSaveSettings = async () => {
-        setIsThreedotLoader(true);
-        const len = sections.length;
-        if (len > 0) {
-            handleSaveSection(sections[len - 1].section_id, false);
-        }
-        const payload = {
-            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
-            label: fieldSettingParams?.[selectedQuestionId]?.label,
-            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
-            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
-            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
-            type: fieldSettingParams?.[selectedQuestionId]?.type,
-            format: fieldSettingParams?.[selectedQuestionId]?.format,
-            field_range: {
-                min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: fieldSettingParams?.[selectedQuestionId]?.max,
-            },
-            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-            source: {
-                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-            },
-            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options,
-            default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
-            pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
-            draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
-        };
-        try {
-            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-            setIsThreedotLoader(false);
-            setToastSuccess(response?.data?.message)
-            if (response?.data?.status >= 400) {
-                setToastError(response?.data?.data?.message || 'Something went wrong.');
-            }
-            dispatch(saveCurrentData());
-        } catch (error) {
-            console.error(error);
-            setIsThreedotLoader(false);
-            setToastError('Failed to update field settings.'); // Provide a user-friendly error message
-            setSelectedComponent(false);
-        }
-    };
+    // const handleSaveSettings = async () => {
+    //     setIsThreedotLoader(true);
+    //     const len = sections.length;
+    //     if (len > 0) {
+    //         handleSaveSection(sections[len - 1].section_id, false);
+    //     }
+    //     const payload = {
+    //         component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+    //         label: fieldSettingParams?.[selectedQuestionId]?.label,
+    //         help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+    //         placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+    //         default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+    //         type: fieldSettingParams?.[selectedQuestionId]?.type,
+    //         format: fieldSettingParams?.[selectedQuestionId]?.format,
+    //         field_range: {
+    //             min: fieldSettingParams?.[selectedQuestionId]?.min,
+    //             max: fieldSettingParams?.[selectedQuestionId]?.max,
+    //         },
+    //         admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
+    //         source: {
+    //             [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+    //                 fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+    //                     fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+    //                     fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+    //         },
+    //         lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+    //         options: fieldSettingParams?.[selectedQuestionId]?.options,
+    //         default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
+    //         increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
+    //         field_texts: {
+    //             pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+    //             post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
+    //         },
+    //         draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+    //         pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+    //         include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
+    //     };
+    //     try {
+    //         const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
+    //         setIsThreedotLoader(false);
+    //         setToastSuccess(response?.data?.message)
+    //         if (response?.data?.status >= 400) {
+    //             setToastError(response?.data?.data?.message || 'Something went wrong.');
+    //         }
+    //         dispatch(saveCurrentData());
+    //     } catch (error) {
+    //         console.error(error);
+    //         setIsThreedotLoader(false);
+    //         setToastError('Failed to update field settings.'); // Provide a user-friendly error message
+    //         setSelectedComponent(false);
+    //     }
+    // };
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -835,11 +841,15 @@ function QuestionnaryForm() {
             },
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
             options: fieldSettingParams?.[selectedQuestionId]?.options,
+            default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
             increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
             field_texts: {
                 pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
                 post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
-            }
+            },
+            draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+            pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+            include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -1018,7 +1028,7 @@ function QuestionnaryForm() {
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
                                         // setFieldSettingParameters: setFieldSettingParameters,
-                                        handleSaveSettings: handleSaveSettings,
+                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,

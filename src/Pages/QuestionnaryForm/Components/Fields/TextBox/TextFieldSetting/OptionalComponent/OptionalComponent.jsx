@@ -21,6 +21,11 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 'Remember allowed',
                 'Field validation',
             ];
+        } else if (componentType === 'photofield') {
+            return [
+                'Visible',
+                'Optional',
+            ];
         } else {
             return [
                 'Load from previously entered data',
