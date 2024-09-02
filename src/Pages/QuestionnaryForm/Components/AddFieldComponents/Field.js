@@ -45,6 +45,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/cameraField.svg',
         testId: 'photo',
+        onClick: 'handlePhotoClick',
         type: 'photo'
     },
     {

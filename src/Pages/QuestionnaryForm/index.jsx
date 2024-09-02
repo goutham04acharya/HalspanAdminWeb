@@ -25,6 +25,8 @@ import NumberField from './Components/Fields/Number/NumberField.jsx';
 import NumberFieldSetting from './Components/Fields/Number/NumberFieldSetting/NumberFieldSetting.jsx';
 import FloorPlanField from './Components/Fields/FloorPlan/FloorPlanField.jsx';
 import FloorPlanSettings from './Components/Fields/FloorPlan/FloorPlanSettings/FloorPlanSettings.jsx';
+import PhotoField from './Components/Fields/PhotoField/PhotoFIeld.jsx';
+import PhotoFieldSetting from './Components/Fields/PhotoField/PhtoFieldSetting/PhotoFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -170,6 +172,10 @@ function QuestionnaryForm() {
             <FloorPlanField
                 {...props}
             />,
+            photofield: (props) =>
+            <PhotoField
+                {...props}
+            />,
 
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
@@ -183,6 +189,7 @@ function QuestionnaryForm() {
         "assetLocationfield": AssetLocationFieldSetting,
         "numberfield": NumberFieldSetting,
         "floorPlanfield": FloorPlanSettings,
+        "photofield": PhotoFieldSetting,
         // Add other mappings here...
     };
 
@@ -727,350 +734,359 @@ function QuestionnaryForm() {
             dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId }));
 
         });
-        }, [addNewQuestion]);
+    }, [addNewQuestion]);
 
-        const handleClick = useCallback((functionName) => {
-            const functionMap = {
-                handleTextboxClick,
-                handleChoiceClick,
-                handleDateTimeClick,
-                handleAssetLocationClick,
-                handleNumberClick,
-                handleFloorPlanClick,
-            };
+    const handlePhotoClick = useCallback(() => {
+        addNewQuestion('photofield', (questionId) => {
+            dispatch(setNewComponent({ id: 'draw_image', value: 'draw_image_no', questionId }));
+            dispatch(setNewComponent({ id: 'include_metadata', value: 'include_metadata_no', questionId }));
 
-            functionMap[functionName]?.();
-        }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick]);
+        });
+    }, [addNewQuestion])
+
+    const handleClick = useCallback((functionName) => {
+        const functionMap = {
+            handleTextboxClick,
+            handleChoiceClick,
+            handleDateTimeClick,
+            handleAssetLocationClick,
+            handleNumberClick,
+            handleFloorPlanClick,
+            handlePhotoClick,
+        };
+
+        functionMap[functionName]?.();
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick]);
 
 
-        //function for handle radio button
-        const handleRadiobtn = (type) => {
-            dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
-            handleAutoSaveSettings();
+    //function for handle radio button
+    const handleRadiobtn = (type) => {
+        dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
+        handleAutoSaveSettings();
+    }
+
+    //function to save the field setting
+    const handleSaveSettings = async () => {
+        setIsThreedotLoader(true);
+        const len = sections.length;
+        if (len > 0) {
+            handleSaveSection(sections[len - 1].section_id, false);
         }
-
-        //function to save the field setting
-        const handleSaveSettings = async () => {
-            setIsThreedotLoader(true);
-            const len = sections.length;
-            if (len > 0) {
-                handleSaveSection(sections[len - 1].section_id, false);
+        const payload = {
+            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+            label: fieldSettingParams?.[selectedQuestionId]?.label,
+            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+            type: fieldSettingParams?.[selectedQuestionId]?.type,
+            format: fieldSettingParams?.[selectedQuestionId]?.format,
+            field_range: {
+                min: fieldSettingParams?.[selectedQuestionId]?.min,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
+            },
+            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
+            source: {
+                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+            },
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
+            pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+            draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+        };
+        try {
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
+            setIsThreedotLoader(false);
+            setToastSuccess(response?.data?.message)
+            if (response?.data?.status >= 400) {
+                setToastError(response?.data?.data?.message || 'Something went wrong.');
             }
-            const payload = {
-                component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
-                label: fieldSettingParams?.[selectedQuestionId]?.label,
-                help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
-                placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
-                default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
-                type: fieldSettingParams?.[selectedQuestionId]?.type,
-                format: fieldSettingParams?.[selectedQuestionId]?.format,
-                field_range: {
-                    min: fieldSettingParams?.[selectedQuestionId]?.min,
-                    max: fieldSettingParams?.[selectedQuestionId]?.max,
-                },
-                admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-                source: {
-                    [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                        fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                            fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                            fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-                },
-                lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-                options: fieldSettingParams?.[selectedQuestionId]?.options,
-                default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
-                pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
-                draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
-            };
-            try {
-                const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-                setIsThreedotLoader(false);
-                setToastSuccess(response?.data?.message)
-                if (response?.data?.status >= 400) {
-                    setToastError(response?.data?.data?.message || 'Something went wrong.');
-                }
-                dispatch(saveCurrentData());
-            } catch (error) {
-                console.error(error);
-                setIsThreedotLoader(false);
-                setToastError('Failed to update field settings.'); // Provide a user-friendly error message
-                setSelectedComponent(false);
+            dispatch(saveCurrentData());
+        } catch (error) {
+            console.error(error);
+            setIsThreedotLoader(false);
+            setToastError('Failed to update field settings.'); // Provide a user-friendly error message
+            setSelectedComponent(false);
+        }
+    };
+
+    const handleAutoSaveSettings = async () => {
+        const payload = {
+            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+            label: fieldSettingParams?.[selectedQuestionId]?.label,
+            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+            type: fieldSettingParams?.[selectedQuestionId]?.type,
+            format: fieldSettingParams?.[selectedQuestionId]?.format,
+            field_range: {
+                min: fieldSettingParams?.[selectedQuestionId]?.min,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
+            },
+            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
+            source: {
+                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+            },
+            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+            options: fieldSettingParams?.[selectedQuestionId]?.options,
+            increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
+            field_texts: {
+                pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+                post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
             }
         };
-
-        const handleAutoSaveSettings = async () => {
-            const payload = {
-                component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
-                label: fieldSettingParams?.[selectedQuestionId]?.label,
-                help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
-                placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
-                default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
-                type: fieldSettingParams?.[selectedQuestionId]?.type,
-                format: fieldSettingParams?.[selectedQuestionId]?.format,
-                field_range: {
-                    min: fieldSettingParams?.[selectedQuestionId]?.min,
-                    max: fieldSettingParams?.[selectedQuestionId]?.max,
-                },
-                admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-                source: {
-                    [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                        fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                            fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                            fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-                },
-                lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-                options: fieldSettingParams?.[selectedQuestionId]?.options,
-                increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
-                field_texts: {
-                    pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
-                    post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
-                }
-            };
-            try {
-                const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-                if (response?.data?.status >= 400) {
-                    setToastError(response?.data?.data?.message || 'Something went wrong');
-                }
-                dispatch(saveCurrentData());
-            } catch (error) {
-                console.error(error);
-                setToastError('Failed to update field settings');
+        try {
+            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
+            if (response?.data?.status >= 400) {
+                setToastError(response?.data?.data?.message || 'Something went wrong');
             }
-        };
+            dispatch(saveCurrentData());
+        } catch (error) {
+            console.error(error);
+            setToastError('Failed to update field settings');
+        }
+    };
 
-        const handleBlur = (e) => {
+    const handleBlur = (e) => {
+        handleAutoSaveSettings();
+        const sectionId = selectedQuestionId.split('_')[0]
+        handleAutoSave(sectionId, sections);
+    }
+
+    useEffect(() => {
+        formDefaultDetails();
+        getFieldSetting();
+        setSavedSection(sections);
+    }, []);
+
+    useEffect(() => {
+        if (shouldAutoSave) {
             handleAutoSaveSettings();
             const sectionId = selectedQuestionId.split('_')[0]
             handleAutoSave(sectionId, sections);
+            setShouldAutoSave(false); // Reset the flag after auto-saving
         }
+    }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
 
-        useEffect(() => {
-            formDefaultDetails();
-            getFieldSetting();
-            setSavedSection(sections);
-        }, []);
-
-        useEffect(() => {
-            if (shouldAutoSave) {
-                handleAutoSaveSettings();
-                const sectionId = selectedQuestionId.split('_')[0]
-                handleAutoSave(sectionId, sections);
-                setShouldAutoSave(false); // Reset the flag after auto-saving
-            }
-        }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
-        return (
-            <>
-                {pageLoading ? (
-                    <FormShimmer />
-                ) : (
-                    <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
-                        <div className='w-[20%]'>
-                            <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
+    return (
+        <>
+            {pageLoading ? (
+                <FormShimmer />
+            ) : (
+                <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
+                    <div className='w-[20%]'>
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
+                    </div>
+                    <div className='w-[50%] '>
+                        <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
+                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                            <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
+                                {getStatusText(formDefaultInfo?.status)}
+                            </button>
                         </div>
-                        <div className='w-[50%] '>
-                            <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
-                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
-                                <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
-                                    {getStatusText(formDefaultInfo?.status)}
-                                </button>
-                            </div>
-                            <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                                <p
-                                    title={formDefaultInfo?.internal_name}
-                                    className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`}
-                                    data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
-                                </p>
-                                {sections?.map((sectionData, sectionIndex) => (
-                                    <div
-                                        key={sectionData?.section_id}
-                                        ref={el => sectionRefs.current[sectionIndex] = el}
-                                        className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
-                                    >
-                                        <div className='flex items-start w-full justify-between gap-7'>
-                                            <EditableField
-                                                name={sectionData?.section_name}
-                                                index={sectionIndex}
-                                                handleSave={handleSaveSectionName}
-                                                section={true}
-                                                testId={`section-${sectionIndex}-name`}
+                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                            <p
+                                title={formDefaultInfo?.internal_name}
+                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`}
+                                data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                            </p>
+                            {sections?.map((sectionData, sectionIndex) => (
+                                <div
+                                    key={sectionData?.section_id}
+                                    ref={el => sectionRefs.current[sectionIndex] = el}
+                                    className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
+                                >
+                                    <div className='flex items-start w-full justify-between gap-7'>
+                                        <EditableField
+                                            name={sectionData?.section_name}
+                                            index={sectionIndex}
+                                            handleSave={handleSaveSectionName}
+                                            section={true}
+                                            testId={`section-${sectionIndex}-name`}
+                                        />
+                                        <div className='flex items-center justify-end'>
+                                            <img src="/Images/trash-black.svg"
+                                                alt="delete"
+                                                title='Delete'
+                                                data-testid={`delete-btn-${sectionIndex}`}
+                                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                                                // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
+                                                onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
                                             />
-                                            <div className='flex items-center justify-end'>
-                                                <img src="/Images/trash-black.svg"
-                                                    alt="delete"
-                                                    title='Delete'
-                                                    data-testid={`delete-btn-${sectionIndex}`}
-                                                    className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                                                    // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                                                    onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
+                                            <img src="/Images/save.svg"
+                                                alt="save"
+                                                title='Save'
+                                                data-testid={`save-btn-${sectionIndex}`}
+                                                className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
+                                        </div>
+                                    </div>
+                                    {sectionData?.pages.map((pageData, pageIndex) => (
+                                        <div
+                                            key={pageData?.page_id}
+                                            ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
+                                            className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
+                                        >
+                                            <div className='flex items-start justify-between gap-7'>
+                                                <EditableField
+                                                    name={pageData?.page_name}
+                                                    index={sectionIndex}
+                                                    secondIndex={pageIndex}
+                                                    handleSave={handleSaveSectionName}
+                                                    testId={`page-${pageIndex}-name`}
+                                                    maxLength={1}
                                                 />
-                                                <img src="/Images/save.svg"
-                                                    alt="save"
-                                                    title='Save'
-                                                    data-testid={`save-btn-${sectionIndex}`}
-                                                    className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
+                                                <div className='flex items-center justify-end'>
+                                                    <img src="/Images/trash-black.svg"
+                                                        title='Delete'
+                                                        alt="Delete"
+                                                        data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
+                                                        onClick={() => {
+                                                            handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
+                                                                setShowPageDeleteModal(true)
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <DraggableList
+                                                itemKey="question_id"
+                                                template={Item}
+                                                list={pageData.questions.map((questionData, questionIndex) => ({
+                                                    ...questionData,
+                                                    sectionIndex,
+                                                    pageIndex,
+                                                    index: questionIndex,
+                                                }))}
+                                                onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
+                                                container={() => document.body}
+                                            />
+                                            <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
+                                                <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                    <span className='mr-[15px]'>+</span>
+                                                    <span>Add question</span>
+                                                </button>
                                             </div>
                                         </div>
-                                        {sectionData?.pages.map((pageData, pageIndex) => (
-                                            <div
-                                                key={pageData?.page_id}
-                                                ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                                                className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
-                                            >
-                                                <div className='flex items-start justify-between gap-7'>
-                                                    <EditableField
-                                                        name={pageData?.page_name}
-                                                        index={sectionIndex}
-                                                        secondIndex={pageIndex}
-                                                        handleSave={handleSaveSectionName}
-                                                        testId={`page-${pageIndex}-name`}
-                                                        maxLength={1}
-                                                    />
-                                                    <div className='flex items-center justify-end'>
-                                                        <img src="/Images/trash-black.svg"
-                                                            title='Delete'
-                                                            alt="Delete"
-                                                            data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                                            onClick={() => {
-                                                                handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
-                                                                    setShowPageDeleteModal(true)
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <DraggableList
-                                                    itemKey="question_id"
-                                                    template={Item}
-                                                    list={pageData.questions.map((questionData, questionIndex) => ({
-                                                        ...questionData,
-                                                        sectionIndex,
-                                                        pageIndex,
-                                                        index: questionIndex,
-                                                    }))}
-                                                    onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
-                                                    container={() => document.body}
-                                                />
-                                                <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
-                                                    <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                                        <span className='mr-[15px]'>+</span>
-                                                        <span>Add question</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <button
-                                            onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
-                                            data-testid={`add-page-sec-${sectionIndex}`}
-                                            className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                            <span className='mr-[15px]'>+</span>
-                                            <span>Add page</span>
-                                        </button>
-                                    </div>
-                                ))}
-                                <button
-                                    onClick={() => handleAddRemoveSection('add')}
-                                    data-testid="add-section"
-                                    className='lex items-center font-semibold text-[#2B333B] text-base'>
-                                    <span className='mr-[15px]'>+</span>
-                                    Add section
-                                </button>
-                            </div>
-                        </div>
-                        <div className='w-[30%]'>
-                            <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                                <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
-                                    <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
-                                    Cancel
-                                </button>
-                                <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
-                                    <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
-                                    Preview
-                                </button>
-                                <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                                // onClick={() => handleSaveSection()}
-                                >
-                                    Save
-                                </button>
-                            </div>
-                            <div>
-                                {selectedComponent ? (
-                                    React.createElement(
-                                        sideComponentMap[selectedComponent],  // Dynamically select the component
-                                        {
-                                            handleInputChange: handleInputChange,
-                                            formParameters: fieldSettingParams[selectedQuestionId],
-                                            handleRadiobtn: handleRadiobtn,
-                                            fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                            // setFieldSettingParameters: setFieldSettingParameters,
-                                            handleSaveSettings: handleSaveSettings,
-                                            isThreedotLoader: isThreedotLoader,
-                                            selectedQuestionId: selectedQuestionId,
-                                            handleBlur: handleBlur,
-                                            setShouldAutoSave: setShouldAutoSave
-                                        }
-                                    )
-                                ) : (
-                                    <AddFields
-                                        buttons={Fieldsneeded}
-                                        handleClick={handleClick}
-                                    />
-                                )}
-
-                            </div>
+                                    ))}
+                                    <button
+                                        onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
+                                        data-testid={`add-page-sec-${sectionIndex}`}
+                                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                        <span className='mr-[15px]'>+</span>
+                                        <span>Add page</span>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                onClick={() => handleAddRemoveSection('add')}
+                                data-testid="add-section"
+                                className='lex items-center font-semibold text-[#2B333B] text-base'>
+                                <span className='mr-[15px]'>+</span>
+                                Add section
+                            </button>
                         </div>
                     </div>
-                )}
-                {isModalOpen && (
-                    <ConfirmationModal
-                        text='Delete Section'
-                        subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
-                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                        Button1text='Delete'
-                        Button2text='Cancel'
-                        src='delete-gray'
-                        testIDBtn1='confirm-delete'
-                        testIDBtn2='cancel-delete'
-                        isModalOpen={isModalOpen}
-                        setModalOpen={setModalOpen}
-                        handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
-                        handleButton2={handleCancel} // Handle cancel button
-                    />
-                )}
-                {showPageDeleteModal && (
-                    <ConfirmationModal
-                        text='Delete Page'
-                        subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
-                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                        Button1text='Delete'
-                        Button2text='Cancel'
-                        src='delete-gray'
-                        testIDBtn1='confirm-delete-page'
-                        testIDBtn2='cancel-delete'
-                        isModalOpen={showPageDeleteModal}
-                        setModalOpen={setShowPageDeleteModal}
-                        handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
-                        handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
-                    />
-                )}
-                {showquestionDeleteModal && (
-                    <ConfirmationModal
-                        text='Delete Question'
-                        subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
-                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                        Button1text='Delete'
-                        Button2text='Cancel'
-                        src='delete-gray'
-                        testIDBtn1='confirm-delete'
-                        testIDBtn2='cancel-delete'
-                        isModalOpen={showquestionDeleteModal}
-                        setModalOpen={setShowquestionDeleteModal}
-                        handleButton1={confirmDeleteQuestion}
-                        handleButton2={() => setShowquestionDeleteModal(false)}
-                    />
-                )}
-            </>
-        );
-    }
+                    <div className='w-[30%]'>
+                        <div className='border-b border-[#DCE0EC] flex items-center w-full'>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
+                                Cancel
+                            </button>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                                <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
+                                Preview
+                            </button>
+                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
+                            // onClick={() => handleSaveSection()}
+                            >
+                                Save
+                            </button>
+                        </div>
+                        <div>
+                            {selectedComponent ? (
+                                React.createElement(
+                                    sideComponentMap[selectedComponent],  // Dynamically select the component
+                                    {
+                                        handleInputChange: handleInputChange,
+                                        formParameters: fieldSettingParams[selectedQuestionId],
+                                        handleRadiobtn: handleRadiobtn,
+                                        fieldSettingParameters: fieldSettingParams[selectedQuestionId],
+                                        // setFieldSettingParameters: setFieldSettingParameters,
+                                        handleSaveSettings: handleSaveSettings,
+                                        isThreedotLoader: isThreedotLoader,
+                                        selectedQuestionId: selectedQuestionId,
+                                        handleBlur: handleBlur,
+                                        setShouldAutoSave: setShouldAutoSave
+                                    }
+                                )
+                            ) : (
+                                <AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                />
+                            )}
+
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isModalOpen && (
+                <ConfirmationModal
+                    text='Delete Section'
+                    subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={isModalOpen}
+                    setModalOpen={setModalOpen}
+                    handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
+                    handleButton2={handleCancel} // Handle cancel button
+                />
+            )}
+            {showPageDeleteModal && (
+                <ConfirmationModal
+                    text='Delete Page'
+                    subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete-page'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={showPageDeleteModal}
+                    setModalOpen={setShowPageDeleteModal}
+                    handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
+                    handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
+                />
+            )}
+            {showquestionDeleteModal && (
+                <ConfirmationModal
+                    text='Delete Question'
+                    subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={showquestionDeleteModal}
+                    setModalOpen={setShowquestionDeleteModal}
+                    handleButton1={confirmDeleteQuestion}
+                    handleButton2={() => setShowquestionDeleteModal(false)}
+                />
+            )}
+        </>
+    );
+}
 
 
 export default QuestionnaryForm;
