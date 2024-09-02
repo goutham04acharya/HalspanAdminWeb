@@ -51,3 +51,4 @@ Feature: Halspan - Admin - Create a Questionnaire using Floor Plan as a Field
       | pindrop     | draw  |
       | "yes"       | "yes" |
       | "no"        | "no"  |
+
