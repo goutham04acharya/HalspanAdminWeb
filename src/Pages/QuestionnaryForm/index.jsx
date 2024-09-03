@@ -21,6 +21,12 @@ import DateTimeField from './Components/Fields/DateTime/DateTimeField.jsx';
 import DateTimeFieldSetting from './Components/Fields/DateTime/DateTimeFieldSetting/DateTimeFieldSetting.jsx';
 import AssetLocationField from './Components/Fields/AssetLocation/AssetLocationField.jsx';
 import AssetLocationFieldSetting from './Components/Fields/AssetLocation/AssetLocationFieldSetting/AssetLocationFieldSetting.jsx';
+import NumberField from './Components/Fields/Number/NumberField.jsx';
+import NumberFieldSetting from './Components/Fields/Number/NumberFieldSetting/NumberFieldSetting.jsx';
+import FloorPlanField from './Components/Fields/FloorPlan/FloorPlanField.jsx';
+import FloorPlanSettings from './Components/Fields/FloorPlan/FloorPlanSettings/FloorPlanSettings.jsx';
+import PhotoField from './Components/Fields/PhotoField/PhotoFIeld.jsx';
+import PhotoFieldSetting from './Components/Fields/PhotoField/PhtoFieldSetting/PhotoFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -138,7 +144,7 @@ function QuestionnaryForm() {
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
             setShouldAutoSave(true);
-        }, 1000); // 1000ms delay before auto-saving
+        }, 500); // 1000ms delay before auto-saving
     };
 
     const componentMap = {
@@ -158,6 +164,19 @@ function QuestionnaryForm() {
             <AssetLocationField
                 {...props}
             />,
+        numberfield: (props) =>
+            <NumberField
+                {...props}
+            />,
+        floorPlanfield: (props) =>
+            <FloorPlanField
+                {...props}
+            />,
+        photofield: (props) =>
+            <PhotoField
+                {...props}
+            />,
+
         // checkbox: (props) => <CheckboxField {...props} />,
         // video: (props) => <VideoField {...props} />,
         // audio: (props) => <AudioField {...props} />,
@@ -167,7 +186,10 @@ function QuestionnaryForm() {
         "textboxfield": TestFieldSetting,
         "choiceboxfield": ChoiceFieldSetting,
         "dateTimefield": DateTimeFieldSetting,
-        "assetLocationfield": AssetLocationFieldSetting
+        "assetLocationfield": AssetLocationFieldSetting,
+        "numberfield": NumberFieldSetting,
+        "floorPlanfield": FloorPlanSettings,
+        "photofield": PhotoFieldSetting,
         // Add other mappings here...
     };
 
@@ -383,7 +405,7 @@ function QuestionnaryForm() {
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         setSelectedComponent(componentType);
     };
-    
+
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
         const { onMouseDown, onTouchStart } = dragHandleProps;
@@ -693,10 +715,34 @@ function QuestionnaryForm() {
         })
     })
 
+    const handleNumberClick = useCallback(() => {
+        addNewQuestion('numberfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'integer', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId }));
+
+        });
+    }, [addNewQuestion]);
+
     const handleAssetLocationClick = useCallback(() => {
         addNewQuestion('assetLocationfield', (questionId) => {
         })
     })
+
+    const handleFloorPlanClick = useCallback(() => {
+        addNewQuestion('floorPlanfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
+
+        });
+    }, [addNewQuestion]);
+
+    const handlePhotoClick = useCallback(() => {
+        addNewQuestion('photofield', (questionId) => {
+            dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
+
+        });
+    }, [addNewQuestion])
 
     const handleClick = useCallback((functionName) => {
         const functionMap = {
@@ -704,10 +750,13 @@ function QuestionnaryForm() {
             handleChoiceClick,
             handleDateTimeClick,
             handleAssetLocationClick,
+            handleNumberClick,
+            handleFloorPlanClick,
+            handlePhotoClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick]);
 
 
     //function for handle radio button
@@ -717,12 +766,60 @@ function QuestionnaryForm() {
     }
 
     //function to save the field setting
-    const handleSaveSettings = async () => {
-        setIsThreedotLoader(true);
-        const len = sections.length;
-        if (len > 0) {
-            handleSaveSection(sections[len - 1].section_id, false);
-        }
+    // const handleSaveSettings = async () => {
+    //     setIsThreedotLoader(true);
+    //     const len = sections.length;
+    //     if (len > 0) {
+    //         handleSaveSection(sections[len - 1].section_id, false);
+    //     }
+    //     const payload = {
+    //         component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
+    //         label: fieldSettingParams?.[selectedQuestionId]?.label,
+    //         help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
+    //         placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
+    //         default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
+    //         type: fieldSettingParams?.[selectedQuestionId]?.type,
+    //         format: fieldSettingParams?.[selectedQuestionId]?.format,
+    //         field_range: {
+    //             min: fieldSettingParams?.[selectedQuestionId]?.min,
+    //             max: fieldSettingParams?.[selectedQuestionId]?.max,
+    //         },
+    //         admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
+    //         source: {
+    //             [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+    //                 fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+    //                     fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+    //                     fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+    //         },
+    //         lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
+    //         options: fieldSettingParams?.[selectedQuestionId]?.options,
+    //         default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
+    //         increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
+    //         field_texts: {
+    //             pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+    //             post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
+    //         },
+    //         draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+    //         pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+    //         include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
+    //     };
+    //     try {
+    //         const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
+    //         setIsThreedotLoader(false);
+    //         setToastSuccess(response?.data?.message)
+    //         if (response?.data?.status >= 400) {
+    //             setToastError(response?.data?.data?.message || 'Something went wrong.');
+    //         }
+    //         dispatch(saveCurrentData());
+    //     } catch (error) {
+    //         console.error(error);
+    //         setIsThreedotLoader(false);
+    //         setToastError('Failed to update field settings.'); // Provide a user-friendly error message
+    //         setSelectedComponent(false);
+    //     }
+    // };
+
+    const handleAutoSaveSettings = async () => {
         const payload = {
             component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
             label: fieldSettingParams?.[selectedQuestionId]?.label,
@@ -731,7 +828,7 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
+            field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
@@ -745,45 +842,16 @@ function QuestionnaryForm() {
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
             options: fieldSettingParams?.[selectedQuestionId]?.options,
             default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
-        };
-        try {
-            const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-            setIsThreedotLoader(false);
-            setToastSuccess(response?.data?.message)
-            if (response?.data?.status >= 400) {
-                setToastError(response?.data?.data?.message || 'Something went wrong.');
+            increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
+            field_texts: {
+                pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
+                post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
+            },
+            asset_extras: {
+                draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
+                pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
+                include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
             }
-            dispatch(saveCurrentData());
-        } catch (error) {
-            console.error(error);
-            setIsThreedotLoader(false);
-            setToastError('Failed to update field settings.'); // Provide a user-friendly error message
-            setSelectedComponent(false);
-        }
-    };
-
-    const handleAutoSaveSettings = async () => {
-        const payload = {
-            component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
-            label: fieldSettingParams?.[selectedQuestionId]?.label,
-            help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
-            placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
-            default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
-            type: fieldSettingParams?.[selectedQuestionId]?.type,
-            format: fieldSettingParams?.[selectedQuestionId]?.format,
-            number_of_characters: {
-                min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: fieldSettingParams?.[selectedQuestionId]?.max,
-            },
-            admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-            source: {
-                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-            },
-            lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-            options: fieldSettingParams?.[selectedQuestionId]?.options
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
@@ -846,7 +914,7 @@ function QuestionnaryForm() {
                                     ref={el => sectionRefs.current[sectionIndex] = el}
                                     className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
                                 >
-                                    <div className='flex items-center w-full justify-between gap-7'>
+                                    <div className='flex items-start w-full justify-between gap-7'>
                                         <EditableField
                                             name={sectionData?.section_name}
                                             index={sectionIndex}
@@ -876,7 +944,7 @@ function QuestionnaryForm() {
                                             ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
                                             className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
                                         >
-                                            <div className='flex items-center justify-between gap-7'>
+                                            <div className='flex items-start justify-between gap-7'>
                                                 <EditableField
                                                     name={pageData?.page_name}
                                                     index={sectionIndex}
@@ -962,7 +1030,7 @@ function QuestionnaryForm() {
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
                                         // setFieldSettingParameters: setFieldSettingParameters,
-                                        handleSaveSettings: handleSaveSettings,
+                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
