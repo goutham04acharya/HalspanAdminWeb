@@ -61,6 +61,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/fileField.svg',
         testId: 'file',
+        onClick: 'handleFileClick',
         type: 'file'
 
     },

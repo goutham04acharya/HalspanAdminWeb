@@ -29,6 +29,8 @@ import PhotoField from './Components/Fields/PhotoField/PhotoFIeld.jsx';
 import PhotoFieldSetting from './Components/Fields/PhotoField/PhtoFieldSetting/PhotoFieldSetting.jsx';
 import VideoField from './Components/Fields/VideoField/VideoField.jsx';
 import VideoFieldSetting from './Components/Fields/VideoField/VideoFieldSetting/VideoFieldSetting.jsx';
+import FileField from './Components/Fields/File/FileFIeld.jsx';
+import FileFieldSetting from './Components/Fields/File/FileFieldSetting/FileFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -121,15 +123,13 @@ function QuestionnaryForm() {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
-        // Check if the input field is 'min' or 'max' and restrict to numbers
-        const updatedValue = ((id === 'fileSize')||(id === 'min' || id === 'max'))
-            ? value.replace(/[^0-9]/g, '')  // Allow only numeric input
-            : value;
-
-        // setFieldSettingParameters((prevState) => ({
-        //     ...prevState,
-        //     [id]: updatedValue,
-        // }));
+        // Restrict numeric input if the id is 'fileType'
+        let updatedValue = value;
+        if (id === 'fileType') {
+            updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
+        } else if (id === 'fileSize' || id === 'min' || id === 'max') {
+            updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
@@ -182,7 +182,10 @@ function QuestionnaryForm() {
             <VideoField
                 {...props}
             />,
-
+        filefield: (props) =>
+            <FileField
+                {...props}
+            />,
     };
 
     const sideComponentMap = {
@@ -194,6 +197,7 @@ function QuestionnaryForm() {
         "floorPlanfield": FloorPlanSettings,
         "photofield": PhotoFieldSetting,
         "videofield": VideoFieldSetting,
+        "filefield": FileFieldSetting,
         // Add other mappings here...
     };
 
@@ -753,7 +757,10 @@ function QuestionnaryForm() {
         })
     })
 
-
+    const handleFileClick = useCallback(() => {
+        addNewQuestion('filefield', (questionId) => {
+        })
+    })
 
     const handleClick = useCallback((functionName) => {
         const functionMap = {
@@ -765,10 +772,11 @@ function QuestionnaryForm() {
             handleFloorPlanClick,
             handlePhotoClick,
             handleVideoClick,
+            handleFileClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick]);
 
 
     //function for handle radio button
@@ -809,7 +817,8 @@ function QuestionnaryForm() {
                 draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
                 pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
                 include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata,
-                file_size:fieldSettingParams?.[selectedQuestionId]?.fileSize,
+                file_size: fieldSettingParams?.[selectedQuestionId]?.fileSize,
+                file_type: fieldSettingParams?.[selectedQuestionId]?.fileType,
             }
         };
         try {

@@ -27,13 +27,13 @@ function PhotoField({ label,
                 htmlFor={textId}
                 maxLength={100}
                 title={fieldSettingParameters?.label}
-                className='font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%]'>
+                className='font-medium text-base text-[#000000] overflow-hidden break-all  break-words block w-full max-w-[85%]'>
                 {fieldSettingParameters?.label}
             </label>
             <div className="custom-file-input-wrapper w-full h-auto mt-5 flex items-center bg-white border border-[#AEB3B7] p-2 rounded-lg">
                 <label
                     htmlFor={textId}
-                    className={`custom-file-label flex-1 py-3 px-4 border border-[#AEB3B7] bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
+                    className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
                     {fileName ? `Upload Photo (${fileName})` : 'Upload Photo(X)'}
                 </label>
