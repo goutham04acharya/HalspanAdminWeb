@@ -67,7 +67,7 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId }
                     data-testid={testId}
                     onClick={handleClick}
                     title={name}
-                    className={`text-[#2B333B] truncate p-[10px] w-full font-medium text-[22px] cursor-pointer rounded mb-1 ${section ? 'hover:bg-white' : 'hover:bg-[#EFF1F8]'}`}
+                    className={`text-[#2B333B] p-[10px] font-medium text-[22px] cursor-pointer rounded mb-1 w-[85%] break-all break-words ${section ? 'hover:bg-white' : 'hover:bg-[#EFF1F8]'}`}
                 >
                     {name}
                 </p>
