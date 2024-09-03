@@ -8,7 +8,7 @@ const Keys = webdriver.Key;
 
 When('I click the photos button', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="photos"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="photo"]`))).click();
 });
 
 Then('I should see the photos field added to the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, questionNumber) {
@@ -53,9 +53,9 @@ When('I enter the minimum and maximum number of photos', async function () {
     await driver.wait(until.elementLocated(By.css('[data-testid="maxChar"]'))).sendKeys('5');
 });
 
-When('I click the draw on image as {string}', async function (image) {
+When('I click the draw on image for photo as {string}', async function (image) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="image-${image}"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="draw-${image}"]`))).click();
 });
 
 When('I click the include metadata as {string}', async function (metadata) {
