@@ -53,6 +53,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/videoField.svg',
         testId: 'video',
+        onClick: 'handleVideoClick',
         type: 'video'
     },
     {

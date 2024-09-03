@@ -27,6 +27,8 @@ import FloorPlanField from './Components/Fields/FloorPlan/FloorPlanField.jsx';
 import FloorPlanSettings from './Components/Fields/FloorPlan/FloorPlanSettings/FloorPlanSettings.jsx';
 import PhotoField from './Components/Fields/PhotoField/PhotoFIeld.jsx';
 import PhotoFieldSetting from './Components/Fields/PhotoField/PhtoFieldSetting/PhotoFieldSetting.jsx';
+import VideoField from './Components/Fields/VideoField/VideoField.jsx';
+import VideoFieldSetting from './Components/Fields/VideoField/VideoFieldSetting/VideoFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -176,10 +178,11 @@ function QuestionnaryForm() {
             <PhotoField
                 {...props}
             />,
+        videofield: (props) =>
+            <VideoField
+                {...props}
+            />,
 
-        // checkbox: (props) => <CheckboxField {...props} />,
-        // video: (props) => <VideoField {...props} />,
-        // audio: (props) => <AudioField {...props} />,
     };
 
     const sideComponentMap = {
@@ -190,6 +193,7 @@ function QuestionnaryForm() {
         "numberfield": NumberFieldSetting,
         "floorPlanfield": FloorPlanSettings,
         "photofield": PhotoFieldSetting,
+        "videofield": VideoFieldSetting,
         // Add other mappings here...
     };
 
@@ -742,7 +746,14 @@ function QuestionnaryForm() {
             dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
 
         });
-    }, [addNewQuestion])
+    }, [addNewQuestion]);
+
+    const handleVideoClick = useCallback(() => {
+        addNewQuestion('videofield', (questionId) => {
+        })
+    })
+
+
 
     const handleClick = useCallback((functionName) => {
         const functionMap = {
@@ -753,10 +764,11 @@ function QuestionnaryForm() {
             handleNumberClick,
             handleFloorPlanClick,
             handlePhotoClick,
+            handleVideoClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick]);
 
 
     //function for handle radio button
@@ -764,60 +776,6 @@ function QuestionnaryForm() {
         dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
         handleAutoSaveSettings();
     }
-
-    //function to save the field setting
-    // const handleSaveSettings = async () => {
-    //     setIsThreedotLoader(true);
-    //     const len = sections.length;
-    //     if (len > 0) {
-    //         handleSaveSection(sections[len - 1].section_id, false);
-    //     }
-    //     const payload = {
-    //         component_type: fieldSettingParams?.[selectedQuestionId]?.componentType,
-    //         label: fieldSettingParams?.[selectedQuestionId]?.label,
-    //         help_text: fieldSettingParams?.[selectedQuestionId]?.helptext,
-    //         placeholder_content: fieldSettingParams?.[selectedQuestionId]?.placeholderContent,
-    //         default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
-    //         type: fieldSettingParams?.[selectedQuestionId]?.type,
-    //         format: fieldSettingParams?.[selectedQuestionId]?.format,
-    //         field_range: {
-    //             min: fieldSettingParams?.[selectedQuestionId]?.min,
-    //             max: fieldSettingParams?.[selectedQuestionId]?.max,
-    //         },
-    //         admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-    //         source: {
-    //             [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-    //                 fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-    //                     fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-    //                     fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-    //         },
-    //         lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
-    //         options: fieldSettingParams?.[selectedQuestionId]?.options,
-    //         default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
-    //         increment_by: fieldSettingParams?.[selectedQuestionId]?.incrementby,
-    //         field_texts: {
-    //             pre_field_text: fieldSettingParams?.[selectedQuestionId]?.preField,
-    //             post_field_text: fieldSettingParams?.[selectedQuestionId]?.postField
-    //         },
-    //         draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
-    //         pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
-    //         include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
-    //     };
-    //     try {
-    //         const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-    //         setIsThreedotLoader(false);
-    //         setToastSuccess(response?.data?.message)
-    //         if (response?.data?.status >= 400) {
-    //             setToastError(response?.data?.data?.message || 'Something went wrong.');
-    //         }
-    //         dispatch(saveCurrentData());
-    //     } catch (error) {
-    //         console.error(error);
-    //         setIsThreedotLoader(false);
-    //         setToastError('Failed to update field settings.'); // Provide a user-friendly error message
-    //         setSelectedComponent(false);
-    //     }
-    // };
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -850,7 +808,8 @@ function QuestionnaryForm() {
             asset_extras: {
                 draw_image: fieldSettingParams?.[selectedQuestionId]?.draw_image,
                 pin_drop: fieldSettingParams?.[selectedQuestionId]?.pin_drop,
-                include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata
+                include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata,
+                file_size:fieldSettingParams?.[selectedQuestionId]?.fileSize,
             }
         };
         try {
