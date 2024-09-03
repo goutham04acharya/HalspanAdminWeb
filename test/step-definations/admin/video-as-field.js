@@ -8,7 +8,7 @@ const Keys = webdriver.Key;
 
 When('I click the videos button', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="videos"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="video"]`))).click();
 });
 
 Then('I should see the videos field added to the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, questionNumber) {
