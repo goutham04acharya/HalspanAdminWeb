@@ -1,11 +1,11 @@
 import React from 'react'
-import CommonComponents from '../../../CommonComponents/CommonComponents';
-import InputField from '../../../../../../Components/InputField/InputField';
-import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
-import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
+import CommonComponents from '../../../CommonComponents/CommonComponents';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
+import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
+import InputField from '../../../../../../Components/InputField/InputField';
 
-function FloorPlanSettings({ handleInputChange,
+function PhotoFieldSetting({ handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
@@ -36,50 +36,41 @@ function FloorPlanSettings({ handleInputChange,
                         assetLocation={true}
                     />
                     <div className='mt-7'>
-                        <p className='font-semibold text-base text-[#2B333B]'>Pin Drop</p>
+                        <p className='font-semibold text-base text-[#2B333B]'>Number of Photos</p>
+                        <div className='flex items-center mt-3'>
+                            <InputField
+                                autoComplete='off'
+                                label=''
+                                id='min'
+                                type='text'
+                                value={fieldSettingParameters?.min}
+                                className='w-full'
+                                labelStyle=''
+                                placeholder='Minimum'
+                                testId='minChar'
+                                htmlFor='min'
+                                maxLength={10}
+                                handleChange={(e) => handleInputChange(e)} />
+                            <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
+                            <InputField
+                                autoComplete='off'
+                                label=''
+                                id='max'
+                                type='text'
+                                value={fieldSettingParameters?.max}
+                                className='w-full'
+                                labelStyle=''
+                                placeholder='Maximum'
+                                testId='maxChar'
+                                htmlFor='max'
+                                maxLength={10}
+                                handleChange={(e) => handleInputChange(e)} />
+                        </div>
+                    </div>
+                    <div className='mt-7'>
+                        <p className='font-semibold text-base text-[#2B333B]'>Draw on Image</p>
                         <div className='mt-2.5'>
                             <div className="relative custom-radioBlue flex items-center" data-testid='yes'>
-                                <input
-                                    type='radio'
-                                    className='w-[17px] h-[17px]'
-                                    name='pin_drop'
-                                    id='pin_drop_yes'
-                                    value='pin_drop'
-                                    checked={fieldSettingParameters?.pin_drop === 'yes'}
-                                    onClick={() => {
-                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
-                                    }}
-                                />
-                                <label htmlFor='pin_drop_yes'
-                                    data-testid='pindrop-yes'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                                    Yes
-                                </label>
-                            </div>
-                            <div className="relative custom-radioBlue flex items-center mt-2.5" data-testid='yes'>
-                                <input
-                                    type='radio'
-                                    className='w-[17px] h-[17px]'
-                                    name='pin_drop'
-                                    id='pin_drop_no'
-                                    value='pin_drop_no'
-                                    checked={fieldSettingParameters?.pin_drop === 'no'}
-                                    onClick={() => {
-                                        dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
-                                    }}
-                                />
-                                <label htmlFor='pin_drop_no'
-                                    data-testid='pindrop-no'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                                    No
-                                </label>
-                            </div>
-                        </div>
-                        <div className='mt-7'>
-                            <p className='font-semibold text-base text-[#2B333B]'>Draw on Image</p>
-                            <div className="relative custom-radioBlue flex items-center mt-2.5" data-testid='yes'>
                                 <input
                                     type='radio'
                                     className='w-[17px] h-[17px]'
@@ -90,14 +81,15 @@ function FloorPlanSettings({ handleInputChange,
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                         setShouldAutoSave(true);
-                                    }} />
+                                    }}
+                                />
                                 <label htmlFor='draw_image_yes'
                                     data-testid='draw-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Yes
                                 </label>
                             </div>
-                            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='yes'>
+                            <div className="relative custom-radioBlue flex items-center mt-2.5" data-testid='yes'>
                                 <input
                                     type='radio'
                                     className='w-[17px] h-[17px]'
@@ -112,6 +104,46 @@ function FloorPlanSettings({ handleInputChange,
                                 />
                                 <label htmlFor='draw_image_no'
                                     data-testid='draw-no'
+                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                        <div className='mt-7'>
+                            <p className='font-semibold text-base text-[#2B333B]'>Include Metadata</p>
+                            <div className="relative custom-radioBlue flex items-center mt-2.5" data-testid='yes'>
+                                <input
+                                    type='radio'
+                                    className='w-[17px] h-[17px]'
+                                    name='include_metadata'
+                                    id='include_metadata_yes'
+                                    value='include_metadata_yes'
+                                    checked={fieldSettingParameters?.include_metadata === 'yes'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'include_metadata', value: 'yes', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }} />
+                                <label htmlFor='include_metadata_yes'
+                                    data-testid='metadata-yes'
+                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    Yes
+                                </label>
+                            </div>
+                            <div className="relative custom-radioBlue flex items-center mt-3" data-testid='yes'>
+                                <input
+                                    type='radio'
+                                    className='w-[17px] h-[17px]'
+                                    name='include_metadata'
+                                    id='include_metadata_no'
+                                    value='include_metadata_no'
+                                    checked={fieldSettingParameters?.include_metadata === 'no'}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId: selectedQuestionId }));
+                                        setShouldAutoSave(true);
+                                    }}
+                                />
+                                <label htmlFor='include_metadata_no'
+                                    data-testid='metadata-no'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     No
                                 </label>
@@ -146,4 +178,5 @@ function FloorPlanSettings({ handleInputChange,
         </>
     )
 }
-export default FloorPlanSettings
+
+export default PhotoFieldSetting
