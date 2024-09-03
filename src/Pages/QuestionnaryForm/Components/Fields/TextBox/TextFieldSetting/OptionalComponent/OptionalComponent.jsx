@@ -26,7 +26,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 'Visible',
                 'Optional',
             ];
-        } else if (componentType === 'videofield') {
+        } else if (componentType === 'videofield' || componentType === 'gpsfield' ) {
             return [
                 'Visible',
                 'Optional',

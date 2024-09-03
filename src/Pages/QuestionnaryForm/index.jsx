@@ -33,6 +33,8 @@ import FileField from './Components/Fields/File/FileFIeld.jsx';
 import FileFieldSetting from './Components/Fields/File/FileFieldSetting/FileFieldSetting.jsx';
 import SignatureField from './Components/Fields/Signature/SignatureField.jsx';
 import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldSetting/SignatureFieldSetting.jsx';
+import GPSField from './Components/Fields/GPS/GPSField.jsx';
+import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -155,7 +157,7 @@ function QuestionnaryForm() {
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
-    
+
         // Restrict numeric input if the id is 'fileType'
         let updatedValue = value;
         if (id === 'fileType') {
@@ -163,14 +165,14 @@ function QuestionnaryForm() {
         } else if (id === 'fileSize' || id === 'min' || id === 'max') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         }
-    
+
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-    
+
         // Check if min is greater than max and set error message
         if (id === 'min' || id === 'max') {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
             const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
-    
+
             if (Number(minValue) > Number(maxValue)) {
                 setValidationErrors(prevErrors => ({
                     ...prevErrors,
@@ -184,23 +186,23 @@ function QuestionnaryForm() {
                 }));
             }
         }
-    
+
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
         update[data[0]] = false;
         setDataIsSame(update);
-    
+
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {
             clearTimeout(debounceTimerRef.current);
         }
-    
+
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
             setShouldAutoSave(true);
         }, 100); // 100ms delay before auto-saving
     };
-    
+
 
     const componentMap = {
         textboxfield: (props) =>
@@ -239,9 +241,13 @@ function QuestionnaryForm() {
             <FileField
                 {...props}
             />,
-        signaturefield: (props) => 
+        signaturefield: (props) =>
             <SignatureField
-            {...props}
+                {...props}
+            />,
+        gpsfield: (props) =>
+            <GPSField
+                {...props}
             />,
     };
 
@@ -255,7 +261,8 @@ function QuestionnaryForm() {
         "photofield": PhotoFieldSetting,
         "videofield": VideoFieldSetting,
         "filefield": FileFieldSetting,
-        "signaturefield": SignatureFieldSetting
+        "signaturefield": SignatureFieldSetting,
+        "gpsfield": GPSFieldSetting,
         // Add other mappings here...
     };
 
@@ -825,6 +832,11 @@ function QuestionnaryForm() {
         })
     });
 
+    const handleGPSClick = useCallback(() => {
+        addNewQuestion('gpsfield', (questionId) => {
+        })
+    });
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -837,10 +849,11 @@ function QuestionnaryForm() {
             handleVideoClick,
             handleFileClick,
             handleSignatureClick,
+            handleGPSClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick]);
 
 
     //function for handle radio button
