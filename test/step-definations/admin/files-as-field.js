@@ -8,7 +8,7 @@ const Keys = webdriver.Key;
 
 When('I click the files button', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="files"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="file"]`))).click();
 });
 
 Then('I should see the files field added to the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, questionNumber) {
@@ -53,10 +53,10 @@ When('I enter the minimum and maximum number of files', async function () {
     await driver.wait(until.elementLocated(By.css('[data-testid="maxChar"]'))).sendKeys('5');
 });
 
-When('I enter the file size', async function () {
-    await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="file-size"]'))).sendKeys('10');
-});
+// When('I enter the file size', async function () {
+//     await new Promise(resolve => setTimeout(resolve, 750));
+//     await driver.wait(until.elementLocated(By.css('[data-testid="file-size"]'))).sendKeys('10');
+// });
 
 When('I enter the file type', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-function VideoField({ label,
+function FileField({ label,
     type,
     textId,
     HelpText,
@@ -35,7 +35,7 @@ function VideoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload Video (${fileName})` : 'Upload Video(X)'}
+                    {fileName ? `Upload File (${fileName})` : 'Upload File(X)'}
                 </label>
                 <input
                     data-testid="input"
@@ -58,4 +58,4 @@ function VideoField({ label,
     )
 }
 
-export default VideoField
+export default FileField
