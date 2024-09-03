@@ -93,6 +93,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/signature.svg',
         testId: 'signature',
+        onClick: 'handleSignatureClick',
         type: 'signature'
     },
     {

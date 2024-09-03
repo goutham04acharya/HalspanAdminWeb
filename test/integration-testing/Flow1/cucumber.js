@@ -21,6 +21,7 @@ module.exports = {
             'test/integration-testing/Flow1/18_photo_as_field.feature',
             'test/integration-testing/Flow1/19_video_as_fields.feature',
             'test/integration-testing/Flow1/20_files_as_field.feature',
+            'test/integration-testing/Flow1/22_signature_as_field.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

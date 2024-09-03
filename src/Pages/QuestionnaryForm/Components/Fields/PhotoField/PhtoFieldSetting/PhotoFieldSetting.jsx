@@ -4,6 +4,7 @@ import CommonComponents from '../../../CommonComponents/CommonComponents';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import InputField from '../../../../../../Components/InputField/InputField';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function PhotoFieldSetting({ handleInputChange,
     formParameters,
@@ -12,6 +13,7 @@ function PhotoFieldSetting({ handleInputChange,
     fieldSettingParameters,
     setShouldAutoSave,
     selectedQuestionId,
+    validationErrors,
 
 }) {
     const dispatch = useDispatch();
@@ -66,6 +68,9 @@ function PhotoFieldSetting({ handleInputChange,
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
+                        {validationErrors?.minMax && (
+                            <ErrorMessage error={validationErrors.minMax} />
+                        )}
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Draw on Image</p>
