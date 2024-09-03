@@ -9,6 +9,7 @@ import InfinateDropdown from '../../../../../../Components/InputField/InfinateDr
 import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function TestFieldSetting({
   handleInputChange,
@@ -20,7 +21,8 @@ function TestFieldSetting({
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
-  setShouldAutoSave
+  setShouldAutoSave,
+  validationErrors
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -32,6 +34,7 @@ function TestFieldSetting({
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
@@ -50,20 +53,12 @@ function TestFieldSetting({
   ];
 
   const handleOptionClick = (option) => {
-    // setFieldSettingParameters((prevState) => ({
-    //   ...prevState,
-    //   format: option.value,
-    // }));
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
-    // setFieldSettingParameters((prevState) => ({
-    //   ...prevState,
-    //   lookupOption: option.value,
-    // }));
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
@@ -263,6 +258,9 @@ function TestFieldSetting({
                     maxLength={10}
                     handleChange={(e) => handleInputChange(e)} />
                 </div>
+                {validationErrors?.minMax && (
+                  <ErrorMessage error={validationErrors.minMax}/>
+                )}
               </div>
               {/* OptionsComponent added here */}
               <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />

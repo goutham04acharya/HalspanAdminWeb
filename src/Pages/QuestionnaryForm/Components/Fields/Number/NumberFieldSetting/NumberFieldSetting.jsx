@@ -4,6 +4,7 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function NumberFieldSetting({
     handleInputChange,
@@ -14,6 +15,7 @@ function NumberFieldSetting({
     setShouldAutoSave,
     selectedQuestionId,
     handleAutoSaveSettings,
+    validationErrors,
 
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
@@ -194,6 +196,9 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
+                        {validationErrors?.minMax && (
+                            <ErrorMessage error={validationErrors.minMax} />
+                        )}
                     </div>
                     <div className='mt-7'>
                         <InputField
