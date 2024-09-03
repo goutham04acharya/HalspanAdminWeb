@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import RangeSlider from './Components/RangeSlider'
 
 function NumberField({
@@ -10,6 +10,25 @@ function NumberField({
     fieldSettingParameters,
 
 }) {
+
+    const [RangeValue, setRangeValue] = useState(value ?? 0);
+
+    // Sync RangeValue with the value prop when it changes, with a check for undefined
+    useEffect(() => {
+        if (value !== undefined && value !== RangeValue) {
+            setRangeValue(value);
+        }
+    }, [value]);
+
+    const handleRange = (event) => {
+        const newValue = event.target.value;
+        setRangeValue(newValue);
+        handleChange({ ...fieldSettingParameters, value: newValue });
+    };
+
+    console.log(RangeValue, 'RangeValue'); // This should now print the correct value
+
+
     return (
         <div>
             <label
@@ -32,7 +51,16 @@ function NumberField({
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <RangeSlider />
+                <div>
+                    <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={RangeValue}
+                        onChange={handleRange}
+                    />
+                    <p>Select Value: {RangeValue}</p>
+                </div>
             }
             <p
                 data-testid="help-text"
