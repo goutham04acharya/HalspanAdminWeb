@@ -81,12 +81,57 @@ const fieldSettingParamsSlice = createSlice({
         saveCurrentData: (state) => {
             state.savedData = { ...state.currentData };
         },
+        // setInitialData: (state, action) => {
+        //     const data = action.payload;
+        
+        //     data.forEach(item => {
+        //         const questionId = item.question_id;
+        
+        //         // Initialize the customizedData object
+        //         const customizedData = {
+        //             componentType: item.component_type,
+        //             label: item.label,
+        //             helptext: item.help_text,
+        //             placeholderContent: item.placeholder_content,
+        //             defaultContent: item.default_content,
+        //             type: item.type,
+        //             format: item.format,
+        //             field_range: {
+        //                 min: item.field_range?.min,
+        //                 max: item.field_range?.max,
+        //             },
+        //             note: item.admin_field_notes,
+        //             questionnaireId: item.questionnaire_id,
+        //             lookupOption: item.lookup_id,
+        //             options: item?.options,
+        //             postField: item?.postField,
+        //             preField: item?.preField,
+        //         };
+                
+        //         // Handle the source object and assign values based on the key
+        //         if (item.source) {
+        //             const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
+
+        //             if (sourceKey === 'fixed_list') {
+        //                 customizedData.source = 'fixedList'
+        //                 customizedData.fixedChoiceArray = item.source[sourceKey];
+        //             } else if (sourceKey === 'lookup') {
+        //                 customizedData.source = sourceKey
+        //                 customizedData.lookupOptionChoice = item.source[sourceKey];
+        //             }
+        //         }
+        
+        //         // Store in both currentData and savedData
+        //         state.currentData[questionId] = customizedData;
+        //         state.savedData[questionId] = customizedData;
+        //     });
+        // }   
         setInitialData: (state, action) => {
             const data = action.payload;
-        
+
             data.forEach(item => {
                 const questionId = item.question_id;
-        
+
                 // Initialize the customizedData object
                 const customizedData = {
                     componentType: item.component_type,
@@ -96,16 +141,16 @@ const fieldSettingParamsSlice = createSlice({
                     defaultContent: item.default_content,
                     type: item.type,
                     format: item.format,
-                    numberOfCharacters: {
-                        min: item.number_of_characters?.min,
-                        max: item.number_of_characters?.max,
-                    },
+                    min: item.field_range?.min,
+                    max: item.field_range?.max,
                     note: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
-                    options: item?.options
+                    options: item?.options,
+                    postField: item?.postField,
+                    preField: item?.preField,
                 };
-                
+
                 // Handle the source object and assign values based on the key
                 if (item.source) {
                     const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
@@ -118,12 +163,12 @@ const fieldSettingParamsSlice = createSlice({
                         customizedData.lookupOptionChoice = item.source[sourceKey];
                     }
                 }
-        
+
                 // Store in both currentData and savedData
                 state.currentData[questionId] = customizedData;
                 state.savedData[questionId] = customizedData;
             });
-        }        
+        }     
     }
 });
 

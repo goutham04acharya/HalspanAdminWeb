@@ -37,6 +37,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/FlorPrintField.svg',
         testId: 'floorplan',
+        onClick: 'handleFloorPlanClick',
         type: 'floorplan',
     },
     {
@@ -44,6 +45,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/cameraField.svg',
         testId: 'photo',
+        onClick: 'handlePhotoClick',
         type: 'photo'
     },
     {
@@ -51,6 +53,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/videoField.svg',
         testId: 'video',
+        onClick: 'handleVideoClick',
         type: 'video'
     },
     {
@@ -74,6 +77,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/NumberField.svg',
         testId: 'number',
+        onClick: 'handleNumberClick',
         type: 'number'
     },
     {

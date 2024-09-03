@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceValue, setNewComponent, updateFixedChoiceArray } from '../../fieldSettingParamsSlice';
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
+import FixedChoiceDraggable from './FixedChoiceDraggable';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -150,18 +151,6 @@ function ChoiceFieldSetting({
                         >
                             <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
                         </div>
-                        {/* <input
-                            type="text"
-                            className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder={`${getOrdinal(item?.index + 1)} Choice`}
-                            onChange={handleFixedChoiceChange}
-                            value={localValue}
-                            id={item.id}
-                            onClick={() => setFocusInput(item.id)} // Call focusInput on click
-                            onBlur={handleBlur}
-                            data-testid={`choice-${item.index + 1}`}
-                            maxLength={50}
-                        /> */}
                         <input
                             type="text"
                             className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
@@ -172,7 +161,6 @@ function ChoiceFieldSetting({
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
                             onBlur={() => {
                                 handleBlur();
-                                console.log('first i am here')
                                 setFocusInput('')
                             }}
                             data-testid={`choice-${item.index + 1}`}
@@ -198,8 +186,16 @@ function ChoiceFieldSetting({
         );
     }));
 
+    // const handleMoveEnd = (newList) => {
+    //     dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+    // };
     const handleMoveEnd = (newList) => {
-        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+        // Remove any non-serializable values before dispatching
+        const sanitizedNewList = newList.map(item => {
+            const { setShouldAutoSave, ...rest } = item;
+            return rest;
+        });
+        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList: sanitizedNewList }));
     };
 
     useEffect(() => {
@@ -295,7 +291,7 @@ function ChoiceFieldSetting({
                                 Fixed List
                             </label>
                         </div>
-                        {fieldSettingParameters?.source === 'fixedList' &&
+                        {/* {fieldSettingParameters?.source === 'fixedList' &&
                             <DraggableList
                                 itemKey="id" // Adjust itemKey according to your unique identifier
                                 template={(props) => (
@@ -310,6 +306,19 @@ function ChoiceFieldSetting({
                                 list={fixedChoiceArray.map((data, choiceIndex) => ({
                                     ...data,
                                     index: choiceIndex,
+                                }))}
+                                onMoveEnd={handleMoveEnd}
+                                container={() => document.body}
+                            />} */}
+                        {fieldSettingParameters?.source === 'fixedList' &&
+                            <DraggableList
+                                itemKey="id" // Adjust itemKey according to your unique identifier
+                                template={FixedChoiceDraggable}
+                                list={fixedChoiceArray.map((data, choiceIndex) => ({
+                                    ...data,
+                                    index: choiceIndex,
+                                    setShouldAutoSave: setShouldAutoSave,
+                                    selectedQuestionId: selectedQuestionId
                                 }))}
                                 onMoveEnd={handleMoveEnd}
                                 container={() => document.body}
