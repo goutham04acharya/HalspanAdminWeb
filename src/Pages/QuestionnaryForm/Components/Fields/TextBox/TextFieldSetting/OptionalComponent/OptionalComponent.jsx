@@ -10,8 +10,8 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingPArams')
 
-     // Define options based on componentType
-     const getOptions = (componentType) => {
+    // Define options based on componentType
+    const getOptions = (componentType) => {
         if (componentType === 'textboxfield') {
             return [
                 'Load from previously entered data',
@@ -26,6 +26,12 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 'Visible',
                 'Optional',
             ];
+        } else if (componentType === 'videofield') {
+            return [
+                'Visible',
+                'Optional',
+                'Remember allowed',
+            ];
         } else {
             return [
                 'Load from previously entered data',
@@ -37,11 +43,11 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         }
     };
 
-     // Initialize the state for the toggles
-     const [toggleStates, setToggleStates] = useState({});
+    // Initialize the state for the toggles
+    const [toggleStates, setToggleStates] = useState({});
 
-     // Sync local state with Redux state when the component mounts or fieldSettingParams change
-     useEffect(() => {
+    // Sync local state with Redux state when the component mounts or fieldSettingParams change
+    useEffect(() => {
         if (fieldSettingParams[selectedQuestionId]) {
             const componentType = fieldSettingParams[selectedQuestionId]?.componentType;
             const options = getOptions(componentType);
@@ -100,9 +106,9 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
         setShouldAutoSave(true);
     };
 
-        // Get options based on current componentType
-        const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
-        const options = getOptions(componentType);
+    // Get options based on current componentType
+    const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
+    const options = getOptions(componentType);
 
     return (
         <div className='mt-7 w-[97%]'>
@@ -112,7 +118,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                     key={option}
                     checked={toggleStates[option]}
                     label={option}
-                    testId = {`${option}`}
+                    testId={`${option}`}
                     onChange={() => handleToggleClick(option)}
                 />
             ))}

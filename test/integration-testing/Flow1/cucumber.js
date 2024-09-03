@@ -19,6 +19,7 @@ module.exports = {
             'test/integration-testing/Flow1/16_view_list_of_questionnaire_versions.feature',
             'test/integration-testing/Flow1/17_floorplan_as_field.feature',
             'test/integration-testing/Flow1/18_photo_as_field.feature',
+            'test/integration-testing/Flow1/19_video_as_fields.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }
