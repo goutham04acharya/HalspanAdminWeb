@@ -49,7 +49,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Photos as a Field
     When I add a new question to the page 1 in section 1
     When I click the photos button
     Then I should see field settings
-    When I click the draw on image as <draw>
+    When I click the draw on image for photo as <draw>
     * I click the include metadata as <metadata>
 
     Examples:
