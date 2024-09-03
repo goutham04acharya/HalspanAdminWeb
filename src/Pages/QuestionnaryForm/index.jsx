@@ -122,7 +122,7 @@ function QuestionnaryForm() {
         const { id, value } = e.target;
 
         // Check if the input field is 'min' or 'max' and restrict to numbers
-        const updatedValue = (id === 'min' || id === 'max')
+        const updatedValue = ((id === 'fileSize')||(id === 'min' || id === 'max'))
             ? value.replace(/[^0-9]/g, '')  // Allow only numeric input
             : value;
 
