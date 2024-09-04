@@ -917,6 +917,12 @@ function QuestionnaryForm() {
                 include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata,
                 file_size: fieldSettingParams?.[selectedQuestionId]?.fileSize,
                 file_type: fieldSettingParams?.[selectedQuestionId]?.fileType,
+            },
+            display_type : {
+                heading: fieldSettingParams?.[selectedQuestionId]?.heading,
+                text: fieldSettingParams?.[selectedQuestionId]?.text,
+                image: fieldSettingParams?.[selectedQuestionId]?.image,
+                url: fieldSettingParams?.[selectedQuestionId]?.url
             }
         };
         try {
