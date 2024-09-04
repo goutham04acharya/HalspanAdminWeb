@@ -35,6 +35,8 @@ import SignatureField from './Components/Fields/Signature/SignatureField.jsx';
 import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldSetting/SignatureFieldSetting.jsx';
 import GPSField from './Components/Fields/GPS/GPSField.jsx';
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
+import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
+import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -249,6 +251,10 @@ function QuestionnaryForm() {
             <GPSField
                 {...props}
             />,
+        displayfield: (props) =>
+            <DIsplayContentField
+                {...props}
+            />,
     };
 
     const sideComponentMap = {
@@ -263,6 +269,7 @@ function QuestionnaryForm() {
         "filefield": FileFieldSetting,
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
+        "displayfield": DisplayFieldSetting,
         // Add other mappings here...
     };
 
@@ -837,6 +844,12 @@ function QuestionnaryForm() {
         })
     });
 
+    const handleDisplayClick = useCallback(() => {
+        addNewQuestion('displayfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
+        })
+    });
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -850,10 +863,11 @@ function QuestionnaryForm() {
             handleFileClick,
             handleSignatureClick,
             handleGPSClick,
+            handleDisplayClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
 
 
     //function for handle radio button

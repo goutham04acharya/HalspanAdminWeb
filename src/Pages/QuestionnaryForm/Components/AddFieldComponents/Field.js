@@ -87,6 +87,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/DisplayField.svg',
         testId: 'display',
+        onClick: 'handleDisplayClick',
         type: 'display'
     },
     {
