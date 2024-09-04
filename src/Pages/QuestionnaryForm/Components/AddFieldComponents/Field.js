@@ -70,6 +70,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/map-pinField.svg',
         testId: 'gps',
+        onClick: 'handleGPSClick',
         type: 'gps'
 
     },
@@ -93,6 +94,7 @@ const Fieldsneeded = [
         buttonNumber: 1,
         buttonIcon: '/Images/signature.svg',
         testId: 'signature',
+        onClick: 'handleSignatureClick',
         type: 'signature'
     },
     {
