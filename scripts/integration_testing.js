@@ -77,7 +77,7 @@ async function runTest(featureFile) {
         console.log('started executing file --', featureFile);
 
         // eslint-disable-next-line security/detect-child-process
-        const child = exec(command, { maxBuffer: 1024 * 500 }, (error) => {
+        const child = exec(command, { maxBuffer: 5 * 1024 * 1024 }, (error) => {
             if (error) {
                 console.log(`Error Executing BDD tests for ${featureFile} ${error}`);
                 reject(error);
