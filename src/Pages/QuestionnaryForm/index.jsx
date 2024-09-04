@@ -79,6 +79,8 @@ function QuestionnaryForm() {
     const [selectedSectionData, setSelectedSectionData] = useState({})
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -166,6 +168,11 @@ function QuestionnaryForm() {
             updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
         } else if (id === 'fileSize' || id === 'min' || id === 'max') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        }
+
+        // Check if the input field's id is the one you want to manage with inputValue
+        if (id === 'text') {
+            setInputValue(updatedValue); // Update inputValue if the id matches
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
@@ -1101,7 +1108,9 @@ function QuestionnaryForm() {
                                         handleBlur: handleBlur,
                                         setShouldAutoSave: setShouldAutoSave,
                                         validationErrors: validationErrors,
-                                        setReplaceModal:setReplaceModal
+                                        setReplaceModal: setReplaceModal,
+                                        setInputValue: setInputValue,
+                                        inputValue: inputValue,
                                     }
                                 )
                             ) : (

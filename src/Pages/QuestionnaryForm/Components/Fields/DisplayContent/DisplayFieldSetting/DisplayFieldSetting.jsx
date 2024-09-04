@@ -17,10 +17,14 @@ function DisplayFieldSetting({
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
+    setInputValue,
+    inputValue,
 }) {
     const dispatch = useDispatch();
     const [selectedFile, setSelectedFile] = useState(null);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(fieldSettingParameters?.format || '');
+
 
 
     const options = [
@@ -31,9 +35,19 @@ function DisplayFieldSetting({
     ];
 
     const handleOptionClick = (option) => {
+        console.log('Before setting:', selectedOption);
+        setSelectedOption(option.value);
         setDropdownOpen(false);
         dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true)
+
+        // Prefill the input field based on the selected option
+        if (option.value === 'http' || option.value === 'https') {
+            setInputValue(`${option.value}://`);
+        } else {
+            setInputValue('');
+        }
+        console.log('After setting:', selectedOption);  
     };
 
     const handleFileUploadClick = () => {
@@ -261,7 +275,7 @@ function DisplayFieldSetting({
                             {fieldSettingParameters?.type === 'url' &&
                                 <InputWithDropDown
                                     id='format'
-                                    top='55px'
+                                    top='30px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                     testID='format-dropdown'
@@ -271,8 +285,31 @@ function DisplayFieldSetting({
                                     isDropdownOpen={isDropdownOpen}
                                     setDropdownOpen={setDropdownOpen}
                                     options={options}
+                                    close={true}
+                                    setSelectedOption={setSelectedOption} // Make sure this is a function
                                 />
+
                             }
+                            {selectedOption && (
+                                <InputField
+                                    autoComplete='off'
+                                    id='text'
+                                    type='text'
+                                    value={inputValue} // Controlled by your component's state
+                                    className='w-full mt-2.5'
+                                    placeholder={
+                                        selectedOption === 'mailto'
+                                            ? 'eg: support@halspan.com'
+                                            : selectedOption === 'tel'
+                                                ? 'Enter phone number'
+                                                : 'Enter text'
+                                    }
+                                    testId='text'
+                                    htmlFor='text'
+                                    maxLength={100}
+                                    handleChange={(e) => setInputValue(e.target.value)} // Ensure this updates correctly
+                                />
+                            )}
                         </div>
                     </div>
                     <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
