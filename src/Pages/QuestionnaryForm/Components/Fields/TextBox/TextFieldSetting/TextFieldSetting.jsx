@@ -227,7 +227,8 @@ function TestFieldSetting({
               handleOptionClick={handleOptionClick}
               isDropdownOpen={isDropdownOpen}
               setDropdownOpen={setDropdownOpen}
-              options={options} />
+              options={options} 
+              />
           </div>
           <div className='mt-7'>
             <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>

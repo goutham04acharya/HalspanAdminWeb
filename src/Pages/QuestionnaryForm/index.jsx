@@ -78,6 +78,8 @@ function QuestionnaryForm() {
     // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
     const [validationErrors, setValidationErrors] = useState({});
+    const [showReplaceModal, setReplaceModal] = useState(false);
+    const [inputValue, setInputValue] = useState('');
 
 
     const dispatch = useDispatch();
@@ -166,6 +168,11 @@ function QuestionnaryForm() {
             updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
         } else if (id === 'fileSize' || id === 'min' || id === 'max') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        }
+
+        // Check if the input field's id is the one you want to manage with inputValue
+        if (id === 'text') {
+            setInputValue(updatedValue); // Update inputValue if the id matches
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
@@ -910,6 +917,12 @@ function QuestionnaryForm() {
                 include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata,
                 file_size: fieldSettingParams?.[selectedQuestionId]?.fileSize,
                 file_type: fieldSettingParams?.[selectedQuestionId]?.fileType,
+            },
+            display_type : {
+                heading: fieldSettingParams?.[selectedQuestionId]?.heading,
+                text: fieldSettingParams?.[selectedQuestionId]?.text,
+                image: fieldSettingParams?.[selectedQuestionId]?.image,
+                url: fieldSettingParams?.[selectedQuestionId]?.url
             }
         };
         try {
@@ -930,6 +943,11 @@ function QuestionnaryForm() {
         const sectionId = selectedQuestionId.split('_')[0]
         handleAutoSave(sectionId, sections);
     }
+    //this is for diplay content field replace modal function
+    const handleConfirmReplace = () => {
+        setReplaceModal(false);
+        document.getElementById('file-upload').click();
+    };
 
     useEffect(() => {
         formDefaultDetails();
@@ -1096,6 +1114,9 @@ function QuestionnaryForm() {
                                         handleBlur: handleBlur,
                                         setShouldAutoSave: setShouldAutoSave,
                                         validationErrors: validationErrors,
+                                        setReplaceModal: setReplaceModal,
+                                        setInputValue: setInputValue,
+                                        inputValue: inputValue,
                                     }
                                 )
                             ) : (
@@ -1155,6 +1176,22 @@ function QuestionnaryForm() {
                     setModalOpen={setShowquestionDeleteModal}
                     handleButton1={confirmDeleteQuestion}
                     handleButton2={() => setShowquestionDeleteModal(false)}
+                />
+            )}
+            {showReplaceModal && (
+                <ConfirmationModal
+                    text='Replace Image'
+                    subText='This will replace the existing image. This action cannot be undone.'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Replace'
+                    Button2text='Cancel'
+                    src='replace'
+                    testIDBtn1='confirm-replace-image'
+                    testIDBtn2='cancel-replace'
+                    isModalOpen={showReplaceModal}
+                    setModalOpen={setReplaceModal}
+                    handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation
+                    handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
         </>
