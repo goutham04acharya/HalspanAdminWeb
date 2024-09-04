@@ -31,6 +31,12 @@ import VideoField from './Components/Fields/VideoField/VideoField.jsx';
 import VideoFieldSetting from './Components/Fields/VideoField/VideoFieldSetting/VideoFieldSetting.jsx';
 import FileField from './Components/Fields/File/FileFIeld.jsx';
 import FileFieldSetting from './Components/Fields/File/FileFieldSetting/FileFieldSetting.jsx';
+import SignatureField from './Components/Fields/Signature/SignatureField.jsx';
+import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldSetting/SignatureFieldSetting.jsx';
+import GPSField from './Components/Fields/GPS/GPSField.jsx';
+import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
+import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
+import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -71,6 +77,8 @@ function QuestionnaryForm() {
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
     // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
+    const [validationErrors, setValidationErrors] = useState({});
+
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -120,6 +128,35 @@ function QuestionnaryForm() {
         }
     };
 
+    // const handleInputChange = (e) => {
+    //     const { id, value } = e.target;
+
+    //     // Restrict numeric input if the id is 'fileType'
+    //     let updatedValue = value;
+    //     if (id === 'fileType') {
+    //         updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
+    //     } else if (id === 'fileSize' || id === 'min' || id === 'max') {
+    //         updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+    //     }
+
+    //     dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+
+    //     const data = selectedQuestionId?.split('_');
+    //     const update = { ...dataIsSame };
+    //     update[data[0]] = false;
+    //     setDataIsSame(update);
+
+    //     // Clear any existing debounce timer
+    //     if (debounceTimerRef.current) {
+    //         clearTimeout(debounceTimerRef.current);
+    //     }
+
+    //     // Set a new debounce timer
+    //     debounceTimerRef.current = setTimeout(() => {
+    //         setShouldAutoSave(true);
+    //     }, 100); // 1000ms delay before auto-saving
+    // };
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
@@ -132,6 +169,25 @@ function QuestionnaryForm() {
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+
+        // Check if min is greater than max and set error message
+        if (id === 'min' || id === 'max') {
+            const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
+            const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
+
+            if (Number(minValue) > Number(maxValue)) {
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    minMax: 'Minimum value should be less than maximum',
+                }));
+            } else {
+                // Clear the error if values are valid
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    minMax: '',
+                }));
+            }
+        }
 
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
@@ -146,8 +202,9 @@ function QuestionnaryForm() {
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
             setShouldAutoSave(true);
-        }, 100); // 1000ms delay before auto-saving
+        }, 100); // 100ms delay before auto-saving
     };
+
 
     const componentMap = {
         textboxfield: (props) =>
@@ -186,6 +243,18 @@ function QuestionnaryForm() {
             <FileField
                 {...props}
             />,
+        signaturefield: (props) =>
+            <SignatureField
+                {...props}
+            />,
+        gpsfield: (props) =>
+            <GPSField
+                {...props}
+            />,
+        displayfield: (props) =>
+            <DIsplayContentField
+                {...props}
+            />,
     };
 
     const sideComponentMap = {
@@ -198,6 +267,9 @@ function QuestionnaryForm() {
         "photofield": PhotoFieldSetting,
         "videofield": VideoFieldSetting,
         "filefield": FileFieldSetting,
+        "signaturefield": SignatureFieldSetting,
+        "gpsfield": GPSFieldSetting,
+        "displayfield": DisplayFieldSetting,
         // Add other mappings here...
     };
 
@@ -755,12 +827,28 @@ function QuestionnaryForm() {
     const handleVideoClick = useCallback(() => {
         addNewQuestion('videofield', (questionId) => {
         })
-    })
+    });
 
     const handleFileClick = useCallback(() => {
         addNewQuestion('filefield', (questionId) => {
         })
-    })
+    });
+
+    const handleSignatureClick = useCallback(() => {
+        addNewQuestion('signaturefield', (questionId) => {
+        })
+    });
+
+    const handleGPSClick = useCallback(() => {
+        addNewQuestion('gpsfield', (questionId) => {
+        })
+    });
+
+    const handleDisplayClick = useCallback(() => {
+        addNewQuestion('displayfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
+        })
+    });
 
     const handleClick = useCallback((functionName) => {
         const functionMap = {
@@ -773,10 +861,13 @@ function QuestionnaryForm() {
             handlePhotoClick,
             handleVideoClick,
             handleFileClick,
+            handleSignatureClick,
+            handleGPSClick,
+            handleDisplayClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
 
 
     //function for handle radio button
@@ -823,8 +914,9 @@ function QuestionnaryForm() {
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
-            if (response?.data?.status >= 400) {
+            if (response?.data?.status >= 401) {
                 setToastError(response?.data?.data?.message || 'Something went wrong');
+                console.log(response?.data?.data?.message)
             }
             dispatch(saveCurrentData());
         } catch (error) {
@@ -1002,7 +1094,8 @@ function QuestionnaryForm() {
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
-                                        setShouldAutoSave: setShouldAutoSave
+                                        setShouldAutoSave: setShouldAutoSave,
+                                        validationErrors: validationErrors,
                                     }
                                 )
                             ) : (

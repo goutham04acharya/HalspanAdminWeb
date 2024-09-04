@@ -9,6 +9,7 @@ import InfinateDropdown from '../../../../../../Components/InputField/InfinateDr
 import objectToQueryString from '../../../../../../CommonMethods/ObjectToQueryString';
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function TestFieldSetting({
   handleInputChange,
@@ -20,7 +21,8 @@ function TestFieldSetting({
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
-  setShouldAutoSave
+  setShouldAutoSave,
+  validationErrors
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -32,6 +34,7 @@ function TestFieldSetting({
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
@@ -50,20 +53,12 @@ function TestFieldSetting({
   ];
 
   const handleOptionClick = (option) => {
-    // setFieldSettingParameters((prevState) => ({
-    //   ...prevState,
-    //   format: option.value,
-    // }));
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   };
 
   const handleLookupOption = (option) => {
-    // setFieldSettingParameters((prevState) => ({
-    //   ...prevState,
-    //   lookupOption: option.value,
-    // }));
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
     setShouldAutoSave(true)
@@ -216,77 +211,80 @@ function TestFieldSetting({
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}
-              <div className='mt-7'>
-                <InputWithDropDown
-                  label='Format'
-                  labelStyle='font-semibold text-[#2B333B] text-base'
-                  id='format'
-                  top='55px'
-                  placeholder='Select'
-                  className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                  testID='format-dropdown'
-                  labeltestID='format-list'
-                  selectedOption={options.find(option => option.value === fieldSettingParameters?.format)}
-                  handleOptionClick={handleOptionClick}
-                  isDropdownOpen={isDropdownOpen}
-                  setDropdownOpen={setDropdownOpen}
-                  options={options} />
-              </div>
-              <div className='mt-7'>
-                <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>
-                <div className='flex items-center mt-3'>
-                  <InputField
-                    autoComplete='off'
-                    label=''
-                    id='min'
-                    type='text'
-                    value={fieldSettingParameters?.min}
-                    className='w-full'
-                    labelStyle=''
-                    placeholder='Minimum'
-                    testId='minChar'
-                    htmlFor='min'
-                    maxLength={10}
-                    handleChange={(e) => handleInputChange(e)} />
-                  <p className='mx-3 font-normal text-base text-[#2B333B]'>to</p>
-                  <InputField
-                    autoComplete='off'
-                    label=''
-                    id='max'
-                    type='text'
-                    value={fieldSettingParameters?.max}
-                    className='w-full'
-                    labelStyle=''
-                    placeholder='Maximum'
-                    testId='maxChar'
-                    htmlFor='max'
-                    maxLength={10}
-                    handleChange={(e) => handleInputChange(e)} />
-                </div>
-              </div>
-              {/* OptionsComponent added here */}
-              <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
-              <div className='mt-7'>
-                <InputField
-                  autoComplete='off'
-                  label='Admin Field Notes'
-                  id='note'
-                  type='text'
-                  value={fieldSettingParameters?.note}
-                  className='w-full mt-2.5'
-                  labelStyle='font-semibold text-base text-[#2B333B]'
-                  placeholder='Notes'
-                  testId='Notes'
-                  htmlFor='note'
-                  maxLength={500}
-                  handleChange={(e) => handleInputChange(e)} />
-              </div>
-              <div className='mx-auto mt-7 flex items-center w-full'>
-                <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
-                  Add Conditional Logic
-                </button>
-              </div>
             </div>
+          </div>
+          <div className='mt-7'>
+            <InputWithDropDown
+              label='Format'
+              labelStyle='font-semibold text-[#2B333B] text-base'
+              id='format'
+              top='55px'
+              placeholder='Select'
+              className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+              testID='format-dropdown'
+              labeltestID='format-list'
+              selectedOption={options.find(option => option.value === fieldSettingParameters?.format)}
+              handleOptionClick={handleOptionClick}
+              isDropdownOpen={isDropdownOpen}
+              setDropdownOpen={setDropdownOpen}
+              options={options} />
+          </div>
+          <div className='mt-7'>
+            <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>
+            <div className='flex items-center mt-3'>
+              <InputField
+                autoComplete='off'
+                label=''
+                id='min'
+                type='text'
+                value={fieldSettingParameters?.min}
+                className='w-full'
+                labelStyle=''
+                placeholder='Minimum'
+                testId='minChar'
+                htmlFor='min'
+                maxLength={10}
+                handleChange={(e) => handleInputChange(e)} />
+              <p className='mx-3 font-normal text-base text-[#2B333B]'>to</p>
+              <InputField
+                autoComplete='off'
+                label=''
+                id='max'
+                type='text'
+                value={fieldSettingParameters?.max}
+                className='w-full'
+                labelStyle=''
+                placeholder='Maximum'
+                testId='maxChar'
+                htmlFor='max'
+                maxLength={10}
+                handleChange={(e) => handleInputChange(e)} />
+            </div>
+            {validationErrors?.minMax && (
+              <ErrorMessage error={validationErrors.minMax} />
+            )}
+          </div>
+          {/* OptionsComponent added here */}
+          <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+          <div className='mt-7'>
+            <InputField
+              autoComplete='off'
+              label='Admin Field Notes'
+              id='note'
+              type='text'
+              value={fieldSettingParameters?.note}
+              className='w-full mt-2.5'
+              labelStyle='font-semibold text-base text-[#2B333B]'
+              placeholder='Notes'
+              testId='Notes'
+              htmlFor='note'
+              maxLength={500}
+              handleChange={(e) => handleInputChange(e)} />
+          </div>
+          <div className='mx-auto mt-7 flex items-center w-full'>
+            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+              Add Conditional Logic
+            </button>
           </div>
         </div>
       </div>
