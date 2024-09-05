@@ -63,25 +63,31 @@ Then('I should see the placeholder content for number updated in the section {in
 
 When('I enter the minimum and maximum range', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="minChar"]'))).sendKeys('10');
-    await driver.wait(until.elementLocated(By.css('[data-testid="maxChar"]'))).sendKeys('500');
+    await driver.wait(until.elementLocated(By.css('[data-testid="minChar"]'))).sendKeys('1');
+    await driver.wait(until.elementLocated(By.css('[data-testid="maxChar"]'))).sendKeys('10');
 });
 
 When('I enter the increment by number', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="increment"]'))).sendKeys('5');
+    if (this.source === 'Slider' || this.source === 'Both') {
+        await driver.wait(until.elementLocated(By.css('[data-testid="increment"]'))).sendKeys('2');
+    }
 });
 
 When('I enter the pre-field text', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="pre-field-option"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('$');
+    if (this.source === 'Entry Field' || this.source === 'Both') {
+        await driver.wait(until.elementLocated(By.css('[data-testid="pre-field-option"]'))).click();
+        await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('$');
+    }
 });
 
 When('I enter the post-field text', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="post-field-option"]'))).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('500');
+    if (this.source === 'Entry Field' || this.source === 'Both') {
+        await driver.wait(until.elementLocated(By.css('[data-testid="post-field-option"]'))).click();
+        await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('USD');
+    }
 });
 
 When('I select the type for number as {string}', async function (numberType) {
@@ -98,11 +104,14 @@ When('I select the source for number as {string}', async function (source) {
 Then('I should see the source added to question {int} page {int} section {int}', async function (questionNumber, pageNumber, sectionNumber) {
     if (this.source === 'Entry Field' || this.source === 'Slider') {
         await new Promise(resolve => setTimeout(resolve, 750));
-        await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="${this.source}"]`)));
+        const source = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="${this.source}"]`)), 2000);
+        await driver.wait(until.elementIsVisible(source), 2000);
     }
-    else {
+    else if (this.source === 'Both') {
         await new Promise(resolve => setTimeout(resolve, 750));
-        await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Entry Field"]`)));
-        await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Slider"]`)));
+        const entryField = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Entry Field"]`)), 2000);
+        await driver.wait(until.elementIsVisible(entryField), 2000);
+        const slider = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Slider"]`)), 2000);
+        await driver.wait(until.elementIsVisible(slider), 2000);
     }
 });
