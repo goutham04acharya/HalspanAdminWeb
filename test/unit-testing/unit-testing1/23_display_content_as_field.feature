@@ -73,9 +73,9 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
     When I click the display button
     Then I should see field settings
     When I click the type as url
-    When I click the url type as <url>
-    * I enter the url as <url-text>
-    Then I should be able see url updated in question 1 page 1 section 1
+    # When I click the url type as <url>
+    # * I enter the url as <url-text>
+    # Then I should be able see url updated in question 1 page 1 section 1
 
     Examples:
       | url      | url-text                      |

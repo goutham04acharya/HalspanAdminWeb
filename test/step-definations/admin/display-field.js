@@ -2,6 +2,7 @@
 const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const webdriver = require('selenium-webdriver');
+const path = require('path'); 
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
 const Keys = webdriver.Key
@@ -85,6 +86,7 @@ Then('I should be able see image updated in question {int} page {int} section {i
 When('I click the type as url', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="url"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="url-dropdown"]`))).click();
 });
 
 When('I click the url type as {string}', async function (urlType) {

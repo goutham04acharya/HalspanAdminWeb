@@ -21,16 +21,16 @@ function DIsplayContentField({
                 {fieldSettingParameters?.label}
             </label>
             {fieldSettingParameters?.type === 'heading' &&
-                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.heading}</p>
+                <p data-testid="heading" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.heading}</p>
             }
             {fieldSettingParameters?.type === 'text' &&
-                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
+                <p data-testid="text" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
             }
             {fieldSettingParameters?.type === 'image' &&
-                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.image}</p>
+                <p data-testid="image" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.image}</p>
             }
             {fieldSettingParameters?.type === 'url' &&
-                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.urlValue}</p>
+                <p data-testid="url" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.urlValue}</p>
             }
             <p
                 data-testid="help-text"

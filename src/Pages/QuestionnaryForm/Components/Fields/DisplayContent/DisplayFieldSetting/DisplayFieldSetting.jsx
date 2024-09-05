@@ -124,7 +124,7 @@ function DisplayFieldSetting({
                                     value={fieldSettingParameters?.heading}
                                     className='w-full mt-2.5'
                                     placeholder='Enter heading'
-                                    testId='heading'
+                                    testId='heading-input'
                                     htmlFor='heading'
                                     maxLength={100}
                                     handleChange={(e) => handleInputChange(e)} />
@@ -152,7 +152,7 @@ function DisplayFieldSetting({
                                     value={fieldSettingParameters?.text}
                                     className='w-full mt-2.5'
                                     placeholder='Enter text'
-                                    testId='text'
+                                    testId='text-input'
                                     htmlFor='text'
                                     maxLength={100}
                                     handleChange={(e) => handleInputChange(e)} />
@@ -179,6 +179,7 @@ function DisplayFieldSetting({
                                             <input
                                                 type="file"
                                                 id="file-upload"
+                                                data-testId="add-image"
                                                 className='hidden'
                                                 onChange={handleFileChange} />
                                             <label
