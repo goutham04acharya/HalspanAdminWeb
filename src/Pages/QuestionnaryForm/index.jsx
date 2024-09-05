@@ -171,7 +171,7 @@ function QuestionnaryForm() {
         }
 
         // Check if the input field's id is the one you want to manage with inputValue
-        if (id === 'text') {
+        if (id === 'urlValue') {
             setInputValue(updatedValue); // Update inputValue if the id matches
         }
 
@@ -879,9 +879,21 @@ function QuestionnaryForm() {
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
+        // Dispatch the type selection
+        const fieldsToReset = ['text', 'heading', 'image', 'url'];
         dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
+
+        // Handle resetting specific fields if the selected type is 'text'
+        fieldsToReset.forEach((field) => {
+            if (field !== type) {
+                dispatch(setNewComponent({ id: field, value: '', questionId: selectedQuestionId }));
+            }
+        });
+        // Auto-save the settings
         handleAutoSaveSettings();
-    }
+    };
+
+
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -918,12 +930,20 @@ function QuestionnaryForm() {
                 file_size: fieldSettingParams?.[selectedQuestionId]?.fileSize,
                 file_type: fieldSettingParams?.[selectedQuestionId]?.fileType,
             },
-            display_type : {
-                heading: fieldSettingParams?.[selectedQuestionId]?.heading,
-                text: fieldSettingParams?.[selectedQuestionId]?.text,
-                image: fieldSettingParams?.[selectedQuestionId]?.image,
-                url: fieldSettingParams?.[selectedQuestionId]?.url
-            }
+            display_type: (() => {
+                switch (fieldSettingParams?.[selectedQuestionId]?.type) {
+                    case 'heading':
+                        return { heading: fieldSettingParams?.[selectedQuestionId]?.heading };
+                    case 'text':
+                        return { text: fieldSettingParams?.[selectedQuestionId]?.text };
+                    case 'image':
+                        return { image: fieldSettingParams?.[selectedQuestionId]?.image };
+                    case 'url':
+                        return { url: fieldSettingParams?.[selectedQuestionId]?.urlValue };
+                    default:
+                        return {}; // Return an empty object if componentType doesn't match any case
+                }
+            })(),
         };
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);

@@ -30,7 +30,7 @@ function DIsplayContentField({
                 <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.image}</p>
             }
             {fieldSettingParameters?.type === 'url' &&
-                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.url}</p>
+                <p className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.urlValue}</p>
             }
             <p
                 data-testid="help-text"

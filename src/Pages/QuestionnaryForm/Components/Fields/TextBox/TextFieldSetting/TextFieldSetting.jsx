@@ -26,9 +26,7 @@ function TestFieldSetting({
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
-  const [selectedLookup, setSelectedLookup] = useState(null);
   const [optionData, setOptionData] = useState([]);
 
   const [loading, setLoading] = useState(true);

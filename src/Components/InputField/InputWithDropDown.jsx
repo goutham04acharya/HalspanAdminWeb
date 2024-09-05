@@ -1,4 +1,6 @@
 import React from 'react';
+import { setNewComponent } from '../../Pages/QuestionnaryForm/Components/Fields/fieldSettingParamsSlice';
+import { useDispatch } from 'react-redux';
 
 function InputWithDropDown({
     className,
@@ -18,11 +20,16 @@ function InputWithDropDown({
     labeltestID,
     validationError,
     close,
-    setSelectedOption
+    setSelectedUrlOption,
+    selectedQuestionId
 }) {
+    const dispatch = useDispatch();
 
     const handleRemove = () => {
-        setSelectedOption('');
+        setSelectedUrlOption('');
+        dispatch(setNewComponent({ id: 'url', value: '', questionId: selectedQuestionId }));
+        setDropdownOpen(false);
+
     }
 
     return (

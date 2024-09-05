@@ -21,11 +21,10 @@ function DisplayFieldSetting({
     inputValue,
 }) {
     const dispatch = useDispatch();
+    // const { uploadImage, uploading, error } = useS3Upload();
     const [selectedFile, setSelectedFile] = useState(null);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(fieldSettingParameters?.format || '');
-
-
+    const [selectedUrlOption, setSelectedUrlOption] = useState(fieldSettingParameters?.format || '');
 
     const options = [
         { value: 'http', label: 'http' },
@@ -35,10 +34,10 @@ function DisplayFieldSetting({
     ];
 
     const handleOptionClick = (option) => {
-        console.log('Before setting:', selectedOption);
-        setSelectedOption(option.value);
+        console.log('Before setting:', selectedUrlOption);
+        setSelectedUrlOption(option.value);
         setDropdownOpen(false);
-        dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'url', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true)
 
         // Prefill the input field based on the selected option
@@ -47,8 +46,8 @@ function DisplayFieldSetting({
         } else {
             setInputValue('');
         }
-        console.log('After setting:', selectedOption);  
     };
+    console.log('After setting:', selectedUrlOption);
 
     const handleFileUploadClick = () => {
         if (selectedFile) {
@@ -58,12 +57,29 @@ function DisplayFieldSetting({
         }
     };
 
+//     const handleFileUploadClick = async() => {
+//         if (selectedFile) {
+//             const key = await uploadImage(selectedFile, "uploads"); // Provide a path for the upload
+//             console.log("File uploaded with key:", key);
+//         setReplaceModal(true);
+//     } else {
+//         document.getElementById('file-upload').click();
+// }
+//     };
+    
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
             setSelectedFile(e.target.files[0]);
             setReplaceModal(false);
         }
     };
+
+
+    const handleImage = () => {
+        dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
+        setShouldAutoSave(true)
+    }
 
     return (
         <>
@@ -149,7 +165,8 @@ function DisplayFieldSetting({
                                     id='image'
                                     value='image'
                                     checked={fieldSettingParameters?.type === 'image'}
-                                    onClick={() => handleRadiobtn('image')} />
+                                    onClick={() => {handleRadiobtn('image'),
+                                        handleImage()}} />
                                 <label htmlFor='image' data-testid='image'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Image
@@ -184,7 +201,7 @@ function DisplayFieldSetting({
                                                         className='w-[17px] h-[17px]'
                                                         name='pin_drop'
                                                         id='pin_drop_yes'
-                                                        value='pin_drop'
+                                                        value='pin_drop_yes'
                                                         checked={fieldSettingParameters?.pin_drop === 'yes'}
                                                         onClick={() => {
                                                             dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
@@ -274,40 +291,40 @@ function DisplayFieldSetting({
                             </div>
                             {fieldSettingParameters?.type === 'url' &&
                                 <InputWithDropDown
-                                    id='format'
+                                    id='url'
                                     top='30px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                    testID='format-dropdown'
-                                    labeltestID='format-list'
-                                    selectedOption={options.find(option => option.value === fieldSettingParameters?.format)}
+                                    testID='url-dropdown'
+                                    labeltestID='url-list'
+                                    selectedOption={options.find(option => option.value === fieldSettingParameters?.url)}
                                     handleOptionClick={handleOptionClick}
                                     isDropdownOpen={isDropdownOpen}
                                     setDropdownOpen={setDropdownOpen}
                                     options={options}
                                     close={true}
-                                    setSelectedOption={setSelectedOption} // Make sure this is a function
+                                    setSelectedUrlOption={setSelectedUrlOption}
+                                    selectedQuestionId={selectedQuestionId}
                                 />
-
                             }
-                            {selectedOption && (
+                            {fieldSettingParameters?.url  && (
                                 <InputField
                                     autoComplete='off'
-                                    id='text'
+                                    id='urlValue'
                                     type='text'
                                     value={inputValue} // Controlled by your component's state
                                     className='w-full mt-2.5'
                                     placeholder={
-                                        selectedOption === 'mailto'
+                                        selectedUrlOption === 'mailto'
                                             ? 'eg: support@halspan.com'
-                                            : selectedOption === 'tel'
-                                                ? 'Enter phone number'
+                                            : selectedUrlOption === 'tel'
+                                                ? 'eg: +44 7911 123456'
                                                 : 'Enter text'
                                     }
-                                    testId='text'
-                                    htmlFor='text'
+                                    testId='urlValue'
+                                    htmlFor='urlValue'
                                     maxLength={100}
-                                    handleChange={(e) => setInputValue(e.target.value)} // Ensure this updates correctly
+                                    handleChange={(e) => handleInputChange(e)} // Ensure this updates correctly
                                 />
                             )}
                         </div>

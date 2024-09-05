@@ -8,7 +8,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     // Get the current field settings from Redux
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingPArams')
 
     // Define options based on componentType
     const getOptions = (componentType) => {
