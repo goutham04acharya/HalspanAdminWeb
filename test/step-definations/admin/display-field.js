@@ -2,7 +2,7 @@
 const assert = require('assert');
 const { Given, When, Then } = require('@cucumber/cucumber');
 const webdriver = require('selenium-webdriver');
-const path = require('path'); 
+const path = require('path');
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
 const Keys = webdriver.Key
@@ -96,8 +96,8 @@ When('I click the url type as {string}', async function (urlType) {
 
 
 Given('I enter the url as {string}', async function (urlText) {
-    await new Promise(resolve => setTimeout(resolve, 750)); 
-    this.url = urlText; 
+    await new Promise(resolve => setTimeout(resolve, 750));
+    this.url = urlText;
     await driver.wait(until.elementLocated(By.css(`[data-testid="urlInput"]`))).sendKeys(urlText);
 });
 
@@ -108,4 +108,14 @@ Then('I should be able see url updated in question {int} page {int} section {int
     const urlText = await url.getText();
     console.log(this.url);
     assert.equal(urlText, this.url);
+});
+
+Then('I should see a confirmation prompt stating to replace image', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="Replace Image"]')));
+});
+
+When('I click the add image', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="upload-image"]`)));
 });
