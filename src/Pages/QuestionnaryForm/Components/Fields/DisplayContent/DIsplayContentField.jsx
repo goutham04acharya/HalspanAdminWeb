@@ -24,7 +24,7 @@ function DIsplayContentField({
                 <p data-testid="heading" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.heading}</p>
             }
             {fieldSettingParameters?.type === 'text' &&
-                <p data-testid="text" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
+                <p data-testid="text" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
             }
             {fieldSettingParameters?.type === 'image' &&
                 <p data-testid="image" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.image}</p>

@@ -7,6 +7,8 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
 import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown';
+import useApi from '../../../../../../services/CustomHook/useApi';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function DisplayFieldSetting({
     handleInputChange,
@@ -21,10 +23,13 @@ function DisplayFieldSetting({
     inputValue,
 }) {
     const dispatch = useDispatch();
+    const { getAPI } = useApi();
+    console.log(fieldSettingParameters?.componentType, 'fieldSettingParameters')
     // const { uploadImage, uploading, error } = useS3Upload();
     const [selectedFile, setSelectedFile] = useState(null);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedUrlOption, setSelectedUrlOption] = useState(fieldSettingParameters?.format || '');
+    const [errorMessage, setErrorMessage] = useState(false);
 
     const options = [
         { value: 'http', label: 'http' },
@@ -33,8 +38,9 @@ function DisplayFieldSetting({
         { value: 'tel', label: 'tel' }
     ];
 
+    const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
     const handleOptionClick = (option) => {
-        console.log('Before setting:', selectedUrlOption);
         setSelectedUrlOption(option.value);
         setDropdownOpen(false);
         dispatch(setNewComponent({ id: 'url', value: option.value, questionId: selectedQuestionId }));
@@ -47,7 +53,6 @@ function DisplayFieldSetting({
             setInputValue('');
         }
     };
-    console.log('After setting:', selectedUrlOption);
 
     const handleFileUploadClick = () => {
         if (selectedFile) {
@@ -57,19 +62,26 @@ function DisplayFieldSetting({
         }
     };
 
-//     const handleFileUploadClick = async() => {
-//         if (selectedFile) {
-//             const key = await uploadImage(selectedFile, "uploads"); // Provide a path for the upload
-//             console.log("File uploaded with key:", key);
-//         setReplaceModal(true);
-//     } else {
-//         document.getElementById('file-upload').click();
-// }
-//     };
-    
+    const handleUploadImage = async () => {
+        const response = await getAPI(`field-settings/upload?folder_name=${fieldSettingParameters?.componentType}&file_name=${selectedFile?.name}`);
+        console.log(response, 'response')
+    }
+
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
-            setSelectedFile(e.target.files[0]);
+            const file = e.target.files[0];
+
+            // Validate file type
+            if (!validFileTypes.includes(file.type)) {
+                setErrorMessage(true);
+                setSelectedFile(null); // Reset selected file
+                return;
+            }
+
+            // Clear error if valid file is selected
+            setSelectedFile(file);
+            setErrorMessage(false);
+            handleUploadImage();
             setReplaceModal(false);
         }
     };
@@ -165,8 +177,10 @@ function DisplayFieldSetting({
                                     id='image'
                                     value='image'
                                     checked={fieldSettingParameters?.type === 'image'}
-                                    onClick={() => {handleRadiobtn('image'),
-                                        handleImage()}} />
+                                    onClick={() => {
+                                        handleRadiobtn('image'),
+                                            handleImage()
+                                    }} />
                                 <label htmlFor='image' data-testid='image'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Image
@@ -181,7 +195,8 @@ function DisplayFieldSetting({
                                                 id="file-upload"
                                                 data-testId="add-image"
                                                 className='hidden'
-                                                onChange={handleFileChange} />
+                                                onChange={handleFileChange}
+                                            />
                                             <label
                                                 onClick={handleFileUploadClick}
                                                 className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
@@ -192,6 +207,8 @@ function DisplayFieldSetting({
                                         </div>
                                         {selectedFile && <label className='ml-3'>{selectedFile.name}</label>}
                                     </div>
+                                    {errorMessage &&
+                                        <ErrorMessage error={'Only JPG, JPEG, and PNG files are allowed.'} />}
                                     <div>
                                         <div className='mt-7'>
                                             <p className='font-semibold text-base text-[#2B333B]'>Pin Drop</p>
@@ -308,7 +325,7 @@ function DisplayFieldSetting({
                                     selectedQuestionId={selectedQuestionId}
                                 />
                             }
-                            {fieldSettingParameters?.url  && (
+                            {fieldSettingParameters?.url && (
                                 <InputField
                                     autoComplete='off'
                                     id='urlValue'
