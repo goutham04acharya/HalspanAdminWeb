@@ -46,7 +46,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     When I click the choice button
     Then I should see field settings
     And I should see the choice field added to the section 1 page 1 question 1
-
+    
     When I enter the label name for choice
     Then I should see the label name for choice updated in the section 1
     When I enter the help text for choice

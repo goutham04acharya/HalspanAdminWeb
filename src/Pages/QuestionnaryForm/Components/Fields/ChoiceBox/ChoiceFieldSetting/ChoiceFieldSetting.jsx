@@ -11,13 +11,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceValue, setNewComponent, updateFixedChoiceArray } from '../../fieldSettingParamsSlice';
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
+import FixedChoiceDraggable from './FixedChoiceDraggable';
 
 function ChoiceFieldSetting({
     handleInputChange,
     formParameters,
     handleRadiobtn,
     fieldSettingParameters,
-    setFieldSettingParameters,
+    // setFieldSettingParameters,
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
@@ -45,10 +46,10 @@ function ChoiceFieldSetting({
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
-        setFieldSettingParameters((prevState) => ({
-            ...prevState,
-            lookupOption: option.value,
-        }));
+        // setFieldSettingParameters((prevState) => ({
+        //     ...prevState,
+        //     lookupOption: option.value,
+        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -57,6 +58,8 @@ function ChoiceFieldSetting({
 
     const handleRemoveLookup = () => {
         dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
+
         setShouldAutoSave(true);
     }
 
@@ -124,14 +127,16 @@ function ChoiceFieldSetting({
 
         // Focus input when required
         useEffect(() => {
+            console.log('helllo')
             const element = document.getElementById(focusInput);
+            console.log(focusInput, 'aaa');
             if (element) {
                 element.focus();
             }
         }, [item.id, focusInput, localValue]);
 
         return (
-            <div className={`disable-select select-none w-full mt-7 rounded-[10px]`}>
+            <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
                 <div className='flex justify-between items-start cursor-pointer'>
                     <div className='flex items-center justify-center w-full'>
                         <div
@@ -154,8 +159,12 @@ function ChoiceFieldSetting({
                             value={localValue}
                             id={item.id}
                             onClick={() => setFocusInput(item.id)} // Call focusInput on click
-                            onBlur={handleBlur}
+                            onBlur={() => {
+                                handleBlur();
+                                setFocusInput('')
+                            }}
                             data-testid={`choice-${item.index + 1}`}
+                            maxLength={50}
                         />
                         {fixedChoiceArray.length > 1 && <img
                             src="/Images/trash-black.svg"
@@ -177,8 +186,16 @@ function ChoiceFieldSetting({
         );
     }));
 
+    // const handleMoveEnd = (newList) => {
+    //     dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+    // };
     const handleMoveEnd = (newList) => {
-        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
+        // Remove any non-serializable values before dispatching
+        const sanitizedNewList = newList.map(item => {
+            const { setShouldAutoSave, ...rest } = item;
+            return rest;
+        });
+        dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList: sanitizedNewList }));
     };
 
     useEffect(() => {
@@ -195,10 +212,10 @@ function ChoiceFieldSetting({
                     labelPlaceholder='Question 1'
                     helpTextId='Help Text'
                     helpText='Help Text'
-                    helpTextPlaceholder='Enter Help Text'
+                    helpTextPlaceholder='Enter help text'
                     placeholderContentId='placeholder'
-                    placeholder='Placeholder Content'
-                    placeholderContent='Text Displayed in the field'
+                    placeholder='Placeholder content'
+                    placeholderContent='Text displayed in the field'
                     handleInputChange={handleInputChange}
                     formParameters={formParameters}
                     handleBlur={handleBlur}
@@ -228,7 +245,7 @@ function ChoiceFieldSetting({
                             </label>
                         </div>
 
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='single-choice'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -242,7 +259,7 @@ function ChoiceFieldSetting({
                                 Single Choice
                             </label>
                         </div>
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -257,7 +274,7 @@ function ChoiceFieldSetting({
                         </div>
 
                         <p className='font-semibold text-base text-[#2B333B] mt-8'>Source</p>
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -274,7 +291,7 @@ function ChoiceFieldSetting({
                                 Fixed List
                             </label>
                         </div>
-                        {fieldSettingParameters?.source === 'fixedList' &&
+                        {/* {fieldSettingParameters?.source === 'fixedList' &&
                             <DraggableList
                                 itemKey="id" // Adjust itemKey according to your unique identifier
                                 template={(props) => (
@@ -292,8 +309,21 @@ function ChoiceFieldSetting({
                                 }))}
                                 onMoveEnd={handleMoveEnd}
                                 container={() => document.body}
+                            />} */}
+                        {fieldSettingParameters?.source === 'fixedList' &&
+                            <DraggableList
+                                itemKey="id" // Adjust itemKey according to your unique identifier
+                                template={FixedChoiceDraggable}
+                                list={fixedChoiceArray.map((data, choiceIndex) => ({
+                                    ...data,
+                                    index: choiceIndex,
+                                    setShouldAutoSave: setShouldAutoSave,
+                                    selectedQuestionId: selectedQuestionId
+                                }))}
+                                onMoveEnd={handleMoveEnd}
+                                container={() => document.body}
                             />}
-                        <div className="relative custom-radioBlue flex items-center mt-3" data-testid='lookup'>
+                        <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
                                 className='w-[17px] h-[17px]'
@@ -318,10 +348,10 @@ function ChoiceFieldSetting({
                                     <InfinateDropdown
                                         label=''
                                         id='lookup'
-                                        placeholder='Select the file'
+                                        placeholder='Select the lookup list'
                                         className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                         testID='lookup-dropdown'
-                                        labeltestID='option0'
+                                        labeltestID='lookup-list'
                                         selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
                                         handleRemoveLookup={handleRemoveLookup}
                                         isDropdownOpen={isLookupOpen}
@@ -338,7 +368,7 @@ function ChoiceFieldSetting({
                                 </button>
                             </div>}
                         {/* OptionsComponent added here */}
-                        <OptionsComponent />
+                        <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'
@@ -349,20 +379,20 @@ function ChoiceFieldSetting({
                                 className='w-full mt-2.5'
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
-                                testId='admin-notes-input'
+                                testId='Notes'
                                 htmlFor='note'
-                                maxLength={250}
+                                maxLength={500}
                                 handleChange={(e) => handleInputChange(e)}
                                 handleBlur={handleBlur}
                             />
                         </div>
                         <div className='mx-auto mt-7 flex items-center w-full'>
-                            <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
+                            {/* <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
                                 onClick={handleSaveSettings}
                             >
                                 Save
-                            </button>
-                            <button type='button' className='w-[70%] py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            </button> */}
+                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>
                         </div>

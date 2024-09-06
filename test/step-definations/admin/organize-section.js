@@ -183,3 +183,25 @@ Then('I should see the section {int} saved', async function (sectionNumber) {
 //     await new Promise((resolve) => setTimeout(resolve, 500));
 //     await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
 // });
+
+Then('I should see confirmation prompt for delete page', async function () {
+    // Write code here that turns the phrase above into concrete actions
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()='Delete Page']`)))
+});
+  
+When('I click on confirm delete page button', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const deleteButton = await driver.wait(until.elementLocated(By.css(`[data-testid="confirm-delete-page"]`)));
+    await deleteButton.click();
+});
+
+Then('I should see confirmation prompt for delete section', async function () {
+    // Write code here that turns the phrase above into concrete actions
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()='Delete Section']`)))
+});
+  
+When('I click on confirm delete section button', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const deleteButton = await driver.wait(until.elementLocated(By.css(`[data-testid="confirm-delete"]`)));
+    await deleteButton.click();
+});

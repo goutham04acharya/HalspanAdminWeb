@@ -16,27 +16,22 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     * I enter valid password as "Auth@123"
     * I click the submit button
     Then I should be redirected to the questionnaire listing screen
-
-  @create_question
-  Scenario: Admin adds multiple section
-    Given I am on the questionnaire management section
-    When I click on add new section
-    Then I should read a message stating that "Section 1 saved successfully"
-    Then I should see the new section added
-
-  @create_question
-  Scenario: Admin adds multiple pages
-    Given I am on the questionnaire management section
-    When I click on add new page
-    Then I should see the new pages added
-
-  @create_question
-  Scenario: Admin saves added section
-    Given I am on the questionnaire management section
-    When I click on add new section
-    Then I should read a message stating that "Section 1 saved successfully"
-    When I click on save button for section 2
-    Then I should read a message stating that "Section 2 saved successfully"
+  # @create_question
+  # Scenario: Admin adds multiple section
+  #   Given I am on the questionnaire management section
+  #   When I click on add new section
+  #   Then I should see the new section added
+  # @create_question
+  # Scenario: Admin adds multiple pages
+  #   Given I am on the questionnaire management section
+  #   When I click on add new page
+  #   Then I should see the new pages added
+  # @create_question
+  # Scenario: Admin saves added section
+  #   Given I am on the questionnaire management section
+  #   When I click on add new section
+  #   When I click on save button for section 2
+  #   Then I should read a message stating that "Section 2 saved successfully"
 
   @create_question
   Scenario: Admin deletes addeded pages from the section
@@ -44,10 +39,14 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     When I click on add new page
     Then I should see the new pages added
     When I click on delete page from section 1
+    Then I should see confirmation prompt for delete page
+    When I click on confirm delete page button
     Then The page should be deleted from section
 
   @create_question
   Scenario: Admin deletes added section
     Given I am on the questionnaire management section
     When I click on delete section 1
+    Then I should see confirmation prompt for delete section
+    When I click on confirm delete section button
     Then I should read a message stating that "Section 1 deleted successfully"

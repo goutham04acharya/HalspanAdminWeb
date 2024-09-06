@@ -12,7 +12,9 @@ function CommonComponents({
     placeholderContent,
     handleInputChange,
     formParameters,
-    handleBlur
+    handleBlur,
+    setFocusInput,
+    assetLocation
 }) {
     return (
         <div>
@@ -31,6 +33,13 @@ function CommonComponents({
                     id='label'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="label-name-input"
+                    maxLength={100}
+                    onFocus={() => {
+                        console.log('focus');
+                        if (setFocusInput) {
+                            setFocusInput('');
+                        }
+                    }}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -48,8 +57,23 @@ function CommonComponents({
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="help-text-input"
+                    maxLength={150}
+                    onFocus={() => {
+                        console.log('focus');
+                        if (setFocusInput) {
+                            setFocusInput('');
+                        }
+                    }}
+                    onMouseDown={(e) => {
+                        console.log('mouse down');
+                        // Get the position where the mouse was clicked
+                        const clickPosition = e.currentTarget.selectionStart;
+                        console.log('Cursor position:', clickPosition);
+                    }}
+
                 />
             </div>
+            {!assetLocation &&
             <div className='flex flex-col justify-start mt-7'>
                 <label
                     htmlFor={placeholderContentId}
@@ -65,8 +89,15 @@ function CommonComponents({
                     id='placeholderContent'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="placeholder-input"
+                    maxLength={50}
+                    onFocus={() => {
+                        console.log('focus');
+                        if (setFocusInput) {
+                            setFocusInput('');
+                        }
+                    }}
                 />
-            </div>
+            </div>}
         </div>
     )
 }

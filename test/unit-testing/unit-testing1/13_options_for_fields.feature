@@ -28,30 +28,20 @@ Feature: Halspan - Admin - Variety of options available for each Field Type
     And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
   @create_question
-  Scenario: Admin adds textbox from the add field section
+  Scenario Outline: Admin toggle the options for field type
     Given I am on the questionnaire management section
     Then I should see an add field section
-    When I click on add question
-    * I click on question section 1
-    * I click the textbox button
+    When I add a new question to the page 1 in section 1
+    When I click the textbox button
     Then I should see field settings
     And I should see the text box added to the section 1
+    When I toggle the options <options>
 
-  # @create_question
-  # Scenario Outline: Admin toggle the options for field type
-  #   Given I am on the questionnaire management section
-  #   Then I should see an add field section
-  #   When I click on add question
-  #   * I click on question section 1
-  #   When I click the textbox button
-  #   Then I should see field settings
-  #   When I toggle the options <options>
-
-  #   Examples:
-  #     | options              |
-  #     | "load_from_previous" |
-  #     | "read_only"          |
-  #     | "visible"            |
-  #     | "optional"           |
-  #     | "remember_allowed"   |
-  #     | "field_validation"   |
+    Examples:
+      | options                             |
+      | "Load from previously entered data" |
+      | "Read only"                         |
+      | "Visible"                           |
+      | "Optional"                          |
+      | "Remember allowed"                  |
+      | "Field validation"                  |

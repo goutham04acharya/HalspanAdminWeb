@@ -32,6 +32,7 @@ function CreateQuestionnary() {
     language: null,
   });
   const [validationErrors, setValidationErrors] = useState({});
+  const [publickey, setpublickey] = useState()
 
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
@@ -100,12 +101,31 @@ function CreateQuestionnary() {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
 
-       if (response?.data?.status === true) {
+      if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
         setIsThreedotLoader(false)
-      } else if (response?.data?.status >= 400 && response?.data?.status < 500 || 'Something Went wrong.') {
-        setToastError(response?.data?.data?.message);
+      } else if (response?.data?.status === 400) {
+        // Check each field separately to determine which error message(s) to display
+        const fieldErrors = {};
+
+        // Check if public_name is too short and set the appropriate error
+        if (createDetails?.public_name?.length < 2) {
+          fieldErrors.public_name = 'Public name requires at least 2 characters';
+        }
+
+        // Check if internal_name is too short and set the appropriate error
+        if (createDetails?.internal_name?.length < 2) {
+          fieldErrors.internal_name = 'Internal name requires at least 2 characters';
+        }
+
+        // Set validation errors for the specific failing fields
+        setValidationErrors({ ...errors, ...fieldErrors });
+
+        setIsThreedotLoader(false);
+      } else if (response?.data?.status === 409) {
+        // setToastError(response?.data?.data?.message);
+        setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
         setToastError('Something went wrong.');
@@ -218,7 +238,7 @@ function CreateQuestionnary() {
                     className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                     top='53px'
                     testID='drop-btn'
-                    labeltestID='option0'
+                    labeltestID='asset'
                     options={options}
                     isDropdownOpen={openDropdown === 'asset_type'}
                     setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
@@ -240,7 +260,7 @@ function CreateQuestionnary() {
                   className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
                   top='53px'
                   testID='language-drop-btn'
-                  labeltestID='language0'
+                  labeltestID='language'
                   options={options1}
                   isDropdownOpen={openDropdown === 'language'}
                   setDropdownOpen={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}

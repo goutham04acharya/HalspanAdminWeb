@@ -23,12 +23,12 @@ function Layout() {
                 <ConfirmationModal
                     text='Logout'
                     subText='You will be signed out of your account.'
-                    button1Style='border border-[#2B333B] bg-[#2B333B]'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover-bg-[#000000]'
                     Button1text='Confirm'
                     Button2text='Cancel'
                     src='Logout-Big'
-                    testIDBtn1='Confirm'
-                    testIDBtn2='Cancel'
+                    testIDBtn1='confirm'
+                    testIDBtn2='cancel'
                     isModalOpen={isModalOpen}
                     setModalOpen={setModalOpen}
                     handleButton1={handleLogout}
