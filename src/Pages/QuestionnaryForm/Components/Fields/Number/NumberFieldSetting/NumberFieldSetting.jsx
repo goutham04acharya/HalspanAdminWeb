@@ -115,6 +115,7 @@ function NumberFieldSetting({
                                     name='source'
                                     id='entryfield'
                                     value='entryfield'
+                                    disabled={fieldSettingParameters?.type === 'rating'}
                                     checked={fieldSettingParameters?.source === 'entryfield'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId: selectedQuestionId }));
@@ -123,7 +124,7 @@ function NumberFieldSetting({
                                 />
                                 <label htmlFor='entryfield'
                                     data-testid='entryfield'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    className={`ml-7 font-normal text-base ${fieldSettingParameters?.type === 'rating' ? 'text-[#DDDDDD] cursor-not-allowed' : 'cursor-pointer text-[#2B333B]'}`}>
                                     Entry Field
                                 </label>
                             </div>
@@ -152,6 +153,7 @@ function NumberFieldSetting({
                                     name='source'
                                     id='both'
                                     value='both'
+                                    disabled={fieldSettingParameters?.type === 'rating'}
                                     checked={fieldSettingParameters?.source === 'both'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
@@ -159,7 +161,7 @@ function NumberFieldSetting({
                                     }} />
                                 <label htmlFor='both'
                                     data-testid='both'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    className={`ml-7 font-normal text-base ${fieldSettingParameters?.type === 'rating' ? 'text-[#DDDDDD] cursor-not-allowed' : 'text-[#2B333B] cursor-pointer'}`}>
                                     Both
                                 </label>
                             </div>
@@ -200,21 +202,23 @@ function NumberFieldSetting({
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <div className='mt-7'>
-                        <InputField
-                            autoComplete='off'
-                            label='Increment By'
-                            id='incrementby'
-                            type='text'
-                            value={fieldSettingParameters?.incrementby}
-                            className='w-full mt-2.5'
-                            labelStyle=''
-                            placeholder='Increment By'
-                            testId='incrementby'
-                            htmlFor='incrementby'
-                            maxLength={10}
-                            handleChange={(e) => handleInputChange(e)} />
-                    </div>
+                    {fieldSettingParameters?.source === 'slider' &&
+                        <div className='mt-7'>
+                            <InputField
+                                autoComplete='off'
+                                label='Increment By'
+                                id='incrementby'
+                                type='text'
+                                value={fieldSettingParameters?.incrementby}
+                                className='w-full mt-2.5'
+                                labelStyle=''
+                                placeholder='Increment By'
+                                testId='incrementby'
+                                htmlFor='incrementby'
+                                maxLength={10}
+                                handleChange={(e) => handleInputChange(e)} />
+                        </div>
+                    }
                     <div className='mt-7'>
                         <div className='flex justify-between'>
                             <p

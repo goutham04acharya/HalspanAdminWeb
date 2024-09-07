@@ -71,9 +71,11 @@ function DisplayFieldSetting({
             'Content-Type': 'image/*',
             'x-amz-acl': 'public-read',
         };
-    
+
+        const formattedFileName = file?.name.replace(/\s+/g, '_');
+
         const response = await getAPI(
-            `field-settings/upload?folder_name=${fieldSettingParameters?.componentType}&file_name=${`${uuidv4()}-${file?.name}`}`, 
+            `field-settings/upload?folder_name=display_content&file_name=${`${uuidv4()}-${formattedFileName}`}`, 
             customHeaders
         );
         console.log(response, 'response');

@@ -193,6 +193,13 @@ body {
   width: 43px;
   height: 24px;
 }
+.custom-radioBlue input[disabled] {
+  cursor: not-allowed;
+  background-color: #DDDDDD;
+  border: 1px solid #DDDDDD;
+}
+
+
 
 /* th:has(button.sortedIcon){
   cursor:pointer;
@@ -276,6 +283,10 @@ custom-toggle-switch input:checked+.slider::before {
 
 .custom-radioBlue input[type="radio"]:checked+label span::after {
   opacity: 1;
+}
+
+.custom-radioBlue .disabled{
+
 }
 
 /* check box  */
