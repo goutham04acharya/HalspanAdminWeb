@@ -35,11 +35,6 @@ Feature: Halspan - Admin - Create a Questionnaire by using Number Field
     Then I should see the help text for number updated in the section 1
     When I enter the placeholder content for number
     Then I should see the placeholder content for number updated in the section 1
-    When I enter the minimum and maximum range
-    When I enter the increment by number
-    When I enter the pre-field text
-    When I enter the post-field text
-    When I enter the admin field notes
 
   @create_question
   Scenario: Admin selects the type, source and options
@@ -51,9 +46,15 @@ Feature: Halspan - Admin - Create a Questionnaire by using Number Field
     When I select the type for number as <type>
     When I select the source for number as <source>
     Then I should see the source added to question 1 page 1 section 1
+    When I enter the minimum and maximum range
+    When I enter the increment by number
+    When I enter the pre-field text
+    When I enter the post-field text
+    When I enter the admin field notes
 
     Examples:
       | type      | source        |
-      | "Integer" | "Entry Field" |
-      | "Float"   | "Slider"      |
-      | "Rating"  | "Both"        |
+      | "Integer" | "Both"        |
+      | "Float"   | "Both"        |
+      | "Rating"  | "Entry Field" |
+      | "Rating"  | "Slider"      |
