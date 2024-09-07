@@ -68,7 +68,7 @@ function FileFieldSetting({ handleInputChange,
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
                     <div className='mt-7'>
-                        <p className='font-semibold text-base text-[#2B333B]'>Number of Videos</p>
+                        <p className='font-semibold text-base text-[#2B333B]'>Number of Files</p>
                         <div className='flex items-center mt-3'>
                             <InputField
                                 autoComplete='off'

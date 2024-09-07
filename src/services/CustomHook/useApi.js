@@ -27,17 +27,35 @@ const useApi = () => {
      * `responseData` is the data received from the API. If there is an error during the API call, it
      * will return `{ error: true, data: errorResponse }`, where `error
      */
-    const getAPI = async (endpoint) => {
+    
+    // const getAPI = async (endpoint) => {
+    //     try {
+    //         const tokenClaims = await getIdTokenClaims();
+    //         const accessToken = tokenClaims.__raw;
+    //         const headers = { Authorization: `Bearer ${accessToken}` }; // Fix the template literal here
+    //         const { data } = await axios.get(`${baseURL}${endpoint}`, { headers }); // Fix the template literal here
+    //         return { error: false, data };
+    //     } catch (error) {
+    //         return { error: true, data: error.response };
+    //     }
+    // };
+
+    const getAPI = async (endpoint, customHeaders = {}) => {
         try {
             const tokenClaims = await getIdTokenClaims();
             const accessToken = tokenClaims.__raw;
-            const headers = { Authorization: `Bearer ${accessToken}` }; // Fix the template literal here
-            const { data } = await axios.get(`${baseURL}${endpoint}`, { headers }); // Fix the template literal here
+            const defaultHeaders = { Authorization: `Bearer ${accessToken}` };
+            
+            // Merge default headers with custom headers
+            const headers = { ...defaultHeaders, ...customHeaders };
+    
+            const { data } = await axios.get(`${baseURL}${endpoint}`, { headers });
             return { error: false, data };
         } catch (error) {
             return { error: true, data: error.response };
         }
     };
+    
 
     /**
      * The function `PostAPI` sends a POST request with authorization headers using an access token
