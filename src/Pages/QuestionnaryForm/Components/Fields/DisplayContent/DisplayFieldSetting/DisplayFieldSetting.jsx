@@ -9,6 +9,8 @@ import InfinateDropdown from '../../../../../../Components/InputField/InfinateDr
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown';
 import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not already done
+
 
 function DisplayFieldSetting({
     handleInputChange,
@@ -30,6 +32,7 @@ function DisplayFieldSetting({
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedUrlOption, setSelectedUrlOption] = useState(fieldSettingParameters?.format || '');
     const [errorMessage, setErrorMessage] = useState(false);
+    
 
     const options = [
         { value: 'http', label: 'http' },
@@ -62,11 +65,19 @@ function DisplayFieldSetting({
         }
     };
 
-    const handleUploadImage = async () => {
-        const response = await getAPI(`field-settings/upload?folder_name=${fieldSettingParameters?.componentType}&file_name=${selectedFile?.name}`);
-        console.log(response, 'response')
-    }
-
+    const handleUploadImage = async (file) => {
+        console.log(file, 'filefilefile')
+        const customHeaders = {
+            'Content-Type': 'image/*',
+            'x-amz-acl': 'public-read',
+        };
+    
+        const response = await getAPI(
+            `field-settings/upload?folder_name=${fieldSettingParameters?.componentType}&file_name=${`${uuidv4()}-${file?.name}`}`, 
+            customHeaders
+        );
+        console.log(response, 'response');
+    };
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -81,7 +92,7 @@ function DisplayFieldSetting({
             // Clear error if valid file is selected
             setSelectedFile(file);
             setErrorMessage(false);
-            handleUploadImage();
+            handleUploadImage(file);  // Pass file directly here
             setReplaceModal(false);
         }
     };
