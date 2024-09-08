@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import RangeSlider from './Components/RangeSlider'
+import { useDispatch, useSelector } from 'react-redux';
+import { handleRangeSlider } from '../RangeSliderDataSlice';
+
 
 function NumberField({
     type,
@@ -10,34 +12,45 @@ function NumberField({
     fieldSettingParameters,
 
 }) {
+    const dispatch = useDispatch();
+    // Safely access rangeData from the Redux store, ensuring it exists
+    const rangeData = useSelector((state) => state.rangeData || {});
 
-    const [RangeValue, setRangeValue] = useState(value ?? 0);
+    // Fallback to default values if rangeData is not yet available
+    const startValue = rangeData.startValue ?? 0;
+    const endValue = rangeData.endValue ?? 100;
+
+    // Use Redux value as initial state for RangeValue
+    const [RangeValue, setRangeValue] = useState(value ?? endValue);
     const [incrementByValue, setIncrementByValue] = useState(fieldSettingParameters?.incrementby ?? 1);
 
 
-    // Sync RangeValue with the value prop when it changes, with a check for undefined
+    // Sync RangeValue with the value prop or Redux state when they change
     useEffect(() => {
         if (value !== undefined && value !== RangeValue) {
             setRangeValue(value);
         }
     }, [value]);
 
-    // Handle Increment By input change
-    const handleIncrementByChange = (event) => {
-        const newIncrementBy = parseInt(event.target.value, 10) || 1; // Default to 1 if the input is empty or invalid
-        setIncrementByValue(newIncrementBy);
+    useEffect(() => {
+        if (endValue !== undefined && endValue !== RangeValue) {
+            setRangeValue(endValue);
+        }
+    }, [endValue]);
 
-        // Update the RangeValue to the nearest multiple of the new incrementBy value
-        setRangeValue((prev) => Math.floor(prev / newIncrementBy) * newIncrementBy);
-        handleChange({ ...fieldSettingParameters, incrementby: newIncrementBy });
-    };
-
-     // Handle range slider change
-     const handleRange = (event) => {
+    // Handle range slider change
+    const handleRange = (event) => {
         const newValue = parseInt(event.target.value, 10);
         const nearestMultiple = Math.floor(newValue / incrementByValue) * incrementByValue;
         setRangeValue(nearestMultiple);
-        handleChange({ ...fieldSettingParameters, value: nearestMultiple });
+
+        // Dispatch the change to Redux store
+        dispatch(handleRangeSlider({ endValue: nearestMultiple }));
+
+        // Trigger the handleChange if passed as a prop
+        if (handleChange) {
+            handleChange({ ...fieldSettingParameters, value: nearestMultiple });
+        }
     };
 
     console.log(RangeValue, 'RangeValue'); // This should now print the correct value
