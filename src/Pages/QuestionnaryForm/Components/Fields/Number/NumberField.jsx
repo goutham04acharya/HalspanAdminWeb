@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { handleRangeSlider } from '../RangeSliderDataSlice';
+import { handleSliderValue } from '../RangeSliderDataSlice';
 
 
 function NumberField({
@@ -13,48 +13,43 @@ function NumberField({
 
 }) {
     const dispatch = useDispatch();
-    // Safely access rangeData from the Redux store, ensuring it exists
-    const rangeData = useSelector((state) => state.rangeData || {});
 
-    // Fallback to default values if rangeData is not yet available
-    const startValue = rangeData.startValue ?? 0;
-    const endValue = rangeData.endValue ?? 100;
+    // Get slider value from Redux store
+    const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
 
-    // Use Redux value as initial state for RangeValue
-    const [RangeValue, setRangeValue] = useState(value ?? endValue);
-    const [incrementByValue, setIncrementByValue] = useState(fieldSettingParameters?.incrementby ?? 1);
+    // Get increment_by value from fieldSettingParameters with a fallback to 1
+    const incrementByValue = fieldSettingParameters?.incrementby || 1;
+    console.log(fieldSettingParameters, 'fieldSettingParametersfieldSettingParameters')
 
 
-    // Sync RangeValue with the value prop or Redux state when they change
+    // Get min and max values from fieldSettingParameters or use defaults
+    const minRange = parseInt(fieldSettingParameters?.min) || 0;
+    const maxRange = parseInt(fieldSettingParameters?.max) || 100;
+
+    // Calculate percentage for slider fill (relative to min/max range)
+    const sliderPercentage = ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+
+    // Sync the fieldSettingParameters value with slider value
     useEffect(() => {
-        if (value !== undefined && value !== RangeValue) {
-            setRangeValue(value);
+        if (fieldSettingParameters?.value !== undefined && fieldSettingParameters.value !== sliderValue) {
+            dispatch(handleSliderValue({ sliderValue: fieldSettingParameters.value }));
         }
-    }, [value]);
+    }, [fieldSettingParameters?.value, sliderValue, dispatch]);
 
-    useEffect(() => {
-        if (endValue !== undefined && endValue !== RangeValue) {
-            setRangeValue(endValue);
-        }
-    }, [endValue]);
-
-    // Handle range slider change
+    // Handle range slider changes and snap to the nearest multiple of incrementByValue
     const handleRange = (event) => {
         const newValue = parseInt(event.target.value, 10);
-        const nearestMultiple = Math.floor(newValue / incrementByValue) * incrementByValue;
-        setRangeValue(nearestMultiple);
+        // Round to the nearest multiple of incrementByValue
+        const nearestMultiple = Math.round(newValue / incrementByValue) * incrementByValue;
+        dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
 
-        // Dispatch the change to Redux store
-        dispatch(handleRangeSlider({ endValue: nearestMultiple }));
-
-        // Trigger the handleChange if passed as a prop
+        // Call the handleChange prop if provided
         if (handleChange) {
             handleChange({ ...fieldSettingParameters, value: nearestMultiple });
         }
     };
 
-    console.log(RangeValue, 'RangeValue'); // This should now print the correct value
-
+    console.log(fieldSettingParameters?.max, 'incrementByValueincrementByValue')
 
     return (
         <div>
@@ -81,13 +76,18 @@ function NumberField({
                 <div className='w-[30%]'>
                     <input
                         type="range"
-                        min="0"
-                        max="100"
-                        value={RangeValue}
+                        min={minRange}
+                        max={maxRange}
+                        value={sliderValue}
                         onChange={handleRange}
-                        className='mt-6'
+                        style={{
+                            '--percent': `${sliderPercentage}%`
+                        }}
+                        className='mt-6 custom-slider'
                     />
-                    <p className='font-normal text-sm text-[#2B333B] italic mt-4'>Select Value: {RangeValue}</p>
+                    <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
+                        Select Value: {sliderValue}
+                    </p>
                 </div>
             }
             <p

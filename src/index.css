@@ -193,78 +193,91 @@ body {
   width: 43px;
   height: 24px;
 }
+
 .custom-radioBlue input[disabled] {
   cursor: not-allowed;
   background-color: #DDDDDD;
   border: 1px solid #DDDDDD;
 }
 
-  /* Customize the Range field color */
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 8px;
-    background: #FFFFFF;
-    border-radius: 5px;
-    outline: none;
-  }
 
-  /* Unselected portion of the track (gray) */
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 8px;
-    background: #FFFFFF;
-    border-radius: 5px;
-  }
 
-  /* Selected portion of the track (black) */
-  input[type=range]::-moz-range-track {
-    background: #FFFFFF;
-  }
 
-  input[type=range]::-webkit-slider-runnable-track {
-    background: #FFFFFF;
-  }
+/* slider css */
+/* Styling for the range input */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  background: #FFFFFF;
+  border-radius: 5px;
+  outline: none;
+}
 
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px; /* Adjust the size */
-    height: 20px; /* Adjust the size */
-    background: #2B333B;
-    border-radius: 100%;
-    position: absolute;
-    top: 42%;
-    cursor: pointer;
-  }
+/* Track fill with gradient, reflecting the percentage */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #2B333B 0%, #2B333B var(--percent), #FFFFFF var(--percent), #FFFFFF 100%);
+  border-radius: 5px;
+}
 
-  input[type=range]:focus::-webkit-slider-runnable-track {
-    background: #FFFFFF;
-  }
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #2B333B 0%, #2B333B var(--percent), #FFFFFF var(--percent), #FFFFFF 100%);
+  border-radius: 5px;
+}
 
-  /* Selected part of the track in Chrome */
-  input[type=range]::-webkit-slider-runnable-track {
-    background: linear-gradient(to right, #2B333B 0%, #2B333B 50%, #FFFFFF 50%);
-  }
+/* Updated styling for the thumb (ball) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: #2B333B;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  /* Move the thumb upwards by using translateY */
+  transform: translateY(-30%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
-  /* Selected part of the track in Firefox */
-  input[type=range]::-moz-range-progress {
-    background: #2B333B;
-  }
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: #2B333B;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
-  /* Unselected part of the track in Firefox */
-  input[type=range]::-moz-range-track {
-    background: #FFFFFF;
-  }
+/* Increase size slightly on hover to indicate interactivity */
+input[type="range"]::-webkit-slider-thumb:hover {
+  /* transform: scale(1.2); */
+  /* Slight enlargement */
+  background: #2B333B;
+  /* Slightly darker on hover */
+}
 
-  /* Thumb (pointer) styling */
-  input[type=range]::-moz-range-thumb {
-    width: 20px; /* Adjust the size */
-    height: 20px; /* Adjust the size */
-    background: #2B333B;
-    border-radius: 50%;
-    cursor: pointer;
-  }
+input[type="range"]::-moz-range-thumb:hover {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
+
+/* Focused state for the thumb */
+input[type="range"]:focus::-webkit-slider-thumb {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
 
 
 
@@ -353,7 +366,6 @@ custom-toggle-switch input:checked+.slider::before {
 .custom-radioBlue input[type="radio"]:checked+label span::after {
   opacity: 1;
 }
-
 
 /* check box  */
 .checkbox input {
