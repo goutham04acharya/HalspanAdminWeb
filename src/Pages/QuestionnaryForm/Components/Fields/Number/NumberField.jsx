@@ -12,6 +12,8 @@ function NumberField({
 }) {
 
     const [RangeValue, setRangeValue] = useState(value ?? 0);
+    const [incrementByValue, setIncrementByValue] = useState(fieldSettingParameters?.incrementby ?? 1);
+
 
     // Sync RangeValue with the value prop when it changes, with a check for undefined
     useEffect(() => {
@@ -20,10 +22,22 @@ function NumberField({
         }
     }, [value]);
 
-    const handleRange = (event) => {
-        const newValue = event.target.value;
-        setRangeValue(newValue);
-        handleChange({ ...fieldSettingParameters, value: newValue });
+    // Handle Increment By input change
+    const handleIncrementByChange = (event) => {
+        const newIncrementBy = parseInt(event.target.value, 10) || 1; // Default to 1 if the input is empty or invalid
+        setIncrementByValue(newIncrementBy);
+
+        // Update the RangeValue to the nearest multiple of the new incrementBy value
+        setRangeValue((prev) => Math.floor(prev / newIncrementBy) * newIncrementBy);
+        handleChange({ ...fieldSettingParameters, incrementby: newIncrementBy });
+    };
+
+     // Handle range slider change
+     const handleRange = (event) => {
+        const newValue = parseInt(event.target.value, 10);
+        const nearestMultiple = Math.floor(newValue / incrementByValue) * incrementByValue;
+        setRangeValue(nearestMultiple);
+        handleChange({ ...fieldSettingParameters, value: nearestMultiple });
     };
 
     console.log(RangeValue, 'RangeValue'); // This should now print the correct value
@@ -51,15 +65,16 @@ function NumberField({
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <div>
+                <div className='w-[30%]'>
                     <input
                         type="range"
                         min="0"
                         max="100"
                         value={RangeValue}
                         onChange={handleRange}
+                        className='mt-6'
                     />
-                    <p>Select Value: {RangeValue}</p>
+                    <p className='font-normal text-sm text-[#2B333B] italic mt-4'>Select Value: {RangeValue}</p>
                 </div>
             }
             <p

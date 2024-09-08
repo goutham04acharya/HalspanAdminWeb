@@ -199,6 +199,75 @@ body {
   border: 1px solid #DDDDDD;
 }
 
+  /* Customize the Range field color */
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    outline: none;
+  }
+
+  /* Unselected portion of the track (gray) */
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    background: #FFFFFF;
+    border-radius: 5px;
+  }
+
+  /* Selected portion of the track (black) */
+  input[type=range]::-moz-range-track {
+    background: #FFFFFF;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    background: #FFFFFF;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px; /* Adjust the size */
+    height: 20px; /* Adjust the size */
+    background: #2B333B;
+    border-radius: 100%;
+    position: absolute;
+    top: 42%;
+    cursor: pointer;
+  }
+
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #FFFFFF;
+  }
+
+  /* Selected part of the track in Chrome */
+  input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #2B333B 0%, #2B333B 50%, #FFFFFF 50%);
+  }
+
+  /* Selected part of the track in Firefox */
+  input[type=range]::-moz-range-progress {
+    background: #2B333B;
+  }
+
+  /* Unselected part of the track in Firefox */
+  input[type=range]::-moz-range-track {
+    background: #FFFFFF;
+  }
+
+  /* Thumb (pointer) styling */
+  input[type=range]::-moz-range-thumb {
+    width: 20px; /* Adjust the size */
+    height: 20px; /* Adjust the size */
+    background: #2B333B;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+
+
 
 
 /* th:has(button.sortedIcon){
@@ -285,9 +354,6 @@ custom-toggle-switch input:checked+.slider::before {
   opacity: 1;
 }
 
-.custom-radioBlue .disabled{
-
-}
 
 /* check box  */
 .checkbox input {
