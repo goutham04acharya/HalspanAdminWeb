@@ -26,13 +26,12 @@ function DisplayFieldSetting({
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
-    console.log(fieldSettingParameters?.componentType, 'fieldSettingParameters')
     // const { uploadImage, uploading, error } = useS3Upload();
     const [selectedFile, setSelectedFile] = useState(null);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedUrlOption, setSelectedUrlOption] = useState(fieldSettingParameters?.format || '');
     const [errorMessage, setErrorMessage] = useState(false);
-    
+
 
     const options = [
         { value: 'http', label: 'http' },
@@ -66,20 +65,57 @@ function DisplayFieldSetting({
     };
 
     const handleUploadImage = async (file) => {
-        console.log(file, 'filefilefile')
-        const customHeaders = {
-            'Content-Type': 'image/*',
-            'x-amz-acl': 'public-read',
-        };
+        try {
+            // Format the file name
+            const formattedFileName = encodeURIComponent(file?.name.replace(/\s+/g, '_'));
 
-        const formattedFileName = file?.name.replace(/\s+/g, '_');
+            // Call your API to get the pre-signed URL
+            const response = await getAPI(
+                `field-settings/upload?folder_name=display_content&file_name=${`${uuidv4()}-${formattedFileName}`}`
+            );
 
-        const response = await getAPI(
-            `field-settings/upload?folder_name=display_content&file_name=${`${uuidv4()}-${formattedFileName}`}`, 
-            customHeaders
-        );
-        console.log(response, 'response');
+            // Log the full response for debugging
+            console.log(response, 'Full response from API');
+
+            if (response?.data?.status) {
+
+                const { url } = response?.data?.data;
+                console.log(url, 'Pre-signed URL');
+
+                // Set up custom headers
+                const customHeaders = {
+                    'Content-Type': 'image/*',
+                    'x-amz-acl': 'public-read',
+                };
+
+                // Upload the image to S3 using the pre-signed URL
+                const uploadResponse = await fetch(url, {
+                    method: 'PUT',
+                    headers: customHeaders,
+                    body: file,  // Send the actual file content
+                });
+                dispatch(setNewComponent(({ id: 'ImageUrl', value: uploadResponse?.url.split('?')[0] }))
+            )
+                console.log(uploadResponse?.url.split('?')[0], 'uploadResponseuploadResponse')
+
+                // Check if the upload was successful
+                if (uploadResponse.ok) {
+                    console.log('Image uploaded successfully!');
+                } else {
+                    console.error('Failed to upload image:', uploadResponse.status, uploadResponse.statusText);
+                    const errorText = await uploadResponse.text();
+                    console.error('Response body:', errorText); // Log the full response for more insight
+                }
+            } else {
+                // Log the error message if status is false
+                console.error('Failed to get pre-signed URL', response?.message || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Error during the image upload process:', error);
+        }
     };
+
+
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];

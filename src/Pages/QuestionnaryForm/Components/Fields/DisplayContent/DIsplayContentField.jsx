@@ -11,6 +11,7 @@ function DIsplayContentField({
     fieldSettingParameters,
     testId
 }) {
+    console.log(fieldSettingParameters, 'fieldSettingParameters')
     return (
         <div>
             <label
@@ -27,7 +28,12 @@ function DIsplayContentField({
                 <p data-testid="text" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
             }
             {fieldSettingParameters?.type === 'image' &&
-                <p data-testid="image" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.image}</p>
+                <img
+                    src={fieldSettingParameters?.ImageUrl} // assuming 'fieldSettingParameters.image' holds the S3 URL of the uploaded image
+                    alt="Uploaded"
+                    className="max-w-[90%]"
+                    data-testid="uploaded-image"
+                />
             }
             {fieldSettingParameters?.type === 'url' &&
                 <p data-testid="url" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.urlValue}</p>

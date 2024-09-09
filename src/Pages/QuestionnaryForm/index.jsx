@@ -80,8 +80,7 @@ function QuestionnaryForm() {
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [expandedSections, setExpandedSections] = useState({}); // Object to track which sections are expanded
-
+    const [expandedSections, setExpandedSections] = useState({}); // Initial empty object
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -138,35 +137,6 @@ function QuestionnaryForm() {
             setShowquestionDeleteModal(false);
         }
     };
-
-    // const handleInputChange = (e) => {
-    //     const { id, value } = e.target;
-
-    //     // Restrict numeric input if the id is 'fileType'
-    //     let updatedValue = value;
-    //     if (id === 'fileType') {
-    //         updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-    //     } else if (id === 'fileSize' || id === 'min' || id === 'max') {
-    //         updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
-    //     }
-
-    //     dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-
-    //     const data = selectedQuestionId?.split('_');
-    //     const update = { ...dataIsSame };
-    //     update[data[0]] = false;
-    //     setDataIsSame(update);
-
-    //     // Clear any existing debounce timer
-    //     if (debounceTimerRef.current) {
-    //         clearTimeout(debounceTimerRef.current);
-    //     }
-
-    //     // Set a new debounce timer
-    //     debounceTimerRef.current = setTimeout(() => {
-    //         setShouldAutoSave(true);
-    //     }, 100); // 1000ms delay before auto-saving
-    // };
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -381,7 +351,17 @@ function QuestionnaryForm() {
                     questions: []
                 }],
             };
-            setSections([...sections, newSection]);
+            setSections((prevSections) => {
+                const updatedSections = [...prevSections, newSection];
+
+                // Open the newly added section
+                setExpandedSections((prev) => ({
+                    ...prev,
+                    [updatedSections.length - 1]: true, // Set the last section to open
+                }));
+
+                return updatedSections;
+            });
 
             setTimeout(() => {
                 sectionRefs.current[sections.length]?.scrollIntoView({ behavior: 'smooth' });
