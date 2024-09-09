@@ -9,6 +9,7 @@ When('I click on the internal name of a questionnaire from the list', async func
     await new Promise((resolve) => setTimeout(resolve, 500));
     const element = await driver.wait(until.elementLocated(By.css('tbody tr:nth-child(4) td:nth-child(2) u')));
     this.internalName = await element.getText();
+    global.internalNameVersion = this.internalName;
     console.log('this internal name', this.internalName)
     await element.click();
 });
