@@ -19,8 +19,6 @@ function NumberField({
 
     // Get increment_by value from fieldSettingParameters with a fallback to 1
     const incrementByValue = fieldSettingParameters?.incrementby || 1;
-    console.log(fieldSettingParameters, 'fieldSettingParametersfieldSettingParameters')
-
 
     // Get min and max values from fieldSettingParameters or use defaults
     const minRange = parseInt(fieldSettingParameters?.min) || 0;
@@ -48,8 +46,6 @@ function NumberField({
             handleChange({ ...fieldSettingParameters, value: nearestMultiple });
         }
     };
-
-    console.log(fieldSettingParameters?.max, 'incrementByValueincrementByValue')
 
     return (
         <div>

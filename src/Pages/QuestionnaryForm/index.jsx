@@ -575,6 +575,7 @@ function QuestionnaryForm() {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
+            console.log(response?.data?.data?.items, 'response?.data?.data?.items')
         } else {
             setToastError('Something went wrong!')
         }
@@ -914,12 +915,13 @@ function QuestionnaryForm() {
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-            source: {
-                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-            },
+            source: fieldSettingParams?.[selectedQuestionId]?.source,
+            source_value:
+                // [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                    fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                    fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+            ,
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
             options: fieldSettingParams?.[selectedQuestionId]?.options,
             default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
@@ -944,12 +946,18 @@ function QuestionnaryForm() {
                     case 'image':
                         return { image: fieldSettingParams?.[selectedQuestionId]?.image };
                     case 'url':
-                        return { url: fieldSettingParams?.[selectedQuestionId]?.urlValue };
+                        return {
+                            url: {
+                                type: fieldSettingParams?.[selectedQuestionId]?.urlType,  // Assuming urlType is a field in fieldSettingParams
+                                value: fieldSettingParams?.[selectedQuestionId]?.urlValue // Assuming urlValue is a field in fieldSettingParams
+                            }
+                        };
                     default:
                         return {}; // Return an empty object if componentType doesn't match any case
                 }
             })(),
         };
+
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
             if (response?.data?.status >= 401) {

@@ -45,7 +45,7 @@ function DisplayFieldSetting({
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
         setDropdownOpen(false);
-        dispatch(setNewComponent({ id: 'url', value: option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true)
 
         // Prefill the input field based on the selected option
@@ -74,13 +74,9 @@ function DisplayFieldSetting({
                 `field-settings/upload?folder_name=display_content&file_name=${`${uuidv4()}-${formattedFileName}`}`
             );
 
-            // Log the full response for debugging
-            console.log(response, 'Full response from API');
-
             if (response?.data?.status) {
 
                 const { url } = response?.data?.data;
-                console.log(url, 'Pre-signed URL');
 
                 // Set up custom headers
                 const customHeaders = {
@@ -94,9 +90,9 @@ function DisplayFieldSetting({
                     headers: customHeaders,
                     body: file,  // Send the actual file content
                 });
-                dispatch(setNewComponent(({ id: 'ImageUrl', value: uploadResponse?.url.split('?')[0] }))
-            )
-                console.log(uploadResponse?.url.split('?')[0], 'uploadResponseuploadResponse')
+                dispatch(setNewComponent({ id: 'image', value: uploadResponse?.url.split('?')[0], questionId: selectedQuestionId }));
+                setShouldAutoSave(true)
+                console.log(uploadResponse?.url.split('?')[0], 'uploadResponse?.url.sp');
 
                 // Check if the upload was successful
                 if (uploadResponse.ok) {
@@ -147,18 +143,6 @@ function DisplayFieldSetting({
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
                 <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
                 <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
-                    <CommonComponents
-                        labelID='label'
-                        labelName='Label'
-                        labelPlaceholder='Question 1'
-                        helpTextId='Help Text'
-                        helpText='Help Text'
-                        helpTextPlaceholder='Enter help text'
-                        handleInputChange={handleInputChange}
-                        formParameters={formParameters}
-                        handleBlur={handleBlur}
-                        assetLocation={true}
-                    />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Type</p>
                         <div className='mt-2.5'>
@@ -364,7 +348,7 @@ function DisplayFieldSetting({
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                     testID='url-dropdown'
                                     labeltestID='url-list'
-                                    selectedOption={options.find(option => option.value === fieldSettingParameters?.url)}
+                                    selectedOption={options.find(option => option.value === fieldSettingParameters?.urlType)}
                                     handleOptionClick={handleOptionClick}
                                     isDropdownOpen={isDropdownOpen}
                                     setDropdownOpen={setDropdownOpen}
@@ -374,7 +358,7 @@ function DisplayFieldSetting({
                                     selectedQuestionId={selectedQuestionId}
                                 />
                             }
-                            {fieldSettingParameters?.url && (
+                            {fieldSettingParameters?.urlType && (
                                 <InputField
                                     autoComplete='off'
                                     id='urlValue'
