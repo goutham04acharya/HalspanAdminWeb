@@ -982,6 +982,19 @@ function QuestionnaryForm() {
         document.getElementById('file-upload').click();
     };
 
+    // Load expanded sections from localStorage on component mount
+    useEffect(() => {
+        const savedExpandedSections = localStorage.getItem('expandedSections');
+        if (savedExpandedSections) {
+            setExpandedSections(JSON.parse(savedExpandedSections));
+        }
+    }, []);
+
+    // Save expanded sections to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+    }, [expandedSections]);
+
     useEffect(() => {
         formDefaultDetails();
         getFieldSetting();
