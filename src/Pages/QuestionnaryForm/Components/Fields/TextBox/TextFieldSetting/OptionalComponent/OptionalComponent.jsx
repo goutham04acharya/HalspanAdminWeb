@@ -8,7 +8,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
 
     // Get the current field settings from Redux
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    console.log(fieldSettingParams?.[selectedQuestionId]?.componentType, 'fieldSettingPArams')
 
     // Define options based on componentType
     const getOptions = (componentType) => {
@@ -26,7 +25,11 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
                 'Visible',
                 'Optional',
             ];
-        } else if (componentType === 'videofield' || componentType === 'gpsfield' ) {
+        } else if (componentType === 'displayfield') {
+            return [
+                'Visible',
+            ];
+        } else if (componentType === 'videofield' || componentType === 'gpsfield') {
             return [
                 'Visible',
                 'Optional',
@@ -77,7 +80,6 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
             </div>
         );
     };
-
 
     // Handle toggle click logic
     const handleToggleClick = (label) => {

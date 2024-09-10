@@ -35,6 +35,8 @@ import SignatureField from './Components/Fields/Signature/SignatureField.jsx';
 import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldSetting/SignatureFieldSetting.jsx';
 import GPSField from './Components/Fields/GPS/GPSField.jsx';
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
+import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
+import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -76,12 +78,22 @@ function QuestionnaryForm() {
     // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
     const [validationErrors, setValidationErrors] = useState({});
-
+    const [showReplaceModal, setReplaceModal] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
+
+    // to open and close the sections
+    const toggleSection = (sectionIndex) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
+        }));
+    };
 
     const handleCancel = () => {
         setModalOpen(false);
@@ -126,35 +138,6 @@ function QuestionnaryForm() {
         }
     };
 
-    // const handleInputChange = (e) => {
-    //     const { id, value } = e.target;
-
-    //     // Restrict numeric input if the id is 'fileType'
-    //     let updatedValue = value;
-    //     if (id === 'fileType') {
-    //         updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-    //     } else if (id === 'fileSize' || id === 'min' || id === 'max') {
-    //         updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
-    //     }
-
-    //     dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-
-    //     const data = selectedQuestionId?.split('_');
-    //     const update = { ...dataIsSame };
-    //     update[data[0]] = false;
-    //     setDataIsSame(update);
-
-    //     // Clear any existing debounce timer
-    //     if (debounceTimerRef.current) {
-    //         clearTimeout(debounceTimerRef.current);
-    //     }
-
-    //     // Set a new debounce timer
-    //     debounceTimerRef.current = setTimeout(() => {
-    //         setShouldAutoSave(true);
-    //     }, 100); // 1000ms delay before auto-saving
-    // };
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
@@ -164,6 +147,11 @@ function QuestionnaryForm() {
             updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
         } else if (id === 'fileSize' || id === 'min' || id === 'max') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        }
+
+        // Check if the input field's id is the one you want to manage with inputValue
+        if (id === 'urlValue') {
+            setInputValue(updatedValue); // Update inputValue if the id matches
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
@@ -249,6 +237,10 @@ function QuestionnaryForm() {
             <GPSField
                 {...props}
             />,
+        displayfield: (props) =>
+            <DIsplayContentField
+                {...props}
+            />,
     };
 
     const sideComponentMap = {
@@ -263,21 +255,40 @@ function QuestionnaryForm() {
         "filefield": FileFieldSetting,
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
+        "displayfield": DisplayFieldSetting,
         // Add other mappings here...
     };
 
     const scrollToSection = (index) => {
-        if (sectionRefs.current[index]) {
-            sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
+        // Check if section is closed, if so, expand it
+        if (!expandedSections[index]) {
+            toggleSection(index); // Assuming toggleSection will expand the section
         }
+
+        // Add a slight delay to ensure DOM update before scrolling
+        setTimeout(() => {
+            if (sectionRefs.current[index]) {
+                sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 300); // Delay to allow the section to open
     };
 
+
     const scrollToPage = (sectionIndex, pageIndex) => {
-        const pageRefKey = `${sectionIndex}-${pageIndex}`;
-        if (pageRefs.current[pageRefKey]) {
-            pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
+        // Check if the section is closed, if so, expand it
+        if (!expandedSections[sectionIndex]) {
+            toggleSection(sectionIndex); // Assuming toggleSection will expand the section
         }
+
+        // Add a slight delay to ensure DOM update before scrolling
+        setTimeout(() => {
+            const pageRefKey = `${sectionIndex}-${pageIndex}`;
+            if (pageRefs.current[pageRefKey]) {
+                pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 300); // Delay to allow the section to open and render the page
     };
+
 
     const getStatusStyles = (status) => {
         switch (status) {
@@ -340,7 +351,17 @@ function QuestionnaryForm() {
                     questions: []
                 }],
             };
-            setSections([...sections, newSection]);
+            setSections((prevSections) => {
+                const updatedSections = [...prevSections, newSection];
+
+                // Open the newly added section
+                setExpandedSections((prev) => ({
+                    ...prev,
+                    [updatedSections.length - 1]: true, // Set the last section to open
+                }));
+
+                return updatedSections;
+            });
 
             setTimeout(() => {
                 sectionRefs.current[sections.length]?.scrollIntoView({ behavior: 'smooth' });
@@ -554,6 +575,7 @@ function QuestionnaryForm() {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
+            console.log(response?.data?.data?.items, 'response?.data?.data?.items')
         } else {
             setToastError('Something went wrong!')
         }
@@ -837,6 +859,12 @@ function QuestionnaryForm() {
         })
     });
 
+    const handleDisplayClick = useCallback(() => {
+        addNewQuestion('displayfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
+        })
+    });
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -850,17 +878,28 @@ function QuestionnaryForm() {
             handleFileClick,
             handleSignatureClick,
             handleGPSClick,
+            handleDisplayClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
 
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
+        // Dispatch the type selection
+        const fieldsToReset = ['text', 'heading', 'image', 'url'];
         dispatch(setNewComponent({ id: 'type', value: type, questionId: selectedQuestionId }));
+
+        // Handle resetting specific fields if the selected type is 'text'
+        fieldsToReset.forEach((field) => {
+            if (field !== type) {
+                dispatch(setNewComponent({ id: field, value: '', questionId: selectedQuestionId }));
+            }
+        });
+        // Auto-save the settings
         handleAutoSaveSettings();
-    }
+    };
 
     const handleAutoSaveSettings = async () => {
         const payload = {
@@ -876,12 +915,13 @@ function QuestionnaryForm() {
                 max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
-            source: {
-                [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
-                    fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
-                        fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
-                        fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
-            },
+            source: fieldSettingParams?.[selectedQuestionId]?.source,
+            source_value:
+                // [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
+                fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
+                    fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
+                    fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
+            ,
             lookup_id: fieldSettingParams?.[selectedQuestionId]?.lookupOption,
             options: fieldSettingParams?.[selectedQuestionId]?.options,
             default_value: fieldSettingParams?.[selectedQuestionId]?.defaultValue,
@@ -896,8 +936,28 @@ function QuestionnaryForm() {
                 include_metadata: fieldSettingParams?.[selectedQuestionId]?.include_metadata,
                 file_size: fieldSettingParams?.[selectedQuestionId]?.fileSize,
                 file_type: fieldSettingParams?.[selectedQuestionId]?.fileType,
-            }
+            },
+            display_type: (() => {
+                switch (fieldSettingParams?.[selectedQuestionId]?.type) {
+                    case 'heading':
+                        return { heading: fieldSettingParams?.[selectedQuestionId]?.heading };
+                    case 'text':
+                        return { text: fieldSettingParams?.[selectedQuestionId]?.text };
+                    case 'image':
+                        return { image: fieldSettingParams?.[selectedQuestionId]?.image };
+                    case 'url':
+                        return {
+                            url: {
+                                type: fieldSettingParams?.[selectedQuestionId]?.urlType,  // Assuming urlType is a field in fieldSettingParams
+                                value: fieldSettingParams?.[selectedQuestionId]?.urlValue // Assuming urlValue is a field in fieldSettingParams
+                            }
+                        };
+                    default:
+                        return {}; // Return an empty object if componentType doesn't match any case
+                }
+            })(),
         };
+
         try {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
             if (response?.data?.status >= 401) {
@@ -916,6 +976,24 @@ function QuestionnaryForm() {
         const sectionId = selectedQuestionId.split('_')[0]
         handleAutoSave(sectionId, sections);
     }
+    //this is for diplay content field replace modal function
+    const handleConfirmReplace = () => {
+        setReplaceModal(false);
+        document.getElementById('file-upload').click();
+    };
+
+    // Load expanded sections from localStorage on component mount
+    useEffect(() => {
+        const savedExpandedSections = localStorage.getItem('expandedSections');
+        if (savedExpandedSections) {
+            setExpandedSections(JSON.parse(savedExpandedSections));
+        }
+    }, []);
+
+    // Save expanded sections to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
+    }, [expandedSections]);
 
     useEffect(() => {
         formDefaultDetails();
@@ -958,17 +1036,27 @@ function QuestionnaryForm() {
                                 <div
                                     key={sectionData?.section_id}
                                     ref={el => sectionRefs.current[sectionIndex] = el}
-                                    className='my-[25px] p-[6px] pb-6 hover:border-[#2B333B] hover:border rounded-[10px]'
-                                >
-                                    <div className='flex items-start w-full justify-between gap-7'>
-                                        <EditableField
-                                            name={sectionData?.section_name}
-                                            index={sectionIndex}
-                                            handleSave={handleSaveSectionName}
-                                            section={true}
-                                            testId={`section-${sectionIndex}-name`}
-                                        />
+                                    className={`p-[6px] hover:border-[#2B333B] hover:border rounded-[10px] ${expandedSections[sectionIndex] ? 'pb-6 my-[25px]' : 'pb-0 mt-[10px] mb-0'}`}>
+                                    <div className='flex items-start justify-between w-full gap-3 relative'>
+                                        {/* <img src="/Images/open-Filter.svg" alt="down-arrow" className='cursor-pointer pt-6 pl-2' /> */}
+                                        <div className='flex items-start'>
+                                            <img
+                                                src="/Images/open-Filter.svg"
+                                                alt="down-arrow"
+                                                className={`cursor-pointer pt-6 pl-2 transform transition-transform duration-300 mr-2 ${expandedSections[sectionIndex] ? 'rotate-180 mt-5 ml-2' : '' // Rotate 180deg when expanded
+                                                    }`}
+                                                onClick={() => toggleSection(sectionIndex)} // Toggle section on click
+                                            />
+                                            <EditableField
+                                                name={sectionData?.section_name}
+                                                index={sectionIndex}
+                                                handleSave={handleSaveSectionName}
+                                                section={true}
+                                                testId={`section-${sectionIndex}-name`}
+                                            />
+                                        </div>
                                         <div className='flex items-center justify-end'>
+                                            <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#FFFFFF] cursor-pointer' />
                                             <img src="/Images/trash-black.svg"
                                                 alt="delete"
                                                 title='Delete'
@@ -984,67 +1072,73 @@ function QuestionnaryForm() {
                                                 className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
                                         </div>
                                     </div>
-                                    {sectionData?.pages.map((pageData, pageIndex) => (
-                                        <div
-                                            key={pageData?.page_id}
-                                            ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                                            className='mt-7 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
-                                        >
-                                            <div className='flex items-start justify-between gap-7'>
-                                                <EditableField
-                                                    name={pageData?.page_name}
-                                                    index={sectionIndex}
-                                                    secondIndex={pageIndex}
-                                                    handleSave={handleSaveSectionName}
-                                                    testId={`page-${pageIndex}-name`}
-                                                    maxLength={1}
-                                                />
-                                                <div className='flex items-center justify-end'>
-                                                    <img src="/Images/trash-black.svg"
-                                                        title='Delete'
-                                                        alt="Delete"
-                                                        data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                                        onClick={() => {
-                                                            handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
-                                                                setShowPageDeleteModal(true)
-                                                        }}
+                                    {expandedSections[sectionIndex] && (
+                                        <>
+                                            {sectionData?.pages.map((pageData, pageIndex) => (
+                                                <div
+                                                    key={pageData?.page_id}
+                                                    ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
+                                                    className='mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
+                                                >
+                                                    <div className='flex items-start justify-between gap-7'>
+                                                        <EditableField
+                                                            name={pageData?.page_name}
+                                                            index={sectionIndex}
+                                                            secondIndex={pageIndex}
+                                                            handleSave={handleSaveSectionName}
+                                                            testId={`page-${pageIndex}-name`}
+                                                            maxLength={1}
+                                                        />
+                                                        <div className='flex items-center justify-end'>
+                                                            <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#EFF1F8] cursor-pointer' />
+                                                            <img src="/Images/trash-black.svg"
+                                                                title='Delete'
+                                                                alt="Delete"
+                                                                data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
+                                                                onClick={() => {
+                                                                    handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
+                                                                        setShowPageDeleteModal(true)
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <DraggableList
+                                                        itemKey="question_id"
+                                                        template={Item}
+                                                        list={pageData.questions.map((questionData, questionIndex) => ({
+                                                            ...questionData,
+                                                            sectionIndex,
+                                                            pageIndex,
+                                                            index: questionIndex,
+                                                        }))}
+                                                        onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
+                                                        container={() => document.body}
                                                     />
+                                                    <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
+                                                        <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
+                                                            <span className='mr-[15px]'>+</span>
+                                                            <span>Add question</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <DraggableList
-                                                itemKey="question_id"
-                                                template={Item}
-                                                list={pageData.questions.map((questionData, questionIndex) => ({
-                                                    ...questionData,
-                                                    sectionIndex,
-                                                    pageIndex,
-                                                    index: questionIndex,
-                                                }))}
-                                                onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
-                                                container={() => document.body}
-                                            />
-                                            <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
-                                                <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                                    <span className='mr-[15px]'>+</span>
-                                                    <span>Add question</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <button
-                                        onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
-                                        data-testid={`add-page-sec-${sectionIndex}`}
-                                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                        <span className='mr-[15px]'>+</span>
-                                        <span>Add page</span>
-                                    </button>
+                                            ))}
+                                            {/* Place "Add Page" button here, outside of the pages map */}
+                                            <button
+                                                onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
+                                                data-testid={`add-page-sec-${sectionIndex}`}
+                                                className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
+                                                <span className='mr-[15px]'>+</span>
+                                                <span>Add page</span>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             ))}
                             <button
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
-                                className='lex items-center font-semibold text-[#2B333B] text-base'>
+                                className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
                                 <span className='mr-[15px]'>+</span>
                                 Add section
                             </button>
@@ -1082,6 +1176,9 @@ function QuestionnaryForm() {
                                         handleBlur: handleBlur,
                                         setShouldAutoSave: setShouldAutoSave,
                                         validationErrors: validationErrors,
+                                        setReplaceModal: setReplaceModal,
+                                        setInputValue: setInputValue,
+                                        inputValue: inputValue,
                                     }
                                 )
                             ) : (
@@ -1141,6 +1238,22 @@ function QuestionnaryForm() {
                     setModalOpen={setShowquestionDeleteModal}
                     handleButton1={confirmDeleteQuestion}
                     handleButton2={() => setShowquestionDeleteModal(false)}
+                />
+            )}
+            {showReplaceModal && (
+                <ConfirmationModal
+                    text='Replace Image'
+                    subText='This will replace the existing image. This action cannot be undone.'
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Replace'
+                    Button2text='Cancel'
+                    src='replace'
+                    testIDBtn1='confirm-replace-image'
+                    testIDBtn2='cancel-replace'
+                    isModalOpen={showReplaceModal}
+                    setModalOpen={setReplaceModal}
+                    handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation
+                    handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
         </>

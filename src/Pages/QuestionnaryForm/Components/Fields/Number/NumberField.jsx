@@ -1,5 +1,7 @@
-import React from 'react'
-import RangeSlider from './Components/RangeSlider'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { handleSliderValue } from '../RangeSliderDataSlice';
+
 
 function NumberField({
     type,
@@ -10,6 +12,41 @@ function NumberField({
     fieldSettingParameters,
 
 }) {
+    const dispatch = useDispatch();
+
+    // Get slider value from Redux store
+    const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
+
+    // Get increment_by value from fieldSettingParameters with a fallback to 1
+    const incrementByValue = fieldSettingParameters?.incrementby || 1;
+
+    // Get min and max values from fieldSettingParameters or use defaults
+    const minRange = parseInt(fieldSettingParameters?.min) || 0;
+    const maxRange = parseInt(fieldSettingParameters?.max) || 100;
+
+    // Calculate percentage for slider fill (relative to min/max range)
+    const sliderPercentage = ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+
+    // Sync the fieldSettingParameters value with slider value
+    useEffect(() => {
+        if (fieldSettingParameters?.value !== undefined && fieldSettingParameters.value !== sliderValue) {
+            dispatch(handleSliderValue({ sliderValue: fieldSettingParameters.value }));
+        }
+    }, [fieldSettingParameters?.value, sliderValue, dispatch]);
+
+    // Handle range slider changes and snap to the nearest multiple of incrementByValue
+    const handleRange = (event) => {
+        const newValue = parseInt(event.target.value, 10);
+        // Round to the nearest multiple of incrementByValue
+        const nearestMultiple = Math.round(newValue / incrementByValue) * incrementByValue;
+        dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
+
+        // Call the handleChange prop if provided
+        if (handleChange) {
+            handleChange({ ...fieldSettingParameters, value: nearestMultiple });
+        }
+    };
+
     return (
         <div>
             <label
@@ -32,7 +69,22 @@ function NumberField({
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <RangeSlider />
+                <div data-testid="slider" className='w-[30%]'>
+                    <input
+                        type="range"
+                        min={minRange}
+                        max={maxRange}
+                        value={sliderValue}
+                        onChange={handleRange}
+                        style={{
+                            '--percent': `${sliderPercentage}%`
+                        }}
+                        className='mt-6 custom-slider'
+                    />
+                    <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
+                        Select Value: {sliderValue}
+                    </p>
+                </div>
             }
             <p
                 data-testid="help-text"

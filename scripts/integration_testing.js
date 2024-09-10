@@ -96,4 +96,3 @@ runTestQueue().catch(error => {
     console.error(`Error occurred during BDD tests: ${error}`);
     process.exit(1);
 });
-
