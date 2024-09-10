@@ -69,7 +69,7 @@ function NumberField({
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <div className='w-[30%]'>
+                <div data-testid="slider" className='w-[30%]'>
                     <input
                         type="range"
                         min={minRange}

@@ -69,14 +69,14 @@ When('I enter the minimum and maximum range', async function () {
 
 When('I enter the increment by number', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    if (this.source === 'Slider' || this.source === 'Both') {
+    if (this.source === 'slider' || this.source === 'both') {
         await driver.wait(until.elementLocated(By.css('[data-testid="increment"]'))).sendKeys('2');
     }
 });
 
 When('I enter the pre-field text', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    if (this.source === 'Entry Field' || this.source === 'Both') {
+    if (this.source === 'entryfield' || this.source === 'both') {
         await driver.wait(until.elementLocated(By.css('[data-testid="pre-field-option"]'))).click();
         await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('$');
     }
@@ -84,7 +84,7 @@ When('I enter the pre-field text', async function () {
 
 When('I enter the post-field text', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    if (this.source === 'Entry Field' || this.source === 'Both') {
+    if (this.source === 'entryfield' || this.source === 'both') {
         await driver.wait(until.elementLocated(By.css('[data-testid="post-field-option"]'))).click();
         await driver.wait(until.elementLocated(By.css('[data-testid="field-text"]'))).sendKeys('USD');
     }
@@ -102,16 +102,21 @@ When('I select the source for number as {string}', async function (source) {
 });
 
 Then('I should see the source added to question {int} page {int} section {int}', async function (questionNumber, pageNumber, sectionNumber) {
-    if (this.source === 'Entry Field' || this.source === 'Slider') {
+    if (this.source === 'entryfield') {
         await new Promise(resolve => setTimeout(resolve, 750));
-        const source = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="${this.source}"]`)), 2000);
+        const source = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="input"]`)), 750);
         await driver.wait(until.elementIsVisible(source), 2000);
     }
-    else if (this.source === 'Both') {
+    else if (this.source === 'slider') {
         await new Promise(resolve => setTimeout(resolve, 750));
-        const entryField = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Entry Field"]`)), 2000);
+        const source = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="${this.source}"]`)), 750);
+        await driver.wait(until.elementIsVisible(source), 2000);
+    }
+    else if (this.source === 'both') {
+        await new Promise(resolve => setTimeout(resolve, 750));
+        const entryField = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="input"]`)), 750);
         await driver.wait(until.elementIsVisible(entryField), 2000);
-        const slider = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="Slider"]`)), 2000);
+        const slider = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="slider"]`)), 750);
         await driver.wait(until.elementIsVisible(slider), 2000);
     }
 });
