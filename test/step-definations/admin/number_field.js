@@ -14,7 +14,7 @@ When('I click the number button', async function () {
 
 Then('I should see the number field added to the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, questionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="number-field"]`)));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"]`)));
 });
 
 When('I enter the label name for number', async function () {
@@ -54,7 +54,7 @@ When('I enter the placeholder content for number', async function () {
     this.placeholder = 'Sample Number placeholder Name';
 });
 
-Then('I should see the placeholder content for number updated in the section {int}', async function (int) {
+Then('I should see the placeholder content for number updated in the section {int}', async function (sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');

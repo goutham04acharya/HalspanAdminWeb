@@ -222,14 +222,14 @@ function NumberFieldSetting({
                     <div className='mt-7'>
                         <div className='flex justify-between'>
                             <p
-                                className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="pre-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
                                 onClick={() => handleTabClick('preField')}
                             >
                                 Pre-field Text
                             </p>
                             <p
-                                className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="post-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
                                 onClick={() => handleTabClick('postField')}
                             >
@@ -247,7 +247,7 @@ function NumberFieldSetting({
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Pre-field text'
-                                    testId='preField'
+                                    testId='field-text'
                                     htmlFor='preField'
                                     maxLength={500}
                                     handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
@@ -265,7 +265,7 @@ function NumberFieldSetting({
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Post-field text'
-                                    testId='postField'
+                                    testId='field-text'
                                     htmlFor='postField'
                                     maxLength={500}
                                     handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
