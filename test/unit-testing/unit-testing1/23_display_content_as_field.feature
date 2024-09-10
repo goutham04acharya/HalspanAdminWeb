@@ -17,7 +17,6 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
     There must be an option to enable or disable the Field mask
     There must be an option to enter the Admin field notes
 
-
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
     When I enter valid email address as "nayana.sk@7edge.com"
@@ -63,8 +62,6 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
     When I click the add image
     Then I should see a confirmation prompt stating to replace image
     When I click the close button
-    When I click the add image
-    Then I should see a confirmation prompt stating to replace image
     When I upload the image from disk
     Then I should be able see image updated in question 1 page 1 section 1
 
@@ -98,7 +95,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
 
     Examples:
       | url      | url-text                      |
-      | "http"   | "halspan.com"                 |
-      | "https"  | "halspan.com"                 |
+      | "http"   | "http://halspan.com"          |
+      | "https"  | "https://halspan.com"         |
       | "mailto" | "halspan.support@halspan.com" |
       | "tel"    | "7911123456"                  |
