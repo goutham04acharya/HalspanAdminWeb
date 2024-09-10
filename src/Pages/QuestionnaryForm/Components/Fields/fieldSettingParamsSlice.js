@@ -140,6 +140,7 @@ const fieldSettingParamsSlice = createSlice({
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,
+                    source: item?.source,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };
