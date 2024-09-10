@@ -81,6 +81,7 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -145,7 +146,7 @@ function QuestionnaryForm() {
         let updatedValue = value;
         if (id === 'fileType') {
             updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-        } else if (id === 'fileSize' || id === 'min' || id === 'max') {
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         }
 
@@ -1249,7 +1250,7 @@ function QuestionnaryForm() {
                     Button2text='Cancel'
                     src='replace'
                     testIDBtn1='confirm-replace-image'
-                    testIDBtn2='cancel-replace'
+                    testIDBtn2='cancel'
                     isModalOpen={showReplaceModal}
                     setModalOpen={setReplaceModal}
                     handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation

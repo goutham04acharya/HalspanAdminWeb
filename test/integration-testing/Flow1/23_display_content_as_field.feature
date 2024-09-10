@@ -42,6 +42,20 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
     When I enter the admin field notes
 
   @create_question
+  Scenario Outline: Admin replaces the added image
+    Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
+    When I click the display button
+    Then I should see field settings
+    When I click the type as image
+    When I upload the image from disk
+    When I click the add image
+    Then I should see a confirmation prompt stating to replace image
+    When I click the cancel button
+    When I upload the image from disk
+    Then I should be able see image updated in question 1 page 1 section 1
+
+  @create_question
   Scenario Outline: Admin adds the pindrop and draw on image for display
     Given I am on the questionnaire management section
     When I add a new question to the page 1 in section 1
@@ -71,7 +85,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
 
     Examples:
       | url      | url-text                      |
-      | "http"   | "halspan.com"                 |
-      | "https"  | "halspan.com"                 |
+      | "http"   | "http://halspan.com"          |
+      | "https"  | "https://halspan.com"         |
       | "mailto" | "halspan.support@halspan.com" |
       | "tel"    | "7911123456"                  |

@@ -48,12 +48,12 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true)
 
-        // Prefill the input field based on the selected option
-        if (option.value === 'http' || option.value === 'https') {
-            setInputValue(`${option.value}://`);
-        } else {
-            setInputValue('');
-        }
+        // // Prefill the input field based on the selected option
+        // if (option.value === 'http' || option.value === 'https') {
+        //     setInputValue(`${option.value}://`);
+        // } else {
+        //     setInputValue('');
+        // }
     };
 
     const handleFileUploadClick = () => {
@@ -131,12 +131,32 @@ function DisplayFieldSetting({
         }
     };
 
+    const extractFileNameFromUrl = (url) => {
+        if (!url) return '';
+
+        // Extract filename from URL
+        const filenameWithQuery = url.substring(url.lastIndexOf('/') + 1);
+
+        // Decode URL-encoded characters
+        const decodedFilename = decodeURIComponent(filenameWithQuery);
+
+        // Remove the first 36 characters (UUID + hyphen) from the filename
+        const filenameWithoutUuid = decodedFilename.substring(37);
+
+        // Optionally, replace specific characters if needed
+        // For example, replace spaces with underscores
+        const cleanedFilename = filenameWithoutUuid.replace(/ /g, '_');
+
+        return cleanedFilename;
+    };
+
 
     const handleImage = () => {
         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         setShouldAutoSave(true)
     }
+    console.log(selectedFile, 'image')
 
     return (
         <>
@@ -221,8 +241,8 @@ function DisplayFieldSetting({
                             </div>
                             {fieldSettingParameters?.type === 'image' && (
                                 <>
-                                    <div className='flex items-center mt-2.5'>
-                                        <div className='relative w-[60%]'>
+                                    <div className='flex items-start mt-2.5'>
+                                        <div className='relative w-[50%]'>
                                             <input
                                                 type="file"
                                                 id="file-upload"
@@ -232,13 +252,15 @@ function DisplayFieldSetting({
                                             />
                                             <label
                                                 onClick={handleFileUploadClick}
-                                                className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
+                                                data-testid="upload-image" className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
                                             >
                                                 Add Image
                                                 <img src="/Images/fileUpload.svg" alt="Upload" className='ml-2.5' />
                                             </label>
                                         </div>
-                                        {selectedFile && <label className='ml-3'>{selectedFile.name}</label>}
+                                        {(fieldSettingParameters?.image || selectedFile) && (
+                                            <label className='ml-3 break-words max-w-[50%]'>{selectedFile?.name || extractFileNameFromUrl(fieldSettingParameters.image)}</label>
+                                        )}
                                     </div>
                                     {errorMessage &&
                                         <ErrorMessage error={'Only JPG, JPEG, and PNG files are allowed.'} />}
@@ -346,7 +368,7 @@ function DisplayFieldSetting({
                                     top='30px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                    testID='url-dropdown'
+                                    testID={'url-dropdown'}
                                     labeltestID='url-list'
                                     selectedOption={options.find(option => option.value === fieldSettingParameters?.urlType)}
                                     handleOptionClick={handleOptionClick}
@@ -372,7 +394,7 @@ function DisplayFieldSetting({
                                                 ? 'eg: +44 7911 123456'
                                                 : 'Enter text'
                                     }
-                                    testId='urlValue'
+                                    testId='urlInput'
                                     htmlFor='urlValue'
                                     maxLength={100}
                                     handleChange={(e) => handleInputChange(e)} // Ensure this updates correctly

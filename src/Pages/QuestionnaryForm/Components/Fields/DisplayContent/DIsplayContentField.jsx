@@ -22,7 +22,6 @@ function DIsplayContentField({
             {fieldSettingParameters?.type === 'image' && 
                 <img
                     src={fieldSettingParameters?.image} // assuming 'fieldSettingParameters.image' holds the S3 URL of the uploaded image
-                    alt="Image"
                     className="mt-8"
                     data-testid="uploaded-image"
                 />
