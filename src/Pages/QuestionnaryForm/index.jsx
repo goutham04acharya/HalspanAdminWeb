@@ -146,7 +146,7 @@ function QuestionnaryForm() {
         let updatedValue = value;
         if (id === 'fileType') {
             updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-        } else if (id === 'fileSize' || id === 'min' || id === 'max') {
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         }
 

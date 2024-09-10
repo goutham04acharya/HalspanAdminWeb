@@ -131,6 +131,25 @@ function DisplayFieldSetting({
         }
     };
 
+    const extractFileNameFromUrl = (url) => {
+        if (!url) return '';
+
+        // Extract filename from URL
+        const filenameWithQuery = url.substring(url.lastIndexOf('/') + 1);
+
+        // Decode URL-encoded characters
+        const decodedFilename = decodeURIComponent(filenameWithQuery);
+
+        // Remove the first 36 characters (UUID + hyphen) from the filename
+        const filenameWithoutUuid = decodedFilename.substring(37);
+
+        // Optionally, replace specific characters if needed
+        // For example, replace spaces with underscores
+        const cleanedFilename = filenameWithoutUuid.replace(/ /g, '_');
+
+        return cleanedFilename;
+    };
+
 
     const handleImage = () => {
         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
@@ -239,8 +258,8 @@ function DisplayFieldSetting({
                                                 <img src="/Images/fileUpload.svg" alt="Upload" className='ml-2.5' />
                                             </label>
                                         </div>
-                                        {fieldSettingParameters?.image && selectedFile && (
-                                            <label className='ml-3 break-words max-w-[50%]'>{selectedFile.name}</label>
+                                        {(fieldSettingParameters?.image || selectedFile) && (
+                                            <label className='ml-3 break-words max-w-[50%]'>{selectedFile?.name || extractFileNameFromUrl(fieldSettingParameters.image)}</label>
                                         )}
                                     </div>
                                     {errorMessage &&
