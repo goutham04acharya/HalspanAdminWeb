@@ -346,7 +346,7 @@ function DisplayFieldSetting({
                                     top='30px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                    testID='url-dropdown'
+                                    testId={`${urlType}`}
                                     labeltestID='url-list'
                                     selectedOption={options.find(option => option.value === fieldSettingParameters?.urlType)}
                                     handleOptionClick={handleOptionClick}
@@ -372,7 +372,7 @@ function DisplayFieldSetting({
                                                 ? 'eg: +44 7911 123456'
                                                 : 'Enter text'
                                     }
-                                    testId='urlValue'
+                                    testId='urlInput'
                                     htmlFor='urlValue'
                                     maxLength={100}
                                     handleChange={(e) => handleInputChange(e)} // Ensure this updates correctly

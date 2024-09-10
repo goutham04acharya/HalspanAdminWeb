@@ -69,7 +69,7 @@ When('I click the type as image', async function () {
 When('I upload the image from disk', async function () {
     let element;
     let valid_file = 'image.png';
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     if (valid_file !== '') {
         element = await driver.wait(until.elementLocated(By.css('[data-testid="add-image"]')));
         const filePath = path.join(__dirname, `../../support/${valid_file}`);
