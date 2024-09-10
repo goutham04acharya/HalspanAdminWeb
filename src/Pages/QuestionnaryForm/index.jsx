@@ -1249,7 +1249,7 @@ function QuestionnaryForm() {
                     Button2text='Cancel'
                     src='replace'
                     testIDBtn1='confirm-replace-image'
-                    testIDBtn2='cancel-replace'
+                    testIDBtn2='cancel'
                     isModalOpen={showReplaceModal}
                     setModalOpen={setReplaceModal}
                     handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation

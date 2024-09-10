@@ -232,7 +232,7 @@ function DisplayFieldSetting({
                                             />
                                             <label
                                                 onClick={handleFileUploadClick}
-                                                className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
+                                                data-testid="upload-image" className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
                                             >
                                                 Add Image
                                                 <img src="/Images/fileUpload.svg" alt="Upload" className='ml-2.5' />
@@ -346,7 +346,7 @@ function DisplayFieldSetting({
                                     top='30px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                    testId={`${urlType}`}
+                                    testID={'url-dropdown'}
                                     labeltestID='url-list'
                                     selectedOption={options.find(option => option.value === fieldSettingParameters?.urlType)}
                                     handleOptionClick={handleOptionClick}
