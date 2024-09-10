@@ -60,8 +60,7 @@ Feature: Halspan - Admin - Create a Questionnaire by using Number Field
     When I enter the admin field notes
 
     Examples:
-      | type      | source        |
-      | "Integer" | "Both"        |
-      | "Float"   | "Both"        |
-      | "Rating"  | "Entry Field" |
-      | "Rating"  | "Slider"      |
+      | type      | source       |
+      | "integer" | "both"       |
+      | "float"   | "both"       |
+      | "rating"  | "slider"     |
