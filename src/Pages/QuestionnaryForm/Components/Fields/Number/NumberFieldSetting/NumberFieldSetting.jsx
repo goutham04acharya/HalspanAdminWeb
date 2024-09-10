@@ -225,7 +225,7 @@ function NumberFieldSetting({
                                 className='w-full mt-2.5'
                                 labelStyle=''
                                 placeholder='Increment By'
-                                testId='incrementby'
+                                testId='increment'
                                 htmlFor='incrementby'
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
