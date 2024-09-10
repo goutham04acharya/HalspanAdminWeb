@@ -16,4 +16,4 @@ for param_name in "${parameter_names[@]}"; do
     echo "VITE_${param_name##*/}=$param_value" >> .env  # Write key-value pair to .env file
 done
 
-printenv | awk -F= '/^REGION|^STAGE|^AUTH0_CLIENT_ID|^AUTH0_API_DOMAIN/ {printf "VITE_%s=%s\n", $1, $2}' >> .env
+printenv | awk -F= '/^REGION|^STAGE|^AUTH0_WEB_CLIENT_ID|^AUTH0_API_DOMAIN/ {printf "VITE_%s=%s\n", $1, $2}' >> .env
