@@ -19,20 +19,24 @@ const processDisplayType = (item, displayType) => {
         }
     };
 
-    // Create a result object and populate it based on displayType
     const result = {};
 
     for (const key in displayTypeMap) {
         if (Object.prototype.hasOwnProperty.call(displayType, key)) {
             const resultKey = displayTypeMap[key];
-            // Set the value if available in the item, otherwise use the displayType value
-            result[resultKey] = item?.[resultKey] || displayType[key];
+            
+            // If key is 'url', handle it as an object with type and value
+            if (key === 'url' && typeof displayType[key] === 'object') {
+                result.urlType = displayType[key].type || item.urlType;
+                result.urlValue = displayType[key].value || item.urlValue;
+            } else if (typeof resultKey === 'string') {
+                result[resultKey] = item?.[resultKey] || displayType[key];
+            }
         }
     }
 
     return result;
 };
-
 
 // Helper function to process source
 const processSource = (item) => {

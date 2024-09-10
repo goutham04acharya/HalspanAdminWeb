@@ -363,7 +363,7 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
-                                    value={inputValue} // Controlled by your component's state
+                                    value={fieldSettingParameters?.urlValue}
                                     className='w-full mt-2.5'
                                     placeholder={
                                         selectedUrlOption === 'mailto'

@@ -27,7 +27,9 @@ function InputWithDropDown({
 
     const handleRemove = () => {
         setSelectedUrlOption('');
-        dispatch(setNewComponent({ id: 'url', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
+
         setDropdownOpen(false);
 
     }
