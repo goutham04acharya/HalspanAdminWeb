@@ -1,4 +1,6 @@
 import React from 'react';
+import { setNewComponent } from '../../Pages/QuestionnaryForm/Components/Fields/fieldSettingParamsSlice';
+import { useDispatch } from 'react-redux';
 
 function InputWithDropDown({
     className,
@@ -18,11 +20,18 @@ function InputWithDropDown({
     labeltestID,
     validationError,
     close,
-    setSelectedOption
+    setSelectedUrlOption,
+    selectedQuestionId
 }) {
+    const dispatch = useDispatch();
 
-    const handleRemove = ()=>{
-        setSelectedOption('');
+    const handleRemove = () => {
+        setSelectedUrlOption('');
+        dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
+
+        setDropdownOpen(false);
+
     }
 
     return (
@@ -40,7 +49,7 @@ function InputWithDropDown({
                     readOnly
                 />
                 {(selectedOption && close) ?
-                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-4`} onClick={()=> handleRemove()} />
+                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={()=> handleRemove()} />
                     :
                     <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />

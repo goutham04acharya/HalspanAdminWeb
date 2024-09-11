@@ -76,7 +76,7 @@ When('I search by the name {string}', async function (string) {
 
 When('I search by the name', async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
-    let nameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`)), 10000);
+    let nameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[4]/td[2]`)), 10000);
     this.name = await nameElement.getText();
     console.log(this.name, "1234");
     let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
