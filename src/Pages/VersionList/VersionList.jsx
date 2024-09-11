@@ -30,37 +30,28 @@ function VersionList() {
         setLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}`);
         setQueSettingDetails(response?.data);
-        setEditedDetails({
-            public_name: data?.public_name || '',
-        });
+        setEditedDetails((prevState) => ({
+            ...prevState,
+            public_name: response?.data?.data?.public_name,
+            internal_name: response?.data?.data?.internal_name,
+            description: response?.data?.data?.description,
+        }));
         setLoading(false);
     };
 
 
-    const handleChange = (e, id) => {
-        const { value } = e.target;
-
-        // Define a regular expression to allow only alphanumeric characters and spaces
-        const regex = /^[a-zA-Z0-9 ]*$/;
-
-        if (regex.test(value)) {
-            setQueSettingDetails((prevState) => ({
-                ...prevState,
-                data: {
-                    ...prevState.data,
-                    [id]: value,
-                },
-            }));
-
-            // Clear the validation error for the current field
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                [id]: '',
-            }));
-        }
+    const handleChange = (e, field) => {
+        e.preventDefault();
+        setEditedDetails((prevState) => ({
+            ...prevState,
+            [field]: e.target.value,
+        }));
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            [field]: '',
+        }));
     };
 
-    console.log(queSettingDetails, 'setQueSettingDetails')
     //implement infinate scroll here
     // const lastElementRef = useCallback(node => {
     //     if (loading || isFetchingMore) return;
@@ -121,6 +112,7 @@ function VersionList() {
                         setValidationErrors={setValidationErrors}
                         validationErrors={validationErrors}
                         editedDetails={editedDetails}
+                        setLoading={setLoading}
                     />
                 </div>
 

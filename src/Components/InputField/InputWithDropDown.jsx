@@ -42,7 +42,7 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
+                    onClick={() => setDropdownOpen ? setDropdownOpen(isDropdownOpen ? null : id) : null} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
