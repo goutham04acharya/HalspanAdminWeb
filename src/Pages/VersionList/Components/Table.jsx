@@ -9,7 +9,6 @@ function Table({
     lastElementRef
 
 }) {
-    console.log(versionList?.data, 'versionList?.data')
     const getStatusStyles = (status) => {
         switch (status) {
             case 'Draft':
