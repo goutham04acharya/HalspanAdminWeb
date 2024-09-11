@@ -465,34 +465,34 @@ function QuestionnaryForm() {
         }
     };
 
-    // const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-    //     let currentPageData = sections[sectionIndex].pages[pageIndex];
-    //     const update = { ...dataIsSame }
-    //     update[sections[sectionIndex].section_id] = false;
-    //     setDataIsSame(update)
-    //     if (event === 'add') {
-    //         if (currentPageData.questions.length < 20) {
-    //             setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-    //             setSelectedQuestionId('');
-    //         } else {
-    //             setToastError("Limit reached: Maximum of 20 questions allowed.");
-    //             return; // Exit the function if the limit is reached
-    //         }
-    //     } else if (event === 'remove') {
-    //         setSelectedQuestionId(false)
-    //         setSelectedAddQuestion({});
-    //         const questionId = currentPageData.questions[questionIndex].question_id
-    //         const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
-    //         currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
-    //         const currentSectionData = [...sections]
-    //         currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
-    //         handleAutoSave(sectionId, currentSectionData, '', questionId);
-    //         // After any delete we remove focus on add question and change the field setting
-    //     }
-    //     setSelectedComponent(false);
-    //     sections[sectionIndex].pages[pageIndex] = currentPageData;
-    //     setSections([...sections]);
-    // };
+    const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
+        let currentPageData = sections[sectionIndex].pages[pageIndex];
+        const update = { ...dataIsSame }
+        update[sections[sectionIndex].section_id] = false;
+        setDataIsSame(update)
+        if (event === 'add') {
+            if (currentPageData.questions.length < 20) {
+                setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
+                setSelectedQuestionId('');
+            } else {
+                setToastError("Limit reached: Maximum of 20 questions allowed.");
+                return; // Exit the function if the limit is reached
+            }
+        } else if (event === 'remove') {
+            setSelectedQuestionId(false)
+            setSelectedAddQuestion({});
+            const questionId = currentPageData.questions[questionIndex].question_id
+            const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
+            currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
+            const currentSectionData = [...sections]
+            currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
+            handleAutoSave(sectionId, currentSectionData, '', questionId);
+            // After any delete we remove focus on add question and change the field setting
+        }
+        setSelectedComponent(false);
+        sections[sectionIndex].pages[pageIndex] = currentPageData;
+        setSections([...sections]);
+    };
 
     const handleQuestionIndexCapture = (question) => {
         // Update state for selected question and reset component state
@@ -502,67 +502,67 @@ function QuestionnaryForm() {
         setSelectedComponent(componentType);
     };
 
-    // Function for dragging questions
-    const Item = ({ item, index, itemSelected, dragHandleProps }) => {
-        const { onMouseDown, onTouchStart } = dragHandleProps;
+    // // Function for dragging questions
+    // const Item = ({ item, index, itemSelected, dragHandleProps }) => {
+    //     const { onMouseDown, onTouchStart } = dragHandleProps;
 
-        return (
-            <div
-                data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
-                onClick={() => handleQuestionIndexCapture(item)}
-                className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
-            >
-                <div className='flex justify-between items-start cursor-pointer'>
-                    <div className='flex items-center justify-end w-full'>
-                        <div
-                            className="disable-select dragHandle"
-                            onMouseDown={(e) => {
-                                document.body.style.overflow = "hidden";
-                                onMouseDown(e);
-                            }}
-                            onMouseUp={() => {
-                                document.body.style.overflow = "visible";
-                            }}
-                            onTouchStart={(e) => {
-                                document.body.style.overflow = "hidden";
-                                onTouchStart(e);
-                            }}
-                            onTouchEnd={() => {
-                                document.body.style.overflow = "visible";
-                            }}
-                        >
-                            <img className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
-                        </div>
-                        <img
-                            src="/Images/trash-black.svg"
-                            alt="delete"
-                            title='Delete'
-                            className={`pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
-                                setShowquestionDeleteModal(true);
-                            }}
-                        />
-                    </div>
-                </div>
-                {/* Render the selected component if the question is visible */}
-                {fieldSettingParams[item.question_id] && (
-                    <>
-                        {React.createElement(
-                            componentMap[fieldSettingParams[item.question_id]?.componentType],
-                            {
-                                // Pass the specific field settings to the component
-                                testId: `section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`,
-                                fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
-                            }
-                        )}
-                    </>
-                )
-                }
-            </div>
-        );
-    };
+    //     return (
+    //         <div
+    //             data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
+    //             onClick={() => handleQuestionIndexCapture(item)}
+    //             className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
+    //         >
+    //             <div className='flex justify-between items-start cursor-pointer'>
+    //                 <div className='flex items-center justify-end w-full'>
+    //                     <div
+    //                         className="disable-select dragHandle"
+    //                         onMouseDown={(e) => {
+    //                             document.body.style.overflow = "hidden";
+    //                             onMouseDown(e);
+    //                         }}
+    //                         onMouseUp={() => {
+    //                             document.body.style.overflow = "visible";
+    //                         }}
+    //                         onTouchStart={(e) => {
+    //                             document.body.style.overflow = "hidden";
+    //                             onTouchStart(e);
+    //                         }}
+    //                         onTouchEnd={() => {
+    //                             document.body.style.overflow = "visible";
+    //                         }}
+    //                     >
+    //                         <img className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
+    //                     </div>
+    //                     <img
+    //                         src="/Images/trash-black.svg"
+    //                         alt="delete"
+    //                         title='Delete'
+    //                         className={`pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]`}
+    //                         onClick={(e) => {
+    //                             e.stopPropagation();
+    //                             handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
+    //                             setShowquestionDeleteModal(true);
+    //                         }}
+    //                     />
+    //                 </div>
+    //             </div>
+    //             {/* Render the selected component if the question is visible */}
+    //             {fieldSettingParams[item.question_id] && (
+    //                 <>
+    //                     {React.createElement(
+    //                         componentMap[fieldSettingParams[item.question_id]?.componentType],
+    //                         {
+    //                             // Pass the specific field settings to the component
+    //                             testId: `section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`,
+    //                             fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
+    //                         }
+    //                     )}
+    //                 </>
+    //             )
+    //             }
+    //         </div>
+    //     );
+    // };
 
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
         sections[sectionIndex].pages[pageIndex].questions = newList;
@@ -1152,7 +1152,6 @@ function QuestionnaryForm() {
                                 handleSaveSectionName={handleSaveSectionName}
                                 setDataIsSame={setDataIsSame}
                                 dataIsSame={dataIsSame}
-                                Item={Item}
                                 setSelectedAddQuestion={setSelectedAddQuestion}
                                 selectedAddQuestion={selectedAddQuestion}
                                 handleDeletePgaeModal={handleDeletePgaeModal}
