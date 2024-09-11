@@ -32,19 +32,19 @@ function QuestionnarySettings({
 
         try {
             const response = await PatchAPI(`questionnaires/${questionnaire_id}`, payload);
-            console.log(response, 'nayan')
+            console.log(response?.data?.status, 'nayan')
             // Handle success and update the state as needed
-            if (response?.status === 200) {
-                console.log("Questionnaire settings updated successfully");
+            if (response?.data?.status === true) {
+                setToastSuccess(response?.data?.message);
                 setIsThreedotLoader(false);
 
             } else {
                 // Handle any validation errors or unsuccessful responses
-                console.error('Error updating questionnaire:', response);
+                setToastSuccess('Something went wrong!');
                 setIsThreedotLoader(false);
             }
         } catch (error) {
-            console.error('Error occurred during the API call:', error);
+            setToastSuccess('Something went wrong!');
             setIsThreedotLoader(false);
         }
     };
@@ -120,14 +120,18 @@ function QuestionnarySettings({
                 </div>
                 <div className='w-full mt-6'>
                     <p className='font-semibold text-base text-[#6F7579] mb-2.5'>Asset type</p>
-                    <button className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
+                    <button
+                        data-testId='assetType'
+                        className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
                         <p>{queSettingDetails?.data?.asset_type}</p>
                         <img src="/Images/open-Filter.svg" alt="" />
                     </button>
                 </div>
                 <div className='w-full mt-6'>
                     <p className='font-semibold text-base text-[#6F7579] mb-2.5'>Language</p>
-                    <button className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
+                    <button
+                        data-testId='language'
+                        className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
                         <p>{queSettingDetails?.data?.language}</p>
                         <img src="/Images/open-Filter.svg" alt="" />
                     </button>
@@ -142,6 +146,7 @@ function QuestionnarySettings({
                                 name='is_adhoc'
                                 id='yes'
                                 value='Yes'
+                                data-testId='yes'
                                 checked={queSettingDetails?.data?.is_adhoc === true}  // Checks if is_adhoc is true
                                 disabled  // Disables the input
                             />
@@ -156,6 +161,7 @@ function QuestionnarySettings({
                                 name='is_adhoc'
                                 id='no'
                                 value='No'
+                                data-testId='no'
                                 checked={queSettingDetails?.data?.is_adhoc === false}  // Checks if is_adhoc is false
                                 disabled  // Disables the input
                             />
