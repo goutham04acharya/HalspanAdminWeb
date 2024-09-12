@@ -73,8 +73,8 @@ function QuestionnaryForm() {
     const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
 
     // text field related states
-    const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
-    const [selectedQuestionId, setSelectedQuestionId] = useState('')
+    const selectedAddQuestion = useSelector((state) => state.question.selectedAddQuestion);
+    const selectedQuestionId = useSelector((state) => state.question.selectedQuestionId);
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
     // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})

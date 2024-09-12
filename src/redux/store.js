@@ -16,6 +16,8 @@ const store = configureStore({
         paginationConfig:persistedReducer,
         fieldSettingParams:fieldSettingParamsSlice,
         sliderConfig: sliderSlice,  // Your slider reducer
+        questionnaryForm: questionSlice // Add the question reducer to the store
+
 
     },
 });
