@@ -3,13 +3,13 @@ import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout';
 import { useNavigate, useParams } from 'react-router-dom';
 import useApi from '../../services/CustomHook/useApi.js';
 import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
-import DraggableList from 'react-draggable-list';
+// import DraggableList from 'react-draggable-list';
 import AddFields from './Components/AddFieldComponents/AddFields.jsx';
 import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
-import EditableField from '../../Components/EditableField/EditableField.jsx';
+// import EditableField from '../../Components/EditableField/EditableField.jsx';
 // import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
 import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,6 +38,7 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/Sections/Sections.jsx';
+import {setSelectedAddQuestion, setSelectedQuestionId} from './Components/QuestionnaryFormSlice.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -73,8 +74,8 @@ function QuestionnaryForm() {
     const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
 
     // text field related states
-    const selectedAddQuestion = useSelector((state) => state.question.selectedAddQuestion);
-    const selectedQuestionId = useSelector((state) => state.question.selectedQuestionId);
+    const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
     // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
@@ -82,7 +83,7 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-    
+
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -376,8 +377,9 @@ function QuestionnaryForm() {
 
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
-            setSelectedQuestionId(false)
-            setSelectedAddQuestion({});
+            // dispatch(setSelectedQuestionId(false))
+            dispatch(setSelectedQuestionId(false))
+            dispatch(setSelectedAddQuestion({}));
             setSelectedComponent('');
 
             // Retrieve the boolean value associated with the sectionId
@@ -441,8 +443,8 @@ function QuestionnaryForm() {
             }
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
-            setSelectedQuestionId(false);
-            setSelectedAddQuestion({});
+            dispatch(setSelectedQuestionId(false));
+            dispatch(setSelectedAddQuestion({}));
             setSelectedComponent('');
 
             const SectionData = [...sections];  // Create a copy of the sections array
@@ -472,15 +474,15 @@ function QuestionnaryForm() {
         setDataIsSame(update)
         if (event === 'add') {
             if (currentPageData.questions.length < 20) {
-                setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-                setSelectedQuestionId('');
+                dispatch(setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId }));
+                dispatch(setSelectedQuestionId(''));
             } else {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
         } else if (event === 'remove') {
-            setSelectedQuestionId(false)
-            setSelectedAddQuestion({});
+            dispatch(setSelectedQuestionId(false))
+            dispatch(setSelectedAddQuestion({}));
             const questionId = currentPageData.questions[questionIndex].question_id
             const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
             currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
@@ -496,8 +498,8 @@ function QuestionnaryForm() {
 
     const handleQuestionIndexCapture = (question) => {
         // Update state for selected question and reset component state
-        setSelectedQuestionId(question.question_id);
-        setSelectedAddQuestion({ questionId: question.question_id });
+        dispatch(setSelectedQuestionId(question.question_id));
+        dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         setSelectedComponent(componentType);
     };
@@ -766,8 +768,8 @@ function QuestionnaryForm() {
 
         // Set the selected component and question ID
         setSelectedComponent(componentType);
-        setSelectedQuestionId(questionId);
-        setSelectedAddQuestion({ questionId });
+        dispatch(setSelectedQuestionId(questionId));
+        dispatch(setSelectedAddQuestion({ questionId }));
 
         // Retrieve the current page data
         const currentPageData = sections[selectedAddQuestion.sectionIndex].pages[selectedAddQuestion.pageIndex];
@@ -982,7 +984,7 @@ function QuestionnaryForm() {
         document.getElementById('file-upload').click();
     };
 
-     // to open and close the sections
+    // to open and close the sections
     //  const toggleSection = (sectionIndex) => {
     //     setExpandedSections((prev) => ({
     //         ...prev,
@@ -1002,7 +1004,7 @@ function QuestionnaryForm() {
     // useEffect(() => {
     //     localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
     // }, [expandedSections]);
-   
+
     useEffect(() => {
         formDefaultDetails();
         getFieldSetting();
@@ -1142,26 +1144,24 @@ function QuestionnaryForm() {
                                 //         </>
                                 //     )}
                                 // </div>
-                                <Sections 
-                                sectionData={sectionData}
-                                sectionIndex={sectionIndex}
-                                expandedSections={expandedSections}
-                                setExpandedSections={setExpandedSections}
-                                handleSaveSectionName={handleSaveSectionName}
-                                setDataIsSame={setDataIsSame}
-                                dataIsSame={dataIsSame}
-                                setSelectedAddQuestion={setSelectedAddQuestion}
-                                selectedAddQuestion={selectedAddQuestion}
-                                handleDeletePgaeModal={handleDeletePgaeModal}
-                                setShowPageDeleteModal={setShowPageDeleteModal}
-                                setSelectedSectionData={setSelectedSectionData}
-                                setModalOpen={setModalOpen}
-                                setSectionToDelete={setSectionToDelete}
-                                setSections={setSections}
-                                sections={Sections}
-                                setSelectedQuestionId={setSelectedQuestionId}
-                                selectedQuestionId={selectedQuestionId}
-                                handleAddRemovePage={handleAddRemovePage}
+                                <Sections
+                                    sectionData={sectionData}
+                                    sectionIndex={sectionIndex}
+                                    expandedSections={expandedSections}
+                                    setExpandedSections={setExpandedSections}
+                                    handleSaveSectionName={handleSaveSectionName}
+                                    setDataIsSame={setDataIsSame}
+                                    dataIsSame={dataIsSame}
+                                    handleDeletePgaeModal={handleDeletePgaeModal}
+                                    setShowPageDeleteModal={setShowPageDeleteModal}
+                                    setSelectedSectionData={setSelectedSectionData}
+                                    setModalOpen={setModalOpen}
+                                    setSectionToDelete={setSectionToDelete}
+                                    setSections={setSections}
+                                    sections={Sections}
+                                    setSelectedQuestionId={setSelectedQuestionId}
+                                    selectedQuestionId={selectedQuestionId}
+                                    handleAddRemovePage={handleAddRemovePage}
                                 />
                             ))}
                             <button

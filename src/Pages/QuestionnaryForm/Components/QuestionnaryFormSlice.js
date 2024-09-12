@@ -24,3 +24,5 @@ const questionnaryFormSlice = createSlice({
 
 // Export the actions
 export const { setSelectedAddQuestion, setSelectedQuestionId } = questionnaryFormSlice.actions;
+export default questionnaryFormSlice.reducer;
+

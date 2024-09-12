@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import EditableField from '../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
 import GlobalContext from '../../../../Components/Context/GlobalContext';
+import {setSelectedAddQuestion, setSelectedQuestionId} from '../QuestionnaryForm/Components/QuestionnaryFormSlice.js'
+import { useDispatch } from 'react-redux';
+
 
 function Sections({
     sectionData,
@@ -11,7 +14,6 @@ function Sections({
     handleSaveSectionName,
     dataIsSame,
     setDataIsSame,
-    setSelectedAddQuestion,
     selectedAddQuestion,
     handleDeletePgaeModal,
     setShowPageDeleteModal,
@@ -20,12 +22,12 @@ function Sections({
     setSectionToDelete,
     setSections,
     sections,
-    setSelectedQuestionId,
     selectedQuestionId,
     handleAddRemovePage,
 }) {
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
+    const dispatch = useDispatch();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
 
     // Function for dragging questions
@@ -98,15 +100,15 @@ function Sections({
         setDataIsSame(update)
         if (event === 'add') {
             if (currentPageData.questions.length < 20) {
-                setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId });
-                setSelectedQuestionId('');
+                dispatch(setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId }));
+                dispatch(setSelectedQuestionId(''));
             } else {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
         } else if (event === 'remove') {
-            setSelectedQuestionId(false)
-            setSelectedAddQuestion({});
+            dispatch(setSelectedQuestionId(false));
+            dispatch(setSelectedAddQuestion({}));
             const questionId = currentPageData.questions[questionIndex].question_id
             const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
             currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
