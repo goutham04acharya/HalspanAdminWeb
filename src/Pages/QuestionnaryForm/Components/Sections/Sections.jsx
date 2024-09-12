@@ -24,6 +24,7 @@ function Sections({
     sections,
     selectedQuestionId,
     handleAddRemovePage,
+    componentMap,
 }) {
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});

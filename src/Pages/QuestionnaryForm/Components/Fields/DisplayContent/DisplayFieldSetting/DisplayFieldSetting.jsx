@@ -21,8 +21,6 @@ function DisplayFieldSetting({
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
-    setInputValue,
-    inputValue,
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -47,13 +45,6 @@ function DisplayFieldSetting({
         setDropdownOpen(false);
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true)
-
-        // // Prefill the input field based on the selected option
-        // if (option.value === 'http' || option.value === 'https') {
-        //     setInputValue(`${option.value}://`);
-        // } else {
-        //     setInputValue('');
-        // }
     };
 
     const handleFileUploadClick = () => {
