@@ -53,7 +53,7 @@ function QuestionnarySettings({
                 setToastSuccess(response?.data?.message);
                 setValidationErrors({});
                 setIsThreedotLoader(false);
-                setIsSaveDisabled(true); // Disable button again after successful save
+                // setIsSaveDisabled(true); // Disable button again after successful save
             } else if (response?.data?.status === 409) {
                 setValidationErrors({
                     ...validationErrors,

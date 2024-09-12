@@ -54,19 +54,19 @@ function Table({
                         {versionList?.data && versionList?.data?.items.map((versionListInfo, index) => (
                             <React.Fragment key={index}>
                                 <tr className='rounded-[10px] mt-[18px]'>
-                                    <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer'><u>Version {versionListInfo?.version_number}</u></td>
+                                    <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer'><u>Version {versionListInfo?.version_number || '-'}</u></td>
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>{new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
                                         day: 'numeric',
                                         month: 'long',
                                         year: 'numeric',
                                     })}
                                     </td>
-                                    <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>{versionListInfo?.updated_by?.name}</td>
+                                    <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>{versionListInfo?.updated_by?.name || '-'}</td>
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 rounded-tr-[10px] rounded-br-[10px] font-normal text-base text-[#2B333B]'>
                                         {versionListInfo?.status
                                             ? (
                                                 <span className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ${getStatusStyles(versionListInfo?.status)} `} title={`${getStatusText(versionListInfo?.status)}`}>
-                                                    {getStatusText(versionListInfo?.status)}
+                                                    {getStatusText(versionListInfo?.status) || '-'}
                                                 </span>
                                             )
                                             : (
