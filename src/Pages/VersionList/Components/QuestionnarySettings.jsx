@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import InputField from '../../../Components/InputField/InputField'
 import InputTextarea from '../../../Components/InputField/InputTextarea'
 import InputWithDropDown from '../../../Components/InputField/InputWithDropDown'
 import Button from '../../../Components/Button/button'
 import useApi from '../../../services/CustomHook/useApi'
 import GlobalContext from '../../../Components/Context/GlobalContext'
+import QuestionnarySettingShimmer from '../../../Components/Shimmers/QuestionnarySettingShimmer'
 
 function QuestionnarySettings({
     queSettingDetails,
@@ -12,47 +13,76 @@ function QuestionnarySettings({
     setValidationErrors,
     validationErrors,
     editedDetails,
-    setLoading
+    dataLoading
 }) {
 
     const { PatchAPI } = useApi();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
+    const [isSaveDisabled, setIsSaveDisabled] = useState(true); // Initially disable save button
+
+
+    // Function to detect changes and dynamically build payload
+    const Payload = () => {
+        const changes = {};
+        if (editedDetails?.public_name !== queSettingDetails?.data?.public_name) {
+            changes.public_name = editedDetails?.public_name;
+        }
+        if (editedDetails?.internal_name !== queSettingDetails?.data?.internal_name) {
+            changes.internal_name = editedDetails?.internal_name;
+        }
+        if (editedDetails?.description !== queSettingDetails?.data?.description) {
+            changes.description = editedDetails?.description;
+        }
+        return changes;
+    };
 
     const editQuestionnarySettings = async () => {
         const questionnaire_id = queSettingDetails?.data?.questionnaire_id;
+        const payload = Payload();
 
-        const payload = {
-            public_name: editedDetails?.public_name,
-            internal_name: editedDetails?.internal_name,
-            description: editedDetails?.description
-        };
+        if (Object.keys(payload).length === 0) {
+            return; // If no changes, don't proceed
+        }
 
         setIsThreedotLoader(true);
 
         try {
             const response = await PatchAPI(`questionnaires/${questionnaire_id}`, payload);
-            console.log(response?.data?.status, 'nayan')
-            // Handle success and update the state as needed
             if (response?.data?.status === true) {
                 setToastSuccess(response?.data?.message);
+                setValidationErrors({});
                 setIsThreedotLoader(false);
-
+                setIsSaveDisabled(true); // Disable button again after successful save
+            } else if (response?.data?.status === 409) {
+                setValidationErrors({
+                    ...validationErrors,
+                    public_name: response?.data?.message,
+                });
+                setIsThreedotLoader(false);
             } else {
-                // Handle any validation errors or unsuccessful responses
-                setToastSuccess('Something went wrong!');
+                setToastError('Something went wrong!');
                 setIsThreedotLoader(false);
             }
         } catch (error) {
-            setToastSuccess('Something went wrong!');
+            setToastError('Something went wrong!');
             setIsThreedotLoader(false);
         }
     };
 
+    // Enable the save button if there are any changes
+    useEffect(() => {
+        const hasChanges = Object.keys(Payload()).length > 0;
+        setIsSaveDisabled(!hasChanges); // Disable the button if no changes
+    }, [editedDetails, queSettingDetails]);
+
     return (
+        dataLoading ? 
+        <QuestionnarySettingShimmer/>
+        :
         <div className='mt-9'>
             <p className='font-medium text-[22px] text-[#2B333B]'>Questionnaire settings</p>
-            <div className='mt-[22px] h-customh11 overflow-auto default-sidebar'>
+            <div className='mt-[22px] h-customh12 overflow-auto default-sidebar overflow-x-hidden'>
                 <div className='w-full mr-[114px]'>
                     <InputField
                         autoComplete='off'
@@ -176,12 +206,12 @@ function QuestionnarySettings({
             <Button
                 text='Save settings'
                 testID='createQuestionnaireBtn'
-                className='w-full h-[50px] mt-[26px]'
+                className={`w-full h-[50px] mt-[26px] ${isSaveDisabled? 'bg-[#DDDDDD] hover:bg-[#DDDDDD]' : 'bg-[#2B333B] hover:bg-[#000000]'}`}
                 onClick={editQuestionnarySettings}
                 isThreedotLoading={isThreedotLoader}
+                disabled={isSaveDisabled} // Disable the button if no changes
             />
         </div>
-
     )
 }
 

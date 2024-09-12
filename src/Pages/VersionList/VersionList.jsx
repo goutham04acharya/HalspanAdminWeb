@@ -12,6 +12,7 @@ function VersionList() {
     const [versionList, setVersionList] = useState([])
     const [queSettingDetails, setQueSettingDetails] = useState()
     const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(false)
     const [validationErrors, setValidationErrors] = useState({});
     const [editedDetails, setEditedDetails] = useState({
         public_name: '',
@@ -20,16 +21,19 @@ function VersionList() {
     });
 
     const handleVersionList = async () => {
+        setDataLoading(true);
         setLoading(true);
-        const response = await getAPI(`questionnaires/versions/${public_name}`)
+        const response = await getAPI(`questionnaires/versions/${questionnaire_id}`)
         setVersionList(response?.data)
         setLoading(false);
     }
 
     const handleQuestionnariesSetting = async () => {
         setLoading(true);
+        setDataLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}`);
         setQueSettingDetails(response?.data);
+        setDataLoading(false);
         setEditedDetails((prevState) => ({
             ...prevState,
             public_name: response?.data?.data?.public_name,
@@ -113,6 +117,8 @@ function VersionList() {
                         validationErrors={validationErrors}
                         editedDetails={editedDetails}
                         setLoading={setLoading}
+                        setDataLoading={setDataLoading}
+                        dataLoading={dataLoading}
                     />
                 </div>
 
