@@ -57,7 +57,7 @@ function QuestionnarySettings({
             } else if (response?.data?.status === 409) {
                 setValidationErrors({
                     ...validationErrors,
-                    public_name: response?.data?.message,
+                    public_name: 'This public name already exists',
                 });
                 setIsThreedotLoader(false);
             } else {
