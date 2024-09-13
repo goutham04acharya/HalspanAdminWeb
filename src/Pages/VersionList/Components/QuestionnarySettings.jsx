@@ -51,6 +51,7 @@ function QuestionnarySettings({
             const response = await PatchAPI(`questionnaires/${questionnaire_id}`, payload);
             if (response?.data?.status === true) {
                 setToastSuccess(response?.data?.message);
+                
                 setValidationErrors({});
                 setIsThreedotLoader(false);
                 // setIsSaveDisabled(true); // Disable button again after successful save

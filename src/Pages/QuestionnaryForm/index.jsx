@@ -1020,6 +1020,7 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
+    console.log(sections, 'nanu')
 
     return (
         <>

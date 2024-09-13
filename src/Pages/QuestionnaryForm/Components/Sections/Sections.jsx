@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import EditableField from '../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
 import GlobalContext from '../../../../Components/Context/GlobalContext';
-import {setSelectedAddQuestion, setSelectedQuestionId} from '../QuestionnaryForm/Components/QuestionnaryFormSlice.js'
 import { useDispatch } from 'react-redux';
 
 
