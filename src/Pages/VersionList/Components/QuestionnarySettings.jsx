@@ -205,7 +205,7 @@ function QuestionnarySettings({
             </div>
             <Button
                 text='Save settings'
-                testID='createQuestionnaireBtn'
+                testID='save-settings'
                 className={`w-full h-[50px] mt-[26px] ${isSaveDisabled? 'bg-[#DDDDDD] hover:bg-[#DDDDDD]' : 'bg-[#2B333B] hover:bg-[#000000]'}`}
                 onClick={editQuestionnarySettings}
                 isThreedotLoading={isThreedotLoader}
