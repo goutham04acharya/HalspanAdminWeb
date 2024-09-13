@@ -19,6 +19,18 @@ Given('I am on the questionnaire version listing screen', async function () {
     } else {
         throw new Error('Questionnaire ID or version number is missing.');
     }
+
+    const rows = await driver.findElements(By.xpath(`//tbody/tr`));
+    const n = rows.length;
+    global.versions = [];
+    for (let i = 1; i <= n; i++) {
+        if (i % 2 === 1) { // Odd-numbered rows
+            const versionNumber = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[${i}]/td[1]`))).getText();
+            global.versions.push(versionNumber);
+        }
+    }
+    global.versions.sort();
+    console.log('Sorted Versions before duplicating:', global.versions);
 });
 
 When('I click the save settings button', async function () {
