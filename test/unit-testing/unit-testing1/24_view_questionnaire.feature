@@ -27,15 +27,15 @@ Feature: Halspan - Admin - View Specific Questionnaire
     Then I should see the version table header containing '["NAME", "LAST EDITED", "EDITED BY", "STATUS"]'
 
   @create_question
-  Scenario: Admin edits the public, intenal name, description, language and asset Type
+  Scenario: Admin edits the public, intenal name, description
     Given I am on the questionnaire version listing screen
+    When I enter "API_TEST_QS" in the public name field
+    * I click the save settings button
+    Then I should read a message stating that "This public name already exists"
     When I enter Unique Public Name in the public name field
     * I enter internal name in the internal name field
     * I enter questionnaire description in the Description field as "test data results"
-    * I select door from the asset type dropdown
-    * I select "yes" from the questionnaire type options
-    * I select british english from the language dropdown
     * I click the save settings button
-    Then I should read a message stating that "Questionnaire updated successfully"
+    Then I should read a message stating that "Questionnaire details updated successfully"
     When I click on back to all questionnaire
     Then I should be redirected to the questionnaire listing screen
