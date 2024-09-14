@@ -266,7 +266,7 @@ function QuestionnaryForm() {
         // Add other mappings here...
     };
 
-    const scrollToSection = (index) => {
+    const scrollToSection = (index, sectionId) => {
         // Check if section is closed, if so, expand it
         if (!expandedSections[index]) {
             toggleSection(index); // Assuming toggleSection will expand the section
@@ -274,14 +274,18 @@ function QuestionnaryForm() {
 
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
-            if (sectionRefs.current[index]) {
-                sectionRefs.current[index].scrollIntoView({ behavior: 'smooth' });
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                console.error(`Element with id ${sectionId} not found`);
             }
-        }, 300); // Delay to allow the section to open
+        }, 300); // Delay to allow the section to open and render the page
     };
 
 
-    const scrollToPage = (sectionIndex, pageIndex) => {
+    const scrollToPage = (sectionIndex, pageId) => {
+
         // Check if the section is closed, if so, expand it
         if (!expandedSections[sectionIndex]) {
             toggleSection(sectionIndex); // Assuming toggleSection will expand the section
@@ -289,9 +293,11 @@ function QuestionnaryForm() {
 
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
-            const pageRefKey = `${sectionIndex}-${pageIndex}`;
-            if (pageRefs.current[pageRefKey]) {
-                pageRefs.current[pageRefKey].scrollIntoView({ behavior: 'smooth' });
+            const element = document.getElementById(pageId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                console.error(`Element with id ${pageId} not found`);
             }
         }, 300); // Delay to allow the section to open and render the page
     };
@@ -472,10 +478,11 @@ function QuestionnaryForm() {
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        let currentPageData = sections[sectionIndex].pages[pageIndex];
-        const update = { ...dataIsSame }
+        let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
+        const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
         dispatch(setDataIsSame(update));
+
         if (event === 'add') {
             if (currentPageData.questions.length < 20) {
                 dispatch(setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId }));
@@ -485,21 +492,45 @@ function QuestionnaryForm() {
                 return; // Exit the function if the limit is reached
             }
         } else if (event === 'remove') {
-            dispatch(setSelectedQuestionId(false))
+            dispatch(setSelectedQuestionId(false));
             dispatch(setSelectedAddQuestion({}));
-            const questionId = currentPageData.questions[questionIndex].question_id
-            const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
-            currentPageData.questions = currentPageData?.questions && currentPageData?.questions?.filter((_, index) => index !== questionIndex);
-            console.log(currentPageData, 'currentPageData')
-            const currentSectionData = [...sections]
-            currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
-            handleAutoSave(sectionId, currentSectionData, '', questionId);
-            // After any delete we remove focus on add question and change the field setting
+
+            const questionId = currentPageData.questions[questionIndex].question_id;
+            const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0];
+
+            // Filter out the removed question and update currentPageData
+            currentPageData.questions = currentPageData.questions.filter((_, index) => index !== questionIndex);
+
+            // Create a new array for sections to avoid mutating the original state
+            const currentSectionData = sections.map((section, secIndex) => {
+                if (secIndex === sectionIndex) {
+                    // Clone the section's pages array and update the current page
+                    return {
+                        ...section,
+                        pages: section.pages.map((page, pgIndex) => pgIndex === pageIndex ? currentPageData : page)
+                    };
+                }
+                return section;
+            });
+
+            handleAutoSave(sectionId, currentSectionData, '', questionId); // Call auto-save function
         }
+
+        // Reset the selected component
         dispatch(setSelectedComponent(false));
-        sections[sectionIndex].pages[pageIndex] = currentPageData;
-        setSections([...sections]);
+
+        // Update the sections state by setting a new array (deep copy)
+        setSections([...sections.map((section, secIndex) => {
+            if (secIndex === sectionIndex) {
+                return {
+                    ...section,
+                    pages: section.pages.map((page, pgIndex) => pgIndex === pageIndex ? currentPageData : page)
+                };
+            }
+            return section;
+        })]);
     };
+
 
     // const handleQuestionIndexCapture = (question) => {
     //     // Update state for selected question and reset component state
@@ -571,11 +602,43 @@ function QuestionnaryForm() {
     //     );
     // };
 
+    // const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
+    //     sections[sectionIndex].pages[pageIndex].questions = newList;
+    //     setSections([...sections]);
+    //     const update = { ...dataIsSame }
+    //     update[sections[sectionIndex].section_id] = false;
+    //     dispatch(setDataIsSame(update));
+    // };
+
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
-        sections[sectionIndex].pages[pageIndex].questions = newList;
-        setSections([...sections]);
-        const update = { ...dataIsSame }
-        update[sections[sectionIndex].section_id] = false;
+        console.log(newList, 'newList');
+        console.log(sectionIndex, 'sectionIndex');
+        console.log(pageIndex, 'pageIndex');
+
+        // Create a copy of the sections array to avoid direct mutation
+        const updatedSections = [...sections];
+
+        // Create a copy of the specific page's data to avoid mutating the original data
+        const updatedPages = [...updatedSections[sectionIndex].pages];
+
+        // Create a copy of the questions and update with the new list
+        updatedPages[pageIndex] = {
+            ...updatedPages[pageIndex],
+            questions: newList,
+        };
+
+        // Update the specific section's pages with the updated pages
+        updatedSections[sectionIndex] = {
+            ...updatedSections[sectionIndex],
+            pages: updatedPages,
+        };
+
+        // Update the sections state with the updatedSections array
+        setSections(updatedSections);
+
+        // Update dataIsSame for the current section
+        const update = { ...dataIsSame };
+        update[updatedSections[sectionIndex].section_id] = false;
         dispatch(setDataIsSame(update));
     };
 
@@ -1028,7 +1091,7 @@ function QuestionnaryForm() {
             ) : (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} /> 
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>

@@ -14,14 +14,8 @@ function Sections({
     setExpandedSections,
     handleSaveSectionName,
     dataIsSame,
-    selectedAddQuestion,
     handleDeletePgaeModal,
     setShowPageDeleteModal,
-    setSelectedSectionData,
-    setModalOpen,
-    setSectionToDelete,
-    setSections,
-    sections,
     selectedQuestionId,
     handleAddRemovePage,
     componentMap,
@@ -37,6 +31,7 @@ function Sections({
     const dispatch = useDispatch();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
 
 
     const handleQuestionIndexCapture = (question) => {
@@ -131,9 +126,11 @@ function Sections({
         localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
     }, [expandedSections]);
 
+
     return (
         <div
             key={sectionData?.section_id}
+            id={sectionData?.section_id}
             ref={el => sectionRefs.current[sectionIndex] = el}
             className={`p-[6px] hover:border-[#2B333B] hover:border rounded-[10px] ${expandedSections[sectionIndex] ? 'pb-6 my-[25px]' : 'pb-0 mt-[10px] mb-0'}`}>
             <div className='flex items-start justify-between w-full gap-3 relative'>
@@ -176,6 +173,7 @@ function Sections({
                     {sectionData?.pages.map((pageData, pageIndex) => (
                         <div
                             key={pageData?.page_id}
+                            id={pageData?.page_id}
                             ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
                             className='mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
                         >
