@@ -2,7 +2,9 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import EditableField from '../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
 import GlobalContext from '../../../../Components/Context/GlobalContext';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete } from '../QuestionnaryFormSlice'
+
 
 
 function Sections({
@@ -12,7 +14,6 @@ function Sections({
     setExpandedSections,
     handleSaveSectionName,
     dataIsSame,
-    setDataIsSame,
     selectedAddQuestion,
     handleDeletePgaeModal,
     setShowPageDeleteModal,
@@ -24,11 +25,27 @@ function Sections({
     selectedQuestionId,
     handleAddRemovePage,
     componentMap,
+    handleDeleteModal,
+    handleSaveSection,
+    handleAddRemoveQuestion,
+    handleDeletequestionModal,
+    handleMoveEnd,
+    setShowquestionDeleteModal
 }) {
     const sectionRefs = useRef([]);
     const pageRefs = useRef({});
     const dispatch = useDispatch();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+
+
+    const handleQuestionIndexCapture = (question) => {
+        // Update state for selected question and reset component state
+        dispatch(setSelectedQuestionId(question.question_id));
+        dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
+        const componentType = fieldSettingParams[question.question_id]?.componentType;
+        dispatch(setSelectedComponent(componentType));
+    };
 
     // Function for dragging questions
     const Item = ({ item, index, itemSelected, dragHandleProps }) => {
@@ -91,43 +108,6 @@ function Sections({
             </div>
         );
     };
-
-
-    const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        let currentPageData = sections[sectionIndex].pages[pageIndex];
-        const update = { ...dataIsSame }
-        update[sections[sectionIndex]?.section_id] = false;
-        setDataIsSame(update)
-        if (event === 'add') {
-            if (currentPageData.questions.length < 20) {
-                dispatch(setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId }));
-                dispatch(setSelectedQuestionId(''));
-            } else {
-                setToastError("Limit reached: Maximum of 20 questions allowed.");
-                return; // Exit the function if the limit is reached
-            }
-        } else if (event === 'remove') {
-            dispatch(setSelectedQuestionId(false));
-            dispatch(setSelectedAddQuestion({}));
-            const questionId = currentPageData.questions[questionIndex].question_id
-            const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
-            currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
-            const currentSectionData = [...sections]
-            currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
-            handleAutoSave(sectionId, currentSectionData, '', questionId);
-            // After any delete we remove focus on add question and change the field setting
-        }
-        setSelectedComponent(false);
-        sections[sectionIndex].pages[pageIndex] = currentPageData;
-        setSections([...sections]);
-    };
-
-    //this is for modal of delete section
-    const handleDeleteModal = (sectionIndex, sectionData) => {
-        setSectionToDelete(sectionIndex); // Set the section to delete
-        setSelectedSectionData(sectionData)
-        setModalOpen(true);
-    }
 
 
     // to open and close the sections

@@ -38,7 +38,7 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/Sections/Sections.jsx';
-import {setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete} from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete } from './Components/QuestionnaryFormSlice.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -87,10 +87,6 @@ function QuestionnaryForm() {
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
 
 
-
-
-
-   
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
@@ -103,16 +99,18 @@ function QuestionnaryForm() {
     //     }));
     // };
 
+
     const handleCancel = () => {
         setModalOpen(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
 
-    // const handleDeleteModal = (sectionIndex, sectionData) => {
-    //     setSectionToDelete(sectionIndex); // Set the section to delete
-    //     setSelectedSectionData(sectionData)
-    //     setModalOpen(true);
-    // }
+    const handleDeleteModal = (sectionIndex, sectionData) => {
+        console.log(sectionIndex, 'sectionIndex')
+        dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
+        setSelectedSectionData(sectionData)
+        setModalOpen(true);
+    }
     const handleDeletePgaeModal = (sectionIndex, pageIndex, pageData) => {
         dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
         dispatch(setSelectedSectionData(pageData));
@@ -126,6 +124,7 @@ function QuestionnaryForm() {
     };
 
     const confirmDeleteSection = () => {
+        console.log(sectionToDelete, 'sectionToDelete')
         if (sectionToDelete !== null) {
             handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
             setModalOpen(false); // Close the modal
@@ -351,7 +350,7 @@ function QuestionnaryForm() {
             const sectionId = `SEC-${uuidv4()}`;
             const pageId = `${sectionId}_PG-${uuidv4()}`;
             const newSection = {
-                section_name: `Section ${sections.length + 1}`,
+                section_name: `Section ${sections && sections.length + 1}`,
                 section_id: sectionId,
                 pages: [{
                     page_id: pageId,
@@ -372,7 +371,7 @@ function QuestionnaryForm() {
             });
 
             setTimeout(() => {
-                sectionRefs.current[sections.length]?.scrollIntoView({ behavior: 'smooth' });
+                sectionRefs.current[sections && sections.length]?.scrollIntoView({ behavior: 'smooth' });
             }, 400);
 
             // Enable save button for the new section
@@ -490,7 +489,8 @@ function QuestionnaryForm() {
             dispatch(setSelectedAddQuestion({}));
             const questionId = currentPageData.questions[questionIndex].question_id
             const sectionId = currentPageData.questions[questionIndex].question_id.split('_')[0]
-            currentPageData.questions = currentPageData?.questions?.filter((_, index) => index !== questionIndex);
+            currentPageData.questions = currentPageData?.questions && currentPageData?.questions?.filter((_, index) => index !== questionIndex);
+            console.log(currentPageData, 'currentPageData')
             const currentSectionData = [...sections]
             currentSectionData[sectionIndex].pages[pageIndex] = currentPageData;
             handleAutoSave(sectionId, currentSectionData, '', questionId);
@@ -501,13 +501,13 @@ function QuestionnaryForm() {
         setSections([...sections]);
     };
 
-    const handleQuestionIndexCapture = (question) => {
-        // Update state for selected question and reset component state
-        dispatch(setSelectedQuestionId(question.question_id));
-        dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
-        const componentType = fieldSettingParams[question.question_id]?.componentType;
-        dispatch(setSelectedComponent(componentType));
-    };
+    // const handleQuestionIndexCapture = (question) => {
+    //     // Update state for selected question and reset component state
+    //     dispatch(setSelectedQuestionId(question.question_id));
+    //     dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
+    //     const componentType = fieldSettingParams[question.question_id]?.componentType;
+    //     dispatch(setSelectedComponent(componentType));
+    // };
 
     // // Function for dragging questions
     // const Item = ({ item, index, itemSelected, dragHandleProps }) => {
@@ -1020,7 +1020,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-    console.log(sections, 'nanu')
 
     return (
         <>
@@ -1029,7 +1028,7 @@ function QuestionnaryForm() {
             ) : (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
+                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} /> 
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -1041,7 +1040,7 @@ function QuestionnaryForm() {
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p
                                 title={formDefaultInfo?.internal_name}
-                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections.length === 0 ? 'mb-3' : ''}`}
+                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
                                 data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
                             </p>
                             {sections?.map((sectionData, sectionIndex) => (
@@ -1157,10 +1156,16 @@ function QuestionnaryForm() {
                                     setShowPageDeleteModal={setShowPageDeleteModal}
                                     setModalOpen={setModalOpen}
                                     setSections={setSections}
-                                    sections={Sections}
+                                    sections={sections}
                                     selectedQuestionId={selectedQuestionId}
                                     handleAddRemovePage={handleAddRemovePage}
                                     componentMap={componentMap}
+                                    handleDeleteModal={handleDeleteModal}
+                                    handleSaveSection={handleSaveSection}
+                                    handleAddRemoveQuestion={handleAddRemoveQuestion}
+                                    handleDeletequestionModal={handleDeletequestionModal}
+                                    handleMoveEnd={handleMoveEnd}
+                                    setShowquestionDeleteModal={setShowquestionDeleteModal}
                                 />
                             ))}
                             <button
