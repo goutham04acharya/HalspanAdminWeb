@@ -38,7 +38,7 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from './Components/QuestionnaryFormSlice.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -69,7 +69,7 @@ function QuestionnaryForm() {
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     const [isModalOpen, setModalOpen] = useState(false);
     const [showPageDeleteModal, setShowPageDeleteModal] = useState(false);
-    const [showquestionDeleteModal, setShowquestionDeleteModal] = useState(false);
+    // const [showquestionDeleteModal, setShowquestionDeleteModal] = useState(false);
     // const [pageToDelete, setPageToDelete] = useState({ sectionIndex: null, pageIndex: null });
     // const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
 
@@ -85,6 +85,8 @@ function QuestionnaryForm() {
     const sectionToDelete = useSelector((state) => state?.questionnaryForm?.sectionToDelete);
     const pageToDelete = useSelector((state) => state?.questionnaryForm?.pageToDelete);
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
+    const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
+
 
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -92,12 +94,12 @@ function QuestionnaryForm() {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
     // // to open and close the sections
-    // const toggleSection = (sectionIndex) => {
-    //     setExpandedSections((prev) => ({
-    //         ...prev,
-    //         [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
-    //     }));
-    // };
+    const toggleSection = (sectionIndex) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
+        }));
+    };
 
 
     const handleCancel = () => {
@@ -117,11 +119,11 @@ function QuestionnaryForm() {
         setModalOpen(true);
     }
 
-    const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
-        dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
-        dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
-        setShowquestionDeleteModal(true);
-    };
+    // const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
+    //     dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
+    //     dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
+    //     setShowquestionDeleteModal(true);
+    // };
 
     const confirmDeleteSection = () => {
         console.log(sectionToDelete, 'sectionToDelete')
@@ -141,7 +143,7 @@ function QuestionnaryForm() {
     const confirmDeleteQuestion = () => {
         if (questionToDelete.sectionIndex !== null && questionToDelete.pageIndex !== null && questionToDelete.questionIndex !== null) {
             handleAddRemoveQuestion('remove', questionToDelete.sectionIndex, questionToDelete.pageIndex, questionToDelete.questionIndex);
-            setShowquestionDeleteModal(false);
+            dispatch(setShowquestionDeleteModal(false));
         }
     };
 
@@ -199,56 +201,56 @@ function QuestionnaryForm() {
     };
 
 
-    const componentMap = {
-        textboxfield: (props) =>
-            <TextBoxField
-                {...props}
-            />,
-        choiceboxfield: (props) =>
-            <ChoiceBoxField
-                {...props}
-            />,
-        dateTimefield: (props) =>
-            <DateTimeField
-                {...props}
-            />,
-        assetLocationfield: (props) =>
-            <AssetLocationField
-                {...props}
-            />,
-        numberfield: (props) =>
-            <NumberField
-                {...props}
-            />,
-        floorPlanfield: (props) =>
-            <FloorPlanField
-                {...props}
-            />,
-        photofield: (props) =>
-            <PhotoField
-                {...props}
-            />,
-        videofield: (props) =>
-            <VideoField
-                {...props}
-            />,
-        filefield: (props) =>
-            <FileField
-                {...props}
-            />,
-        signaturefield: (props) =>
-            <SignatureField
-                {...props}
-            />,
-        gpsfield: (props) =>
-            <GPSField
-                {...props}
-            />,
-        displayfield: (props) =>
-            <DIsplayContentField
-                {...props}
-            />,
-    };
+    // const componentMap = {
+    //     textboxfield: (props) =>
+    //         <TextBoxField
+    //             {...props}
+    //         />,
+    //     choiceboxfield: (props) =>
+    //         <ChoiceBoxField
+    //             {...props}
+    //         />,
+    //     dateTimefield: (props) =>
+    //         <DateTimeField
+    //             {...props}
+    //         />,
+    //     assetLocationfield: (props) =>
+    //         <AssetLocationField
+    //             {...props}
+    //         />,
+    //     numberfield: (props) =>
+    //         <NumberField
+    //             {...props}
+    //         />,
+    //     floorPlanfield: (props) =>
+    //         <FloorPlanField
+    //             {...props}
+    //         />,
+    //     photofield: (props) =>
+    //         <PhotoField
+    //             {...props}
+    //         />,
+    //     videofield: (props) =>
+    //         <VideoField
+    //             {...props}
+    //         />,
+    //     filefield: (props) =>
+    //         <FileField
+    //             {...props}
+    //         />,
+    //     signaturefield: (props) =>
+    //         <SignatureField
+    //             {...props}
+    //         />,
+    //     gpsfield: (props) =>
+    //         <GPSField
+    //             {...props}
+    //         />,
+    //     displayfield: (props) =>
+    //         <DIsplayContentField
+    //             {...props}
+    //         />,
+    // };
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -611,35 +613,38 @@ function QuestionnaryForm() {
     // };
 
     const handleMoveEnd = (newList, sectionIndex, pageIndex) => {
-        console.log(newList, 'newList');
-        console.log(sectionIndex, 'sectionIndex');
-        console.log(pageIndex, 'pageIndex');
 
         // Create a copy of the sections array to avoid direct mutation
         const updatedSections = [...sections];
-
+    
         // Create a copy of the specific page's data to avoid mutating the original data
         const updatedPages = [...updatedSections[sectionIndex].pages];
-
+    
         // Create a copy of the questions and update with the new list
         updatedPages[pageIndex] = {
             ...updatedPages[pageIndex],
             questions: newList,
         };
-
+    
         // Update the specific section's pages with the updated pages
         updatedSections[sectionIndex] = {
             ...updatedSections[sectionIndex],
             pages: updatedPages,
         };
-
+    
         // Update the sections state with the updatedSections array
         setSections(updatedSections);
-
+    
+        // Retrieve the sectionId using the sectionIndex
+        const sectionId = updatedSections[sectionIndex].section_id;
+    
         // Update dataIsSame for the current section
         const update = { ...dataIsSame };
-        update[updatedSections[sectionIndex].section_id] = false;
+        update[sectionId] = false;
         dispatch(setDataIsSame(update));
+    
+        // Call handleAutoSave with the correct sectionId and updated sections
+        handleAutoSave(sectionId, updatedSections);
     };
 
     // API to get the fieldSettingData 
@@ -1107,107 +1112,6 @@ function QuestionnaryForm() {
                                 data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
                             </p>
                             {sections?.map((sectionData, sectionIndex) => (
-                                // <div
-                                //     key={sectionData?.section_id}
-                                //     ref={el => sectionRefs.current[sectionIndex] = el}
-                                //     className={`p-[6px] hover:border-[#2B333B] hover:border rounded-[10px] ${expandedSections[sectionIndex] ? 'pb-6 my-[25px]' : 'pb-0 mt-[10px] mb-0'}`}>
-                                //     <div className='flex items-start justify-between w-full gap-3 relative'>
-                                //         {/* <img src="/Images/open-Filter.svg" alt="down-arrow" className='cursor-pointer pt-6 pl-2' /> */}
-                                //         <div className='flex items-start'>
-                                //             <img
-                                //                 src="/Images/open-Filter.svg"
-                                //                 alt="down-arrow"
-                                //                 className={`cursor-pointer pt-6 pl-2 transform transition-transform duration-300 mr-2 ${expandedSections[sectionIndex] ? 'rotate-180 mt-5 ml-2' : '' // Rotate 180deg when expanded
-                                //                     }`}
-                                //                 onClick={() => toggleSection(sectionIndex)} // Toggle section on click
-                                //             />
-                                //             <EditableField
-                                //                 name={sectionData?.section_name}
-                                //                 index={sectionIndex}
-                                //                 handleSave={handleSaveSectionName}
-                                //                 section={true}
-                                //                 testId={`section-${sectionIndex}-name`}
-                                //             />
-                                //         </div>
-                                //         <div className='flex items-center justify-end'>
-                                //             <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#FFFFFF] cursor-pointer' />
-                                //             <img src="/Images/trash-black.svg"
-                                //                 alt="delete"
-                                //                 title='Delete'
-                                //                 data-testid={`delete-btn-${sectionIndex}`}
-                                //                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                                //                 // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                                //                 onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
-                                //             />
-                                //             <img src="/Images/save.svg"
-                                //                 alt="save"
-                                //                 title='Save'
-                                //                 data-testid={`save-btn-${sectionIndex}`}
-                                //                 className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
-                                //         </div>
-                                //     </div>
-                                //     {expandedSections[sectionIndex] && (
-                                //         <>
-                                //             {sectionData?.pages.map((pageData, pageIndex) => (
-                                //                 <div
-                                //                     key={pageData?.page_id}
-                                //                     ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                                //                     className='mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
-                                //                 >
-                                //                     <div className='flex items-start justify-between gap-7'>
-                                //                         <EditableField
-                                //                             name={pageData?.page_name}
-                                //                             index={sectionIndex}
-                                //                             secondIndex={pageIndex}
-                                //                             handleSave={handleSaveSectionName}
-                                //                             testId={`page-${pageIndex}-name`}
-                                //                             maxLength={1}
-                                //                         />
-                                //                         <div className='flex items-center justify-end'>
-                                //                             <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#EFF1F8] cursor-pointer' />
-                                //                             <img src="/Images/trash-black.svg"
-                                //                                 title='Delete'
-                                //                                 alt="Delete"
-                                //                                 data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                //                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                //                                 onClick={() => {
-                                //                                     handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
-                                //                                         setShowPageDeleteModal(true)
-                                //                                 }}
-                                //                             />
-                                //                         </div>
-                                //                     </div>
-                                //                     <DraggableList
-                                //                         itemKey="question_id"
-                                //                         template={Item}
-                                //                         list={pageData.questions.map((questionData, questionIndex) => ({
-                                //                             ...questionData,
-                                //                             sectionIndex,
-                                //                             pageIndex,
-                                //                             index: questionIndex,
-                                //                         }))}
-                                //                         onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
-                                //                         container={() => document.body}
-                                //                     />
-                                //                     <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
-                                //                         <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                //                             <span className='mr-[15px]'>+</span>
-                                //                             <span>Add question</span>
-                                //                         </button>
-                                //                     </div>
-                                //                 </div>
-                                //             ))}
-                                //             {/* Place "Add Page" button here, outside of the pages map */}
-                                //             <button
-                                //                 onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
-                                //                 data-testid={`add-page-sec-${sectionIndex}`}
-                                //                 className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                                //                 <span className='mr-[15px]'>+</span>
-                                //                 <span>Add page</span>
-                                //             </button>
-                                //         </>
-                                //     )}
-                                // </div>
                                 <Sections
                                     sectionData={sectionData}
                                     sectionIndex={sectionIndex}
@@ -1222,13 +1126,11 @@ function QuestionnaryForm() {
                                     sections={sections}
                                     selectedQuestionId={selectedQuestionId}
                                     handleAddRemovePage={handleAddRemovePage}
-                                    componentMap={componentMap}
                                     handleDeleteModal={handleDeleteModal}
                                     handleSaveSection={handleSaveSection}
                                     handleAddRemoveQuestion={handleAddRemoveQuestion}
-                                    handleDeletequestionModal={handleDeletequestionModal}
+                                    // handleDeletequestionModal={handleDeletequestionModal}
                                     handleMoveEnd={handleMoveEnd}
-                                    setShowquestionDeleteModal={setShowquestionDeleteModal}
                                 />
                             ))}
                             <button
@@ -1333,7 +1235,7 @@ function QuestionnaryForm() {
                     isModalOpen={showquestionDeleteModal}
                     setModalOpen={setShowquestionDeleteModal}
                     handleButton1={confirmDeleteQuestion}
-                    handleButton2={() => setShowquestionDeleteModal(false)}
+                    handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
                 />
             )}
             {showReplaceModal && (

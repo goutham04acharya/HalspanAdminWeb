@@ -3,7 +3,20 @@ import EditableField from '../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
 import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete } from '../QuestionnaryFormSlice'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from '../QuestionnaryFormSlice'
+import TextBoxField from '../Fields/TextBox/TextBoxField';
+import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
+import DateTimeField from '../Fields/DateTime/DateTimeField';
+import AssetLocationField from '../Fields/AssetLocation/AssetLocationField';
+import NumberField from '../Fields/Number/NumberField';
+import FloorPlanField from '../Fields/FloorPlan/FloorPlanField';
+import PhotoField from '../Fields/PhotoField/PhotoFIeld';
+import VideoField from '../Fields/VideoField/VideoField';
+import FileField from '../Fields/File/FileFIeld';
+import SignatureField from '../Fields/Signature/SignatureField';
+import GPSField from '../Fields/GPS/GPSField';
+import DIsplayContentField from '../Fields/DisplayContent/DIsplayContentField';
+import Pages from '../PagesList/Pages';
 
 
 
@@ -18,94 +31,21 @@ function Sections({
     setShowPageDeleteModal,
     selectedQuestionId,
     handleAddRemovePage,
-    componentMap,
     handleDeleteModal,
     handleSaveSection,
     handleAddRemoveQuestion,
     handleDeletequestionModal,
     handleMoveEnd,
-    setShowquestionDeleteModal
 }) {
     const sectionRefs = useRef([]);
-    const pageRefs = useRef({});
     const dispatch = useDispatch();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
 
 
-    const handleQuestionIndexCapture = (question) => {
-        // Update state for selected question and reset component state
-        dispatch(setSelectedQuestionId(question.question_id));
-        dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
-        const componentType = fieldSettingParams[question.question_id]?.componentType;
-        dispatch(setSelectedComponent(componentType));
-    };
-
-    // Function for dragging questions
-    const Item = ({ item, index, itemSelected, dragHandleProps }) => {
-        const { onMouseDown, onTouchStart } = dragHandleProps;
-
-        return (
-            <div
-                data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`}
-                onClick={() => handleQuestionIndexCapture(item)}
-                className={`disable-select select-none w-full  rounded-[10px] p-4 hover:border border-[#2B333B] ${item.question_id === selectedQuestionId ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}
-            >
-                <div className='flex justify-between items-start cursor-pointer'>
-                    <div className='flex items-center justify-end w-full'>
-                        <div
-                            className="disable-select dragHandle"
-                            onMouseDown={(e) => {
-                                document.body.style.overflow = "hidden";
-                                onMouseDown(e);
-                            }}
-                            onMouseUp={() => {
-                                document.body.style.overflow = "visible";
-                            }}
-                            onTouchStart={(e) => {
-                                document.body.style.overflow = "hidden";
-                                onTouchStart(e);
-                            }}
-                            onTouchEnd={() => {
-                                document.body.style.overflow = "visible";
-                            }}
-                        >
-                            <img className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]' title='Drag' src={`/Images/drag.svg`} alt="Drag" />
-                        </div>
-                        <img
-                            src="/Images/trash-black.svg"
-                            alt="delete"
-                            title='Delete'
-                            className={`pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
-                                setShowquestionDeleteModal(true);
-                            }}
-                        />
-                    </div>
-                </div>
-                {/* Render the selected component if the question is visible */}
-                {fieldSettingParams[item.question_id] && (
-                    <>
-                        {React.createElement(
-                            componentMap[fieldSettingParams[item.question_id]?.componentType],
-                            {
-                                // Pass the specific field settings to the component
-                                testId: `section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${item.index + 1}`,
-                                fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
-                            }
-                        )}
-                    </>
-                )
-                }
-            </div>
-        );
-    };
-
-
     // to open and close the sections
+
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
             ...prev,
@@ -171,54 +111,16 @@ function Sections({
             {expandedSections[sectionIndex] && (
                 <>
                     {sectionData?.pages.map((pageData, pageIndex) => (
-                        <div
-                            key={pageData?.page_id}
-                            id={pageData?.page_id}
-                            ref={el => pageRefs.current[`${sectionIndex}-${pageIndex}`] = el}
-                            className='mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] hover:border'
-                        >
-                            <div className='flex items-start justify-between gap-7'>
-                                <EditableField
-                                    name={pageData?.page_name}
-                                    index={sectionIndex}
-                                    secondIndex={pageIndex}
-                                    handleSave={handleSaveSectionName}
-                                    testId={`page-${pageIndex}-name`}
-                                    maxLength={1}
-                                />
-                                <div className='flex items-center justify-end'>
-                                    <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#EFF1F8] cursor-pointer' />
-                                    <img src="/Images/trash-black.svg"
-                                        title='Delete'
-                                        alt="Delete"
-                                        data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                        onClick={() => {
-                                            handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
-                                                setShowPageDeleteModal(true)
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                            <DraggableList
-                                itemKey="question_id"
-                                template={Item}
-                                list={pageData.questions.map((questionData, questionIndex) => ({
-                                    ...questionData,
-                                    sectionIndex,
-                                    pageIndex,
-                                    index: questionIndex,
-                                }))}
-                                onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
-                                container={() => document.body}
-                            />
-                            <div className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id ? 'border bg-[#d1d3d9b7]' : 'bg-[#EFF1F8]'}`}>
-                                <button data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1}`} onClick={() => handleAddRemoveQuestion('add', sectionIndex, pageIndex, '', pageData.page_id)} className='flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base'>
-                                    <span className='mr-[15px]'>+</span>
-                                    <span>Add question</span>
-                                </button>
-                            </div>
-                        </div>
+                        <Pages
+                            pageData={pageData}
+                            handleSaveSectionName={handleSaveSectionName}
+                            sectionIndex={sectionIndex}
+                            pageIndex={pageIndex}
+                            handleAddRemoveQuestion={handleAddRemoveQuestion}
+                            handleMoveEnd={handleMoveEnd}
+                            handleDeletePgaeModal={handleDeletePgaeModal}
+                            setShowPageDeleteModal={setShowPageDeleteModal}
+                        />
                     ))}
                     {/* Place "Add Page" button here, outside of the pages map */}
                     <button
