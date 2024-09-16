@@ -1,21 +1,21 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import TextBoxField from '../Fields/TextBox/TextBoxField';
-import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
-import DateTimeField from '../Fields/DateTime/DateTimeField';
-import AssetLocationField from '../Fields/AssetLocation/AssetLocationField';
-import NumberField from '../Fields/Number/NumberField';
-import FloorPlanField from '../Fields/FloorPlan/FloorPlanField';
-import PhotoField from '../Fields/PhotoField/PhotoFIeld';
-import VideoField from '../Fields/VideoField/VideoField';
-import FileField from '../Fields/File/FileFIeld';
-import SignatureField from '../Fields/Signature/SignatureField';
-import GPSField from '../Fields/GPS/GPSField';
-import DIsplayContentField from '../Fields/DisplayContent/DIsplayContentField';
-import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal} from '../QuestionnaryFormSlice'
+import TextBoxField from '../../Fields/TextBox/TextBoxField';
+import ChoiceBoxField from '../../Fields/ChoiceBox/ChoiceBoxField';
+import DateTimeField from '../../Fields/DateTime/DateTimeField';
+import AssetLocationField from '../../Fields/AssetLocation/AssetLocationField';
+import NumberField from '../../Fields/Number/NumberField';
+import FloorPlanField from '../../Fields/FloorPlan/FloorPlanField';
+import PhotoField from '../../Fields/PhotoField/PhotoFIeld';
+import VideoField from '../../Fields/VideoField/VideoField';
+import FileField from '../../Fields/File/FileFIeld';
+import SignatureField from '../../Fields/Signature/SignatureField';
+import GPSField from '../../Fields/GPS/GPSField';
+import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField';
+import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal} from '../../QuestionnaryFormSlice'
 
 
-const DraggableQuestionItem = ({
+const Questions = ({
     item,
     dragHandleProps,
 
@@ -157,4 +157,4 @@ const DraggableQuestionItem = ({
     );
 };
 
-export default DraggableQuestionItem;
+export default Questions;

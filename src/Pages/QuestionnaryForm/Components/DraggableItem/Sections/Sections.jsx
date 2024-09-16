@@ -1,51 +1,81 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import EditableField from '../../../../Components/EditableField/EditableField'
+import EditableField from '../../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
-import GlobalContext from '../../../../Components/Context/GlobalContext';
+import GlobalContext from '../../../../../Components/Context/GlobalContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setShowPageDeleteModal, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from '../QuestionnaryFormSlice'
-import TextBoxField from '../Fields/TextBox/TextBoxField';
-import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
-import DateTimeField from '../Fields/DateTime/DateTimeField';
-import AssetLocationField from '../Fields/AssetLocation/AssetLocationField';
-import NumberField from '../Fields/Number/NumberField';
-import FloorPlanField from '../Fields/FloorPlan/FloorPlanField';
-import PhotoField from '../Fields/PhotoField/PhotoFIeld';
-import VideoField from '../Fields/VideoField/VideoField';
-import FileField from '../Fields/File/FileFIeld';
-import SignatureField from '../Fields/Signature/SignatureField';
-import GPSField from '../Fields/GPS/GPSField';
-import DIsplayContentField from '../Fields/DisplayContent/DIsplayContentField';
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setShowPageDeleteModal, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setModalOpen } from '../../QuestionnaryFormSlice'
 import Pages from '../PagesList/Pages';
-import DraggablePageItem from '../DraggableItem/DraggablePageItem';
 
 
 
 function Sections({
-    sectionData,
-    sectionIndex,
-    expandedSections,
-    setExpandedSections,
-    handleSaveSectionName,
-    dataIsSame,
-    handleDeletePageModal,
-    selectedQuestionId,
-    handleAddRemovePage,
-    handleDeleteModal,
-    handleSaveSection,
-    handleAddRemoveQuestion,
-    handleDeletequestionModal,
-    handleMoveEnd,
+    item,
+    dragHandleProps,
+
 }) {
+    const { sectionData,
+        sectionIndex,
+        expandedSections,
+        setExpandedSections,
+        handleSaveSectionName,
+        dataIsSame,
+        selectedQuestionId,
+        handleAddRemovePage,
+        handleAddRemoveQuestion,
+        sections,
+        setSections,
+        handleAutoSave,
+    } = item
+
+    console.log(sectionIndex, 'sectionIndex')
+
     const sectionRefs = useRef([]);
     const dispatch = useDispatch();
-    const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
+    const { onMouseDown, onTouchStart } = dragHandleProps;
 
+    const handleDeleteModal = (sectionIndex, sectionData) => {
+        console.log(sectionIndex, 'sectionIndex')
+        dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
+        setSelectedSectionData(sectionData)
+        dispatch(setModalOpen(true));
+    }
+
+    const handleMoveEndPages = (newList, sectionIndex, pageIndex) => {
+        // Create a copy of the sections array to avoid direct mutation
+        const updatedSections = [...sections];
+
+        const updatedNewList = newList.map(item => ({
+            ...item.pageData, // Spread the pageData properties (questions, page_id, page_name)
+            sectionIndex: item.sectionIndex,
+            index: item.index,
+        }));
+        console.log(updatedNewList, 'updatedNewList')
+
+        // Update the specific section's pages with the updated pages
+        updatedSections[sectionIndex] = {
+            ...updatedSections[sectionIndex],
+            pages: updatedNewList,
+        };
+        console.log(newList, 'newListnewList')
+
+        // Update the sections state with the updatedSections array
+        setSections(updatedSections);
+        console.log(updatedSections, 'updatedSections')
+
+        // Retrieve the sectionId using the sectionIndex
+        const sectionId = updatedSections[sectionIndex].section_id;
+        console.log(sections, 'sectionID')
+
+        // Update dataIsSame for the current section
+        const update = { ...dataIsSame };
+        update[sectionId] = false;
+        dispatch(setDataIsSame(update));
+
+        // Call handleAutoSave with the correct sectionId and updated sections
+        handleAutoSave(sectionId, updatedSections);
+    };
 
     // to open and close the sections
-
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
             ...prev,
@@ -74,7 +104,6 @@ function Sections({
             ref={el => sectionRefs.current[sectionIndex] = el}
             className={`p-[6px] hover:border-[#2B333B] hover:border rounded-[10px] ${expandedSections[sectionIndex] ? 'pb-6 my-[25px]' : 'pb-0 mt-[10px] mb-0'}`}>
             <div className='flex items-start justify-between w-full gap-3 relative'>
-                {/* <img src="/Images/open-Filter.svg" alt="down-arrow" className='cursor-pointer pt-6 pl-2' /> */}
                 <div className='flex items-start'>
                     <img
                         src="/Images/open-Filter.svg"
@@ -92,7 +121,30 @@ function Sections({
                     />
                 </div>
                 <div className='flex items-center justify-end'>
-                    {/* <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#FFFFFF] cursor-pointer' /> */}
+                    <div
+                        className="disable-select dragHandle"
+                        onMouseDown={(e) => {
+                            document.body.style.overflow = "hidden";
+                            onMouseDown(e);
+                        }}
+                        onMouseUp={() => {
+                            document.body.style.overflow = "visible";
+                        }}
+                        onTouchStart={(e) => {
+                            document.body.style.overflow = "hidden";
+                            onTouchStart(e);
+                        }}
+                        onTouchEnd={() => {
+                            document.body.style.overflow = "visible";
+                        }}
+                    >
+                        <img
+                            className='cursor-grab p-2 mb-2 absolute top-0 right-[80px] z-[9] rounded-full hover:bg-[#FFFFFF]'
+                            title='Drag'
+                            src={`/Images/drag.svg`}
+                            alt="Drag"
+                        />
+                    </div>
                     <img src="/Images/trash-black.svg"
                         alt="delete"
                         title='Delete'
@@ -114,13 +166,16 @@ function Sections({
                         itemKey="page_id"
                         template={Pages}
                         list={sectionData?.pages?.map((pageData, pageIndex) => ({
-                            ...pageData,
+                            pageData,
                             sectionIndex,
                             index: pageIndex,
                             setShouldAutoSave: setShouldAutoSave,
                             selectedQuestionId: selectedQuestionId,
+                            handleAddRemoveQuestion: handleAddRemoveQuestion,
+                            sections: sections,
+                            setSections: setSections
                         }))}
-                        onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
+                        onMoveEnd={(newList) => handleMoveEndPages(newList, sectionIndex)}
                         container={() => document.body}
 
                     >
