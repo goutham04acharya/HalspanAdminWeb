@@ -94,7 +94,6 @@ function QuestionnaryForm() {
     // }
 
     const confirmDeleteSection = () => {
-        console.log(sectionToDelete, 'sectionToDelete')
         if (sectionToDelete !== null) {
             handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
             dispatch(setModalOpen(false)); // Close the modal
@@ -361,7 +360,7 @@ function QuestionnaryForm() {
 
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
-            console.log(sectionId, 'sectionIdsectionId')
+            console.log(sectionIndex,'sectionIndex')
             const isSaved = dataIsSame?.[sectionId] || false;
 
             if (isSaved) {
@@ -376,7 +375,7 @@ function QuestionnaryForm() {
             removeIndexAndShift(sections[sectionIndex].section_id);
 
         } else {
-            console.log('am here')
+            console.log(sectionIndex, 'nnnnnnnnnnnnnnnnnnnnnn')
             sections = sections?.splice(0, sectionIndex);
             setSections([...sections]);
             console.log(sections, 'coming undefiend')
@@ -952,7 +951,6 @@ function QuestionnaryForm() {
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
 
-    console.log(sections, 'nnnnnnnnnnnnnnnnnnnnnn')
     return (
         <>
             {pageLoading ? (
@@ -992,7 +990,9 @@ function QuestionnaryForm() {
                                     sections: sections,
                                     handleAddRemovePage: handleAddRemovePage,
                                     handleSaveSection: handleSaveSection,
-                                    handleAutoSave: handleAutoSave
+                                    handleAutoSave: handleAutoSave,
+                                    sectionIndex: sectionIndex,
+
                                 }))}
                                 onMoveEnd={(newList, sectionIndex) => handleMoveEndSections(newList, sectionIndex)}
                                 container={() => document.body}

@@ -25,16 +25,15 @@ function Sections({
         sections,
         setSections,
         handleAutoSave,
+        handleSaveSection
     } = item
 
-    console.log(sectionIndex, 'sectionIndex')
 
     const sectionRefs = useRef([]);
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
-        console.log(sectionIndex, 'sectionIndex')
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
         setSelectedSectionData(sectionData)
         dispatch(setModalOpen(true));
@@ -49,22 +48,18 @@ function Sections({
             sectionIndex: item.sectionIndex,
             index: item.index,
         }));
-        console.log(updatedNewList, 'updatedNewList')
 
         // Update the specific section's pages with the updated pages
         updatedSections[sectionIndex] = {
             ...updatedSections[sectionIndex],
             pages: updatedNewList,
         };
-        console.log(newList, 'newListnewList')
 
         // Update the sections state with the updatedSections array
         setSections(updatedSections);
-        console.log(updatedSections, 'updatedSections')
 
         // Retrieve the sectionId using the sectionIndex
         const sectionId = updatedSections[sectionIndex].section_id;
-        console.log(sections, 'sectionID')
 
         // Update dataIsSame for the current section
         const update = { ...dataIsSame };
@@ -173,7 +168,8 @@ function Sections({
                             selectedQuestionId: selectedQuestionId,
                             handleAddRemoveQuestion: handleAddRemoveQuestion,
                             sections: sections,
-                            setSections: setSections
+                            setSections: setSections,
+                            pageIndex: pageIndex
                         }))}
                         onMoveEnd={(newList) => handleMoveEndPages(newList, sectionIndex)}
                         container={() => document.body}
