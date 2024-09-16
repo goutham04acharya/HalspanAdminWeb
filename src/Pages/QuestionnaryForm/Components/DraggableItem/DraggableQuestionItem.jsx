@@ -12,10 +12,10 @@ import FileField from '../Fields/File/FileFIeld';
 import SignatureField from '../Fields/Signature/SignatureField';
 import GPSField from '../Fields/GPS/GPSField';
 import DIsplayContentField from '../Fields/DisplayContent/DIsplayContentField';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal} from '../QuestionnaryFormSlice'
+import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal} from '../QuestionnaryFormSlice'
 
 
-const DraggableItem = ({
+const DraggableQuestionItem = ({
     item,
     dragHandleProps,
 
@@ -157,4 +157,4 @@ const DraggableItem = ({
     );
 };
 
-export default DraggableItem;
+export default DraggableQuestionItem;

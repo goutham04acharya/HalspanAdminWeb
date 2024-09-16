@@ -3,7 +3,7 @@ import EditableField from '../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
 import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from '../QuestionnaryFormSlice'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setShowPageDeleteModal, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from '../QuestionnaryFormSlice'
 import TextBoxField from '../Fields/TextBox/TextBoxField';
 import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
 import DateTimeField from '../Fields/DateTime/DateTimeField';
@@ -17,6 +17,7 @@ import SignatureField from '../Fields/Signature/SignatureField';
 import GPSField from '../Fields/GPS/GPSField';
 import DIsplayContentField from '../Fields/DisplayContent/DIsplayContentField';
 import Pages from '../PagesList/Pages';
+import DraggablePageItem from '../DraggableItem/DraggablePageItem';
 
 
 
@@ -27,8 +28,7 @@ function Sections({
     setExpandedSections,
     handleSaveSectionName,
     dataIsSame,
-    handleDeletePgaeModal,
-    setShowPageDeleteModal,
+    handleDeletePageModal,
     selectedQuestionId,
     handleAddRemovePage,
     handleDeleteModal,
@@ -92,7 +92,7 @@ function Sections({
                     />
                 </div>
                 <div className='flex items-center justify-end'>
-                    <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#FFFFFF] cursor-pointer' />
+                    {/* <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#FFFFFF] cursor-pointer' /> */}
                     <img src="/Images/trash-black.svg"
                         alt="delete"
                         title='Delete'
@@ -110,19 +110,21 @@ function Sections({
             </div>
             {expandedSections[sectionIndex] && (
                 <>
-                    {sectionData?.pages.map((pageData, pageIndex) => (
-                        <Pages
-                            pageData={pageData}
-                            handleSaveSectionName={handleSaveSectionName}
-                            sectionIndex={sectionIndex}
-                            pageIndex={pageIndex}
-                            handleAddRemoveQuestion={handleAddRemoveQuestion}
-                            handleMoveEnd={handleMoveEnd}
-                            handleDeletePgaeModal={handleDeletePgaeModal}
-                            setShowPageDeleteModal={setShowPageDeleteModal}
-                        />
-                    ))}
-                    {/* Place "Add Page" button here, outside of the pages map */}
+                    <DraggableList
+                        itemKey="page_id"
+                        template={Pages}
+                        list={sectionData?.pages?.map((pageData, pageIndex) => ({
+                            ...pageData,
+                            sectionIndex,
+                            index: pageIndex,
+                            setShouldAutoSave: setShouldAutoSave,
+                            selectedQuestionId: selectedQuestionId,
+                        }))}
+                        onMoveEnd={(newList) => handleMoveEnd(newList, sectionIndex, pageIndex)}
+                        container={() => document.body}
+
+                    >
+                    </DraggableList>
                     <button
                         onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
                         data-testid={`add-page-sec-${sectionIndex}`}

@@ -7,38 +7,26 @@ import FormShimmer from '../../Components/Shimmers/FormShimmer.jsx';
 import AddFields from './Components/AddFieldComponents/AddFields.jsx';
 import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
-import TextBoxField from './Components/Fields/TextBox/TextBoxField.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 // import EditableField from '../../Components/EditableField/EditableField.jsx';
 // import globalStates from '../../Pages/QuestionnaryForm/Components/Fields/GlobalStates.js'
-import ChoiceBoxField from './Components/Fields/ChoiceBox/ChoiceBoxField.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
-import DateTimeField from './Components/Fields/DateTime/DateTimeField.jsx';
 import DateTimeFieldSetting from './Components/Fields/DateTime/DateTimeFieldSetting/DateTimeFieldSetting.jsx';
-import AssetLocationField from './Components/Fields/AssetLocation/AssetLocationField.jsx';
 import AssetLocationFieldSetting from './Components/Fields/AssetLocation/AssetLocationFieldSetting/AssetLocationFieldSetting.jsx';
-import NumberField from './Components/Fields/Number/NumberField.jsx';
 import NumberFieldSetting from './Components/Fields/Number/NumberFieldSetting/NumberFieldSetting.jsx';
-import FloorPlanField from './Components/Fields/FloorPlan/FloorPlanField.jsx';
 import FloorPlanSettings from './Components/Fields/FloorPlan/FloorPlanSettings/FloorPlanSettings.jsx';
-import PhotoField from './Components/Fields/PhotoField/PhotoFIeld.jsx';
 import PhotoFieldSetting from './Components/Fields/PhotoField/PhtoFieldSetting/PhotoFieldSetting.jsx';
-import VideoField from './Components/Fields/VideoField/VideoField.jsx';
 import VideoFieldSetting from './Components/Fields/VideoField/VideoFieldSetting/VideoFieldSetting.jsx';
-import FileField from './Components/Fields/File/FileFIeld.jsx';
 import FileFieldSetting from './Components/Fields/File/FileFieldSetting/FileFieldSetting.jsx';
-import SignatureField from './Components/Fields/Signature/SignatureField.jsx';
 import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldSetting/SignatureFieldSetting.jsx';
-import GPSField from './Components/Fields/GPS/GPSField.jsx';
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
-import DIsplayContentField from './Components/Fields/DisplayContent/DIsplayContentField.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setSelectedPageId, setSelectedSectionId } from './Components/QuestionnaryFormSlice.js'
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -59,7 +47,6 @@ function QuestionnaryForm() {
         }]
     }]);
     const sectionRefs = useRef([]);
-    const pageRefs = useRef({});
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
@@ -67,15 +54,12 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [showPageDeleteModal, setShowPageDeleteModal] = useState(false);
-    // const [showquestionDeleteModal, setShowquestionDeleteModal] = useState(false);
-    // const [pageToDelete, setPageToDelete] = useState({ sectionIndex: null, pageIndex: null });
-    // const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
 
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const selectedPageId = useSelector((state) => state?.questionnaryForm?.selectedPageId);
+    const selectedSectionId = useSelector((state) => state?.questionnaryForm?.selectedSectionId);
     const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
@@ -86,8 +70,8 @@ function QuestionnaryForm() {
     const pageToDelete = useSelector((state) => state?.questionnaryForm?.pageToDelete);
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
-
-
+    const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
+    const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
@@ -103,7 +87,7 @@ function QuestionnaryForm() {
 
 
     const handleCancel = () => {
-        setModalOpen(false);
+        dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
 
@@ -111,13 +95,13 @@ function QuestionnaryForm() {
         console.log(sectionIndex, 'sectionIndex')
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
         setSelectedSectionData(sectionData)
-        setModalOpen(true);
+        dispatch(setModalOpen(true));
     }
-    const handleDeletePgaeModal = (sectionIndex, pageIndex, pageData) => {
-        dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
-        dispatch(setSelectedSectionData(pageData));
-        setModalOpen(true);
-    }
+    // const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
+    //     dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
+    //     dispatch(setSelectedSectionData(pageData));
+    //     setModalOpen(true);
+    // }
 
     // const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
     //     dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
@@ -129,14 +113,14 @@ function QuestionnaryForm() {
         console.log(sectionToDelete, 'sectionToDelete')
         if (sectionToDelete !== null) {
             handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
-            setModalOpen(false); // Close the modal
+            dispatch(setModalOpen(false)); // Close the modal
         }
     }
 
     const confirmDeletePage = () => {
         if (pageToDelete.sectionIndex !== null && pageToDelete.pageIndex !== null) { // Check if indices are valid
             handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex, selectedSectionData); // Pass selectedSectionData instead of undefined pageData
-            setShowPageDeleteModal(false);
+            dispatch(setShowPageDeleteModal(false));
         }
     }
 
@@ -1119,9 +1103,6 @@ function QuestionnaryForm() {
                                     setExpandedSections={setExpandedSections}
                                     handleSaveSectionName={handleSaveSectionName}
                                     dataIsSame={dataIsSame}
-                                    handleDeletePgaeModal={handleDeletePgaeModal}
-                                    setShowPageDeleteModal={setShowPageDeleteModal}
-                                    setModalOpen={setModalOpen}
                                     setSections={setSections}
                                     sections={sections}
                                     selectedQuestionId={selectedQuestionId}
@@ -1201,7 +1182,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
                     isModalOpen={isModalOpen}
-                    setModalOpen={setModalOpen}
+                    setModalOpen={dispatch(setModalOpen)}
                     handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
                     handleButton2={handleCancel} // Handle cancel button
                 />
@@ -1217,9 +1198,9 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete-page'
                     testIDBtn2='cancel-delete'
                     isModalOpen={showPageDeleteModal}
-                    setModalOpen={setShowPageDeleteModal}
+                    setModalOpen={dispatch(setShowPageDeleteModal)}
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
-                    handleButton2={() => setShowPageDeleteModal(false)} // Handle cancel button
+                    handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
             )}
             {showquestionDeleteModal && (

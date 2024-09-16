@@ -16,9 +16,11 @@ const initialState = {
     sectionToDelete: null,
     pageToDelete: { sectionIndex: null, pageIndex: null },
     questionToDelete: { sectionIndex: null, pageIndex: null, questionIndex: null },
-    showquestionDeleteModal: ''
-
-
+    showquestionDeleteModal: '',
+    showPageDeleteModal: '',
+    isModalOpen: '',
+    selectedPageId: '',
+    selectedSectionId: '',
 };
 
 
@@ -62,7 +64,19 @@ const questionnaryFormSlice = createSlice({
         },
         setShowquestionDeleteModal: (state, action) => {  
             state.showquestionDeleteModal = action.payload; 
-        }
+        },
+        setShowPageDeleteModal: (state, action) => {
+            state.showPageDeleteModal = action.payload;
+        },
+        setModalOpen: (state, action) => {
+            state.isModalOpen = action.payload;
+        },
+        setSelectedPageId: (state, action) => {
+            state.selectedPageId = action.payload;
+        },
+        setSelectedSectionId: (state, action) => {
+            state.selectedSectionId = action.payload;
+        },
     }
 });
 
@@ -80,6 +94,10 @@ export const {
     setSectionToDelete,
     setQuestionToDelete,
     setShowquestionDeleteModal,
+    setShowPageDeleteModal,
+    setModalOpen,
+    setSelectedPageId,
+    setSelectedSectionId,
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

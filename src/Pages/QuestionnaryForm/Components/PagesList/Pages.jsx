@@ -1,26 +1,28 @@
 import React, { useRef } from 'react'
 import EditableField from '../../../../Components/EditableField/EditableField';
 import DraggableList from 'react-draggable-list';
-import DraggableItem from '../DraggableItem/DraggableItem';
 import { useSelector } from 'react-redux';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal } from '../QuestionnaryFormSlice'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../QuestionnaryFormSlice'
+import DraggableQuestionItem from '../DraggableItem/DraggableQuestionItem';
 
-function Pages({ pageData,
-    handleSaveSectionName,
-    sectionIndex,
-    pageIndex,
-    handleAddRemoveQuestion,
-    handleMoveEnd,
-    handleDeletePgaeModal,
-    setShowPageDeleteModal,
-    handleDeletequestionModal
+function Pages({ item,
+    dragHandleProps
 
 }) {
+    const { pageIndex,
+        pageData,
+        setShouldAutoSave,
+        handleSaveSectionName,
+        sectionIndex,
+        handleAddRemoveQuestion,
+        handleMoveEnd,
+        handleDeletePgaeModal,
+        handleDeletequestionModal } = item;
 
     const pageRefs = useRef({});
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-
+    console.log(pageData, 'ietmssss')
 
     return (
         <div>
@@ -40,7 +42,30 @@ function Pages({ pageData,
                         maxLength={1}
                     />
                     <div className='flex items-center justify-end'>
-                        <img src="/Images/drag.svg" alt="drag" className='p-2 rounded-full hover:bg-[#EFF1F8] cursor-pointer' />
+                        <div
+                            className="disable-select dragHandle"
+                            onMouseDown={(e) => {
+                                document.body.style.overflow = "hidden";
+                                onMouseDown(e);
+                            }}
+                            onMouseUp={() => {
+                                document.body.style.overflow = "visible";
+                            }}
+                            onTouchStart={(e) => {
+                                document.body.style.overflow = "hidden";
+                                onTouchStart(e);
+                            }}
+                            onTouchEnd={() => {
+                                document.body.style.overflow = "visible";
+                            }}
+                        >
+                            <img
+                                className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]'
+                                title='Drag'
+                                src={`/Images/drag.svg`}
+                                alt="Drag"
+                            />
+                        </div>
                         <img src="/Images/trash-black.svg"
                             title='Delete'
                             alt="Delete"
@@ -48,15 +73,15 @@ function Pages({ pageData,
                             className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
                             onClick={() => {
                                 handleDeletePgaeModal(sectionIndex, pageIndex, pageData),
-                                    setShowPageDeleteModal(true)
+                                    dispatch(setShowPageDeleteModal(true));
                             }}
                         />
                     </div>
                 </div>
                 <DraggableList
                     itemKey="question_id"
-                    template={DraggableItem}
-                    list={pageData.questions.map((questionData, questionIndex) => ({
+                    template={DraggableQuestionItem}
+                    list={pageData?.questions.map((questionData, questionIndex) => ({
                         ...questionData,
                         sectionIndex,
                         pageIndex,
