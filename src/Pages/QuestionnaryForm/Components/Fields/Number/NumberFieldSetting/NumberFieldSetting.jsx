@@ -231,62 +231,60 @@ function NumberFieldSetting({
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
                     }
-                    {fieldSettingParameters?.source !== 'slider' &&
-                        <div className='mt-7'>
-                            <div className='flex justify-between'>
-                                <p
-                                    data-testid="pre-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
-                                        }`}
-                                    onClick={() => handleTabClick('preField')}
-                                >
-                                    Pre-field Text
-                                </p>
-                                <p
-                                    data-testid="post-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
-                                        }`}
-                                    onClick={() => handleTabClick('postField')}
-                                >
-                                    Post-field Text
-                                </p>
-                            </div>
-                            {/* Display the Pre-field input if preField is active */}
-                            {activeTab === 'preField' && (
-                                <div className='mt-3'>
-                                    <InputField
-                                        autoComplete='off'
-                                        id='preField'
-                                        type='preField'
-                                        value={fieldSettingParameters?.preField}
-                                        className='w-full'
-                                        labelStyle='font-semibold text-base text-[#2B333B]'
-                                        placeholder='Pre-field text'
-                                        testId='field-text'
-                                        htmlFor='preField'
-                                        maxLength={500}
-                                        handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
-                                    />
-                                </div>
-                            )}
-                            {/* Display the Post-field input if postField is active */}
-                            {activeTab === 'postField' && (
-                                <div className='mt-3'>
-                                    <InputField
-                                        autoComplete='off'
-                                        id='postField'
-                                        type='postField'
-                                        value={fieldSettingParameters?.postField}
-                                        className='w-full'
-                                        labelStyle='font-semibold text-base text-[#2B333B]'
-                                        placeholder='Post-field text'
-                                        testId='field-text'
-                                        htmlFor='postField'
-                                        maxLength={500}
-                                        handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
-                                    />
-                                </div>
-                            )}
+                    <div className='mt-7'>
+                        <div className='flex justify-between'>
+                            <p
+                                data-testid="pre-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                    }`}
+                                onClick={() => handleTabClick('preField')}
+                            >
+                                Pre-field Text
+                            </p>
+                            <p
+                                data-testid="post-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                    }`}
+                                onClick={() => handleTabClick('postField')}
+                            >
+                                Post-field Text
+                            </p>
                         </div>
-                    }
+                        {/* Display the Pre-field input if preField is active */}
+                        {activeTab === 'preField' && (
+                            <div className='mt-3'>
+                                <InputField
+                                    autoComplete='off'
+                                    id='preField'
+                                    type='preField'
+                                    value={fieldSettingParameters?.preField}
+                                    className='w-full'
+                                    labelStyle='font-semibold text-base text-[#2B333B]'
+                                    placeholder='Pre-field text'
+                                    testId='field-text'
+                                    htmlFor='preField'
+                                    maxLength={50}
+                                    handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
+                                />
+                            </div>
+                        )}
+                        {/* Display the Post-field input if postField is active */}
+                        {activeTab === 'postField' && (
+                            <div className='mt-3'>
+                                <InputField
+                                    autoComplete='off'
+                                    id='postField'
+                                    type='postField'
+                                    value={fieldSettingParameters?.postField}
+                                    className='w-full'
+                                    labelStyle='font-semibold text-base text-[#2B333B]'
+                                    placeholder='Post-field text'
+                                    testId='field-text'
+                                    htmlFor='postField'
+                                    maxLength={50}
+                                    handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
+                                />
+                            </div>
+                        )}
+                    </div>
                     <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField

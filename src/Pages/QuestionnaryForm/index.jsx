@@ -750,7 +750,6 @@ function QuestionnaryForm() {
     const handleDateTimeClick = useCallback(() => {
         addNewQuestion('dateTimefield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
-            dispatch(setNewComponent({ id: 'format', value: '12', questionId }));
 
         })
     })
