@@ -75,13 +75,12 @@ function QuestionnaryForm() {
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
     const [selectedQuestionId, setSelectedQuestionId] = useState('')
     const [shouldAutoSave, setShouldAutoSave] = useState(false);
-    // const [fieldSettingParameters, setFieldSettingParameters] = useState({});
     const [selectedSectionData, setSelectedSectionData] = useState({})
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-    
+
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -144,11 +143,21 @@ function QuestionnaryForm() {
 
         // Restrict numeric input if the id is 'fileType'
         let updatedValue = value;
+        // Handle URL prefill for http and https
         if (id === 'fileType') {
-            updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
+            // Remove numbers, spaces around commas, and trim any leading/trailing spaces
+            updatedValue = value
+                .replace(/[0-9]/g, '')      // Remove numbers
+                .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
+                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
+            updatedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/(\.\d{2})\d+/, '$1');
         }
+        // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
+        // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
+        // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
 
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
@@ -181,6 +190,7 @@ function QuestionnaryForm() {
         update[data[0]] = false;
         setDataIsSame(update);
 
+
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {
             clearTimeout(debounceTimerRef.current);
@@ -191,7 +201,6 @@ function QuestionnaryForm() {
             setShouldAutoSave(true);
         }, 100); // 100ms delay before auto-saving
     };
-
 
     const componentMap = {
         textboxfield: (props) =>
@@ -651,13 +660,7 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-                // if (showShimmer) {
-                //     setPageLoading(true);
-                // }
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                // if (showShimmer) {
-                //     setPageLoading(false);
-                // }
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -1169,8 +1172,6 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        // setFieldSettingParameters: setFieldSettingParameters,
-                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,

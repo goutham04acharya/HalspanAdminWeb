@@ -35,7 +35,7 @@ function PhotoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload Photo (${fileName})` : 'Upload Photo (X)'}
+                    {fileName ? `Upload Photo (${fileName})` : `${`Upload Photo (${fieldSettingParameters?.max || '3'})`}`}
                 </label>
                 <input
                     data-testid="input"

@@ -14,15 +14,11 @@ import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not alrea
 
 function DisplayFieldSetting({
     handleInputChange,
-    formParameters,
-    handleBlur,
     fieldSettingParameters,
     setShouldAutoSave,
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
-    setInputValue,
-    inputValue,
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -34,28 +30,41 @@ function DisplayFieldSetting({
 
 
     const options = [
-        { value: 'http', label: 'http' },
-        { value: 'https', label: 'https' },
-        { value: 'mailto', label: 'mailto' },
-        { value: 'tel', label: 'tel' }
+        { value: 'http://', label: 'http://' },
+        { value: 'https://', label: 'https://' },
+        { value: 'mailto:', label: 'mailto:' },
+        { value: 'tel:', label: 'tel:' }
     ];
 
     const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
+    // const handleOptionClick = (option) => {
+    //     setSelectedUrlOption(option.value);
+    //     setDropdownOpen(false);
+    //     dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
+    //     setShouldAutoSave(true)
+
+    //     // Prefill the input field based on the selected optio
+    // };
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
         setDropdownOpen(false);
+        
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        setShouldAutoSave(true)
-
-        // // Prefill the input field based on the selected option
-        // if (option.value === 'http' || option.value === 'https') {
-        //     setInputValue(`${option.value}://`);
-        // } else {
-        //     setInputValue('');
-        // }
+        setShouldAutoSave(true);
+    
+        // Prefill the input field based on the selected option
+        let updatedUrlValue = '';
+        if (option.value === 'http://' || option.value === 'https://' || option.value === 'mailto:' || option.value === 'tel:') {
+            updatedUrlValue = `${option.value}`; // Prefill with example.com for these types
+            console.log(updatedUrlValue, 'updatedUrlValue')
+        } else {
+            updatedUrlValue = ''; // Leave it empty for others
+        }
+    
+        // Update the input value (make sure you use the correct state updater)
     };
-
+    
     const handleFileUploadClick = () => {
         if (selectedFile) {
             setReplaceModal(true);
@@ -156,7 +165,6 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         setShouldAutoSave(true)
     }
-    console.log(selectedFile, 'image')
 
     return (
         <>
@@ -385,14 +393,16 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
-                                    value={fieldSettingParameters?.urlValue}
+                                    value={updatedUrlValue (fieldSettingParameters?.urlValue)}
                                     className='w-full mt-2.5'
                                     placeholder={
-                                        selectedUrlOption === 'mailto'
+                                        selectedUrlOption === 'mailto:'
                                             ? 'eg: support@halspan.com'
-                                            : selectedUrlOption === 'tel'
+                                            : selectedUrlOption === 'tel:'
                                                 ? 'eg: +44 7911 123456'
-                                                : 'Enter text'
+                                                : selectedUrlOption === 'http://' || selectedUrlOption === 'https://'
+                                                    ? `eg: ${selectedUrlOption} example.com`
+                                                    : 'Enter text'
                                     }
                                     testId='urlInput'
                                     htmlFor='urlValue'

@@ -15,7 +15,6 @@ function FileFieldSetting({ handleInputChange,
     validationErrors,
 
 }) {
-    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>

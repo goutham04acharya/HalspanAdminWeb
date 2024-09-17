@@ -6,7 +6,8 @@ import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/O
 import InputField from '../../../../../../Components/InputField/InputField';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
-function PhotoFieldSetting({ handleInputChange,
+function PhotoFieldSetting({
+    handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
@@ -59,7 +60,7 @@ function PhotoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max}
+                                value={fieldSettingParameters?.max || '3'}  // Use '3' as the default if max is not set
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
