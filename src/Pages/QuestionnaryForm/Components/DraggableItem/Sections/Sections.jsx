@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import EditableField from '../../../../../Components/EditableField/EditableField'
 import DraggableList from 'react-draggable-list'
-import GlobalContext from '../../../../../Components/Context/GlobalContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setShowPageDeleteModal, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setModalOpen } from '../../QuestionnaryFormSlice'
 import Pages from '../PagesList/Pages';
@@ -169,7 +168,8 @@ function Sections({
                             handleAddRemoveQuestion: handleAddRemoveQuestion,
                             sections: sections,
                             setSections: setSections,
-                            pageIndex: pageIndex
+                            pageIndex: pageIndex,
+                            handleAutoSave: handleAutoSave
                         }))}
                         onMoveEnd={(newList) => handleMoveEndPages(newList, sectionIndex)}
                         container={() => document.body}

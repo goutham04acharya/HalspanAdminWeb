@@ -360,7 +360,7 @@ function QuestionnaryForm() {
 
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
-            console.log(sectionIndex,'sectionIndex')
+            console.log(sectionIndex, 'sectionIndex')
             const isSaved = dataIsSame?.[sectionId] || false;
 
             if (isSaved) {
@@ -496,42 +496,31 @@ function QuestionnaryForm() {
         })]);
     };
 
-    const handleMoveEndSections = (newList, sectionIndex, pageIndex) => {
-        // Create a copy of the sections array to avoid direct mutation
-        const updatedSections = [...sections];
+    const handleMoveEndSections = (newList) => {
+        // Ensure newList is correctly formatted
+        const updatedSections = newList.map((item, index) => ({
+            ...item,
+            sectionIndex: index, // Update the section index if needed
+        }));
 
-        // Create a copy of the specific page's data to avoid mutating the original data
-        const updatedPages = [...updatedSections[sectionIndex].pages];
-
-        // Create a copy of the questions and update with the new list
-        updatedPages[pageIndex] = {
-            ...updatedPages[pageIndex],
-            questions: newList,
-        };
-
-        // Update the specific section's pages with the updated pages
-        updatedSections[sectionIndex] = {
-            ...updatedSections[sectionIndex],
-            pages: updatedPages,
-        };
-
-        // Update the sections state with the updatedSections array
+        // Update the state with the new section order
         setSections(updatedSections);
 
-        // Retrieve the sectionId using the sectionIndex
-        const sectionId = updatedSections[sectionIndex].section_id;
+        // Prepare the data to send to the backend
+        const newOrder = updatedSections.map(section => section.sectionData.section_id);
+        console.log(newOrder, 'newOrder');
 
-        // Update dataIsSame for the current section
+        // Optionally call handleAutoSave or other necessary actions
         const update = { ...dataIsSame };
-        update[sectionId] = false;
+        updatedSections.forEach(section => {
+            update[section.sectionData.section_id] = false;
+        });
         dispatch(setDataIsSame(update));
+    };
 
-        // Call handleAutoSave with the correct sectionId and updated sections
-        handleAutoSave(sectionId, updatedSections);
-    }
 
     // API to get the fieldSettingData 
-    
+
     const getFieldSetting = async () => {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
         if (!response.error) {
@@ -998,7 +987,6 @@ function QuestionnaryForm() {
                                 container={() => document.body}
                             >
                             </DraggableList>
-                       
                             <button
                                 onClick={() => handleAddRemoveSection('add')}
                                 data-testid="add-section"
@@ -1067,7 +1055,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
                     isModalOpen={isModalOpen}
-                    setModalOpen={dispatch(setModalOpen)}
+                    setModalOpen={dispatch(setModalOpen())}
                     handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
                     handleButton2={handleCancel} // Handle cancel button
                 />

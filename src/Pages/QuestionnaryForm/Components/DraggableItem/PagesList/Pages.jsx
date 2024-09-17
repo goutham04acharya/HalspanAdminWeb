@@ -18,6 +18,7 @@ function Pages({ item,
         handleAddRemoveQuestion,
         handleDeletequestionModal,
         sections,
+        handleAutoSave,
         setSections } = item;
 
     const { onMouseDown, onTouchStart } = dragHandleProps;
