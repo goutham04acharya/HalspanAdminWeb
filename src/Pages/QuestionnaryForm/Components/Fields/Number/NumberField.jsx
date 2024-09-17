@@ -69,18 +69,28 @@ function NumberField({
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <div data-testid="slider" className='w-[30%]'>
-                    <input
-                        type="range"
-                        min={minRange}
-                        max={maxRange}
-                        value={sliderValue}
-                        onChange={handleRange}
-                        style={{
-                            '--percent': `${sliderPercentage}%`
-                        }}
-                        className='mt-6 custom-slider'
-                    />
+                <div data-testid="slider" className=''>
+                    <div className='flex items-center w-full'>
+                        {fieldSettingParameters?.preField &&
+                            <p className='w-auto max-w-[30%] break-all overflow-auto'>{fieldSettingParameters?.preField}</p>
+                        }
+                        <div className='w-[40%]'>
+                            <input
+                                type="range"
+                                min={minRange}
+                                max={maxRange}
+                                value={sliderValue}
+                                onChange={handleRange}
+                                maxLength={50}
+                                style={{
+                                    '--percent': `${sliderPercentage}%`
+                                }}
+                                className='mt-6 custom-slider w-full'
+                            />
+                        </div>
+                        {fieldSettingParameters?.preField &&
+                            <p className='w-auto max-w-[30%] break-all overflow-auto'>{fieldSettingParameters?.postField}</p>}
+                    </div>
                     <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
                         Select Value: {sliderValue}
                     </p>
