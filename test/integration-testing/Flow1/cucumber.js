@@ -24,6 +24,7 @@ module.exports = {
             'test/integration-testing/Flow1/22_signature_as_field.feature',
             'test/integration-testing/Flow1/21_gps_as_field.feature',
             'test/integration-testing/Flow1/23_display_content_as_field.feature',
+            'test/integration-testing/Flow1/28_save_questionnaire.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }
