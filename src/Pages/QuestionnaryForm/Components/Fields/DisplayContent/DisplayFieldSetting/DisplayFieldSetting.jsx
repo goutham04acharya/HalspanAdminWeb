@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
-import ConfirmationModal from '../../../../../../Components/Modals/ConfirmationModal/ConfirmationModal';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
-import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown';
 import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
@@ -38,33 +35,15 @@ function DisplayFieldSetting({
 
     const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
-    // const handleOptionClick = (option) => {
-    //     setSelectedUrlOption(option.value);
-    //     setDropdownOpen(false);
-    //     dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-    //     setShouldAutoSave(true)
-
-    //     // Prefill the input field based on the selected optio
-    // };
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
+        // setTypeInput(option.value)
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: option.value, questionId: selectedQuestionId }));
+
         setShouldAutoSave(true);
-
-        if (selectedUrlOption !== option.value) {
-            // Clear the URL input value when switching to a new option
-            dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
-        }
-
-        // Prefill the input field based on the selected option
-        let updatedUrlValue = '';
-        if (option.value === 'http://' || option.value === 'https://' || option.value === 'mailto:' || option.value === 'tel:') {
-            updatedUrlValue = `${option.value}`; // Prefill with example.com for these types
-        } else {
-            updatedUrlValue = ''; // Leave it empty for others
-        }
 
         // Update the input value (make sure you use the correct state updater)
     };
@@ -397,7 +376,7 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
-                                    prefixValue={selectedUrlOption}
+                                    // value={fieldSettingParameters?.urlValue}
                                     value={fieldSettingParameters?.urlValue}
                                     className='w-full mt-2.5'
                                     placeholder={
