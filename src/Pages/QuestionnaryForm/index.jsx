@@ -137,15 +137,15 @@ function QuestionnaryForm() {
         // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
 
         // Check if the input field's id is the one you want to manage with inputValue
-        if (id === 'urlValue') {
-            setInputValue(updatedValue); // Update inputValue if the id matches
-        }
+        // if (id === 'urlValue') {
+        //     setInputValue(updatedValue); // Update inputValue if the id matches
+        // }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         setFixedMaxValue(updatedValue);
 
         // Check if min is greater than max and set error message
-        if (id === 'min' || id === 'max' ) {
+        if (id === 'min' || id === 'max') {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
             const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
 
@@ -159,6 +159,23 @@ function QuestionnaryForm() {
                 setValidationErrors(prevErrors => ({
                     ...prevErrors,
                     minMax: '',
+                }));
+            }
+        }
+        // Validate incrementby value against the max range
+        if (id === 'incrementby') {
+            const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
+
+            if (Number(updatedValue) > maxRange) {
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    incrementby: `Value cannot exceed the maximum range of ${maxRange}`,
+                }));
+            } else {
+                // Clear the error if within the range
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    incrementby: '',
                 }));
             }
         }
@@ -867,7 +884,7 @@ function QuestionnaryForm() {
             format: fieldSettingParams?.[selectedQuestionId]?.format,
             field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield'  || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
+                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
@@ -1039,7 +1056,7 @@ function QuestionnaryForm() {
                                         // setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-                                        fixedMaxValue : fixedMaxValue
+                                        fixedMaxValue: fixedMaxValue
                                     }
                                 )
                             ) : (

@@ -12,6 +12,7 @@ import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceV
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -367,6 +368,9 @@ function ChoiceFieldSetting({
                                     <img src="/Images/plus.svg" alt="plus" />
                                 </button>
                             </div>}
+                        {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
+                            <ErrorMessage error={'No lookup list available. Please create one'}/>
+                        )}
                         {/* OptionsComponent added here */}
                         <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
