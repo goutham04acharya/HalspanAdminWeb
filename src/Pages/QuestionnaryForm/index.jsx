@@ -33,6 +33,7 @@ function QuestionnaryForm() {
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
     const dispatch = useDispatch();
+    const [fixedMaxValue, setFixedMaxValue] = useState('3');
     const section1Id = `SEC-${uuidv4()}`;
     const page1Id = `${section1Id}_PG-${uuidv4()}`;
     let [sections, setSections] = useState([{
@@ -119,11 +120,21 @@ function QuestionnaryForm() {
 
         // Restrict numeric input if the id is 'fileType'
         let updatedValue = value;
+        // Handle URL prefill for http and https
         if (id === 'fileType') {
-            updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
+            // Remove numbers, spaces around commas, and trim any leading/trailing spaces
+            updatedValue = value
+                .replace(/[0-9]/g, '')      // Remove numbers
+                .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
+                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
+            updatedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/(\.\d{2})\d+/, '$1');
         }
+        // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
+        // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
+        // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
 
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
@@ -131,11 +142,12 @@ function QuestionnaryForm() {
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+        setFixedMaxValue(updatedValue);
 
         // Check if min is greater than max and set error message
-        if (id === 'min' || id === 'max') {
+        if (id === 'min' || id === 'max' ) {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-            const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
+            const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
 
             if (Number(minValue) > Number(maxValue)) {
                 setValidationErrors(prevErrors => ({
@@ -855,7 +867,7 @@ function QuestionnaryForm() {
             format: fieldSettingParams?.[selectedQuestionId]?.format,
             field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: fieldSettingParams?.[selectedQuestionId]?.max,
+                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield'  || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
@@ -938,7 +950,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
     return (
         <>
             {pageLoading ? (
@@ -1020,8 +1031,6 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        // setFieldSettingParameters: setFieldSettingParameters,
-                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
@@ -1030,6 +1039,7 @@ function QuestionnaryForm() {
                                         // setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+                                        fixedMaxValue : fixedMaxValue
                                     }
                                 )
                             ) : (
