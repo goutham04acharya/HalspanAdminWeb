@@ -49,10 +49,15 @@ function DisplayFieldSetting({
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
         setDropdownOpen(false);
-        
+
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
         setShouldAutoSave(true);
-    
+
+        if (selectedUrlOption !== option.value) {
+            // Clear the URL input value when switching to a new option
+            dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
+        }
+
         // Prefill the input field based on the selected option
         let updatedUrlValue = '';
         if (option.value === 'http://' || option.value === 'https://' || option.value === 'mailto:' || option.value === 'tel:') {
@@ -60,10 +65,10 @@ function DisplayFieldSetting({
         } else {
             updatedUrlValue = ''; // Leave it empty for others
         }
-    
+
         // Update the input value (make sure you use the correct state updater)
     };
-    
+
     const handleFileUploadClick = () => {
         if (selectedFile) {
             setReplaceModal(true);
