@@ -81,7 +81,7 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-
+    
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -232,14 +232,17 @@ function QuestionnaryForm() {
         photofield: (props) =>
             <PhotoField
                 {...props}
+                fixedMaxValue={fixedMaxValue}
             />,
         videofield: (props) =>
             <VideoField
                 {...props}
+                fixedMaxValue={fixedMaxValue}
             />,
         filefield: (props) =>
             <FileField
                 {...props}
+                fixedMaxValue={fixedMaxValue}
             />,
         signaturefield: (props) =>
             <SignatureField
@@ -405,10 +408,7 @@ function QuestionnaryForm() {
 
             removeIndexAndShift(sections[sectionIndex].section_id);
 
-            // Update the saved status
-            // const update = { ...dataIsSame };
-            // update.splice(sectionIndex, 1);
-            // setDataIsSame(update);
+
         } else {
             sections = sections.splice(0, sectionIndex);
             setSections([...sections]);
