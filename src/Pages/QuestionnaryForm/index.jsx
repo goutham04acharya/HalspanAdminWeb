@@ -44,6 +44,7 @@ function QuestionnaryForm() {
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
+    const [fixedMaxValue, setFixedMaxValue] = useState('3');
     const section1Id = `SEC-${uuidv4()}`;
     const page1Id = `${section1Id}_PG-${uuidv4()}`;
     let [sections, setSections] = useState([{
@@ -165,11 +166,12 @@ function QuestionnaryForm() {
         }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+        setFixedMaxValue(updatedValue);
 
         // Check if min is greater than max and set error message
-        if (id === 'min' || id === 'max') {
+        if (id === 'min' || id === 'max' ) {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-            const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
+            const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
 
             if (Number(minValue) > Number(maxValue)) {
                 setValidationErrors(prevErrors => ({
@@ -915,7 +917,7 @@ function QuestionnaryForm() {
             format: fieldSettingParams?.[selectedQuestionId]?.format,
             field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: fieldSettingParams?.[selectedQuestionId]?.max,
+                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield'  || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
@@ -1012,7 +1014,6 @@ function QuestionnaryForm() {
             setShouldAutoSave(false); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
     return (
         <>
             {pageLoading ? (
@@ -1180,6 +1181,7 @@ function QuestionnaryForm() {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+                                        fixedMaxValue : fixedMaxValue
                                     }
                                 )
                             ) : (

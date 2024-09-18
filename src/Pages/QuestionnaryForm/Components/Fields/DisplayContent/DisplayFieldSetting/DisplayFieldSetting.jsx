@@ -57,7 +57,6 @@ function DisplayFieldSetting({
         let updatedUrlValue = '';
         if (option.value === 'http://' || option.value === 'https://' || option.value === 'mailto:' || option.value === 'tel:') {
             updatedUrlValue = `${option.value}`; // Prefill with example.com for these types
-            console.log(updatedUrlValue, 'updatedUrlValue')
         } else {
             updatedUrlValue = ''; // Leave it empty for others
         }
@@ -393,7 +392,8 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
-                                    value={updatedUrlValue (fieldSettingParameters?.urlValue)}
+                                    prefixValue={selectedUrlOption}
+                                    value={fieldSettingParameters?.urlValue}
                                     className='w-full mt-2.5'
                                     placeholder={
                                         selectedUrlOption === 'mailto:'

@@ -27,7 +27,7 @@ function DIsplayContentField({
                 />
             }
             {fieldSettingParameters?.type === 'url' &&
-                <p data-testid="url" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3 cursor-pointer'><a href="" className='underline'>{fieldSettingParameters?.urlValue}</a></p>
+                <p data-testid="url" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3 cursor-pointer'><a href="#" className='underline'>{fieldSettingParameters?.urlType}{fieldSettingParameters?.urlValue}</a></p>
             }
         </div>
     )

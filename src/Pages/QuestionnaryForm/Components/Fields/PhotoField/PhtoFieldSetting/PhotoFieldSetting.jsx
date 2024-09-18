@@ -15,6 +15,7 @@ function PhotoFieldSetting({
     setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
+    fixedMaxValue,
 
 }) {
     const dispatch = useDispatch();
@@ -60,7 +61,7 @@ function PhotoFieldSetting({
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max || '3'}  // Use '3' as the default if max is not set
+                                value={fixedMaxValue}  // Use '3' as the default if max is not set
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
