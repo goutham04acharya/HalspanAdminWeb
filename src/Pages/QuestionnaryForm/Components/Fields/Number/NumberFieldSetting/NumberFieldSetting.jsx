@@ -231,6 +231,9 @@ function NumberFieldSetting({
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
                     }
+                    {validationErrors?.incrementby && (
+                        <ErrorMessage error={validationErrors.incrementby} />
+                    )}
                     <div className='mt-7'>
                         <div className='flex justify-between'>
                             <p
