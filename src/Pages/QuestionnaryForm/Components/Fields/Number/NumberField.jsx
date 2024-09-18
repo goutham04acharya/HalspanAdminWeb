@@ -73,7 +73,7 @@ function NumberField({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={value}
+                    value={`${fieldSettingParameters?.preField} ${fieldSettingParameters?.postField}`}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-5 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent}
                     onChange={() => handleChange(fieldSettingParameters)}
