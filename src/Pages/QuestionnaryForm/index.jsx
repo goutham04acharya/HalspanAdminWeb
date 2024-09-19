@@ -604,7 +604,6 @@ function QuestionnaryForm() {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
-            console.log(response?.data?.data?.items, 'response?.data?.data?.items')
         } else {
             setToastError('Something went wrong!')
         }
@@ -984,7 +983,6 @@ function QuestionnaryForm() {
             const response = await PatchAPI(`field-settings/${questionnaire_id}/${selectedQuestionId}`, payload);
             if (response?.data?.status >= 401) {
                 setToastError(response?.data?.data?.message || 'Something went wrong');
-                console.log(response?.data?.data?.message)
             }
             dispatch(saveCurrentData());
         } catch (error) {
