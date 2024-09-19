@@ -85,7 +85,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
 
     Examples:
       | url      | url-text                      |
-      | "http"   | "http://halspan.com"          |
-      | "https"  | "https://halspan.com"         |
+      | "http"   | "halspan.com"                 |
+      | "https"  | "halspan.com"                 |
       | "mailto" | "halspan.support@halspan.com" |
       | "tel"    | "7911123456"                  |

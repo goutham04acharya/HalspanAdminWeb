@@ -8,7 +8,8 @@ function VideoField({ label,
     className,
     handleChange,
     fieldSettingParameters,
-    testId
+    testId,
+    fixedMaxValue
 
 }) {
 
@@ -35,7 +36,8 @@ function VideoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload Video (${fileName})` : 'Upload Video (X)'}
+                    {fileName ? `Upload Video (${fileName})` : `${`Upload Video (${fixedMaxValue})`}`}
+
                 </label>
                 <input
                     data-testid="input"
