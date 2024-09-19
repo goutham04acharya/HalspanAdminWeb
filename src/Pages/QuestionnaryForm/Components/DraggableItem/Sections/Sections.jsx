@@ -1,192 +1,205 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import EditableField from '../../../../../Components/EditableField/EditableField'
-import DraggableList from 'react-draggable-list'
-import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setShowPageDeleteModal, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setModalOpen } from '../../QuestionnaryFormSlice'
-import Pages from '../PagesList/Pages';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import EditableField from "../../../../../Components/EditableField/EditableField";
+import DraggableList from "react-draggable-list";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setShouldAutoSave,
+  setShowPageDeleteModal,
+  setSelectedSectionData,
+  setPageToDelete,
+  setModalOpen,
+  setDataIsSame
+} from "../../QuestionnaryFormSlice";
+import Pages from "../PagesList/Pages";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
+function Sections({sectionData,
+  sectionIndex,
+  expandedSections,
+  setExpandedSections,
+  handleSaveSectionName,
+  dataIsSame,
+  handleAddRemovePage,
+  handleAddRemoveQuestion,
+  sections,
+  setSections,
+  handleAutoSave,
+ }) {
 
+  const sectionRefs = useRef([]);
+  const dispatch = useDispatch();
+  // const { onMouseDown, onTouchStart } = dragHandleProps;
 
-function Sections({
-    item,
-    dragHandleProps,
+  const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
+    dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
+    dispatch(setSelectedSectionData(pageData));
+    dispatch(setModalOpen(true));
+  }
 
-}) {
-    const { sectionData,
-        sectionIndex,
-        expandedSections,
-        setExpandedSections,
-        handleSaveSectionName,
-        dataIsSame,
-        selectedQuestionId,
-        handleAddRemovePage,
-        handleAddRemoveQuestion,
-        sections,
-        setSections,
-        handleAutoSave,
-        handleSaveSection
-    } = item
-
-
-    const sectionRefs = useRef([]);
-    const dispatch = useDispatch();
-    const { onMouseDown, onTouchStart } = dragHandleProps;
-
-    const handleDeleteModal = (sectionIndex, sectionData) => {
-        dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
-        setSelectedSectionData(sectionData)
-        dispatch(setModalOpen(true));
+  // Load expanded sections from localStorage on component mount
+  useEffect(() => {
+    const savedExpandedSections = localStorage.getItem("expandedSections");
+    if (savedExpandedSections) {
+      setExpandedSections(JSON.parse(savedExpandedSections));
     }
+  }, []);
 
-    const handleMoveEndPages = (newList, sectionIndex, pageIndex) => {
-        // Create a copy of the sections array to avoid direct mutation
-        const updatedSections = [...sections];
+  // Save expanded sections to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
+  }, [expandedSections]);
 
-        const updatedNewList = newList.map(item => ({
-            ...item.pageData, // Spread the pageData properties (questions, page_id, page_name)
-            sectionIndex: item.sectionIndex,
-            index: item.index,
-        }));
 
-        // Update the specific section's pages with the updated pages
-        updatedSections[sectionIndex] = {
-            ...updatedSections[sectionIndex],
-            pages: updatedNewList,
-        };
-
-        // Update the sections state with the updatedSections array
-        setSections(updatedSections);
-
-        // Retrieve the sectionId using the sectionIndex
-        const sectionId = updatedSections[sectionIndex].section_id;
-
-        // Update dataIsSame for the current section
-        const update = { ...dataIsSame };
-        update[sectionId] = false;
-        dispatch(setDataIsSame(update));
-
-        // Call handleAutoSave with the correct sectionId and updated sections
-        handleAutoSave(sectionId, updatedSections);
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+  
+    const { source, destination } = result;
+    // const sectionIndex = source.droppableId; // Assuming sectionIndex is provided by droppableId
+    const pageIndex = source.index;
+  
+    // Create a copy of the current section's pages
+    const updatedSections = [...sections];
+    const reorderedPages = Array.from(updatedSections[sectionIndex]?.pages || []);
+  
+    // Reorder the pages based on drag and drop
+    const [movedPage] = reorderedPages.splice(pageIndex, 1);
+    reorderedPages.splice(destination.index, 0, movedPage);
+  
+    // Map reordered pages with updated indices
+    const updatedPageList = reorderedPages.map((pageData, index) => ({
+      ...pageData,  // Spread the existing page properties
+      sectionIndex: sectionIndex,  // Set the sectionIndex for each page
+      index: index,  // Update the page index in the reordered list
+    }));
+  
+    // Update the specific section with the reordered pages
+    updatedSections[sectionIndex] = {
+      ...updatedSections[sectionIndex],
+      pages: updatedPageList,
     };
+  
+    // Set the updated sections state
+    setSections(updatedSections);
+  
+    // Retrieve the sectionId from the updatedSections
+    const sectionId = updatedSections[sectionIndex].section_id;
+  
+    // Update dataIsSame for the current section
+    const updatedDataIsSame = { ...dataIsSame };
+    updatedDataIsSame[sectionId] = false;
+    dispatch(setDataIsSame(updatedDataIsSame));
+  
+    // Call handleAutoSave with the correct sectionId and updated sections
+    handleAutoSave(sectionId, updatedSections);
+  };
 
-    // to open and close the sections
-    const toggleSection = (sectionIndex) => {
-        setExpandedSections((prev) => ({
-            ...prev,
-            [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
-        }));
-    };
-
-    // Load expanded sections from localStorage on component mount
-    useEffect(() => {
-        const savedExpandedSections = localStorage.getItem('expandedSections');
-        if (savedExpandedSections) {
-            setExpandedSections(JSON.parse(savedExpandedSections));
-        }
-    }, []);
-
-    // Save expanded sections to localStorage whenever it changes
-    useEffect(() => {
-        localStorage.setItem('expandedSections', JSON.stringify(expandedSections));
-    }, [expandedSections]);
-
-
-    return (
-        <div
-            key={sectionData?.section_id}
-            id={sectionData?.section_id}
-            ref={el => sectionRefs.current[sectionIndex] = el}
-            className={`p-[6px] hover:border-[#2B333B] hover:border rounded-[10px] ${expandedSections[sectionIndex] ? 'pb-6 my-[25px]' : 'pb-0 mt-[10px] mb-0'}`}>
-            <div className='flex items-start justify-between w-full gap-3 relative'>
-                <div className='flex items-start'>
-                    <img
-                        src="/Images/open-Filter.svg"
-                        alt="down-arrow"
-                        className={`cursor-pointer pt-6 pl-2 transform transition-transform duration-300 mr-2 ${expandedSections[sectionIndex] ? 'rotate-180 mt-5 ml-2' : '' // Rotate 180deg when expanded
-                            }`}
-                        onClick={() => toggleSection(sectionIndex)} // Toggle section on click
-                    />
-                    <EditableField
-                        name={sectionData?.section_name}
-                        index={sectionIndex}
-                        handleSave={handleSaveSectionName}
-                        section={true}
-                        testId={`section-${sectionIndex}-name`}
-                    />
-                </div>
-                <div className='flex items-center justify-end'>
-                    <div
-                        className="disable-select dragHandle"
-                        onMouseDown={(e) => {
-                            document.body.style.overflow = "hidden";
-                            onMouseDown(e);
-                        }}
-                        onMouseUp={() => {
-                            document.body.style.overflow = "visible";
-                        }}
-                        onTouchStart={(e) => {
-                            document.body.style.overflow = "hidden";
-                            onTouchStart(e);
-                        }}
-                        onTouchEnd={() => {
-                            document.body.style.overflow = "visible";
-                        }}
+  return (
+    <div
+      key={sectionData?.section_id}
+      id={sectionData?.section_id}
+      ref={(el) => (sectionRefs.current[sectionIndex] = el)}
+      className={`${expandedSections[sectionIndex]
+        ? ""
+        : "pb-0 mt-[10px] mb-0"
+        }`}
+    >
+      {expandedSections[sectionIndex] && (
+        <>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided) => (
+                <ul {...provided.droppableProps} ref={provided.innerRef}>
+                  {sectionData?.pages?.map((pageData, pageIndex) => (
+                    <Draggable
+                      key={pageData.page_id}
+                      draggableId={pageData.page_id}
+                      index={pageIndex}
                     >
-                        <img
-                            className='cursor-grab p-2 mb-2 absolute top-0 right-[80px] z-[9] rounded-full hover:bg-[#FFFFFF]'
-                            title='Drag'
-                            src={`/Images/drag.svg`}
-                            alt="Drag"
-                        />
-                    </div>
-                    <img src="/Images/trash-black.svg"
-                        alt="delete"
-                        title='Delete'
-                        data-testid={`delete-btn-${sectionIndex}`}
-                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                        // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                        onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
-                    />
-                    <img src="/Images/save.svg"
-                        alt="save"
-                        title='Save'
-                        data-testid={`save-btn-${sectionIndex}`}
-                        className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id] ? 'cursor-not-allowed' : 'cursor-pointer'}`} onClick={() => { if (!dataIsSame[sectionData.section_id]) handleSaveSection(sectionData?.section_id) }} />
-                </div>
-            </div>
-            {expandedSections[sectionIndex] && (
-                <>
-                    <DraggableList
-                        itemKey="page_id"
-                        template={Pages}
-                        list={sectionData?.pages?.map((pageData, pageIndex) => ({
-                            pageData,
-                            sectionIndex,
-                            index: pageIndex,
-                            setShouldAutoSave: setShouldAutoSave,
-                            selectedQuestionId: selectedQuestionId,
-                            handleAddRemoveQuestion: handleAddRemoveQuestion,
-                            sections: sections,
-                            setSections: setSections,
-                            pageIndex: pageIndex,
-                            handleAutoSave: handleAutoSave
-                        }))}
-                        onMoveEnd={(newList) => handleMoveEndPages(newList, sectionIndex)}
-                        container={() => document.body}
+                      {(provided) => (
+                        <li
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          // {...provided.dragHandleProps}
+                          className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
+                        >
+                          <div className="flex justify-between">
+                            <div className="flex items-center w-full">
+                              {/* <img
+                                src="/Images/open-Filter.svg"
+                                alt="down-arrow"
+                                className={`cursor-pointer pt-6 pl-2 transform transition-transform duration-300 mr-2 ${expandedSections[sectionIndex] ? "rotate-180 mt-5 ml-2" : "" // Rotate 180deg when expanded
+                                  }`}
+                                onClick={() => toggleSection(sectionIndex)} // Toggle section on click
+                              /> */}
+                              <EditableField
+                                name={pageData?.page_name}
+                                index={sectionIndex}
+                                secondIndex={pageIndex}
+                                handleSave={handleSaveSectionName}
+                                testId={`page-${pageIndex}-name`}
+                                maxLength={1}
+                              />
+                            </div>
+                            <div className="flex items-center">
+                              <img
+                                className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
+                                title="Drag"
+                                src={`/Images/drag.svg`}
+                                alt="Drag"
+                                {...provided.dragHandleProps}
+                              />
+                               <img src="/Images/trash-black.svg"
+                                title='Delete'
+                                alt="Delete"
+                                data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
+                                onClick={() => {
+                                  handleDeletePageModal(sectionIndex, pageIndex, pageData),
+                                    dispatch(setShowPageDeleteModal(true));
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <Pages
+                            pageIndex={pageIndex}
+                            pageData={pageData}
+                            setShouldAutoSave={setShouldAutoSave}
+                            handleSaveSectionName={handleSaveSectionName}
+                            sectionIndex={sectionIndex}
+                            handleAddRemoveQuestion={handleAddRemoveQuestion}
+                            sections={sections}
+                            handleAutoSave={handleAutoSave}
+                            setSections={setSections}
+                          />
+                        </li>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>
 
-                    >
-                    </DraggableList>
-                    <button
-                        onClick={() => handleAddRemovePage('add', sectionIndex, '', sectionData.section_id)}
-                        data-testid={`add-page-sec-${sectionIndex}`}
-                        className='flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]'>
-                        <span className='mr-[15px]'>+</span>
-                        <span>Add page</span>
-                    </button>
-                </>
-            )}
-        </div>
-    )
+          <button
+            onClick={() =>
+              handleAddRemovePage(
+                "add",
+                sectionIndex,
+                "",
+                sectionData.section_id
+              )
+            }
+            data-testid={`add-page-sec-${sectionIndex}`}
+            className="flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
+          >
+            <span className="mr-[15px]">+</span>
+            <span>Add page</span>
+          </button>
+        </>
+      )}
+    </div>
+  );
 }
 
-export default Sections
+export default Sections;

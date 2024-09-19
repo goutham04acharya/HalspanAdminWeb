@@ -25,6 +25,9 @@ import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayField
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import DraggableList from 'react-draggable-list';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import EditableField from '../../Components/EditableField/EditableField.jsx';
+
 
 function QuestionnaryForm() {
     const { questionnaire_id, version_number } = useParams();
@@ -33,7 +36,6 @@ function QuestionnaryForm() {
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
     const dispatch = useDispatch();
-    const [fixedMaxValue, setFixedMaxValue] = useState('3');
     const section1Id = `SEC-${uuidv4()}`;
     const page1Id = `${section1Id}_PG-${uuidv4()}`;
     let [sections, setSections] = useState([{
@@ -45,6 +47,7 @@ function QuestionnaryForm() {
             questions: []
         }]
     }]);
+
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -74,6 +77,7 @@ function QuestionnaryForm() {
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
+
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
@@ -86,13 +90,6 @@ function QuestionnaryForm() {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-
-    // const handleDeleteModal = (sectionIndex, sectionData) => {
-    //     console.log(sectionIndex, 'sectionIndex')
-    //     dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
-    //     setSelectedSectionData(sectionData)
-    //     dispatch(setModalOpen(true));
-    // }
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
@@ -120,34 +117,23 @@ function QuestionnaryForm() {
 
         // Restrict numeric input if the id is 'fileType'
         let updatedValue = value;
-        // Handle URL prefill for http and https
         if (id === 'fileType') {
-            // Remove numbers, spaces around commas, and trim any leading/trailing spaces
-            updatedValue = value
-                .replace(/[0-9]/g, '')      // Remove numbers
-                .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
-        } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
+            updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
-        } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
-            updatedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/(\.\d{2})\d+/, '$1');
         }
-        // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
-        // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
-        // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
 
         // Check if the input field's id is the one you want to manage with inputValue
-        // if (id === 'urlValue') {
-        //     setInputValue(updatedValue); // Update inputValue if the id matches
-        // }
+        if (id === 'urlValue') {
+            setInputValue(updatedValue); // Update inputValue if the id matches
+        }
 
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-        setFixedMaxValue(updatedValue);
 
         // Check if min is greater than max and set error message
         if (id === 'min' || id === 'max') {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-            const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
+            const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
 
             if (Number(minValue) > Number(maxValue)) {
                 setValidationErrors(prevErrors => ({
@@ -159,23 +145,6 @@ function QuestionnaryForm() {
                 setValidationErrors(prevErrors => ({
                     ...prevErrors,
                     minMax: '',
-                }));
-            }
-        }
-        // Validate incrementby value against the max range
-        if (id === 'incrementby') {
-            const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
-
-            if (Number(updatedValue) > maxRange) {
-                setValidationErrors(prevErrors => ({
-                    ...prevErrors,
-                    incrementby: `Value cannot exceed the maximum range of ${maxRange}`,
-                }));
-            } else {
-                // Clear the error if within the range
-                setValidationErrors(prevErrors => ({
-                    ...prevErrors,
-                    incrementby: '',
                 }));
             }
         }
@@ -195,57 +164,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(true));
         }, 100); // 100ms delay before auto-saving
     };
-
-    // const componentMap = {
-    //     textboxfield: (props) =>
-    //         <TextBoxField
-    //             {...props}
-    //         />,
-    //     choiceboxfield: (props) =>
-    //         <ChoiceBoxField
-    //             {...props}
-    //         />,
-    //     dateTimefield: (props) =>
-    //         <DateTimeField
-    //             {...props}
-    //         />,
-    //     assetLocationfield: (props) =>
-    //         <AssetLocationField
-    //             {...props}
-    //         />,
-    //     numberfield: (props) =>
-    //         <NumberField
-    //             {...props}
-    //         />,
-    //     floorPlanfield: (props) =>
-    //         <FloorPlanField
-    //             {...props}
-    //         />,
-    //     photofield: (props) =>
-    //         <PhotoField
-    //             {...props}
-    //         />,
-    //     videofield: (props) =>
-    //         <VideoField
-    //             {...props}
-    //         />,
-    //     filefield: (props) =>
-    //         <FileField
-    //             {...props}
-    //         />,
-    //     signaturefield: (props) =>
-    //         <SignatureField
-    //             {...props}
-    //         />,
-    //     gpsfield: (props) =>
-    //         <GPSField
-    //             {...props}
-    //         />,
-    //     displayfield: (props) =>
-    //         <DIsplayContentField
-    //             {...props}
-    //         />,
-    // };
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -389,7 +307,6 @@ function QuestionnaryForm() {
 
             // Retrieve the boolean value associated with the sectionId
             const sectionId = sections?.[sectionIndex]?.section_id;
-            console.log(sectionIndex, 'sectionIndex')
             const isSaved = dataIsSame?.[sectionId] || false;
 
             if (isSaved) {
@@ -404,10 +321,8 @@ function QuestionnaryForm() {
             removeIndexAndShift(sections[sectionIndex].section_id);
 
         } else {
-            console.log(sectionIndex, 'nnnnnnnnnnnnnnnnnnnnnn')
             sections = sections?.splice(0, sectionIndex);
             setSections([...sections]);
-            console.log(sections, 'coming undefiend')
         }
     };
 
@@ -525,29 +440,6 @@ function QuestionnaryForm() {
         })]);
     };
 
-    const handleMoveEndSections = (newList) => {
-        // Ensure newList is correctly formatted
-        const updatedSections = newList.map((item, index) => ({
-            ...item,
-            sectionIndex: index, // Update the section index if needed
-        }));
-
-        // Update the state with the new section order
-        setSections(updatedSections);
-
-        // Prepare the data to send to the backend
-        const newOrder = updatedSections.map(section => section.sectionData.section_id);
-        console.log(newOrder, 'newOrder');
-
-        // Optionally call handleAutoSave or other necessary actions
-        const update = { ...dataIsSame };
-        updatedSections.forEach(section => {
-            update[section.sectionData.section_id] = false;
-        });
-        dispatch(setDataIsSame(update));
-    };
-
-
     // API to get the fieldSettingData 
 
     const getFieldSetting = async () => {
@@ -560,23 +452,58 @@ function QuestionnaryForm() {
     }
 
     // API calling function
+    // const formDefaultDetails = useCallback(async () => {
+    //     setPageLoading(true);
+    //     const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+    //     dispatch(setFormDefaultInfo(response?.data?.data));
+    //     setSections(response?.data?.data?.sections);
+    //     const sections = response?.data?.data?.sections || [];
+
+    //     // Create an object with section_id as the key and true as the value
+    //     const updatedSections = sections.reduce((acc, section) => {
+    //         acc[section.section_id] = true;
+    //         return acc;
+    //     }, {});
+
+    //     dispatch(setDataIsSame(updatedSections));
+
+    //     setPageLoading(false);
+    // }, [getAPI, questionnaire_id, version_number]);
+
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
-        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-        dispatch(setFormDefaultInfo(response?.data?.data));
-        setSections(response?.data?.data?.sections);
-        const sections = response?.data?.data?.sections || [];
+        try {
+            const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            if (!response?.error) {
+                dispatch(setFormDefaultInfo(response.data.data));
+                const sectionsData = response.data.data.sections || [];
 
-        // Create an object with section_id as the key and true as the value
-        const updatedSections = sections.reduce((acc, section) => {
-            acc[section.section_id] = true;
-            return acc;
-        }, {});
+                // Fetch section order
+                const sectionOrder = await GetSectionOrder();
 
-        dispatch(setDataIsSame(updatedSections));
+                // Sort sections based on sectionOrder
+                const orderedSections = sectionOrder.map(orderId =>
+                    sectionsData.find(section => section.section_id === orderId)
+                ).filter(Boolean); // Filter out any undefined sections
 
-        setPageLoading(false);
-    }, [getAPI, questionnaire_id, version_number]);
+                // Create an object with section_id as the key and true as the value
+                const updatedSections = orderedSections.reduce((acc, section) => {
+                    acc[section.section_id] = true;
+                    return acc;
+                }, {});
+
+                dispatch(setDataIsSame(updatedSections));
+                setSections(orderedSections); // Set ordered sections
+            } else {
+                setToastError('Something went wrong fetching form details');
+            }
+        } catch (error) {
+            console.error(error)
+            setToastError('An error occurred during the API call');
+        } finally {
+            setPageLoading(false);
+        }
+    }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
 
     //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
@@ -607,6 +534,7 @@ function QuestionnaryForm() {
                     page_name: page.page_name,
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
+                        question_name: question?.question_name,
                     }))
                 }))
             }
@@ -650,21 +578,33 @@ function QuestionnaryForm() {
     };
 
     // Save the section and page name
-    const handleSaveSectionName = (value, index, secondIndex) => {
-        const updatedSections = [...sections];
 
-        // Check if secondIndex is provided to update a page name or a section name
-        if (secondIndex !== undefined && secondIndex !== null) {
-            updatedSections[index].pages[secondIndex].page_name = value;
+    const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
+        // Create a deep copy of sections
+        let updatedSections = sections.map((section, idx) => {
+            if (idx === sectionIndex) {
+                return {
+                    ...section, // Shallow copy the section
+                    pages: section.pages ? section.pages.map((page, pIdx) => (
+                        pageIndex === pIdx ? { ...page } : page // Shallow copy the page if needed
+                    )) : section.pages
+                };
+            }
+            return section;
+        });
+
+        // Check if a pageIndex is provided to update a page name or section name
+        if (pageIndex !== undefined && pageIndex !== null) {
+            updatedSections[sectionIndex].pages[pageIndex].page_name = value; // Safe to update now
         } else {
-            updatedSections[index].section_name = value;
+            updatedSections[sectionIndex].section_name = value;
         }
 
         // Update the sections state
         setSections(updatedSections);
 
         // Call handleAutoSave with the section ID and updated sections
-        handleAutoSave(updatedSections[index]?.section_id, updatedSections);
+        handleAutoSave(updatedSections[sectionIndex]?.section_id, updatedSections);
     };
 
     const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
@@ -682,6 +622,7 @@ function QuestionnaryForm() {
                     questions: page?.questions.map(question => ({
                         question_id: question?.question_id,
                         question_text: question?.question_name,
+                        question_name: question?.question_name,
                         // Include other necessary fields for questions here
                     }))
                 }))
@@ -884,7 +825,7 @@ function QuestionnaryForm() {
             format: fieldSettingParams?.[selectedQuestionId]?.format,
             field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
@@ -942,6 +883,67 @@ function QuestionnaryForm() {
         }
     };
 
+    const handleDeleteModal = (sectionIndex, sectionData) => {
+        console.log(selectedSectionData, 'sectionIndexsectionIndex')
+        dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
+        setSelectedSectionData(sectionData);
+        dispatch(setModalOpen(true));
+        // setSections(sectionData)
+    };
+
+    // handleSectionSaveOrder
+    const handleSectionSaveOrder = async (updatedSection) => {
+        console.log(formDefaultInfo, 'formDefaultInfo')
+        const body = {
+            "public_name": formDefaultInfo.public_name,
+            "sections": updatedSection.map((section, index) => ({
+                index: index,
+                id: section.section_id
+            }))
+        }
+        console.log(body, 'body')
+        try {
+            const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+            if (!(response?.data?.error)) {
+                // Success
+            } else {
+                setToastError('Something went wrong');
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+        }
+    }
+
+    const GetSectionOrder = async () => {
+        try {
+            const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+            if (!response?.data?.error) {
+
+                // Extract section IDs in the order provided
+                const sectionOrder = response.data.data.sections.map(section => section.id);
+                return sectionOrder; // Return the ordered section IDs
+            } else {
+                setToastError('Something went wrong');
+                return []; // Return an empty array if there is an error
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+            return []; // Return an empty array in case of an error
+        }
+    };
+
+    const onDragEnd = (result) => {
+        if (!result.destination) return;
+
+        const reorderedItems = Array.from(sections || []);
+        const [removed] = reorderedItems.splice(result.source.index, 1);
+        reorderedItems.splice(result.destination.index, 0, removed);
+
+        setSections(reorderedItems);
+        dispatch(setSavedSection(reorderedItems));
+        handleSectionSaveOrder(reorderedItems);
+    };
+
     const handleBlur = (e) => {
         handleAutoSaveSettings();
         const sectionId = selectedQuestionId.split('_')[0]
@@ -967,6 +969,7 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
+
     return (
         <>
             {pageLoading ? (
@@ -989,38 +992,114 @@ function QuestionnaryForm() {
                                 className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
                                 data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
                             </p>
-                            <DraggableList
-                                itemKey="section_id"
-                                template={Sections}
-                                list={sections?.map((sectionData, sectionIndex) => ({
-                                    sectionData,
-                                    index: sectionIndex,
-                                    setShouldAutoSave: setShouldAutoSave,
-                                    selectedQuestionId: selectedQuestionId,
-                                    handleAddRemoveQuestion: handleAddRemoveQuestion,
-                                    expandedSections: expandedSections,
-                                    setExpandedSections: setExpandedSections,
-                                    handleSaveSectionName: handleSaveSectionName,
-                                    dataIsSame: dataIsSame,
-                                    setSections: setSections,
-                                    sections: sections,
-                                    handleAddRemovePage: handleAddRemovePage,
-                                    handleSaveSection: handleSaveSection,
-                                    handleAutoSave: handleAutoSave,
-                                    sectionIndex: sectionIndex,
+                            <div>
+                                <DragDropContext onDragEnd={onDragEnd}>
+                                    <Droppable droppableId="droppable">
+                                        {(provided) => (
+                                            <ul {...provided.droppableProps} ref={provided.innerRef}>
+                                                {sections.map((sectionData, sectionIndex) => (
+                                                    <Draggable
+                                                        key={sectionData.section_id}
+                                                        draggableId={sectionData.section_id}
+                                                        index={sectionIndex}
+                                                    >
+                                                        {(provided) => (
+                                                            <li
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                style={{
+                                                                    ...provided.draggableProps.style,
+                                                                    // Ensure the transform exists and contains a Y-axis translation
+                                                                    transform: provided.draggableProps.style?.transform
+                                                                        ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
+                                                                        : "none", // Fallback in case transform is null/undefined
+                                                                }}
 
-                                }))}
-                                onMoveEnd={(newList, sectionIndex) => handleMoveEndSections(newList, sectionIndex)}
-                                container={() => document.body}
-                            >
-                            </DraggableList>
-                            <button
-                                onClick={() => handleAddRemoveSection('add')}
-                                data-testid="add-section"
-                                className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
-                                <span className='mr-[15px]'>+</span>
-                                Add section
-                            </button>
+                                                                className="disable-select select-none w-full rounded-[10px] p-4 border hover:border-[#2B333B] border-transparent mb-2.5"
+                                                            >
+                                                                <div className="flex justify-between w-full">
+                                                                    <div className='flex items-center'>
+                                                                        <img
+                                                                            src="/Images/open-Filter.svg"
+                                                                            alt="down-arrow"
+                                                                            className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? "rotate-180 ml-2" : "" // Rotate 180deg when expanded
+                                                                                }`}
+                                                                            onClick={() => toggleSection(sectionIndex)} // Toggle section on click
+                                                                        />
+                                                                        <EditableField
+                                                                            name={sectionData?.section_name}
+                                                                            index={sectionIndex}
+                                                                            handleSave={handleSaveSectionName}
+                                                                            section={true}
+                                                                            testId={`section-${sectionIndex}-name`}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex items-center">
+                                                                        <img
+                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
+                                                                            title="Drag"
+                                                                            src={`/Images/drag.svg`}
+                                                                            alt="Drag"
+                                                                            {...provided.dragHandleProps}
+                                                                        />
+                                                                        <img src="/Images/trash-black.svg"
+                                                                            alt="delete"
+                                                                            title='Delete'
+                                                                            data-testid={`delete-btn-${sectionIndex}`}
+                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                                                                            // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
+                                                                            onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
+                                                                        />
+                                                                        <img
+                                                                            src="/Images/save.svg"
+                                                                            alt="save"
+                                                                            title="Save"
+                                                                            data-testid={`save-btn-${sectionIndex}`}
+                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id]
+                                                                                ? "cursor-not-allowed"
+                                                                                : "cursor-pointer"
+                                                                                }`}
+                                                                            onClick={() => {
+                                                                                if (!dataIsSame[sectionData.section_id])
+                                                                                    handleSaveSection(sectionData?.section_id);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <Sections
+                                                                    sectionData={sectionData}
+                                                                    sectionIndex={sectionIndex}
+                                                                    setShouldAutoSave={setShouldAutoSave}
+                                                                    selectedQuestionId={selectedQuestionId}
+                                                                    handleAddRemoveQuestion={handleAddRemoveQuestion}
+                                                                    expandedSections={expandedSections}
+                                                                    setExpandedSections={setExpandedSections}
+                                                                    handleSaveSectionName={handleSaveSectionName}
+                                                                    dataIsSame={dataIsSame}
+                                                                    setSections={setSections}
+                                                                    sections={sections}
+                                                                    handleAddRemovePage={handleAddRemovePage}
+                                                                    handleSaveSection={handleSaveSection}
+                                                                    handleAutoSave={handleAutoSave}
+                                                                    handleDeleteModal={handleDeleteModal}
+                                                                />
+                                                            </li>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </ul>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
+                                <button
+                                    onClick={() => handleAddRemoveSection('add')}
+                                    data-testid="add-section"
+                                    className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
+                                    <span className='mr-[15px]'>+</span>
+                                    Add section
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div className='w-[30%]'>
@@ -1048,6 +1127,8 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
+                                        // setFieldSettingParameters: setFieldSettingParameters,
+                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
@@ -1056,7 +1137,6 @@ function QuestionnaryForm() {
                                         // setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-                                        fixedMaxValue: fixedMaxValue
                                     }
                                 )
                             ) : (
@@ -1097,7 +1177,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete-page'
                     testIDBtn2='cancel-delete'
                     isModalOpen={showPageDeleteModal}
-                    setModalOpen={dispatch(setShowPageDeleteModal)}
+                    setModalOpen={dispatch(setShowPageDeleteModal())}
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
