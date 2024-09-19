@@ -124,6 +124,75 @@ body {
   background-color: #2B333B;
 }
 
+
+
+
+/* disabled radio button styling */
+.custom-radiodisabled [type='radio']:checked,
+[type='radio'] {
+  background-image: none;
+  position: absolute;
+  top: 3px;
+  cursor: pointer;
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::before,
+.custom-radiodisabled [type="radio"]:not(:checked)+label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(50% - 9px);
+  width: 17px;
+  height: 17px;
+  border: 1px solid #AEB3B7;
+  border-radius: 100%;
+  background: #FFFFFF;
+  cursor:not-allowed;
+}
+
+.custom-radiodisabled [type="radio"]:not(:checked)+label::before {
+  background-color: #FFFFFF;
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::before {
+  border: 1px solid #AEB3B7;
+  background-color: #FFFFFF;
+}
+
+.custom-radiodisabled [type="radio"]:not(:checked)+label::after {
+  opacity: 0;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::after {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::after,
+.custom-radiodisabled [type="radio"]:not(:checked)+label::after {
+  width: 9px;
+  height: 9px;
+  position: absolute;
+  top: calc(50% - 5px);
+  content: '';
+  left: 4px;
+  border-radius: 100%;
+  background: #FFFFFF;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+  cursor:not-allowed;
+
+}
+
+.custom-radiodisabled [type="radio"]:checked+label:after {
+  background-color: #6F7579;
+}
+
+
+
 /* to remove the default sidebar which is use in questionnary list */
 .default-sidebar::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
