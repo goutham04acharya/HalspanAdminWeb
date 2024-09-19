@@ -8,7 +8,7 @@ const keys = webdriver.Key
 Given('I am on the login page', async function () {
     await driver.get('http://localhost:3000');
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Log in"]')));
+    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Welcome"]')));
 });
 
 Given('I am on the dashboard screen', async function(){

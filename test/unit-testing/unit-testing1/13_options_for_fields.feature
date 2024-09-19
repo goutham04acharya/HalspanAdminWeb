@@ -17,7 +17,7 @@ Feature: Halspan - Admin - Variety of options available for each Field Type
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
     When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "Auth@123"
+    * I enter valid password as "dApje7-nepnig-vibqyc"
     * I click the submit button
     Then I should be redirected to the questionnaire listing screen
 
