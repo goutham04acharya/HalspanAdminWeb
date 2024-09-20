@@ -41,7 +41,7 @@ function DisplayFieldSetting({
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        dispatch(setNewComponent({ id: 'urlValue', value: option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value:( option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
 
         setShouldAutoSave(true);
 
@@ -376,7 +376,6 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
-                                    // value={fieldSettingParameters?.urlValue}
                                     value={fieldSettingParameters?.urlValue}
                                     className='w-full mt-2.5'
                                     placeholder={

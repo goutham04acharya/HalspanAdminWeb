@@ -38,8 +38,9 @@ function DateTimeField({
                 {fieldSettingParameters?.type === 'date' &&
                     <img src="/Images/calendar.svg" alt="calender" className='absolute top-8 right-3 cursor-pointer' />}
                 {fieldSettingParameters?.type === 'time' &&
-                    <img src="/Images/clock.svg" alt="calender" className='absolute top-8 right-3 cursor-pointer' />}
-
+                    <img src="/Images/clock.svg" alt="clock" className='absolute top-8 right-3 cursor-pointer' />}
+                {fieldSettingParameters?.type === 'datetime' &&
+                    <img src="/Images/calendar-clock.svg" alt="calender-clock" className='absolute top-8 right-3 cursor-pointer' />}
             </div>
             <p
                 data-testid="help-text"

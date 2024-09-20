@@ -16,6 +16,7 @@ function Pages({ pageIndex,
   sections,
   handleAutoSave,
   setSections,
+  fixedMaxValue
 }) {
 
   const pageRefs = useRef({});
@@ -87,6 +88,7 @@ function Pages({ pageIndex,
             setShouldAutoSave: setShouldAutoSave,
             selectedQuestionId: selectedQuestionId,
             handleDeletequestionModal: handleDeletequestionModal,
+            fixedMaxValue:fixedMaxValue
           }))}
           onMoveEnd={(newList) =>
             handleMoveEnd(newList, sectionIndex, pageIndex)
