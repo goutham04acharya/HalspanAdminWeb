@@ -44,5 +44,5 @@ When('I click the confirm button', async function () {
 
 Then('I should be redirected to the login screen', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Log in"]')));
+    await driver.wait(until.elementLocated(By.xpath('//h1[text()="Welcome"]')));
 });
