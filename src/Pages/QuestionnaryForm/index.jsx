@@ -56,7 +56,7 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-
+    const [fixedMaxValue, setFixedMaxValue] = useState('3');
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
