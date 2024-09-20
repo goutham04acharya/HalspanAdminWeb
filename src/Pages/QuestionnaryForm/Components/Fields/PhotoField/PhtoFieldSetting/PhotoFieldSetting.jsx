@@ -4,14 +4,18 @@ import CommonComponents from '../../../CommonComponents/CommonComponents';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import InputField from '../../../../../../Components/InputField/InputField';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
-function PhotoFieldSetting({ handleInputChange,
+function PhotoFieldSetting({
+    handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
     setShouldAutoSave,
     selectedQuestionId,
+    validationErrors,
+    fixedMaxValue,
 
 }) {
     const dispatch = useDispatch();
@@ -57,7 +61,7 @@ function PhotoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max}
+                                value={fixedMaxValue}  // Use '3' as the default if max is not set
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -66,6 +70,9 @@ function PhotoFieldSetting({ handleInputChange,
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
+                        {validationErrors?.minMax && (
+                            <ErrorMessage error={validationErrors.minMax} />
+                        )}
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Draw on Image</p>

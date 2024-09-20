@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import CommonComponents from '../../../CommonComponents/CommonComponents';
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function VideoFieldSetting({ handleInputChange,
     formParameters,
@@ -11,9 +12,9 @@ function VideoFieldSetting({ handleInputChange,
     fieldSettingParameters,
     setShouldAutoSave,
     selectedQuestionId,
-
+    validationErrors,
+    fixedMaxValue
 }) {
-    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -72,7 +73,7 @@ function VideoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max}
+                                value={fixedMaxValue}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -81,29 +82,32 @@ function VideoFieldSetting({ handleInputChange,
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
-                        <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
-                        <div className='mt-7'>
-                            <InputField
-                                autoComplete='off'
-                                label='Admin Field Notes'
-                                id='note'
-                                type='text'
-                                value={fieldSettingParameters?.note}
-                                className='w-full mt-2.5'
-                                labelStyle='font-semibold text-base text-[#2B333B]'
-                                placeholder='Notes'
-                                testId='Notes'
-                                htmlFor='note'
-                                maxLength={500}
-                                handleChange={handleInputChange}
-                                handleBlur={handleBlur}
-                            />
-                        </div>
-                        <div className='mx-auto mt-7 flex items-center w-full'>
-                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
-                                Add Conditional Logic
-                            </button>
-                        </div>
+                        {validationErrors?.minMax && (
+                            <ErrorMessage error={validationErrors.minMax} />
+                        )}
+                    </div>
+                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <div className='mt-7'>
+                        <InputField
+                            autoComplete='off'
+                            label='Admin Field Notes'
+                            id='note'
+                            type='text'
+                            value={fieldSettingParameters?.note}
+                            className='w-full mt-2.5'
+                            labelStyle='font-semibold text-base text-[#2B333B]'
+                            placeholder='Notes'
+                            testId='Notes'
+                            htmlFor='note'
+                            maxLength={500}
+                            handleChange={handleInputChange}
+                            handleBlur={handleBlur}
+                        />
+                    </div>
+                    <div className='mx-auto mt-7 flex items-center w-full'>
+                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                            Add Conditional Logic
+                        </button>
                     </div>
                 </div>
             </div>

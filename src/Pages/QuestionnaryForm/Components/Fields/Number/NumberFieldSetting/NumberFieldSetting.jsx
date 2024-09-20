@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents';
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function NumberFieldSetting({
     handleInputChange,
@@ -14,6 +15,7 @@ function NumberFieldSetting({
     setShouldAutoSave,
     selectedQuestionId,
     handleAutoSaveSettings,
+    validationErrors,
 
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
@@ -23,6 +25,13 @@ function NumberFieldSetting({
     const handleTabClick = (tab) => {
         setActiveTab(tab);
     };
+
+    useEffect(() => {
+        // Check if the type is 'rating', if so, set the source to 'slider'
+        if (fieldSettingParameters?.type === 'rating' && fieldSettingParameters?.source !== 'slider') {
+            dispatch(setNewComponent({ id: 'source', value: 'slider', questionId: selectedQuestionId }));
+        }
+    }, [fieldSettingParameters?.type, fieldSettingParameters?.source, dispatch, selectedQuestionId]);
 
     return (
         <>
@@ -113,15 +122,18 @@ function NumberFieldSetting({
                                     name='source'
                                     id='entryfield'
                                     value='entryfield'
+                                    disabled={fieldSettingParameters?.type === 'rating'}
                                     checked={fieldSettingParameters?.source === 'entryfield'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        if (fieldSettingParameters?.type !== 'rating') {
+                                            dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId: selectedQuestionId }));
+                                            setShouldAutoSave(true);
+                                        }
                                     }}
                                 />
                                 <label htmlFor='entryfield'
                                     data-testid='entryfield'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    className={`ml-7 font-normal text-base ${fieldSettingParameters?.type === 'rating' ? 'text-[#DDDDDD] cursor-not-allowed' : 'cursor-pointer text-[#2B333B]'}`}>
                                     Entry Field
                                 </label>
                             </div>
@@ -150,14 +162,18 @@ function NumberFieldSetting({
                                     name='source'
                                     id='both'
                                     value='both'
+                                    disabled={fieldSettingParameters?.type === 'rating'}
                                     checked={fieldSettingParameters?.source === 'both'}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
-                                    }} />
+                                        if (fieldSettingParameters?.type !== 'rating') {
+                                            dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
+                                            setShouldAutoSave(true);
+                                        }
+                                    }}
+                                />
                                 <label htmlFor='both'
                                     data-testid='both'
-                                    className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                                    className={`ml-7 font-normal text-base ${fieldSettingParameters?.type === 'rating' ? 'text-[#DDDDDD] cursor-not-allowed' : 'text-[#2B333B] cursor-pointer'}`}>
                                     Both
                                 </label>
                             </div>
@@ -194,33 +210,41 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                         </div>
+                        {validationErrors?.minMax && (
+                            <ErrorMessage error={validationErrors.minMax} />
+                        )}
                     </div>
-                    <div className='mt-7'>
-                        <InputField
-                            autoComplete='off'
-                            label='Increment By'
-                            id='incrementby'
-                            type='text'
-                            value={fieldSettingParameters?.incrementby}
-                            className='w-full mt-2.5'
-                            labelStyle=''
-                            placeholder='Increment By'
-                            testId='incrementby'
-                            htmlFor='incrementby'
-                            maxLength={10}
-                            handleChange={(e) => handleInputChange(e)} />
-                    </div>
+                    {(fieldSettingParameters?.source === 'slider' || fieldSettingParameters?.source === 'both' || fieldSettingParameters?.type === 'rating') &&
+                        <div className='mt-7'>
+                            <InputField
+                                autoComplete='off'
+                                label='Increment By'
+                                id='incrementby'
+                                type='text'
+                                value={fieldSettingParameters?.incrementby}
+                                className='w-full mt-2.5'
+                                labelStyle=''
+                                placeholder='Increment By'
+                                testId='increment'
+                                htmlFor='incrementby'
+                                maxLength={10}
+                                handleChange={(e) => handleInputChange(e)} />
+                        </div>
+                    }
+                    {validationErrors?.incrementby && (
+                        <ErrorMessage error={validationErrors.incrementby} />
+                    )}
                     <div className='mt-7'>
                         <div className='flex justify-between'>
                             <p
-                                className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="pre-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
                                 onClick={() => handleTabClick('preField')}
                             >
                                 Pre-field Text
                             </p>
                             <p
-                                className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="post-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
                                 onClick={() => handleTabClick('postField')}
                             >
@@ -238,9 +262,9 @@ function NumberFieldSetting({
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Pre-field text'
-                                    testId='preField'
+                                    testId='field-text'
                                     htmlFor='preField'
-                                    maxLength={500}
+                                    maxLength={50}
                                     handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
                                 />
                             </div>
@@ -256,9 +280,9 @@ function NumberFieldSetting({
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Post-field text'
-                                    testId='postField'
+                                    testId='field-text'
                                     htmlFor='postField'
-                                    maxLength={500}
+                                    maxLength={50}
                                     handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
                                 />
                             </div>

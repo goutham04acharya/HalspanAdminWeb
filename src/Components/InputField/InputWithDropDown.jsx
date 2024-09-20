@@ -1,4 +1,6 @@
 import React from 'react';
+import { setNewComponent } from '../../Pages/QuestionnaryForm/Components/Fields/fieldSettingParamsSlice';
+import { useDispatch } from 'react-redux';
 
 function InputWithDropDown({
     className,
@@ -18,11 +20,18 @@ function InputWithDropDown({
     labeltestID,
     validationError,
     close,
-    setSelectedOption
+    setSelectedUrlOption,
+    selectedQuestionId
 }) {
+    const dispatch = useDispatch();
 
-    const handleRemove = ()=>{
-        setSelectedOption('');
+    const handleRemove = () => {
+        setSelectedUrlOption('');
+        dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
+
+        setDropdownOpen(false);
+
     }
 
     return (
@@ -33,14 +42,14 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
+                    onClick={() => setDropdownOpen ? setDropdownOpen(isDropdownOpen ? null : id) : null} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
                 {(selectedOption && close) ?
-                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-4`} onClick={()=> handleRemove()} />
+                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={()=> handleRemove()} />
                     :
                     <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />

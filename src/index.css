@@ -83,7 +83,6 @@ body {
   border: 1px solid #AEB3B7;
   border-radius: 100%;
   background: #FFFFFF;
-  cursor: pointer;
 }
 
 .custom-radioBlue [type="radio"]:not(:checked)+label::before {
@@ -119,12 +118,80 @@ body {
   background: #FFFFFF;
   -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
-  cursor: pointer;
 }
 
 .custom-radioBlue [type="radio"]:checked+label:after {
   background-color: #2B333B;
 }
+
+
+
+
+/* disabled radio button styling */
+.custom-radiodisabled [type='radio']:checked,
+[type='radio'] {
+  background-image: none;
+  position: absolute;
+  top: 3px;
+  cursor: pointer;
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::before,
+.custom-radiodisabled [type="radio"]:not(:checked)+label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(50% - 9px);
+  width: 17px;
+  height: 17px;
+  border: 1px solid #AEB3B7;
+  border-radius: 100%;
+  background: #FFFFFF;
+  cursor:not-allowed;
+}
+
+.custom-radiodisabled [type="radio"]:not(:checked)+label::before {
+  background-color: #FFFFFF;
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::before {
+  border: 1px solid #AEB3B7;
+  background-color: #FFFFFF;
+}
+
+.custom-radiodisabled [type="radio"]:not(:checked)+label::after {
+  opacity: 0;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::after {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+
+.custom-radiodisabled [type="radio"]:checked+label::after,
+.custom-radiodisabled [type="radio"]:not(:checked)+label::after {
+  width: 9px;
+  height: 9px;
+  position: absolute;
+  top: calc(50% - 5px);
+  content: '';
+  left: 4px;
+  border-radius: 100%;
+  background: #FFFFFF;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+  cursor:not-allowed;
+
+}
+
+.custom-radiodisabled [type="radio"]:checked+label:after {
+  background-color: #6F7579;
+}
+
+
 
 /* to remove the default sidebar which is use in questionnary list */
 .default-sidebar::-webkit-scrollbar,
@@ -194,6 +261,87 @@ body {
   height: 24px;
 }
 
+
+/* slider css */
+/* Styling for the range input */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  background: #FFFFFF;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* Track fill with gradient, reflecting the percentage */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #2B333B 0%, #2B333B var(--percent), #FFFFFF var(--percent), #FFFFFF 100%);
+  border-radius: 5px;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #2B333B 0%, #2B333B var(--percent), #FFFFFF var(--percent), #FFFFFF 100%);
+  border-radius: 5px;
+}
+
+/* Updated styling for the thumb (ball) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: #2B333B;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  /* Move the thumb upwards by using translateY */
+  transform: translateY(-30%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: #2B333B;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Increase size slightly on hover to indicate interactivity */
+input[type="range"]::-webkit-slider-thumb:hover {
+  /* transform: scale(1.2); */
+  /* Slight enlargement */
+  background: #2B333B;
+  /* Slightly darker on hover */
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
+
+/* Focused state for the thumb */
+input[type="range"]:focus::-webkit-slider-thumb {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+  /* transform: scale(1.2); */
+  background: #2B333B;
+}
+
+
+
+
+
 /* th:has(button.sortedIcon){
   cursor:pointer;
 } */
@@ -255,7 +403,6 @@ custom-toggle-switch input:checked+.slider::before {
   border: 1px solid #2B333B;
   border-radius: 50%;
   background: #FFFFFF;
-  cursor: pointer;
 }
 
 .custom-radioBlue label span::after {
@@ -277,6 +424,35 @@ custom-toggle-switch input:checked+.slider::before {
 .custom-radioBlue input[type="radio"]:checked+label span::after {
   opacity: 1;
 }
+
+.custom-radioBlue input[type="radio"]:disabled+label {
+  cursor: not-allowed !important;
+  color: #DDDDDD;
+}
+
+.custom-radioBlue input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+.custom-radioBlue label.disabled {
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  /* Prevents click events */
+  color: #DDDDDD;
+  /* Gray out the label */
+}
+
+.custom-radioBlue label.cursor-not-allowed {
+  cursor: not-allowed !important;
+  color: #DDDDDD;
+}
+
+.custom-radioBlue input[disabled] {
+  cursor: not-allowed !important;
+}
+
+
 
 /* check box  */
 .checkbox input {

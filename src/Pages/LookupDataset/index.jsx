@@ -340,7 +340,7 @@ const LookupDataset = () => {
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Confirm'
                     Button2text='Cancel'
-                    src='delete-gray'
+                    src='replace'
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
                     isOpen={showlookupReplaceModal}

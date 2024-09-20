@@ -13,7 +13,7 @@ module.exports = {
             'test/integration-testing/Flow1/8_create_text_box_field.feature',
             'test/integration-testing/Flow1/13_options_for_fields.feature',
             'test/integration-testing/Flow1/11_choice-box-as-field.feature',
-            // 'test/integration-testing/Flow1/14_number_as_field.feature',
+            'test/integration-testing/Flow1/14_number_as_field.feature',
             'test/integration-testing/Flow1/15_asset_location.feature',
             'test/integration-testing/Flow1/12_date_time_as_field.feature',
             'test/integration-testing/Flow1/16_view_list_of_questionnaire_versions.feature',
@@ -22,6 +22,10 @@ module.exports = {
             'test/integration-testing/Flow1/19_video_as_fields.feature',
             'test/integration-testing/Flow1/20_files_as_field.feature',
             'test/integration-testing/Flow1/25_edit_questionnaire.feature',
+            'test/integration-testing/Flow1/22_signature_as_field.feature',
+            'test/integration-testing/Flow1/21_gps_as_field.feature',
+            'test/integration-testing/Flow1/23_display_content_as_field.feature',
+            'test/integration-testing/Flow1/24_view_questionnaire.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

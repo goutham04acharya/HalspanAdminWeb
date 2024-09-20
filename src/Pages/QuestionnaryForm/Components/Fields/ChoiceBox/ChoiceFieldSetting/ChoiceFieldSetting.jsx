@@ -12,6 +12,7 @@ import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceV
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -114,77 +115,77 @@ function ChoiceFieldSetting({
     const inputRefs = useRef({});
 
     // Function for dragging Choices
-    const Item2 = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
-        const dispatch = useDispatch();
-        const [localValue, setLocalValue] = useState(item.value || '');
+    // const Item2 = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
+    //     const dispatch = useDispatch();
+    //     const [localValue, setLocalValue] = useState(item.value || '');
 
-        // Handle input change
-        const handleFixedChoiceChange = useCallback((e) => {
-            const { value } = e.target;
-            setLocalValue(value);
-            dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionId }));
-        }, [dispatch, item.id, selectedQuestionId]);
+    //     // Handle input change
+    //     const handleFixedChoiceChange = useCallback((e) => {
+    //         const { value } = e.target;
+    //         setLocalValue(value);
+    //         dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionId }));
+    //     }, [dispatch, item.id, selectedQuestionId]);
 
-        // Focus input when required
-        useEffect(() => {
-            console.log('helllo')
-            const element = document.getElementById(focusInput);
-            console.log(focusInput, 'aaa');
-            if (element) {
-                element.focus();
-            }
-        }, [item.id, focusInput, localValue]);
+    //     // Focus input when required
+    //     useEffect(() => {
+    //         console.log('helllo')
+    //         const element = document.getElementById(focusInput);
+    //         console.log(focusInput, 'aaa');
+    //         if (element) {
+    //             element.focus();
+    //         }
+    //     }, [item.id, focusInput, localValue]);
 
-        return (
-            <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
-                <div className='flex justify-between items-start cursor-pointer'>
-                    <div className='flex items-center justify-center w-full'>
-                        <div
-                            className="disable-select dragHandle"
-                            onMouseDown={(e) => {
-                                document.body.style.overflow = "hidden";
-                                dragHandleProps.onMouseDown(e);
-                            }}
-                            onMouseUp={() => {
-                                document.body.style.overflow = "visible";
-                            }}
-                        >
-                            <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
-                        </div>
-                        <input
-                            type="text"
-                            className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder={`${getOrdinal(item?.index + 1)} Choice`}
-                            onChange={handleFixedChoiceChange}
-                            value={localValue}
-                            id={item.id}
-                            onClick={() => setFocusInput(item.id)} // Call focusInput on click
-                            onBlur={() => {
-                                handleBlur();
-                                setFocusInput('')
-                            }}
-                            data-testid={`choice-${item.index + 1}`}
-                            maxLength={50}
-                        />
-                        {fixedChoiceArray.length > 1 && <img
-                            src="/Images/trash-black.svg"
-                            alt="delete"
-                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                            onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
-                            data-testid={`delete-choice-${item.index + 1}`}
-                        />}
-                        <img
-                            src="/Images/add.svg"
-                            alt="add"
-                            data-testid={`add-choice-${item.index + 2}`}
-                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                            onClick={() => handleAddRemoveFixedChoice('add', item.id)}
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    }));
+    //     return (
+    //         <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
+    //             <div className='flex justify-between items-start cursor-pointer'>
+    //                 <div className='flex items-center justify-center w-full'>
+    //                     <div
+    //                         className="disable-select dragHandle"
+    //                         onMouseDown={(e) => {
+    //                             document.body.style.overflow = "hidden";
+    //                             dragHandleProps.onMouseDown(e);
+    //                         }}
+    //                         onMouseUp={() => {
+    //                             document.body.style.overflow = "visible";
+    //                         }}
+    //                     >
+    //                         <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+    //                     </div>
+    //                     <input
+    //                         type="text"
+    //                         className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+    //                         placeholder={`${getOrdinal(item?.index + 1)} Choice`}
+    //                         onChange={handleFixedChoiceChange}
+    //                         value={localValue}
+    //                         id={item.id}
+    //                         onClick={() => setFocusInput(item.id)} // Call focusInput on click
+    //                         onBlur={() => {
+    //                             handleBlur();
+    //                             setFocusInput('')
+    //                         }}
+    //                         data-testid={`choice-${item.index + 1}`}
+    //                         maxLength={50}
+    //                     />
+    //                     {fixedChoiceArray.length > 1 && <img
+    //                         src="/Images/trash-black.svg"
+    //                         alt="delete"
+    //                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+    //                         onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
+    //                         data-testid={`delete-choice-${item.index + 1}`}
+    //                     />}
+    //                     <img
+    //                         src="/Images/add.svg"
+    //                         alt="add"
+    //                         data-testid={`add-choice-${item.index + 2}`}
+    //                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+    //                         onClick={() => handleAddRemoveFixedChoice('add', item.id)}
+    //                     />
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     );
+    // }));
 
     // const handleMoveEnd = (newList) => {
     //     dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
@@ -367,6 +368,9 @@ function ChoiceFieldSetting({
                                     <img src="/Images/plus.svg" alt="plus" />
                                 </button>
                             </div>}
+                        {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
+                            <ErrorMessage error={'No lookup list available. Please create one'}/>
+                        )}
                         {/* OptionsComponent added here */}
                         <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>

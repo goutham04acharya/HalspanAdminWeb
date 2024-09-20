@@ -25,7 +25,7 @@ Given('I should see the versions of the questionnaire', async function () {
 });
 
 When('I click on back to all questionnaire', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await driver.wait(until.elementLocated(By.css('[data-testid="back-to-questionnaire"]'))).click();
 });
 

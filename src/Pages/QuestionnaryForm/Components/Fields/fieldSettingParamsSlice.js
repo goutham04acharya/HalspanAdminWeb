@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,18 +7,59 @@ const initialState = {
     currentData: {}
 };
 
+// Helper function to process displayType
+const processDisplayType = (item, displayType) => {
+    // Define a mapping of displayType keys to result properties
+    const displayTypeMap = {
+        heading: 'heading',
+        text: 'text',
+        image: 'image',
+        url: {
+            type: 'urlType',
+            value: 'urlValue'
+        }
+    };
+
+    const result = {};
+
+    for (const key in displayTypeMap) {
+        if (Object.prototype.hasOwnProperty.call(displayType, key)) {
+            const resultKey = displayTypeMap[key];
+
+            // If key is 'url', handle it as an object with type and value
+            if (key === 'url' && typeof displayType[key] === 'object') {
+                result.urlType = displayType[key].type || item.urlType;
+                result.urlValue = displayType[key].value || item.urlValue;
+            } else if (typeof resultKey === 'string') {
+                result[resultKey] = item?.[resultKey] || displayType[key];
+            }
+        }
+    }
+
+    return result;
+};
+
+// Helper function to process source
+const processSource = (item) => {
+    if (item.source === 'fixed_list') {
+        return { fixedChoiceArray: item.source_value };
+    } else if (item.source === 'lookup') {
+        return { lookupOptionChoice: item.source_value };
+    }
+    return {};
+};
+
 const fieldSettingParamsSlice = createSlice({
     name: 'FieldSettingParams',
     initialState,
     reducers: {
         setNewComponent: (state, action) => {
             const { questionId, id, value } = action.payload;
-            // Ensure that the questionId exists in the currentData
-            if (!state.currentData?.[questionId]) {
+
+            if (!state.currentData[questionId]) {
                 state.currentData[questionId] = {};
             }
 
-            // Update or add the new property while preserving existing properties
             state.currentData[questionId] = {
                 ...state.currentData[questionId],
                 [id]: value
@@ -26,11 +68,10 @@ const fieldSettingParamsSlice = createSlice({
         addNewFixedChoice: (state, action) => {
             const { questionId } = action.payload;
 
-            // Ensure that the questionId exists and fixedChoiceArray is initialized
-            if (!state.currentData?.[questionId]) {
+            if (!state.currentData[questionId]) {
                 state.currentData[questionId] = {};
             }
-            if (!state.currentData?.[questionId]?.fixedChoiceArray) {
+            if (!state.currentData[questionId].fixedChoiceArray) {
                 state.currentData[questionId].fixedChoiceArray = [];
             }
 
@@ -39,7 +80,7 @@ const fieldSettingParamsSlice = createSlice({
         removeFixedChoice: (state, action) => {
             const { questionId, id } = action.payload;
 
-            if (state?.currentData[questionId] && state?.currentData?.[questionId]?.fixedChoiceArray) {
+            if (state.currentData[questionId] && state.currentData[questionId].fixedChoiceArray) {
                 state.currentData[questionId].fixedChoiceArray = state.currentData[questionId].fixedChoiceArray.filter(
                     item => item.id !== id
                 );
@@ -48,11 +89,10 @@ const fieldSettingParamsSlice = createSlice({
         resetFixedChoice: (state, action) => {
             const { questionId } = action.payload;
 
-            if (!state?.currentData?.[questionId]) {
+            if (!state.currentData[questionId]) {
                 state.currentData[questionId] = {};
             }
 
-            // Reset fixedChoiceArray to a new array with three empty items
             state.currentData[questionId].fixedChoiceArray = [
                 { id: `C-${uuidv4()}`, value: '' },
                 { id: `C-${uuidv4()}`, value: '' },
@@ -62,77 +102,29 @@ const fieldSettingParamsSlice = createSlice({
         setFixedChoiceValue: (state, action) => {
             const { questionId, id, value } = action.payload;
 
-            if (state.currentData?.[questionId] && state.currentData?.[questionId]?.fixedChoiceArray) {
-                // Find the item with the matching id and update its value
+            if (state.currentData[questionId] && state.currentData[questionId].fixedChoiceArray) {
                 state.currentData[questionId].fixedChoiceArray = state.currentData[questionId].fixedChoiceArray.map(item =>
                     item.id === id ? { ...item, value } : item
                 );
             }
         },
-        // Update the entire fixedChoiceArray
         updateFixedChoiceArray: (state, action) => {
             const { questionId, newList } = action.payload;
 
-            if (state.currentData?.[questionId]) {
+            if (state.currentData[questionId]) {
                 state.currentData[questionId].fixedChoiceArray = newList;
             }
         },
-        // Function to update savedData with currentData
         saveCurrentData: (state) => {
             state.savedData = { ...state.currentData };
         },
-        // setInitialData: (state, action) => {
-        //     const data = action.payload;
-        
-        //     data.forEach(item => {
-        //         const questionId = item.question_id;
-        
-        //         // Initialize the customizedData object
-        //         const customizedData = {
-        //             componentType: item.component_type,
-        //             label: item.label,
-        //             helptext: item.help_text,
-        //             placeholderContent: item.placeholder_content,
-        //             defaultContent: item.default_content,
-        //             type: item.type,
-        //             format: item.format,
-        //             field_range: {
-        //                 min: item.field_range?.min,
-        //                 max: item.field_range?.max,
-        //             },
-        //             note: item.admin_field_notes,
-        //             questionnaireId: item.questionnaire_id,
-        //             lookupOption: item.lookup_id,
-        //             options: item?.options,
-        //             postField: item?.postField,
-        //             preField: item?.preField,
-        //         };
-                
-        //         // Handle the source object and assign values based on the key
-        //         if (item.source) {
-        //             const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
-
-        //             if (sourceKey === 'fixed_list') {
-        //                 customizedData.source = 'fixedList'
-        //                 customizedData.fixedChoiceArray = item.source[sourceKey];
-        //             } else if (sourceKey === 'lookup') {
-        //                 customizedData.source = sourceKey
-        //                 customizedData.lookupOptionChoice = item.source[sourceKey];
-        //             }
-        //         }
-        
-        //         // Store in both currentData and savedData
-        //         state.currentData[questionId] = customizedData;
-        //         state.savedData[questionId] = customizedData;
-        //     });
-        // }   
         setInitialData: (state, action) => {
             const data = action.payload;
 
             data.forEach(item => {
                 const questionId = item.question_id;
+                const displayType = item.display_type || {}; // Ensure displayType is defined
 
-                // Initialize the customizedData object
                 const customizedData = {
                     componentType: item.component_type,
                     label: item.label,
@@ -149,29 +141,23 @@ const fieldSettingParamsSlice = createSlice({
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,
+                    source: item?.source,
+                    draw_image: item?.asset_extras?.draw_image,
+                    pin_drop: item?.asset_extras?.pin_drop,
+                    include_metadata: item?.asset_extras?.include_metadata,
+                    file_size: item?.asset_extras?.fileSize,
+                    file_type: item?.asset_extras?.fileType,
+
+                    ...processDisplayType(item, displayType),
+                    ...processSource(item)
                 };
 
-                // Handle the source object and assign values based on the key
-                if (item.source) {
-                    const sourceKey = Object.keys(item.source)[0];  // Get the first key in the source object
-
-                    if (sourceKey === 'fixed_list') {
-                        customizedData.source = 'fixedList'
-                        customizedData.fixedChoiceArray = item.source[sourceKey];
-                    } else if (sourceKey === 'lookup') {
-                        customizedData.source = sourceKey
-                        customizedData.lookupOptionChoice = item.source[sourceKey];
-                    }
-                }
-
-                // Store in both currentData and savedData
                 state.currentData[questionId] = customizedData;
                 state.savedData[questionId] = customizedData;
             });
-        }     
+        }
     }
 });
-
 
 // Utility function to compare currentData with savedData
 export const compareData = (currentData, savedData) => {
