@@ -57,7 +57,7 @@ function Table({
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer'><u>Version {versionListInfo?.version_number || '-'}</u></td>
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>{new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
                                         day: 'numeric',
-                                        month: 'long',
+                                        month: 'short',
                                         year: 'numeric',
                                     })}
                                     </td>

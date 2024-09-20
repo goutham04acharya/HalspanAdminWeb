@@ -35,7 +35,11 @@ function DateTimeField({
                                 : 'dd-mm-yyyy hh:mm:ss')}
                     onClick={() => handleChange(fieldSettingParameters)}
                 />
-                <img src="/Images/calendar.svg" alt="calender" className='absolute top-8 right-3 cursor-pointer' />
+                {fieldSettingParameters?.type === 'date' &&
+                    <img src="/Images/calendar.svg" alt="calender" className='absolute top-8 right-3 cursor-pointer' />}
+                {fieldSettingParameters?.type === 'time' &&
+                    <img src="/Images/clock.svg" alt="calender" className='absolute top-8 right-3 cursor-pointer' />}
+
             </div>
             <p
                 data-testid="help-text"

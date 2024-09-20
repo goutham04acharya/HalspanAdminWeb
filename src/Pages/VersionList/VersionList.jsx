@@ -101,7 +101,7 @@ function VersionList() {
                         <Button2
                             testId='edit'
                             // onClick={handleNavigateBack}
-                            className='w-[40%] h-[50px] ml-[32px] font-semibold text-[#2B333B]'
+                            className='w-[40%] h-[50px] font-semibold text-[#2B333B]'
                             text='Edit'
                         />
                         <Button2

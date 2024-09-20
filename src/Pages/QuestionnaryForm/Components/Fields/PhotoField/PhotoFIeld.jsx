@@ -12,7 +12,7 @@ function PhotoField({ label,
     fixedMaxValue
 
 }) {
-
+console.log(fixedMaxValue, 'fixedMaxValue')
     const [fileName, setFileName] = useState('');
 
     const handleFileChange = (e) => {
