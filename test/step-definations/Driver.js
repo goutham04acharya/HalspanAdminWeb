@@ -58,7 +58,7 @@ Before('@login', async function () {
     if (!loginPerformed) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         await driver.wait(until.elementLocated(By.id('username'))).sendKeys('nayana.sk@7edge.com');
-        await driver.wait(until.elementLocated(By.id('password'))).sendKeys('Auth@123');
+        await driver.wait(until.elementLocated(By.id('password'))).sendKeys('dApje7-nepnig-vibqyc');
         await new Promise((resolve) => setTimeout(resolve, 750));
         await driver.wait(until.elementLocated(By.css('button[type="submit"]'))).click();
         await new Promise((resolve) => setTimeout(resolve, 2000));

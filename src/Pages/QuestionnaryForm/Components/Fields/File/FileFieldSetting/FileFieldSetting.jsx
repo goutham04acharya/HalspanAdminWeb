@@ -13,9 +13,8 @@ function FileFieldSetting({ handleInputChange,
     setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
-
+    fixedMaxValue
 }) {
-    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -89,7 +88,7 @@ function FileFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fieldSettingParameters?.max}
+                                value={fixedMaxValue}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

@@ -13,7 +13,7 @@ function QuestionnarySettings({
     setValidationErrors,
     validationErrors,
     editedDetails,
-    dataLoading
+    dataLoading,
 }) {
 
     const { PatchAPI } = useApi();
@@ -53,11 +53,15 @@ function QuestionnarySettings({
                 setToastSuccess(response?.data?.message);
                 setValidationErrors({});
                 setIsThreedotLoader(false);
-                setIsSaveDisabled(true); // Disable button again after successful save
+                // Delay the page refresh to allow the success message to be visible
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000); // 2 second delay
+
             } else if (response?.data?.status === 409) {
                 setValidationErrors({
                     ...validationErrors,
-                    public_name: response?.data?.message,
+                    public_name: 'This public name already exists',
                 });
                 setIsThreedotLoader(false);
             } else {
@@ -70,16 +74,17 @@ function QuestionnarySettings({
         }
     };
 
-    // Enable the save button if there are any changes
+    // Logic to handle Save button enabling/disabling based on changes
     useEffect(() => {
         const hasChanges = Object.keys(Payload()).length > 0;
-        setIsSaveDisabled(!hasChanges); // Disable the button if no changes
+        setIsSaveDisabled(!hasChanges); // Disable the button if no changes, enable if there are changes
     }, [editedDetails, queSettingDetails]);
 
     return (
         dataLoading ? 
         <QuestionnarySettingShimmer/>
         :
+        
         <div className='mt-9'>
             <p className='font-medium text-[22px] text-[#2B333B]'>Questionnaire settings</p>
             <div className='mt-[22px] h-customh12 overflow-auto default-sidebar overflow-x-hidden'>
@@ -205,7 +210,7 @@ function QuestionnarySettings({
             </div>
             <Button
                 text='Save settings'
-                testID='createQuestionnaireBtn'
+                testID='save-settings'
                 className={`w-full h-[50px] mt-[26px] ${isSaveDisabled? 'bg-[#DDDDDD] hover:bg-[#DDDDDD]' : 'bg-[#2B333B] hover:bg-[#000000]'}`}
                 onClick={editQuestionnarySettings}
                 isThreedotLoading={isThreedotLoader}

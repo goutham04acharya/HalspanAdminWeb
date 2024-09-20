@@ -38,7 +38,18 @@ function NumberField({
     const handleRange = (event) => {
         const newValue = parseInt(event.target.value, 10);
         // Round to the nearest multiple of incrementByValue
-        const nearestMultiple = Math.round(newValue / incrementByValue) * incrementByValue;
+        let nearestMultiple = Math.round(newValue / incrementByValue) * incrementByValue;
+
+        // Ensure the nearest multiple doesn't exceed the maxRange
+        if (nearestMultiple > maxRange) {
+            nearestMultiple = Math.floor(maxRange / incrementByValue) * incrementByValue;
+        }
+
+        // Ensure it doesn't go below the minRange
+        if (nearestMultiple < minRange) {
+            nearestMultiple = minRange;
+        }
+
         dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
 
         // Call the handleChange prop if provided
@@ -62,27 +73,40 @@ function NumberField({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={value}
+                    value={`${fieldSettingParameters?.preField ? fieldSettingParameters.preField : ''}${fieldSettingParameters?.postField ? ` ${fieldSettingParameters.postField}` : ''}`}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-5 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange(fieldSettingParameters)}
+                    onChange={() => handleChange(fieldSettingParameters)}
                 />
             }
             {((fieldSettingParameters?.source === 'slider') || (fieldSettingParameters?.source === 'both')) &&
-                <div data-testid="slider" className='w-[30%]'>
-                    <input
-                        type="range"
-                        min={minRange}
-                        max={maxRange}
-                        value={sliderValue}
-                        onChange={handleRange}
-                        style={{
-                            '--percent': `${sliderPercentage}%`
-                        }}
-                        className='mt-6 custom-slider'
-                    />
+                <div data-testid="slider" className=''>
+                    <div className='flex items-center w-full'>
+                        {fieldSettingParameters?.preField &&
+                            <p className='w-auto max-w-[20%] break-all overflow-auto mt-5 mr-2'>{fieldSettingParameters?.preField}</p>
+                        }
+                        <p className='w-auto max-w-[10%] break-all overflow-auto mt-5 mr-2'>{fieldSettingParameters?.min}</p>
+
+                        <div className='w-[40%]'>
+                            <input
+                                type="range"
+                                min={minRange}
+                                max={maxRange}
+                                value={sliderValue}
+                                onChange={handleRange}
+                                maxLength={50}
+                                style={{
+                                    '--percent': `${sliderPercentage}%`
+                                }}
+                                className='mt-6 custom-slider w-full'
+                            />
+                        </div>
+                        <p className='w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2'>{fieldSettingParameters?.max}</p>
+                        {fieldSettingParameters?.postField &&
+                            <p className='w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2'>{fieldSettingParameters?.postField}</p>}
+                    </div>
                     <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
-                        Select Value: {sliderValue}
+                    Select Value: {fieldSettingParameters?.type === 'float' ? sliderValue.toFixed(2) : sliderValue}
                     </p>
                 </div>
             }
