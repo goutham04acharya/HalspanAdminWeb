@@ -44,7 +44,6 @@ function QuestionnaryForm() {
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
-    const [fixedMaxValue, setFixedMaxValue] = useState('3');
     const section1Id = `SEC-${uuidv4()}`;
     const page1Id = `${section1Id}_PG-${uuidv4()}`;
     let [sections, setSections] = useState([{
@@ -71,6 +70,8 @@ function QuestionnaryForm() {
     const [showquestionDeleteModal, setShowquestionDeleteModal] = useState(false);
     const [pageToDelete, setPageToDelete] = useState({ sectionIndex: null, pageIndex: null });
     const [questionToDelete, setQuestionToDelete] = useState({ sectionIndex: null, pageIndex: null, questionIndex: null });
+    const [fixedMaxValue, setFixedMaxValue] = useState('3');
+
 
     // text field related states
     const [selectedAddQuestion, setSelectedAddQuestion] = useState('')
