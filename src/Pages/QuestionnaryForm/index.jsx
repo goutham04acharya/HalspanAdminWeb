@@ -452,58 +452,55 @@ function QuestionnaryForm() {
     }
 
     // API calling function
-    // const formDefaultDetails = useCallback(async () => {
-    //     setPageLoading(true);
-    //     const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-    //     dispatch(setFormDefaultInfo(response?.data?.data));
-    //     setSections(response?.data?.data?.sections);
-    //     const sections = response?.data?.data?.sections || [];
-
-    //     // Create an object with section_id as the key and true as the value
-    //     const updatedSections = sections.reduce((acc, section) => {
-    //         acc[section.section_id] = true;
-    //         return acc;
-    //     }, {});
-
-    //     dispatch(setDataIsSame(updatedSections));
-
-    //     setPageLoading(false);
-    // }, [getAPI, questionnaire_id, version_number]);
-
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             if (!response?.error) {
-                dispatch(setFormDefaultInfo(response.data.data));
-                const sectionsData = response.data.data.sections || [];
-
+                dispatch(setFormDefaultInfo(response?.data?.data));
+                const sectionsData = response?.data?.data?.sections || [];
+    
                 // Fetch section order
-                const sectionOrder = await GetSectionOrder();
-
-                // Sort sections based on sectionOrder
-                const orderedSections = sectionOrder.map(orderId =>
-                    sectionsData.find(section => section.section_id === orderId)
-                ).filter(Boolean); // Filter out any undefined sections
-
-                // Create an object with section_id as the key and true as the value
-                const updatedSections = orderedSections.reduce((acc, section) => {
-                    acc[section.section_id] = true;
-                    return acc;
-                }, {});
-
-                dispatch(setDataIsSame(updatedSections));
-                setSections(orderedSections); // Set ordered sections
+                let sectionOrder;
+                try {
+                    sectionOrder = await GetSectionOrder();
+                } catch (error) {
+                    console.error('Error fetching section order:', error);
+                    // If there's an error in GetSectionOrder, set sections to their initial order and return
+                    setSections(sectionsData);
+                    return; // Exit the function early
+                }
+    
+                // If sectionOrder is valid, proceed with sorting
+                if (sectionOrder) {
+                    const orderedSections = sectionOrder.map(orderId =>
+                        sectionsData.find(section => section.section_id === orderId)
+                    ).filter(Boolean); // Filter out any undefined sections
+    
+                    // Create an object with section_id as the key and true as the value
+                    const updatedSections = orderedSections.reduce((acc, section) => {
+                        acc[section.section_id] = true;
+                        return acc;
+                    }, {});
+    
+                    dispatch(setDataIsSame(updatedSections));
+                    setSections(orderedSections); // Set ordered sections
+                } else {
+                    // If sectionOrder is invalid, use initial sections order
+                    setSections(sectionsData);
+                }
             } else {
                 setToastError('Something went wrong fetching form details');
             }
         } catch (error) {
-            console.error(error)
+            console.error('API call error:', error);
             setToastError('An error occurred during the API call');
         } finally {
             setPageLoading(false);
         }
     }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
+    
+    
 
     //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
@@ -1015,7 +1012,7 @@ function QuestionnaryForm() {
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
 
-                                                                className="disable-select select-none w-full rounded-[10px] p-4 border hover:border-[#2B333B] border-transparent mb-2.5"
+                                                                className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center'>
