@@ -7,12 +7,16 @@ const Key = webdriver.Key
 
 When('I change the status of the version to testing', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[4]/td[2]/*[@data-testid='status']`))).click();
-    await driver.wait(until.elementLocated(By.css('[@data-testid="testing"]'))).click();
+    // const status = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]/`)));
+    await driver.wait(until.elementLocated(By.css('[data-testid="status"]'))).click();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="Testing"]'))).click();
 });
 
 When('I change the status of the version to publish', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[4]/td[2]/*[@data-testid='status']`))).click();
-    await driver.wait(until.elementLocated(By.css('[@data-testid="publish"]'))).click();
+    // await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]/*[@data-testid='status']`))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="status"]'))).click();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="Published"]'))).click();
 });

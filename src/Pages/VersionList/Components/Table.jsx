@@ -146,6 +146,7 @@ function Table({
                                                                     // placeholder={selectedOption}
                                                                     onClick={(e) => handleDropdownClick(versionListInfo?.status, versionListInfo?.version_number)}
                                                                     value={versionListInfo?.status}
+                                                                    data-testid="status"
                                                                     className={`border w-full border-[#AEB3B7] outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                                                                     readOnly
                                                                 />
@@ -167,6 +168,7 @@ function Table({
                                                             {options.map(option => (
                                                                 <li key={option}
                                                                     className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
+                                                                    data-testid={`${option}`}
                                                                     onClick={() => handleOptionClick(option, versionListInfo?.questionnaire_id, versionListInfo?.version_number)}>
                                                                     {option}
                                                                 </li>
