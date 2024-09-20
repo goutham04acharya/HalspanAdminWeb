@@ -29,10 +29,10 @@ function DateTimeField({
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg mt-5 bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent ||
                         (fieldSettingParameters?.type === 'date'
-                            ? 'dd-mm-yyyy'
+                            ? 'dd/mm/yyyy'
                             : fieldSettingParameters?.type === 'time'
                                 ? 'hh:mm:ss'
-                                : 'dd-mm-yyyy hh:mm:ss')}
+                                : 'dd/mm/yyyy hh:mm:ss')}
                     onClick={() => handleChange(fieldSettingParameters)}
                 />
                 {fieldSettingParameters?.type === 'date' &&

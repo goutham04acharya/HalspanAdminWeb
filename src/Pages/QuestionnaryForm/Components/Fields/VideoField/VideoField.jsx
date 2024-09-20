@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
 function VideoField({ label,
     type,
@@ -14,6 +15,9 @@ function VideoField({ label,
 }) {
 
     const [fileName, setFileName] = useState('');
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+
+    console.log(fixedMaxValue.video, 'fixedddmac')
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -36,8 +40,10 @@ function VideoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload Video (${fileName})` : `${`Upload Video (${fixedMaxValue})`}`}
-
+                    {/* {fileName ? `Upload Video (${fileName})` : `${`Upload Video (${fixedMaxValue?.video === 'undefined' ? '0' : fixedMaxValue?.video})`}`} */}
+                    {fileName
+                        ? `Upload Video (${fileName})`
+                        : `Upload Video (${fixedMaxValue?.[selectedQuestionId] || '3'})`} {/* Default to 3 */}
                 </label>
                 <input
                     data-testid="input"

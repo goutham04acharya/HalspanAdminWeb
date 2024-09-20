@@ -73,7 +73,7 @@ function VideoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue}
+                                value={fixedMaxValue?.[selectedQuestionId]?.video || ''}  // Max value specific to 'video'
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

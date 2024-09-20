@@ -61,7 +61,7 @@ function PhotoFieldSetting({
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue}  // Use '3' as the default if max is not set
+                                value={fixedMaxValue?.[selectedQuestionId]?.photo || ''}  // Max value specific to 'photo'
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

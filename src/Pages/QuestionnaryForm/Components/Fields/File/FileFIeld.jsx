@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
 function FileField({
     textId,
@@ -10,6 +11,8 @@ function FileField({
 
     console.log(fixedMaxValue, 'fixedMaxValue')
     const [fileName, setFileName] = useState('');
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -32,8 +35,10 @@ function FileField({
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload File (${fileName})` : `${`Upload File (${fixedMaxValue === 'undefined' ? '0' : fixedMaxValue})`}`}
-
+                    {/* {fileName ? `Upload File (${fileName})` : `${`Upload File (${fixedMaxValue?.file === 'undefined' ? '0' : fixedMaxValue?.file})`}`} */}
+                    {fileName
+                        ? `Upload File (${fileName})`
+                        : `Upload File (${fixedMaxValue?.[selectedQuestionId] || '3'})`} {/* Default to 3 */}
                 </label>
                 <input
                     data-testid="input"
