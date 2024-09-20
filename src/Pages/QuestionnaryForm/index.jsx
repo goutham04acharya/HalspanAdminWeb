@@ -451,56 +451,50 @@ function QuestionnaryForm() {
         }
     }
 
-    // API calling function
-    const formDefaultDetails = useCallback(async () => {
-        setPageLoading(true);
-        try {
-            const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-            if (!response?.error) {
-                dispatch(setFormDefaultInfo(response?.data?.data));
-                const sectionsData = response?.data?.data?.sections || [];
-    
-                // Fetch section order
-                let sectionOrder;
-                try {
-                    sectionOrder = await GetSectionOrder();
-                } catch (error) {
-                    console.error('Error fetching section order:', error);
-                    // If there's an error in GetSectionOrder, set sections to their initial order and return
-                    setSections(sectionsData);
-                    return; // Exit the function early
-                }
-    
-                // If sectionOrder is valid, proceed with sorting
-                if (sectionOrder) {
-                    const orderedSections = sectionOrder.map(orderId =>
-                        sectionsData.find(section => section.section_id === orderId)
-                    ).filter(Boolean); // Filter out any undefined sections
-    
-                    // Create an object with section_id as the key and true as the value
-                    const updatedSections = orderedSections.reduce((acc, section) => {
-                        acc[section.section_id] = true;
-                        return acc;
-                    }, {});
-    
-                    dispatch(setDataIsSame(updatedSections));
-                    setSections(orderedSections); // Set ordered sections
-                } else {
-                    // If sectionOrder is invalid, use initial sections order
-                    setSections(sectionsData);
-                }
-            } else {
-                setToastError('Something went wrong fetching form details');
+   // API calling function
+   const formDefaultDetails = useCallback(async () => {
+    setPageLoading(true);
+    try {
+        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+        if (!response?.error) {
+            dispatch(setFormDefaultInfo(response?.data?.data));
+            const sectionsData = response?.data?.data?.sections || [];
+
+            const sectionOrder = await GetSectionOrder();
+
+            if(sectionOrder === 'no_data'){
+                setSections(sectionsData);
+                return;
             }
-        } catch (error) {
-            console.error('API call error:', error);
-            setToastError('An error occurred during the API call');
-        } finally {
-            setPageLoading(false);
+
+            // If sectionOrder is valid, proceed with sorting
+            if (sectionOrder) {
+                const orderedSections = sectionOrder.map(orderId =>
+                    sectionsData.find(section => section.section_id === orderId)
+                ).filter(Boolean); // Filter out any undefined sections
+
+                // Create an object with section_id as the key and true as the value
+                const updatedSections = orderedSections.reduce((acc, section) => {
+                    acc[section.section_id] = true;
+                    return acc;
+                }, {});
+
+                dispatch(setDataIsSame(updatedSections));
+                setSections(orderedSections); // Set ordered sections
+            } else {
+                // If sectionOrder is invalid, use initial sections order
+                setSections(sectionsData);
+            }
+        } else {
+            setToastError('Something went wrong fetching form details');
         }
-    }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
-    
-    
+    } catch (error) {
+        console.error('API call error:', error);
+        setToastError('An error occurred during the API call');
+    } finally {
+        setPageLoading(false);
+    }
+}, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
 
     //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
@@ -914,13 +908,17 @@ function QuestionnaryForm() {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            if (!response?.data?.error) {
+            console.log(response, 'res')
+            console.log(response.error, 'error')
+            if (!response?.error) {
 
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section.id);
                 return sectionOrder; // Return the ordered section IDs
+            } else if (response?.data?.status === 404) {
+                return 'no_data'
             } else {
-                setToastError('Something went wrong');
+                setToastError('Something went wrong!!');
                 return []; // Return an empty array if there is an error
             }
         } catch (error) {
@@ -1158,7 +1156,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
                     isModalOpen={isModalOpen}
-                    setModalOpen={dispatch(setModalOpen())}
+                    setModalOpen={(setModalOpen)}
                     handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
                     handleButton2={handleCancel} // Handle cancel button
                 />
@@ -1174,7 +1172,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete-page'
                     testIDBtn2='cancel-delete'
                     isModalOpen={showPageDeleteModal}
-                    setModalOpen={dispatch(setShowPageDeleteModal())}
+                    // setModalOpen={dispatch(setShowPageDeleteModal())}
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
