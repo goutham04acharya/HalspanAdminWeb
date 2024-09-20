@@ -1145,7 +1145,7 @@ function QuestionnaryForm() {
                     </div>
                 </div>
             )}
-            {isModalOpen && (
+           {isModalOpen && (
                 <ConfirmationModal
                     text='Delete Section'
                     subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
@@ -1156,7 +1156,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
                     isModalOpen={isModalOpen}
-                    setModalOpen={(setModalOpen)}
+                    setModalOpen={setModalOpen}
                     handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
                     handleButton2={handleCancel} // Handle cancel button
                 />
@@ -1172,7 +1172,7 @@ function QuestionnaryForm() {
                     testIDBtn1='confirm-delete-page'
                     testIDBtn2='cancel-delete'
                     isModalOpen={showPageDeleteModal}
-                    // setModalOpen={dispatch(setShowPageDeleteModal())}
+                    setModalOpen={setShowPageDeleteModal}
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />

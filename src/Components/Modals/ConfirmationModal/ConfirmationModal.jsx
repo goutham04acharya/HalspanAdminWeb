@@ -3,17 +3,15 @@ import Image from '../../Image/Image'
 import useOnClickOutside from '../../../CommonMethods/outSideClick.js'
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
-import { setShowquestionDeleteModal, setModalOpen } from '../../../Pages/QuestionnaryForm/Components/QuestionnaryFormSlice.js'
 
 
-function ConfirmationModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel }) {
+function ConfirmationModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
 
     const handleClose = () => {
         dispatch(setModalOpen(false));
-        dispatch(setShowquestionDeleteModal(false));
     };
 
     useOnClickOutside(modalRef, () => {
