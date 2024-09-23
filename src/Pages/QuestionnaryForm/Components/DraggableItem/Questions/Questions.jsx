@@ -23,7 +23,7 @@ const Questions = ({
 
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
-    const { index, selectedQuestionId, setShouldAutoSave, fixedMaxValue } = item;
+    const { index, selectedQuestionId, setShouldAutoSave } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
@@ -60,17 +60,14 @@ const Questions = ({
         photofield: (props) =>
             <PhotoField
                 {...props}
-                fixedMaxValue={fixedMaxValue}
             />,
         videofield: (props) =>
             <VideoField
                 {...props}
-                fixedMaxValue={fixedMaxValue}
             />,
         filefield: (props) =>
             <FileField
                 {...props}
-                fixedMaxValue={fixedMaxValue}
             />,
         signaturefield: (props) =>
             <SignatureField

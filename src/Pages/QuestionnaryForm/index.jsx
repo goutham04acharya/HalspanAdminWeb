@@ -56,12 +56,6 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-    const [fixedMaxValue, setFixedMaxValue] = useState({
-        video: '3',
-        photo: '3',
-        file: '3',
-        // Add other component identifiers as needed
-    });
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -117,95 +111,6 @@ function QuestionnaryForm() {
         }
     };
 
-    // const handleInputChange = (e) => {
-    //     const { id, value } = e.target;
-
-    //     // Restrict numeric input if the id is 'fileType'
-    //     let updatedValue = value;
-    //     // Handle URL prefill for http and https
-    //     if (id === 'fileType')  {
-    //         // Remove numbers, spaces around commas, and trim any leading/trailing spaces
-    //         updatedValue = value
-    //             .replace(/[0-9]/g, '')      // Remove numbers
-    //             .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-    //             .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
-    //     } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
-    //         updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
-    //     } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
-    //         updatedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/(\.\d{2})\d+/, '$1');
-    //     }
-    //     // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
-    //     // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
-    //     // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
-
-    //     // Check if the input field's id is the one you want to manage with inputValue
-    //     if (id === 'urlValue') {
-    //         if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
-    //             updatedValue = fieldSettingParams?.[selectedQuestionId].urlType
-    //         }
-
-    //         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-    //     } else {
-    //         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-    //     }
-
-    //     if (id === 'max') {
-    //         setFixedMaxValue(updatedValue);
-    //     }
-
-    //     // Check if min is greater than max and set error message
-    //     if (id === 'min' || id === 'max') {
-    //         const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-    //         const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
-
-    //         if (Number(minValue) > Number(maxValue) || Number(minValue) === Number(maxValue)) {
-    //             setValidationErrors(prevErrors => ({
-    //                 ...prevErrors,
-    //                 minMax: 'Minimum value should be less than maximum',
-    //             }));
-    //         } else {
-    //             // Clear the error if values are valid
-    //             setValidationErrors(prevErrors => ({
-    //                 ...prevErrors,
-    //                 minMax: '',
-    //             }));
-    //         }
-    //     }
-    //     // Validate incrementby value against the max range
-    //     if (id === 'incrementby') {
-    //         const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
-
-    //         if (Number(updatedValue) > maxRange) {
-    //             setValidationErrors(prevErrors => ({
-    //                 ...prevErrors,
-    //                 incrementby: `Value cannot exceed the maximum range of ${maxRange}`,
-    //             }));
-    //         } else {
-    //             // Clear the error if within the range
-    //             setValidationErrors(prevErrors => ({
-    //                 ...prevErrors,
-    //                 incrementby: '',
-    //             }));
-    //         }
-    //     }
-
-    //     const data = selectedQuestionId?.split('_');
-    //     const update = { ...dataIsSame };
-    //     update[data[0]] = false;
-    //     setDataIsSame(update);
-
-
-    //     // Clear any existing debounce timer
-    //     if (debounceTimerRef.current) {
-    //         clearTimeout(debounceTimerRef.current);
-    //     }
-
-    //     // Set a new debounce timer
-    //     debounceTimerRef.current = setTimeout(() => {
-    //         setShouldAutoSave(true);
-    //     }, 100); // 100ms delay before auto-saving
-    // };
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -241,17 +146,8 @@ function QuestionnaryForm() {
             dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         }
 
-        // If the 'max' field is being updated, set max value for the specific component type
-        // Dispatch the updated value
-
-        // Handle max value updates
         if (id === 'max') {
-            const key = fieldSettingParams?.[selectedQuestionId]?.componentType
-            console.log('key', key)
-            setFixedMaxValue((prevValues) => ({
-                ...prevValues,
-                [key]: updatedValue, // Update the specific component's max value
-            }));
+            dispatch(setNewComponent({ id: 'max', value: updatedValue, questionId: selectedQuestionId }));
         }
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         console.log(fieldSettingParams?.[selectedQuestionId], 'fieldSettingParams?.[selectedQuestionId]')
@@ -263,7 +159,7 @@ function QuestionnaryForm() {
         // Additional validation logic (min and max comparison)
         if (id === 'min' || id === 'max') {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-            const maxValue = (id === 'max') ? updatedValue : (fieldSettingParams?.[selectedQuestionId].componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId].componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max;
+            const maxValue = (id === 'max') ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max
 
             if (Number(minValue) > Number(maxValue) || Number(minValue) === 0 && Number(maxValue) === 0) {
                 setValidationErrors(prevErrors => ({
@@ -313,9 +209,6 @@ function QuestionnaryForm() {
             setShouldAutoSave(true);
         }, 100); // 100ms delay before auto-saving
     };
-    console.log(question_id, 'question.question_idquestion.question_id')
-
-
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -892,17 +785,21 @@ function QuestionnaryForm() {
         addNewQuestion('photofield', (questionId) => {
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
 
         });
     }, [addNewQuestion]);
 
     const handleVideoClick = useCallback(() => {
         addNewQuestion('videofield', (questionId) => {
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
+
         })
     });
 
     const handleFileClick = useCallback(() => {
         addNewQuestion('filefield', (questionId) => {
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
         })
     });
 
@@ -966,13 +863,9 @@ function QuestionnaryForm() {
             default_content: fieldSettingParams?.[selectedQuestionId]?.defaultContent,
             type: fieldSettingParams?.[selectedQuestionId]?.type,
             format: fieldSettingParams?.[selectedQuestionId]?.format,
-            // field_range: {
-            //     min: fieldSettingParams?.[selectedQuestionId]?.min,
-            //     max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue : fieldSettingParams?.[selectedQuestionId]?.max,
-            // },
             field_range: {
                 min: fieldSettingParams?.[selectedQuestionId]?.min,
-                max: (fieldSettingParams?.[selectedQuestionId]?.componentType === 'photofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'videofield' || fieldSettingParams?.[selectedQuestionId]?.componentType === 'filefield') ? fixedMaxValue[selectedQuestionId] : fieldSettingParams?.[selectedQuestionId]?.max,
+                max: fieldSettingParams?.[selectedQuestionId]?.max,
             },
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
@@ -1232,7 +1125,6 @@ function QuestionnaryForm() {
                                                                     handleSaveSection={handleSaveSection}
                                                                     handleAutoSave={handleAutoSave}
                                                                     handleDeleteModal={handleDeleteModal}
-                                                                    fixedMaxValue={fixedMaxValue}
                                                                 />
                                                             </li>
                                                         )}
@@ -1288,7 +1180,6 @@ function QuestionnaryForm() {
                                         // setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-                                        fixedMaxValue: fixedMaxValue
 
                                     }
                                 )

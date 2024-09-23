@@ -6,12 +6,10 @@ function FileField({
     className,
     handleChange,
     fieldSettingParameters,
-    fixedMaxValue
+    
 }) {
 
     const [fileName, setFileName] = useState('');
-    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const labelDisplayValue = fixedMaxValue?.filefield|| fixedMaxValue?.photo; // Default to 3 if no value
 
 
 
@@ -36,10 +34,9 @@ function FileField({
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {/* {fileName ? `Upload File (${fileName})` : `${`Upload File (${fixedMaxValue?.file === 'undefined' ? '0' : fixedMaxValue?.file})`}`} */}
                     {fileName
                         ? `Upload File (${fileName})`
-                        : `Upload File (${labelDisplayValue})`} {/* Ensure proper string rendering */}
+                        : `Upload File (${fieldSettingParameters?.max})`} {/* Ensure proper string rendering */}
                 </label>
                 <input
                     data-testid="input"

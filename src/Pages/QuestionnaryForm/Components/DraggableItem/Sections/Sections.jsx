@@ -24,7 +24,6 @@ function Sections({sectionData,
   sections,
   setSections,
   handleAutoSave,
-  fixedMaxValue,
  }) {
 
   const sectionRefs = useRef([]);
@@ -172,7 +171,6 @@ function Sections({sectionData,
                             sections={sections}
                             handleAutoSave={handleAutoSave}
                             setSections={setSections}
-                            fixedMaxValue={fixedMaxValue}
                           />
                         </li>
                       )}

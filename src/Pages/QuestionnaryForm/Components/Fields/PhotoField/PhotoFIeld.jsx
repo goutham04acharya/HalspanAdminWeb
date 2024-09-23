@@ -10,12 +10,9 @@ function PhotoField({ label,
     handleChange,
     fieldSettingParameters,
     testId,
-    fixedMaxValue
 
 }) {
     const [fileName, setFileName] = useState('');
-    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const labelDisplayValue = fixedMaxValue?.photofield|| fixedMaxValue?.photo; // Default to 3 if no value
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -40,7 +37,7 @@ function PhotoField({ label,
                 >
                      {fileName
                         ? `Upload Photo (${fileName})`
-                        : `Upload Photo (${labelDisplayValue})`}
+                        : `Upload Photo (${fieldSettingParameters?.max})`}
                 </label>
                 <input
                     data-testid="input"

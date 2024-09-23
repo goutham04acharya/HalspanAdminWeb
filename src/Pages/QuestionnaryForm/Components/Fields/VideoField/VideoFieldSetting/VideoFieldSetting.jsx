@@ -13,7 +13,6 @@ function VideoFieldSetting({ handleInputChange,
     setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
-    fixedMaxValue
 }) {
 
     return (
@@ -74,9 +73,7 @@ function VideoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue?.videofield !== undefined
-                                    ? fixedMaxValue?.videofield
-                                    : fixedMaxValue?.video || '3'}
+                                value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

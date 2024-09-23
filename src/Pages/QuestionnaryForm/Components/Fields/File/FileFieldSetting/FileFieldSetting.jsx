@@ -13,7 +13,6 @@ function FileFieldSetting({ handleInputChange,
     setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
-    fixedMaxValue
 }) {
     return (
         <>
@@ -88,9 +87,7 @@ function FileFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue?.filefield !== undefined
-                                    ? fixedMaxValue?.filefield
-                                    : fixedMaxValue?.file || '3'}
+                                value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

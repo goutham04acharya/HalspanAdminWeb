@@ -10,12 +10,10 @@ function VideoField({ label,
     handleChange,
     fieldSettingParameters,
     testId,
-    fixedMaxValue
 
 }) {
     const [fileName, setFileName] = useState('');
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const labelDisplayValue = fixedMaxValue?.videofield || fixedMaxValue?.video; // Default to 3 if no value
 
     console.log(selectedQuestionId, 'selectedQuestionIdselectedQuestionId')
     const handleFileChange = (e) => {
@@ -41,7 +39,7 @@ function VideoField({ label,
                 >
                     {fileName
                         ? `Upload Video (${fileName})`
-                        : `Upload Video (${labelDisplayValue})`} {/* Ensure proper string rendering */}
+                        : `Upload Video (${fieldSettingParameters?.max})`} 
                 </label>
                 <input
                     data-testid="input"
