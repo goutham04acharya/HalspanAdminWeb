@@ -1176,6 +1176,7 @@ function QuestionnaryForm() {
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
+                
             )}
             {showquestionDeleteModal && (
                 <ConfirmationModal
