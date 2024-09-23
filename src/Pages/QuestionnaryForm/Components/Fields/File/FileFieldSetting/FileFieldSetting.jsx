@@ -88,7 +88,9 @@ function FileFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue?.[selectedQuestionId]?.file || ''}  // Max value specific to 'file'
+                                value={fixedMaxValue?.filefield !== undefined
+                                    ? fixedMaxValue?.filefield
+                                    : fixedMaxValue?.file || '3'}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

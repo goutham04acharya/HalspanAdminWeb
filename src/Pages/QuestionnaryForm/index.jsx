@@ -242,15 +242,19 @@ function QuestionnaryForm() {
         }
 
         // If the 'max' field is being updated, set max value for the specific component type
-    if (id === 'max') {
-        setFixedMaxValue((prevValues) => ({
-            ...prevValues,
-            [selectedQuestionId]: {
-                ...prevValues[selectedQuestionId],
-                [fieldSettingParams[selectedQuestionId]?.componentType]: updatedValue, // Save max value by component type
-            },
-        }));
-    }
+        // Dispatch the updated value
+
+        // Handle max value updates
+        if (id === 'max') {
+            const key = fieldSettingParams?.[selectedQuestionId]?.componentType
+            console.log('key', key)
+            setFixedMaxValue((prevValues) => ({
+                ...prevValues,
+                [key]: updatedValue, // Update the specific component's max value
+            }));
+        }
+        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+        console.log(fieldSettingParams?.[selectedQuestionId], 'fieldSettingParams?.[selectedQuestionId]')
 
         if (id === 'min') {
             dispatch(setNewComponent({ id: 'min', value: updatedValue, questionId: selectedQuestionId }));
@@ -309,6 +313,8 @@ function QuestionnaryForm() {
             setShouldAutoSave(true);
         }, 100); // 100ms delay before auto-saving
     };
+    console.log(question_id, 'question.question_idquestion.question_id')
+
 
 
     const sideComponentMap = {
@@ -1114,7 +1120,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
     return (
         <>
             {pageLoading ? (

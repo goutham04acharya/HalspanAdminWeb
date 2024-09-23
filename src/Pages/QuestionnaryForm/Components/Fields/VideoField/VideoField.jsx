@@ -13,12 +13,11 @@ function VideoField({ label,
     fixedMaxValue
 
 }) {
-
     const [fileName, setFileName] = useState('');
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const labelDisplayValue = fixedMaxValue?.videofield || fixedMaxValue?.video; // Default to 3 if no value
 
-    console.log(fixedMaxValue.video, 'fixedddmac')
-
+    console.log(selectedQuestionId, 'selectedQuestionIdselectedQuestionId')
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setFileName(file ? file.name : '');
@@ -40,10 +39,9 @@ function VideoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {/* {fileName ? `Upload Video (${fileName})` : `${`Upload Video (${fixedMaxValue?.video === 'undefined' ? '0' : fixedMaxValue?.video})`}`} */}
                     {fileName
                         ? `Upload Video (${fileName})`
-                        : `Upload Video (${fixedMaxValue?.[selectedQuestionId] || '3'})`} {/* Default to 3 */}
+                        : `Upload Video (${labelDisplayValue})`} {/* Ensure proper string rendering */}
                 </label>
                 <input
                     data-testid="input"

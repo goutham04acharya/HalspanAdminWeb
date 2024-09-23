@@ -15,6 +15,7 @@ function VideoFieldSetting({ handleInputChange,
     validationErrors,
     fixedMaxValue
 }) {
+
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -73,7 +74,9 @@ function VideoFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue?.[selectedQuestionId]?.video || ''}  // Max value specific to 'video'
+                                value={fixedMaxValue?.videofield !== undefined
+                                    ? fixedMaxValue?.videofield
+                                    : fixedMaxValue?.video || '3'}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'

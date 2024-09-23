@@ -9,9 +9,10 @@ function FileField({
     fixedMaxValue
 }) {
 
-    console.log(fixedMaxValue, 'fixedMaxValue')
     const [fileName, setFileName] = useState('');
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const labelDisplayValue = fixedMaxValue?.filefield|| fixedMaxValue?.photo; // Default to 3 if no value
+
 
 
     const handleFileChange = (e) => {
@@ -38,7 +39,7 @@ function FileField({
                     {/* {fileName ? `Upload File (${fileName})` : `${`Upload File (${fixedMaxValue?.file === 'undefined' ? '0' : fixedMaxValue?.file})`}`} */}
                     {fileName
                         ? `Upload File (${fileName})`
-                        : `Upload File (${fixedMaxValue?.[selectedQuestionId] || '3'})`} {/* Default to 3 */}
+                        : `Upload File (${labelDisplayValue})`} {/* Ensure proper string rendering */}
                 </label>
                 <input
                     data-testid="input"
