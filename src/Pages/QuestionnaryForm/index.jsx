@@ -84,7 +84,7 @@ function QuestionnaryForm() {
             [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
         }));
     };
-
+      
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
@@ -1075,7 +1075,7 @@ function QuestionnaryForm() {
                                                                     </div>
                                                                     <div className="flex items-center">
                                                                         <img
-                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
+                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
                                                                             title="Drag"
                                                                             src={`/Images/drag.svg`}
                                                                             alt="Drag"

@@ -12,7 +12,7 @@ import {
 import Pages from "../PagesList/Pages";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-function Sections({sectionData,
+function Sections({ sectionData,
   sectionIndex,
   expandedSections,
   setExpandedSections,
@@ -23,7 +23,7 @@ function Sections({sectionData,
   sections,
   setSections,
   handleAutoSave,
- }) {
+}) {
 
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
@@ -52,43 +52,43 @@ function Sections({sectionData,
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
-  
+
     const { source, destination } = result;
     // const sectionIndex = source.droppableId; // Assuming sectionIndex is provided by droppableId
     const pageIndex = source.index;
-  
+
     // Create a copy of the current section's pages
     const updatedSections = [...sections];
     const reorderedPages = Array.from(updatedSections[sectionIndex]?.pages || []);
-  
+
     // Reorder the pages based on drag and drop
     const [movedPage] = reorderedPages.splice(pageIndex, 1);
     reorderedPages.splice(destination.index, 0, movedPage);
-  
+
     // Map reordered pages with updated indices
     const updatedPageList = reorderedPages.map((pageData, index) => ({
       ...pageData,  // Spread the existing page properties
       sectionIndex: sectionIndex,  // Set the sectionIndex for each page
       index: index,  // Update the page index in the reordered list
     }));
-  
+
     // Update the specific section with the reordered pages
     updatedSections[sectionIndex] = {
       ...updatedSections[sectionIndex],
       pages: updatedPageList,
     };
-  
+
     // Set the updated sections state
     setSections(updatedSections);
-  
+
     // Retrieve the sectionId from the updatedSections
     const sectionId = updatedSections[sectionIndex].section_id;
-  
+
     // Update dataIsSame for the current section
     const updatedDataIsSame = { ...dataIsSame };
     updatedDataIsSame[sectionId] = false;
     dispatch(setDataIsSame(updatedDataIsSame));
-  
+
     // Call handleAutoSave with the correct sectionId and updated sections
     handleAutoSave(sectionId, updatedSections);
   };
@@ -119,18 +119,17 @@ function Sections({sectionData,
                         <li
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          // {...provided.dragHandleProps}
+                          style={{
+                            ...provided.draggableProps.style,
+                            // Ensure the transform exists and contains a Y-axis translation
+                            transform: provided.draggableProps.style?.transform
+                              ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
+                              : "none", // Fallback in case transform is null/undefined
+                          }}
                           className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
                         >
                           <div className="flex justify-between">
                             <div className="flex items-center w-full">
-                              {/* <img
-                                src="/Images/open-Filter.svg"
-                                alt="down-arrow"
-                                className={`cursor-pointer pt-6 pl-2 transform transition-transform duration-300 mr-2 ${expandedSections[sectionIndex] ? "rotate-180 mt-5 ml-2" : "" // Rotate 180deg when expanded
-                                  }`}
-                                onClick={() => toggleSection(sectionIndex)} // Toggle section on click
-                              /> */}
                               <EditableField
                                 name={pageData?.page_name}
                                 index={sectionIndex}
@@ -148,7 +147,7 @@ function Sections({sectionData,
                                 alt="Drag"
                                 {...provided.dragHandleProps}
                               />
-                               <img src="/Images/trash-black.svg"
+                              <img src="/Images/trash-black.svg"
                                 title='Delete'
                                 alt="Delete"
                                 data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
