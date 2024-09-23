@@ -209,7 +209,7 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(true));
         }, 100); // 100ms delay before auto-saving
     };
-    
+
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -941,7 +941,6 @@ function QuestionnaryForm() {
                 id: section.section_id
             }))
         }
-        console.log(body, 'body')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -957,10 +956,7 @@ function QuestionnaryForm() {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            console.log(response, 'res')
-            console.log(response.error, 'error')
             if (!response?.error) {
-
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section.id);
                 return sectionOrder; // Return the ordered section IDs
