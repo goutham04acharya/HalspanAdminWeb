@@ -5,6 +5,8 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import InputField from '../../../../../../Components/InputField/InputField';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+
 
 function PhotoFieldSetting({
     handleInputChange,
@@ -12,7 +14,6 @@ function PhotoFieldSetting({
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
 
@@ -86,7 +87,7 @@ function PhotoFieldSetting({
                                     checked={fieldSettingParameters?.draw_image === 'yes'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }}
                                 />
                                 <label htmlFor='draw_image_yes'
@@ -105,7 +106,7 @@ function PhotoFieldSetting({
                                     checked={fieldSettingParameters?.draw_image === 'no'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }}
                                 />
                                 <label htmlFor='draw_image_no'
@@ -127,7 +128,7 @@ function PhotoFieldSetting({
                                     checked={fieldSettingParameters?.include_metadata === 'yes'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'yes', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }} />
                                 <label htmlFor='include_metadata_yes'
                                     data-testid='metadata-yes'
@@ -145,7 +146,7 @@ function PhotoFieldSetting({
                                     checked={fieldSettingParameters?.include_metadata === 'no'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }}
                                 />
                                 <label htmlFor='include_metadata_no'
@@ -155,7 +156,7 @@ function PhotoFieldSetting({
                                 </label>
                             </div>
                         </div>
-                        <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                        <OptionsComponent selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'

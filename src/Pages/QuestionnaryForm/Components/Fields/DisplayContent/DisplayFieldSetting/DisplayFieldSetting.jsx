@@ -7,12 +7,12 @@ import InputWithDropDown from '../../../../../../Components/InputField/InputWith
 import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not already done
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
 
 
 function DisplayFieldSetting({
     handleInputChange,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
@@ -43,7 +43,7 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'urlValue', value:( option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
 
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
 
         // Update the input value (make sure you use the correct state updater)
     };
@@ -51,6 +51,7 @@ function DisplayFieldSetting({
     const handleFileUploadClick = () => {
         if (selectedFile) {
             setReplaceModal(true);
+            dispatch(setShouldAutoSave(true));
         } else {
             document.getElementById('file-upload').click();
         }
@@ -83,8 +84,7 @@ function DisplayFieldSetting({
                     body: file,  // Send the actual file content
                 });
                 dispatch(setNewComponent({ id: 'image', value: uploadResponse?.url.split('?')[0], questionId: selectedQuestionId }));
-                setShouldAutoSave(true)
-                console.log(uploadResponse?.url.split('?')[0], 'uploadResponse?.url.sp');
+                dispatch(setShouldAutoSave(true));
 
                 // Check if the upload was successful
                 if (uploadResponse.ok) {
@@ -146,7 +146,7 @@ function DisplayFieldSetting({
     const handleImage = () => {
         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
-        setShouldAutoSave(true)
+        dispatch(setShouldAutoSave(true));
     }
 
     return (
@@ -269,7 +269,7 @@ function DisplayFieldSetting({
                                                         checked={fieldSettingParameters?.pin_drop === 'yes'}
                                                         onClick={() => {
                                                             dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
-                                                            setShouldAutoSave(true);
+                                                            dispatch(setShouldAutoSave(true));
                                                         }} />
                                                     <label htmlFor='pin_drop_yes'
                                                         data-testid='pindrop-yes'
@@ -287,7 +287,7 @@ function DisplayFieldSetting({
                                                         checked={fieldSettingParameters?.pin_drop === 'no'}
                                                         onClick={() => {
                                                             dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
-                                                            setShouldAutoSave(true);
+                                                            dispatch(setShouldAutoSave(true));
                                                         }} />
                                                     <label htmlFor='pin_drop_no'
                                                         data-testid='pindrop-no'
@@ -309,7 +309,7 @@ function DisplayFieldSetting({
                                                     checked={fieldSettingParameters?.draw_image === 'yes'}
                                                     onClick={() => {
                                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
-                                                        setShouldAutoSave(true);
+                                                        dispatch(setShouldAutoSave(true));
                                                     }} />
                                                 <label htmlFor='draw_image_yes'
                                                     data-testid='draw-yes'
@@ -327,7 +327,7 @@ function DisplayFieldSetting({
                                                     checked={fieldSettingParameters?.draw_image === 'no'}
                                                     onClick={() => {
                                                         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
-                                                        setShouldAutoSave(true);
+                                                        dispatch(setShouldAutoSave(true));
                                                     }} />
                                                 <label htmlFor='draw_image_no'
                                                     data-testid='draw-no'
@@ -395,7 +395,7 @@ function DisplayFieldSetting({
                             )}
                         </div>
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

@@ -206,9 +206,10 @@ function QuestionnaryForm() {
 
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
-            setShouldAutoSave(true);
+            dispatch(setShouldAutoSave(true));
         }, 100); // 100ms delay before auto-saving
     };
+    
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -870,7 +871,6 @@ function QuestionnaryForm() {
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
             source_value:
-                // [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
                 fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
                     fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                     fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
@@ -1112,7 +1112,6 @@ function QuestionnaryForm() {
                                                                 <Sections
                                                                     sectionData={sectionData}
                                                                     sectionIndex={sectionIndex}
-                                                                    setShouldAutoSave={setShouldAutoSave}
                                                                     selectedQuestionId={selectedQuestionId}
                                                                     handleAddRemoveQuestion={handleAddRemoveQuestion}
                                                                     expandedSections={expandedSections}
@@ -1177,7 +1176,7 @@ function QuestionnaryForm() {
                                         handleBlur: handleBlur,
                                         setShouldAutoSave: setShouldAutoSave,
                                         validationErrors: validationErrors,
-                                        // setReplaceModal: setReplaceModal,
+                                        setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
 

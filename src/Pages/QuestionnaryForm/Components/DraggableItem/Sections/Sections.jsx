@@ -164,7 +164,6 @@ function Sections({sectionData,
                           <Pages
                             pageIndex={pageIndex}
                             pageData={pageData}
-                            setShouldAutoSave={setShouldAutoSave}
                             handleSaveSectionName={handleSaveSectionName}
                             sectionIndex={sectionIndex}
                             handleAddRemoveQuestion={handleAddRemoveQuestion}

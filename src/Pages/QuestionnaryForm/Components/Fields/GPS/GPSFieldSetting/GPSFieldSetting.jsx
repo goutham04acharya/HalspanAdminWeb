@@ -3,12 +3,12 @@ import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
 
+
 function GPSFieldSetting({
     handleInputChange,
     formParameters,
     handleBlur,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
 }) {
     return (
@@ -28,7 +28,7 @@ function GPSFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                     />
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

@@ -10,7 +10,6 @@ function VideoFieldSetting({ handleInputChange,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
 }) {
@@ -86,7 +85,7 @@ function VideoFieldSetting({ handleInputChange,
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
