@@ -87,14 +87,7 @@ function VersionList() {
         setDataLoading(true);
         setLoading(true);
         const response = await getAPI(`questionnaires/versions/${questionnaire_id}`)
-        console.log(response, 'version')
-        // const data = response?.data?.items?.map(item => ({
-        //     version_number: item.version_number,
-        //     status: item.status
-        // }));
-        // console.log(data, 'data');
-        setVersionList(response?.data);
-        // setVersionData(data);
+        setVersionList(response?.data)
         console.log(response)
         setLoading(false);
     }
