@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 function GPSField({
     type,
@@ -12,6 +12,7 @@ function GPSField({
 
     const [location, setLocation] = useState('');
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true); // Add loading states
 
     useEffect(() => {
         const fetchLocation = () => {
@@ -23,18 +24,25 @@ function GPSField({
                             position.coords.longitude
                         );
                         setLocation(formattedLocation);
+                        setLoading(false); // Stop loading once location is fetched
+
                     },
                     (err) => {
                         setError(err.message);
+                        setLoading(false); // Stop loading once location is fetched
                     }
                 );
             } else {
                 setError("Geolocation is not supported by this browser.");
+                setLoading(false); // Stop loading once location is fetched
             }
         };
 
         fetchLocation();
     }, []);
+
+    // Memoize the formatted location to prevent unnecessary re-renders
+    const memoizedLocation = useMemo(() => location, [location]);
 
     const formatCoordinates = (lat, lon) => {
         const latDirection = lat >= 0 ? 'N' : 'S';
@@ -58,10 +66,12 @@ function GPSField({
                 {fieldSettingParameters?.label}
             </label>
             <div className='mt-7 ml-4'>
-                {error ? (
+                {loading ? ( // Display a loading message while fetching location
+                    <p>Loading location...</p>
+                ) : error ? (
                     <p>Error: {error}</p>
                 ) : (
-                    <p className={className}>{location}</p>
+                    <p className={className}>{memoizedLocation}</p>
                 )}
             </div>
             <p

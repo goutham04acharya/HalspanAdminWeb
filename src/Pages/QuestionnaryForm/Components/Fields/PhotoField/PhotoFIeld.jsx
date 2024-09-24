@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
 function PhotoField({ label,
     type,
@@ -9,10 +10,8 @@ function PhotoField({ label,
     handleChange,
     fieldSettingParameters,
     testId,
-    fixedMaxValue
 
 }) {
-
     const [fileName, setFileName] = useState('');
 
     const handleFileChange = (e) => {
@@ -36,7 +35,9 @@ function PhotoField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload Photo (${fileName})` : `${`Upload Photo (${fixedMaxValue})`}`}
+                     {fileName
+                        ? `Upload Photo (${fileName})`
+                        : `Upload Photo (${fieldSettingParameters?.max})`}
                 </label>
                 <input
                     data-testid="input"

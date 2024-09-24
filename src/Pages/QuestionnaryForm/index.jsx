@@ -24,7 +24,6 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
-import DraggableList from 'react-draggable-list';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 
@@ -56,7 +55,6 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -102,8 +100,12 @@ function QuestionnaryForm() {
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
-            handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
-            dispatch(setModalOpen(false)); // Close the modal
+            handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion     
+            dispatch(setModalOpen(false)); // Close the modal  
+            handleSectionSaveOrder(sections);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000); // 2 second delay  
         }
     }
 
@@ -123,28 +125,53 @@ function QuestionnaryForm() {
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
+        let updatedValue = value;
 
         // Restrict numeric input if the id is 'fileType'
-        let updatedValue = value;
         if (id === 'fileType') {
-            updatedValue = value.replace(/[0-9]/g, ''); // Remove all numbers
-        } else if (id === 'fileSize' || id === 'min' || id === 'max' || id === 'incrementby') {
+            // Remove numbers, spaces around commas, and trim any leading/trailing spaces
+            updatedValue = value
+                .replace(/[0-9]/g, '')      // Remove numbers
+                .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
+                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+        } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
+        } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
+            updatedValue = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/(\.\d{2})\d+/, '$1');
         }
+        //     // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
+        //     // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
+        //     // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
+
+        // Update the state dynamically
+        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
-            setInputValue(updatedValue); // Update inputValue if the id matches
+            if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
+                updatedValue = fieldSettingParams?.[selectedQuestionId].urlType
+            }
+
+            dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+        } else {
+            dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         }
 
+        if (id === 'max') {
+            dispatch(setNewComponent({ id: 'max', value: updatedValue, questionId: selectedQuestionId }));
+        }
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
-        // Check if min is greater than max and set error message
+        if (id === 'min') {
+            dispatch(setNewComponent({ id: 'min', value: updatedValue, questionId: selectedQuestionId }));
+        }
+
+        // Additional validation logic (min and max comparison)
         if (id === 'min' || id === 'max') {
             const minValue = id === 'min' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.min;
-            const maxValue = id === 'max' ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max;
+            const maxValue = (id === 'max') ? updatedValue : fieldSettingParams?.[selectedQuestionId]?.max
 
-            if (Number(minValue) > Number(maxValue)) {
+            if (Number(minValue) > Number(maxValue) || Number(minValue) === 0 && Number(maxValue) === 0) {
                 setValidationErrors(prevErrors => ({
                     ...prevErrors,
                     minMax: 'Minimum value should be less than maximum',
@@ -158,10 +185,29 @@ function QuestionnaryForm() {
             }
         }
 
+        // Validate incrementby value against the max range
+        if (id === 'incrementby') {
+            const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
+
+            if (Number(updatedValue) > maxRange) {
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    incrementby: `Value cannot exceed the maximum range of ${maxRange}`,
+                }));
+            } else {
+                // Clear the error if within the range
+                setValidationErrors(prevErrors => ({
+                    ...prevErrors,
+                    incrementby: '',
+                }));
+            }
+        }
+
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
         update[data[0]] = false;
-        dispatch(setDataIsSame(update));
+        setDataIsSame(update);
+
 
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {
@@ -273,6 +319,8 @@ function QuestionnaryForm() {
         if (event === 'add') {
             const len = sections.length;
             if (len > 0) {
+                // Call handleSectionSaveOrder with the current sections before adding a new one
+                handleSectionSaveOrder(sections);
                 handleSaveSection(sections[len - 1].section_id, false);
             }
             const sectionId = `SEC-${uuidv4()}`;
@@ -498,7 +546,6 @@ function QuestionnaryForm() {
                 setToastError('Something went wrong fetching form details');
             }
         } catch (error) {
-            console.error('API call error:', error);
             setToastError('An error occurred during the API call');
         } finally {
             setPageLoading(false);
@@ -520,6 +567,7 @@ function QuestionnaryForm() {
     };
 
     const handleSaveSection = async (sectionId, showShimmer = true) => {
+        handleSectionSaveOrder(sections);
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
@@ -556,9 +604,7 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -578,7 +624,6 @@ function QuestionnaryForm() {
     };
 
     // Save the section and page name
-
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
         // Create a deep copy of sections
         let updatedSections = sections.map((section, idx) => {
@@ -749,17 +794,21 @@ function QuestionnaryForm() {
         addNewQuestion('photofield', (questionId) => {
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
 
         });
     }, [addNewQuestion]);
 
     const handleVideoClick = useCallback(() => {
         addNewQuestion('videofield', (questionId) => {
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
+
         })
     });
 
     const handleFileClick = useCallback(() => {
         addNewQuestion('filefield', (questionId) => {
+            dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
         })
     });
 
@@ -830,7 +879,6 @@ function QuestionnaryForm() {
             admin_field_notes: fieldSettingParams?.[selectedQuestionId]?.note,
             source: fieldSettingParams?.[selectedQuestionId]?.source,
             source_value:
-                // [fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ? 'fixed_list' : 'lookup']:
                 fieldSettingParams?.[selectedQuestionId]?.source === 'fixedList' ?
                     fieldSettingParams?.[selectedQuestionId]?.fixedChoiceArray :
                     fieldSettingParams?.[selectedQuestionId]?.lookupOptionChoice
@@ -878,13 +926,11 @@ function QuestionnaryForm() {
             }
             dispatch(saveCurrentData());
         } catch (error) {
-            console.error(error);
             setToastError('Failed to update field settings');
         }
     };
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
-        console.log(selectedSectionData, 'sectionIndexsectionIndex')
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
         setSelectedSectionData(sectionData);
         dispatch(setModalOpen(true));
@@ -893,7 +939,6 @@ function QuestionnaryForm() {
 
     // handleSectionSaveOrder
     const handleSectionSaveOrder = async (updatedSection) => {
-        console.log(formDefaultInfo, 'formDefaultInfo')
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({
@@ -901,7 +946,6 @@ function QuestionnaryForm() {
                 id: section.section_id
             }))
         }
-        console.log(body, 'body')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -917,10 +961,7 @@ function QuestionnaryForm() {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            console.log(response, 'res')
-            console.log(response.error, 'error')
             if (!response?.error) {
-
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section.id);
                 return sectionOrder; // Return the ordered section IDs
@@ -938,6 +979,10 @@ function QuestionnaryForm() {
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
+        let dragIndex = expandedSections[result.source.index]
+        expandedSections[result.source.index] = expandedSections[result.destination.index]
+        expandedSections[result.destination.index] = dragIndex
+        setExpandedSections(expandedSections);
 
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
@@ -973,7 +1018,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
     return (
         <>
             {pageLoading ? (
@@ -1040,7 +1084,7 @@ function QuestionnaryForm() {
                                                                     </div>
                                                                     <div className="flex items-center">
                                                                         <img
-                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
+                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
                                                                             title="Drag"
                                                                             src={`/Images/drag.svg`}
                                                                             alt="Drag"
@@ -1059,7 +1103,6 @@ function QuestionnaryForm() {
                                                                 <Sections
                                                                     sectionData={sectionData}
                                                                     sectionIndex={sectionIndex}
-                                                                    setShouldAutoSave={setShouldAutoSave}
                                                                     selectedQuestionId={selectedQuestionId}
                                                                     handleAddRemoveQuestion={handleAddRemoveQuestion}
                                                                     expandedSections={expandedSections}
@@ -1083,7 +1126,11 @@ function QuestionnaryForm() {
                                     </Droppable>
                                 </DragDropContext>
                                 <button
-                                    onClick={() => handleAddRemoveSection('add')}
+                                    onClick={() => {
+                                        handleAddRemoveSection('add'),
+                                            handleSectionSaveOrder(updatedSection)
+                                    }
+                                    }
                                     data-testid="add-section"
                                     className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
                                     <span className='mr-[15px]'>+</span>
@@ -1127,9 +1174,10 @@ function QuestionnaryForm() {
                                         handleBlur: handleBlur,
                                         setShouldAutoSave: setShouldAutoSave,
                                         validationErrors: validationErrors,
-                                        // setReplaceModal: setReplaceModal,
+                                        setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+
                                     }
                                 )
                             ) : (
