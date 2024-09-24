@@ -11,6 +11,7 @@ import { setInitialData } from '../QuestionnaryForm/Components/Fields/fieldSetti
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import VersionEditModal from '../../Components/Modals/VersionEditModal.jsx';
+import GridTable from './Components/GridTable.jsx';
 
 function VersionList() {
     const { getAPI } = useApi();
@@ -40,6 +41,7 @@ function VersionList() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [dropdownsOpen, setDropdownsOpen] = useState(false);
     const [version, setVersion] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState([])
     const [editedDetails, setEditedDetails] = useState({
         public_name: '',
         internal_name: '',
@@ -61,24 +63,29 @@ function VersionList() {
         setDropdownsOpen(!dropdownsOpen)
         // setIsCreateModalOpen(false)
     }
-    let selectedVersionObj = [];
-    const handleEditClick = () => {
-        selectedVersionObj = versionList?.data?.items?.find(
-            (version) => version.version_number === selectedVersion
-        );
-        
-        if (selectedVersionObj && selectedVersionObj.status !== 'Testing') {
-            setVersion(false)
+    let selectedVersionObj = {};
+const handleEditClick = () => {
+    selectedVersionObj = versionList?.data?.items?.find(
+        (version) => version.version_number === selectedVersion
+    );
+    
+    if (selectedVersionObj) {
+        setSelectedStatus(selectedVersionObj); // Set the selected version object to state
+        console.log(selectedStatus.status, 'selectedStatus')
+        if (selectedVersionObj.status === 'Draft') {
+            setVersion(false); // Proceed with navigation
             navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
-            // questionnaries/create-questionnary/questionnary-form/2/1
-            // formDefaultDetails()
-            // getFieldSetting()
+            // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
         } else {
-            console.log('Selected version is in "Testing" status or invalid');
-            setVersion(true)
-            console.log(version, 'acaac')
+            console.log('Selected version is not in "Draft" status');
+            setVersion(true); // Prevent navigation
         }
-    };
+    } else {
+        console.log('No version found with the selected version number');
+    }
+};
+
+    console.log(selectedVersion, 'asca')
     useEffect(() => {
         console.log(isCreateModalOpen, 'modal');
     }, [isCreateModalOpen]);
@@ -190,7 +197,7 @@ function VersionList() {
             </div>
             {isCreateModalOpen && <VersionEditModal
                 text={`${version ? 'This question can’t be edited' : 'Edit Questionnaire'}`}
-                subText={`${version ? 'Version ' +selectedVersion + ' is in Testing state, therefore can’t be edited.' : 'Please select the version you want to edit.'}`}
+                subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : 'Please select the version you want to edit.'}`}
                 handleButton1={handleEditClick}
                 Button1text='Edit'
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
