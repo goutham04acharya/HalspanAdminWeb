@@ -24,7 +24,6 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
-import DraggableList from 'react-draggable-list';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 
@@ -84,7 +83,7 @@ function QuestionnaryForm() {
             [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
         }));
     };
-      
+
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
@@ -92,8 +91,12 @@ function QuestionnaryForm() {
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
-            handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion
-            dispatch(setModalOpen(false)); // Close the modal
+            handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion     
+            dispatch(setModalOpen(false)); // Close the modal  
+            handleSectionSaveOrder(sections);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000); // 2 second delay  
         }
     }
 
@@ -116,7 +119,6 @@ function QuestionnaryForm() {
         let updatedValue = value;
 
         // Restrict numeric input if the id is 'fileType'
-        // Handle URL prefill for http and https
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
@@ -150,7 +152,6 @@ function QuestionnaryForm() {
             dispatch(setNewComponent({ id: 'max', value: updatedValue, questionId: selectedQuestionId }));
         }
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-        console.log(fieldSettingParams?.[selectedQuestionId], 'fieldSettingParams?.[selectedQuestionId]')
 
         if (id === 'min') {
             dispatch(setNewComponent({ id: 'min', value: updatedValue, questionId: selectedQuestionId }));
@@ -209,7 +210,6 @@ function QuestionnaryForm() {
             dispatch(setShouldAutoSave(true));
         }, 100); // 100ms delay before auto-saving
     };
-
 
     const sideComponentMap = {
         "textboxfield": TestFieldSetting,
@@ -310,6 +310,8 @@ function QuestionnaryForm() {
         if (event === 'add') {
             const len = sections.length;
             if (len > 0) {
+                // Call handleSectionSaveOrder with the current sections before adding a new one
+                handleSectionSaveOrder(sections);
                 handleSaveSection(sections[len - 1].section_id, false);
             }
             const sectionId = `SEC-${uuidv4()}`;
@@ -535,7 +537,6 @@ function QuestionnaryForm() {
                 setToastError('Something went wrong fetching form details');
             }
         } catch (error) {
-            console.error('API call error:', error);
             setToastError('An error occurred during the API call');
         } finally {
             setPageLoading(false);
@@ -557,6 +558,7 @@ function QuestionnaryForm() {
     };
 
     const handleSaveSection = async (sectionId, showShimmer = true) => {
+        handleSectionSaveOrder(sections);
         // Find the section to save
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
@@ -593,9 +595,7 @@ function QuestionnaryForm() {
             removeKeys(body);
 
             try {
-
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -615,7 +615,6 @@ function QuestionnaryForm() {
     };
 
     // Save the section and page name
-
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
         // Create a deep copy of sections
         let updatedSections = sections.map((section, idx) => {
@@ -918,13 +917,11 @@ function QuestionnaryForm() {
             }
             dispatch(saveCurrentData());
         } catch (error) {
-            console.error(error);
             setToastError('Failed to update field settings');
         }
     };
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
-        console.log(selectedSectionData, 'sectionIndexsectionIndex')
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
         setSelectedSectionData(sectionData);
         dispatch(setModalOpen(true));
@@ -933,7 +930,6 @@ function QuestionnaryForm() {
 
     // handleSectionSaveOrder
     const handleSectionSaveOrder = async (updatedSection) => {
-        console.log(formDefaultInfo, 'formDefaultInfo')
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({
@@ -1131,7 +1127,11 @@ function QuestionnaryForm() {
                                     </Droppable>
                                 </DragDropContext>
                                 <button
-                                    onClick={() => handleAddRemoveSection('add')}
+                                    onClick={() => {
+                                        handleAddRemoveSection('add'),
+                                            handleSectionSaveOrder(updatedSection)
+                                    }
+                                    }
                                     data-testid="add-section"
                                     className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
                                     <span className='mr-[15px]'>+</span>
