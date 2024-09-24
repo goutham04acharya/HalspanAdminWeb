@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
-import ConfirmationModal from '../../../../../../Components/Modals/ConfirmationModal/ConfirmationModal';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
-import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown';
 import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
@@ -14,15 +11,11 @@ import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not alrea
 
 function DisplayFieldSetting({
     handleInputChange,
-    formParameters,
-    handleBlur,
     fieldSettingParameters,
     setShouldAutoSave,
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
-    setInputValue,
-    inputValue,
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -34,26 +27,25 @@ function DisplayFieldSetting({
 
 
     const options = [
-        { value: 'http', label: 'http' },
-        { value: 'https', label: 'https' },
-        { value: 'mailto', label: 'mailto' },
-        { value: 'tel', label: 'tel' }
+        { value: 'http://', label: 'http://' },
+        { value: 'https://', label: 'https://' },
+        { value: 'mailto:', label: 'mailto:' },
+        { value: 'tel:', label: 'tel:' }
     ];
 
     const validFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
+        // setTypeInput(option.value)
         setDropdownOpen(false);
-        dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        setShouldAutoSave(true)
 
-        // // Prefill the input field based on the selected option
-        // if (option.value === 'http' || option.value === 'https') {
-        //     setInputValue(`${option.value}://`);
-        // } else {
-        //     setInputValue('');
-        // }
+        dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: option.value, questionId: selectedQuestionId }));
+
+        setShouldAutoSave(true);
+
+        // Update the input value (make sure you use the correct state updater)
     };
 
     const handleFileUploadClick = () => {
@@ -156,7 +148,6 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         setShouldAutoSave(true)
     }
-    console.log(selectedFile, 'image')
 
     return (
         <>
@@ -385,14 +376,17 @@ function DisplayFieldSetting({
                                     autoComplete='off'
                                     id='urlValue'
                                     type='text'
+                                    // value={fieldSettingParameters?.urlValue}
                                     value={fieldSettingParameters?.urlValue}
                                     className='w-full mt-2.5'
                                     placeholder={
-                                        selectedUrlOption === 'mailto'
+                                        selectedUrlOption === 'mailto:'
                                             ? 'eg: support@halspan.com'
-                                            : selectedUrlOption === 'tel'
+                                            : selectedUrlOption === 'tel:'
                                                 ? 'eg: +44 7911 123456'
-                                                : 'Enter text'
+                                                : selectedUrlOption === 'http://' || selectedUrlOption === 'https://'
+                                                    ? `eg: ${selectedUrlOption} example.com`
+                                                    : 'Enter text'
                                     }
                                     testId='urlInput'
                                     htmlFor='urlValue'

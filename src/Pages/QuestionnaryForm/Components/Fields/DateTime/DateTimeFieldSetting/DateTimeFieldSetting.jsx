@@ -23,7 +23,7 @@ function DateTimeFieldSetting({
 }
 
   const handleTime = () => {
-    dispatch(setNewComponent({ id: 'format', value: '12', questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
     setShouldAutoSave(true)
   }
 
@@ -144,7 +144,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          <div className='mt-7'>
+          {/* <div className='mt-7'>
             <InputField
               autoComplete='off'
               label='Default Value'
@@ -159,7 +159,7 @@ function DateTimeFieldSetting({
               htmlFor='defaultValue'
               maxLength={10}
               handleChange={(e) => handleInputChange(e)} />
-          </div>
+          </div> */}
           <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
           <div className='mt-7'>
             <InputField

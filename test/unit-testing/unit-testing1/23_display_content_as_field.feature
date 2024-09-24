@@ -20,7 +20,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
     When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "Auth@123"
+    * I enter valid password as "dApje7-nepnig-vibqyc"
     * I click the submit button
     Then I should be redirected to the questionnaire listing screen
 
@@ -95,7 +95,7 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
 
     Examples:
       | url      | url-text                      |
-      | "http"   | "http://halspan.com"          |
-      | "https"  | "https://halspan.com"         |
+      | "http"   | "halspan.com"                 |
+      | "https"  | "halspan.com"                 |
       | "mailto" | "halspan.support@halspan.com" |
       | "tel"    | "7911123456"                  |

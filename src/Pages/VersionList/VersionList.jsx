@@ -3,6 +3,7 @@ import useApi from '../../services/CustomHook/useApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import Table from '../../Pages/VersionList/Components/Table.jsx'
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
+import QuestionnarySettings from './Components/QuestionnarySettings.jsx';
 
 function VersionList() {
     const { getAPI } = useApi();
@@ -11,21 +12,52 @@ function VersionList() {
     const [versionList, setVersionList] = useState([])
     const [queSettingDetails, setQueSettingDetails] = useState()
     const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(false)
+    const [validationErrors, setValidationErrors] = useState({});
+    const [editedDetails, setEditedDetails] = useState({
+        public_name: '',
+        internal_name: '',
+        description: '',
+    });
 
     const handleVersionList = async () => {
+        setDataLoading(true);
         setLoading(true);
-        const response = await getAPI(`questionnaires/versions/${public_name}`)
+        const response = await getAPI(`questionnaires/versions/${questionnaire_id}`)
         setVersionList(response?.data)
+        console.log(response)
         setLoading(false);
     }
 
     const handleQuestionnariesSetting = async () => {
         setLoading(true);
-        const response = await getAPI(`questionnaires/${questionnaire_id}`)
-        console.log(response?.data?.data?.internal_name, 'seting')
-        setQueSettingDetails(response?.data)
-    }
+        setDataLoading(true);
+        const response = await getAPI(`questionnaires/${questionnaire_id}`);
+        setQueSettingDetails(response?.data);
+        setDataLoading(false);
+        setEditedDetails((prevState) => ({
+            ...prevState,
+            public_name: response?.data?.data?.public_name,
+            internal_name: response?.data?.data?.internal_name,
+            description: response?.data?.data?.description,
+        }));
+        setLoading(false);
+    };
 
+
+    const handleChange = (e, field) => {
+        e.preventDefault();
+        setEditedDetails((prevState) => ({
+            ...prevState,
+            [field]: e.target.value,
+        }));
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            [field]: '',
+        }));
+    };
+
+    //implement infinate scroll here
     // const lastElementRef = useCallback(node => {
     //     if (loading || isFetchingMore) return;
     //     if (observer.current) observer.current.disconnect();
@@ -45,7 +77,7 @@ function VersionList() {
 
     return (
         <div className='p-7 bg-[#F4F6FA]'>
-            <div className='px-[34px] py-[38px] w-full flex items-start bg-[#FFFFFF]'>
+            <div className='px-[34px] py-[38px] w-full flex items-start bg-[#FFFFFF] h-customh6'>
                 <div className='w-[75%]'>
                     <p className='mt-2 text-[28px] font-medium text-[#2B333B]'>{queSettingDetails?.data?.internal_name}</p>
                     <p className='mt-8 text-[22px] font-medium text-[#2B333B] '>Choose a Version</p>
@@ -55,7 +87,7 @@ function VersionList() {
                             versionList={versionList}
                             setLoading={setLoading}
                             loading={loading}
-                            // lastElementRef={lastElementRef}
+                        // lastElementRef={lastElementRef}
                         />
                         <Button2
                             testId='back-to-questionnaire'
@@ -67,9 +99,28 @@ function VersionList() {
                 </div>
                 <div className='w-[25%] ml-[88px]'>
                     <div className='flex items-center'>
-                        <button>Edit</button>
-                        <button>Duplicate</button>
+                        <Button2
+                            testId='edit'
+                            // onClick={handleNavigateBack}
+                            className='w-[40%] h-[50px] ml-[32px] font-semibold text-[#2B333B]'
+                            text='Edit'
+                        />
+                        <Button2
+                            text='Duplicate'
+                            testId='duplicate'
+                            className='w-[60%] h-[50px] ml-[32px] font-semibold text-[#2B333B]l'
+                        />
                     </div>
+                    <QuestionnarySettings
+                        queSettingDetails={queSettingDetails}
+                        handleChange={handleChange}
+                        setValidationErrors={setValidationErrors}
+                        validationErrors={validationErrors}
+                        editedDetails={editedDetails}
+                        setLoading={setLoading}
+                        setDataLoading={setDataLoading}
+                        dataLoading={dataLoading}
+                    />
                 </div>
 
             </div>
