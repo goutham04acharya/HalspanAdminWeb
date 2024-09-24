@@ -76,6 +76,15 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
+    const [latestSectionId, setLatestSectionId] = useState(null);
+
+    useEffect(() => {
+        if (sections.length > 0) {
+            const lastSection = sections[sections.length - 1]; // Get the latest section
+            setLatestSectionId(lastSection.section_id);
+        }
+    }, [sections]); // This useEffect runs whenever `sections` changes
+
 
 
     // // to open and close the sections
@@ -451,50 +460,50 @@ function QuestionnaryForm() {
         }
     }
 
-   // API calling function
-   const formDefaultDetails = useCallback(async () => {
-    setPageLoading(true);
-    try {
-        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-        if (!response?.error) {
-            dispatch(setFormDefaultInfo(response?.data?.data));
-            const sectionsData = response?.data?.data?.sections || [];
+    // API calling function
+    const formDefaultDetails = useCallback(async () => {
+        setPageLoading(true);
+        try {
+            const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            if (!response?.error) {
+                dispatch(setFormDefaultInfo(response?.data?.data));
+                const sectionsData = response?.data?.data?.sections || [];
 
-            const sectionOrder = await GetSectionOrder();
+                const sectionOrder = await GetSectionOrder();
 
-            if(sectionOrder === 'no_data'){
-                setSections(sectionsData);
-                return;
-            }
+                if (sectionOrder === 'no_data') {
+                    setSections(sectionsData);
+                    return;
+                }
 
-            // If sectionOrder is valid, proceed with sorting
-            if (sectionOrder) {
-                const orderedSections = sectionOrder.map(orderId =>
-                    sectionsData.find(section => section.section_id === orderId)
-                ).filter(Boolean); // Filter out any undefined sections
+                // If sectionOrder is valid, proceed with sorting
+                if (sectionOrder) {
+                    const orderedSections = sectionOrder.map(orderId =>
+                        sectionsData.find(section => section.section_id === orderId)
+                    ).filter(Boolean); // Filter out any undefined sections
 
-                // Create an object with section_id as the key and true as the value
-                const updatedSections = orderedSections.reduce((acc, section) => {
-                    acc[section.section_id] = true;
-                    return acc;
-                }, {});
+                    // Create an object with section_id as the key and true as the value
+                    const updatedSections = orderedSections.reduce((acc, section) => {
+                        acc[section.section_id] = true;
+                        return acc;
+                    }, {});
 
-                dispatch(setDataIsSame(updatedSections));
-                setSections(orderedSections); // Set ordered sections
+                    dispatch(setDataIsSame(updatedSections));
+                    setSections(orderedSections); // Set ordered sections
+                } else {
+                    // If sectionOrder is invalid, use initial sections order
+                    setSections(sectionsData);
+                }
             } else {
-                // If sectionOrder is invalid, use initial sections order
-                setSections(sectionsData);
+                setToastError('Something went wrong fetching form details');
             }
-        } else {
-            setToastError('Something went wrong fetching form details');
+        } catch (error) {
+            console.error('API call error:', error);
+            setToastError('An error occurred during the API call');
+        } finally {
+            setPageLoading(false);
         }
-    } catch (error) {
-        console.error('API call error:', error);
-        setToastError('An error occurred during the API call');
-    } finally {
-        setPageLoading(false);
-    }
-}, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
+    }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
 
     //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
@@ -1045,20 +1054,6 @@ function QuestionnaryForm() {
                                                                             // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
                                                                             onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
                                                                         />
-                                                                        <img
-                                                                            src="/Images/save.svg"
-                                                                            alt="save"
-                                                                            title="Save"
-                                                                            data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id]
-                                                                                ? "cursor-not-allowed"
-                                                                                : "cursor-pointer"
-                                                                                }`}
-                                                                            onClick={() => {
-                                                                                if (!dataIsSame[sectionData.section_id])
-                                                                                    handleSaveSection(sectionData?.section_id);
-                                                                            }}
-                                                                        />
                                                                     </div>
                                                                 </div>
                                                                 <Sections
@@ -1107,11 +1102,14 @@ function QuestionnaryForm() {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                            // onClick={() => handleSaveSection()}
-                            >
+
+                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
+                                if (!dataIsSame[latestSectionId])
+                                    handleSaveSection(latestSectionId);
+                            }}>
                                 Save
                             </button>
+
                         </div>
                         <div>
                             {selectedComponent ? (
@@ -1145,7 +1143,7 @@ function QuestionnaryForm() {
                     </div>
                 </div>
             )}
-           {isModalOpen && (
+            {isModalOpen && (
                 <ConfirmationModal
                     text='Delete Section'
                     subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
@@ -1176,7 +1174,7 @@ function QuestionnaryForm() {
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
-                
+
             )}
             {showquestionDeleteModal && (
                 <ConfirmationModal
