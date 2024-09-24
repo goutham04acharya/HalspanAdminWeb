@@ -51,6 +51,7 @@ function QuestionnarySettings({
             const response = await PatchAPI(`questionnaires/${questionnaire_id}`, payload);
             if (response?.data?.status === true) {
                 setToastSuccess(response?.data?.message);
+                
                 setValidationErrors({});
                 setIsThreedotLoader(false);
                 // Delay the page refresh to allow the success message to be visible

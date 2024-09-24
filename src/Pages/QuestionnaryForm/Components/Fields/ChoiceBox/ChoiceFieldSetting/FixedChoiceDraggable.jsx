@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewFixedChoice, removeFixedChoice, setFixedChoiceValue } from '../../fieldSettingParamsSlice';
+import {setShouldAutoSave}  from '../../../QuestionnaryFormSlice'
 
 const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
-    const { id, value, index, selectedQuestionId, setShouldAutoSave } = item;
+    const { id, value, index, selectedQuestionId } = item;
     const dispatch = useDispatch();
     const [localValue, setLocalValue] = useState(value);
     const debounceTimerRef = useRef(null); // Ref to store the debounce timer
@@ -24,7 +25,7 @@ const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
 
         // Set a new debounce timer
         debounceTimerRef.current = setTimeout(() => {
-            setShouldAutoSave(true);
+            dispatch(setShouldAutoSave(true));
         }, 1000); // 1000ms delay before auto-saving
     };
 
@@ -34,7 +35,7 @@ const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
         } else if (event === 'remove') {
             dispatch(removeFixedChoice({ id, questionId: selectedQuestionId }))
         }
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
     };
 
     return (

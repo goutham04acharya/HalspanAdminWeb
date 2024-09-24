@@ -4,13 +4,14 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+
 
 function FloorPlanSettings({ handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
 
 }) {
@@ -48,7 +49,7 @@ function FloorPlanSettings({ handleInputChange,
                                     checked={fieldSettingParameters?.pin_drop === 'yes'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }}
                                 />
                                 <label htmlFor='pin_drop_yes'
@@ -67,7 +68,7 @@ function FloorPlanSettings({ handleInputChange,
                                     checked={fieldSettingParameters?.pin_drop === 'no'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }}
                                 />
                                 <label htmlFor='pin_drop_no'
@@ -90,7 +91,7 @@ function FloorPlanSettings({ handleInputChange,
                                 checked={fieldSettingParameters?.draw_image === 'yes'}
                                 onClick={() => {
                                     dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
-                                    setShouldAutoSave(true);
+                                    dispatch(setShouldAutoSave(true));
                                 }} />
                             <label htmlFor='draw_image_yes'
                                 data-testid='draw-yes'
@@ -108,7 +109,7 @@ function FloorPlanSettings({ handleInputChange,
                                 checked={fieldSettingParameters?.draw_image === 'no'}
                                 onClick={() => {
                                     dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
-                                    setShouldAutoSave(true);
+                                    dispatch(setShouldAutoSave(true));
                                 }}
                             />
                             <label htmlFor='draw_image_no'
@@ -118,7 +119,7 @@ function FloorPlanSettings({ handleInputChange,
                             </label>
                         </div>
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

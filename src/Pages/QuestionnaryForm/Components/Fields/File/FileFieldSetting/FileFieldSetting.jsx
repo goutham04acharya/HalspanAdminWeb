@@ -5,15 +5,14 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
+
 function FileFieldSetting({ handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
-    fixedMaxValue
 }) {
     return (
         <>
@@ -88,7 +87,7 @@ function FileFieldSetting({ handleInputChange,
                                 label=''
                                 id='max'
                                 type='text'
-                                value={fixedMaxValue}
+                                value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -101,7 +100,7 @@ function FileFieldSetting({ handleInputChange,
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
