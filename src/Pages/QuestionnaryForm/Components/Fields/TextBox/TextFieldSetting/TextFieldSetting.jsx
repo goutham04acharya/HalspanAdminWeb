@@ -23,9 +23,11 @@ function TestFieldSetting({
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
-  validationErrors
+  validationErrors,
+  setConditionalLogic,
+  conditionalLogic
 }) {
-
+  console.log(conditionalLogic, 'ConditionalLogic');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
@@ -282,7 +284,11 @@ function TestFieldSetting({
               handleChange={(e) => handleInputChange(e)} />
           </div>
           <div className='mx-auto mt-7 flex items-center w-full'>
-            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+            <button 
+            type='button' 
+            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+            onClick={() => setConditionalLogic(true)}  // Use arrow function
+            >
               Add Conditional Logic
             </button>
           </div>

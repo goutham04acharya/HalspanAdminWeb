@@ -26,6 +26,7 @@ import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import ConditionalLogic from './Components/ConditionalLogicAdvanced/index.jsx';
 
 
 function QuestionnaryForm() {
@@ -55,6 +56,7 @@ function QuestionnaryForm() {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    const [conditionalLogic, setConditionalLogic] = useState(false);
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -74,7 +76,6 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
-
 
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
@@ -1169,8 +1170,6 @@ function QuestionnaryForm() {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        // setFieldSettingParameters: setFieldSettingParameters,
-                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
@@ -1179,7 +1178,8 @@ function QuestionnaryForm() {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-
+                                        setConditionalLogic: setConditionalLogic,
+                                        conditionalLogic: conditionalLogic,
                                     }
                                 )
                             ) : (
@@ -1256,6 +1256,9 @@ function QuestionnaryForm() {
                     handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
+            )}
+            {conditionalLogic && (
+                <ConditionalLogic/>
             )}
         </>
     );
