@@ -54,6 +54,7 @@ function Sections({ sectionData,
     if (!result.destination) return;
 
     const { source, destination } = result;
+
     // const sectionIndex = source.droppableId; // Assuming sectionIndex is provided by droppableId
     const pageIndex = source.index;
 
