@@ -9,7 +9,6 @@ import Questions from "../Questions/Questions";
 
 function Pages({ pageIndex,
   pageData,
-  setShouldAutoSave,
   sectionIndex,
   handleAddRemoveQuestion,
   handleDeletequestionModal,
@@ -84,7 +83,6 @@ function Pages({ pageIndex,
             sectionIndex,
             pageIndex,
             index: questionIndex,
-            setShouldAutoSave: setShouldAutoSave,
             selectedQuestionId: selectedQuestionId,
             handleDeletequestionModal: handleDeletequestionModal,
           }))}

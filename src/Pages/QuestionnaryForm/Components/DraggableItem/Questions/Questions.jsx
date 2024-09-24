@@ -12,7 +12,7 @@ import FileField from '../../Fields/File/FileFIeld';
 import SignatureField from '../../Fields/Signature/SignatureField';
 import GPSField from '../../Fields/GPS/GPSField';
 import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField';
-import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal} from '../../QuestionnaryFormSlice'
+import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setShouldAutoSave, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../../QuestionnaryFormSlice'
 
 
 const Questions = ({
@@ -23,7 +23,7 @@ const Questions = ({
 
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
-    const { index, selectedQuestionId, setShouldAutoSave } = item;
+    const { index, selectedQuestionId } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {

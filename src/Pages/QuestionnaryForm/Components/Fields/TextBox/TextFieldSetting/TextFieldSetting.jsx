@@ -10,6 +10,8 @@ import objectToQueryString from '../../../../../../CommonMethods/ObjectToQuerySt
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+
 
 function TestFieldSetting({
   handleInputChange,
@@ -21,7 +23,6 @@ function TestFieldSetting({
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
-  setShouldAutoSave,
   validationErrors
 }) {
 
@@ -53,18 +54,18 @@ function TestFieldSetting({
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
-    setShouldAutoSave(true)
+    dispatch(setShouldAutoSave(true));
   };
 
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
-    setShouldAutoSave(true)
+    dispatch(setShouldAutoSave(true));
   };
 
   const handleRemoveLookup = () => {
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
-    setShouldAutoSave(true)
+    dispatch(setShouldAutoSave(true));
   }
 
   // List Functions
@@ -264,7 +265,7 @@ function TestFieldSetting({
             )}
           </div>
           {/* OptionsComponent added here */}
-          <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+          <OptionsComponent selectedQuestionId={selectedQuestionId} />
           <div className='mt-7'>
             <InputField
               autoComplete='off'

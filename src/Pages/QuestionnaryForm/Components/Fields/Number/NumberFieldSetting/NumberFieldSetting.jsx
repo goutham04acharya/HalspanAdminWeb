@@ -5,6 +5,8 @@ import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/O
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+
 
 function NumberFieldSetting({
     handleInputChange,
@@ -12,7 +14,6 @@ function NumberFieldSetting({
     handleBlur,
     fieldSettingParameters,
     handleRadiobtn,
-    setShouldAutoSave,
     selectedQuestionId,
     handleAutoSaveSettings,
     validationErrors,
@@ -127,7 +128,7 @@ function NumberFieldSetting({
                                     onClick={() => {
                                         if (fieldSettingParameters?.type !== 'rating') {
                                             dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId: selectedQuestionId }));
-                                            setShouldAutoSave(true);
+                                            dispatch(setShouldAutoSave(true));
                                         }
                                     }}
                                 />
@@ -147,7 +148,7 @@ function NumberFieldSetting({
                                     checked={fieldSettingParameters?.source === 'slider'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'slider', questionId: selectedQuestionId }));
-                                        setShouldAutoSave(true);
+                                        dispatch(setShouldAutoSave(true));
                                     }} />
                                 <label htmlFor='slider'
                                     data-testid='slider'
@@ -167,7 +168,7 @@ function NumberFieldSetting({
                                     onClick={() => {
                                         if (fieldSettingParameters?.type !== 'rating') {
                                             dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
-                                            setShouldAutoSave(true);
+                                            dispatch(setShouldAutoSave(true));
                                         }
                                     }}
                                 />
@@ -288,7 +289,7 @@ function NumberFieldSetting({
                             </div>
                         )}
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
