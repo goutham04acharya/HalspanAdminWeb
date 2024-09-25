@@ -157,7 +157,7 @@ function VersionList() {
                         <p className='mt-2 text-[28px] font-medium text-[#2B333B]'>{queSettingDetails?.data?.internal_name}</p>
                         <p className='mt-8 text-[22px] font-medium text-[#2B333B] '>Choose a Version</p>
                         <div className='mt-10'>
-                            <Table
+                            <GridTable
                                 setVersionList={setVersionList}
                                 versionList={versionList}
                                 setLoading={setLoading}
