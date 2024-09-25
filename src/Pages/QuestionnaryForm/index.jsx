@@ -24,10 +24,10 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
-import {setAllSectionDetails} from '../../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice.js'
+import { setUniqueAllSectionDetails } from '../../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
-import ConditionalLogic from './Components/ConditionalLogicAdvanced/index.jsx';
+import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 
 
 function QuestionnaryForm() {
@@ -74,11 +74,10 @@ function QuestionnaryForm() {
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
-
-    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const savedData = useSelector(state => state.fieldSettingParams.savedData);
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails); 
+    const fieldSettingParams = useSelector(state => state?.fieldSettingParams.currentData);
+    // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
-
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
@@ -580,8 +579,8 @@ function QuestionnaryForm() {
                     }))
                 }))
             }
-            setAllSectionDetails(sectionToSave)
-            console.log(allSectionDetails, 'sectionToSave')
+            dispatch(setUniqueAllSectionDetails(sectionToSave)); // <- Add this line to update Redux state
+
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -600,7 +599,6 @@ function QuestionnaryForm() {
 
             try {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                console.log(response, 'what is the repsonse ere')
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -668,6 +666,8 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
+
+            dispatch(setUniqueAllSectionDetails(sections)); // <- Add this line to update Redux state
 
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
@@ -1260,7 +1260,7 @@ function QuestionnaryForm() {
                 />
             )}
             {conditionalLogic && (
-                <ConditionalLogic />
+                <ConditionalLogic setConditionalLogic={setConditionalLogic}/>
             )}
         </>
     );

@@ -19,7 +19,7 @@ const store = configureStore({
         fieldSettingParams:fieldSettingParamsSlice,
         sliderConfig: sliderSlice,  // Your slider reducer
         questionnaryForm: questionnaryFormSlice, // Add the question reducer to the store
-        allSectiondetails: allSectionDetailsSlice,
+        allsectiondetails: allSectionDetailsSlice,
     },
 });
 
