@@ -149,7 +149,7 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
                                                     </span>
                                                 )}
                                                 {dropdownsOpen[versionListInfo?.version_number] && (
-                                                    <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] ${(index >= versionList?.data?.items.length - 2) ? 'top-[-145px]' : 'top-[58px]'} z-10`}>
+                                                    <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2) ? 'top-[-145px]' : 'top-[58px]') : 'top-[58px]'} z-10`}>
                                                         {options.map(option => (
                                                             <li key={option}
                                                                 className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
