@@ -30,10 +30,11 @@ function Sections({ sectionData,
   // const { onMouseDown, onTouchStart } = dragHandleProps;
 
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
+    
     console.log(pageIndex, 'pageIndex')
     dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
     dispatch(setSelectedSectionData(pageData));
-    dispatch(setModalOpen(true));
+    // dispatch(setModalOpen(true));
   }
 
   // Load expanded sections from localStorage on component mount
@@ -154,6 +155,7 @@ function Sections({ sectionData,
                                 data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
                                 onClick={() => {
+                                 
                                   handleDeletePageModal(sectionIndex, pageIndex, pageData),
                                     dispatch(setShowPageDeleteModal(true));
                                 }}

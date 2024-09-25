@@ -25,6 +25,7 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView, setDelet
                                     <td className='py-5 text-center bg-[#F4F6FA] flex justify-start items-center gap-4'>
                                         <p
                                             className='underline cursor-pointer'
+                                            id={"view" + index}
                                             onClick={() => handleView(LookupInfo?.lookup_id, LookupInfo?.name, LookupInfo?.choices)}
                                         >
                                             View

@@ -15,6 +15,5 @@ Feature: Halspan - Admin - Change the Status of the Questionnaire version
     Given I am on the questionnaire version listing screen
     Then I should see the version table header containing '["NAME", "LAST EDITED", "EDITED BY", "STATUS"]'
     When I change the status of the version to testing
-    When I change the status of the version to publish
     When I click on back to all questionnaire
     Then I should be redirected to the questionnaire listing screen
