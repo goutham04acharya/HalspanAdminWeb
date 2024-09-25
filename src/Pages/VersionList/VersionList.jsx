@@ -64,26 +64,26 @@ function VersionList() {
         // setIsCreateModalOpen(false)
     }
     let selectedVersionObj = {};
-const handleEditClick = () => {
-    selectedVersionObj = versionList?.data?.items?.find(
-        (version) => version.version_number === selectedVersion
-    );
-    
-    if (selectedVersionObj) {
-        setSelectedStatus(selectedVersionObj); // Set the selected version object to state
-        console.log(selectedStatus.status, 'selectedStatus')
-        if (selectedVersionObj.status === 'Draft') {
-            setVersion(false); // Proceed with navigation
-            navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
-            // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
+    const handleEditClick = () => {
+        selectedVersionObj = versionList?.data?.items?.find(
+            (version) => version.version_number === selectedVersion
+        );
+
+        if (selectedVersionObj) {
+            setSelectedStatus(selectedVersionObj); // Set the selected version object to state
+            console.log(selectedStatus.status, 'selectedStatus')
+            if (selectedVersionObj.status === 'Draft') {
+                setVersion(false); // Proceed with navigation
+                navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
+                // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
+            } else {
+                console.log('Selected version is not in "Draft" status');
+                setVersion(true); // Prevent navigation
+            }
         } else {
-            console.log('Selected version is not in "Draft" status');
-            setVersion(true); // Prevent navigation
+            console.log('No version found with the selected version number');
         }
-    } else {
-        console.log('No version found with the selected version number');
-    }
-};
+    };
 
     console.log(selectedVersion, 'asca')
     useEffect(() => {
@@ -200,6 +200,8 @@ const handleEditClick = () => {
                 subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : 'Please select the version you want to edit.'}`}
                 handleButton1={handleEditClick}
                 Button1text='Edit'
+                testIDBtn1='confirm-edit'
+                testIDBtn2='cancel'
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                 Button2text='Cancel'
                 handleButton2={handleClose}

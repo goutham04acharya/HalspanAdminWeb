@@ -14,7 +14,7 @@ Feature: Halspan - Admin - Edit the Questionnaire
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
     When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "Auth@123"
+    * I enter valid password as "dApje7-nepnig-vibqyc"
     * I click the submit button
     Then I should be redirected to the questionnaire listing screen
 
@@ -25,6 +25,7 @@ Feature: Halspan - Admin - Edit the Questionnaire
     # * I should see the versions of the questionnaire
     Then I should see the version table header containing '["NAME", "LAST EDITED", "EDITED BY", "STATUS"]'
 
+  @create_question
   Scenario: Admin selects the version
     Given I am on the questionnaire version listing screen
     When I click on edit option

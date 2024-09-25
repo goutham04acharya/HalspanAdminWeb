@@ -7,14 +7,14 @@ import { useDispatch } from 'react-redux';
 function VersionEditModal({ text, subText, setVersion, version, setSelectedVersion, handleDropdownClick, handleOptionClick, selectedVersion, dropdownsOpen, setDropdownsOpen, Button1text, isOpen, versionListEdit, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, versionNumber, versionList, testIDBtn1, testIDBtn2, isImportLoading, showLabel }) {
 
     const modalRef = useRef();
-    
+
     const handleClose = () => {
         setModalOpen(false);
         setDropdownsOpen(false)
         setVersion(false)
         setSelectedVersion('')
     };
-    
+
     useOnClickOutside(modalRef, () => {
         setModalOpen(false);
         setDropdownsOpen(false);
@@ -34,6 +34,7 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
                         <input
                             type="text"
                             // id={versionListInfo?.version_number}
+                            data-testid="Version"
                             placeholder={'Select'}
                             onClick={handleDropdownClick}
                             value={selectedVersion ? `Version ${selectedVersion}` : ''}
@@ -51,6 +52,7 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
                         <ul className="relative bg-white border border-[#AEB3B7] mt-1 w-full z-[100000]">
                             {versionList?.data?.items?.map(versionNumber => (
                                 <li key={versionNumber}
+                                    data-testid={`Version-${versionNumber?.version_number}`}
                                     className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                                     onClick={() => handleOptionClick(versionNumber?.version_number)}>
                                     Version {versionNumber?.version_number}
@@ -60,7 +62,7 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
                     )}
                 </>
                 }
-                {!version &&<div className='mt-5 flex items-center justify-between'>
+                {!version && <div className='mt-5 flex items-center justify-between'>
                     {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
                         {Button1text}
                     </button> :

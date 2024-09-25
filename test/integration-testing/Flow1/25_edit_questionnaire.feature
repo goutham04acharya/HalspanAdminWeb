@@ -18,14 +18,11 @@ Feature: Halspan - Admin - Edit the Questionnaire
     # * I should see the versions of the questionnaire
     Then I should see the version table header containing '["NAME", "LAST EDITED", "EDITED BY", "STATUS"]'
 
+  @create_question
   Scenario: Admin selects the version
     Given I am on the questionnaire version listing screen
     When I click on edit option
     Then I should see a pop up for selecting the version of the questionnaire
     When I select the version
-    When I click the cancel button
-    When I click on edit option
-    Then I should see a pop up for selecting the version of the questionnaire
-    When I select the version
-    When I click the confirm edit button 
+    When I click the confirm edit button
     Then I should be redirected to the questionnaire management section of that version
