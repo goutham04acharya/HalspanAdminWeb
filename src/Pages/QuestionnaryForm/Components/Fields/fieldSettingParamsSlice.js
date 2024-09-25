@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import { createSlice } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,7 +25,7 @@ const processDisplayType = (item, displayType) => {
     for (const key in displayTypeMap) {
         if (Object.prototype.hasOwnProperty.call(displayType, key)) {
             const resultKey = displayTypeMap[key];
-            
+
             // If key is 'url', handle it as an object with type and value
             if (key === 'url' && typeof displayType[key] === 'object') {
                 result.urlType = displayType[key].type || item.urlType;
@@ -141,6 +142,12 @@ const fieldSettingParamsSlice = createSlice({
                     postField: item?.postField,
                     preField: item?.preField,
                     source: item?.source,
+                    draw_image: item?.asset_extras?.draw_image,
+                    pin_drop: item?.asset_extras?.pin_drop,
+                    include_metadata: item?.asset_extras?.include_metadata,
+                    file_size: item?.asset_extras?.fileSize,
+                    file_type: item?.asset_extras?.fileType,
+
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };

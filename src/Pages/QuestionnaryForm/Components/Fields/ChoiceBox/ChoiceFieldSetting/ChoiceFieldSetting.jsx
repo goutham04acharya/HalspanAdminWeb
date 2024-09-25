@@ -12,6 +12,8 @@ import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceV
 import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -22,7 +24,6 @@ function ChoiceFieldSetting({
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
-    setShouldAutoSave
 }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -53,14 +54,13 @@ function ChoiceFieldSetting({
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
     };
 
     const handleRemoveLookup = () => {
         dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
-
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
     }
 
     // List Functions
@@ -107,7 +107,7 @@ function ChoiceFieldSetting({
         } else if (event === 'remove') {
             dispatch(removeFixedChoice({ id, questionId: selectedQuestionId }))
         }
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
     };
 
     // Create a ref map to store input refs
@@ -285,7 +285,7 @@ function ChoiceFieldSetting({
                                 onClick={() => {
                                     dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionId }))
                                     dispatch(resetFixedChoice({ questionId: selectedQuestionId }))
-                                    setShouldAutoSave(true);
+                                    dispatch(setShouldAutoSave(true));
                                 }} />  {/* handleSource('fixedList') */}
                             <label htmlFor='FixedList' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Fixed List
@@ -317,7 +317,6 @@ function ChoiceFieldSetting({
                                 list={fixedChoiceArray.map((data, choiceIndex) => ({
                                     ...data,
                                     index: choiceIndex,
-                                    setShouldAutoSave: setShouldAutoSave,
                                     selectedQuestionId: selectedQuestionId
                                 }))}
                                 onMoveEnd={handleMoveEnd}
@@ -335,7 +334,7 @@ function ChoiceFieldSetting({
                                     dispatch(setNewComponent({
                                         id: 'source', value: 'lookup', questionId: selectedQuestionId
                                     }))
-                                    setShouldAutoSave(true);
+                                    dispatch(setShouldAutoSave(true));
                                 }} />  {/* handleSource('lookup') */}
                             <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Lookup
@@ -367,8 +366,11 @@ function ChoiceFieldSetting({
                                     <img src="/Images/plus.svg" alt="plus" />
                                 </button>
                             </div>}
+                        {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
+                            <ErrorMessage error={'No lookup list available. Please create one'}/>
+                        )}
                         {/* OptionsComponent added here */}
-                        <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                        <OptionsComponent  selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'

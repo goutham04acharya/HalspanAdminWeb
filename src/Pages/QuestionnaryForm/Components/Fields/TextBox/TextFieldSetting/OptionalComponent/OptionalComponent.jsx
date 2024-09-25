@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import {setShouldAutoSave} from '../../../../QuestionnaryFormSlice'
 
-function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
+function OptionsComponent({ selectedQuestionId }) {
 
     const dispatch = useDispatch();
 
@@ -105,7 +106,7 @@ function OptionsComponent({ selectedQuestionId, setShouldAutoSave }) {
             value: payload,
             questionId: selectedQuestionId
         }));
-        setShouldAutoSave(true);
+        dispatch(setShouldAutoSave(true));
     };
 
     // Get options based on current componentType

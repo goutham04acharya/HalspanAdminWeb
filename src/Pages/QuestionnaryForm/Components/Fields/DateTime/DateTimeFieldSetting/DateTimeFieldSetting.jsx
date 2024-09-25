@@ -4,6 +4,7 @@ import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
+import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -11,7 +12,6 @@ function DateTimeFieldSetting({
   handleBlur,
   handleRadiobtn,
   fieldSettingParameters,
-  setShouldAutoSave,
   selectedQuestionId,
 
 }) {
@@ -23,8 +23,8 @@ function DateTimeFieldSetting({
 }
 
   const handleTime = () => {
-    dispatch(setNewComponent({ id: 'format', value: '12', questionId: selectedQuestionId }));
-    setShouldAutoSave(true)
+    dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
+    dispatch(setShouldAutoSave(true));
   }
 
   return (
@@ -144,7 +144,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          <div className='mt-7'>
+          {/* <div className='mt-7'>
             <InputField
               autoComplete='off'
               label='Default Value'
@@ -159,8 +159,8 @@ function DateTimeFieldSetting({
               htmlFor='defaultValue'
               maxLength={10}
               handleChange={(e) => handleInputChange(e)} />
-          </div>
-          <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+          </div> */}
+          <OptionsComponent selectedQuestionId={selectedQuestionId} />
           <div className='mt-7'>
             <InputField
               autoComplete='off'

@@ -5,17 +5,15 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
+
 function FileFieldSetting({ handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
-    setShouldAutoSave,
     selectedQuestionId,
     validationErrors,
-
 }) {
-    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -102,7 +100,7 @@ function FileFieldSetting({ handleInputChange,
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent setShouldAutoSave={setShouldAutoSave} selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

@@ -1,18 +1,17 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux';
 
-function FileField({ label,
-    type,
+function FileField({
     textId,
-    HelpText,
-    value,
     className,
     handleChange,
     fieldSettingParameters,
-    testId
-
+    
 }) {
 
     const [fileName, setFileName] = useState('');
+
+
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -35,7 +34,9 @@ function FileField({ label,
                     htmlFor={textId}
                     className={`custom-file-label flex-1 py-3 px-4 bg-[#DFE0E2] rounded max-w-[30%] outline-0 font-semibold text-base text-[#505B66] cursor-pointer ${className}`}
                 >
-                    {fileName ? `Upload File (${fileName})` : 'Upload File (X)'}
+                    {fileName
+                        ? `Upload File (${fileName})`
+                        : `Upload File (${fieldSettingParameters?.max})`} {/* Ensure proper string rendering */}
                 </label>
                 <input
                     data-testid="input"

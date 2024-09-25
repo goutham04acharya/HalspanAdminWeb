@@ -90,7 +90,7 @@ When('I upload the image from disk', async function () {
 
 
 Then('I should be able see image updated in question {int} page {int} section {int}', async function (sectionNumber, pageNumber, questionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     const text = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="uploaded-image"]`)));
     await driver.wait(until.elementIsVisible(text), 2000);
 });
@@ -131,12 +131,14 @@ Then('I should be able see url updated in question {int} page {int} section {int
     await driver.wait(until.elementIsVisible(url), 2000);
     const urlText = await url.getText();
     console.log(this.url);
-    // if (this.urlType === 'http') {
-    //     assert.equal(urlText, 'http://' + this.url);
-    // } else if (this.urlType === 'https') {
-    //     assert.equal(urlText, 'https://' + this.url);
-    // } else 
-    assert.equal(urlText, this.url);
+    if (this.urlType === 'http') {
+        assert.equal(urlText, 'http://' + this.url);
+    } else if (this.urlType === 'https') {
+        assert.equal(urlText, 'https://' + this.url);
+    } else if (this.urlType === 'tel')
+        assert.equal(urlText, 'tel: ' + this.url);
+    else
+        assert.equal(urlText, 'mailto: ' + this.url);
 });
 
 Then('I should see a confirmation prompt stating to replace image', async function () {

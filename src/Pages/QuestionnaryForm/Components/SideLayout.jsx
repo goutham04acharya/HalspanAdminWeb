@@ -34,7 +34,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                 setSelectedSection(sectionIndex);
                                 setSelectedPage(null); // Reset selected page when a section is selected
                                 handleDropdown(sectionIndex);
-                                handleSectionScroll(sectionIndex);
+                                handleSectionScroll(sectionIndex, sectionItem?.section_id);
                             }}
                             className={`${selectedSection === sectionIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-11 pr-3 cursor-pointer`}>
                             <img src="/Images/down-arrow.svg" alt="down-arrow" />
@@ -49,11 +49,11 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                         {sectionItem?.pages?.length > 0 && sectionItem?.pages.map((pageItem, pageIndex) => (
                             dropdownOpen[sectionIndex] && (
                                 <div
-                                    key={sectionItem?.page_id}
+                                    key={pageItem?.page_id}
                                     onClick={() => {
                                         setSelectedSection(sectionIndex); // Keep track of the section
                                         setSelectedPage(pageIndex); // Highlight the selected page
-                                        handlePageScroll(sectionIndex, pageIndex);
+                                        handlePageScroll(sectionIndex, pageItem.page_id);
                                     }}
                                     className={`${selectedSection === sectionIndex && selectedPage === pageIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-14 pr-2 cursor-pointer truncate`}>
                                     <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>

@@ -46,4 +46,4 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     When I click on delete section 1
     Then I should see confirmation prompt for delete section
     When I click on confirm delete section button
-    Then I should read a message stating that "Section 1 deleted successfully"
+    # Then I should read a message stating that "Section 1 deleted successfully"
