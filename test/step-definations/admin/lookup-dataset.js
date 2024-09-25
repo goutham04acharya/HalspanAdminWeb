@@ -116,7 +116,7 @@ Then('I should read success message for updating dataset by importing the datase
 
 When('I click on the view dataset', async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
-    await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]//p[text()='View']`))).click();
+    await driver.wait(until.elementLocated(By.id(`view0`))).click();
     const id = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[1]`))).getText();
     this.id = id;
 });
