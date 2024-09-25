@@ -24,6 +24,7 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
+import {setAllSectionDetails} from '../../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/index.jsx';
@@ -46,7 +47,7 @@ function QuestionnaryForm() {
             page_name: 'Page 1',
             questions: []
         }],
-        
+
     }]);
 
     const sectionRefs = useRef([]);
@@ -75,7 +76,7 @@ function QuestionnaryForm() {
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    // const savedData = useSelector(state => state.fieldSettingParams.savedData);
+    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
 
     // // to open and close the sections
@@ -579,7 +580,8 @@ function QuestionnaryForm() {
                     }))
                 }))
             }
-
+            setAllSectionDetails(sectionToSave)
+            console.log(allSectionDetails, 'sectionToSave')
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -598,6 +600,7 @@ function QuestionnaryForm() {
 
             try {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                console.log(response, 'what is the repsonse ere')
                 if (!(response?.data?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
@@ -977,7 +980,7 @@ function QuestionnaryForm() {
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
 
-        setExpandedSections({0: false})
+        setExpandedSections({ 0: false })
         console.log("nnnnn", reorderedItems)
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
@@ -1057,7 +1060,7 @@ function QuestionnaryForm() {
                                                                 className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
-                                                                    <div className='flex items-center w-[85%]' style={{width: '-webkit-fill-available'}}>
+                                                                    <div className='flex items-center w-[85%]' style={{ width: '-webkit-fill-available' }}>
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
@@ -1133,7 +1136,7 @@ function QuestionnaryForm() {
                                 <button
                                     onClick={() => {
                                         handleAddRemoveSection('add'),
-                                            handleSectionSaveOrder(updatedSection)
+                                            handleSectionSaveOrder(sections)
                                     }
                                     }
                                     data-testid="add-section"
@@ -1257,7 +1260,7 @@ function QuestionnaryForm() {
                 />
             )}
             {conditionalLogic && (
-                <ConditionalLogic/>
+                <ConditionalLogic />
             )}
         </>
     );

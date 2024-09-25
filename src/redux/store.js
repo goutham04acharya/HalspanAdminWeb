@@ -5,7 +5,7 @@ import paginationReducer from './paginationSlice'
 import fieldSettingParamsSlice from '../Pages/QuestionnaryForm/Components/Fields/fieldSettingParamsSlice';
 import sliderSlice from '../Pages/QuestionnaryForm/Components/Fields/RangeSliderDataSlice';
 import questionnaryFormSlice from '../Pages/QuestionnaryForm/Components/QuestionnaryFormSlice';
-
+import allSectionDetailsSlice from '../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 
 const persistConfig = {
     key: 'root', // key for the storage
@@ -18,7 +18,8 @@ const store = configureStore({
         paginationConfig:persistedReducer,
         fieldSettingParams:fieldSettingParamsSlice,
         sliderConfig: sliderSlice,  // Your slider reducer
-        questionnaryForm: questionnaryFormSlice // Add the question reducer to the store
+        questionnaryForm: questionnaryFormSlice, // Add the question reducer to the store
+        allSectiondetails: allSectionDetailsSlice,
     },
 });
 
