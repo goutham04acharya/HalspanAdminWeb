@@ -44,7 +44,8 @@ function QuestionnaryForm() {
             page_id: page1Id,
             page_name: 'Page 1',
             questions: []
-        }]
+        }],
+        
     }]);
 
     const sectionRefs = useRef([]);
@@ -979,15 +980,13 @@ function QuestionnaryForm() {
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
-        let dragIndex = expandedSections[result.source.index]
-        expandedSections[result.source.index] = expandedSections[result.destination.index]
-        expandedSections[result.destination.index] = dragIndex
-        setExpandedSections(expandedSections);
 
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
 
+        setExpandedSections({0: false})
+        console.log("nnnnn", reorderedItems)
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
         handleSectionSaveOrder(reorderedItems);
