@@ -7,14 +7,21 @@ import Button from '../../../../Components/Button/button';
 import StaticDetails from './Components/StaticDetails/StaticDetails'
 import AdvancedEditor from './Components/AdvancedEditor/AdvancedEditor';
 import { useSelector } from 'react-redux';
-import { setUniqueAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
+import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
+import useApi from '../../../../services/CustomHook/useApi';
+import { useParams } from 'react-router-dom';
 
-function ConditionalLogic({setConditionalLogic}) {
+
+function ConditionalLogic({ setConditionalLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
-    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails); 
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const [showSectionList, setShowSectionList] = useState(false)
+    const { getAPI } = useApi();
+    const { questionnaire_id, version_number } = useParams();
+    console.log(allSectionDetails, 'allSectionDetails')
+
 
     // Handlers to switch tabs
     const handleTabClick = (tab) => {
@@ -29,8 +36,10 @@ function ConditionalLogic({setConditionalLogic}) {
         dispatch(setModalOpen(false));
     });
 
-    const handleListSectionDetails = () => {
+    const handleListSectionDetails = async () => {
         setShowSectionList(true)
+        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
+        dispatch(setAllSectionDetails(response.data));
     }
 
     return (
@@ -39,19 +48,19 @@ function ConditionalLogic({setConditionalLogic}) {
                 <div className='w-[60%]'>
                     <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
                     <AdvancedEditor
-                    handleListSectionDetails={handleListSectionDetails}
-                    showSectionList={showSectionList}
+                        handleListSectionDetails={handleListSectionDetails}
+                        showSectionList={showSectionList}
                     />
                 </div>
                 <div className='w-[40%]'>
-                   <StaticDetails
-                   handleTabClick={handleTabClick}
-                   activeTab={activeTab}
-                   setActiveTab={setActiveTab}
-                   />
+                    <StaticDetails
+                        handleTabClick={handleTabClick}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                    />
                     <div className='mt-5 flex items-center justify-between'>
                         <Button2
-                        text='Cancel'
+                            text='Cancel'
                             type='button'
                             data-testid='button1'
                             className='w-[162px] h-[50px] text-black font-semibold text-base'

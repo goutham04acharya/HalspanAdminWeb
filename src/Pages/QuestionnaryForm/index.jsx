@@ -24,7 +24,6 @@ import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSet
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
-import { setUniqueAllSectionDetails } from '../../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
@@ -590,8 +589,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             }
-            console.log(sectionToSave, 'what am gettig here')
-            dispatch(setUniqueAllSectionDetails(sectionToSave)); // <- Add this line to update Redux state
+            // dispatch(setUniqueAllSectionDetails(sectionToSave)); // <- Add this line to update Redux state
 
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
@@ -671,14 +669,12 @@ function QuestionnaryForm() {
                     page_name: page?.page_name,
                     questions: page?.questions.map(question => ({
                         question_id: question?.question_id,
-                        question_text: question?.question_name,
                         question_name: question?.question_name,
                         // Include other necessary fields for questions here
                     }))
                 }))
             };
-            // dispatch(setUniqueAllSectionDetails(sections)); // <- Add this line to update Redux state
-            console.log(sectionToSave, 'what is here then')
+            // dispatch(setUniqueAllSectionDetails(sectionToSave)); // <- Add this line to update Redux state
 
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
