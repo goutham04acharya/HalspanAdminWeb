@@ -74,7 +74,7 @@ function QuestionnaryForm() {
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
-    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails); 
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const fieldSettingParams = useSelector(state => state?.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
@@ -579,6 +579,7 @@ function QuestionnaryForm() {
                     }))
                 }))
             }
+            console.log(sectionToSave, 'what am gettig here')
             dispatch(setUniqueAllSectionDetails(sectionToSave)); // <- Add this line to update Redux state
 
             // Recursive function to remove specified keys
@@ -603,7 +604,6 @@ function QuestionnaryForm() {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
                     }
-
                     // Update the saved status
                     const update = { ...dataIsSame };
                     update[sections[sectionIndex].section_id] = true;
@@ -666,8 +666,8 @@ function QuestionnaryForm() {
                     }))
                 }))
             };
-
-            dispatch(setUniqueAllSectionDetails(sections)); // <- Add this line to update Redux state
+            // dispatch(setUniqueAllSectionDetails(sections)); // <- Add this line to update Redux state
+            console.log(sectionToSave, 'what is here then')
 
             // Recursive function to remove specified keys
             const removeKeys = (obj) => {
@@ -704,6 +704,8 @@ function QuestionnaryForm() {
                     const update = { ...dataIsSame };
                     update[sections[sectionIndex].section_id] = true;
                     dispatch(setDataIsSame(update));
+                } else if(response?.data?.status === 409){
+                    setToastError(response?.data?.data?.message);
                 } else {
                     setToastError('Something went wrong');
                 }
@@ -981,7 +983,6 @@ function QuestionnaryForm() {
         reorderedItems.splice(result.destination.index, 0, removed);
 
         setExpandedSections({ 0: false })
-        console.log("nnnnn", reorderedItems)
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
         handleSectionSaveOrder(reorderedItems);
@@ -1260,7 +1261,7 @@ function QuestionnaryForm() {
                 />
             )}
             {conditionalLogic && (
-                <ConditionalLogic setConditionalLogic={setConditionalLogic}/>
+                <ConditionalLogic setConditionalLogic={setConditionalLogic} />
             )}
         </>
     );
