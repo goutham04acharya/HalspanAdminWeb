@@ -136,6 +136,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                         
                                                         {loading ? <Shimmer column={1} row={1} dropdown /> :<input
                                                             type="text"
+                                                            data-testid="status"
                                                             id={versionListInfo?.version_number}
                                                             value={versionListInfo?.status}
                                                             className={`w-full placeholder:font-normal placeholder:text-base outline-0 border-0 cursor-pointer`}
@@ -156,6 +157,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                     <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2) ? 'top-[-145px]' : 'top-[58px]') : 'top-[58px]'} z-10`}>
                                                         {options.map(option => (
                                                             <li key={option}
+                                                                data-testid={`${option}`}
                                                                 className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                                                                 onClick={() => handleOptionClick(option, versionListInfo?.questionnaire_id, versionListInfo?.version_number)}>
                                                                 {option}

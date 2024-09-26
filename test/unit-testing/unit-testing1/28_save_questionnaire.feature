@@ -8,7 +8,7 @@ Feature: Halspan - Admin - Save Questionnaire
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
     When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "Auth@123"
+    * I enter valid password as "dApje7-nepnig-vibqyc"
     * I click the submit button
     Then I should be redirected to the questionnaire listing screen
 
@@ -22,4 +22,4 @@ Feature: Halspan - Admin - Save Questionnaire
     Then I should see field settings
     And I should see the display field added to the section 1 page 1 question 1
     When I click the save button
-    Then I should read a message stating that "Questionnaire saved successfully"
+    Then I should read a message stating that "Section 2 saved successfully"

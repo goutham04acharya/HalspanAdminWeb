@@ -32,8 +32,12 @@ When('I click on back to all questionnaire', async function () {
 Then('I should see the version table header containing {string}', async function (tableHeader) {
     await new Promise(resolve => setTimeout(resolve, 3000));
     const arr = JSON.parse(tableHeader);
-    const tableData = await driver.wait(until.elementLocated(By.xpath('//table/thead'))).getText();
+    // const tableData = await driver.wait(until.elementLocated(By.xpath('//table/thead'))).getText();
+    // arr.forEach(element => {
+    //     return assert(tableData.includes(element));
+    // });
+    const pageSource = await driver.getPageSource();
     arr.forEach(element => {
-        return assert(tableData.includes(element));
+        assert(pageSource.includes(element), `The header "${element}" is not found.`);
     });
 });

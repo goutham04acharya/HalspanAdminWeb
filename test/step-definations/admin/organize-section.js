@@ -38,12 +38,12 @@ Then('I should see the new pages added', async function () {
 
 When('I click on save button for section 2', async function () {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="save-btn-1"]'))).click()
+    await driver.wait(until.elementLocated(By.css('[data-testid="save"]'))).click()
 });
 
 When('I click on save button for section 1', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.css('[data-testid="save-btn-0"]'))).click()
+    await driver.wait(until.elementLocated(By.css('[data-testid="save"]'))).click()
 });
 
 When('I click on delete page from section 1', async function () {

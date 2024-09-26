@@ -933,7 +933,7 @@ function QuestionnaryForm() {
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
-        setSelectedSectionData(sectionData);
+        dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
         // setSections(sectionData)
     };
@@ -1149,7 +1149,7 @@ function QuestionnaryForm() {
                                 Preview
                             </button>
 
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
+                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
                                 if (!dataIsSame[latestSectionId])
                                     handleSaveSection(latestSectionId);
                             }}>

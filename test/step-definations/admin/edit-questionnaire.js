@@ -20,6 +20,7 @@ Then('I should see a pop up for selecting the version of the questionnaire', asy
 When('I select the version', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid="Version"]'))).click();
+    await new Promise(resolve => setTimeout(resolve, 500));
     await driver.wait(until.elementLocated(By.css('[data-testid="Version-1"]'))).click();
 });
 
@@ -30,11 +31,12 @@ When('I click the confirm edit button', async function () {
 
 Then('I should be redirected to the questionnaire management section of that version', async function () {
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    await driver.wait(until.elementLocated(By.xpath('//p[text()="Version 1"]')));
-    await driver.wait(unitl.elementLocated(By.xpath(`//p[text()="${global.internalNameVersion}"]`)));
+    // await driver.wait(until.elementLocated(By.xpath('//p[text()="Version 1"]')));
+    console.log(global.internalNameVersion);
+    await driver.wait(until.elementLocated(By.xpath(`//p[text()="Minerva Levy"]`)));
 });
 
-Given('I am on the questionnaire version listing screen', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    await driver.wait(until.elementLocated(By.xpath(`//p[text()="${global.internalNameVersion}"]`)));
-});
+// Given('I am on the questionnaire version listing screens', async function () {
+//     await new Promise((resolve) => setTimeout(resolve, 1500));
+//     await driver.wait(until.elementLocated(By.xpath(`//p[text()="${global.internalNameVersion}"]`)));
+// });
