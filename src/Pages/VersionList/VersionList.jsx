@@ -15,6 +15,7 @@ import GridTable from './Components/GridTable.jsx';
 
 function VersionList() {
     const { getAPI } = useApi();
+    const { PatchAPI } = useApi();
     const dispatch = useDispatch();
     const section1Id = `SEC-${uuidv4()}`;
     const page1Id = `${section1Id}_PG-${uuidv4()}`;
@@ -41,7 +42,9 @@ function VersionList() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [dropdownsOpen, setDropdownsOpen] = useState(false);
     const [version, setVersion] = useState(false);
+    const [edit, setEdit] = useState(false)
     const [selectedStatus, setSelectedStatus] = useState([])
+    const [duplicate, setDuplicate] = useState(false)
     const [editedDetails, setEditedDetails] = useState({
         public_name: '',
         internal_name: '',
@@ -57,6 +60,8 @@ function VersionList() {
         setDropdownsOpen(false)
         setVersion(false)
         setSelectedVersion('')
+        setEdit(false)
+        setDuplicate(false)
         // console.log(version, 'on close')
     }
     const handleDropdownClick = () => {
@@ -64,26 +69,71 @@ function VersionList() {
         // setIsCreateModalOpen(false)
     }
     let selectedVersionObj = {};
-const handleEditClick = () => {
-    selectedVersionObj = versionList?.data?.items?.find(
-        (version) => version.version_number === selectedVersion
-    );
-    
-    if (selectedVersionObj) {
-        setSelectedStatus(selectedVersionObj); // Set the selected version object to state
-        console.log(selectedStatus.status, 'selectedStatus')
-        if (selectedVersionObj.status === 'Draft') {
-            setVersion(false); // Proceed with navigation
-            navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
-            // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
-        } else {
-            console.log('Selected version is not in "Draft" status');
-            setVersion(true); // Prevent navigation
+    const handleDuplicateClick = async () => {
+        
+        if (!selectedVersion) {
+            setToastError('Please select a version to duplicate.');
+            return;
         }
-    } else {
-        console.log('No version found with the selected version number');
-    }
-};
+
+        // Find the selected version object from the version list
+        const selectedVersionObj = versionList?.data?.items?.find(
+            (version) => version.version_number === selectedVersion
+        );
+        setLoading(true)
+        if (selectedVersionObj) {
+            try {
+                const payload = {
+                    questionnaire_id,
+                    public_name: queSettingDetails?.data?.public_name,
+                    from_version_number: selectedVersion
+                };
+
+                const response = await PatchAPI('questionnaires/duplicate', payload);
+
+                if (response.status === 204) {
+                    setToastSuccess('Version duplicated successfully.');
+                    handleClose(); // Close the modal
+
+                    // Fetch the updated version list after duplicating
+                    await handleVersionList();
+                    window.location.reload()
+                    
+                } else {
+                    setToastError('Failed to duplicate the version.');
+                    window.location.reload()
+                }
+            } catch (error) {
+                setToastError('An error occurred while duplicating the version.');
+                console.error(error);
+            }
+        } else {
+            setToastError('No version found with the selected version number.');
+        }
+        setLoading(false)
+    };
+
+    const handleEditClick = () => {
+        selectedVersionObj = versionList?.data?.items?.find(
+            (version) => version.version_number === selectedVersion
+        );
+        setLoading(true)
+        if (selectedVersionObj) {
+            setSelectedStatus(selectedVersionObj); // Set the selected version object to state
+            console.log(selectedStatus.status, 'selectedStatus')
+            if (selectedVersionObj.status === 'Draft') {
+                setVersion(false); // Proceed with navigation
+                navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
+                // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
+            } else {
+                console.log('Selected version is not in "Draft" status');
+                setVersion(true); // Prevent navigation
+            }
+        } else {
+            console.log('No version found with the selected version number');
+        }
+        setLoading(false)
+    };
 
     console.log(selectedVersion, 'asca')
     useEffect(() => {
@@ -117,8 +167,6 @@ const handleEditClick = () => {
         }));
         setLoading(false);
     };
-
-
     const handleChange = (e, field) => {
         e.preventDefault();
         setEditedDetails((prevState) => ({
@@ -130,20 +178,6 @@ const handleEditClick = () => {
             [field]: '',
         }));
     };
-
-    //implement infinate scroll here
-    // const lastElementRef = useCallback(node => {
-    //     if (loading || isFetchingMore) return;
-    //     if (observer.current) observer.current.disconnect();
-    //     observer.current = new IntersectionObserver(entries => {
-    //       if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
-    //         setIsFetchingMore(true);
-    //         fetchQuestionnaryList();
-    //       }
-    //     });
-    //     if (node) observer.current.observe(node);
-    //   }, [loading, isFetchingMore]);
-
     useEffect(() => {
         handleVersionList();
         handleQuestionnariesSetting();
@@ -161,7 +195,10 @@ const handleEditClick = () => {
                                 setVersionList={setVersionList}
                                 versionList={versionList}
                                 setLoading={setLoading}
-                                loading={loading} />
+                                loading={loading}
+                                setSelectedVersion={setSelectedVersion}
+                                selectedVersion={selectedVersion}
+                            />
                             <Button2
                                 testId='back-to-questionnaire'
                                 onClick={() => navigate('/questionnaries')}
@@ -173,11 +210,18 @@ const handleEditClick = () => {
                         <div className='flex items-center'>
                             <Button2
                                 testId='edit'
-                                onClick={() => setIsCreateModalOpen(true)}
+                                onClick={() => {
+                                    setIsCreateModalOpen(true)
+                                    setEdit(true)
+                                }}
                                 className='w-[40%] h-[50px] ml-[32px] font-semibold text-[#2B333B]'
                                 text='Edit' />
                             <Button2
                                 text='Duplicate'
+                                onClick={() => {
+                                    setIsCreateModalOpen(true)
+                                    setDuplicate(true);
+                                }}
                                 testId='duplicate'
                                 className='w-[60%] h-[50px] ml-[32px] font-semibold text-[#2B333B]l' />
                         </div>
@@ -196,15 +240,17 @@ const handleEditClick = () => {
 
             </div>
             {isCreateModalOpen && <VersionEditModal
-                text={`${version ? 'This question can’t be edited' : 'Edit Questionnaire'}`}
-                subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : 'Please select the version you want to edit.'}`}
-                handleButton1={handleEditClick}
-                Button1text='Edit'
+                text={`${version ? 'This question can’t be edited' : duplicate ? 'Select Version' : edit ? 'Edit Questionnaire' : ''}`}
+                subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : edit ? 'Please select the version you want to edit.' : duplicate ? 'Please select the version you want to duplicate.' : ''}`}
+                handleButton1={edit ? handleEditClick : handleDuplicateClick}
+                Button1text={edit ? 'Edit' : 'Duplicate'}
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                 Button2text='Cancel'
                 handleButton2={handleClose}
                 handleClose={handleClose}
                 isOpen={isCreateModalOpen}
+                loading={loading}
+                setLoading={setLoading}
                 setModalOpen={setIsCreateModalOpen}
                 versionListEdit={'Version List'}
                 handleDropdownClick={handleDropdownClick}
@@ -216,6 +262,11 @@ const handleEditClick = () => {
                 setSelectedVersion={setSelectedVersion}
                 setVersion={setVersion}
                 version={version}
+                setDuplicate={setDuplicate}
+                setEdit={setEdit}
+                edit={edit}
+                duplicate={duplicate}
+                questionnaireId={questionnaire_id}
             />}
         </>
     )

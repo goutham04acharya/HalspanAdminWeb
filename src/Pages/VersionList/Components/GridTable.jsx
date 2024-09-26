@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Shimmer from '../../../Components/Shimmers/Shimmer';
 import useApi from '../../../services/CustomHook/useApi';
+import { useNavigate } from 'react-router-dom';
 
-export function GridTable({ setVersionList, versionList, loading, lastElemendivef }) {
+export function GridTable({ setVersionList, versionList, setLoading, loading, lastElemendivef, setSelectedVersion, selectedVersion, questionnaireId }) {
     const { PatchAPI } = useApi();
     const options = ['Draft', 'Testing', 'Published', 'Retired'];
     const [dropdownsOpen, setDropdownsOpen] = useState({});
     const dropdownRefs = useRef([]);
+    const navigate = useNavigate();
 
     const handleDropdownClick = (version_number) => {
         setDropdownsOpen({
@@ -15,6 +17,7 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
     };
 
     const handleOptionClick = async (status, questionnaire_id, version_number) => {
+        setLoading(true)
         const previousPublishedVersion = versionList?.data?.items.find(
             item => item.status === 'Published'
         );
@@ -53,7 +56,7 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
                 });
                 return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
             });
-
+            
             console.log('Status updated');
         } catch (error) {
             console.error('Error updating status:', error);
@@ -64,6 +67,7 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
             ...prev,
             [version_number]: false,
         }));
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -110,8 +114,8 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
                         {versionList?.data?.items.sort((a, b) => b.version_number - a.version_number).map((versionListInfo, index) => (
                             <React.Fragment key={index}>
                                 <div className='rounded-[10px] mt-[10px] flex w-full relative' ref={el => dropdownRefs.current[index] = el}>
-                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer'>
-                                        <u>Version {versionListInfo?.version_number}</u>
+                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
+                                        <a onClick={()=>navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
                                     </div>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>
                                         {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
@@ -130,13 +134,13 @@ export function GridTable({ setVersionList, versionList, loading, lastElemendive
                                                     <div className='flex w-[164px] h-[36px] border border-[#AEB3B7] rounded px-[18px] bg-white items-center cursor-pointer'
                                                     onClick={() => handleDropdownClick(versionListInfo?.version_number)}>
                                                         
-                                                        <input
+                                                        {loading ? <Shimmer column={1} row={1} dropdown /> :<input
                                                             type="text"
                                                             id={versionListInfo?.version_number}
                                                             value={versionListInfo?.status}
                                                             className={`w-full placeholder:font-normal placeholder:text-base outline-0 border-0 cursor-pointer`}
                                                             readOnly
-                                                        />
+                                                        />}
                                                         <img
                                                             src="/Images/open-status.svg"
                                                             alt="open-filter"
