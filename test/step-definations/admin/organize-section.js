@@ -3,7 +3,9 @@ const { Given, When, Then, But } = require('@cucumber/cucumber');
 const { By, until, Key } = require('selenium-webdriver')
 
 Given('I am on the questionnaire management section', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const questionnaireId = global.response?.data?.data?.questionnaire_id;
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const versionNumber = global.response?.data?.data?.version_number;
 
     if (questionnaireId && versionNumber) {

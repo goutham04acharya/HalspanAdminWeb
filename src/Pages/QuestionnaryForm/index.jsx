@@ -1065,7 +1065,7 @@ function QuestionnaryForm() {
                                                                 className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
-                                                                    <div className='flex items-center w-[85%]' style={{width: '-webkit-fill-available'}}>
+                                                                    <div className='flex items-center w-[90%]' style={{width: '-webkit-fill-available'}}>
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
@@ -1081,7 +1081,7 @@ function QuestionnaryForm() {
                                                                             testId={`section-${sectionIndex}-name`}
                                                                         />
                                                                     </div>
-                                                                    <div className="flex items-center w-[15%]">
+                                                                    <div className="flex items-center w-[10%]">
                                                                         <img
                                                                             className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
                                                                             title="Drag"
