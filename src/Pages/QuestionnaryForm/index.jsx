@@ -78,6 +78,17 @@ function QuestionnaryForm() {
     const fieldSettingParams = useSelector(state => state?.fieldSettingParams.currentData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer
+    const [latestSectionId, setLatestSectionId] = useState(null);
+
+    useEffect(() => {
+        if (sections.length > 0) {
+            const lastSection = sections[sections.length - 1]; // Get the latest section
+            setLatestSectionId(lastSection.section_id);
+        }
+    }, [sections]); // This useEffect runs whenever `sections` changes
+
+
+
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
@@ -930,7 +941,7 @@ function QuestionnaryForm() {
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete
-        setSelectedSectionData(sectionData);
+        dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
         // setSections(sectionData)
     };
@@ -1093,20 +1104,6 @@ function QuestionnaryForm() {
                                                                             // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
                                                                             onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
                                                                         />
-                                                                        <img
-                                                                            src="/Images/save.svg"
-                                                                            alt="save"
-                                                                            title="Save"
-                                                                            data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] ${dataIsSame[sectionData.section_id]
-                                                                                ? "cursor-not-allowed"
-                                                                                : "cursor-pointer"
-                                                                                }`}
-                                                                            onClick={() => {
-                                                                                if (!dataIsSame[sectionData.section_id])
-                                                                                    handleSaveSection(sectionData?.section_id);
-                                                                            }}
-                                                                        />
                                                                     </div>
                                                                 </div>
                                                                 <Sections
@@ -1158,11 +1155,14 @@ function QuestionnaryForm() {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                            // onClick={() => handleSaveSection()}
-                            >
+
+                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
+                                if (!dataIsSame[latestSectionId])
+                                    handleSaveSection(latestSectionId);
+                            }}>
                                 Save
                             </button>
+
                         </div>
                         <div>
                             {selectedComponent ? (
@@ -1227,6 +1227,7 @@ function QuestionnaryForm() {
                     handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
                     handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
                 />
+
             )}
             {showquestionDeleteModal && (
                 <ConfirmationModal
