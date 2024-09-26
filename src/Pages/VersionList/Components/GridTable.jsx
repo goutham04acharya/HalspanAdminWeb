@@ -115,7 +115,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                             <React.Fragment key={index}>
                                 <div className='rounded-[10px] mt-[10px] flex w-full relative' ref={el => dropdownRefs.current[index] = el}>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
-                                        <a onClick={()=>navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
+                                        <a data-testid={`version-${index}`} onClick={()=>navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
                                     </div>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>
                                         {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {

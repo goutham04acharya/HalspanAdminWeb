@@ -20,17 +20,18 @@ Given('I am on the questionnaire version listing screen', async function () {
         throw new Error('Questionnaire ID or version number is missing.');
     }
 
-    const rows = await driver.findElements(By.xpath(`//tbody/tr`));
-    const n = rows.length;
-    global.versions = [];
-    for (let i = 1; i <= n; i++) {
-        if (i % 2 === 1) { // Odd-numbered rows
-            const versionNumber = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[${i}]/td[1]`))).getText();
-            global.versions.push(versionNumber);
-        }
+    // Find all versions by using the data-testid attribute
+    const versionDivs = await driver.findElements(By.css('a[data-testid^="version-"]'));
+    const n = versionDivs.length;
+    global.versionsBefore = [];
+
+    // Loop through each version div and store its text
+    for (let i = 0; i < n; i++) {
+        const versionNumber = await versionDivs[i].getText();
+        global.versionsBefore.push(versionNumber);
     }
-    global.versions.sort();
-    console.log('Sorted Versions before duplicating:', global.versions);
+    global.versionsBefore.sort();
+    console.log('Sorted Versions before duplicating:', global.versionsBefore);
 });
 
 When('I click the save settings button', async function () {
