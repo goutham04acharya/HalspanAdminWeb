@@ -316,6 +316,19 @@ function QuestionnaryForm() {
         }));;
     };
 
+    // const removeIndexAndShift = (indexToRemove) => {
+    //     // Create a copy of the current state
+    //     const newState = { ...isSameData };
+
+    //     // Check if the key exists, and if so, delete it
+    //     if (newState.hasOwnProperty(indexToRemove)) {
+    //         delete newState[indexToRemove];
+    //     }
+
+    //     // Dispatch the updated state back to Redux
+    //     dispatch(setDataIsSame(newState));
+    // };
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const len = sections.length;
@@ -667,7 +680,6 @@ function QuestionnaryForm() {
                     page_name: page?.page_name,
                     questions: page?.questions.map(question => ({
                         question_id: question?.question_id,
-                        question_text: question?.question_name,
                         question_name: question?.question_name,
                         // Include other necessary fields for questions here
                     }))
@@ -1081,7 +1093,7 @@ function QuestionnaryForm() {
                                                                             testId={`section-${sectionIndex}-name`}
                                                                         />
                                                                     </div>
-                                                                    <div className="flex items-center w-[10%]">
+                                                                    <div className="flex items-center">
                                                                         <img
                                                                             className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
                                                                             title="Drag"
@@ -1093,7 +1105,7 @@ function QuestionnaryForm() {
                                                                             alt="delete"
                                                                             title='Delete'
                                                                             data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
+                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF] mr-3'
                                                                             // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
                                                                             onClick={() => handleDeleteModal(sectionIndex, sectionData)} // Open modal instead of directly deleting
                                                                         />

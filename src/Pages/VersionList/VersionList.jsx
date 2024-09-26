@@ -214,7 +214,7 @@ function VersionList() {
                                     setIsCreateModalOpen(true)
                                     setEdit(true)
                                 }}
-                                className='w-[40%] h-[50px] ml-[32px] font-semibold text-[#2B333B]'
+                                className='w-[40%] h-[50px] font-semibold text-[#2B333B]'
                                 text='Edit' />
                             <Button2
                                 text='Duplicate'

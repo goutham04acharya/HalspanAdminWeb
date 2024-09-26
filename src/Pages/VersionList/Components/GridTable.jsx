@@ -120,7 +120,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>
                                         {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
                                             day: 'numeric',
-                                            month: 'long',
+                                            month: 'short',
                                             year: 'numeric',
                                         })}
                                     </div>
