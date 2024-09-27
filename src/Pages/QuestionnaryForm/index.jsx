@@ -106,9 +106,6 @@ function QuestionnaryForm() {
             handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion     
             dispatch(setModalOpen(false)); // Close the modal  
             handleSectionSaveOrder(sections);
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000); // 2 second delay  
         }
     }
 
@@ -306,30 +303,17 @@ function QuestionnaryForm() {
 
     // Form related code
     const removeIndexAndShift = (indexToRemove) => {
-        dispatch(setDataIsSame((prevState) => {
-            const newState = { ...prevState };
+        // Create a copy of the current state
+        const newState = { ...dataIsSame };
 
-            // Check if the key exists, and if so, delete it
-            if (newState.hasOwnProperty(indexToRemove)) {
-                delete newState[indexToRemove];
-            }
+        // Check if the key exists, and if so, delete it
+        if (newState.hasOwnProperty(indexToRemove)) {
+            delete newState[indexToRemove];
+        }
 
-            return newState;
-        }));;
+        // Dispatch the updated state back to Redux
+        dispatch(setDataIsSame(newState));
     };
-
-    // const removeIndexAndShift = (indexToRemove) => {
-    //     // Create a copy of the current state
-    //     const newState = { ...isSameData };
-
-    //     // Check if the key exists, and if so, delete it
-    //     if (newState.hasOwnProperty(indexToRemove)) {
-    //         delete newState[indexToRemove];
-    //     }
-
-    //     // Dispatch the updated state back to Redux
-    //     dispatch(setDataIsSame(newState));
-    // };
 
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
@@ -622,7 +606,7 @@ function QuestionnaryForm() {
 
             try {
                 const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                if (!(response?.data?.error)) {
+                if (!(response?.error)) {
                     if (showShimmer) {
                         setToastSuccess(response?.data?.message);
                     }
@@ -630,6 +614,10 @@ function QuestionnaryForm() {
                     const update = { ...dataIsSame };
                     update[sections[sectionIndex].section_id] = true;
                     dispatch(setDataIsSame(update));
+                } else if (response?.data?.status === 409) {
+                    setToastError(response?.data?.data?.message);
+                } else if (response?.data?.status === 400) {
+                    setToastError(response?.data?.data?.message);
                 } else {
                     setToastError('Something went wrong.');
                 }
@@ -724,7 +712,9 @@ function QuestionnaryForm() {
                     const update = { ...dataIsSame };
                     update[sections[sectionIndex].section_id] = true;
                     dispatch(setDataIsSame(update));
-                } else if(response?.data?.status === 409){
+                } else if (response?.data?.status === 409) {
+                    setToastError(response?.data?.data?.message);
+                } else if (response?.data?.status === 400) {
                     setToastError(response?.data?.data?.message);
                 } else {
                     setToastError('Something went wrong');
@@ -1081,7 +1071,7 @@ function QuestionnaryForm() {
                                                                 className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
-                                                                    <div className='flex items-center w-[90%]' style={{width: '-webkit-fill-available'}}>
+                                                                    <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
