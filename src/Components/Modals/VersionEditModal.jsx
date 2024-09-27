@@ -3,8 +3,9 @@ import Image from '../Image/Image.jsx';
 import useOnClickOutside from '../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
+import Button from '../Button/button.jsx';
 
-function VersionEditModal({ text, subText, setVersion, version, setSelectedVersion, handleDropdownClick, handleOptionClick, selectedVersion, dropdownsOpen, setDropdownsOpen, Button1text, isOpen, versionListEdit, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, versionNumber, versionList, testIDBtn1, testIDBtn2, isImportLoading, showLabel }) {
+function VersionEditModal({ text, subText, setVersion, loading, setLoading,  version, setSelectedVersion, handleDropdownClick, handleOptionClick, selectedVersion, dropdownsOpen, setDropdownsOpen, Button1text, isOpen, versionListEdit, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, versionNumber, versionList, testIDBtn1, edit, duplicate, setDuplicate, setEdit, testIDBtn2, isImportLoading, showLabel }) {
 
     const modalRef = useRef();
 
@@ -13,6 +14,9 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
         setDropdownsOpen(false)
         setVersion(false)
         setSelectedVersion('')
+        setDuplicate(false)
+        setEdit(false)
+        setLoading(false)
     };
 
     useOnClickOutside(modalRef, () => {
@@ -20,6 +24,8 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
         setDropdownsOpen(false);
         setVersion(false)
         setSelectedVersion('')
+        setDuplicate(false)
+        setEdit(false)
     });
 
     return (
@@ -64,7 +70,7 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
                 }
                 {!version && <div className='mt-5 flex items-center justify-between'>
                     {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
-                        {Button1text}
+                        {!loading ? Button1text : <BeatLoader color="#fff" size={'10px'} /> }
                     </button> :
                         <>
                             <input
@@ -89,7 +95,7 @@ function VersionEditModal({ text, subText, setVersion, version, setSelectedVersi
                             </label>
                         </>}
                     <button type='button' data-testid={testIDBtn2} className='w-[200px] h-[50px] border border-[#2B333B] rounded text-[#2B333B] hover:bg-[#EFF1F8] text-base font-semibold' onClick={() => handleButton2()}>
-                        {Button2text}
+                    {!loading ? Button2text : <BeatLoader color="#fff" size={'10px'} /> }
                     </button>
                 </div>}
             </div>
