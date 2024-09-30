@@ -45,7 +45,7 @@ function QuestionnaryForm() {
             page_name: 'Page 1',
             questions: []
         }],
-        
+
     }]);
 
     const sectionRefs = useRef([]);
@@ -522,23 +522,41 @@ function QuestionnaryForm() {
         }
     }
 
-    // API calling function
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
         try {
+               
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            console.log(response);
+
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
-                const sectionsData = response?.data?.data?.sections || [];
-
+                const sectionsData = response?.data?.data?.sections?.map((section) => {
+                    return section?.pages
+                }) || [];
+                console.log(sectionsData, 'section data')
+                
+                const fieldSettingsData = sectionsData.flat().flatMap(page => {
+                    return {
+                        page_id: page?.page_id, // Safely accessing page_id
+                        page_name: page?.page_name, // Safely accessing page_name
+                        questions: page?.questions?.map(question => ({
+                            question_id: question?.question_id,
+                            label: question?.question_name,
+                            component_type: question?.component_type,
+                            type: question?.type
+                        })) || [] // Fallback to an empty array if questions is undefined
+                    };
+                });
+                
+                console.log(fieldSettingsData);
+                dispatch(setInitialData(fieldSettingsData));
                 const sectionOrder = await GetSectionOrder();
-
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
                     return;
                 }
 
-                // If sectionOrder is valid, proceed with sorting
                 if (sectionOrder) {
                     const orderedSections = sectionOrder.map(orderId =>
                         sectionsData.find(section => section.section_id === orderId)
@@ -556,15 +574,60 @@ function QuestionnaryForm() {
                     // If sectionOrder is invalid, use initial sections order
                     setSections(sectionsData);
                 }
+                console.log(sections)
             } else {
-                setToastError('Something went wrong fetching form details');
+                setToastError('Something went wrong!');
             }
         } catch (error) {
-            setToastError('An error occurred during the API call');
+            console.error('Error fetching data:', error);
+            setToastError('Failed to fetch data!');
         } finally {
             setPageLoading(false);
         }
     }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
+    // API calling function
+    // const formDefaultDetails = useCallback(async () => {
+    //     setPageLoading(true);
+    //     try {
+    //         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+    //         if (!response?.error) {
+    //             dispatch(setFormDefaultInfo(response?.data?.data));
+    //             const sectionsData = response?.data?.data?.sections || [];
+
+    //             const sectionOrder = await GetSectionOrder();
+
+    //             if (sectionOrder === 'no_data') {
+    //                 setSections(sectionsData);
+    //                 return;
+    //             }
+
+    //             // If sectionOrder is valid, proceed with sorting
+    //             if (sectionOrder) {
+    //                 const orderedSections = sectionOrder.map(orderId =>
+    //                     sectionsData.find(section => section.section_id === orderId)
+    //                 ).filter(Boolean); // Filter out any undefined sections
+
+    //                 // Create an object with section_id as the key and true as the value
+    //                 const updatedSections = orderedSections.reduce((acc, section) => {
+    //                     acc[section.section_id] = true;
+    //                     return acc;
+    //                 }, {});
+
+    //                 dispatch(setDataIsSame(updatedSections));
+    //                 setSections(orderedSections); // Set ordered sections
+    //             } else {
+    //                 // If sectionOrder is invalid, use initial sections order
+    //                 setSections(sectionsData);
+    //             }
+    //         } else {
+    //             setToastError('Something went wrong fetching form details');
+    //         }
+    //     } catch (error) {
+    //         setToastError('An error occurred during the API call');
+    //     } finally {
+    //         setPageLoading(false);
+    //     }
+    // }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
 
     //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
@@ -997,7 +1060,7 @@ function QuestionnaryForm() {
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
 
-        setExpandedSections({0: false})
+        setExpandedSections({ 0: false })
         console.log("nnnnn", reorderedItems)
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
@@ -1077,7 +1140,7 @@ function QuestionnaryForm() {
                                                                 className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
-                                                                    <div className='flex items-center w-[90%]' style={{width: '-webkit-fill-available'}}>
+                                                                    <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
