@@ -515,6 +515,7 @@ function QuestionnaryForm() {
 
     const getFieldSetting = async () => {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
+        console.log(response, 'Field Settigs Old API')
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
         } else {
@@ -525,17 +526,21 @@ function QuestionnaryForm() {
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
         try {
-               
+
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-            console.log(response);
+            console.log(response, 'this is the response');
 
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
-                const sectionsData = response?.data?.data?.sections?.map((section) => {
-                    return section?.pages
-                }) || [];
-                console.log(sectionsData, 'section data')
-                
+                console.log(response?.data?.data, 'esponse?.data?.data')
+                // const sectionsData = response?.data?.data?.sections?.map((section) => {
+                //     return section?.pages;
+                // })?.flat() || [];
+                const sectionsData = response?.data?.data?.sections
+
+                // Output will now be a flat array of objects instead of arrays inside arrays
+                console.log(sectionsData, 'sectionsDatasectionsDatasectionsData');
+
                 const fieldSettingsData = sectionsData.flat().flatMap(page => {
                     return {
                         page_id: page?.page_id, // Safely accessing page_id
@@ -544,13 +549,21 @@ function QuestionnaryForm() {
                             question_id: question?.question_id,
                             label: question?.question_name,
                             component_type: question?.component_type,
-                            type: question?.type
-                        })) || [] // Fallback to an empty array if questions is undefined
+                            type: question?.type,
+                            // default_content: question?.default_content,
+                            // help_text: question?.help_text,
+                            // placeholder_content: question?.placeholder_content,
+                            // admin_field_notes: question?.admin_field_notes,
+                            // format: question?.format
+
+                        })) // Fallback to an empty array if questions is undefined
                     };
                 });
-                
-                console.log(fieldSettingsData);
+
+                console.log(fieldSettingsData, 'fieldSettingsData');
                 dispatch(setInitialData(fieldSettingsData));
+                
+                console.log(sectionsData, 'section data data')
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
@@ -558,23 +571,21 @@ function QuestionnaryForm() {
                 }
 
                 if (sectionOrder) {
-                    const orderedSections = sectionOrder.map(orderId =>
-                        sectionsData.find(section => section.section_id === orderId)
-                    ).filter(Boolean); // Filter out any undefined sections
+                    console.log(sectionOrder, 'sectionOrder')
+                    const orderedSectionsData = [...sectionsData].sort((a, b) => {
+                        return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
+                    });
 
-                    // Create an object with section_id as the key and true as the value
-                    const updatedSections = orderedSections.reduce((acc, section) => {
-                        acc[section.section_id] = true;
-                        return acc;
-                    }, {});
-
-                    dispatch(setDataIsSame(updatedSections));
-                    setSections(orderedSections); // Set ordered sections
+                    dispatch(setDataIsSame(orderedSectionsData));
+                    console.log(sectionsData, 'section data data after order')
+                    console.log(orderedSectionsData, 'orderedSections section data data after order')
+                    setSections(orderedSectionsData); // Set ordered sections
                 } else {
                     // If sectionOrder is invalid, use initial sections order
                     setSections(sectionsData);
+                    console.log(sectionsData, 'section data data else else')
                 }
-                console.log(sections)
+                console.log(sectionsData, 'qwertyuiasdfghjzzzzzzzzzzzzzzzz')
             } else {
                 setToastError('Something went wrong!');
             }
@@ -660,6 +671,58 @@ function QuestionnaryForm() {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: question?.question_name,
+                        component_type: question?.componentType,
+                        label: question?.label,
+                        help_text: question?.helptext,
+                        placeholder_content: question?.placeholderContent,
+                        default_content: question?.defaultContent,
+                        type: question?.type,
+                        format: question?.format,
+                        field_range: {
+                            min: question?.min,
+                            max: question?.max,
+                        },
+                        admin_field_notes: question?.note,
+                        source: question?.source,
+                        source_value:
+                            question?.source === 'fixedList' ?
+                                question?.fixedChoiceArray :
+                                question?.lookupOptionChoice
+                        ,
+                        lookup_id: question?.lookupOption,
+                        options: question?.options,
+                        default_value: question?.defaultValue,
+                        increment_by: question?.incrementby,
+                        field_texts: {
+                            pre_field_text: question?.preField,
+                            post_field_text: question?.postField
+                        },
+                        asset_extras: {
+                            draw_image: question?.draw_image,
+                            pin_drop: question?.pin_drop,
+                            include_metadata: question?.include_metadata,
+                            file_size: question?.fileSize,
+                            file_type: question?.fileType,
+                        },
+                        display_type: (() => {
+                            switch (question?.type) {
+                                case 'heading':
+                                    return { heading: question?.heading };
+                                case 'text':
+                                    return { text: question?.text };
+                                case 'image':
+                                    return { image: question?.image };
+                                case 'url':
+                                    return {
+                                        url: {
+                                            type: question?.urlType,  // Assuming urlType is a field in fieldSettingParams
+                                            value: question?.urlValue // Assuming urlValue is a field in fieldSettingParams
+                                        }
+                                    };
+                                default:
+                                    return {}; // Return an empty object if componentType doesn't match any case
+                            }
+                        })(),
                     }))
                 }))
             }
@@ -730,6 +793,7 @@ function QuestionnaryForm() {
     };
 
     const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
+        debugger
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
@@ -744,6 +808,58 @@ function QuestionnaryForm() {
                     questions: page?.questions.map(question => ({
                         question_id: question?.question_id,
                         question_name: question?.question_name,
+                        component_type: question?.componentType,
+                        label: question?.question_name,
+                        help_text: question?.helptext,
+                        placeholder_content: question?.placeholderContent,
+                        default_content:question?.defaultContent,
+                        type: question?.type,
+                        format: question?.format,
+                        field_range: {
+                            min: question?.min,
+                            max: question?.max,
+                        },
+                        admin_field_notes: question?.note,
+                        source: question?.source,
+                        source_value:
+                            question?.source === 'fixedList' ?
+                                question?.fixedChoiceArray :
+                                question?.lookupOptionChoice
+                        ,
+                        lookup_id: question?.lookupOption,
+                        options: question?.options,
+                        default_value: question?.defaultValue,
+                        increment_by: question?.incrementby,
+                        field_texts: {
+                            pre_field_text: question?.preField,
+                            post_field_text: question?.postField
+                        },
+                        asset_extras: {
+                            draw_image: question?.draw_image,
+                            pin_drop: question?.pin_drop,
+                            include_metadata: question?.include_metadata,
+                            file_size: question?.fileSize,
+                            file_type: question?.fileType,
+                        },
+                        display_type: (() => {
+                            switch (question?.type) {
+                                case 'heading':
+                                    return { heading: question?.heading };
+                                case 'text':
+                                    return { text: question?.text };
+                                case 'image':
+                                    return { image: question?.image };
+                                case 'url':
+                                    return {
+                                        url: {
+                                            type: question?.urlType,  // Assuming urlType is a field in fieldSettingParams
+                                            value: question?.urlValue // Assuming urlValue is a field in fieldSettingParams
+                                        }
+                                    };
+                                default:
+                                    return {}; // Return an empty object if componentType doesn't match any case
+                            }
+                        })(),
                         // Include other necessary fields for questions here
                     }))
                 }))
@@ -1037,9 +1153,12 @@ function QuestionnaryForm() {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+            console.log(response, 'layout')
             if (!response?.error) {
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section.id);
+                console.log(sectionOrder, 'layout section order')
+
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -1081,6 +1200,8 @@ function QuestionnaryForm() {
     useEffect(() => {
         formDefaultDetails();
         getFieldSetting();
+        // setSavedSection({})
+        // console.log(savedSection)
         dispatch(setSavedSection(sections));
     }, []);
 
