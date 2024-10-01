@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
@@ -20,8 +20,7 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [showSectionList, setShowSectionList] = useState(false)
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
-    console.log(allSectionDetails, 'allSectionDetails')
-
+    console.log(allSectionDetails?.data?.sections, 'allSectionDetails')
 
     // Handlers to switch tabs
     const handleTabClick = (tab) => {
@@ -41,6 +40,10 @@ function ConditionalLogic({ setConditionalLogic }) {
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
         dispatch(setAllSectionDetails(response.data));
     }
+    useEffect(() => {
+        handleListSectionDetails();
+    }, [])
+
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
