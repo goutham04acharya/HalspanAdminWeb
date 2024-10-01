@@ -20,7 +20,36 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [showSectionList, setShowSectionList] = useState(false)
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
-    console.log(allSectionDetails?.data?.sections, 'allSectionDetails')
+    const [inputValue, setInputValue] = useState(''); // Track input value
+    const [error, setError] = useState(''); // State to manage error message
+    const [showMethodSuggestions, setShowMethodSuggestions] = useState(false); // State to track whether to show methods
+    const [suggestions, setSuggestions] = useState([]); // For method suggestions
+    const [selectedFieldType, setSelectedFieldType] = useState('string'); // Track the selected field type
+    const textareaRef = useRef(null); // To reference the textarea
+
+
+    // Define string and date methods
+    const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()"];
+    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+
+    //this is my listing of types based on the component type
+    const getFieldType = (componentType) => {
+        let fieldType;
+
+        switch (componentType) {
+            case 'textboxfield':  // Handle both cases if they map to 'string'
+                fieldType = 'string';
+                break;
+            case 'datefield':
+                fieldType = new Date;
+                break;
+            default:
+                fieldType = 'unknown';  // Default case if componentType is not recognized
+                break;
+        }
+
+        return fieldType;
+    };
 
     // Handlers to switch tabs
     const handleTabClick = (tab) => {
@@ -44,6 +73,183 @@ function ConditionalLogic({ setConditionalLogic }) {
         handleListSectionDetails();
     }, [])
 
+    //this is my function to store the cbasic sticture of my entire questionnary object
+    function handleQuestionnaryObject(data) {
+        const result = [];
+
+        if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
+            allSectionDetails?.data?.sections.forEach((section) => {
+                const sectionObject = {
+                    section_id: section.section_id,
+                    section_name: section.section_name,
+                    pages: []
+                };
+
+                if (section.pages && section.pages.length > 0) {
+                    section.pages.forEach((page) => {
+                        const pageObject = {
+                            page_id: page.page_id,
+                            page_name: page.page_name,
+                            questions: []
+                        };
+
+                        if (page.questions && page.questions.length > 0) {
+                            page.questions.forEach((question) => {
+                                const fieldType = getFieldType(question.component_type);
+                                const questionObject = {
+                                    question_id: question.question_id,
+                                    question_name: question.question_name,
+                                    component_type: question.component_type || 'unknown', // Handle null component_type
+                                    field_type: fieldType  // Add the field type based on component_type
+
+                                };
+                                pageObject.questions.push(questionObject);
+                            });
+                        }
+
+                        sectionObject.pages.push(pageObject);
+                    });
+                }
+
+                result.push(sectionObject);
+            });
+        }
+        return result;
+    }
+
+    useEffect(() => {
+        handleQuestionnaryObject();
+    }, []);
+
+    // Handle input change and check for matches
+    const handleInputField = (event) => {
+        const value = event.target.value;
+        setInputValue(value); // Update input value
+        console.log(inputValue, 'm')
+
+        // If there's no match and input is not empty, show error
+        if (!checkForSameQueName(value) && value.trim() !== '') {
+            setError('No matching variables found.');
+        } else {
+            setError(''); // Clear error if matches found
+        }
+
+        const lastChar = value.slice(-1);
+        // If the last character is a dot, check the field type and show method suggestions
+
+        if (lastChar === '.') {
+            if (selectedFieldType === 'string') {
+                setSuggestions(stringMethods);
+                setShowMethodSuggestions(true);
+            } else if (selectedFieldType === 'date') {
+                setSuggestions(dateMethods);
+                setShowMethodSuggestions(true);
+            } else {
+                setSuggestions([]);
+                setShowMethodSuggestions(false);
+            }
+        } else {
+            setSuggestions([]);
+            setShowMethodSuggestions(false); // Reset method suggestions
+        }
+
+        // Automatically insert closing parentheses or brackets when typed
+        if (lastChar === '(') {
+            insertAtCaret(event.target, ')');
+        } else if (lastChar === '[') {
+            insertAtCaret(event.target, ']');
+        } else if (lastChar === '{') {
+            insertAtCaret(event.target, '}');
+        }
+    };
+
+    const insertAtCaret = (element, closingChar) => {
+        const start = element.selectionStart;
+        const end = element.selectionEnd;
+        const textBefore = element.value.substring(0, start);
+        const textAfter = element.value.substring(end);
+        const newText = textBefore + closingChar + textAfter;
+
+        element.value = newText;
+
+        setTimeout(() => {
+            element.selectionStart = element.selectionEnd = start;
+        }, 0);
+    };
+
+    // Combined function to insert either a question or a method
+    const handleClickToInsert = (textToInsert, isMethod = false) => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            // Insert the text at the current caret position
+            const textBefore = textarea.value.substring(0, start);
+            const textAfter = textarea.value.substring(end);
+            const newText = textBefore + textToInsert + textAfter;
+
+            // Update the textarea value
+            textarea.value = newText;
+            setInputValue(newText);  // Update the inputValue state
+
+            // Move the caret position after the inserted text
+            setTimeout(() => {
+                textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+                textarea.focus();
+            }, 0);
+        }
+
+        if (isMethod) {
+            setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
+
+        }
+    };
+
+    // Check if there are any matches based on input value
+    const checkForSameQueName = (value) => {
+        const matches = [];
+
+        allSectionDetails?.data?.sections?.forEach((section) => {
+            const sectionName = section.section_name.replace(/\s+/g, '_');
+            if (sectionName.includes(value)) {
+                matches.push(sectionName);
+            }
+
+            section.pages?.forEach((page) => {
+                const pageName = page.page_name.replace(/\s+/g, '_');
+                if (sectionName.includes(value) || pageName.includes(value)) {
+                    matches.push(`${sectionName}.${pageName}`);
+                }
+
+                page.questions?.forEach((question) => {
+                    const questionName = question.question_name ? question.question_name.replace(/\s+/g, '_') : 'No_Question_Text';
+                    if (sectionName.includes(value) || pageName.includes(value) || questionName.includes(value)) {
+                        matches.push(`${sectionName}.${pageName}.${questionName}`);
+                    }
+                });
+            });
+        });
+
+        return matches.length > 0;
+    };
+    // Your handleSave function
+    const handleSave = () => {
+        try {
+            // Assuming inputValue is the expression typed by the user
+            const result = eval(inputValue);  // Evaluate the expression
+
+            if (typeof result === 'boolean') {
+                console.log('Valid expression, result is a boolean:', result);
+                // No error message if the result is boolean
+            } else {
+                console.log('Result is not a boolean:', result);
+            }
+        } catch (error) {
+            // Handle and log any evaluation errors
+            console.error('Error evaluating the expression:', error.message);
+        }
+    };
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
@@ -53,6 +259,13 @@ function ConditionalLogic({ setConditionalLogic }) {
                     <AdvancedEditor
                         handleListSectionDetails={handleListSectionDetails}
                         showSectionList={showSectionList}
+                        inputValue={inputValue}
+                        error={error}
+                        showMethodSuggestions={showMethodSuggestions}
+                        suggestions={suggestions}
+                        handleClickToInsert={handleClickToInsert}
+                        textareaRef={textareaRef}
+                        handleInputField={handleInputField}
                     />
                 </div>
                 <div className='w-[40%]'>
@@ -60,6 +273,7 @@ function ConditionalLogic({ setConditionalLogic }) {
                         handleTabClick={handleTabClick}
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
+
                     />
                     <div className='mt-5 flex items-center justify-between'>
                         <Button2
@@ -72,6 +286,7 @@ function ConditionalLogic({ setConditionalLogic }) {
                         </Button2>
                         <Button
                             text='Save'
+                            onClick={handleSave}
                             type='button'
                             data-testid='cancel'
                             className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[59px]'
