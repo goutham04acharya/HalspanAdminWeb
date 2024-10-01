@@ -90,7 +90,7 @@ function VersionList() {
                 };
 
                 const response = await PatchAPI('questionnaires/duplicate', payload);
-
+                console.log(response.status)
                 if (response.status === 204) {
                     setToastSuccess('Version duplicated successfully.');
                     handleClose(); // Close the modal
