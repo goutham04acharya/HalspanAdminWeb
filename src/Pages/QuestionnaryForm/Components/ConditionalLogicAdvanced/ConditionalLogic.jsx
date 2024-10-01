@@ -26,7 +26,9 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [suggestions, setSuggestions] = useState([]); // For method suggestions
     const [selectedFieldType, setSelectedFieldType] = useState('string'); // Track the selected field type
     const textareaRef = useRef(null); // To reference the textarea
-
+    const [evaluatingObject, setEvaluatingObject] = useState({})
+    const [evaluatingValue, setEvaluatingValue] = useState('');
+    console.log(allSectionDetails, 'hfhdfghdgfhdsfg')
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()"];
@@ -38,13 +40,10 @@ function ConditionalLogic({ setConditionalLogic }) {
 
         switch (componentType) {
             case 'textboxfield':  // Handle both cases if they map to 'string'
-                fieldType = 'string';
+                fieldType = '';
                 break;
             case 'datefield':
-                fieldType = new Date;
-                break;
-            default:
-                fieldType = 'unknown';  // Default case if componentType is not recognized
+                fieldType = new Date();
                 break;
         }
 
@@ -74,46 +73,35 @@ function ConditionalLogic({ setConditionalLogic }) {
     }, [])
 
     //this is my function to store the cbasic sticture of my entire questionnary object
-    function handleQuestionnaryObject(data) {
-        const result = [];
-
+    function handleQuestionnaryObject() {
+        let result = {};
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
             allSectionDetails?.data?.sections.forEach((section) => {
-                const sectionObject = {
-                    section_id: section.section_id,
-                    section_name: section.section_name,
-                    pages: []
+                let sectionObject = {
+                    [section.section_name]: {}
                 };
-
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
-                        const pageObject = {
-                            page_id: page.page_id,
-                            page_name: page.page_name,
-                            questions: []
-                        };
-
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 const fieldType = getFieldType(question.component_type);
-                                const questionObject = {
-                                    question_id: question.question_id,
-                                    question_name: question.question_name,
-                                    component_type: question.component_type || 'unknown', // Handle null component_type
-                                    field_type: fieldType  // Add the field type based on component_type
+                                sectionObject[section.section_name][page.page_name] = {
+                                    ...sectionObject[section.section_name][page.page_name],
+                                    [question.question_name]: fieldType
+                                }
 
-                                };
-                                pageObject.questions.push(questionObject);
                             });
                         }
-
-                        sectionObject.pages.push(pageObject);
                     });
                 }
-
-                result.push(sectionObject);
+                result = {
+                    ...result,
+                    ...sectionObject
+                }
+                setEvaluatingObject(result);
             });
         }
+        console.log(result, 'ananahana')
         return result;
     }
 
@@ -125,6 +113,7 @@ function ConditionalLogic({ setConditionalLogic }) {
     const handleInputField = (event) => {
         const value = event.target.value;
         setInputValue(value); // Update input value
+        setEvaluatingValue(value)
         console.log(inputValue, 'm')
 
         // If there's no match and input is not empty, show error
@@ -178,7 +167,7 @@ function ConditionalLogic({ setConditionalLogic }) {
     };
 
     // Combined function to insert either a question or a method
-    const handleClickToInsert = (textToInsert, isMethod = false) => {
+    const handleClickToInsert = (textToInsert, isMethod ) => {
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -188,16 +177,18 @@ function ConditionalLogic({ setConditionalLogic }) {
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
             const newText = textBefore + textToInsert + textAfter;
+            // const newEvaluatingText = textBefore + `${isMethod? '' : 'evaluatingObject.'}${textToInsert}` + textAfter
 
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
+            // setEvaluatingValue(newEvaluatingText);
 
             // Move the caret position after the inserted text
-            setTimeout(() => {
-                textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
-                textarea.focus();
-            }, 0);
+            // setTimeout(() => {
+            //     textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+            //     textarea.focus();
+            // }, 0);
         }
 
         if (isMethod) {
@@ -236,9 +227,10 @@ function ConditionalLogic({ setConditionalLogic }) {
     // Your handleSave function
     const handleSave = () => {
         try {
-            // Assuming inputValue is the expression typed by the user
-            const result = eval(inputValue);  // Evaluate the expression
+            console.log(evaluatingValue, 'evaluatingValue');
 
+            // Assuming inputValue is the expression typed by the user
+            const result = eval(evaluatingValue);  // Evaluate the expression
             if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 // No error message if the result is boolean
