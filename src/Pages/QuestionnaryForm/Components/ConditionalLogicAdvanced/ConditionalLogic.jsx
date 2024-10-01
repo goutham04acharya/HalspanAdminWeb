@@ -24,11 +24,9 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [error, setError] = useState(''); // State to manage error message
     const [showMethodSuggestions, setShowMethodSuggestions] = useState(false); // State to track whether to show methods
     const [suggestions, setSuggestions] = useState([]); // For method suggestions
-    const [selectedFieldType, setSelectedFieldType] = useState('string'); // Track the selected field type
+    const [selectedFieldType, setSelectedFieldType] = useState(); // Track the selected field type
     const textareaRef = useRef(null); // To reference the textarea
-    const [evaluatingObject, setEvaluatingObject] = useState({})
-    const [evaluatingValue, setEvaluatingValue] = useState('');
-    console.log(allSectionDetails, 'hfhdfghdgfhdsfg')
+    const [sections, setSections] = useState({})
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()"];
@@ -78,16 +76,16 @@ function ConditionalLogic({ setConditionalLogic }) {
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
             allSectionDetails?.data?.sections.forEach((section) => {
                 let sectionObject = {
-                    [section.section_name]: {}
+                    [(section.section_name).replaceAll(' ', '_')]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 const fieldType = getFieldType(question.component_type);
-                                sectionObject[section.section_name][page.page_name] = {
-                                    ...sectionObject[section.section_name][page.page_name],
-                                    [question.question_name]: fieldType
+                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
                                 }
 
                             });
@@ -98,7 +96,7 @@ function ConditionalLogic({ setConditionalLogic }) {
                     ...result,
                     ...sectionObject
                 }
-                setEvaluatingObject(result);
+                setSections(result);
             });
         }
         console.log(result, 'ananahana')
@@ -113,7 +111,6 @@ function ConditionalLogic({ setConditionalLogic }) {
     const handleInputField = (event) => {
         const value = event.target.value;
         setInputValue(value); // Update input value
-        setEvaluatingValue(value)
         console.log(inputValue, 'm')
 
         // If there's no match and input is not empty, show error
@@ -127,10 +124,10 @@ function ConditionalLogic({ setConditionalLogic }) {
         // If the last character is a dot, check the field type and show method suggestions
 
         if (lastChar === '.') {
-            if (selectedFieldType === 'string') {
+            if (selectedFieldType === 'textboxfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'date') {
+            } else if (selectedFieldType === 'datefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
             } else {
@@ -167,7 +164,8 @@ function ConditionalLogic({ setConditionalLogic }) {
     };
 
     // Combined function to insert either a question or a method
-    const handleClickToInsert = (textToInsert, isMethod ) => {
+    const handleClickToInsert = (textToInsert, isMethod, componentType ) => {
+        console.log(componentType, 'componentType')
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -177,12 +175,10 @@ function ConditionalLogic({ setConditionalLogic }) {
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
             const newText = textBefore + textToInsert + textAfter;
-            // const newEvaluatingText = textBefore + `${isMethod? '' : 'evaluatingObject.'}${textToInsert}` + textAfter
 
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
-            // setEvaluatingValue(newEvaluatingText);
 
             // Move the caret position after the inserted text
             // setTimeout(() => {
@@ -194,6 +190,9 @@ function ConditionalLogic({ setConditionalLogic }) {
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
 
+        }else{
+            console.log(typeof textToInsert, 'mnbvcxz')
+            setSelectedFieldType(componentType)
         }
     };
 
@@ -227,10 +226,9 @@ function ConditionalLogic({ setConditionalLogic }) {
     // Your handleSave function
     const handleSave = () => {
         try {
-            console.log(evaluatingValue, 'evaluatingValue');
 
             // Assuming inputValue is the expression typed by the user
-            const result = eval(evaluatingValue);  // Evaluate the expression
+            const result = eval(inputValue);  // Evaluate the expression
             if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 // No error message if the result is boolean
@@ -242,6 +240,7 @@ function ConditionalLogic({ setConditionalLogic }) {
             console.error('Error evaluating the expression:', error.message);
         }
     };
+    console.log(sections, 'sectionssssss')
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

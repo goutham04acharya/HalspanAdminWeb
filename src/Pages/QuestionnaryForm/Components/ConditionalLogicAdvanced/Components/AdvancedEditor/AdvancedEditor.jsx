@@ -62,8 +62,8 @@ function AdvancedEditor({
 
                             return (
                                 <div key={section.section_id}>
-                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(sectionName)}>
-                                        {sectionName}
+                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(`sections.${sectionName}`)}>
+                                    sections.{sectionName}
                                     </p>
                                     {section.pages?.length > 0 ? (
                                         section.pages.map((page) => {
@@ -75,8 +75,8 @@ function AdvancedEditor({
 
                                             return (
                                                 <div key={page.page_id}>
-                                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(`${sectionName}.${pageName}`)}>
-                                                        {sectionName}.{pageName}
+                                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}`)}>
+                                                    sections.{sectionName}.{pageName}
                                                     </p>
                                                     {page.questions?.length > 0 ? (
                                                         page.questions.map((question) => {
@@ -90,9 +90,9 @@ function AdvancedEditor({
                                                                 <p
                                                                     key={question.question_id}
                                                                     className='cursor-pointer'
-                                                                    onClick={() => handleClickToInsert(`${sectionName}.${pageName}.${questionName}`)}
+                                                                    onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}.${questionName}`,false , question.component_type)}
                                                                 >
-                                                                    {sectionName}.{pageName}.{questionName}
+                                                                sections.{sectionName}.{pageName}.{questionName}
                                                                 </p>
                                                             );
                                                         })
