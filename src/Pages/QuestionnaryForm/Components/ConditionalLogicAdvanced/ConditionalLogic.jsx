@@ -27,9 +27,10 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [selectedFieldType, setSelectedFieldType] = useState(); // Track the selected field type
     const textareaRef = useRef(null); // To reference the textarea
     const [sections, setSections] = useState({})
+    const [searchResults, setSearchResults] = useState('')
 
     // Define string and date methods
-    const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()"];
+    const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "concat()", "endsWith()", "includes()", "startsWith()", "trimEnd()", "trimStart()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
 
     //this is my listing of types based on the component type
@@ -71,6 +72,32 @@ function ConditionalLogic({ setConditionalLogic }) {
         handleListSectionDetails();
     }, [])
 
+    const searchInArray = (searchTerm, dataArray) => {
+        const cleanString = (str) => str.replace(/[_\.]/g, '').toLowerCase();
+        // Helper function to search recursively
+        const searchRecursively = (obj, term) => {
+            for (const key in obj) {
+                if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    if (searchRecursively(obj[key])) return true;
+                } else if (
+                    typeof obj[key] === 'string' &&
+                    cleanString(obj[key]).includes(cleanString(term))
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        const cleanedSearchTerm = cleanString(searchTerm);
+
+        // Perform the search
+        const results = dataArray.filter(item => searchRecursively(item, cleanedSearchTerm));
+
+        // Return empty array if no results found
+        return results.length > 0 ? results : [];
+    };
+
     //this is my function to store the cbasic sticture of my entire questionnary object
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
@@ -108,13 +135,6 @@ function ConditionalLogic({ setConditionalLogic }) {
         const value = event.target.value;
         setInputValue(value); // Update input value
 
-        // If there's no match and input is not empty, show error
-        if (!checkForSameQueName(value) && value.trim() !== '') {
-            setError('No matching variables found.');
-        } else {
-            setError(''); // Clear error if matches found
-        }
-
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
 
@@ -142,6 +162,9 @@ function ConditionalLogic({ setConditionalLogic }) {
         } else if (lastChar === '{') {
             insertAtCaret(event.target, '}');
         }
+        const searchResults = searchInArray(value, allSectionDetails?.data?.sections);
+        setSearchResults(searchResults); // Assume you have a state to store search results
+
     };
 
     const insertAtCaret = (element, closingChar) => {
@@ -174,68 +197,30 @@ function ConditionalLogic({ setConditionalLogic }) {
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
 
-            // Move the caret position after the inserted text
-            // setTimeout(() => {
-            //     textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
-            //     textarea.focus();
-            // }, 0);
         }
 
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
+
 
         } else {
             setSelectedFieldType(componentType)
         }
     };
 
-    // Check if there are any matches based on input value
-    const checkForSameQueName = (value) => {
-        const matches = [];
-
-        allSectionDetails?.data?.sections?.forEach((section) => {
-            const sectionName = section.section_name.replace(/\s+/g, '_');
-            if (sectionName.includes(value)) {
-                matches.push(sectionName);
-            }
-
-            section.pages?.forEach((page) => {
-                const pageName = page.page_name.replace(/\s+/g, '_');
-                if (sectionName.includes(value) || pageName.includes(value)) {
-                    matches.push(`${sectionName}.${pageName}`);
-                }
-
-                page.questions?.forEach((question) => {
-                    const questionName = question.question_name ? question.question_name.replace(/\s+/g, '_') : 'No_Question_Text';
-                    if (sectionName.includes(value) || pageName.includes(value) || questionName.includes(value)) {
-                        matches.push(`${sectionName}.${pageName}.${questionName}`);
-                    }
-                });
-            });
-        });
-
-        return matches.length > 0;
-    };
-    // Function to subtract days
-    // function subtractDays(date, days) {
-    //     const resultDate = new Date(date);
-    //     resultDate.setDate(resultDate.getDate() - days);
-    //     return resultDate;
-    // }
 
     // Your handleSave function
     const handleSave = () => {
+        setShowSectionList(false);
         try {
 
             // Assuming inputValue is the expression typed by the user
             let evalInputValue = inputValue
                 .replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
                 .replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-                .replaceAll('AND', '&&') // Replace AND with &&
-                .replaceAll('OR', '||'); // Replace OR with ||
-            console.log(sections, 'sections')
-            // Evaluate the modified string
-            console.log(evalInputValue, 'ghghgh')
+                .replaceAll(' AND ', ' && ') // Replace AND with &&
+                .replaceAll(' OR ', ' || '); // Replace OR with ||
+
             // Evaluate the modified string
             const result = eval(evalInputValue);
 
@@ -243,6 +228,8 @@ function ConditionalLogic({ setConditionalLogic }) {
                 console.log('Valid expression, result is a boolean:', result);
                 setError(result);
                 // No error message if the result is boolean
+                // } else if(result === NaN){
+                //     setError('please pass the parameter insdie the function');
             } else {
                 console.log('Result is not a boolean:', result);
                 setError(result);
@@ -270,6 +257,7 @@ function ConditionalLogic({ setConditionalLogic }) {
                         handleClickToInsert={handleClickToInsert}
                         textareaRef={textareaRef}
                         handleInputField={handleInputField}
+
                     />
                 </div>
                 <div className='w-[40%]'>

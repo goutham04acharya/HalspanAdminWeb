@@ -11,31 +11,31 @@ function StaticDetails({
                 <div className='flex justify-between'>
                     <p
                         data-testid="pre-field-option"
-                        className={`font-semibold text-base cursor-pointer ${activeTab === 'text' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'text' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
                         onClick={() => handleTabClick('text')}
                     >
                         Text
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base cursor-pointer ${activeTab === 'number' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'number' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
                         onClick={() => handleTabClick('number')}
                     >
-                        number
+                        Number
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base cursor-pointer ${activeTab === 'date' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'date' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
                         onClick={() => handleTabClick('date')}
                     >
-                        date
+                        Date/Time
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base cursor-pointer ${activeTab === 'file' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'file' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
                         onClick={() => handleTabClick('file')}
                     >
-                        file
+                        File
                     </p>
                 </div>
                 {/* Display the Pre-field input if preField is active */}
@@ -46,19 +46,19 @@ function StaticDetails({
                             <p className='font-semibold text-base text-[#000000]'>Equals</p>
                             <p className='font-normal text-base text-[#000000]'>=(AssetName == "Door")</p>
                         </div>
-                        <div className='mt-3'>
+                        <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Includes</p>
                             <p className='font-normal text-base text-[#000000]'>=(AssetName.Includes("Door"))</p>
                         </div>
-                        <div className='mt-3'>
+                        <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Not Equal to</p>
                             <p className='font-normal text-base text-[#000000]'>=(AssetName != "Door")</p>
                         </div>
-                        <div className='mt-3'>
+                        <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Does not Include</p>
                             <p className='font-normal text-base text-[#000000]'>=(!AssetName.Includes("Door"))</p>
                         </div>
-                        <div className='mt-3'>
+                        <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
                             <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) then "Snowing" else "Raining"</p>
                         </div>

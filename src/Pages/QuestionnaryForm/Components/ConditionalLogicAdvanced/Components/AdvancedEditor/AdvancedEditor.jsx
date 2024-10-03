@@ -10,8 +10,9 @@ function AdvancedEditor({
     suggestions,
     handleClickToInsert,
     textareaRef,
-    handleInputField
- }) {
+    handleInputField,
+
+}) {
     const allSectionDetails = useSelector((state) => state?.allsectiondetails?.allSectionDetails);
 
     return (
@@ -23,6 +24,7 @@ function AdvancedEditor({
                     id="editor"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
                     onChange={(event) => { handleInputField(event) }}
+                    onMouseDown={(event) => { handleInputField(event) }}
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
@@ -38,7 +40,7 @@ function AdvancedEditor({
 
             {/* Show matching results if available */}
             {showSectionList && (
-                <div className='h-[260px] w-auto border border-[#AEB3B7] p-2.5 overflow-y-auto scrollbar_gray'>
+                <div className='h-[260px] w-[50%] border border-[#AEB3B7] p-2.5 overflow-y-auto scrollbar_gray'>
                     {/* Conditionally show method suggestions or the normal question list */}
                     {showMethodSuggestions ? (
                         <div className="suggestions-box">
@@ -56,8 +58,8 @@ function AdvancedEditor({
                         allSectionDetails?.data?.sections?.map((section) => {
                             const sectionName = section.section_name.replace(/\s+/g, '_');
 
-                            if (inputValue && !sectionName.includes(inputValue)) {
-                                return null; // Skip section if it doesn't match input
+                            if (inputValue && sectionName.includes(inputValue)) {
+                                return sectionName; // Skip section if it doesn't match input
                             }
 
                             return (
@@ -69,8 +71,8 @@ function AdvancedEditor({
                                         section.pages.map((page) => {
                                             const pageName = page.page_name.replace(/\s+/g, '_');
 
-                                            if (inputValue && !pageName.includes(inputValue)) {
-                                                return null; // Skip page if it doesn't match input
+                                            if (inputValue && pageName.includes(inputValue)) {
+                                                return pageName; // Skip page if it doesn't match input
                                             }
 
                                             return (
@@ -82,8 +84,8 @@ function AdvancedEditor({
                                                         page.questions.map((question) => {
                                                             const questionName = question.question_name ? question.question_name.replace(/\s+/g, '_') : 'No_Question_Text';
 
-                                                            if (inputValue && !questionName.includes(inputValue)) {
-                                                                return null; // Skip question if it doesn't match input
+                                                            if (inputValue && questionName.includes(inputValue)) {
+                                                                return questionName; // Skip question if it doesn't match input
                                                             }
 
                                                             return (
