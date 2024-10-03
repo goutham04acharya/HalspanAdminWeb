@@ -90,7 +90,7 @@ function AdvancedEditor({
                                                                 <p
                                                                     key={question.question_id}
                                                                     className='cursor-pointer'
-                                                                    onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}.${questionName}`,false , question.component_type)}
+                                                                    onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}.${questionName}`,false, question.component_type)}
                                                                 >
                                                                 sections.{sectionName}.{pageName}.{questionName}
                                                                 </p>

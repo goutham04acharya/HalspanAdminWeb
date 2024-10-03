@@ -65,13 +65,14 @@ function ConditionalLogic({ setConditionalLogic }) {
         setShowSectionList(true)
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
         dispatch(setAllSectionDetails(response.data));
+        handleQuestionnaryObject(response.data);
     }
     useEffect(() => {
         handleListSectionDetails();
     }, [])
 
     //this is my function to store the cbasic sticture of my entire questionnary object
-    function handleQuestionnaryObject() {
+    function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
             allSectionDetails?.data?.sections.forEach((section) => {
@@ -99,19 +100,13 @@ function ConditionalLogic({ setConditionalLogic }) {
                 setSections(result);
             });
         }
-        console.log(result, 'ananahana')
-        return result;
     }
 
-    useEffect(() => {
-        handleQuestionnaryObject();
-    }, []);
 
     // Handle input change and check for matches
     const handleInputField = (event) => {
         const value = event.target.value;
         setInputValue(value); // Update input value
-        console.log(inputValue, 'm')
 
         // If there's no match and input is not empty, show error
         if (!checkForSameQueName(value) && value.trim() !== '') {
@@ -164,8 +159,7 @@ function ConditionalLogic({ setConditionalLogic }) {
     };
 
     // Combined function to insert either a question or a method
-    const handleClickToInsert = (textToInsert, isMethod, componentType ) => {
-        console.log(componentType, 'componentType')
+    const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -190,8 +184,7 @@ function ConditionalLogic({ setConditionalLogic }) {
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
 
-        }else{
-            console.log(typeof textToInsert, 'mnbvcxz')
+        } else {
             setSelectedFieldType(componentType)
         }
     };
@@ -223,24 +216,44 @@ function ConditionalLogic({ setConditionalLogic }) {
 
         return matches.length > 0;
     };
+    // Function to subtract days
+    // function subtractDays(date, days) {
+    //     const resultDate = new Date(date);
+    //     resultDate.setDate(resultDate.getDate() - days);
+    //     return resultDate;
+    // }
+
     // Your handleSave function
     const handleSave = () => {
         try {
 
             // Assuming inputValue is the expression typed by the user
-            const result = eval(inputValue);  // Evaluate the expression
+            let evalInputValue = inputValue
+                .replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
+                .replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+                .replaceAll('AND', '&&') // Replace AND with &&
+                .replaceAll('OR', '||'); // Replace OR with ||
+            console.log(sections, 'sections')
+            // Evaluate the modified string
+            console.log(evalInputValue, 'ghghgh')
+            // Evaluate the modified string
+            const result = eval(evalInputValue);
+
             if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
+                setError(result);
                 // No error message if the result is boolean
             } else {
                 console.log('Result is not a boolean:', result);
+                setError(result);
             }
         } catch (error) {
             // Handle and log any evaluation errors
             console.error('Error evaluating the expression:', error.message);
+            setError(error.message);
+
         }
     };
-    console.log(sections, 'sectionssssss')
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
