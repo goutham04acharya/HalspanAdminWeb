@@ -426,7 +426,7 @@ const QuestionnaryForm = () => {
             setSections(SectionData);
 
             // Call handleSaveSection with the updated section data
-            if (!isSectionSaved[sectionId]) {
+            if (isSectionSaved[sectionId]) {
                 handleSaveSection(sectionId, SectionData, false);
             }
             setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
@@ -449,7 +449,7 @@ const QuestionnaryForm = () => {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
-            if (!isSectionSaved[sectionId]) {
+            if (isSectionSaved[sectionId]) {
                 handleSaveSection(sectionId, false);
             }
             setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
@@ -474,7 +474,7 @@ const QuestionnaryForm = () => {
                 }
                 return section;
             });
-            if (!isSectionSaved[sectionId]) {
+            if (isSectionSaved[sectionId]) {
                 handleSaveSection(sectionId, currentSectionData, false); // Call auto-save function 
             }
 
