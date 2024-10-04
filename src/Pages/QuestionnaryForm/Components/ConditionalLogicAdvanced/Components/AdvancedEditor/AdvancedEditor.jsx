@@ -24,15 +24,21 @@ function AdvancedEditor({
         const value = event.target.value;
         setSearchInput(value);
 
-        if (value) {
-            const filteredData = secDetailsForSearching.filter((item) => 
+        if (value.trim() !== '') { // Only filter if something is typed
+            const filteredData = secDetailsForSearching.filter((item) =>
                 item.toLowerCase().includes(value.toLowerCase())
             );
-            setFilteredSuggestions(filteredData);
+            setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
         } else {
-            setFilteredSuggestions([]);
+            // If input is cleared, show all suggestions
+            setFilteredSuggestions(secDetailsForSearching);
         }
     };
+
+    // Populate all items initially
+    useEffect(() => {
+        setFilteredSuggestions(secDetailsForSearching);
+    }, [secDetailsForSearching]); // This will run whenever secDetailsForSearching changes
 
     return (
         <div className='mr-[18px] mt-[8%]'>
@@ -75,7 +81,7 @@ function AdvancedEditor({
                             ))}
                         </div>
                     ) : (
-                        // Filtered suggestions based on the user's input
+                        // Show filtered suggestions or "No items found" if none match
                         filteredSuggestions.length > 0 ? (
                             filteredSuggestions.map((suggestion, index) => (
                                 <div
@@ -87,16 +93,7 @@ function AdvancedEditor({
                                 </div>
                             ))
                         ) : (
-                            // Fallback to all suggestions if no input
-                            secDetailsForSearching.map((suggestion, index) => (
-                                <div
-                                    key={index}
-                                    className="cursor-pointer"
-                                    onClick={() => handleClickToInsert(suggestion)}
-                                >
-                                    {suggestion}
-                                </div>
-                            ))
+                            searchInput.trim() !== '' && <div className='text-red-500 mt-2'>No items found</div>
                         )
                     )}
                 </div>
