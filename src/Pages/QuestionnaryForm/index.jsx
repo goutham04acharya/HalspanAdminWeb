@@ -395,13 +395,15 @@ const QuestionnaryForm = () => {
                 setSections(SectionData);
 
                 // Call handleSaveSection with the updated section data
-                if (!isSectionSaved[sectionId]) {
+                if (isSectionSaved[sectionId] ) {
                     handleSaveSection(sectionId, SectionData, false);
                 }
             } else {
                 setToastError("Limit reached: Maximum of 20 pages allowed.");
                 return; // Exit the function if the limit is reached
             }
+            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
+            console.log(isSectionSaved)
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             dispatch(setSelectedQuestionId(false));
@@ -427,10 +429,10 @@ const QuestionnaryForm = () => {
             if (!isSectionSaved[sectionId]) {
                 handleSaveSection(sectionId, SectionData, false);
             }
-
+            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
 
-        setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
+        
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
@@ -678,7 +680,7 @@ const QuestionnaryForm = () => {
             removeKeys(body);
 
             try {
-                if (!isDataSame) {
+                if (isSaving) {
                     // ... call the API ...  
                     const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                     // console.log(body, 'body')
@@ -686,6 +688,7 @@ const QuestionnaryForm = () => {
                     if (!(response?.data?.error)) {
 
                         setToastSuccess(response?.data?.message);
+
 
 
                         // Update the saved status  
