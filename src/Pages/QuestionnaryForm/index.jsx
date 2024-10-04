@@ -76,12 +76,14 @@ const QuestionnaryForm = () => {
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
+    const [saveClick, setSaveClick] = useState(false)
+    const [isSectionSaved, setIsSectionSaved] = useState({});
 
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
             setLatestSectionId(lastSection.section_id);
-            handleSectionSaveOrder(sections)
+            // handleSectionSaveOrder(sections)
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
@@ -99,31 +101,6 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         handleAddRemoveSection('remove', sectionToDelete); // Trigger the deletion     
-    //         dispatch(setModalOpen(false)); // Close the modal  
-    //         handleSectionSaveOrder(sections);
-    //         setTimeout(() => {
-    //             window.location.reload();
-    //         }, 2000); // 2 second delay  
-    //     }
-    // }
-
-    // const confirmDeletePage = () => {
-    //     if (pageToDelete.sectionIndex !== null && pageToDelete.pageIndex !== null) { // Check if indices are valid
-    //         handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex, selectedSectionData); // Pass selectedSectionData instead of undefined pageData
-    //         dispatch(setShowPageDeleteModal(false));
-    //     }
-    // }
-
-    // const confirmDeleteQuestion = () => {
-    //     if (questionToDelete.sectionIndex !== null && questionToDelete.pageIndex !== null && questionToDelete.questionIndex !== null) {
-    //         handleAddRemoveQuestion('remove', questionToDelete.sectionIndex, questionToDelete.pageIndex, questionToDelete.questionIndex);
-    //         dispatch(setShowquestionDeleteModal(false));
-    //     }
-    // };
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -317,31 +294,8 @@ const QuestionnaryForm = () => {
         }));;
     };
 
-    // const removeIndexAndShift = (indexToRemove) => {
-    //     // Create a copy of the current state
-    //     const newState = { ...isSameData };
-
-    //     // Check if the key exists, and if so, delete it
-    //     if (newState.hasOwnProperty(indexToRemove)) {
-    //         delete newState[indexToRemove];
-    //     }
-
-    //     // Dispatch the updated state back to Redux
-    //     dispatch(setDataIsSame(newState));
-    // };
-
     const handleAddRemoveSection = (event, sectionIndex) => {
-        // debugger
-        console.log(sections,'before')
         if (event === 'add') {
-            // const len = sections?.length;
-            // // console.log(sections, 'inside handleAddRemoveSection')
-            // if (len > 0) {
-            //     // Call handleSectionSaveOrder with the current sections before adding a new one
-            //     handleSectionSaveOrder(sections);
-            //     handleSaveSection(sections[len - 1].section_id, false);
-            // }
-
             const sectionId = `SEC-${uuidv4()}`;
             const pageId = `${sectionId}_PG-${uuidv4()}`;
             const newSection = {
@@ -353,17 +307,12 @@ const QuestionnaryForm = () => {
                     questions: []
                 }],
             };
-            // console.log(newSection, 'new section')
             setSections((prevSections) => {
-                // console.log(prevSections, 'prev sections')
-                // console.log(newSection, 'new section')
                 const updatedSections = prevSections.concat(newSection);
-                // console.log(updatedSections, 'updated sections')
                 handleSectionSaveOrder(updatedSections); // Call handleSectionSaveOrder with the updated sections   
                 return updatedSections;
             })
 
-            // console.log(sections, 'updated sections')
             setTimeout(() => {
                 sectionRefs.current[sections && sections.length]?.scrollIntoView({ behavior: 'smooth' });
             }, 400);
@@ -377,7 +326,6 @@ const QuestionnaryForm = () => {
 
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
-            // dispatch(setSelectedQuestionId(false))
             dispatch(setSelectedQuestionId(false))
             dispatch(setSelectedAddQuestion({}));
             dispatch(setSelectedComponent(''));
@@ -402,21 +350,16 @@ const QuestionnaryForm = () => {
             sections = sections?.splice(0, sectionIndex);
             setSections([...sections]);
         }
-
     };
     const confirmDeletePage = () => {
-        // console.log('confirmDeletePage called with pageToDelete:', pageToDelete);
         if (pageToDelete.sectionIndex !== null && pageToDelete.pageIndex !== null) {
-            // console.log('Deleting page with ID:', sections[pageToDelete.sectionIndex].pages[pageToDelete.pageIndex].page_id);
             handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex, sections[pageToDelete.sectionIndex].section_id);
             dispatch(setShowPageDeleteModal(false));
         }
     }
 
     const confirmDeleteQuestion = () => {
-        // console.log('confirmDeleteQuestion called with questionToDelete:', questionToDelete);
         if (questionToDelete.sectionIndex !== null && questionToDelete.pageIndex !== null && questionToDelete.questionIndex !== null) {
-            // console.log('Deleting question with ID:', sections[questionToDelete.sectionIndex].pages[questionToDelete.pageIndex].questions[questionToDelete.questionIndex].question_id);
             handleAddRemoveQuestion('remove', questionToDelete.sectionIndex, questionToDelete.pageIndex, questionToDelete.questionIndex, sections[questionToDelete.sectionIndex].pages[questionToDelete.pageIndex].page_id);
             dispatch(setShowquestionDeleteModal(false));
         }
@@ -424,7 +367,6 @@ const QuestionnaryForm = () => {
 
 
     const handleAddRemovePage = (event, sectionIndex, pageIndex, sectionId) => {
-        // console.log('handleAddRemovePage called with event:', event, 'sectionIndex:', sectionIndex, 'pageIndex:', pageIndex, 'sectionId:', sectionId);
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
         update[sectionId] = false;
@@ -452,8 +394,10 @@ const QuestionnaryForm = () => {
                 // Update the state with the new sections array
                 setSections(SectionData);
 
-                // Call handleAutoSave with the updated section data
-                handleAutoSave(sectionId, SectionData);
+                // Call handleSaveSection with the updated section data
+                if (!isSectionSaved[sectionId]) {
+                    handleSaveSection(sectionId, SectionData, false);
+                }
             } else {
                 setToastError("Limit reached: Maximum of 20 pages allowed.");
                 return; // Exit the function if the limit is reached
@@ -479,18 +423,22 @@ const QuestionnaryForm = () => {
             // Update the state with the new sections array
             setSections(SectionData);
 
-            // Call handleAutoSave with the updated section data
-            handleAutoSave(sectionId, SectionData, pageId);
+            // Call handleSaveSection with the updated section data
+            if (!isSectionSaved[sectionId]) {
+                handleSaveSection(sectionId, SectionData, false);
+            }
+
         }
+
+        setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        // console.log('handleAddRemoveQuestion called with event:', event, 'sectionIndex:', sectionIndex, 'pageIndex:', pageIndex, 'questionIndex:', questionIndex, 'pageId:', pageId);
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
         dispatch(setDataIsSame(update));
-
+        const sectionId = sections[sectionIndex].section_id;
         if (event === 'add') {
             if (currentPageData.questions.length < 20) {
                 dispatch(setSelectedAddQuestion({ sectionIndex, pageIndex, questionIndex, pageId }));
@@ -499,6 +447,10 @@ const QuestionnaryForm = () => {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
+            if (!isSectionSaved[sectionId]) {
+                handleSaveSection(sectionId, false);
+            }
+            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         } else if (event === 'remove') {
             dispatch(setSelectedQuestionId(false));
             dispatch(setSelectedAddQuestion({}));
@@ -520,8 +472,11 @@ const QuestionnaryForm = () => {
                 }
                 return section;
             });
+            if (!isSectionSaved[sectionId]) {
+                handleSaveSection(sectionId, currentSectionData, false); // Call auto-save function 
+            }
 
-            handleAutoSave(sectionId, currentSectionData, '', questionId); // Call auto-save function
+            setIsSectionSaved(prevState => ({ ...prevState, [pageId.split('_')[0]]: false }));
         }
 
         // Reset the selected component
@@ -539,18 +494,7 @@ const QuestionnaryForm = () => {
         })]);
     };
 
-    // API to get the fieldSettingData 
-
-    // const getFieldSetting = async () => {
-    //     const response = await getAPI(`field-settings/${questionnaire_id}`);
-    //     // console.log(response, 'Field Settigs Old API')
-    //     if (!response.error) {
-    //         dispatch(setInitialData(response?.data?.data?.items))
-    //     } else {
-    //         setToastError('Something went wrong!')
-    //     }
-    // }
-
+    // API call to get form details with field settings
     const formDefaultDetails = useCallback(async () => {
         setPageLoading(true);
         try {
@@ -618,53 +562,7 @@ const QuestionnaryForm = () => {
         }
     }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
 
-    // API calling function
-    // const formDefaultDetails = useCallback(async () => {
-    //     setPageLoading(true);
-    //     try {
-    //         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-    //         if (!response?.error) {
-    //             dispatch(setFormDefaultInfo(response?.data?.data));
-    //             const sectionsData = response?.data?.data?.sections || [];
-
-    //             const sectionOrder = await GetSectionOrder();
-
-    //             if (sectionOrder === 'no_data') {
-    //                 setSections(sectionsData);
-    //                 return;
-    //             }
-
-    //             // If sectionOrder is valid, proceed with sorting
-    //             if (sectionOrder) {
-    //                 const orderedSections = sectionOrder.map(orderId =>
-    //                     sectionsData.find(section => section.section_id === orderId)
-    //                 ).filter(Boolean); // Filter out any undefined sections
-
-    //                 // Create an object with section_id as the key and true as the value
-    //                 const updatedSections = orderedSections.reduce((acc, section) => {
-    //                     acc[section.section_id] = true;
-    //                     return acc;
-    //                 }, {});
-
-    //                 dispatch(setDataIsSame(updatedSections));
-    //                 setSections(orderedSections); // Set ordered sections
-    //             } else {
-    //                 // If sectionOrder is invalid, use initial sections order
-    //                 setSections(sectionsData);
-    //             }
-    //         } else {
-    //             setToastError('Something went wrong fetching form details');
-    //         }
-    //     } catch (error) {
-    //         setToastError('An error occurred during the API call');
-    //     } finally {
-    //         setPageLoading(false);
-    //     }
-    // }, [getAPI, questionnaire_id, version_number, dispatch, setFormDefaultInfo, setDataIsSame, setToastError]);
-
-    //API for deleteing the section
     const handleDeleteSection = async (sectionId) => {
-        // console.log('handleDeleteSection called with sectionId:', sectionId);
         try {
             const response = await DeleteAPI(`questionnaires/${questionnaire_id}/${version_number}?section_id=${sectionId}`);
             if (response?.data?.status === 200) {
@@ -684,7 +582,7 @@ const QuestionnaryForm = () => {
 
 
 
-    const handleSaveSection = async (sectionId) => {
+    const handleSaveSection = async (sectionId, isSaving = true) => {
         handleSectionSaveOrder(sections)
         console.log(sections, 'after save')
         // Find the section to save  
@@ -692,6 +590,11 @@ const QuestionnaryForm = () => {
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
 
         if (sectionToSave) {
+            const isDataSame = dataIsSame[sectionId];
+            if (isDataSame) {
+                // If data is the same, return early and don't call the API  
+                return;
+            }
             // Create a new object containing only the selected section's necessary fields  
             let body = {
                 section_id: sectionToSave.section_id,
@@ -775,19 +678,27 @@ const QuestionnaryForm = () => {
             removeKeys(body);
 
             try {
-                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                // console.log(body, 'body')
+                if (!isDataSame) {
+                    // ... call the API ...  
+                    const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                    // console.log(body, 'body')
+                    setSaveClick(true)
+                    if (!(response?.data?.error)) {
 
-                if (!(response?.data?.error)) {
-                    setToastSuccess(response?.data?.message);
-                    // Update the saved status  
-                    const update = { ...dataIsSame };
-                    update[sections[sectionIndex].section_id] = true;
+                        setToastSuccess(response?.data?.message);
 
-                    dispatch(setDataIsSame(update));
-                } else {
-                    setToastError('Something went wrong.');
+
+                        // Update the saved status  
+                        const update = { ...dataIsSame };
+                        update[sections[sectionIndex].section_id] = true;
+
+                        dispatch(setDataIsSame(update));
+
+                    } else {
+                        setToastError('Something went wrong.');
+                    }
                 }
+
             } catch (error) {
                 setToastError('Something went wrong.');
             }
@@ -820,125 +731,8 @@ const QuestionnaryForm = () => {
         // Update the sections state
         setSections(updatedSections);
 
-        // Call handleAutoSave with the section ID and updated sections
-        handleAutoSave(updatedSections[sectionIndex]?.section_id, updatedSections);
-    };
-
-    const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
-        // debugger
-        // Find the section to save
-        const sectionToSave = updatedData.find(section => section.section_id === sectionId);
-        const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
-        if (sectionToSave) {
-            // Create a new object containing only the selected section's necessary fields
-            let body = {
-                section_id: sectionToSave?.section_id,
-                section_name: sectionToSave?.section_name,
-                pages: sectionToSave?.pages.map(page => ({
-                    page_id: page?.page_id,
-                    page_name: page?.page_name,
-                    questions: page?.questions.map(question => ({
-                        question_id: question?.question_id,
-                        question_name: question?.question_name,
-                        component_type: fieldSettingParams[question.question_id]?.componentType,
-                        label: fieldSettingParams[question.question_id]?.question_name,
-                        help_text: fieldSettingParams[question.question_id]?.helptext,
-                        placeholder_content: fieldSettingParams[question.question_id]?.placeholderContent,
-                        default_content: fieldSettingParams[question.question_id]?.defaultContent,
-                        type: question?.type,
-                        format: question?.format,
-                        field_range: {
-                            min: question?.min,
-                            max: question?.max,
-                        },
-                        admin_field_notes: question?.note,
-                        source: question?.source,
-                        source_value:
-                            question?.source === 'fixedList' ?
-                                question?.fixedChoiceArray :
-                                question?.lookupOptionChoice
-                        ,
-                        lookup_id: question?.lookupOption,
-                        options: question?.options,
-                        default_value: question?.defaultValue,
-                        increment_by: question?.incrementby,
-                        field_texts: {
-                            pre_field_text: question?.preField,
-                            post_field_text: question?.postField
-                        },
-                        asset_extras: {
-                            draw_image: question?.draw_image,
-                            pin_drop: question?.pin_drop,
-                            include_metadata: question?.include_metadata,
-                            file_size: question?.fileSize,
-                            file_type: question?.fileType,
-                        },
-                        display_type: (() => {
-                            switch (question?.type) {
-                                case 'heading':
-                                    return { heading: question?.heading };
-                                case 'text':
-                                    return { text: question?.text };
-                                case 'image':
-                                    return { image: question?.image };
-                                case 'url':
-                                    return {
-                                        url: {
-                                            type: question?.urlType,  // Assuming urlType is a field in fieldSettingParams
-                                            value: question?.urlValue // Assuming urlValue is a field in fieldSettingParams
-                                        }
-                                    };
-                                default:
-                                    return {}; // Return an empty object if componentType doesn't match any case
-                            }
-                        })(),
-                        // Include other necessary fields for questions here
-                    }))
-                }))
-            };
-
-            // Recursive function to remove specified keys
-            const removeKeys = (obj) => {
-                if (Array.isArray(obj)) {
-                    obj.forEach(removeKeys);
-                } else if (typeof obj === 'object' && obj !== null) {
-                    delete obj.created_at;
-                    delete obj.updated_at;
-                    delete obj.questionnaire_id;
-                    delete obj.version_number;
-                    Object.values(obj).forEach(removeKeys);
-                }
-            };
-
-            // Remove keys from the cloned body
-            removeKeys(body);
-
-            const queryParams = [];
-
-            if (pageId) {
-                queryParams.push(`page_deleted=${pageId}`);
-            }
-
-            if (questionId) {
-                queryParams.push(`question_deleted=${questionId}`);
-            }
-
-            const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
-
-            try {
-                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}${queryString}`, body);
-                if (!(response?.data?.error)) {
-                    // Update the saved status
-                    const update = { ...dataIsSame };
-                    update[sections[sectionIndex].section_id] = true;
-                    dispatch(setDataIsSame(update));
-                } else {
-                    setToastError('Something went wrong');
-                }
-            } catch (error) {
-                setToastError('Something went wrong');
-            }
-        }
+        // Call handleSaveSection with the section ID and updated sections
+        handleSaveSection(updatedSections[sectionIndex]?.section_id, updatedSections);
     };
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
@@ -1084,22 +878,19 @@ const QuestionnaryForm = () => {
             }
         });
         // Auto-save the settings
-        handleAutoSave();
+        handleSaveSection();
     };
 
     // 
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
-        // console.log('handleDeleteModal called with sectionIndex:', sectionIndex);
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete  
         dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
     }
 
     const confirmDeleteSection = () => {
-        // console.log('confirmDeleteSection called with sectionToDelete:', sectionToDelete);
         if (sectionToDelete !== null) {
-            // console.log('Deleting section with ID:', sections[sectionToDelete].section_id);
             handleDeleteSection(sections[sectionToDelete].section_id);
             handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
             dispatch(setModalOpen(false)); // Close the modal  
@@ -1114,11 +905,9 @@ const QuestionnaryForm = () => {
                 id: section.section_id
             }))
         }
-        // console.log(body, 'body')
         console.log(updatedSection, 'updated section dafafddafdafad')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
-            // // console.log(response, 'sdfjaijjafj')
             if (!(response?.data?.error)) {
                 // Success
             } else {
@@ -1132,14 +921,11 @@ const QuestionnaryForm = () => {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            // console.log(response, 'layout')
             console.log(response, 'response get api layout')
             if (!response?.error) {
 
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section?.id);
-                // console.log(sectionOrder, 'layout section order')
-
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -1153,19 +939,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-    // const onDragEnd = (result) => {
-    //     if (!result.destination) return;
-
-    //     const reorderedItems = Array.from(sections || []);
-    //     const [removed] = reorderedItems.splice(result.source.index, 1);
-    //     reorderedItems.splice(result.destination.index, 0, removed);
-
-    //     setExpandedSections({ 0: false })
-    //     // console.log("nnnnn", reorderedItems)
-    //     setSections(reorderedItems);
-    //     dispatch(setSavedSection(reorderedItems));
-    //     handleSectionSaveOrder(reorderedItems);
-    // };
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
@@ -1175,17 +948,15 @@ const QuestionnaryForm = () => {
         reorderedItems.splice(result.destination.index, 0, removed);
 
         setExpandedSections({ 0: false })
-        // console.log("nnnnn", reorderedItems)
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
         handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
-        // console.log(reorderedItems, "reaoedereditems")
     }
 
 
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
-        handleAutoSave(sectionId, sections);
+        handleSaveSection(sectionId, sections);
     }
     //this is for diplay content field replace modal function
     const handleConfirmReplace = () => {
@@ -1195,23 +966,19 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         formDefaultDetails();
-        // getFieldSetting();
-        // setSavedSection({})
-        // // console.log(savedSection)
         dispatch(setSavedSection(sections));
+        console.log(sections, 'inside useEffect')
     }, []);
 
     useEffect(() => {
         if (shouldAutoSave) {
             const questionId = selectedQuestionId.split('_')[0]
             const sectionId = version_number + '_' + questionId
-            // // console.log(version_number,'version number')
-            // // console.log(sectionId,"section id")
-            handleAutoSave(sectionId, sections);
+            handleSaveSection(sectionId);
             dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
         }
     }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-    // console.log(sections, 'sections')
+
     return (
         <>
             {pageLoading ? (
@@ -1295,16 +1062,23 @@ const QuestionnaryForm = () => {
 
                                                                             }} // Open modal instead of directly deleting
                                                                         />
-                                                                        <img src="/Images/save.svg"
-                                                                            alt="Save"
-                                                                            title='Save'
+                                                                        <img
+                                                                            src="/Images/save.svg"
+                                                                            alt="save"
+                                                                            title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF] mr-6'
+                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 ${dataIsSame[sectionData.section_id]
+                                                                                ? "cursor-not-allowed"
+                                                                                : "cursor-pointer"
+                                                                                }`}
                                                                             onClick={() => {
-                                                                                handleSaveSection(sectionData.section_id);
-
+                                                                                if (!dataIsSame[sectionData.section_id])
+                                                                                    handleSaveSection(sectionData?.section_id);
                                                                             }}
                                                                         />
+
+
+
                                                                     </div>
                                                                 </div>
                                                                 <Sections
@@ -1320,7 +1094,7 @@ const QuestionnaryForm = () => {
                                                                     sections={sections}
                                                                     handleAddRemovePage={handleAddRemovePage}
                                                                     handleSaveSection={handleSaveSection}
-                                                                    handleAutoSave={handleAutoSave}
+                                                                    handleAutoSave={handleSaveSection}
                                                                     handleDeleteModal={handleDeleteModal}
                                                                 />
                                                             </li>
