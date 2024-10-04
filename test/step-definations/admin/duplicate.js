@@ -57,5 +57,112 @@ When('I click the confirm duplicate button', async function () {
 
 Then('I should see the new version created', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="version-0"]`)));
+    const versionName = await driver.wait(until.elementLocated(By.css(`[data-testid="version-0"]`))).getText();
+    assert.equal(versionName, 'Version 2')
+});
+
+When('I save all the data inside the version about to be duplicated', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+
+    await driver.wait(until.elementLocated(By.css(`[data-testid="version-0"]`))).click();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-page-sec-0"]'))).click();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
+    console.log('pass 1');
+
+    await driver.wait(until.elementLocated(By.css('.default-sidebar')), 10000);
+    console.log('pass 2');
+
+    let i = 0;
+    this.sectionData = {};
+    while (true) {
+        try {
+            const section = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${i}"]`)), 3000);
+            const sectionName = await section.getText();
+            console.log(`Section ${i}: ${sectionName}`);
+            this.sectionData[sectionName] = [];
+            await section.click();
+            i++;
+        } catch (error) {
+            console.log(`No more sections found after index ${i - 1}`);
+            break;
+        }
+    }
+
+    console.log('All sections:', Object.keys(this.sectionData));
+    for (let i = 0; i < Object.keys(this.sectionData).length; i++) {
+        const sectionName = Object.keys(this.sectionData)[i];
+        console.log(`Processing ${sectionName}`);
+
+        let k = 0;
+
+        while (true) {
+            try {
+                // eslint-disable-next-line max-len
+                const page = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${i}-page-${k}"]`)), 3000);
+                const pageName = await page.getText();
+                console.log(`Page ${k}: ${pageName}`);
+                this.sectionData[sectionName].push(pageName);
+                k++;
+            } catch (error) {
+                console.log(`No more pages found after index ${k - 1} in section ${sectionName}`);
+                break;
+            }
+        }
+    }
+
+    console.log('Final section data:', this.sectionData);
+    await driver.navigate().back();
+});
+
+Then('I should see exact duplication of the selected version', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="version-0"]`))).click();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const actualSectionData = {};
+    await driver.wait(until.elementLocated(By.css('.default-sidebar')), 10000);
+    let i = 0;
+    while (true) {
+        try {
+            const section = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${i}"]`)), 3000);
+            const sectionName = await section.getText();
+            console.log(`Found Section: ${sectionName}`);
+            actualSectionData[sectionName] = [];
+            await section.click();
+
+            let k = 0;
+            while (true) {
+                try {
+                    // eslint-disable-next-line max-len
+                    const page = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${i}-page-${k}"]`)), 3000);
+                    const pageName = await page.getText();
+                    console.log(`Found Page ${k}: ${pageName}`);
+                    actualSectionData[sectionName].push(pageName);
+                    k++;
+                } catch (error) {
+                    console.log(`No more pages found after index ${k - 1} in section ${sectionName}`);
+                    break;
+                }
+            }
+
+            i++;
+        } catch (error) {
+            console.log(`No more sections found after index ${i - 1}`);
+            break;
+        }
+    }
+    console.log('Actual section data:', actualSectionData);
+    for (const section in this.sectionData) {
+        if (JSON.stringify(actualSectionData[section]) !== JSON.stringify(this.sectionData[section])) {
+            // eslint-disable-next-line max-len
+            throw new Error(`Data mismatch for ${section}: expected ${JSON.stringify(this.sectionData[section])}, got ${JSON.stringify(actualSectionData[section])}`);
+        }
+    }
+
+    console.log('All sections match the expected data!');
+    await driver.navigate().back();
 });
