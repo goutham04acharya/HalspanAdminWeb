@@ -12,7 +12,7 @@ import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
 
 
-function ConditionalLogic({ setConditionalLogic }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -27,7 +27,9 @@ function ConditionalLogic({ setConditionalLogic }) {
     const [selectedFieldType, setSelectedFieldType] = useState(); // Track the selected field type
     const textareaRef = useRef(null); // To reference the textarea
     const [sections, setSections] = useState({})
-    const [searchResults, setSearchResults] = useState('')
+    const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
+    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "concat()", "endsWith()", "includes()", "startsWith()", "trimEnd()", "trimStart()"];
@@ -62,9 +64,37 @@ function ConditionalLogic({ setConditionalLogic }) {
         dispatch(setModalOpen(false));
     });
 
+    //function for filtering the search
+    const filterSectionDetails = () => {
+        // Initialize an empty array to hold the flattened details
+        const sectionDetailsArray = [];
+
+        // Access the sections from the data object
+        allSectionDetails?.data?.sections?.forEach((section) => {
+            const sectionName = section.section_name.replace(/\s+/g, '_');
+            sectionDetailsArray.push(sectionName); // Add the section name
+
+            // Access pages within each section
+            section.pages?.forEach((page) => {
+                const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
+                sectionDetailsArray.push(pageName); // Add section.page
+
+                // Access questions within each page
+                page.questions?.forEach((question) => {
+                    const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                    sectionDetailsArray.push(questionName); // Add section.page.question
+                });
+            });
+        });
+
+        // Return the array containing all the details
+        setSecDetailsForSearching(sectionDetailsArray);
+    };
+
     const handleListSectionDetails = async () => {
         setShowSectionList(true)
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
+        console.log(response, 'respoo')
         dispatch(setAllSectionDetails(response.data));
         handleQuestionnaryObject(response.data);
     }
@@ -72,31 +102,11 @@ function ConditionalLogic({ setConditionalLogic }) {
         handleListSectionDetails();
     }, [])
 
-    const searchInArray = (searchTerm, dataArray) => {
-        const cleanString = (str) => str.replace(/[_\.]/g, '').toLowerCase();
-        // Helper function to search recursively
-        const searchRecursively = (obj, term) => {
-            for (const key in obj) {
-                if (typeof obj[key] === 'object' && obj[key] !== null) {
-                    if (searchRecursively(obj[key])) return true;
-                } else if (
-                    typeof obj[key] === 'string' &&
-                    cleanString(obj[key]).includes(cleanString(term))
-                ) {
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        const cleanedSearchTerm = cleanString(searchTerm);
-
-        // Perform the search
-        const results = dataArray.filter(item => searchRecursively(item, cleanedSearchTerm));
-
-        // Return empty array if no results found
-        return results.length > 0 ? results : [];
-    };
+    useEffect(() => {
+        if (allSectionDetails) {
+            filterSectionDetails(); // Call this when the state is updated
+        }
+    }, [allSectionDetails]);
 
     //this is my function to store the cbasic sticture of my entire questionnary object
     function handleQuestionnaryObject(allSectionDetails) {
@@ -128,7 +138,6 @@ function ConditionalLogic({ setConditionalLogic }) {
             });
         }
     }
-
 
     // Handle input change and check for matches
     const handleInputField = (event) => {
@@ -162,8 +171,6 @@ function ConditionalLogic({ setConditionalLogic }) {
         } else if (lastChar === '{') {
             insertAtCaret(event.target, '}');
         }
-        const searchResults = searchInArray(value, allSectionDetails?.data?.sections);
-        setSearchResults(searchResults); // Assume you have a state to store search results
 
     };
 
@@ -207,7 +214,6 @@ function ConditionalLogic({ setConditionalLogic }) {
             setSelectedFieldType(componentType)
         }
     };
-
 
     // Your handleSave function
     const handleSave = () => {
@@ -257,7 +263,7 @@ function ConditionalLogic({ setConditionalLogic }) {
                         handleClickToInsert={handleClickToInsert}
                         textareaRef={textareaRef}
                         handleInputField={handleInputField}
-
+                        secDetailsForSearching={secDetailsForSearching}
                     />
                 </div>
                 <div className='w-[40%]'>

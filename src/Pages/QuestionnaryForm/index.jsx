@@ -502,7 +502,6 @@ function QuestionnaryForm() {
 
     const getFieldSetting = async () => {
         const response = await getAPI(`field-settings/${questionnaire_id}`);
-        console.log(response, 'Field Settigs Old API')
         if (!response.error) {
             dispatch(setInitialData(response?.data?.data?.items))
         } else {
@@ -515,18 +514,15 @@ function QuestionnaryForm() {
         try {
 
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-            console.log(response, 'this is the response');
 
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
-                console.log(response?.data?.data, 'esponse?.data?.data')
                 // const sectionsData = response?.data?.data?.sections?.map((section) => {
                 //     return section?.pages;
                 // })?.flat() || [];
                 const sectionsData = response?.data?.data?.sections
 
                 // Output will now be a flat array of objects instead of arrays inside arrays
-                console.log(sectionsData, 'sectionsDatasectionsDatasectionsData');
 
                 const fieldSettingsData = sectionsData.flat().flatMap(page => {
                     return {
@@ -547,10 +543,8 @@ function QuestionnaryForm() {
                     };
                 });
 
-                console.log(fieldSettingsData, 'fieldSettingsData');
                 dispatch(setInitialData(fieldSettingsData));
                 
-                console.log(sectionsData, 'section data data')
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
@@ -558,21 +552,16 @@ function QuestionnaryForm() {
                 }
 
                 if (sectionOrder) {
-                    console.log(sectionOrder, 'sectionOrder')
                     const orderedSectionsData = [...sectionsData].sort((a, b) => {
                         return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
                     });
 
                     dispatch(setDataIsSame(orderedSectionsData));
-                    console.log(sectionsData, 'section data data after order')
-                    console.log(orderedSectionsData, 'orderedSections section data data after order')
                     setSections(orderedSectionsData); // Set ordered sections
                 } else {
                     // If sectionOrder is invalid, use initial sections order
                     setSections(sectionsData);
-                    console.log(sectionsData, 'section data data else else')
                 }
-                console.log(sectionsData, 'qwertyuiasdfghjzzzzzzzzzzzzzzzz')
             } else {
                 setToastError('Something went wrong!');
             }
@@ -784,7 +773,6 @@ function QuestionnaryForm() {
     };
 
     const handleAutoSave = async (sectionId, updatedData, pageId, questionId) => {
-        debugger
         // Find the section to save
         const sectionToSave = updatedData.find(section => section.section_id === sectionId);
         const sectionIndex = updatedData.findIndex(section => section.section_id === sectionId);
@@ -1149,11 +1137,9 @@ function QuestionnaryForm() {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            console.log(response, 'layout')
             if (!response?.error) {
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section.id);
-                console.log(sectionOrder, 'layout section order')
 
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
@@ -1195,8 +1181,6 @@ function QuestionnaryForm() {
     useEffect(() => {
         formDefaultDetails();
         getFieldSetting();
-        // setSavedSection({})
-        // console.log(savedSection)
         dispatch(setSavedSection(sections));
     }, []);
 
@@ -1446,7 +1430,7 @@ function QuestionnaryForm() {
                 />
             )}
             {conditionalLogic && (
-                <ConditionalLogic setConditionalLogic={setConditionalLogic} />
+                <ConditionalLogic setConditionalLogic={setConditionalLogic} conditionalLogic={conditionalLogic}/>
             )}
         </>
     );

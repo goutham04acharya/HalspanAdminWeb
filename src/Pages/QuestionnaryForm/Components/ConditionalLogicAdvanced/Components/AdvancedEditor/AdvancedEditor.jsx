@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 function AdvancedEditor({
@@ -11,9 +11,28 @@ function AdvancedEditor({
     handleClickToInsert,
     textareaRef,
     handleInputField,
-
+    secDetailsForSearching
 }) {
     const allSectionDetails = useSelector((state) => state?.allsectiondetails?.allSectionDetails);
+
+    // State to track the user's input
+    const [searchInput, setSearchInput] = useState('');
+    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+
+    // Handle user input change and filter suggestions
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchInput(value);
+
+        if (value) {
+            const filteredData = secDetailsForSearching.filter((item) => 
+                item.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredSuggestions(filteredData);
+        } else {
+            setFilteredSuggestions([]);
+        }
+    };
 
     return (
         <div className='mr-[18px] mt-[8%]'>
@@ -23,8 +42,8 @@ function AdvancedEditor({
                     name="editor"
                     id="editor"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
-                    onChange={(event) => { handleInputField(event) }}
-                    onMouseDown={(event) => { handleInputField(event) }}
+                    onChange={(event) => { handleInputField(event); handleSearchChange(event); }}
+                    onMouseDown={(event) => { handleInputField(event); handleSearchChange(event); }}
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
@@ -35,6 +54,7 @@ function AdvancedEditor({
                     =
                 </span>
             </div>
+
             {/* Error message if no matching results */}
             {error && <div className='text-red-500 mt-2'>{error}</div>}
 
@@ -55,61 +75,29 @@ function AdvancedEditor({
                             ))}
                         </div>
                     ) : (
-                        allSectionDetails?.data?.sections?.map((section) => {
-                            const sectionName = section.section_name.replace(/\s+/g, '_');
-
-                            if (inputValue && sectionName.includes(inputValue)) {
-                                return sectionName; // Skip section if it doesn't match input
-                            }
-
-                            return (
-                                <div key={section.section_id}>
-                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(`sections.${sectionName}`)}>
-                                    sections.{sectionName}
-                                    </p>
-                                    {section.pages?.length > 0 ? (
-                                        section.pages.map((page) => {
-                                            const pageName = page.page_name.replace(/\s+/g, '_');
-
-                                            if (inputValue && pageName.includes(inputValue)) {
-                                                return pageName; // Skip page if it doesn't match input
-                                            }
-
-                                            return (
-                                                <div key={page.page_id}>
-                                                    <p className='cursor-pointer' onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}`)}>
-                                                    sections.{sectionName}.{pageName}
-                                                    </p>
-                                                    {page.questions?.length > 0 ? (
-                                                        page.questions.map((question) => {
-                                                            const questionName = question.question_name ? question.question_name.replace(/\s+/g, '_') : 'No_Question_Text';
-
-                                                            if (inputValue && questionName.includes(inputValue)) {
-                                                                return questionName; // Skip question if it doesn't match input
-                                                            }
-
-                                                            return (
-                                                                <p
-                                                                    key={question.question_id}
-                                                                    className='cursor-pointer'
-                                                                    onClick={() => handleClickToInsert(`sections.${sectionName}.${pageName}.${questionName}`,false, question.component_type)}
-                                                                >
-                                                                sections.{sectionName}.{pageName}.{questionName}
-                                                                </p>
-                                                            );
-                                                        })
-                                                    ) : (
-                                                        '' // No questions message
-                                                    )}
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        '' // No pages message
-                                    )}
+                        // Filtered suggestions based on the user's input
+                        filteredSuggestions.length > 0 ? (
+                            filteredSuggestions.map((suggestion, index) => (
+                                <div
+                                    key={index}
+                                    className="cursor-pointer"
+                                    onClick={() => handleClickToInsert(suggestion)}
+                                >
+                                    {suggestion}
                                 </div>
-                            );
-                        })
+                            ))
+                        ) : (
+                            // Fallback to all suggestions if no input
+                            secDetailsForSearching.map((suggestion, index) => (
+                                <div
+                                    key={index}
+                                    className="cursor-pointer"
+                                    onClick={() => handleClickToInsert(suggestion)}
+                                >
+                                    {suggestion}
+                                </div>
+                            ))
+                        )
                     )}
                 </div>
             )}
