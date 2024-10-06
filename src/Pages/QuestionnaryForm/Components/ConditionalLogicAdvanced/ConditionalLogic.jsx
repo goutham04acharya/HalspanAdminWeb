@@ -46,6 +46,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
             case 'datefield':
                 fieldType = new Date();
                 break;
+            default: fieldType = ''
         }
 
         return fieldType;
@@ -86,7 +87,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
                 });
             });
         });
-
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
     };
@@ -94,7 +94,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     const handleListSectionDetails = async () => {
         setShowSectionList(true)
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
-        console.log(response, 'respoo')
         dispatch(setAllSectionDetails(response.data));
         handleQuestionnaryObject(response.data);
     }
@@ -121,6 +120,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 const fieldType = getFieldType(question.component_type);
+                                console.log(fieldType, 'fieldType')
                                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
                                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
                                     [(question.question_name).replaceAll(' ', '_')]: fieldType
@@ -139,6 +139,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
         }
     }
 
+
     // Handle input change and check for matches
     const handleInputField = (event) => {
         const value = event.target.value;
@@ -146,7 +147,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
-
         if (lastChar === '.') {
             if (selectedFieldType === 'textboxfield') {
                 setSuggestions(stringMethods);
@@ -187,9 +187,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
             element.selectionStart = element.selectionEnd = start;
         }, 0);
     };
-
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        console.log(componentType, 'comp')
+
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -211,7 +212,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
 
         } else {
-            setSelectedFieldType(componentType)
+            let fieldType = ''
+            switch (componentType) {
+                case 'string': fieldType = 'textboxfield'
+                    break;
+                case 'number': fieldType = 'numberfield'
+                    break;
+                case 'date': fieldType = 'datefield';
+                    break
+            }
+            setSelectedFieldType(fieldType)
         }
     };
 
@@ -264,6 +274,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
                         textareaRef={textareaRef}
                         handleInputField={handleInputField}
                         secDetailsForSearching={secDetailsForSearching}
+                        sections={sections}
+                        setShowMethodSuggestions={setShowMethodSuggestions}
                     />
                 </div>
                 <div className='w-[40%]'>

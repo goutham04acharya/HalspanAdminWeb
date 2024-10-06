@@ -11,7 +11,9 @@ function AdvancedEditor({
     handleClickToInsert,
     textareaRef,
     handleInputField,
-    secDetailsForSearching
+    secDetailsForSearching,
+    sections,
+    setShowMethodSuggestions
 }) {
     const allSectionDetails = useSelector((state) => state?.allsectiondetails?.allSectionDetails);
 
@@ -34,6 +36,16 @@ function AdvancedEditor({
             setFilteredSuggestions(secDetailsForSearching);
         }
     };
+    const handleAddQuestion = (suggestion, sections) => {
+        let allSections = sections
+        const getVariableType = a => a.constructor.name.toLowerCase();
+        let valueType = getVariableType(eval(`allSections.${suggestion}`))
+        handleClickToInsert(suggestion, false, valueType);
+
+        // After selecting a suggestion, show suggestions list again and hide error
+        setShowMethodSuggestions(false);
+        setFilteredSuggestions(secDetailsForSearching);
+    }
 
     // Populate all items initially
     useEffect(() => {
@@ -54,9 +66,7 @@ function AdvancedEditor({
                     value={inputValue}
                 ></textarea>
                 <span
-                    className="absolute left-[2%] top-[6%] cursor-pointer"
-                    onClick={() => handleListSectionDetails()}
-                >
+                    className="absolute left-[2%] top-[6%] cursor-pointer">
                     =
                 </span>
             </div>
@@ -65,7 +75,7 @@ function AdvancedEditor({
             {error && <div className='text-red-500 mt-2'>{error}</div>}
 
             {/* Show matching results if available */}
-            {showSectionList && (
+            {(showSectionList && Object.keys(sections).length > 0) && (
                 <div className='h-[260px] w-[50%] border border-[#AEB3B7] p-2.5 overflow-y-auto scrollbar_gray'>
                     {/* Conditionally show method suggestions or the normal question list */}
                     {showMethodSuggestions ? (
@@ -87,13 +97,26 @@ function AdvancedEditor({
                                 <div
                                     key={index}
                                     className="cursor-pointer"
-                                    onClick={() => handleClickToInsert(suggestion)}
+                                    onClick={() => handleAddQuestion(suggestion, sections)}
                                 >
                                     {suggestion}
                                 </div>
                             ))
                         ) : (
-                            searchInput.trim() !== '' && <div className='text-red-500 mt-2'>No items found</div>
+                            showMethodSuggestions ? (
+                                <div className="suggestions-box">
+                                    {suggestions.map((method, index) => (
+                                        <div
+                                            key={index}
+                                            className="suggestion-item cursor-pointer"
+                                            onClick={() => handleClickToInsert(method, true)} // Pass true for method
+                                        >
+                                            {method}
+                                        </div>
+                                    ))}
+                                </div>)
+                                :
+                                searchInput.trim() !== '' && <div className='text-red-500 mt-2'>No items found</div>
                         )
                     )}
                 </div>
