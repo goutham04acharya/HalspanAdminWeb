@@ -12,7 +12,7 @@ import {
 import Pages from "../PagesList/Pages";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-function Sections({ sectionData,
+const Sections = ({ sectionData,
   sectionIndex,
   expandedSections,
   setExpandedSections,
@@ -23,7 +23,7 @@ function Sections({ sectionData,
   sections,
   setSections,
   handleAutoSave,
-}) {
+}) => {
 
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
