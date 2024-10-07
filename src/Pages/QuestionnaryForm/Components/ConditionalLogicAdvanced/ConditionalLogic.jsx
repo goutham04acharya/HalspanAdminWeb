@@ -29,6 +29,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
 
     // Define string and date methods
@@ -120,7 +122,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 const fieldType = getFieldType(question.component_type);
-                                console.log(fieldType, 'fieldType')
                                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
                                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
                                     [(question.question_name).replaceAll(' ', '_')]: fieldType
@@ -142,6 +143,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
     // Handle input change and check for matches
     const handleInputField = (event) => {
+        setError('');
+        setShowMethodSuggestions(false);
+        setShowSectionList(true)
+
         const value = event.target.value;
         setInputValue(value); // Update input value
 
@@ -189,7 +194,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     };
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        console.log(componentType, 'comp')
 
         const textarea = textareaRef.current;
         if (textarea) {
@@ -226,23 +230,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     };
 
     // Your handleSave function
-    const handleSave = () => {
+    const handleSave = async () => {
+        let body = {
+            question_id: selectedQuestionId,
+            conditonal_logic: inputValue
+
+        }
         setShowSectionList(false);
         try {
+            // Function to add "sections." to section IDs
+            const addSectionPrefix = (input) => {
+                return input.replaceAll(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+            };
 
-            // Assuming inputValue is the expression typed by the user
-            let evalInputValue = inputValue
-                .replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
-                .replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-                .replaceAll(' AND ', ' && ') // Replace AND with &&
-                .replaceAll(' OR ', ' || '); // Replace OR with ||
-
+            // Apply the section prefix function to the inputValue
+            let evalInputValue = addSectionPrefix(inputValue)
+            evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
+            evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+            evalInputValue.replaceAll(/\b( AND | and | And )\b/g, ' && ')  // Replace AND with &&
+            evalInputValue.replaceAll(/\b( OR | or | Or )\b/g, ' || ');  // Replace OR with ||
             // Evaluate the modified string
             const result = eval(evalInputValue);
 
             if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 setError(result);
+                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                 // No error message if the result is boolean
                 // } else if(result === NaN){
                 //     setError('please pass the parameter insdie the function');
@@ -257,6 +270,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
         }
     };
+
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

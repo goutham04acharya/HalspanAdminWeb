@@ -1430,7 +1430,12 @@ function QuestionnaryForm() {
                 />
             )}
             {conditionalLogic && (
-                <ConditionalLogic setConditionalLogic={setConditionalLogic} conditionalLogic={conditionalLogic}/>
+                <ConditionalLogic 
+                setConditionalLogic={setConditionalLogic} 
+                conditionalLogic={conditionalLogic}
+                handleSaveSection={handleSaveSection}
+                />
+
             )}
         </>
     );

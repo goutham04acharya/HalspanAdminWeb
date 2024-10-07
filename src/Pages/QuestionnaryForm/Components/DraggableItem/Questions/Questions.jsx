@@ -30,6 +30,7 @@ const Questions = ({
         dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
         dispatch(setShowquestionDeleteModal(true));
+        console.log(fieldSettingParams, 'fieldSettingParamss')
     };
 
     const componentMap = {
