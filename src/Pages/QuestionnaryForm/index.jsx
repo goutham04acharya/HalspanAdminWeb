@@ -395,14 +395,14 @@ const QuestionnaryForm = () => {
                 setSections(SectionData);
 
                 // Call handleSaveSection with the updated section data
-                if (isSectionSaved[sectionId] ) {
-                    handleSaveSection(sectionId, SectionData, false);
-                }
+                // if (isSectionSaved[sectionId] ) {
+                //     handleSaveSection(sectionId, SectionData, false);
+                // }
             } else {
                 setToastError("Limit reached: Maximum of 20 pages allowed.");
                 return; // Exit the function if the limit is reached
             }
-            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
+            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
             console.log(isSectionSaved)
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
@@ -426,16 +426,17 @@ const QuestionnaryForm = () => {
             setSections(SectionData);
 
             // Call handleSaveSection with the updated section data
-            if (isSectionSaved[sectionId]) {
-                handleSaveSection(sectionId, SectionData, false);
-            }
-            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
+            // if (isSectionSaved[sectionId]) {
+            //     handleSaveSection(sectionId, SectionData, false);
+            // }
+            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
 
         
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
+        debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -449,10 +450,10 @@ const QuestionnaryForm = () => {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
-            if (isSectionSaved[sectionId]) {
-                handleSaveSection(sectionId, false);
-            }
-            setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
+            // if (!isSectionSaved[sectionId]) {
+            //     handleSaveSection(sectionId, false);
+            // }
+            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         } else if (event === 'remove') {
             dispatch(setSelectedQuestionId(false));
             dispatch(setSelectedAddQuestion({}));
@@ -474,11 +475,11 @@ const QuestionnaryForm = () => {
                 }
                 return section;
             });
-            if (isSectionSaved[sectionId]) {
-                handleSaveSection(sectionId, currentSectionData, false); // Call auto-save function 
-            }
+            // if (!isSectionSaved[sectionId]) {
+            //     handleSaveSection(sectionId, currentSectionData, false); // Call auto-save function 
+            // }
 
-            setIsSectionSaved(prevState => ({ ...prevState, [pageId.split('_')[0]]: false }));
+            // setIsSectionSaved(prevState => ({ ...prevState, [pageId.split('_')[0]]: false }));
         }
 
         // Reset the selected component
@@ -585,6 +586,7 @@ const QuestionnaryForm = () => {
 
 
     const handleSaveSection = async (sectionId, isSaving = true) => {
+        // debugger
         handleSectionSaveOrder(sections)
         console.log(sections, 'after save')
         // Find the section to save  
@@ -973,15 +975,15 @@ const QuestionnaryForm = () => {
         console.log(sections, 'inside useEffect')
     }, []);
 
-    useEffect(() => {
-        if (shouldAutoSave) {
-            const questionId = selectedQuestionId.split('_')[0]
-            const sectionId = version_number + '_' + questionId
-            handleSaveSection(sectionId);
-            dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
-        }
-    }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-
+    // useEffect(() => {
+    //     if (shouldAutoSave) {
+    //         const questionId = selectedQuestionId.split('_')[0]
+    //         const sectionId = version_number + '_' + questionId
+    //         handleSaveSection(sectionId);
+    //         dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
+    //     }
+    // }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
+    // console.log(navigate(-1), 'navigate -1')
     return (
         <>
             {pageLoading ? (
@@ -1079,9 +1081,6 @@ const QuestionnaryForm = () => {
                                                                                     handleSaveSection(sectionData?.section_id);
                                                                             }}
                                                                         />
-
-
-
                                                                     </div>
                                                                 </div>
                                                                 <Sections
