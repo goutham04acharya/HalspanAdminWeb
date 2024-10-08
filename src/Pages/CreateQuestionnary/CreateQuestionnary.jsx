@@ -15,7 +15,7 @@ function CreateQuestionnary() {
   const navigate = useNavigate();
   const { PostAPI } = useApi();
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
-  const [isThreedotLoader, setIsThreedotLoader] = useState(false)
+  const [isThreedotLoader, setIsThreedotLoader] = useState(true)
 
   const [createDetails, setCreateDetails] = useState({
     public_name: '',
