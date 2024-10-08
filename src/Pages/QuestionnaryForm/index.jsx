@@ -523,7 +523,8 @@ const QuestionnaryForm = () => {
                     format: question?.format,
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
-                    options: question?.options
+                    options: question?.options,
+                    conditional_logic:question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -584,15 +585,16 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, evalInputValue) => {
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
         handleSectionSaveOrder(sections)
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
         if (sectionToSave) {
             const isDataSame = dataIsSame[sectionId];
-            if (isDataSame) {
+            if (isDataSame && !payloadString) {
+                setIsThreedotLoader(false);
+                setConditionalLogic(false)
                 // If data is the same, return early and don't call the API  
                 return;
             }
@@ -606,6 +608,7 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
+                        conditional_logic: question.question_id === selectedQuestionId ? payloadString : (question.conditional_logic || ''),
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -660,10 +663,10 @@ const QuestionnaryForm = () => {
                                     return {}; // Return an empty object if componentType doesn't match any case  
                             }
                         })(),
-                        conditional_logic: evalInputValue
                     }))
                 }))
             };
+            console.log(fieldSettingParams, 'fieldSettingParams')
 
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
@@ -685,10 +688,11 @@ const QuestionnaryForm = () => {
                 if (isSaving) {
                     // ... call the API ...  
                     const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                    setSaveClick(true)
+                    // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
-                        // dispatch(setConditionalLogic(false));
+                        setIsThreedotLoader(false);
+                        setConditionalLogic(false);
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;

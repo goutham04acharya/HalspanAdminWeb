@@ -14,14 +14,11 @@ import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
 
-
 function TestFieldSetting({
   handleInputChange,
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  // setFieldSettingParameters,
-  handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
@@ -37,7 +34,7 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
-
+  console.log(allSectionDetails?.data?.sections, 'nayanayan')
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
@@ -108,7 +105,6 @@ function TestFieldSetting({
     });
     if (node) observer.current.observe(node);
   }, [loading, isFetchingMore, fieldSettingParameters?.type]);
-
 
   useEffect(() => {
     fetchLookupList();
@@ -293,13 +289,8 @@ function TestFieldSetting({
             >
               Add Conditional Logic
             </button>
-            {allSectionDetails?.data?.sections.map(section =>
-              section.pages.map(page =>
-                page.questions.map(question => question.question_id === selectedQuestionId && question.conditional_logic !== null)
-              )
-            ) && (
-                <p className='text-center italic mt-1'>Conditional Logic Added</p>
-              )
+            {fieldSettingParameters.conditional_logic &&
+              <p className='text-center italic mt-1'>Conditional Logic Added</p>
             }
           </div>
         </div>

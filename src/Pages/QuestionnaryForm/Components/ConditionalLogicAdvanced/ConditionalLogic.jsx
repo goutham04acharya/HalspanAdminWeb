@@ -61,7 +61,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleClose = () => {
-        dispatch(setConditionalLogic(false));
+        setConditionalLogic(false);
     };
 
     useOnClickOutside(modalRef, () => {
@@ -142,7 +142,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             });
         }
     }
-
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
@@ -263,6 +262,26 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     };
 
+    useEffect(() => {
+        // Assuming `allSectionDetails` contains the fetched data and 
+        // you have a way to map `selectedQuestionId` to the relevant question
+        const findSelectedQuestion = () => {
+            allSectionDetails?.data?.sections?.forEach((section) => {
+                section.pages?.forEach((page) => {
+                    page.questions?.forEach((question) => {
+                        if (question.question_id === selectedQuestionId) {
+                            // Pre-fill the editor with the conditional logic of the selected question
+                            setInputValue(question.conditional_logic || '');
+                        }
+                    });
+                });
+            });
+        };
+        if (selectedQuestionId) {
+            findSelectedQuestion(); // Set the existing conditional logic as input value
+        }
+    }, [selectedQuestionId, allSectionDetails]);
+
     // Your handleSave function
     const handleSave = async () => {
         const sectionId = selectedQuestionId.split('_')[0];
@@ -273,7 +292,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
             // Apply the section prefix function to the inputValue
-            let evalInputValue = addSectionPrefix(inputValue)
+            let evalInputValue = (inputValue)
             evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
             evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             let expression = evalInputValue.toString();
@@ -284,15 +303,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
 
+            let payloadString = expression;
+            evalInputValue = addSectionPrefix(evalInputValue);
+
             // Evaluate the modified string
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
             if (!error) {
                 setError(result);
-                handleSaveSection(sectionId, true, evalInputValue);
-                setIsThreedotLoader(false);
-                // dispatch(setConditionalLogic(false));
-
+                handleSaveSection(sectionId, true, payloadString);
             } else if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 setError(''); // Clear the error since result is valid

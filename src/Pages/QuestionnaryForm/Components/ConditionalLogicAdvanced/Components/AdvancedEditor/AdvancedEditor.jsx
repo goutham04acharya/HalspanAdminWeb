@@ -118,7 +118,10 @@ function AdvancedEditor({
                                     ))
                                 ) : (
                                     searchInput.trim() !== '' && (
-                                        <div className="text-red-500 mt-2">No items found</div>
+                                        <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
+                                            <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
+                                            No items found
+                                        </div>
                                     )
                                 )}
                             </div>
