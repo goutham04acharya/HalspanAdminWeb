@@ -608,8 +608,7 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: question.question_id === selectedQuestionId ? payloadString : (question.conditional_logic || ''),
-                        component_type: fieldSettingParams[question.question_id].componentType,
+                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),                        component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
                         placeholder_content: fieldSettingParams[question.question_id].placeholderContent,

@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
+import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
@@ -312,6 +313,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (!error) {
                 setError(result);
                 handleSaveSection(sectionId, true, payloadString);
+                dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 setError(''); // Clear the error since result is valid
