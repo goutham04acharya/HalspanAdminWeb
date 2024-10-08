@@ -29,6 +29,7 @@ module.exports = {
             'test/integration-testing/Flow1/24_view_questionnaire.feature',
             'test/integration-testing/Flow1/26_change_status.feature',
             'test/integration-testing/Flow1/27_duplicate_questionnaire.feature',
+            'test/integration-testing/Flow1/30_advanced_editor.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

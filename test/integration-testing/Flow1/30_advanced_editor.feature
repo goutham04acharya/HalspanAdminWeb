@@ -10,13 +10,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     An Appropriate error message to be displayed if the query in the Advance Editor as syntax errors.
     Once I apply the conditional logic, I must be able to preview the same so that i will be able to view all my responses in advance.
 
-  Scenario: Admin logs in with valid credentials
-    Given I am on the login page
-    When I enter valid email address as "nayana.sk@7edge.com"
-    * I enter valid password as "dApje7-nepnig-vibqyc"
-    * I click the submit button
-    Then I should be redirected to the questionnaire listing screen
-
   @create_question
   Scenario: Admin views all types of field to create the form
     Given I am on the questionnaire management section
