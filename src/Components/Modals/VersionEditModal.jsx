@@ -95,7 +95,7 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                             </label>
                         </>}
                     <button type='button' data-testid={testIDBtn2} className='w-[200px] h-[50px] border border-[#2B333B] rounded text-[#2B333B] hover:bg-[#EFF1F8] text-base font-semibold' onClick={() => handleButton2()}>
-                    {!loading ? Button2text : <BeatLoader color="#fff" size={'10px'} /> }
+                    {Button2text }
                     </button>
                 </div>}
             </div>

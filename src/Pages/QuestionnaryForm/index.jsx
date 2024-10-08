@@ -79,6 +79,8 @@ const QuestionnaryForm = () => {
     const [saveClick, setSaveClick] = useState(false)
     const [isSectionSaved, setIsSectionSaved] = useState({});
 
+    console.log(selectedSectionData, 'selectedSectionData')
+
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -124,7 +126,12 @@ const QuestionnaryForm = () => {
 
         // Update the state dynamically
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-
+        if (id === 'regular_expression') {
+            dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'format_error') {
+            dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
+        }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -432,11 +439,11 @@ const QuestionnaryForm = () => {
             // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
 
-        
+
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        debugger
+        // debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -522,6 +529,10 @@ const QuestionnaryForm = () => {
                     source: question?.source,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
+                    format: question?.format,
+                    regular_expression: question?.regular_expression,
+                    format_error: question?.format_error,
+                    options: question?.options
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -592,8 +603,9 @@ const QuestionnaryForm = () => {
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
-        if (sectionToSave) {
+        const currentFieldSettingParams = fieldSettingParams[selectedQuestionId];
+        const previousFieldSettingParams = dataIsSame[sectionId]?.fieldSettingParams;
+        if (sectionToSave && (currentFieldSettingParams !== previousFieldSettingParams)) {
             const isDataSame = dataIsSame[sectionId];
             if (isDataSame) {
                 // If data is the same, return early and don't call the API  
@@ -616,6 +628,8 @@ const QuestionnaryForm = () => {
                         default_content: fieldSettingParams[question.question_id].defaultContent,
                         type: fieldSettingParams[question.question_id].type,
                         format: fieldSettingParams[question.question_id].format,
+                        regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+                        format_error: fieldSettingParams[question?.question_id]?.format_error,
                         field_range: {
                             min: fieldSettingParams[question.question_id].min,
                             max: fieldSettingParams[question.question_id].max,
@@ -697,7 +711,8 @@ const QuestionnaryForm = () => {
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
 
-                        dispatch(setDataIsSame(update));
+                        dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+
 
                     } else {
                         setToastError('Something went wrong.');
@@ -972,7 +987,7 @@ const QuestionnaryForm = () => {
     useEffect(() => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
-        console.log(sections, 'inside useEffect')
+        console.log(fieldSettingParams, 'inside useEffect')
     }, []);
 
     // useEffect(() => {
@@ -1161,6 +1176,7 @@ const QuestionnaryForm = () => {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+                                        questionData: dataIsSame[selectedSectionData]
 
                                     }
                                 )

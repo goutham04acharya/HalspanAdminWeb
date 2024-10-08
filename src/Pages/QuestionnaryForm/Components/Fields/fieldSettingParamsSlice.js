@@ -50,14 +50,18 @@ const processSource = (item) => {
 };
 
 const fieldSettingParamsSlice = createSlice({
+    
     name: 'FieldSettingParams',
     initialState,
     reducers: {
         setNewComponent: (state, action) => {
+            debugger
             const { questionId, id, value } = action.payload;
-
+            console.log(action.payload, 'action.payload')
+            console.log(state.currentData[questionId], 'state.currentData[questionId]')
             if (!state.currentData[questionId]) {
                 state.currentData[questionId] = {};
+
             }
 
             state.currentData[questionId] = {
@@ -133,6 +137,8 @@ const fieldSettingParamsSlice = createSlice({
                     defaultContent: item.default_content,
                     type: item.type,
                     format: item.format,
+                    regular_expression: item?.regular_expression,
+                    format_error: item?.format_error,
                     min: item.field_range?.min,
                     max: item.field_range?.max,
                     note: item.admin_field_notes,
