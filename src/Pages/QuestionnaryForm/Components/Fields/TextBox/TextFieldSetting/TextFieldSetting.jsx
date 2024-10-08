@@ -25,7 +25,8 @@ function TestFieldSetting({
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
-  validationErrors
+  validationErrors,
+  setValidationErrors
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -62,22 +63,22 @@ function TestFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     // dispatch(setShouldAutoSave(true));
   };
-  const validateRegex = (regex) => {
-    console.log(regex, 'regex')
-    try {
-      // new RegExp(regex);
-      const regexPattern = /^\/(.+)\/([gimuy]*)$/;
-      setIsValid(true)
-
-      return regexPattern.test(regex);
-      // return true;
-    } catch (error) {
-      setIsValid(false)
-      return false;
-
-    }
+  const validateRegex = (value) => {  
+    const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
+    if (!regexPattern.test(value) || value.trim() === '') {  
+     setValidationErrors((prevErrors) => ({  
+      ...prevErrors,  
+      regular_expression: 'Invalid regular expression',  
+     }));  
+    } else {  
+     setValidationErrors((prevErrors) => ({  
+      ...prevErrors,  
+      regular_expression: '',  
+     }));  
+    }  
   };
   const handleRegularExpression = (event) => {
+    // debugger
     const value = event.target.value;
     console.log(value, 'value')
     // const isValidate = validateRegex(value);
@@ -291,14 +292,17 @@ function TestFieldSetting({
                 className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder="Regex pattern (e.g. ^[a-zA-Z0-9]+$)"
                 value={fieldSettingParameters?.regular_expression}
-                // onChange={(e) => handleInputChange(e)}
-                handleChange={(e) => handleRegularExpression(e, e.id, e.type)}
+                handleBlur={(e) => validateRegex(e)}
+                handleChange={(e) => handleInputChange(e)}
                 // onBlur={(e)=>}
                 data-testid="placeholder-input"
                 maxLength={50}
                 validationError={isValid ? 'Invalid Expression' : ''}
               />
-            </div></>}
+            </div>{validationErrors?.regular_expression && (
+              <ErrorMessage error={validationErrors?.regular_expression} />
+            )}</>}
+
           {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true) && <div className='flex flex-col justify-start mt-7'>
             <label
               // htmlFor={placeholderContentId}
@@ -310,7 +314,7 @@ function TestFieldSetting({
               className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
               placeholder="Enter a custom error message for invalid input"
               value={fieldSettingParameters?.format_error}
-              handleChange={(e) => handleErrorMessage(e, id, type)}
+              handleChange={(e) => handleInputChange(e)}
 
               data-testid="placeholder-input"
               maxLength={50} />

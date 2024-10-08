@@ -26,6 +26,7 @@ import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import PreviewModal from './Components/Preview.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -55,6 +56,7 @@ const QuestionnaryForm = () => {
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
+    const [previewModal, setPreviewModal] = useState(false)
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
@@ -131,6 +133,20 @@ const QuestionnaryForm = () => {
         }
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'regular_expression') {
+            const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
+            if (!regexPattern.test(value) || value.trim() === '') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: 'Invalid regular expression',
+                }));
+            } else {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: '',
+                }));
+            }
         }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
@@ -1144,7 +1160,11 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            <button onClick={() => {
+                                // Open the custom modal  
+                                setPreviewModal(true)
+
+                            }} className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
@@ -1176,7 +1196,9 @@ const QuestionnaryForm = () => {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-                                        questionData: dataIsSame[selectedSectionData]
+                                        questionData: dataIsSame[selectedSectionData],
+                                        setValidationErrors: setValidationErrors,
+
 
                                     }
                                 )
@@ -1256,6 +1278,15 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
+            {previewModal && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                
+            />}
         </>
     );
 }
