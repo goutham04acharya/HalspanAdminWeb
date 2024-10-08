@@ -10,7 +10,9 @@ import objectToQueryString from '../../../../../../CommonMethods/ObjectToQuerySt
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
-import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
+import { useSelector } from 'react-redux';
 
 
 function TestFieldSetting({
@@ -35,6 +37,8 @@ function TestFieldSetting({
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
+  console.log(allSectionDetails)
 
 
   const lastEvaluatedKeyRef = useRef(null);
@@ -111,6 +115,7 @@ function TestFieldSetting({
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
+  console.log(allSectionDetails, 'allSectionDetails.sections')
 
   return (
     <>
@@ -228,8 +233,8 @@ function TestFieldSetting({
               handleOptionClick={handleOptionClick}
               isDropdownOpen={isDropdownOpen}
               setDropdownOpen={setDropdownOpen}
-              options={options} 
-              />
+              options={options}
+            />
           </div>
           <div className='mt-7'>
             <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>
@@ -283,14 +288,22 @@ function TestFieldSetting({
               maxLength={500}
               handleChange={(e) => handleInputChange(e)} />
           </div>
-          <div className='mx-auto mt-7 flex items-center w-full'>
-            <button 
-            type='button' 
-            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-            onClick={() => setConditionalLogic(true)}  // Use arrow function
+          <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+            <button
+              type='button'
+              className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+              onClick={() => setConditionalLogic(true)}  // Use arrow function
             >
               Add Conditional Logic
             </button>
+            {allSectionDetails?.data?.sections.map(section =>
+              section.pages.map(page =>
+                page.questions.map(question => question.question_id === selectedQuestionId && question.conditional_logic !== null)
+              )
+            ) && (
+                <p className='text-center'>Condition applied</p>
+              )
+            }
           </div>
         </div>
       </div>

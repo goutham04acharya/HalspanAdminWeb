@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen } from '../QuestionnaryFormSlice';
@@ -12,7 +13,7 @@ import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -28,10 +29,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
     const textareaRef = useRef(null); // To reference the textarea
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
-    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
+    console.log(allSectionDetails, 'allSectionDetails')
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "concat()", "endsWith()", "includes()", "startsWith()", "trimEnd()", "trimStart()"];
@@ -142,11 +142,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
 
     // Handle input change and check for matches
-    const handleInputField = (event) => {
+    const handleInputField = (event, sections) => {
         setError('');
+        setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
-
         const value = event.target.value;
         setInputValue(value); // Update input value
 
@@ -160,8 +160,39 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
             } else {
-                setSuggestions([]);
-                setShowMethodSuggestions(false);
+                const cursorPosition = event.target.selectionStart; // Get the cursor position
+
+                // Find the word around the cursor
+                const leftPart = value.slice(0, cursorPosition);
+                const rightPart = value.slice(cursorPosition);
+
+                // Find the index of the last space before the cursor and the next space after the cursor
+                const startOfWord = leftPart.lastIndexOf(' ') + 1;
+                const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length - 1 : rightPart.indexOf(' ') - 1;
+
+                const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
+
+                let allSections = sections;
+                const getVariableType = a => a.constructor.name.toLowerCase();
+                let valueType = ''
+                try {
+                    valueType = getVariableType(eval(`allSections.${wordToSearch}`))
+                } catch (e) {
+
+                }
+                switch (valueType) {
+                    case 'string':
+                        setSuggestions(stringMethods);
+                        setShowMethodSuggestions(true);
+                        break;
+                    case 'date':
+                        setSuggestions(dateMethods);
+                        setShowMethodSuggestions(true);
+                        break;
+                    default:
+                        setSuggestions([]);
+                        setShowMethodSuggestions(false);
+                }
             }
         } else {
             setSuggestions([]);
@@ -231,34 +262,61 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
 
     // Your handleSave function
     const handleSave = async () => {
-        let body = {
-            question_id: selectedQuestionId,
-            conditonal_logic: inputValue
-
-        }
+        const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             // Function to add "sections." to section IDs
             const addSectionPrefix = (input) => {
-                return input.replaceAll(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
-
             // Apply the section prefix function to the inputValue
             let evalInputValue = addSectionPrefix(inputValue)
             evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
             evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue.replaceAll(/\b( AND | and | And )\b/g, ' && ')  // Replace AND with &&
-            evalInputValue.replaceAll(/\b( OR | or | Or )\b/g, ' || ');  // Replace OR with ||
+            let expression = evalInputValue.toString();
+
+            // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
+            expression = expression.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
+            expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
+            expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
+            evalInputValue = expression
+            console.log(evalInputValue, 'evalInputValue')
+            // Extract variable names from evalInputValue (dot notation)
+            let variableNames = evalInputValue.match(/\b([a-zA-Z_][\w.]*)\b/g);
+
+            // Remove the "sections." prefix from the variable names (if applicable)
+            variableNames = variableNames.map(variable =>
+                variable.startsWith('sections.') ? variable.replace('sections.', '') : variable
+            );
+
+            // Extract the core variable name by removing any method/function calls (e.g., `.toUpperCase`)
+            const coreVariableNames = variableNames.map(variable => {
+                const match = variable.match(/^([a-zA-Z_][\w.]*)(?=\.)?/); // Match before method/function
+                return match ? match[0] : variable; // Return the core variable name
+            });
+
+            // Validate core variables against secDetailsForSearching
+            const invalidVariables = coreVariableNames.filter(
+                coreVariable => !secDetailsForSearching.some(validVariable => coreVariable.startsWith(validVariable))
+            );
+
+            if (invalidVariables.length > 0) {
+                // Show error for invalid variable names
+                setError(`Invalid variable names: ${invalidVariables.join(', ')}`);
+                return; // Stop further processing
+            }
+            console.log(evalInputValue, 'evalInputValue')
             // Evaluate the modified string
             const result = eval(evalInputValue);
-
-            if (typeof result === 'boolean') {
-                console.log('Valid expression, result is a boolean:', result);
+            if (!error) {
+                handleSaveSection(sectionId, true, evalInputValue);
                 setError(result);
-                const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                // No error message if the result is boolean
-                // } else if(result === NaN){
-                //     setError('please pass the parameter insdie the function');
+                conditionalLogic(false);
+            } else if (typeof result === 'boolean') {
+                console.log('Valid expression, result is a boolean:', result);
+                setError(''); // Clear the error since result is valid
+            } else if (isNaN(result)) {
+                setError('Please pass the parameter inside the function');            
             } else {
                 console.log('Result is not a boolean:', result);
                 setError(result);
@@ -267,11 +325,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic }) {
             // Handle and log any evaluation errors
             console.error('Error evaluating the expression:', error.message);
             setError(error.message);
-
         }
     };
-
-
+    console.log(secDetailsForSearching, 'secDetailsForSearching')
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[80%] h-[80%] mx-auto bg-white rounded-[14px] relative p-[18px] flex'>
