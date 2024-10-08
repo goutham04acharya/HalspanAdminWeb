@@ -686,12 +686,9 @@ const QuestionnaryForm = () => {
                     // ... call the API ...  
                     const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                     setSaveClick(true)
-                    if (!(response?.data?.error)) {
-
+                    if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
-
-
-
+                        // dispatch(setConditionalLogic(false));
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -708,7 +705,6 @@ const QuestionnaryForm = () => {
             }
         }
     };
-    console.log(sections, 'sections')
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1084,7 +1080,7 @@ const QuestionnaryForm = () => {
                                                                     handleAddRemovePage={handleAddRemovePage}
                                                                     handleSaveSection={handleSaveSection}
                                                                     handleAutoSave={handleSaveSection}
-                                                                    handleDeleteModal={handleDeleteModal}// 
+                                                                    handleDeleteModal={handleDeleteModal}
                                                                 />
                                                             </li>
                                                         )}

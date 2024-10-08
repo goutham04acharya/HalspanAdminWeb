@@ -29,7 +29,6 @@ function TestFieldSetting({
   setConditionalLogic,
   conditionalLogic
 }) {
-  console.log(conditionalLogic, 'ConditionalLogic');
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
@@ -38,7 +37,6 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
-  console.log(allSectionDetails)
 
 
   const lastEvaluatedKeyRef = useRef(null);
@@ -115,7 +113,6 @@ function TestFieldSetting({
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
-  console.log(allSectionDetails, 'allSectionDetails.sections')
 
   return (
     <>
@@ -301,7 +298,7 @@ function TestFieldSetting({
                 page.questions.map(question => question.question_id === selectedQuestionId && question.conditional_logic !== null)
               )
             ) && (
-                <p className='text-center'>Condition applied</p>
+                <p className='text-center italic mt-1'>Conditional Logic Added</p>
               )
             }
           </div>

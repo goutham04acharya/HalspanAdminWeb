@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { BeatLoader } from 'react-spinners';
 
 function AdvancedEditor({
     handleListSectionDetails,
@@ -13,9 +13,10 @@ function AdvancedEditor({
     handleInputField,
     secDetailsForSearching,
     sections,
-    setShowMethodSuggestions
+    setShowMethodSuggestions,
+    isThreedotLoaderBlack,
+    smallLoader
 }) {
-    const allSectionDetails = useSelector((state) => state?.allsectiondetails?.allSectionDetails);
 
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
@@ -66,60 +67,63 @@ function AdvancedEditor({
     }, [secDetailsForSearching]); // This will run whenever secDetailsForSearching changes
 
     return (
-        <div className='mr-[18px] mt-[8%]'>
-            <div className='relative'>
+        <div className='mr-[18px] mt-[6%]'>
+            <div className='relative h-[230px]'>
                 <label htmlFor="editor"></label>
                 <textarea
                     name="editor"
                     id="editor"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
                     onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
-                    onMouseDown={(event) => { handleInputField(event); handleSearchChange(event); }}
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
-                <span
-                    className="absolute left-[2%] top-[6%] cursor-pointer">
-                    =
-                </span>
+                <span className="absolute left-[2%] top-[6%] cursor-pointer">=</span>
             </div>
 
             {/* Error message if no matching results */}
             {error ? (
-                <div className="text-red-500 mt-2 w-[90%] break-words">{error}</div>
+                <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
+                    <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    {error}</div>
             ) : (
-                // Show matching results if available
-                showSectionList && Object.keys(sections).length > 0 && (
-                    <div className="h-[260px] w-full border border-[#AEB3B7] p-2.5 overflow-y-auto scrollbar_gray">
-                        {/* Conditionally show method suggestions or the normal question list */}
-                        {showMethodSuggestions ? (
-                            <div className="suggestions-box">
-                                {suggestions.map((method, index) => (
-                                    <div
-                                        key={index}
-                                        className="suggestion-item cursor-pointer"
-                                        onClick={() => handleClickToInsert(method, true)} // Pass true for method
-                                    >
-                                        {method}
+                isThreedotLoaderBlack ? (
+                    <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} />
+                ) : (
+                    showSectionList && Object.keys(sections).length > 0 && (
+                        <div className='pl-2.5 py-2.5 pr-1.5 h-[260px] w-[60%] overflow-y-auto scrollbar_gray border-l border-b border-r border-[#AEB3B7]'>
+                            <div className="pr-1">
+                                {/* Conditionally show method suggestions or the normal question list */}
+                                {showMethodSuggestions ? (
+                                    <div className="suggestions-box">
+                                        {suggestions.map((method, index) => (
+                                            <div
+                                                key={index}
+                                                className="suggestion-item cursor-pointer"
+                                                onClick={() => handleClickToInsert(method, true)} // Pass true for method
+                                            >
+                                                {method}
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                ) : filteredSuggestions.length > 0 ? (
+                                    filteredSuggestions.map((suggestion, index) => (
+                                        <div
+                                            key={index}
+                                            className="cursor-pointer"
+                                            onClick={() => handleAddQuestion(suggestion, sections)}
+                                        >
+                                            {suggestion}
+                                        </div>
+                                    ))
+                                ) : (
+                                    searchInput.trim() !== '' && (
+                                        <div className="text-red-500 mt-2">No items found</div>
+                                    )
+                                )}
                             </div>
-                        ) : filteredSuggestions.length > 0 ? (
-                            filteredSuggestions.map((suggestion, index) => (
-                                <div
-                                    key={index}
-                                    className="cursor-pointer"
-                                    onClick={() => handleAddQuestion(suggestion, sections)}
-                                >
-                                    {suggestion}
-                                </div>
-                            ))
-                        ) : (
-                            searchInput.trim() !== '' && (
-                                <div className="text-red-500 mt-2">No items found</div>
-                            )
-                        )}
-                    </div>
+                        </div>
+                    )
                 )
             )}
         </div>

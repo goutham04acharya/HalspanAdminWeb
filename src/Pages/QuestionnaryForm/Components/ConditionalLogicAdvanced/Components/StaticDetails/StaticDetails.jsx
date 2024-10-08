@@ -7,32 +7,32 @@ function StaticDetails({
 }) {
     return (
         <div className=''>
-            <div className='mt-7'>
+            <div className='mt-4'>
                 <div className='flex justify-between'>
                     <p
                         data-testid="pre-field-option"
-                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'text' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'text' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9] border-b border-[#DDDDDD]'}`}
                         onClick={() => handleTabClick('text')}
                     >
                         Text
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'number' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'number' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9] border-b border-[#DDDDDD]'}`}
                         onClick={() => handleTabClick('number')}
                     >
                         Number
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'date' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'date' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9] border-b border-[#DDDDDD]'}`}
                         onClick={() => handleTabClick('date')}
                     >
                         Date/Time
                     </p>
                     <p
                         data-testid="post-field-option"
-                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'file' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9]'}`}
+                        className={`font-semibold text-base text-center cursor-pointer w-1/4 ${activeTab === 'file' ? 'text-black border-b-2 border-[#000000] pb-2 w-1/4 text-center' : 'text-[#9FACB9] border-b border-[#DDDDDD]'}`}
                         onClick={() => handleTabClick('file')}
                     >
                         File

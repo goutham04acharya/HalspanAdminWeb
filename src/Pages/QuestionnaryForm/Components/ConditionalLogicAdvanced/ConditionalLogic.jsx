@@ -30,8 +30,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const [isThreedotLoader, setIsThreedotLoader] = useState(false)
+    const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
 
-    console.log(allSectionDetails, 'allSectionDetails')
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "concat()", "endsWith()", "includes()", "startsWith()", "trimEnd()", "trimStart()"];
@@ -94,10 +95,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleListSectionDetails = async () => {
+        setIsThreedotLoaderBlack(true);
         setShowSectionList(true)
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
         dispatch(setAllSectionDetails(response.data));
         handleQuestionnaryObject(response.data);
+        setIsThreedotLoaderBlack(false);
     }
     useEffect(() => {
         handleListSectionDetails();
@@ -280,57 +283,39 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
-            console.log(evalInputValue, 'evalInputValue')
-            // Extract variable names from evalInputValue (dot notation)
-            let variableNames = evalInputValue.match(/\b([a-zA-Z_][\w.]*)\b/g);
 
-            // Remove the "sections." prefix from the variable names (if applicable)
-            variableNames = variableNames.map(variable =>
-                variable.startsWith('sections.') ? variable.replace('sections.', '') : variable
-            );
-
-            // Extract the core variable name by removing any method/function calls (e.g., `.toUpperCase`)
-            const coreVariableNames = variableNames.map(variable => {
-                const match = variable.match(/^([a-zA-Z_][\w.]*)(?=\.)?/); // Match before method/function
-                return match ? match[0] : variable; // Return the core variable name
-            });
-
-            // Validate core variables against secDetailsForSearching
-            const invalidVariables = coreVariableNames.filter(
-                coreVariable => !secDetailsForSearching.some(validVariable => coreVariable.startsWith(validVariable))
-            );
-
-            if (invalidVariables.length > 0) {
-                // Show error for invalid variable names
-                setError(`Invalid variable names: ${invalidVariables.join(', ')}`);
-                return; // Stop further processing
-            }
-            console.log(evalInputValue, 'evalInputValue')
             // Evaluate the modified string
             const result = eval(evalInputValue);
+            setIsThreedotLoader(true);
             if (!error) {
-                handleSaveSection(sectionId, true, evalInputValue);
                 setError(result);
-                conditionalLogic(false);
+                handleSaveSection(sectionId, true, evalInputValue);
+                setIsThreedotLoader(false);
+                // dispatch(setConditionalLogic(false));
+
             } else if (typeof result === 'boolean') {
                 console.log('Valid expression, result is a boolean:', result);
                 setError(''); // Clear the error since result is valid
+                setIsThreedotLoader(false);
             } else if (isNaN(result)) {
-                setError('Please pass the parameter inside the function');            
+                setError('Please pass the parameter inside the function');
+                setIsThreedotLoader(false);
             } else {
                 console.log('Result is not a boolean:', result);
                 setError(result);
+                setIsThreedotLoader(false);
+
             }
         } catch (error) {
             // Handle and log any evaluation errors
             console.error('Error evaluating the expression:', error.message);
             setError(error.message);
+            setIsThreedotLoader(false);
         }
     };
-    console.log(secDetailsForSearching, 'secDetailsForSearching')
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-            <div ref={modalRef} className='w-[80%] h-[80%] mx-auto bg-white rounded-[14px] relative p-[18px] flex'>
+            <div ref={modalRef} className='w-[80%] h-[80%] mx-auto bg-white relative p-[18px] flex'>
                 <div className='w-[60%]'>
                     <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
                     <AdvancedEditor
@@ -346,6 +331,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         secDetailsForSearching={secDetailsForSearching}
                         sections={sections}
                         setShowMethodSuggestions={setShowMethodSuggestions}
+                        isThreedotLoaderBlack={isThreedotLoaderBlack}
                     />
                 </div>
                 <div className='w-[40%]'>
@@ -353,7 +339,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         handleTabClick={handleTabClick}
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
-
                     />
                     <div className='mt-5 flex items-center justify-between'>
                         <Button2
@@ -370,6 +355,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             type='button'
                             data-testid='cancel'
                             className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[59px]'
+                            isThreedotLoading={isThreedotLoader}
                         >
                         </Button>
                     </div>
