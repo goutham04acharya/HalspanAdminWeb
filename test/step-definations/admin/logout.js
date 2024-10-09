@@ -28,9 +28,14 @@ When('I click the close button', async function () {
 });
 
 When('I click the cancel button', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 750));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click();
 });
+
+When('I click on cancel button', async function(){
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="cancel-btn"]'))).click();
+})
 
 Then('I should be on the dashboard screen', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
