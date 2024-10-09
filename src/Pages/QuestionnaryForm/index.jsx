@@ -1021,6 +1021,7 @@ const QuestionnaryForm = () => {
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
+                                                                            data-testid="open"
                                                                             className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? "rotate-180 ml-2" : "" // Rotate 180deg when expanded
                                                                                 }`}
                                                                             onClick={() => toggleSection(sectionIndex)} // Toggle section on click

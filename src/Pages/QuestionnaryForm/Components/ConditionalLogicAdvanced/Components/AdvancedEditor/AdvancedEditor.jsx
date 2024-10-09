@@ -73,6 +73,7 @@ function AdvancedEditor({
                 <textarea
                     name="editor"
                     id="editor"
+                    data-testid="conditional-logic-text"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
                     onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
                     ref={textareaRef}

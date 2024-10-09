@@ -21,6 +21,7 @@ Given('I am on the questionnaire management section', async function () {
 When('I click on add new section', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="open"]'))).click();
 });
 
 Then("I should see the new section added", async function () {
