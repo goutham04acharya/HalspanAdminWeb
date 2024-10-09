@@ -325,7 +325,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 console.log('Result is not a boolean:', result);
                 setError(result);
                 setIsThreedotLoader(false);
-
             }
         } catch (error) {
             // Handle and log any evaluation errors
