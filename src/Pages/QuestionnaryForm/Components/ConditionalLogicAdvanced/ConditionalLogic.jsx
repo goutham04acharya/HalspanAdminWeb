@@ -36,7 +36,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
     // Define string and date methods
-    const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "concat()", "endsWith()", "includes()", "startsWith()", "trimEnd()", "trimStart()"];
+    const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
 
     //this is my listing of types based on the component type
@@ -47,11 +47,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             case 'textboxfield':  // Handle both cases if they map to 'string'
                 fieldType = '';
                 break;
-            case 'datefield':
+            case 'dateTimefield':
                 fieldType = new Date();
                 break;
             case 'numberfield':
-                fieldType = 0;
+                fieldType = 1;
                 break;
             default: fieldType = ''
         }
@@ -80,12 +80,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
             const sectionName = section.section_name.replace(/\s+/g, '_');
-            sectionDetailsArray.push(sectionName); // Add the section name
+            // sectionDetailsArray.push(sectionName); // Add the section name
 
             // Access pages within each section
             section.pages?.forEach((page) => {
                 const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
-                sectionDetailsArray.push(pageName); // Add section.page
+                // sectionDetailsArray.push(pageName); // Add section.page
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
@@ -162,9 +162,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (selectedFieldType === 'textboxfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'datefield') {
+            } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
+            } else if (selectedFieldType === 'numberfield') {
+                setShowMethodSuggestions(true);
+
             } else {
                 const cursorPosition = event.target.selectionStart; // Get the cursor position
 
@@ -193,6 +196,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         break;
                     case 'date':
                         setSuggestions(dateMethods);
+                        setShowMethodSuggestions(true);
+                        break;
+                    case 'number':
                         setShowMethodSuggestions(true);
                         break;
                     default:
@@ -245,6 +251,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
+            setShowSectionList(false);
 
         }
 
@@ -259,7 +266,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     break;
                 case 'number': fieldType = 'numberfield'
                     break;
-                case 'date': fieldType = 'datefield';
+                case 'date': fieldType = 'dateTimefield';
                     break
             }
             setSelectedFieldType(fieldType)
@@ -356,6 +363,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         sections={sections}
                         setShowMethodSuggestions={setShowMethodSuggestions}
                         isThreedotLoaderBlack={isThreedotLoaderBlack}
+                        selectedFieldType={selectedFieldType}
                     />
                 </div>
                 <div className='w-[40%]'>

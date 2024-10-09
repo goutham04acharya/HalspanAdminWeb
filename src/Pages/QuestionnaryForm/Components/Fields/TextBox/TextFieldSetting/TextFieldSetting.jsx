@@ -34,7 +34,6 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
-  console.log(allSectionDetails?.data?.sections, 'nayanayan')
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();

@@ -5,7 +5,7 @@ import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/O
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
-import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 
 
 function NumberFieldSetting({
@@ -17,6 +17,7 @@ function NumberFieldSetting({
     selectedQuestionId,
     handleAutoSaveSettings,
     validationErrors,
+    setConditionalLogic,
 
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
@@ -307,10 +308,17 @@ function NumberFieldSetting({
                             handleBlur={handleBlur}
                         />
                     </div>
-                    <div className='mx-auto mt-7 flex items-center w-full'>
-                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                    <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+                        <button
+                            type='button'
+                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                        >
                             Add Conditional Logic
                         </button>
+                        {fieldSettingParameters.conditional_logic &&
+                            <p className='text-center italic mt-1'>Conditional Logic Added</p>
+                        }
                     </div>
                 </div>
             </div>

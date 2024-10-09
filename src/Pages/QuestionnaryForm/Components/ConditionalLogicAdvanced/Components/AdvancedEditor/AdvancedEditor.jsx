@@ -15,7 +15,8 @@ function AdvancedEditor({
     sections,
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
-    smallLoader
+    smallLoader,
+    selectedFieldType
 }) {
 
     // State to track the user's input
@@ -73,12 +74,12 @@ function AdvancedEditor({
                 <textarea
                     name="editor"
                     id="editor"
-                    className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
+                    className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
                     onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
-                <span className="absolute left-[2%] top-[6%] cursor-pointer">=</span>
+                <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
 
             {/* Error message if no matching results */}

@@ -58,10 +58,6 @@ function StaticDetails({
                             <p className='font-semibold text-base text-[#000000]'>Does not Include</p>
                             <p className='font-normal text-base text-[#000000]'>=(!AssetName.Includes("Door"))</p>
                         </div>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                            <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) then "Snowing" else "Raining"</p>
-                        </div>
                     </div>
                 )}
                 {activeTab === 'number' && (
@@ -91,10 +87,6 @@ function StaticDetails({
                             <p className='font-semibold text-base text-[#000000]'>Larger or Equal</p>
                             <p className='font-normal text-base text-[#000000]'>=(AssetNumber &gt= 20)</p>
                         </div>
-                        <div className='mt-3'>
-                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                            <p className='font-normal text-base text-[#000000]'>=If ((Quantity &gt 5 AND Number1 &lt10) OR Number2 &lt20) then 50 else 10</p>
-                        </div>
                     </div>
                 )}
                 {activeTab === 'date' && (
@@ -120,10 +112,6 @@ function StaticDetails({
                             <p className='font-semibold text-base text-[#000000]'>Date is with "X" days of Set date</p>
                             <p className='font-normal text-base text-[#000000]'>=(Math.abs(startDate - setDate) == 5)</p>
                         </div>
-                        <div className='mt-3'>
-                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                            <p className='font-normal text-base text-[#000000]'>=If ((StartDate.getFullYear() &gt 2000 AND EndDate.getMonth() &lt 10) OR StartDate.getMonth() &lt 3 ) then 19/06/2024 else 20/04/2025</p>
-                        </div>
                     </div>
                 )}
                 {/* Display the Post-field input if postField is active */}
@@ -137,10 +125,6 @@ function StaticDetails({
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Has No Files</p>
                             <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() = 0)</p>
-                        </div>
-                        <div className='mt-3'>
-                            <p className='font-semibold text-base text-[#000000]'>Number of Files is</p>
-                            <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() = 5)</p>
                         </div>
                     </div>
                 )}
