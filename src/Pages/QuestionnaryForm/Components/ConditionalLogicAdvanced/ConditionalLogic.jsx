@@ -106,6 +106,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleQuestionnaryObject(response.data);
         setIsThreedotLoaderBlack(false);
     }
+
     useEffect(() => {
         handleListSectionDetails();
     }, [])
@@ -166,7 +167,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'numberfield') {
-                setShowMethodSuggestions(true);
+                setShowMethodSuggestions(false);
+                setSuggestions('')
 
             } else {
                 const cursorPosition = event.target.selectionStart; // Get the cursor position
@@ -235,43 +237,56 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             element.selectionStart = element.selectionEnd = start;
         }, 0);
     };
+
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-
-            // Insert the text at the current caret position
+    
+            // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-            const newText = textBefore + textToInsert + textAfter;
-
+    
+            // Check if there's a space or if the input is empty
+            const lastChar = textBefore.slice(-1);
+            let newText;
+    
+            if (lastChar === ' ' || textBefore.length === 0) {
+                // Append the text if there's a space or the input is empty
+                newText = textBefore + textToInsert + textAfter;
+            } else {
+                // Replace the last word if there's no space
+                const lastSpaceIndex = textBefore.lastIndexOf(' ');
+                const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
+                newText = textToKeep + textToInsert + textAfter;
+            }
+    
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
-
         }
-
+    
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
-
-
         } else {
-            let fieldType = ''
+            let fieldType = '';
             switch (componentType) {
-                case 'string': fieldType = 'textboxfield'
+                case 'string':
+                    fieldType = 'textboxfield';
                     break;
-                case 'number': fieldType = 'numberfield'
+                case 'number':
+                    fieldType = 'numberfield';
                     break;
-                case 'date': fieldType = 'dateTimefield';
-                    break
+                case 'date':
+                    fieldType = 'dateTimefield';
+                    break;
             }
-            setSelectedFieldType(fieldType)
+            setSelectedFieldType(fieldType);
         }
-    };
+    };    
 
     useEffect(() => {
         // Assuming `allSectionDetails` contains the fetched data and 
@@ -282,16 +297,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     page.questions?.forEach((question) => {
                         if (question.question_id === selectedQuestionId) {
                             // Pre-fill the editor with the conditional logic of the selected question
-                            setInputValue(question.conditional_logic || '');
+                            let conditionalLogic = question.conditional_logic || '';
+
+                            // Replace && with "and" and || with "or"
+                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
+
+                            setInputValue(conditionalLogic);
                         }
                     });
                 });
             });
         };
+
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
     }, [selectedQuestionId, allSectionDetails]);
+
 
     // Your handleSave function
     const handleSave = async () => {
@@ -314,9 +336,30 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
 
+            // Check for the "includes" method being used without a parameter
+            const includesRegex = /\.includes\(\)/;
+            if (includesRegex.test(evalInputValue)) {
+                setError('Please pass the parameter inside the function');
+                setIsThreedotLoader(false);
+                return; // Stop execution if validation fails
+            }
+
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
+            // Extract variable names from the payloadString using a regex
+            const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+            const variableNames = payloadString.match(variableRegex) || [];
+
+            // Validate if all variable names exist in secDetailsForSearching
+            const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+
+            if (invalidVariables.length > 0) {
+                setError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
+                setIsThreedotLoader(false);
+                return; // Stop execution if invalid variables are found
+            }
+            console.log(evalInputValue, 'evalInputValue')
             // Evaluate the modified string
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
@@ -335,7 +378,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 console.log('Result is not a boolean:', result);
                 setError(result);
                 setIsThreedotLoader(false);
-
             }
         } catch (error) {
             // Handle and log any evaluation errors
