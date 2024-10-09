@@ -9,7 +9,8 @@ const TextBoxField = ({
     className,
     handleChange,
     fieldSettingParameters,
-    testId
+    testId,
+    preview
 
 }) => {
 
@@ -30,8 +31,8 @@ const TextBoxField = ({
                     id={textId}
                     value={value}
                     className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white mt-5 py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange(fieldSettingParameters)}
+                    placeholder={preview ? fieldSettingParameters?.placeholder_content :fieldSettingParameters?.placeholderContent}
+                    onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
                 />
                 :
                 <input
@@ -39,9 +40,9 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={value}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-5 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    placeholder={fieldSettingParameters?.placeholderContent}
-                    onClick={() => handleChange(fieldSettingParameters)}
+                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    placeholder={preview ? fieldSettingParameters?.placeholder_content :fieldSettingParameters?.placeholderContent}
+                    onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
                 />
             }
             <p

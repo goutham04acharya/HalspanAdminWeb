@@ -1148,6 +1148,9 @@ const QuestionnaryForm = () => {
                                         inputValue: inputValue,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
+                                        questionData: dataIsSame[selectedSectionData],
+                                        setValidationErrors: setValidationErrors,
+                                        
 
                                     }
                                 )
@@ -1235,6 +1238,14 @@ const QuestionnaryForm = () => {
                 />
 
             )}
+            {previewModal && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                sections={sections}
+                
+            />}
         </>
     );
 }

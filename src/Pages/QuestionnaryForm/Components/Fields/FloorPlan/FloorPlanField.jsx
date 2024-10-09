@@ -7,7 +7,8 @@ function FloorPlanField({
     className,
     handleChange,
     fieldSettingParameters,
-
+    helpText,
+    preview
 }) {
     return (
         <div>
@@ -25,9 +26,9 @@ function FloorPlanField({
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'
-                title={fieldSettingParameters?.helptext}
+                title={preview ? helpText : fieldSettingParameters?.helptext}
             >
-                {fieldSettingParameters?.helptext}</p>
+                {preview? helpText : fieldSettingParameters?.helptext}</p>
         </div>
     )
 }
