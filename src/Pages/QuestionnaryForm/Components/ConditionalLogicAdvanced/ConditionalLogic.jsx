@@ -64,13 +64,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let fieldType;
 
         switch (componentType) {
-            case 'textboxfield':  // Handle both cases if they map to 'string'
+            case 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield':  // Handle both cases if they map to 'string'
                 fieldType = '';
                 break;
             case 'dateTimefield':
                 fieldType = new Date();
                 break;
-            case 'numberfield':
+            case 'numberfield, photofield, videofield, filefield':
                 fieldType = 1;
                 break;
             default: fieldType = ''
@@ -206,13 +206,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
-            if (selectedFieldType === 'textboxfield') {
+            if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'numberfield') {
+            } else if (selectedFieldType === 'numberfield, photofield, videofield, filefield') {
                 setShowMethodSuggestions(false);
                 setSuggestions('')
 
@@ -321,10 +321,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let fieldType = '';
             switch (componentType) {
                 case 'string':
-                    fieldType = 'textboxfield';
+                    fieldType = 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield';
                     break;
                 case 'number':
-                    fieldType = 'numberfield';
+                    fieldType = 'numberfield ,photofield, videofield, filefield';
                     break;
                 case 'date':
                     fieldType = 'dateTimefield';

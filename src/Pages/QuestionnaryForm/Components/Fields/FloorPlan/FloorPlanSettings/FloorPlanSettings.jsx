@@ -4,7 +4,7 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { useDispatch } from 'react-redux';
-import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 
 
 function FloorPlanSettings({ handleInputChange,
@@ -137,10 +137,17 @@ function FloorPlanSettings({ handleInputChange,
                             handleBlur={handleBlur}
                         />
                     </div>
-                    <div className='mx-auto mt-7 flex items-center w-full'>
-                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                    <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+                        <button
+                            type='button'
+                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                        >
                             Add Conditional Logic
                         </button>
+                        {fieldSettingParameters.conditional_logic &&
+                            <p className='text-center italic mt-1'>Conditional Logic Added</p>
+                        }
                     </div>
                 </div>
             </div>
