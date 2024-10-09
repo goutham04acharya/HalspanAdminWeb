@@ -619,14 +619,9 @@ const QuestionnaryForm = () => {
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-        const currentFieldSettingParams = fieldSettingParams[selectedQuestionId];
-        const previousFieldSettingParams = dataIsSame[sectionId]?.fieldSettingParams;
-        if (sectionToSave && (currentFieldSettingParams !== previousFieldSettingParams)) {
-            const isDataSame = dataIsSame[sectionId];
-            if (isDataSame) {
-                // If data is the same, return early and don't call the API  
-                return;
-            }
+
+        if (sectionToSave) {
+
             // Create a new object containing only the selected section's necessary fields  
             let body = {
                 section_id: sectionToSave.section_id,
@@ -992,7 +987,7 @@ const QuestionnaryForm = () => {
 
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
-        handleSaveSection(sectionId, sections);
+        handleSaveSection(sectionId, false);
     }
     //this is for diplay content field replace modal function
     const handleConfirmReplace = () => {
@@ -1003,7 +998,7 @@ const QuestionnaryForm = () => {
     useEffect(() => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
-        console.log(fieldSettingParams, 'inside useEffect')
+        // console.log(sections, 'inside useEffect')
     }, []);
 
     // useEffect(() => {
@@ -1103,13 +1098,9 @@ const QuestionnaryForm = () => {
                                                                             alt="save"
                                                                             title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 ${dataIsSame[sectionData.section_id]
-                                                                                ? "cursor-not-allowed"
-                                                                                : "cursor-pointer"
-                                                                                }`}
+                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 cursor-pointer`}
                                                                             onClick={() => {
-                                                                                if (!dataIsSame[sectionData.section_id])
-                                                                                    handleSaveSection(sectionData?.section_id);
+                                                                                handleSaveSection(sectionData?.section_id);
                                                                             }}
                                                                         />
                                                                     </div>
@@ -1170,8 +1161,8 @@ const QuestionnaryForm = () => {
                             </button>
 
                             <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
-                                if (!dataIsSame[latestSectionId])
-                                    handleSaveSection(latestSectionId);
+
+                                handleSaveSection(latestSectionId);
                             }}>
                                 Save
                             </button>
