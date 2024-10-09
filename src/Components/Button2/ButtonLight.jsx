@@ -21,7 +21,7 @@ const Button2 = ({
             className={`bg-[#fff] hover:bg-[#EFF1F8] h-[50px] border border-[#2B333B] text-base text-center
                 leading-[24px] py-2 rounded ${className} ${disabled || isThreedotLoading ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             disabled={disabled || isThreedotLoading}>
-            <div className='flex justify-center items-center gap-2'>
+            <div className='flex justify-center items-center gap-2' data-testid="cancel">
                 {isThreedotLoading ? (
                     <BeatLoader color="#2B333B" size={smallLoader ? '7px' : '10px'} />
                 ) : (

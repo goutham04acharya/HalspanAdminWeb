@@ -427,7 +427,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             text='Save'
                             onClick={handleSave}
                             type='button'
-                            data-testid='cancel'
+                            testID='save-conditional-logic'
                             className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[59px]'
                             isThreedotLoading={isThreedotLoader}
                         >

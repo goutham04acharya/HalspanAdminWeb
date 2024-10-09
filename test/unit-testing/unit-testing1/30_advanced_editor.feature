@@ -37,6 +37,7 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see the help text updated in the section 1
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 1
+    When I click the save button for the questionnaire version
 
     When I click on add new section
     Then I should see the new section added
@@ -45,22 +46,22 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     When I add a new question to the page 1 in section 2
     When I click the textbox button
     Then I should see field settings
-    And I should see the text box added to the section 1
+    And I should see the text box added to the section 2
     When I enter the label name for textbox
-    Then I should see the label name updated in the section 1
+    Then I should see the label name updated in the section 2
     When I enter the help text for textbox
-    Then I should see the help text updated in the section 1
+    Then I should see the help text updated in the section 2
     When I enter the placeholder content for textbox
-    Then I should see the placeholder content updated in the section 1
+    Then I should see the placeholder content updated in the section 2
 
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
     When I enter the incorrect conditional logic
-    Then I should read a message stating that "Invalid syntax"
+    Then I should read a message stating that "No items found"
     When I click the cancel button
     Then I should see field settings
 
     When I click the add conditional logic button
     When I enter the correct conditional logic 
-    Then I click the save button
+    Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
