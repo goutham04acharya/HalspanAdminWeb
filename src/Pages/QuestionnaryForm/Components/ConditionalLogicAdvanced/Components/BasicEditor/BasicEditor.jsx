@@ -11,24 +11,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
 
     const conditionObj = {
-        'text': [
-            {
-                condition: 'includes',
-                format: '.includes()'
-            },
-            {
-                condition: 'does not include',
-                format: '.includes()'
-            },
-            {
-                condition: 'equals',
-                format: ' === '
-            },
-            {
-                condition: 'not equal to',
-                format: ' !== '
-            },
-        ]
+        'text': ['includes','does not include','equals','not equal to'],
+        'numeric':['equals','not equal to','smaller','larger','smaller or equal','larger or equal'],
+        'photofield':['has at least one file','has no files','number of file is'],
+        'date':['date is before today','date is before or equal to today','date is after today','date is after or equal to today','date is “X” date of set date']
     }
     //function to handle dropdowns
     const updateDropdown = (dropdown, mainIndex, subIndex) => {
@@ -203,9 +189,15 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         updateDropdown(type, mainIndex, subIndex)
     }
     const getConditions = (key) => {
+        let arr = []
         switch (key) {
-            case "textboxfield": let arr = conditionObj['text']
+            case "textboxfield" || "choiceboxfield" || "assetLocationfield"
+                || "floorPlanfield" || "signaturefield" || "gpsfield" || "displayfield": return(arr = conditionObj['text'])
+               
+            case "numberfield": return(conditionObj['numeric'])
                 return arr;
+            case "photofield" || "videofield" || "filefield" : return(conditionObj['file'])
+            case "dateTimefield" :return(conditionObj['date'])
         }
     }
     const validateConditions = () => {
@@ -278,7 +270,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     subIndex={i}
                                                     isDropdownOpen={conditions[index]['conditions'][i]['condition_dropdown']}
                                                     setDropdownOpen={updateDropdown}
-                                                    options={getConditions(conditions[index].conditions[i].condition_type).map(item => item?.condition)}
+                                                    options={getConditions(conditions[index].conditions[i].condition_type)}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.condition_logic === ''}
                                                 />
                                                 {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}

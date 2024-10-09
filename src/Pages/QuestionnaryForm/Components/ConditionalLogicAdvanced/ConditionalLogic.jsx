@@ -50,27 +50,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 'condition_dropdown': false,
                 'condition_type': 'textboxfield'
             },
-            {
-                'question_name': '',
-                'condition_logic': '',
-                'value': '',
-                'dropdown': false,
-                'condition_dropdown': false,
-                'condition_type': 'textboxfield'
-            }
         ]
-    }, {
-        'conditions': [
-            {
-                'question_name': '',
-                'condition_logic': '',
-                'value': '',
-                'dropdown': false,
-                'condition_dropdown': false,
-                'condition_type': 'textboxfield'
-            }
-        ]
-    },
+    }
     ])
 
 
@@ -419,7 +400,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleSaveBasicEditor = () => {
         setSubmitSelected(true);
-        console.log(conditions, 'olololo')
         if (validateConditions()) {
             console.log('working');
             return;
@@ -429,10 +409,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] flex'>
+            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                 <div className='w-full'>
                     {tab ?
-                        <>
+                        <div className='flex h-customh14'>
                             <div className='w-[60%]'>
                                 <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
                                 <AdvancedEditor
@@ -445,14 +425,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     handleClickToInsert={handleClickToInsert}
                                     textareaRef={textareaRef}
                                     handleInputField={handleInputField}
-                                    secDetailsForSearching={secDetailsForSearching} />
-                            </div><div className='w-[40%]'>
+                                    secDetailsForSearching={secDetailsForSearching}
+                                    sections={sections}
+                                    setShowMethodSuggestions={setShowMethodSuggestions}
+                                    isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                    selectedFieldType={selectedFieldType}
+                                />
+                            </div>
+                            <div className='w-[40%]'>
                                 <StaticDetails
                                     handleTabClick={handleTabClick}
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab} />
                             </div>
-                        </> :
+                        </div> :
                         <BasicEditor
                             secDetailsForSearching={filterQuestions()}
                             questions={allSectionDetails.data}
@@ -467,8 +453,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                     <div className='flex justify-between items-end'>
                         <div className='flex gap-5 items-end'>
-                            <p onClick={()=>setTab(false)} className={tab ? 'text-lg text-[#9FACB9] px-[1px] border-b-2 border-white cursor-pointer' :'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                            <p onClick={()=>setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] px-[1px] border-b-2 border-white cursor-pointer' :'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                            <p onClick={() => setTab(false)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
+                            <p onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                         </div>
                         <div>
                             <Button2
@@ -490,10 +476,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         </div>
                     </div>
                 </div>
-                {/* <button onClick={() => setTab(!tab)}>toggle</button> */}
-                {/* <div className='mt-5 flex items-center justify-between'> */}
-
-                {/* </div> */}
             </div>
 
         </div>
