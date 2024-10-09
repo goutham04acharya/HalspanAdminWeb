@@ -98,19 +98,19 @@ function StaticDetails({
                         <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is before Today</p>
-                            <p className='font-normal text-base text-[#000000]'>=(StartDate &lt "Today")</p>
+                            <p className='font-normal text-base text-[#000000]'>=(StartDate &lt; "Today")</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is before or equal to Today</p>
-                            <p className='font-normal text-base text-[#000000]'>=StartDate &lt= Today</p>
+                            <p className='font-normal text-base text-[#000000]'>=StartDate &lt;= Today</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is after Today</p>
-                            <p className='font-normal text-base text-[#000000]'>=(StartDate &gt "Today")</p>
+                            <p className='font-normal text-base text-[#000000]'>=(StartDate &gt; "Today")</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is after or equal to Today</p>
-                            <p className='font-normal text-base text-[#000000]'>=(StartDate &gt= "Today")</p>
+                            <p className='font-normal text-base text-[#000000]'>=(StartDate &gt;= "Today")</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is with "X" days of Set date</p>
@@ -124,11 +124,15 @@ function StaticDetails({
                         <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Has Atleast One File</p>
-                            <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() &lt 0)</p>
+                            <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() &lt; 0)</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Has No Files</p>
                             <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() = 0)</p>
+                        </div>
+                        <div className='mt-3'>
+                            <p className='font-semibold text-base text-[#000000]'>Number of Files is</p>
+                            <p className='font-normal text-base text-[#000000]'>=(UploadDamagedDoor() = 5)</p>
                         </div>
                     </div>
                 )}
