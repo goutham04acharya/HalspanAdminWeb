@@ -26,6 +26,7 @@ import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import PreviewModal from './Components/Preview.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -55,6 +56,7 @@ const QuestionnaryForm = () => {
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
+    const [previewModal, setPreviewModal] = useState(false)
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
@@ -78,6 +80,8 @@ const QuestionnaryForm = () => {
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
     const [isSectionSaved, setIsSectionSaved] = useState({});
+
+    console.log(selectedSectionData, 'selectedSectionData')
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -124,7 +128,26 @@ const QuestionnaryForm = () => {
 
         // Update the state dynamically
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-
+        if (id === 'regular_expression') {
+            dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'format_error') {
+            dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'regular_expression') {
+            const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
+            if (!regexPattern.test(value) || value.trim() === '') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: 'Invalid regular expression',
+                }));
+            } else {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: '',
+                }));
+            }
+        }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -432,11 +455,11 @@ const QuestionnaryForm = () => {
             // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
 
-        
+
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        debugger
+        // debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -522,6 +545,10 @@ const QuestionnaryForm = () => {
                     source: question?.source,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
+                    format: question?.format,
+                    regular_expression: question?.regular_expression,
+                    format_error: question?.format_error,
+                    options: question?.options
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -592,8 +619,9 @@ const QuestionnaryForm = () => {
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
-        if (sectionToSave) {
+        const currentFieldSettingParams = fieldSettingParams[selectedQuestionId];
+        const previousFieldSettingParams = dataIsSame[sectionId]?.fieldSettingParams;
+        if (sectionToSave && (currentFieldSettingParams !== previousFieldSettingParams)) {
             const isDataSame = dataIsSame[sectionId];
             if (isDataSame) {
                 // If data is the same, return early and don't call the API  
@@ -616,6 +644,8 @@ const QuestionnaryForm = () => {
                         default_content: fieldSettingParams[question.question_id].defaultContent,
                         type: fieldSettingParams[question.question_id].type,
                         format: fieldSettingParams[question.question_id].format,
+                        regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+                        format_error: fieldSettingParams[question?.question_id]?.format_error,
                         field_range: {
                             min: fieldSettingParams[question.question_id].min,
                             max: fieldSettingParams[question.question_id].max,
@@ -697,7 +727,8 @@ const QuestionnaryForm = () => {
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
 
-                        dispatch(setDataIsSame(update));
+                        dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+
 
                     } else {
                         setToastError('Something went wrong.');
@@ -972,7 +1003,7 @@ const QuestionnaryForm = () => {
     useEffect(() => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
-        console.log(sections, 'inside useEffect')
+        console.log(fieldSettingParams, 'inside useEffect')
     }, []);
 
     // useEffect(() => {
@@ -1129,7 +1160,11 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            <button onClick={() => {
+                                // Open the custom modal  
+                                setPreviewModal(true)
+
+                            }} className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
@@ -1161,6 +1196,9 @@ const QuestionnaryForm = () => {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+                                        questionData: dataIsSame[selectedSectionData],
+                                        setValidationErrors: setValidationErrors,
+
 
                                     }
                                 )
@@ -1240,6 +1278,15 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
+            {previewModal && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                
+            />}
         </>
     );
 }
