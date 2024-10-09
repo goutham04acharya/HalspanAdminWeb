@@ -147,7 +147,7 @@ const fieldSettingParamsSlice = createSlice({
                     include_metadata: item?.asset_extras?.include_metadata,
                     file_size: item?.asset_extras?.fileSize,
                     file_type: item?.asset_extras?.fileType,
-
+                    conditional_logic: item?.conditional_logic,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };
