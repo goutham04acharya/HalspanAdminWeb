@@ -34,7 +34,6 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
-  console.log(allSectionDetails?.data?.sections, 'nayanayan')
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
@@ -284,6 +283,7 @@ function TestFieldSetting({
           <div className='mx-auto mt-7 flex flex-col items-center w-full'>
             <button
               type='button'
+              data-testid="add-conditional-logic"
               className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
               onClick={() => setConditionalLogic(true)}  // Use arrow function
             >
