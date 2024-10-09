@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx';
 import FloorPlanField from './Fields/FloorPlan/FloorPlanField.jsx';
 import TextBoxField from './Fields/TextBox/TextBoxField.jsx';
+import DateTimeField from './Fields/DateTime/DateTimeField.jsx';
 
 
 function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, sections }) {
@@ -25,9 +26,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         } else if (currentSection < sections.length - 1) {
             setCurrentSection(currentSection + 1);
             setCurrentPage(0);
-            setSliderValue(0);
+            // setSliderValue(0);
         }
     };
+    console.log((currentPage + 1) / sections[currentSection].pages.length * 100, '(currentPage + 1) / sections[currentSection].pages.length * 100')
 
     const handleBackClick = () => {
         if (currentPage > 0) {
@@ -36,7 +38,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         } else if (currentSection > 0) {
             setCurrentSection(currentSection - 1);
             setCurrentPage(sections[currentSection - 1].pages.length - 1);
-            setSliderValue(100);
+            // setSliderValue(100);
         }
     };
 
@@ -56,7 +58,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'choiceboxfield':
                 return <p>Choice Box Field</p>;
             case 'dateTimefield':
-                return <p>Date Time Field</p>;
+                return <DateTimeField preview helpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
                 return <p>Number Field</p>;
             case 'assetLocationfield':

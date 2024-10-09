@@ -28,6 +28,7 @@ import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSe
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
+import PreviewModal from './Components/Preview.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -81,6 +82,7 @@ const QuestionnaryForm = () => {
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
     const [isSectionSaved, setIsSectionSaved] = useState({});
+    const [previewModal, setPreviewModal] = useState(false)
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -1114,7 +1116,7 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={()=>setPreviewModal(true)}>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
