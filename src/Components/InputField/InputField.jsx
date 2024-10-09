@@ -18,7 +18,10 @@ const InputField = ({
     labelStyle,
     handleBlur,
     optional,
-    prefixValue
+    prefixValue,
+    subIndex,
+    mainIndex,
+
 }) => {
  
     return (
@@ -38,7 +41,7 @@ const InputField = ({
                     placeholder={prefixValue ? '' : placeholder}
                     data-testid={testId}
                     maxLength={maxLength}
-                    onChange={(e) => handleChange(e, id, type)}
+                    onChange={(e) => handleChange(e, id, type, mainIndex, subIndex)}
                     onBlur={(e) => {
                         if (handleBlur) handleBlur(e)
                     }}

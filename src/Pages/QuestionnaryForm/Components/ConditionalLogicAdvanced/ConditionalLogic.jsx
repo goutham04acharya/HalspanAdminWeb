@@ -12,6 +12,9 @@ import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/Condi
 import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
 import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
+import BasicEditor from './Components/BasicEditor/BasicEditor';
+import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
+
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
@@ -33,6 +36,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
+    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const [tab, setTab] = useState(false);
+    const [submitSelected, setSubmitSelected] = useState(false);
+
+    const [conditions, setConditions] = useState([{
+        'conditions': [
+            {
+                'question_name': '',
+                'condition_logic': '',
+                'value': '',
+                'dropdown': false,
+                'condition_dropdown': false,
+                'condition_type': 'textboxfield'
+            },
+            {
+                'question_name': '',
+                'condition_logic': '',
+                'value': '',
+                'dropdown': false,
+                'condition_dropdown': false,
+                'condition_type': 'textboxfield'
+            }
+        ]
+    }, {
+        'conditions': [
+            {
+                'question_name': '',
+                'condition_logic': '',
+                'value': '',
+                'dropdown': false,
+                'condition_dropdown': false,
+                'condition_type': 'textboxfield'
+            }
+        ]
+    },
+    ])
 
 
     // Define string and date methods
@@ -93,6 +132,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
+    };
+
+    //function for filtering for the basic editor -- does not need section and page
+    const filterQuestions = () => {
+        // Initialize an empty array to hold the flattened details
+        const sectionDetailsArray = [];
+
+        // Access the sections from the data object
+        allSectionDetails?.data?.sections?.forEach((section) => {
+            const sectionName = section.section_name.replace(/\s+/g, '_');
+            // sectionDetailsArray.push(sectionName); // Add the section name
+
+            // Access pages within each section
+            section.pages?.forEach((page) => {
+                const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
+                // sectionDetailsArray.push(pageName); // Add section.page
+
+                // Access questions within each page
+                page.questions?.forEach((question) => {
+                    const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                    sectionDetailsArray.push(questionName); // Add section.page.question
+                });
+            });
+        });
+        // Return the array containing all the details
+        return sectionDetailsArray;
     };
 
     const handleListSectionDetails = async () => {
@@ -334,54 +399,103 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(false);
         }
     };
+
+    const validateConditions = () => {
+        for (let i = 0; i < conditions.length; i++) {
+            for (let j = 0; j < conditions[i].conditions.length; j++) {
+                const condition = conditions[i].conditions[j];
+                if (
+
+                    condition.question_name === '' ||
+                    condition.condition_logic === '' ||
+                    condition.value === ''
+                ) {
+                    return true;  // Return true if any key is empty
+                }
+            }
+        }
+        return false;  // Return false if all keys have values
+    };
+
+    const handleSaveBasicEditor = () => {
+        setSubmitSelected(true);
+        console.log(conditions, 'olololo')
+        if (validateConditions()) {
+            console.log('working');
+            return;
+        }
+        let condition_logic = buildConditionExpression(conditions);
+        console.log(condition_logic, 'olololo')
+    }
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-            <div ref={modalRef} className='w-[80%] h-[80%] mx-auto bg-white relative p-[18px] flex'>
-                <div className='w-[60%]'>
-                    <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
-                    <AdvancedEditor
-                        handleListSectionDetails={handleListSectionDetails}
-                        showSectionList={showSectionList}
-                        inputValue={inputValue}
-                        error={error}
-                        showMethodSuggestions={showMethodSuggestions}
-                        suggestions={suggestions}
-                        handleClickToInsert={handleClickToInsert}
-                        textareaRef={textareaRef}
-                        handleInputField={handleInputField}
-                        secDetailsForSearching={secDetailsForSearching}
-                        sections={sections}
-                        setShowMethodSuggestions={setShowMethodSuggestions}
-                        isThreedotLoaderBlack={isThreedotLoaderBlack}
-                    />
-                </div>
-                <div className='w-[40%]'>
-                    <StaticDetails
-                        handleTabClick={handleTabClick}
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                    />
-                    <div className='mt-5 flex items-center justify-between'>
-                        <Button2
-                            text='Cancel'
-                            type='button'
-                            data-testid='button1'
-                            className='w-[162px] h-[50px] text-black font-semibold text-base'
-                            onClick={() => handleClose()}
-                        >
-                        </Button2>
-                        <Button
-                            text='Save'
-                            onClick={handleSave}
-                            type='button'
-                            data-testid='cancel'
-                            className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[59px]'
-                            isThreedotLoading={isThreedotLoader}
-                        >
-                        </Button>
+            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] flex'>
+                <div className='w-full'>
+                    {tab ?
+                        <>
+                            <div className='w-[60%]'>
+                                <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                <AdvancedEditor
+                                    handleListSectionDetails={handleListSectionDetails}
+                                    showSectionList={showSectionList}
+                                    inputValue={inputValue}
+                                    error={error}
+                                    showMethodSuggestions={showMethodSuggestions}
+                                    suggestions={suggestions}
+                                    handleClickToInsert={handleClickToInsert}
+                                    textareaRef={textareaRef}
+                                    handleInputField={handleInputField}
+                                    secDetailsForSearching={secDetailsForSearching} />
+                            </div><div className='w-[40%]'>
+                                <StaticDetails
+                                    handleTabClick={handleTabClick}
+                                    activeTab={activeTab}
+                                    setActiveTab={setActiveTab} />
+                            </div>
+                        </> :
+                        <BasicEditor
+                            secDetailsForSearching={filterQuestions()}
+                            questions={allSectionDetails.data}
+                            sections={sections}
+                            setShowMethodSuggestions={setShowMethodSuggestions}
+                            isThreedotLoaderBlack={isThreedotLoaderBlack}
+                            conditions={conditions}
+                            setConditions={setConditions}
+                            submitSelected={submitSelected}
+                            setSubmitSelected={setSubmitSelected}
+                        />
+                    }
+                    <div className='flex justify-between items-end'>
+                        <div className='flex gap-5 items-end'>
+                            <p onClick={()=>setTab(false)} className={tab ? 'text-lg text-[#9FACB9] px-[1px] border-b-2 border-white cursor-pointer' :'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
+                            <p onClick={()=>setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] px-[1px] border-b-2 border-white cursor-pointer' :'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                        </div>
+                        <div>
+                            <Button2
+                                text='Cancel'
+                                type='button'
+                                data-testid='button1'
+                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                onClick={() => handleClose()}
+                            >
+                            </Button2>
+                            <Button
+                                text='Save'
+                                onClick={tab ? handleSave : handleSaveBasicEditor}
+                                type='button'
+                                data-testid='cancel'
+                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                            >
+                            </Button>
+                        </div>
                     </div>
                 </div>
+                {/* <button onClick={() => setTab(!tab)}>toggle</button> */}
+                {/* <div className='mt-5 flex items-center justify-between'> */}
+
+                {/* </div> */}
             </div>
+
         </div>
     );
 }
