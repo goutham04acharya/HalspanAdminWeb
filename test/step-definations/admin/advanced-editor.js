@@ -24,12 +24,11 @@ When('I enter the incorrect conditional logic', async function () {
 When('I enter the correct conditional logic', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Question_1.includes("Roopesh")');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_Label_Name.includes("Roopesh")');
 });
 
 Then('I click the save button for conditional logic', async function () {
     await new Promise(resolve => setTimeout(resolve, 500));  
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="save-conditional-logic"]`))).click();
-    await driver.wait(until.elementLocated(By.xpath('//button[text()="Save"]')), 10000).click();
-    
+    await driver.wait(until.elementLocated(By.css('[data-testid="save-conditional-logic"]'))).click();
+    // await driver.wait(until.elementLocated(By.xpath('//button[text()="Save"]')), 10000).click();
 });

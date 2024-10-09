@@ -30,6 +30,7 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see the help text updated in the section 1
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 1
+    When I click the save button for the questionnaire version
 
     When I click on add new section
     Then I should see the new section added
