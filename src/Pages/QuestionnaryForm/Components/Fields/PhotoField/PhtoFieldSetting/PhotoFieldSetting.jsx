@@ -16,6 +16,7 @@ function PhotoFieldSetting({
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
+    setConditionalLogic
 
 }) {
     const dispatch = useDispatch();

@@ -13,6 +13,7 @@ function DateTimeFieldSetting({
   handleRadiobtn,
   fieldSettingParameters,
   selectedQuestionId,
+  setConditionalLogic
 
 }) {
   const dispatch = useDispatch();

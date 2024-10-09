@@ -24,6 +24,7 @@ function ChoiceFieldSetting({
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
+    setConditionalLogic
 }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);

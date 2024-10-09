@@ -10,6 +10,7 @@ function GPSFieldSetting({
     handleBlur,
     fieldSettingParameters,
     selectedQuestionId,
+    setConditionalLogic
 }) {
     return (
         <>

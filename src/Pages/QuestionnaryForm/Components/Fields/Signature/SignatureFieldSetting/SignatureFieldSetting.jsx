@@ -7,6 +7,7 @@ function SignatureFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
+    setConditionalLogic,
 }) {
     return (
         <>

@@ -7,6 +7,7 @@ function AssetLocationFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
+    setConditionalLogic
 }) {
     return (
         <>

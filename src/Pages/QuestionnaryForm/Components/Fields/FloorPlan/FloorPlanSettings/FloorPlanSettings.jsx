@@ -13,6 +13,7 @@ function FloorPlanSettings({ handleInputChange,
     handleRadiobtn,
     fieldSettingParameters,
     selectedQuestionId,
+    setConditionalLogic
 
 }) {
     const dispatch = useDispatch();

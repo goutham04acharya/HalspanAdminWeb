@@ -13,6 +13,7 @@ function FileFieldSetting({ handleInputChange,
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
+    setConditionalLogic
 }) {
     return (
         <>

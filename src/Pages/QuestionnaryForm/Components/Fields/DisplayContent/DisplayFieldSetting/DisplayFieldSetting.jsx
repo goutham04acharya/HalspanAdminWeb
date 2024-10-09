@@ -16,6 +16,7 @@ function DisplayFieldSetting({
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
+    setConditionalLogic
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
