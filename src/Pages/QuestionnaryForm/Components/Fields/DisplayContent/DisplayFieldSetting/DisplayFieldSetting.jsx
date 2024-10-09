@@ -7,7 +7,7 @@ import InputWithDropDown from '../../../../../../Components/InputField/InputWith
 import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not already done
-import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 
 
 function DisplayFieldSetting({
@@ -41,7 +41,7 @@ function DisplayFieldSetting({
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        dispatch(setNewComponent({ id: 'urlValue', value:( option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: (option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
 
         dispatch(setShouldAutoSave(true));
 
@@ -411,10 +411,17 @@ function DisplayFieldSetting({
                             maxLength={500}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
-                    <div className='mx-auto mt-7 flex items-center w-full'>
-                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                    <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+                        <button
+                            type='button'
+                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                        >
                             Add Conditional Logic
                         </button>
+                        {fieldSettingParameters.conditional_logic &&
+                            <p className='text-center italic mt-1'>Conditional Logic Added</p>
+                        }
                     </div>
                 </div>
             </div >

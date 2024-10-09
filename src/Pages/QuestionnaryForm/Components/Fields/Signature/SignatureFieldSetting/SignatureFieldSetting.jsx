@@ -40,10 +40,17 @@ function SignatureFieldSetting({
                             maxLength={500}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
-                    <div className='mx-auto mt-7 flex items-center w-full'>
-                        <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+                    <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+                        <button
+                            type='button'
+                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                        >
                             Add Conditional Logic
                         </button>
+                        {fieldSettingParameters.conditional_logic &&
+                            <p className='text-center italic mt-1'>Conditional Logic Added</p>
+                        }
                     </div>
                 </div>
 
