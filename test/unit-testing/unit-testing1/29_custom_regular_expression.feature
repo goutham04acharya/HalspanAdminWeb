@@ -36,6 +36,12 @@ Feature: Halspan - Admin - Regular expression for pattern matching
     When I check the field validation 
     When I select the type as <type>
     * I select the format as <format>
+    When I enter the custom regular expression as ""
+    When I enter the format error message as "Invalid"
+    Then I should read a message stating that "Regular expression cannot be empty"
+    When I enter the custom regular expression as "["
+    When I enter the format error message as "Invalid"
+    Then I should read a message stating that "Invalid regular expression"
     When I enter the custom regular expression as "^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
     When I enter the format error message as "Invalid PAN format"
     # Then I should see the format reflected on the text box section 1

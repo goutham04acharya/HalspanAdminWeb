@@ -7,15 +7,19 @@ const Key = webdriver.Key
 
 When('I check the field validation', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementsLocated(By.css(`[data-testid="Field validation"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="Field validation"]`))).click();
 });
 
 When('I enter the custom regular expression as {string}', async function (regex) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementsLocated(By.css(`[data-testid="regex-input"]`))).sendkeys(regex);
+    let custom_regex = await driver.wait(until.elementLocated(By.css(`[data-testid="regex-input"]`)));
+    await custom_regex.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    await custom_regex.sendKeys(regex);
 });
 
 When('I enter the format error message as {string}', async function (message) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementsLocated(By.css(`[data-testid="format-error-input"]`))).sendkeys(message);
+    let format_error = await driver.wait(until.elementLocated(By.css(`[data-testid="format-error-input"]`)));
+    await format_error.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    await format_error.sendKeys(message);
 });
