@@ -41,8 +41,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
 
     When I click on add new section
     Then I should see the new section added
-    # When I click on add new page
-    # Then I should see the new pages added
     When I add a new question to the page 1 in section 2
     When I click the textbox button
     Then I should see field settings
@@ -54,10 +52,21 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 2
 
+
+  Scenario: Admin adds the conditional logic for textfield
+    Given I am on the Questionnaire management sections
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
+    Then I should see the suggestions for questions
     When I enter the incorrect conditional logic
     Then I should read a message stating that "No items found"
+    Then I click the save button for conditional logic
+    Then I should read a error message
+    When I click the cancel button
+    Then I should see field settings
+    
+    When I click the add conditional logic button
+    When I select the question from the suggestions
     When I click the cancel button
     Then I should see field settings
 
