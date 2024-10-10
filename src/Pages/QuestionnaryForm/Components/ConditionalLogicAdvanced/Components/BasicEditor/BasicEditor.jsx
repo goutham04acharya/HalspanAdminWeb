@@ -237,8 +237,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                    testID='format-dropdown'
-                                                    labeltestID='format-list'
+                                                    testID={`select-${index}-${i}`}
+                                                    labeltestID={`select-dropdown-${index}-${i}`}
                                                     selectedOption={conditions[index]?.conditions[i]?.question_name}
                                                     handleOptionClick={handleSelectDropdown}
                                                     isDropdownOpen={conditions[index]['conditions'][i]['dropdown']}
@@ -261,8 +261,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                    testID='format-dropdown'
-                                                    labeltestID='format-list'
+                                                    testID={`condition-${index}-${i}`}
+                                                    labeltestID={`condition-dropdown-${index}-${i}`}
                                                     selectedOption={conditions[index]?.conditions[i]?.condition_logic}
                                                     handleOptionClick={handleSelectDropdown}
                                                     mainIndex={index}
@@ -287,7 +287,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     className='w-full'
                                                     labelStyle=''
                                                     placeholder=''
-                                                    testId=''
+                                                    testId={`value-input-${index}-${i}`}
                                                     htmlFor=''
                                                     maxLength={32}
                                                     mainIndex={index}
@@ -299,7 +299,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                             </div>
                                         </div>
                                     </div>
-                                    {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' onClick={() => handleAdd('AND', index)}>
+                                    {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />
                                         <p className='text-sm text-[#2B333B] -mt-2 font-semibold cursor-pointer'>AND</p>
                                     </div> : <div className='w-[3%] flex flex-col items-center'>
@@ -314,7 +314,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                 </div>
                             </div>
                         ))}
-                        {conditions.length - 1 === index ? <div className='cursor-pointer' onClick={() => handleAdd('OR')}>
+                        {conditions.length - 1 === index ? <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => handleAdd('OR')}>
                             <Image src="add" className="mx-auto w-8 h-8" data-testid="add" />
                             <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                         </div> :
