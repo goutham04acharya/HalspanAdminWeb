@@ -71,6 +71,13 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see field settings
 
     When I click the add conditional logic button
-    When I enter the correct conditional logic 
+    When I enter the incorrect conditional logic with then and else
+    Then I click the save button for conditional logic
+    And I should read a message stating that "Unexpected identifier 'then'"
+    When I click the cancel button
+    Then I should see field settings
+
+    When I click the add conditional logic button
+    When I enter the correct conditional logic
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
