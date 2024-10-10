@@ -33,6 +33,7 @@ function AdvancedEditor({
         // Find the index of the last space before the cursor and the next space after the cursor
         const startOfWord = leftPart.lastIndexOf(' ') + 1;
         const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
+        
 
         const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord).trim();
         // Check for specific characters and prevent showing the error
@@ -54,15 +55,29 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
-        
+
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
+        console.log(valueType)
+        // let valueType = '';
+        // try {
+        //     if (allSections[suggestion] !== undefined) {
+        //         valueType = getVariableType(allSections[suggestion]);
+        //     } else {
+        //         // If suggestion is not a valid key in allSections, handle the error gracefully
+        //         console.error('Invalid suggestion:', suggestion);
+        //     }
+        // } catch (e) {
+        //     console.error('Error in eval:', e);
+        // }
+
         handleClickToInsert(suggestion, false, valueType);
 
         // After selecting a suggestion, show suggestions list again and hide error
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
     }
+
     const handleKeyDown = (event) => {
         // Prevent single quote key (keyCode 222 is the code for single quote)
         if (event.key === "'" || event.keyCode === 222) {

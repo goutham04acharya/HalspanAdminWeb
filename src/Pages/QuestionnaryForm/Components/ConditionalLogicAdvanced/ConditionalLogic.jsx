@@ -38,7 +38,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
-    const fileMethods = ["()"];
+    const fileMethods = ['()'];
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -61,7 +61,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 fieldType = 1;  // Handle all numeric-related fields similarly
                 break;
             case 'photofield':
+                fieldType = [];
+                break;
             case 'videofield':
+                fieldType = [];
+                break;
             case 'filefield':
                 fieldType = [];
                 break;
@@ -133,6 +137,45 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [allSectionDetails]);
 
     //this is my function to store the cbasic sticture of my entire questionnary object
+    // function handleQuestionnaryObject(allSectionDetails) {
+    //     let result = {};
+    //     if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
+    //         allSectionDetails?.data?.sections.forEach((section) => {
+    //             let sectionObject = {
+    //                 [(section.section_name).replaceAll(' ', '_')]: {}
+    //             };
+    //             let skip = true
+    //             if (section.pages && section.pages.length > 0) {
+    //                 section.pages.forEach((page) => {
+    //                     if (page.questions && page.questions.length > 0) {
+    //                         page.questions.forEach((question) => {
+    //                             if (question.question_id !== selectedQuestionId) {
+    //                                 skip = false
+    //                                 const fieldType = getFieldType(question.component_type);
+    //                                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+    //                                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+    //                                     [(question.question_name).replaceAll(' ', '_')]: fieldType
+    //                                 }
+    //                             } else {
+    //                                 skip = true
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //             if (!skip) {
+    //                 result = {
+    //                     ...result,
+    //                     ...sectionObject
+    //                 }
+    //                 console.log(result,'result rnjtih')
+    //                 setSections(result);
+    //             }
+
+    //         });
+    //     }
+    // }
+
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
@@ -140,33 +183,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 let sectionObject = {
                     [(section.section_name).replaceAll(' ', '_')]: {}
                 };
-                let skip = true
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
-                                if (question.question_id !== selectedQuestionId) {
-                                    skip = false
-                                    const fieldType = getFieldType(question.component_type);
-                                    sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                                        ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                                        [(question.question_name).replaceAll(' ', '_')]: fieldType
-                                    }
-                                } else {
-                                    skip = true
+                                const fieldType = getFieldType(question.component_type);
+                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
                                 }
+
                             });
                         }
                     });
                 }
-                if (!skip) {
-                    result = {
-                        ...result,
-                        ...sectionObject
-                    }
-                    setSections(result);
+                result = {
+                    ...result,
+                    ...sectionObject
                 }
-
+                setSections(result);
             });
         }
     }
@@ -183,6 +218,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
+            console.log(selectedFieldType, 'type')
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -215,6 +251,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
 
                 let allSections = sections;
+                console.log(sections, 'lllllllll')
                 const getVariableType = a => a.constructor.name.toLowerCase();
                 let valueType = ''
                 try {
@@ -232,7 +269,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         setShowMethodSuggestions(true);
                         break;
                     case 'number':
-                        setShowMethodSuggestions(true);
+                        setShowMethodSuggestions(false);
                         break;
                     case 'file':
                         setSuggestions(fileMethods);
@@ -248,34 +285,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
 
-        // Automatically insert closing parentheses or brackets when typed
-        if (lastChar === '(') {
-            insertAtCaret(event.target, ')');
-        } else if (lastChar === '[') {
-            insertAtCaret(event.target, ']');
-        } else if (lastChar === '{') {
-            insertAtCaret(event.target, '}');
-        }
-
     };
     console.log(suggestions, 'suggegege')
 
-    const insertAtCaret = (element, closingChar) => {
-        const start = element.selectionStart;
-        const end = element.selectionEnd;
-        const textBefore = element.value.substring(0, start);
-        const textAfter = element.value.substring(end);
-        const newText = textBefore + closingChar + textAfter;
-
-        element.value = newText;
-
-        setTimeout(() => {
-            element.selectionStart = element.selectionEnd = start;
-        }, 0);
-    };
-
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        console.log(componentType, 'componentType')
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -308,7 +323,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
         } else {
-            let fieldType = 's';
+            let fieldType = '';
             switch (componentType) {
                 case 'string':
                     fieldType = [
@@ -326,7 +341,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         'numberfield',
                     ];
                     break;
-                case '[]':
+                case 'array':
                     fieldType = [
                         'photofield',
                         'videofield',
@@ -381,9 +396,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             };
             // Apply the section prefix function to the inputValue
             let evalInputValue = (inputValue)
+            console.log(evalInputValue,'before')
             evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
             evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue.replaceAll('()', 'length') // Replace () with length function
+            evalInputValue.replaceAll('()', 'length'); // Replace () with length function
+            console.log(typeof evalInputValue,'after')
 
             let expression = evalInputValue.toString();
 
@@ -400,9 +417,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return; // Stop execution if validation fails
             }
-
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
+            console.log(payloadString, 'evalInputValue')
 
             // Extract variable names from the payloadString using a regex
             const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
