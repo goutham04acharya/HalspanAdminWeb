@@ -247,7 +247,7 @@ function VersionList() {
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                 Button2text='Cancel'
                 testIDBtn1={edit ? 'confirm-edit' : 'confirm-duplicate'}
-                testIDBtn2='cancel-btn'
+                testIDBtn2='cancel-btn-modal'
                 handleButton2={handleClose}
                 handleClose={handleClose}
                 isOpen={isCreateModalOpen}

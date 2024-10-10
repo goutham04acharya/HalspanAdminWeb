@@ -93,7 +93,7 @@ async function selectDropdownValueNotExist(selectTestId, dropdownPrefix, optionT
 Then('I should not see current selected question should not exist in the list', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));  // Adding delay
     // First condition (select and condition)
-    const exist = await selectDropdown('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Sample_Label_Name');
+    const exist = await selectDropdownValueNotExist('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Sample_Label_Name');
     assert.notEqual(exist)
 });
 
