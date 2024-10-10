@@ -44,25 +44,56 @@ When('I enter the correct conditional logic for basic editor', async function ()
     await new Promise((resolve) => setTimeout(resolve, 750));  // Adding delay
 
     // First condition (select and condition)
-    await selectDropdown('select-0', 'select-dropdown', 'Section_1.Page_1.Question_1');
-    await selectDropdown('condition-0', 'condition-dropdown', 'equals');
-    await enterValue('value-input-0', '200');
+    await selectDropdown('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Sample_Label_Name');
+    await selectDropdown('condition-0-0', 'condition-dropdown-0-0', 'equals');
+    await enterValue('value-input-0-0', '200');
     await driver.wait(until.elementLocated(By.css('[data-testid="AND-0"]')), 5000).click();  // Add AND condition
 
+    await new Promise((resolve) => setTimeout(resolve, 750));
     // Second AND condition
-    await selectDropdown('select-1', 'select-dropdown', 'Section_1.Page_1.Question_1');
-    await selectDropdown('condition-1', 'condition-dropdown', 'does not include');
-    await enterValue('value-input-1', '1500');
+    await selectDropdown('select-0-1', 'select-dropdown-0-1', 'Section_1.Page_1.Sample_Label_Name');
+    await selectDropdown('condition-0-1', 'condition-dropdown-0-1', 'does not include');
+    await enterValue('value-input-0-1', '1500');
     await driver.wait(until.elementLocated(By.css('[data-testid="OR-0"]')), 5000).click();  // Add OR condition
 
+    await new Promise((resolve) => setTimeout(resolve, 750));
     // Third condition (OR)
-    await selectDropdown('select-2', 'select-dropdown', 'Section_1.Page_1.Question_1');
-    await selectDropdown('condition-2', 'condition-dropdown', 'includes');
-    await enterValue('value-input-2', '200');
-    await driver.wait(until.elementLocated(By.css('[data-testid="AND-2"]')), 5000).click();  // Add AND condition
+    await selectDropdown('select-1-0', 'select-dropdown-1-0', 'Section_1.Page_1.Sample_Label_Name');
+    await selectDropdown('condition-1-0', 'condition-dropdown-1-0', 'includes');
+    await enterValue('value-input-1-0', '200');
+    await driver.wait(until.elementLocated(By.css('[data-testid="AND-1"]')), 5000).click();  // Add AND condition
 
+    await new Promise((resolve) => setTimeout(resolve, 750));
     // Fourth AND condition
-    await selectDropdown('select-3', 'select-dropdown', 'Section_1.Page_1.Question_1');
-    await selectDropdown('condition-3', 'condition-dropdown', 'not equal to');
-    await enterValue('value-input-3', '1500');
+    await selectDropdown('select-1-1', 'select-dropdown-1-1', 'Section_1.Page_1.Sample_Label_Name');
+    await selectDropdown('condition-1-1', 'condition-dropdown-1-1', 'not equal to');
+    await enterValue('value-input-1-1', '1500');
 });
+
+async function selectDropdownValueNotExist(selectTestId, dropdownPrefix, optionText) {
+    await driver.wait(until.elementLocated(By.css(`[data-testid="${selectTestId}"]`)), 10000).click();
+
+    let exist = false
+    const elements = await await driver.wait(until.findElements(By.css('[data-testid^="option"]')), 10000);
+    let count = elements.length
+    while (count > 0) {
+        let option = await driver.wait(until.elementLocated(By.css(`[data-testid="${dropdownPrefix}-${count -1 }"]`)), 10000);
+        let optionTextValue = await option.getText();
+
+        if (optionTextValue === optionText) {
+            exist = true
+            break;
+        }
+        count--;
+    }
+    return exist
+
+}
+
+Then('I should not see current selected question should not exist in the list', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 750));  // Adding delay
+    // First condition (select and condition)
+    const exist = await selectDropdown('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Sample_Label_Name');
+    assert.notEqual(exist)
+});
+
