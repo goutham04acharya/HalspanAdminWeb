@@ -48,6 +48,7 @@ Feature: Halspan- Admin - Show/hide entire section/page for Text Fields(Basic Ed
 
     When I click the add conditional logic button
     Then I should see the basic editor for textfield
+    Then I should not see current selected question should not exist in the list
     When I enter the correct conditional logic for basic editor
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"

@@ -69,3 +69,31 @@ When('I enter the correct conditional logic for basic editor', async function ()
     await selectDropdown('condition-1-1', 'condition-dropdown-1-1', 'not equal to');
     await enterValue('value-input-1-1', '1500');
 });
+
+async function selectDropdownValueNotExist(selectTestId, dropdownPrefix, optionText) {
+    await driver.wait(until.elementLocated(By.css(`[data-testid="${selectTestId}"]`)), 10000).click();
+
+    let exist = false
+    const elements = await await driver.wait(until.findElements(By.css('[data-testid^="option"]')), 10000);
+    let count = elements.length
+    while (count > 0) {
+        let option = await driver.wait(until.elementLocated(By.css(`[data-testid="${dropdownPrefix}-${count -1 }"]`)), 10000);
+        let optionTextValue = await option.getText();
+
+        if (optionTextValue === optionText) {
+            exist = true
+            break;
+        }
+        count--;
+    }
+    return exist
+
+}
+
+Then('I should not see current selected question should not exist in the list', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 750));  // Adding delay
+    // First condition (select and condition)
+    const exist = await selectDropdown('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Sample_Label_Name');
+    assert.notEqual(exist)
+});
+
