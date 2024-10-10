@@ -18,8 +18,6 @@ function NumberFieldSetting({
     handleAutoSaveSettings,
     validationErrors,
     setConditionalLogic,
-    setConditionalLogic
-
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
     const dispatch = useDispatch();

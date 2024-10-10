@@ -21,7 +21,7 @@ const InputField = ({
     prefixValue,
     subIndex,
     mainIndex,
-
+    onInput
 }) => {
  
     return (
@@ -41,6 +41,11 @@ const InputField = ({
                     placeholder={prefixValue ? '' : placeholder}
                     data-testid={testId}
                     maxLength={maxLength}
+                    onInput={(e) => {
+                        if (onInput) { 
+                          e.target.value = e.target.value.replace(/[^0-9.]/g, ''); 
+                        }
+                      }}
                     onChange={(e) => handleChange(e, id, type, mainIndex, subIndex)}
                     onBlur={(e) => {
                         if (handleBlur) handleBlur(e)

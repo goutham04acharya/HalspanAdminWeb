@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
+import GlobalContext from '../../../../Components/Context/GlobalContext';
 
 
 
@@ -39,6 +40,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [tab, setTab] = useState(false);
     const [submitSelected, setSubmitSelected] = useState(false);
+    const { setToastError, setToastSuccess } = useContext(GlobalContext);
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -290,15 +292,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (textarea) {
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-    
+
             // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-    
+
             // Check if there's a space or if the input is empty
             const lastChar = textBefore.slice(-1);
             let newText;
-    
+
             if (lastChar === ' ' || textBefore.length === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
@@ -308,13 +310,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
                 newText = textToKeep + textToInsert + textAfter;
             }
-    
+
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
         }
-    
+
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
         } else {
@@ -332,7 +334,237 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             setSelectedFieldType(fieldType);
         }
-    };    
+    };
+
+    function getDetails(path, data) {
+        // Step 1: Split the path by '.' to get section, page, and question names
+        const [sectionPart, pagePart, questionPart] = path.split('.');
+
+        // Step 2: Replace underscores with spaces to match the actual names
+        const sectionName = sectionPart.replace(/_/g, ' ');
+        const pageName = pagePart.replace(/_/g, ' ');
+        const questionName = questionPart.replace(/_/g, ' ');
+
+        // Step 3: Search for the matching section in the data
+        const matchingSection = data?.sections.find(section => section.section_name === sectionName);
+        if (!matchingSection) {
+            return null; // No matching section found
+        }
+
+        // Step 4: Search for the matching page in the section
+        const matchingPage = matchingSection.pages.find(page => page.page_name === pageName);
+        if (!matchingPage) {
+            return null; // No matching page found
+        }
+
+        // Step 5: Search for the matching question in the page
+        const matchingQuestion = matchingPage.questions.find(question => question.question_name === questionName);
+        if (!matchingQuestion) {
+            return null; // No matching question found
+        }
+
+        // Step 6: Return the matching question details
+        return matchingQuestion;
+    }
+
+    // Helper function to trim unnecessary parentheses
+    const trimParentheses = (expression) => {
+        let trimmedExpression = expression.trim();
+
+        // Trim the outermost parentheses if they match
+        if (trimmedExpression.startsWith('(') && trimmedExpression.endsWith(')')) {
+            // Check if it's a balanced pair of parentheses
+            let parenthesesCount = 0;
+            for (let i = 0; i < trimmedExpression.length; i++) {
+                if (trimmedExpression[i] === '(') parenthesesCount++;
+                if (trimmedExpression[i] === ')') parenthesesCount--;
+
+                // If we reach the end and it's still balanced, trim
+                if (i === trimmedExpression.length - 1 && parenthesesCount === 0) {
+                    return trimmedExpression.slice(1, -1).trim();
+                }
+            }
+        }
+        return trimmedExpression;
+    };
+
+    // Main function to split the expression and reconstruct conditions
+    // const parseLogicExpression = (expression) => {
+    //     const conditionGroups = expression.split('||').map(group => trimParentheses(group));
+
+    //     return conditionGroups.map(group => {
+    //         const conditions = group.split('&&').map(condition => {
+    //             condition = trimParentheses(condition);
+
+    //             // Adjust regex to capture question name, logic, and value with optional spaces
+    //             const matches = condition.match(/([\w.]+)\s*(!?)(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
+
+    //             if (matches) {
+    //                 // Destructure the match to extract question name, logic, and value
+    //                 let [, question_name, negate, condition_logic, value] = matches;
+
+    //                 // If the negate flag is present, adjust the condition logic
+    //                 if (negate) {
+    //                     if (condition_logic === 'includes') {
+    //                         condition_logic = 'does not include';
+    //                     } else {
+    //                         // Convert logical operators to corresponding values in conditions
+    //                         if (condition_logic === '===') condition_logic = 'equals';
+    //                         else if (condition_logic === '!==') condition_logic = 'not equals to';
+    //                         else if (condition_logic === '<') condition_logic = 'smaller';
+    //                         else if (condition_logic === '>') condition_logic = 'larger';
+    //                         else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+    //                         else if (condition_logic === '>=') condition_logic = 'larger or equal';
+    //                     }
+    //                 } else {
+    //                     // Convert logical operators to corresponding values in conditions
+    //                     if (condition_logic === '===') condition_logic = 'equals';
+    //                     else if (condition_logic === '!==') condition_logic = 'not equals to';
+    //                     else if (condition_logic === '<') condition_logic = 'smaller';
+    //                     else if (condition_logic === '>') condition_logic = 'larger';
+    //                     else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+    //                     else if (condition_logic === '>=') condition_logic = 'larger or equal';
+    //                 }
+
+    //                 // Remove quotes if the value is a string
+    //                 value = value.startsWith("'") ? value.slice(1, -1) : Number(value);
+
+    //                 // Return the object in the correct structure
+    //                 return {
+    //                     question_name: question_name.trim(),
+    //                     condition_logic: condition_logic.trim(),
+    //                     value: value,
+    //                     dropdown: false,
+    //                     condition_dropdown: false,
+    //                     condition_type: 'textboxfield'
+    //                 };
+    //             }
+
+    //             // Return null or handle errors if format doesn't match
+    //             return null;
+    //         });
+    //         if (conditions.filter(cond => cond !== null).length > 0) {
+    //             return {
+    //                 conditions: conditions.filter(cond => cond !== null)
+    //             };
+    //         } else {
+    //             if (!tab) {
+    //                 setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
+    //             }
+    //             return {
+    //                 conditions: [
+    //                     {
+    //                         'question_name': '',
+    //                         'condition_logic': '',
+    //                         'value': '',
+    //                         'dropdown': false,
+    //                         'condition_dropdown': false,
+    //                         'condition_type': 'textboxfield'
+    //                     },
+    //                 ]
+    //             };
+    //         }
+
+    //     });
+    // };
+    const parseLogicExpression = (expression) => {
+        console.log(expression, 'kkkkkkkkkkkk')
+        const conditionGroups = expression.split('||').map(group => trimParentheses(group));
+
+        const parsedConditions = conditionGroups.map(group => {
+            const conditions = group.split('&&').map(condition => {
+                condition = trimParentheses(condition);
+                // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
+                const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
+                if (matches) {
+                    // Destructure the match to extract question name, logic, and value
+                    let [, negate, question_name, condition_logic, value] = matches;
+                    console.log(value, 'val')
+                    // If the negate flag is present, adjust the condition logic
+                    if (negate) {
+                        if (condition_logic === 'includes') {
+                            condition_logic = 'does not include';
+                        } else {
+                            // Convert logical operators to corresponding values in conditions
+                            if (condition_logic === '===') condition_logic = 'equals';
+                            else if (condition_logic === '!==') condition_logic = 'not equals to';
+                            else if (condition_logic === '<') condition_logic = 'smaller';
+                            else if (condition_logic === '>') condition_logic = 'larger';
+                            else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+                            else if (condition_logic === '>=') condition_logic = 'larger or equal';
+                        }
+                    } else {
+                        // Convert logical operators to corresponding values in conditions
+                        if (condition_logic === '===') condition_logic = 'equals';
+                        else if (condition_logic === '!==') condition_logic = 'not equals to';
+                        else if (condition_logic === '<') condition_logic = 'smaller';
+                        else if (condition_logic === '>') condition_logic = 'larger';
+                        else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+                        else if (condition_logic === '>=') condition_logic = 'larger or equal';
+                    }
+
+                    // Remove quotes if the value is a string
+                    if (value.startsWith("(") && value.endsWith(")")) {
+                        // If the value is enclosed in parentheses, treat it as a string
+                        value = value.slice(2, -2); // Remove parentheses
+                    } else if (value.startsWith("'") && value.endsWith("'")) {
+                        // If the value is a string in quotes, remove quotes
+                        value = value.slice(1, -1);
+                    } else {
+                        // Convert to a number if it's not a string
+                        value = Number(value);
+                    }
+
+                    // Return the object in the correct structure
+                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+                    return {
+                        question_name: question_name.trim(),
+                        condition_logic: condition_logic.trim(),
+                        value: value,
+                        dropdown: false,
+                        condition_dropdown: false,
+                        condition_type: question?.component_type
+                    };
+                }
+
+                // Return null or handle errors if format doesn't match
+                return null;
+            });
+
+            if (conditions.filter(cond => cond !== null).length > 0) {
+                return {
+                    conditions: conditions.filter(cond => cond !== null)
+                };
+            } else {
+                if (!tab) {
+                    setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
+                }
+                return {
+                    conditions: [
+                        {
+                            'question_name': '',
+                            'condition_logic': '',
+                            'value': '',
+                            'dropdown': false,
+                            'condition_dropdown': false,
+                            'condition_type': 'textboxfield'
+                        },
+                    ]
+                };
+            }
+        });
+
+        // Check if the total number of conditions across all groups exceeds 10
+        const totalConditions = parsedConditions.reduce((sum, group) => sum + group.conditions.length, 0);
+
+        if (totalConditions > 10) {
+            setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
+        }
+
+        return parsedConditions;
+    };
 
     useEffect(() => {
         // Assuming `allSectionDetails` contains the fetched data and 
@@ -349,6 +581,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
 
                             setInputValue(conditionalLogic);
+                            setConditions(parseLogicExpression(question.conditional_logic));
                         }
                     });
                 });
@@ -357,8 +590,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
+
         }
-    }, [selectedQuestionId, allSectionDetails]);
+    }, [selectedQuestionId, allSectionDetails, tab]);
 
 
     // Your handleSave function
@@ -456,8 +690,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             console.log('working');
             return;
         }
+        const sectionId = selectedQuestionId.split('_')[0];
         let condition_logic = buildConditionExpression(conditions);
         console.log(condition_logic, 'olololo')
+        handleSaveSection(sectionId, true, condition_logic);
+        dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

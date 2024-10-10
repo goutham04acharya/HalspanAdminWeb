@@ -9,6 +9,14 @@ export const buildLogicExpression = (question_name, condition_logic, value) => {
         return `${question_name}.includes('${value}')`;
     case 'does not include':
         return `!${question_name}.includes('${value}')`;
+    case 'smaller':
+        return `${question_name} < '${value}'`;
+    case 'larger':
+        return `${question_name} > '${value}'`;
+    case 'smaller or equal':
+        return `${question_name} <= '${value}'`;
+    case 'larger or equal':
+        return `${question_name} >= '${value}'`;
     default:
         // Fallback for other logic (you can add more cases here if needed)
         return `${question_name} ${condition_logic} '${value}'`;
@@ -22,7 +30,7 @@ export const buildConditionExpression = (conditionsArray) => {
             const { question_name, condition_logic, value } = cond;
 
             // Use the buildLogicExpression function for each condition
-            return `(${buildLogicExpression(question_name, condition_logic, value)})`;
+            return `${buildLogicExpression(question_name, condition_logic, value)}`;
         });
 
         // Join expressions with " && " and wrap the entire expression in parentheses

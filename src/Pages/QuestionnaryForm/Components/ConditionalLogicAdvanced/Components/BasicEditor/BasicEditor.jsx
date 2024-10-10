@@ -11,10 +11,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
 
     const conditionObj = {
-        'text': ['includes','does not include','equals','not equal to'],
-        'numeric':['equals','not equal to','smaller','larger','smaller or equal','larger or equal'],
-        'photofield':['has at least one file','has no files','number of file is'],
-        'date':['date is before today','date is before or equal to today','date is after today','date is after or equal to today','date is “X” date of set date']
+        'text': ['includes', 'does not include', 'equals', 'not equal to'],
+        'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
+        'photofield': ['has at least one file', 'has no files', 'number of file is'],
+        'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
     //function to handle dropdowns
     const updateDropdown = (dropdown, mainIndex, subIndex) => {
@@ -192,12 +192,12 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         let arr = []
         switch (key) {
             case "textboxfield" || "choiceboxfield" || "assetLocationfield"
-                || "floorPlanfield" || "signaturefield" || "gpsfield" || "displayfield": return(arr = conditionObj['text'])
-               
-            case "numberfield": return(conditionObj['numeric'])
+                || "floorPlanfield" || "signaturefield" || "gpsfield" || "displayfield": return (arr = conditionObj['text'])
+
+            case "numberfield": return (conditionObj['numeric'])
                 return arr;
-            case "photofield" || "videofield" || "filefield" : return(conditionObj['file'])
-            case "dateTimefield" :return(conditionObj['date'])
+            case "photofield" || "videofield" || "filefield": return (conditionObj['file'])
+            case "dateTimefield": return (conditionObj['date'])
         }
     }
     const validateConditions = () => {
@@ -217,7 +217,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         return false;  // Return false if all keys have values
     };
 
-    console.log(getConditions(conditions[0].conditions[0].condition_type));
+    // console.log(getConditions(conditions[0].conditions[0].condition_type));
     return (
         <div className='w-full '>
             <p className='font-semibold text-2xl'>Conditional Fields</p>
@@ -284,7 +284,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     label=''
                                                     id='value'
                                                     type='text'
-                                                    // value={fieldSettingParameters?.min}
+                                                    value={conditions[index].conditions[i].value}
                                                     className='w-full'
                                                     labelStyle=''
                                                     placeholder=''
@@ -294,6 +294,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     mainIndex={index}
                                                     subIndex={i}
                                                     handleChange={handleInputChange}
+                                                    onInput={conditions[index].conditions[i].condition_type === 'numberfield'}
                                                     validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
                                                 />
                                             </div>
