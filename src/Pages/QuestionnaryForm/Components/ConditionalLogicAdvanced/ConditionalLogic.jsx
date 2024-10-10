@@ -475,8 +475,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     //     });
     // };
     const parseLogicExpression = (expression) => {
-        console.log(expression, 'iiiiiiii');
-
         if (!expression) {
             return [{
                 'conditions': [
@@ -497,7 +495,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parsedConditions = conditionGroups.map(group => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                console.log(condition, 'kkkkkkkkkk')
                 // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
@@ -509,6 +506,41 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
+                    if (question_name.includes('.length')) {
+                        
+                        question_name = question_name.replace('.length', '');
+                      }
+                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+                    if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
+                        if (value.startsWith("(") && value.endsWith(")")) {
+                            // If the value is enclosed in parentheses, treat it as a string
+                            value = value.slice(2, -2); // Remove parentheses
+                        } else if (value.startsWith("'") && value.endsWith("'")) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else if (value.startsWith('"') && value.endsWith('"')) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else {
+                            // Convert to a number if it's not a string
+                            value = Number(value);
+                        }
+                        if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
+                        else if (condition_logic === '===') condition_logic = 'number of files is';
+
+                       
+
+                        return {
+                            question_name: question_name.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: value,
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type
+                        };
+
+                    }
                     if (negate) {
                         if (condition_logic.includes('includes')) {
                             condition_logic = 'does not include';
@@ -548,7 +580,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
 
                     // Return the object in the correct structure
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -700,14 +732,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         for (let i = 0; i < conditions.length; i++) {
             for (let j = 0; j < conditions[i].conditions.length; j++) {
                 const condition = conditions[i].conditions[j];
-                if (
+                if (condition.condition_logic === 'has atleast one file' || condition.condition_logic === 'has no files') {
 
-                    condition.question_name === '' ||
-                    condition.condition_logic === '' ||
-                    condition.value === ''
-                ) {
-                    return true;  // Return true if any key is empty
+                    if (condition.question_name === '' || condition.condition_logic === '') {
+                        return true;
+                    }
+
+                } else {
+                    if (
+
+                        condition.question_name === '' ||
+                        condition.condition_logic === '' ||
+                        condition.value === ''
+                    ) {
+                        return true;  // Return true if any key is empty
+                    }
                 }
+
             }
         }
         return false;  // Return false if all keys have values
@@ -718,8 +759,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (validateConditions()) {
             return;
         }
+        let condition_logic;
+        try {
+            condition_logic = buildConditionExpression(conditions);
+        } catch (error) {
+            console.log(error, 'oooooooooooooooooooooooo')
+        }
         const sectionId = selectedQuestionId.split('_')[0];
-        let condition_logic = buildConditionExpression(conditions);
+
+        console.log('condition', condition_logic)
+
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
