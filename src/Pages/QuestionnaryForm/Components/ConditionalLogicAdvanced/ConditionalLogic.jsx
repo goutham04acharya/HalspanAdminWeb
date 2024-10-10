@@ -597,7 +597,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Your handleSave function
     const handleSave = async () => {
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = version_number + '_' + selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             // Function to add "sections." to section IDs
@@ -690,7 +690,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             console.log('working');
             return;
         }
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = version_number + '_' + selectedQuestionId.split('_')[0];
         let condition_logic = buildConditionExpression(conditions);
         console.log(condition_logic, 'olololo')
         handleSaveSection(sectionId, true, condition_logic);
