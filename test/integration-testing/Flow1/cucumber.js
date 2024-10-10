@@ -30,6 +30,7 @@ module.exports = {
             'test/integration-testing/Flow1/26_change_status.feature',
             'test/integration-testing/Flow1/27_duplicate_questionnaire.feature',
             'test/integration-testing/Flow1/30_advanced_editor.feature',
+            'test/integration-testing/Flow1/33_files_photos_video_advanced_editor.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }
