@@ -9,11 +9,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const [dropdown, setDropdown] = useState(false)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
 
-
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
-        'photofield': ['has at least one file', 'has no files', 'number of file is'],
+        'file': ['has at least one file', 'has no files', 'number of file is'],
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
     //function to handle dropdowns
@@ -140,7 +139,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         setConditions(prevConditions => {
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
-            console.log(updatedConditions, 'lol')
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
 
@@ -182,6 +180,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             // Update question_name and condition_type with the new values
             conditionToUpdate.question_name = key;
             conditionToUpdate.condition_type = selectedQuestion.component_type;
+            conditionToUpdate.value = '';
+            conditionToUpdate.condition_logic = '';
+            
 
             // Return the updated array
             return updatedConditions;
@@ -216,8 +217,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         }
         return false;  // Return false if all keys have values
     };
-
-    // console.log(getConditions(conditions[0].conditions[0].condition_type));
     return (
         <div className='w-full '>
             <p className='font-semibold text-2xl'>Conditional Fields</p>
