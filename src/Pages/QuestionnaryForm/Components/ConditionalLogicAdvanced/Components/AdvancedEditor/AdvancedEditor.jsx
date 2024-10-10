@@ -116,7 +116,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
-                    <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    <span data-testid="error-message" className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (
@@ -131,6 +131,7 @@ function AdvancedEditor({
                                         {suggestions.map((method, index) => (
                                             <div
                                                 key={index}
+                                                data-testid={`condition-${index}`}
                                                 className="suggestion-item cursor-pointer"
                                                 onClick={() => handleClickToInsert(method, true)} // Pass true for method
                                             >
@@ -142,6 +143,7 @@ function AdvancedEditor({
                                     filteredSuggestions.map((suggestion, index) => (
                                         <div
                                             key={index}
+                                            data-testid={`suggestion-${index}`}
                                             className="cursor-pointer"
                                             onClick={() => handleAddQuestion(suggestion, sections)}
                                         >
