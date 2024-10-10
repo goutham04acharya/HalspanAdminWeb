@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
 
 function AdvancedEditor({
-    handleListSectionDetails,
     showSectionList,
     inputValue,
     error,
@@ -16,9 +15,7 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
-    selectedFieldType
 }) {
-
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -45,7 +42,7 @@ function AdvancedEditor({
             setFilteredSuggestions(secDetailsForSearching); // Show all suggestions
         } else if (wordToSearch !== '') { // Only filter if the word is not empty
             const filteredData = secDetailsForSearching.filter((item) =>
-                item.toLowerCase().includes(wordToSearch.toLowerCase())
+                item.includes(wordToSearch)
             );
             setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
         } else {
@@ -66,6 +63,12 @@ function AdvancedEditor({
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
     }
+    const handleKeyDown = (event) => {
+        // Prevent single quote key (keyCode 222 is the code for single quote)
+        if (event.key === "'" || event.keyCode === 222) {
+            event.preventDefault(); // Stop the default behavior (inserting the single quote)
+        }
+    };
 
     // Populate all items initially
     useEffect(() => {
@@ -82,6 +85,7 @@ function AdvancedEditor({
                     data-testid="conditional-logic-text"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
                     onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
+                    onKeyDown={handleKeyDown} // Intercept key presses
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>

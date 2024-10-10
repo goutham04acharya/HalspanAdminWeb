@@ -38,6 +38,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+    const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -57,10 +58,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 fieldType = new Date();
                 break;
             case 'numberfield':
+                fieldType = 1;  // Handle all numeric-related fields similarly
+                break;
             case 'photofield':
             case 'videofield':
             case 'filefield':
-                fieldType = 1;  // Handle all numeric-related fields similarly
+                fieldType = [];
                 break;
             default:
                 fieldType = '';
@@ -157,7 +160,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     });
                 }
                 if (!skip) {
-                    console.log(sectionObject)
                     result = {
                         ...result,
                         ...sectionObject
@@ -167,7 +169,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             });
         }
-        console.log(result)
     }
 
     // Handle input change and check for matches
@@ -188,20 +189,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'numberfield') {
-                setShowMethodSuggestions(false);
-                setSuggestions('')
-                setShowMethodSuggestions(false); // Reset method suggestions
             } else if (selectedFieldType === 'photofield') {
-                setShowMethodSuggestions(false);
-                setSuggestions('')
-                setShowMethodSuggestions(false); // Reset method suggestions
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
             } else if (selectedFieldType === 'videofield') {
-                setShowMethodSuggestions(false);
-                setSuggestions('')
-                setShowMethodSuggestions(false); // Reset method suggestions
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
             } else if (selectedFieldType === 'filefield') {
-                setShowMethodSuggestions(false);
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
+            } else if (selectedFieldType === 'numberfield') {
                 setSuggestions('')
                 setShowMethodSuggestions(false); // Reset method suggestions
             } else {
@@ -237,6 +234,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'number':
                         setShowMethodSuggestions(true);
                         break;
+                    case 'file':
+                        setSuggestions(fileMethods);
+                        setShowMethodSuggestions(true);
+                        break;
                     default:
                         setSuggestions([]);
                         setShowMethodSuggestions(false);
@@ -257,6 +258,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
     };
+    console.log(suggestions, 'suggegege')
 
     const insertAtCaret = (element, closingChar) => {
         const start = element.selectionStart;
@@ -287,7 +289,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const lastChar = textBefore.slice(-1);
             let newText;
 
-            if (lastChar === ' ' || textBefore.length === 0) {
+            if ((lastChar === ' ' || lastChar === '.') || textBefore.length === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
             } else {
@@ -322,6 +324,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case 'number':
                     fieldType = [
                         'numberfield',
+                    ];
+                    break;
+                case '[]':
+                    fieldType = [
                         'photofield',
                         'videofield',
                         'filefield'
@@ -335,6 +341,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             setSelectedFieldType(fieldType);
+
         }
     };
 
@@ -363,7 +370,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [selectedQuestionId, allSectionDetails]);
 
-
     // Your handleSave function
     const handleSave = async () => {
         const sectionId = selectedQuestionId.split('_')[0];
@@ -377,6 +383,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let evalInputValue = (inputValue)
             evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
             evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+            evalInputValue.replaceAll('()', 'length') // Replace () with length function
+
             let expression = evalInputValue.toString();
 
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
