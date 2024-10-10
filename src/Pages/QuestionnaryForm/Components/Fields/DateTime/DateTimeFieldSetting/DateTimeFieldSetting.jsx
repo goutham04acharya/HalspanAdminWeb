@@ -145,22 +145,6 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          {/* <div className='mt-7'>
-            <InputField
-              autoComplete='off'
-              label='Default Value'
-              optional='(e.g. dd/mm/yyyy)'
-              id='defaultValue'
-              type='text'
-              value={fieldSettingParameters?.defaultValue}
-              className='w-full mt-2.5'
-              labelStyle=''
-              placeholder='Now'
-              testId='defaultValue'
-              htmlFor='defaultValue'
-              maxLength={10}
-              handleChange={(e) => handleInputChange(e)} />
-          </div> */}
           <OptionsComponent selectedQuestionId={selectedQuestionId} />
           <div className='mt-7'>
             <InputField

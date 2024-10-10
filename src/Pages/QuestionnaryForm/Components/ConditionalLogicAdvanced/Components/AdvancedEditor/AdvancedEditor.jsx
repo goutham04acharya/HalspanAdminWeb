@@ -24,31 +24,6 @@ function AdvancedEditor({
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
     // Handle user input change and filter suggestions
-    // const handleSearchChange = (event) => {
-    //     const value = event.target.value;
-    //     const cursorPosition = event.target.selectionStart; // Get the cursor position
-    //     setSearchInput(value);
-
-    //     // Find the word around the cursor
-    //     const leftPart = value.slice(0, cursorPosition);
-    //     const rightPart = value.slice(cursorPosition);
-
-    //     // Find the index of the last space before the cursor and the next space after the cursor
-    //     const startOfWord = leftPart.lastIndexOf(' ') + 1;
-    //     const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
-
-    //     const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
-
-    //     if (wordToSearch.trim() !== '') { // Only filter if the word is not empty
-    //         const filteredData = secDetailsForSearching.filter((item) =>
-    //             item.includes(wordToSearch)
-    //         );
-    //         setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
-    //     } else {
-    //         // If input is cleared or no word to search, show all suggestions
-    //         setFilteredSuggestions(secDetailsForSearching);
-    //     }
-    // };
     const handleSearchChange = (event) => {
         const value = event.target.value;
         const cursorPosition = event.target.selectionStart; // Get the cursor position
@@ -82,6 +57,7 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
+        
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
         handleClickToInsert(suggestion, false, valueType);

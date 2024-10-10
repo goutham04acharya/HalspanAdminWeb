@@ -15,10 +15,8 @@ function NumberFieldSetting({
     fieldSettingParameters,
     handleRadiobtn,
     selectedQuestionId,
-    handleAutoSaveSettings,
     validationErrors,
     setConditionalLogic,
-    setConditionalLogic
 
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'

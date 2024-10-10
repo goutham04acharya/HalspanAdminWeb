@@ -44,16 +44,26 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let fieldType;
 
         switch (componentType) {
-            case 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield':  // Handle both cases if they map to 'string'
-                fieldType = '';
+            case 'textboxfield':
+            case 'choiceboxfield':
+            case 'assetLocationfield':
+            case 'floorPlanfield':
+            case 'signaturefield':
+            case 'gpsfield':
+            case 'displayfield':
+                fieldType = 's';  // Handle all these cases similarly
                 break;
             case 'dateTimefield':
                 fieldType = new Date();
                 break;
-            case 'numberfield, photofield, videofield, filefield':
-                fieldType = 1;
+            case 'numberfield':
+            case 'photofield':
+            case 'videofield':
+            case 'filefield':
+                fieldType = 1;  // Handle all numeric-related fields similarly
                 break;
-            default: fieldType = ''
+            default:
+                fieldType = '';
         }
 
         return fieldType;
@@ -139,15 +149,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
                                         [(question.question_name).replaceAll(' ', '_')]: fieldType
                                     }
-                                } else{
-                                    console.log("yyyyyy")
+                                } else {
                                     skip = true
                                 }
                             });
                         }
                     });
                 }
-                if(!skip){
+                if (!skip) {
                     console.log(sectionObject)
                     result = {
                         ...result,
@@ -155,7 +164,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                     setSections(result);
                 }
-                
+
             });
         }
         console.log(result)
@@ -179,10 +188,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'numberfield, photofield, videofield, filefield') {
+            } else if (selectedFieldType === 'numberfield') {
                 setShowMethodSuggestions(false);
                 setSuggestions('')
-
+                setShowMethodSuggestions(false); // Reset method suggestions
+            } else if (selectedFieldType === 'photofield') {
+                setShowMethodSuggestions(false);
+                setSuggestions('')
+                setShowMethodSuggestions(false); // Reset method suggestions
+            } else if (selectedFieldType === 'videofield') {
+                setShowMethodSuggestions(false);
+                setSuggestions('')
+                setShowMethodSuggestions(false); // Reset method suggestions
+            } else if (selectedFieldType === 'filefield') {
+                setShowMethodSuggestions(false);
+                setSuggestions('')
+                setShowMethodSuggestions(false); // Reset method suggestions
             } else {
                 const cursorPosition = event.target.selectionStart; // Get the cursor position
 
@@ -257,15 +278,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (textarea) {
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-    
+
             // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-    
+
             // Check if there's a space or if the input is empty
             const lastChar = textBefore.slice(-1);
             let newText;
-    
+
             if (lastChar === ' ' || textBefore.length === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
@@ -275,31 +296,47 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
                 newText = textToKeep + textToInsert + textAfter;
             }
-    
+
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
         }
-    
+
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
         } else {
-            let fieldType = '';
+            let fieldType = 's';
             switch (componentType) {
                 case 'string':
-                    fieldType = 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield';
+                    fieldType = [
+                        'textboxfield',
+                        'choiceboxfield',
+                        'assetLocationfield',
+                        'floorPlanfield',
+                        'signaturefield',
+                        'gpsfield',
+                        'displayfield'
+                    ];
                     break;
                 case 'number':
-                    fieldType = 'numberfield ,photofield, videofield, filefield';
+                    fieldType = [
+                        'numberfield',
+                        'photofield',
+                        'videofield',
+                        'filefield'
+                    ];
                     break;
                 case 'date':
                     fieldType = 'dateTimefield';
                     break;
+                default:
+                    fieldType = ''; // Handle any unexpected cases
             }
+
             setSelectedFieldType(fieldType);
         }
-    };    
+    };
 
     useEffect(() => {
         // Assuming `allSectionDetails` contains the fetched data and 
@@ -371,7 +408,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return; // Stop execution if invalid variables are found
             }
-            console.log(evalInputValue, 'evalInputValue')
             // Evaluate the modified string
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
