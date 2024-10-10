@@ -2,21 +2,21 @@
 export const buildLogicExpression = (question_name, condition_logic, value) => {
     switch (condition_logic) {
     case 'equals':
-        return `${question_name} === '${value}'`;
-    case 'not equals to':
-        return `${question_name} !== '${value}'`;
+        return `${question_name} === "${value}"`;
+    case 'not equal to':
+        return `${question_name} !== "${value}"`;
     case 'includes':
-        return `${question_name}.includes('${value}')`;
+        return `${question_name}.includes("${value}")`;
     case 'does not include':
-        return `!${question_name}.includes('${value}')`;
+        return `!${question_name}.includes("${value}")`;
     case 'smaller':
-        return `${question_name} < '${value}'`;
+        return `${question_name} < ${value}`;
     case 'larger':
-        return `${question_name} > '${value}'`;
+        return `${question_name} > ${value}`;
     case 'smaller or equal':
-        return `${question_name} <= '${value}'`;
+        return `${question_name} <= ${value}`;
     case 'larger or equal':
-        return `${question_name} >= '${value}'`;
+        return `${question_name} >= ${value}`;
     default:
         // Fallback for other logic (you can add more cases here if needed)
         return `${question_name} ${condition_logic} '${value}'`;
@@ -34,6 +34,6 @@ export const buildConditionExpression = (conditionsArray) => {
         });
 
         // Join expressions with " && " and wrap the entire expression in parentheses
-        return `(${expressions.join(' && ')})`;
+        return `${expressions.join(' && ')}`;
     }).join(' || ');  // Separate each group with " OR "
 };

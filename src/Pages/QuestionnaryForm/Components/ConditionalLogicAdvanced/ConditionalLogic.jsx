@@ -41,6 +41,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [tab, setTab] = useState(false);
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const [selectionArray, setSelectionArray] = useState([])
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -53,7 +54,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 'condition_type': 'textboxfield'
             },
         ]
-    }
+    },
     ])
 
 
@@ -137,8 +138,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
+                    const questionId = question?.question_id;
                     const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
-                    sectionDetailsArray.push(questionName); // Add section.page.question
+                    if (questionId !== selectedQuestionId) {
+                        sectionDetailsArray.push(questionName);
+                    } else {
+
+                    }
+
                 });
             });
         });
@@ -468,23 +475,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     //     });
     // };
     const parseLogicExpression = (expression) => {
-        console.log(expression, 'kkkkkkkkkkkk')
+        console.log(expression, 'iiiiiiii');
+
+        if (!expression) {
+            return [{
+                'conditions': [
+                    {
+                        'question_name': '',
+                        'condition_logic': '',
+                        'value': '',
+                        'dropdown': false,
+                        'condition_dropdown': false,
+                        'condition_type': 'textboxfield'
+                    },
+                ]
+            },
+            ]
+        }
         const conditionGroups = expression.split('||').map(group => trimParentheses(group));
 
         const parsedConditions = conditionGroups.map(group => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
+                console.log(condition, 'kkkkkkkkkk')
                 // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
-                const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
+                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+
                 if (matches) {
+
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
-                    console.log(value, 'val')
                     // If the negate flag is present, adjust the condition logic
                     if (negate) {
-                        if (condition_logic === 'includes') {
+                        if (condition_logic.includes('includes')) {
                             condition_logic = 'does not include';
                         } else {
                             // Convert logical operators to corresponding values in conditions
@@ -503,6 +529,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         else if (condition_logic === '>') condition_logic = 'larger';
                         else if (condition_logic === '<=') condition_logic = 'smaller or equal';
                         else if (condition_logic === '>=') condition_logic = 'larger or equal';
+                        else if (condition_logic.includes('includes')) condition_logic = 'includes';
                     }
 
                     // Remove quotes if the value is a string
@@ -510,6 +537,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         // If the value is enclosed in parentheses, treat it as a string
                         value = value.slice(2, -2); // Remove parentheses
                     } else if (value.startsWith("'") && value.endsWith("'")) {
+                        // If the value is a string in quotes, remove quotes
+                        value = value.slice(1, -1);
+                    } else if (value.startsWith('"') && value.endsWith('"')) {
                         // If the value is a string in quotes, remove quotes
                         value = value.slice(1, -1);
                     } else {
@@ -582,6 +612,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                             setInputValue(conditionalLogic);
                             setConditions(parseLogicExpression(question.conditional_logic));
+
                         }
                     });
                 });
@@ -639,7 +670,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return; // Stop execution if invalid variables are found
             }
-            console.log(evalInputValue, 'evalInputValue')
             // Evaluate the modified string
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
@@ -648,7 +678,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
-                console.log('Valid expression, result is a boolean:', result);
                 setError(''); // Clear the error since result is valid
                 setIsThreedotLoader(false);
             } else if (isNaN(result)) {
@@ -687,15 +716,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleSaveBasicEditor = () => {
         setSubmitSelected(true);
         if (validateConditions()) {
-            console.log('working');
             return;
         }
         const sectionId = selectedQuestionId.split('_')[0];
         let condition_logic = buildConditionExpression(conditions);
-        console.log(condition_logic, 'olololo')
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
+
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
