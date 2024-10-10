@@ -15,6 +15,7 @@ Feature: Halspan - Admin - Option to Duplicate the Specific Questionnaire
   @create_question
   Scenario: Admin edits the public, intenal name, description, language and asset Type
     Given I am on the questionnaire version listing screen
+    When I save all the data inside the version about to be duplicated
     When I click the duplicate button
     Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
@@ -28,5 +29,6 @@ Feature: Halspan - Admin - Option to Duplicate the Specific Questionnaire
     When I select the version of the questionnaire
     When I click the confirm duplicate button
     Then I should see the new version created
+    Then I should see exact duplication of the selected version
     When I click on back to all questionnaire
     Then I should be redirected to the questionnaire listing screen

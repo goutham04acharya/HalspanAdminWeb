@@ -51,7 +51,7 @@ Then('I should see the updated section {int} name on the sidebar', async functio
 Then('I should see the updated page {int} name on the sidebar', async function (pageNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${pageNumber}"]`))).click();
-    const pageName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-page-${pageNumber}"]`))).getText();
+    const pageName = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-0-page-${pageNumber}"]`))).getText();
     assert.equal(pageName, this.pageName);
 });
 

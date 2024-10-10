@@ -13,7 +13,6 @@ const TextBoxField = ({
     preview
 
 }) => {
-
     return (
         <div>
             <label
