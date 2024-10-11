@@ -15,6 +15,7 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
+    setSelectedType
 }) {
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
@@ -59,17 +60,7 @@ function AdvancedEditor({
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
         console.log(valueType)
-        // let valueType = '';
-        // try {
-        //     if (allSections[suggestion] !== undefined) {
-        //         valueType = getVariableType(allSections[suggestion]);
-        //     } else {
-        //         // If suggestion is not a valid key in allSections, handle the error gracefully
-        //         console.error('Invalid suggestion:', suggestion);
-        //     }
-        // } catch (e) {
-        //     console.error('Error in eval:', e);
-        // }
+        setSelectedType(valueType);
 
         handleClickToInsert(suggestion, false, valueType);
 
@@ -80,7 +71,7 @@ function AdvancedEditor({
 
     const handleKeyDown = (event) => {
         // Prevent single quote key (keyCode 222 is the code for single quote)
-        if (event.key === "'" || event.keyCode === 222) {
+        if (event.key === "'" ) {
             event.preventDefault(); // Stop the default behavior (inserting the single quote)
         }
     };
@@ -109,8 +100,8 @@ function AdvancedEditor({
 
             {/* Error message if no matching results */}
             {error ? (
-                <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
-                    <span data-testid="error-message" className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
+                <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
+                    <span data-testid="error-message" className='w-[10%]'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (

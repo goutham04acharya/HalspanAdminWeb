@@ -17,7 +17,6 @@ import { buildConditionExpression, buildLogicExpression } from '../../../../Comm
 import GlobalContext from '../../../../Components/Context/GlobalContext';
 
 
-
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -37,11 +36,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
-    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
     const [tab, setTab] = useState(false);
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    const [selectionArray, setSelectionArray] = useState([])
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -60,7 +58,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
-    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()", "Today()"];
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -372,7 +370,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             setSelectedFieldType(fieldType);
-
         }
     };
 
@@ -428,85 +425,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return trimmedExpression;
     };
 
-    // Main function to split the expression and reconstruct conditions
-    // const parseLogicExpression = (expression) => {
-    //     const conditionGroups = expression.split('||').map(group => trimParentheses(group));
-
-    //     return conditionGroups.map(group => {
-    //         const conditions = group.split('&&').map(condition => {
-    //             condition = trimParentheses(condition);
-
-    //             // Adjust regex to capture question name, logic, and value with optional spaces
-    //             const matches = condition.match(/([\w.]+)\s*(!?)(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
-
-    //             if (matches) {
-    //                 // Destructure the match to extract question name, logic, and value
-    //                 let [, question_name, negate, condition_logic, value] = matches;
-
-    //                 // If the negate flag is present, adjust the condition logic
-    //                 if (negate) {
-    //                     if (condition_logic === 'includes') {
-    //                         condition_logic = 'does not include';
-    //                     } else {
-    //                         // Convert logical operators to corresponding values in conditions
-    //                         if (condition_logic === '===') condition_logic = 'equals';
-    //                         else if (condition_logic === '!==') condition_logic = 'not equals to';
-    //                         else if (condition_logic === '<') condition_logic = 'smaller';
-    //                         else if (condition_logic === '>') condition_logic = 'larger';
-    //                         else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-    //                         else if (condition_logic === '>=') condition_logic = 'larger or equal';
-    //                     }
-    //                 } else {
-    //                     // Convert logical operators to corresponding values in conditions
-    //                     if (condition_logic === '===') condition_logic = 'equals';
-    //                     else if (condition_logic === '!==') condition_logic = 'not equals to';
-    //                     else if (condition_logic === '<') condition_logic = 'smaller';
-    //                     else if (condition_logic === '>') condition_logic = 'larger';
-    //                     else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-    //                     else if (condition_logic === '>=') condition_logic = 'larger or equal';
-    //                 }
-
-    //                 // Remove quotes if the value is a string
-    //                 value = value.startsWith("'") ? value.slice(1, -1) : Number(value);
-
-    //                 // Return the object in the correct structure
-    //                 return {
-    //                     question_name: question_name.trim(),
-    //                     condition_logic: condition_logic.trim(),
-    //                     value: value,
-    //                     dropdown: false,
-    //                     condition_dropdown: false,
-    //                     condition_type: 'textboxfield'
-    //                 };
-    //             }
-
-    //             // Return null or handle errors if format doesn't match
-    //             return null;
-    //         });
-    //         if (conditions.filter(cond => cond !== null).length > 0) {
-    //             return {
-    //                 conditions: conditions.filter(cond => cond !== null)
-    //             };
-    //         } else {
-    //             if (!tab) {
-    //                 setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
-    //             }
-    //             return {
-    //                 conditions: [
-    //                     {
-    //                         'question_name': '',
-    //                         'condition_logic': '',
-    //                         'value': '',
-    //                         'dropdown': false,
-    //                         'condition_dropdown': false,
-    //                         'condition_type': 'textboxfield'
-    //                     },
-    //                 ]
-    //             };
-    //         }
-
-    //     });
-    // };
     const parseLogicExpression = (expression) => {
         if (!expression) {
             return [{
@@ -529,20 +447,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
                 // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
                 const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
 
                 if (matches) {
-
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
-                        
+
                         question_name = question_name.replace('.length', '');
-                      }
+                    }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
                     if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
                         if (value.startsWith("(") && value.endsWith(")")) {
@@ -562,8 +476,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
                         else if (condition_logic === '===') condition_logic = 'number of files is';
 
-                       
-
                         return {
                             question_name: question_name.trim(),
                             condition_logic: condition_logic.trim(),
@@ -572,7 +484,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             condition_dropdown: false,
                             condition_type: question?.component_type
                         };
-
                     }
                     if (negate) {
                         if (condition_logic.includes('includes')) {
@@ -699,12 +610,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
-            
+
             // New function to modify string (replace () with length())
             const modifyString = (input) => {
-                const lastIndex = input.lastIndexOf('()');
-                if (lastIndex !== -1) {
-                    return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
+                if (selectedType === 'array') {
+                    const lastIndex = input.lastIndexOf('()');
+                    if (lastIndex !== -1) {
+                        return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
+                    }
                 }
                 return input;
             };
@@ -712,10 +625,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Apply the section prefix function to the inputValue
             let evalInputValue = modifyString(inputValue);
             console.log(evalInputValue, 'before')
-            evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
-            evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue.replace(/\(\)/g, 'length'); // Replace () with length function
-            console.log(typeof evalInputValue, 'after')
+            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
+            evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+            evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
+            console.log(evalInputValue, 'after')
 
             let expression = evalInputValue.toString();
 
@@ -726,8 +639,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = expression
 
             // Check for the "includes" method being used without a parameter
-            const includesRegex = /\.includes\(\)/;
-            if (includesRegex.test(evalInputValue)) {
+            let methods = [
+                "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
+                "getDay", "getHours", "getMinutes", "getSeconds", "getMilliseconds",
+                "getTime", "Date", "Today", "setDate", "includes"
+            ]
+            const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
+            if (functionCallRegex.test(evalInputValue)) {
                 setError('Please pass the parameter inside the function');
                 setIsThreedotLoader(false);
                 return; // Stop execution if validation fails
@@ -752,7 +670,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
             if (!error) {
-                setError(result);
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
@@ -809,11 +726,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         try {
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
-            console.log(error, 'oooooooooooooooooooooooo')
         }
         const sectionId = selectedQuestionId.split('_')[0];
-
-        console.log('condition', condition_logic)
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
@@ -842,6 +756,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}
                                     selectedFieldType={selectedFieldType}
+                                    setSelectedType={setSelectedType}
                                 />
                             </div>
                             <div className='w-[40%]'>

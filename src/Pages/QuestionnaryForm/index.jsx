@@ -368,7 +368,6 @@ const QuestionnaryForm = () => {
         }
     }
 
-
     const handleAddRemovePage = (event, sectionIndex, pageIndex, sectionId) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -423,14 +422,7 @@ const QuestionnaryForm = () => {
             // Update the state with the new sections array
             setSections(SectionData);
 
-            // Call handleSaveSection with the updated section data
-            // if (isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, SectionData, false);
-            // }
-            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
-
-
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
