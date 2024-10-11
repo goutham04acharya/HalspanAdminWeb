@@ -38,7 +38,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
-    const fileMethods = ['()'];
+    const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -136,46 +136,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [allSectionDetails]);
 
-    //this is my function to store the cbasic sticture of my entire questionnary object
-    // function handleQuestionnaryObject(allSectionDetails) {
-    //     let result = {};
-    //     if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
-    //         allSectionDetails?.data?.sections.forEach((section) => {
-    //             let sectionObject = {
-    //                 [(section.section_name).replaceAll(' ', '_')]: {}
-    //             };
-    //             let skip = true
-    //             if (section.pages && section.pages.length > 0) {
-    //                 section.pages.forEach((page) => {
-    //                     if (page.questions && page.questions.length > 0) {
-    //                         page.questions.forEach((question) => {
-    //                             if (question.question_id !== selectedQuestionId) {
-    //                                 skip = false
-    //                                 const fieldType = getFieldType(question.component_type);
-    //                                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-    //                                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-    //                                     [(question.question_name).replaceAll(' ', '_')]: fieldType
-    //                                 }
-    //                             } else {
-    //                                 skip = true
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //             }
-    //             if (!skip) {
-    //                 result = {
-    //                     ...result,
-    //                     ...sectionObject
-    //                 }
-    //                 console.log(result,'result rnjtih')
-    //                 setSections(result);
-    //             }
-
-    //         });
-    //     }
-    // }
-
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
@@ -225,13 +185,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'photofield') {
+            } else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions
-            } else if (selectedFieldType === 'videofield') {
+            } else if (selectedFieldType.includes('videofield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions
-            } else if (selectedFieldType === 'filefield') {
+            } else if (selectedFieldType.includes('filefield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions
             } else if (selectedFieldType === 'numberfield') {
@@ -251,7 +211,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
 
                 let allSections = sections;
-                console.log(sections, 'lllllllll')
                 const getVariableType = a => a.constructor.name.toLowerCase();
                 let valueType = ''
                 try {
@@ -286,11 +245,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
     };
-    console.log(suggestions, 'suggegege')
 
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        console.log(componentType, 'componentType')
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -394,13 +351,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
+            
+            // New function to modify string (replace () with length())
+            const modifyString = (input) => {
+                const lastIndex = input.lastIndexOf('()');
+                if (lastIndex !== -1) {
+                    return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
+                }
+                return input;
+            };
+
             // Apply the section prefix function to the inputValue
-            let evalInputValue = (inputValue)
-            console.log(evalInputValue,'before')
+            let evalInputValue = modifyString(inputValue);
+            console.log(evalInputValue, 'before')
             evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
             evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue.replaceAll('()', 'length'); // Replace () with length function
-            console.log(typeof evalInputValue,'after')
+            evalInputValue.replace(/\(\)/g, 'length'); // Replace () with length function
+            console.log(typeof evalInputValue, 'after')
 
             let expression = evalInputValue.toString();
 
@@ -459,6 +426,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(false);
         }
     };
+
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[80%] h-[80%] mx-auto bg-white relative p-[18px] flex'>
