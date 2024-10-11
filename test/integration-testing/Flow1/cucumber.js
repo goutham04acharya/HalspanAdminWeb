@@ -32,6 +32,8 @@ module.exports = {
             'test/integration-testing/Flow1/30_advanced_editor.feature',
             'test/integration-testing/Flow1/32_advanced_editor_number.feature',
             'test/integration-testing/Flow1/33_files_photos_video_advanced_editor.feature',
+            'test/integration-testing/Flow1/31_basic_editor.feature',
+            'test/integration-testing/Flow1/34_number_basic_editor.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

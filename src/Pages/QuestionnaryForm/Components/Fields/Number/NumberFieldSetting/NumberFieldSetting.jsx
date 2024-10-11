@@ -310,6 +310,7 @@ function NumberFieldSetting({
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            data-testid="add-conditional-logic"
                             className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
