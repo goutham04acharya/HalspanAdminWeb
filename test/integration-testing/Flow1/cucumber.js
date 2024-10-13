@@ -32,6 +32,7 @@ module.exports = {
             'test/integration-testing/Flow1/30_advanced_editor.feature',
             'test/integration-testing/Flow1/31_basic_editor.feature',
             'test/integration-testing/Flow1/34_number_basic_editor.feature',
+            'test/integration-testing/Flow1/36_files_basic_editor.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

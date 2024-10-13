@@ -192,13 +192,24 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const getConditions = (key) => {
         let arr = []
         switch (key) {
-            case "textboxfield" || "choiceboxfield" || "assetLocationfield"
-                || "floorPlanfield" || "signaturefield" || "gpsfield" || "displayfield": return (arr = conditionObj['text'])
-
-            case "numberfield": return (conditionObj['numeric'])
-                return arr;
-            case "photofield" || "videofield" || "filefield": return (conditionObj['file'])
-            case "dateTimefield": return (conditionObj['date'])
+            case "textboxfield":
+            case "choiceboxfield":
+            case "assetLocationfield":
+            case "floorPlanfield":
+            case "signaturefield":
+            case "gpsfield":
+            case "displayfield":
+                return conditionObj['text'];
+            case "numberfield":
+                return conditionObj['numeric'];
+            case "photofield":
+            case "videofield":
+            case "filefield":
+                return conditionObj['file'];
+            case "dateTimefield":
+                return conditionObj['date'];
+            default:
+                return arr; // This is the fallback if none of the cases match
         }
     }
     const validateConditions = () => {
