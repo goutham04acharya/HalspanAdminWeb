@@ -60,11 +60,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     When I select the question from the suggestions
     When I click the cancel button
     Then I should see field settings
-    When I click the add conditional logic button
-    Then I should see the advanced editor for textfield
-    When I enter the correct conditional logic 
-    Then I click the save button for conditional logic
-    And I should read a message stating that "Conditional Logic Added"
 
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
@@ -73,4 +68,11 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     And I should read a message stating that "Unexpected identifier 'then'"
     When I click the cancel button
     Then I should see field settings
+
+    When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
+    When I enter the correct conditional logic 
+    Then I click the save button for conditional logic
+    And I should read a message stating that "Conditional Logic Added"
+
     

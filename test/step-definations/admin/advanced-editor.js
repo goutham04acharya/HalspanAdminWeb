@@ -6,7 +6,7 @@ const By = require('selenium-webdriver').By
 const Key = webdriver.Key
 
 When('I click the add conditional logic button', async function () {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 950));
     await driver.wait(until.elementLocated(By.css(`[data-testid="add-conditional-logic"]`))).click();
 });
 
