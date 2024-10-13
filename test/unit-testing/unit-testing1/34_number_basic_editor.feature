@@ -1,14 +1,14 @@
 @1.0
-Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advanced Editor Conditional Logic)
-    As an Admin, I want an option to set conditional logic for Number Fields to show or hide entire sections or pages in Advanced Editor
-    Condition of satisfaction
-    In the Number field it should allow the following Conditions
-    a) Equals - It will return true if the text field value exactly matches the specified value.
-    b) Not Equals: Returns true if the number field value does not match the specified number.
-    c) Smaller: Returns true if the number field value is less than the specified number.
-    d) Larger: Returns true if the number field value is greater than the specified number.
-    e) Smaller or Equal: Returns true if the number field value is less than or equal to the specified number.
-    f) Larger or Equal: Returns true if the number field value is greater than or equal to the specified number.
+Feature: Halspan- Admin-Show/Hide entire section/pages for Number Field(Basic Editor Conditional Logic)
+    As an Admin, I want an option to set conditional logic to show or hide entire sections or pages in Basic Editor for Number Fields
+    Condition of Satisfaction
+    There must be an option to select the Operators
+    Operators for text fields include: Includes, Equals, Does not include, Not equal to.
+    There must be an option to enter the value which would be a string
+    There must be an option to handle the multiple conditions using AND or OR
+    There must be an option to delete the condition that was added
+    For the identifier, they will be able to add or enter the fields based on the section or the page which they have added which creating the questionnaire
+    Once the condition is applied, and when i click on AND or OR there must be an option to choose any fields (Text Fields, Number Fields etc
 
   Scenario: Admin logs in with valid credentials
     Given I am on the login page
@@ -18,7 +18,7 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     Then I should be redirected to the questionnaire listing screen
 
   @create_question
-  Scenario: Admin adds number field from the add field section
+  Scenario: Admin adds textbox from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -45,24 +45,14 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     Then I should see the help text for number updated in the section 2
     When I enter the placeholder content for number
     Then I should see the placeholder content for number updated in the section 2
+
     When I click the add conditional logic button
-    Then I should see the advanced editor for number field
-    Then I should see the suggestions for questions
-    When I enter the incorrect conditional logic for number field
-    Then I should read a message stating that "No items found"
-    Then I click the save button for conditional logic
-    Then I should read a error message 
-    When I click the cancel button
-    Then I should see field settings
-    
-    When I click the add conditional logic button
-    Then I should see the advanced editor for number field
-    When I select the question from the suggestions for number field
+    Then I should see the basic editor for textfield
     When I click the cancel button
     Then I should see field settings
 
     When I click the add conditional logic button
-    Then I should see the advanced editor for number field
-    When I enter the correct conditional logic for number field
+    Then I should see the basic editor for textfield
+    When I enter the correct number conditional logic for basic editor
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
