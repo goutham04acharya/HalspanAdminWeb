@@ -4,6 +4,7 @@ import Image from '../../../../../../Components/Image/Image'
 import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
+import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected }) {
     const [dropdown, setDropdown] = useState(false)
@@ -182,7 +183,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             conditionToUpdate.condition_type = selectedQuestion.component_type;
             conditionToUpdate.value = '';
             conditionToUpdate.condition_logic = '';
-            
+
+            if (selectedQuestion.component_type === 'dateTimefield') {
+                conditionToUpdate['date'] = '';
+            }
+
 
             // Return the updated array
             return updatedConditions;
@@ -217,7 +222,36 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         }
         return false;  // Return false if all keys have values
     };
+
+    // function to render the input value field as it is not  there for some conditions 
+    const showInputValue = (key) => {
+        //this is the array of cndition where the input value  tap will not be  shown
+        let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
+        // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
+        if (arr.includes(key)) {
+            return false;
+        }
+        // if  its not there then return tru as the input box is required for  other condiitons 
+        return true;
+    }
     
+
+    //handler for datepicker
+    const handleDatePicker = (dateString, mainIndex, subIndex) => {
+
+        setConditions(prevConditions => {
+            // Create a new array from the current conditions
+            const updatedConditions = [...prevConditions];
+
+            // Access the specific condition using mainIndex and subIndex
+            const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+
+            // Update question_name and condition_type with the new value
+            conditionToUpdate['date'] = dateString;
+            // Return the updated array
+            return updatedConditions;
+        });
+    }
     return (
         <div className='w-full '>
             <p className='font-semibold text-2xl'>Conditional Fields</p>
@@ -276,7 +310,25 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                 {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
                                             </div>
                                         </div>
-                                        {!['has no files','has atleast one file'].includes(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
+                                        {conditions[index]?.conditions[i]?.condition_logic === 'date is “X” date of set date' && <div className='w-1/3 px-2 '>
+                                            <p className='text-sm text-[#2B333B] mb-[11px]'>Set Date</p>
+                                            <DatePicker
+                                                autoComplete='off'
+                                                label=''
+                                                id='value'
+                                                type='text'
+                                                value={conditions[index].conditions[i]?.date || null}
+                                                className='w-full'
+                                                labelStyle=''
+                                                testId={`value-input-${index}-${i}`}
+                                                htmlFor=''
+                                                mainIndex={index}
+                                                subIndex={i}
+                                                handleChange={handleDatePicker}
+                                                validationError={submitSelected && conditions[index]?.conditions[i]?.date === '' && 'This field  is mandatory'}
+                                            />
+                                        </div>}
+                                        {showInputValue(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
                                             <div className=''>
                                                 <p className='text-sm text-[#2B333B] mb-3'>Value</p>
                                                 <InputField
@@ -294,11 +346,13 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     mainIndex={index}
                                                     subIndex={i}
                                                     handleChange={handleInputChange}
-                                                    onInput={conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
+                                                    onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
                                                     validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
                                                 />
                                             </div>
+
                                         </div>}
+
                                     </div>
                                     {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />
