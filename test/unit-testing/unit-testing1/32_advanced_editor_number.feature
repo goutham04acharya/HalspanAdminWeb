@@ -24,7 +24,7 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
   @create_question
-  Scenario: Admin adds number from the add field section
+  Scenario: Admin adds number field from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -41,12 +41,10 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
 
     When I click on add new section
     Then I should see the new section added
-    # When I click on add new page
-    # Then I should see the new pages added
     When I add a new question to the page 1 in section 2
     When I click the number button
     Then I should see field settings
-    And I should see the number field added to the section 1 page 1 question 1
+    And I should see the number field added to the section 2 page 1 question 1
     When I enter the label name for number
     Then I should see the label name updated in the section 2
     When I enter the help text for number
@@ -54,12 +52,24 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     When I enter the placeholder content for number
     Then I should see the placeholder content updated in the section 2
 
+
+  Scenario: Admin adds the conditional logic for textfield
+    Given I am on the Questionnaire management sections
     When I click the add conditional logic button
     Then I should see the advanced editor for number field
+    Then I should see the suggestions for questions
     When I enter the incorrect conditional logic for number field
     Then I should read a message stating that "No items found"
+    Then I click the save button for conditional logic
+    Then I should read a error message 
     When I click the cancel button
     Then I should see field settings
+    
+    When I click the add conditional logic button
+    When I select the question from the suggestions for number field
+    When I click the cancel button
+    Then I should see field settings
+
     When I click the add conditional logic button
     When I enter the correct conditional logic for number field
     Then I click the save button for conditional logic
