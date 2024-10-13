@@ -112,8 +112,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
-                    const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
-                    sectionDetailsArray.push(questionName); // Add section.page.question
+                    if (question.question_id !== selectedQuestionId) {
+                        const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                        sectionDetailsArray.push(questionName); // Add section.page.question
+                    }
                 });
             });
         });
@@ -180,27 +182,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 let sectionObject = {
                     [(section.section_name).replaceAll(' ', '_')]: {}
                 };
+                let skip = true
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
-                                const fieldType = getFieldType(question.component_type);
-                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
+                                if (question.question_id !== selectedQuestionId) {
+                                    skip = false
+                                    const fieldType = getFieldType(question.component_type);
+                                    sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+                                        ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+                                        [(question.question_name).replaceAll(' ', '_')]: fieldType
+                                    }
+                                } else{
+                                    console.log("yyyyyy")
+                                    skip = true
                                 }
-
                             });
                         }
                     });
                 }
-                result = {
-                    ...result,
-                    ...sectionObject
+                if(!skip){
+                    console.log(sectionObject)
+                    result = {
+                        ...result,
+                        ...sectionObject
+                    }
+                    setSections(result);
                 }
-                setSections(result);
+                
             });
         }
+        console.log(result)
     }
 
     // Handle input change and check for matches
@@ -650,7 +663,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 });
             });
         };
-
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
 

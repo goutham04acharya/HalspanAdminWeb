@@ -63,7 +63,6 @@ function AdvancedEditor({
         const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
 
         const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord).trim();
-
         // Check for specific characters and prevent showing the error
         const specialCharacters = ['(', '{', '!', '[', ']', '}', ')'];
 
@@ -71,7 +70,7 @@ function AdvancedEditor({
             setFilteredSuggestions(secDetailsForSearching); // Show all suggestions
         } else if (wordToSearch !== '') { // Only filter if the word is not empty
             const filteredData = secDetailsForSearching.filter((item) =>
-                item.includes(wordToSearch)
+                item.toLowerCase().includes(wordToSearch.toLowerCase())
             );
             setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
         } else {
@@ -105,7 +104,7 @@ function AdvancedEditor({
                     name="editor"
                     id="editor"
                     data-testid="conditional-logic-text"
-                    className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-2xl'
+                    className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
                     onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
                     ref={textareaRef}
                     value={inputValue}
