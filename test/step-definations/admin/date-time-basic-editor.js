@@ -34,7 +34,6 @@ When('I enter the correct date\\/time conditional logic for basic editor', async
     // First condition (select and condition)
     await selectDropdown('select-0-0', 'select-dropdown-0-0', 'Section_1.Page_1.Date_or_time');
     await selectDropdown('condition-0-0', 'condition-dropdown-0-0', 'date is before today');
-    await enterValue('value-input-0-0', '10');  
     await driver.wait(until.elementLocated(By.css('[data-testid="AND-0"]')), 5000).click();  // Add AND condition
     
     
@@ -42,26 +41,25 @@ When('I enter the correct date\\/time conditional logic for basic editor', async
     // Second AND condition
     await selectDropdown('select-0-1', 'select-dropdown-0-1', 'Section_1.Page_1.Date_or_time');
     await selectDropdown('condition-0-1', 'condition-dropdown-0-1', 'date is before or equal to today');
-    await enterValue('value-input-0-1', '10');  
     await driver.wait(until.elementLocated(By.css('[data-testid="OR-0"]')), 5000).click();  // Add OR condition
 
     await new Promise((resolve) => setTimeout(resolve, 750));
     // Third condition (OR)
     await selectDropdown('select-1-0', 'select-dropdown-1-0', 'Section_1.Page_1.Date_or_time');
-    await selectDropdown('condition-1-0', 'condition-dropdown-1-0', 'date is after today');
-    await enterValue('value-input-1-0', '10');  
+    await selectDropdown('condition-1-0', 'condition-dropdown-1-0', 'date is after today'); 
     await driver.wait(until.elementLocated(By.css('[data-testid="AND-1"]')), 5000).click();  // Add AND condition
 
     await new Promise((resolve) => setTimeout(resolve, 750));
     // Fourth AND condition
     await selectDropdown('select-1-1', 'select-dropdown-1-1', 'Section_1.Page_1.Date_or_time');
     await selectDropdown('condition-1-1', 'condition-dropdown-1-1', 'date is after or equal to today');
-    await enterValue('value-input-1-1', '10');  
     await driver.wait(until.elementLocated(By.css('[data-testid="OR-1"]')), 5000).click();  // Add AND condition
 
     await new Promise((resolve) => setTimeout(resolve, 750));
     // Fifth OR condition
     await selectDropdown('select-2-0', 'select-dropdown-2-0', 'Section_1.Page_1.Date_or_time');
     await selectDropdown('condition-2-0', 'condition-dropdown-2-0', 'date is “X” date of set date');
-    await enterValue('value-input-2-0', '10');  
+    await driver.wait(until.elementLocated(By.css('[data-testid="set-date-2-0"]')), 5000).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid=""]')), 5000).click();  // Add AND condition
+    await enterValue('value-input-2-0', '10');
 });
