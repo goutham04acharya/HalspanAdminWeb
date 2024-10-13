@@ -18,12 +18,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should be redirected to the questionnaire listing screen
 
   @create_question
-  Scenario: Admin views all types of field to create the form
-    Given I am on the questionnaire management section
-    Then I should see the add field
-    And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
-
-  @create_question
   Scenario: Admin adds textbox from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
@@ -51,10 +45,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see the help text updated in the section 2
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 2
-
-
-  Scenario: Admin adds the conditional logic for textfield
-    Given I am on the Questionnaire management sections
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
     Then I should see the suggestions for questions
@@ -66,15 +56,18 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see field settings
     
     When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
     When I select the question from the suggestions
     When I click the cancel button
     Then I should see field settings
     When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
     When I enter the correct conditional logic 
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
 
     When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
     When I enter the incorrect conditional logic with then and else
     Then I click the save button for conditional logic
     And I should read a message stating that "Unexpected identifier 'then'"

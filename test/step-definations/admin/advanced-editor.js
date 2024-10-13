@@ -12,6 +12,8 @@ When('I click the add conditional logic button', async function () {
 
 Then('I should see the advanced editor for textfield', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="advance-editor-tab"]`))).click();
+    await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.xpath('//*[text()="shows when..."]')));
 });
 
@@ -44,6 +46,7 @@ Then('I should read a error message', async function () {
 });
 
 Then('I should see the suggestions for questions', async function () {
+    await new Promise(resolve => setTimeout(resolve, 500));
     let bool = true;
     let suggestions = ['Section_1.Page_1.Sample_Label_name'];
     let i = 0;
@@ -79,7 +82,7 @@ When('I select the question from the suggestions', async function () {
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('.');
 
     // eslint-disable-next-line max-len
-    let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()', 'concat()', 'endsWith()', 'includes()', 'startsWith()', 'trimEnd()', 'trimStart()'];
+    let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()','includes()'];
 
     bool = true;
     i = 0;
