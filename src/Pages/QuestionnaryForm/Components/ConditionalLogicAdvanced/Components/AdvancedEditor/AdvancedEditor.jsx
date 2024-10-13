@@ -15,7 +15,8 @@ function AdvancedEditor({
     sections,
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
-    smallLoader
+    smallLoader,
+    selectedFieldType
 }) {
 
     // State to track the user's input
@@ -23,6 +24,31 @@ function AdvancedEditor({
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
     // Handle user input change and filter suggestions
+    // const handleSearchChange = (event) => {
+    //     const value = event.target.value;
+    //     const cursorPosition = event.target.selectionStart; // Get the cursor position
+    //     setSearchInput(value);
+
+    //     // Find the word around the cursor
+    //     const leftPart = value.slice(0, cursorPosition);
+    //     const rightPart = value.slice(cursorPosition);
+
+    //     // Find the index of the last space before the cursor and the next space after the cursor
+    //     const startOfWord = leftPart.lastIndexOf(' ') + 1;
+    //     const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
+
+    //     const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
+
+    //     if (wordToSearch.trim() !== '') { // Only filter if the word is not empty
+    //         const filteredData = secDetailsForSearching.filter((item) =>
+    //             item.includes(wordToSearch)
+    //         );
+    //         setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
+    //     } else {
+    //         // If input is cleared or no word to search, show all suggestions
+    //         setFilteredSuggestions(secDetailsForSearching);
+    //     }
+    // };
     const handleSearchChange = (event) => {
         const value = event.target.value;
         const cursorPosition = event.target.selectionStart; // Get the cursor position
@@ -36,9 +62,14 @@ function AdvancedEditor({
         const startOfWord = leftPart.lastIndexOf(' ') + 1;
         const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
 
-        const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord);
+        const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord).trim();
 
-        if (wordToSearch.trim() !== '') { // Only filter if the word is not empty
+        // Check for specific characters and prevent showing the error
+        const specialCharacters = ['(', '{', '!', '[', ']', '}', ')'];
+
+        if (specialCharacters.some(char => wordToSearch.startsWith(char))) {
+            setFilteredSuggestions(secDetailsForSearching); // Show all suggestions
+        } else if (wordToSearch !== '') { // Only filter if the word is not empty
             const filteredData = secDetailsForSearching.filter((item) =>
                 item.includes(wordToSearch)
             );
@@ -67,7 +98,7 @@ function AdvancedEditor({
     }, [secDetailsForSearching]); // This will run whenever secDetailsForSearching changes
 
     return (
-        <div className='mr-[18px] mt-[6%]'>
+        <div className='mr-[18px] mt-[4%]'>
             <div className='relative h-[230px]'>
                 <label htmlFor="editor"></label>
                 <textarea
@@ -79,7 +110,7 @@ function AdvancedEditor({
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
-                <span className="absolute left-[2%] top-[6%] cursor-pointer">=</span>
+                <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
 
             {/* Error message if no matching results */}

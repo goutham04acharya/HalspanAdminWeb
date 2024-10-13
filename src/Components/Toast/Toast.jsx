@@ -40,7 +40,7 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
                     transition={{ duration: 1 }}
                     exit={{ opacity: 0.5 }}
                     onClick={() => { setShowToast(!showToast); setToastmessage(''); }}
-                    style={{ zIndex: '999' }}
+                    style={{ zIndex: '999999' }}
                     className={`cursor-pointer w-[400px] rounded-[4px] px-5 py-[15px] flex justify-between items-center absolute z-50 gap-4 ${bottom ? 'bottom-[6vh] right-2/4 translate-x-1/2' : 'top-7 right-5'}
                         ${type === 'success'
                     ? 'bg-[#7D7C7C]'

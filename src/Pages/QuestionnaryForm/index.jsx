@@ -665,7 +665,6 @@ const QuestionnaryForm = () => {
                     }))
                 }))
             };
-            console.log(fieldSettingParams, 'fieldSettingParams')
 
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {

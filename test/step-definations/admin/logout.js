@@ -27,9 +27,20 @@ When('I click the close button', async function () {
     await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click();
 });
 
+When('I click the modal close button', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="modal-close"]'))).click();
+});
+
 When('I click the cancel button', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click()
+    
+});
+
+When('I click the modal cancel button', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="cancel-btn-modal"]'))).click()
 });
 
 When('I click on cancel button', async function(){
