@@ -55,3 +55,4 @@ Feature: Halspan- Admin - Show/Hide entire Section/Pages for Date/Time fields(Ba
     When I enter the correct date/time conditional logic for basic editor
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
+    

@@ -23,7 +23,7 @@ const DatePicker = ({
     optional,
     prefixValue,
     mainIndex,
-    subIndex
+    subIndex,
 }) => {
 
     const [open, setOpen] = useState(false)
@@ -46,7 +46,7 @@ const DatePicker = ({
                     ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} ${className} rounded `}
                     data-testid={testId}
                 />
-                <img src="/Images/calendarField.svg" className='cursor pointer absolute top-2.5 right-3' alt="ggtgtg" />
+                <img src="/Images/calendarField.svg" className='cursor pointer absolute top-2.5 right-3' alt="ggtgtg" data-testid={`${testId}-calendar`} />
             </div>
             {validationError && <ErrorMessage error={validationError} />}
             <div className='bg-white w-full'>
