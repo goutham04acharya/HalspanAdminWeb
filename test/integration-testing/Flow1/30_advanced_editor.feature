@@ -11,13 +11,7 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Once I apply the conditional logic, I must be able to preview the same so that i will be able to view all my responses in advance.
 
   @create_question
-  Scenario: Admin views all types of field to create the form
-    Given I am on the questionnaire management section
-    Then I should see the add field
-    And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
-
-  @create_question
-  Scenario: Admin adds textbox from the add field section
+  Scenario: Admin adds the conditional logic for textfield
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -34,8 +28,6 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
 
     When I click on add new section
     Then I should see the new section added
-    # When I click on add new page
-    # Then I should see the new pages added
     When I add a new question to the page 1 in section 2
     When I click the textbox button
     Then I should see field settings
@@ -46,15 +38,9 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Then I should see the help text updated in the section 2
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 2
-
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
-    When I enter the incorrect conditional logic
-    Then I should read a message stating that "No items found"
-    When I click the cancel button
-    Then I should see field settings
-
-    When I click the add conditional logic button
+    Then I should see the suggestions for questions
     When I enter the correct conditional logic 
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"

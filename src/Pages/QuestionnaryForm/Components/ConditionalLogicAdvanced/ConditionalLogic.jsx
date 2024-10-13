@@ -372,7 +372,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSelectedFieldType(fieldType);
         }
     };
-
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -797,12 +796,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     <div className='flex justify-between items-end'>
                         <div className='flex gap-5 items-end'>
                             <p onClick={() => setTab(false)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                            <p onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                            <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                         </div>
                         <div>
                             <Button2
                                 text='Cancel'
                                 type='button'
+                                testId='cancel'
                                 data-testid='button1'
                                 className='w-[162px] h-[50px] text-black font-semibold text-base'
                                 onClick={() => handleClose()}

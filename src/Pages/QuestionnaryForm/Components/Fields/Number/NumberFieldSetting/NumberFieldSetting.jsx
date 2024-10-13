@@ -17,7 +17,6 @@ function NumberFieldSetting({
     selectedQuestionId,
     validationErrors,
     setConditionalLogic,
-
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
     const dispatch = useDispatch();
