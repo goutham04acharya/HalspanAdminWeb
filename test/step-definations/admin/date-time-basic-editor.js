@@ -59,7 +59,9 @@ When('I enter the correct date\\/time conditional logic for basic editor', async
     // Fifth OR condition
     await selectDropdown('select-2-0', 'select-dropdown-2-0', 'Section_1.Page_1.Date_or_time');
     await selectDropdown('condition-2-0', 'condition-dropdown-2-0', 'date is “X” date of set date');
-    await driver.wait(until.elementLocated(By.css('[data-testid="set-date-2-0"]')), 5000).click();
-    await driver.wait(until.elementLocated(By.css('[data-testid=""]')), 5000).click();  // Add AND condition
+    const element = await driver.wait(until.elementLocated(By.css('[data-testid="set-date-2-0"]')), 5000);
+    await element.sendKeys('31/10/2024');
+    
+    // await driver.wait(until.elementLocated(By.css('[data-testid=""]')), 5000).click();  // Add AND condition
     await enterValue('value-input-2-0', '10');
 });

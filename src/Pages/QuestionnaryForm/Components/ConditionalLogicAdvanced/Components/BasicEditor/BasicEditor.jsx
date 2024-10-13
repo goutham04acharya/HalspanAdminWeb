@@ -320,7 +320,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                 value={conditions[index].conditions[i]?.date || null}
                                                 className='w-full'
                                                 labelStyle=''
-                                                testId={`value-input-${index}-${i}`}
+                                                testId={`set-date-${index}-${i}`}
                                                 htmlFor=''
                                                 mainIndex={index}
                                                 subIndex={i}
