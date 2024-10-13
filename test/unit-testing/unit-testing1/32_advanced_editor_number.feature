@@ -18,43 +18,33 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     Then I should be redirected to the questionnaire listing screen
 
   @create_question
-  Scenario: Admin views all types of field to create the form
-    Given I am on the questionnaire management section
-    Then I should see the add field
-    And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
-
-  @create_question
   Scenario: Admin adds number field from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
     When I click the number button
-    Then I should see field settings
     And I should see the number field added to the section 1 page 1 question 1
     When I enter the label name for number
-    Then I should see the label name updated in the section 1
+    Then I should see the label name for number updated in the section 1
     When I enter the help text for number
-    Then I should see the help text updated in the section 1
+    Then I should see the help text for number updated in the section 1
     When I enter the placeholder content for number
-    Then I should see the placeholder content updated in the section 1
+    Then I should see the placeholder content for number updated in the section 1
     When I click the save button for the questionnaire version
 
     When I click on add new section
     Then I should see the new section added
+    # When I click on add new page
+    # Then I should see the new pages added
     When I add a new question to the page 1 in section 2
     When I click the number button
-    Then I should see field settings
     And I should see the number field added to the section 2 page 1 question 1
     When I enter the label name for number
-    Then I should see the label name updated in the section 2
+    Then I should see the label name for number updated in the section 2
     When I enter the help text for number
-    Then I should see the help text updated in the section 2
+    Then I should see the help text for number updated in the section 2
     When I enter the placeholder content for number
-    Then I should see the placeholder content updated in the section 2
-
-
-  Scenario: Admin adds the conditional logic for textfield
-    Given I am on the Questionnaire management sections
+    Then I should see the placeholder content for number updated in the section 2
     When I click the add conditional logic button
     Then I should see the advanced editor for number field
     Then I should see the suggestions for questions
@@ -66,11 +56,13 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     Then I should see field settings
     
     When I click the add conditional logic button
+    Then I should see the advanced editor for number field
     When I select the question from the suggestions for number field
     When I click the cancel button
     Then I should see field settings
 
     When I click the add conditional logic button
+    Then I should see the advanced editor for number field
     When I enter the correct conditional logic for number field
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"

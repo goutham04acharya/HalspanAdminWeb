@@ -7,6 +7,8 @@ const Key = webdriver.Key
 
 Then('I should see the advanced editor for number field', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="advance-editor-tab"]`))).click();
+    await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.xpath('//*[text()="shows when..."]')));
 });
 
