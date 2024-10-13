@@ -826,6 +826,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             <Button2
                                 text='Cancel'
                                 type='button'
+                                testId='cancel'
                                 data-testid='button1'
                                 className='w-[162px] h-[50px] text-black font-semibold text-base'
                                 onClick={() => handleClose()}
