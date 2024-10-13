@@ -11,6 +11,7 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Once I apply the conditional logic, I must be able to preview the same so that i will be able to view all my responses in advance.
 
   @create_question
+  Scenario: Admin adds the conditional logic for textfield
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1

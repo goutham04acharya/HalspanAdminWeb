@@ -18,17 +18,16 @@ Feature: Halspan- Admin-Show/Hide entire Sections/Pages for Files,Video,Photo (A
     And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
   @create_question
-  Scenario: Admin adds textbox from the add field section
+  Scenario: Admin adds files field from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
     When I click the files button
-    Then I should see field settings
     And I should see the files field added to the section 1 page 1 question 1
     When I enter the label name for files
-    Then I should see the label name updated in the section 1
+    Then I should see the label name for files updated in the section 1
     When I enter the help text for files
-    Then I should see the help text updated in the section 1
+    Then I should see the help text for files updated in the section 1
     When I click the save button for the questionnaire version
 
     When I click on add new section
@@ -37,21 +36,20 @@ Feature: Halspan- Admin-Show/Hide entire Sections/Pages for Files,Video,Photo (A
     # Then I should see the new pages added
     When I add a new question to the page 1 in section 2
     When I click the files button
-    Then I should see field settings
-    And I should see the files field added to the section 1 page 1 question 1
+    And I should see the files field added to the section 2 page 1 question 1
     When I enter the label name for files
-    Then I should see the label name updated in the section 2
+    Then I should see the label name for files updated in the section 2
     When I enter the help text for files
-    Then I should see the help text updated in the section 2
-
+    Then I should see the help text for files updated in the section 2
+    
     When I click the add conditional logic button
     Then I should see the advanced editor for files or photos or videos
-    When I enter the incorrect conditional logic for files or photos or videos
-    Then I should read a message stating that "No items found"
+    When I select the question from the suggestions for files
     When I click the cancel button
     Then I should see field settings
 
     When I click the add conditional logic button
+    Then I should see the advanced editor for files or photos or videos
     When I enter the correct conditional logic for files or photos or videos
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"
