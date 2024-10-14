@@ -12,7 +12,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
-        'file': ['has at least one file', 'has no files', 'number of file is'],
+        'file': ['has atleast one file', 'has no files', 'number of file is'],
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
     //function to handle dropdowns
@@ -192,13 +192,24 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const getConditions = (key) => {
         let arr = []
         switch (key) {
-            case "textboxfield" || "choiceboxfield" || "assetLocationfield"
-                || "floorPlanfield" || "signaturefield" || "gpsfield" || "displayfield": return (arr = conditionObj['text'])
-
-            case "numberfield": return (conditionObj['numeric'])
-                return arr;
-            case "photofield" || "videofield" || "filefield": return (conditionObj['file'])
-            case "dateTimefield": return (conditionObj['date'])
+            case "textboxfield":
+            case "choiceboxfield":
+            case "assetLocationfield":
+            case "floorPlanfield":
+            case "signaturefield":
+            case "gpsfield":
+            case "displayfield":
+                return conditionObj['text'];
+            case "numberfield":
+                return conditionObj['numeric'];
+            case "photofield":
+            case "videofield":
+            case "filefield":
+                return conditionObj['file'];
+            case "dateTimefield":
+                return conditionObj['date'];
+            default:
+                return arr; // This is the fallback if none of the cases match
         }
     }
     const validateConditions = () => {
@@ -217,6 +228,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         }
         return false;  // Return false if all keys have values
     };
+    
     return (
         <div className='w-full '>
             <p className='font-semibold text-2xl'>Conditional Fields</p>
@@ -275,7 +287,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                 {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
                                             </div>
                                         </div>
-                                        <div className='w-1/3 px-2 '>
+                                        {!['has no files','has atleast one file'].includes(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
                                             <div className=''>
                                                 <p className='text-sm text-[#2B333B] mb-3'>Value</p>
                                                 <InputField
@@ -293,11 +305,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     mainIndex={index}
                                                     subIndex={i}
                                                     handleChange={handleInputChange}
-                                                    onInput={conditions[index].conditions[i].condition_type === 'numberfield'}
+                                                    onInput={conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
                                                     validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
                                                 />
                                             </div>
-                                        </div>
+                                        </div>}
                                     </div>
                                     {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />

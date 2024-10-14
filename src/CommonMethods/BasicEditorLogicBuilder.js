@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 // Function to handle logic transformation
 export const buildLogicExpression = (question_name, condition_logic, value) => {
     switch (condition_logic) {
@@ -17,6 +18,12 @@ export const buildLogicExpression = (question_name, condition_logic, value) => {
         return `${question_name} <= ${value}`;
     case 'larger or equal':
         return `${question_name} >= ${value}`;
+    case 'has no files':
+        return `${question_name}.length === 0`;
+    case 'has atleast one file':
+        return `${question_name}.length >= 1`;
+    case 'number of file is':
+        return `${question_name}.length === ${value}`;
     default:
         // Fallback for other logic (you can add more cases here if needed)
         return `${question_name} ${condition_logic} '${value}'`;
