@@ -27,6 +27,7 @@ import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
+import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 
 
@@ -57,6 +58,8 @@ const QuestionnaryForm = () => {
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
+    const [previewModal, setPreviewModal] = useState(false)
+    // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
     const [conditionalLogic, setConditionalLogic] = useState(false);
     // text field related states
@@ -81,6 +84,8 @@ const QuestionnaryForm = () => {
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
     const [isSectionSaved, setIsSectionSaved] = useState({});
+
+    console.log(selectedSectionData, 'selectedSectionData')
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -127,7 +132,26 @@ const QuestionnaryForm = () => {
 
         // Update the state dynamically
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-
+        if (id === 'regular_expression') {
+            dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'format_error') {
+            dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'regular_expression') {
+            const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
+            if (!regexPattern.test(value) || value.trim() === '') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: 'Invalid regular expression',
+                }));
+            } else {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    regular_expression: '',
+                }));
+            }
+        }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -368,7 +392,6 @@ const QuestionnaryForm = () => {
         }
     }
 
-
     const handleAddRemovePage = (event, sectionIndex, pageIndex, sectionId) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -423,14 +446,7 @@ const QuestionnaryForm = () => {
             // Update the state with the new sections array
             setSections(SectionData);
 
-            // Call handleSaveSection with the updated section data
-            // if (isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, SectionData, false);
-            // }
-            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
-
-
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
@@ -524,7 +540,7 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    conditional_logic:question?.conditional_logic
+                    conditional_logic: question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -608,7 +624,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),                        component_type: fieldSettingParams[question.question_id].componentType,
+                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
                         placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
@@ -694,7 +711,8 @@ const QuestionnaryForm = () => {
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
 
-                        dispatch(setDataIsSame(update));
+                        dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+
 
                     } else {
                         setToastError('Something went wrong.');
@@ -955,7 +973,7 @@ const QuestionnaryForm = () => {
 
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
-        handleSaveSection(sectionId, sections);
+        handleSaveSection(sectionId, false);
     }
     //this is for diplay content field replace modal function
     const handleConfirmReplace = () => {
@@ -1057,13 +1075,9 @@ const QuestionnaryForm = () => {
                                                                             alt="save"
                                                                             title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 ${dataIsSame[sectionData.section_id]
-                                                                                ? "cursor-not-allowed"
-                                                                                : "cursor-pointer"
-                                                                                }`}
+                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 cursor-pointer`}
                                                                             onClick={() => {
-                                                                                if (!dataIsSame[sectionData.section_id])
-                                                                                    handleSaveSection(sectionData?.section_id);
+                                                                                handleSaveSection(sectionData?.section_id);
                                                                             }}
                                                                         />
                                                                     </div>
@@ -1114,14 +1128,18 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            <button onClick={() => {
+                                // Open the custom modal  
+                                setPreviewModal(true)
+
+                            }} className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
 
                             <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
-                                if (!dataIsSame[latestSectionId])
-                                    handleSaveSection(latestSectionId);
+
+                                handleSaveSection(latestSectionId);
                             }}>
                                 Save
                             </button>
@@ -1146,6 +1164,8 @@ const QuestionnaryForm = () => {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
+                                        questionData: dataIsSame[selectedSectionData],
+                                        setValidationErrors: setValidationErrors,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
 
@@ -1227,6 +1247,15 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
+            {previewModal && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                
+            />}
             {conditionalLogic && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}

@@ -58,7 +58,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                     className={`${selectedSection === sectionIndex && selectedPage === pageIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-14 pr-2 cursor-pointer truncate`}>
                                     <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>
                                     <p
-                                        data-testid={`sidebar-page-${pageIndex}`}
+                                        data-testid={`sidebar-section-${sectionIndex}-page-${pageIndex}`}
                                         title={pageItem?.page_name}
                                         className='font-normal text-base text-[#2B333B] cursor-pointer py-2 truncate'
                                     >
