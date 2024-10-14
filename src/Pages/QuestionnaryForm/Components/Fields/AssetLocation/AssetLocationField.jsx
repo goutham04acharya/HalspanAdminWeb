@@ -11,7 +11,9 @@ const AssetLocationField = ({
     handleChange,
     // above are not sent
     fieldSettingParameters,
-    testId
+    testId,
+    preview,
+    question
 }) => {
 
     return (
@@ -19,13 +21,13 @@ const AssetLocationField = ({
             <label
                 data-testid="label-name"
                 htmlFor={textId}
-                title={fieldSettingParameters?.label}
-                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}
+                title={preview ? question?.label : fieldSettingParameters?.label}
+                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${(preview ? question?.label : fieldSettingParameters?.label) === '' ? 'h-[20px]' : 'h-auto'}`}
                 maxLength={100}
             >
-                {fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}
             </label>
-            <div className='relative mt-5'>
+            <div className={`relative ${preview ? 'mt-3' : 'mt-5'}`}>
                 <label htmlFor={textId} className='font-medium text-base text-black'>Site</label>
                 <input
                     data-testid='input'
@@ -40,7 +42,7 @@ const AssetLocationField = ({
                     <Image src='down' />
                 </div>
             </div>
-            <div className='relative mt-8'>
+            <div className={`relative ${preview ? 'mt-5' : 'mt-8'}`}>
                 <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
                 <input
                     data-testid='input'
@@ -55,7 +57,7 @@ const AssetLocationField = ({
                     <Image src='down' />
                 </div>
             </div>
-            <div className='relative mt-8'>
+            <div className={`relative ${preview ? 'mt-4' : 'mt-8'}`}>
                 <label htmlFor={textId} className='font-medium text-base text-black'>Floor</label>
                 <input
                     data-testid='input'

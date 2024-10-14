@@ -7,9 +7,17 @@ import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx
 import FloorPlanField from './Fields/FloorPlan/FloorPlanField.jsx';
 import TextBoxField from './Fields/TextBox/TextBoxField.jsx';
 import DateTimeField from './Fields/DateTime/DateTimeField.jsx';
+import GPSField from './Fields/GPS/GPSField.jsx';
+import SignatureField from './Fields/Signature/SignatureField.jsx';
+import FileField from './Fields/File/FileFIeld.jsx';
+import ChoiceBoxField from './Fields/ChoiceBox/ChoiceBoxField.jsx';
+import NumberField from './Fields/Number/NumberField.jsx';
+import AssetLocationField from './Fields/AssetLocation/AssetLocationField.jsx';
+import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
+import VideoField from './Fields/VideoField/VideoField.jsx';
 
 
-function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, sections }) {
+function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, sections, setValidationErrors, validationErrors, formDefaultInfo }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -17,24 +25,32 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [currentPage, setCurrentPage] = useState(0);
     const [sliderValue, setSliderValue] = useState(0);
     console.log(sections, 'sections mmdmd')
-    const totalPages = sections.reduce((acc, section) => acc + section.pages.length, 0);
+    const totalPages = Array.isArray(sections) ? sections.reduce((acc, section) => acc + (Array.isArray(section.pages) ? section.pages.length : 0), 0) : 0;
 
     const handleNextClick = () => {
         if (currentPage < sections[currentSection].pages.length - 1) {
             setCurrentPage(currentPage + 1);
             setSliderValue((currentPage + 1) / sections[currentSection].pages.length * 100);
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_textboxfield: '', // Or remove the key if you prefer
+            }));
         } else if (currentSection < sections.length - 1) {
             setCurrentSection(currentSection + 1);
             setCurrentPage(0);
             // setSliderValue(0);
         }
     };
-    console.log((currentPage + 1) / sections[currentSection].pages.length * 100, '(currentPage + 1) / sections[currentSection].pages.length * 100')
+    // console.log((currentPage + 1) / sections[currentSection].pages.length * 100, '(currentPage + 1) / sections[currentSection].pages.length * 100')
 
     const handleBackClick = () => {
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
             setSliderValue((currentPage - 1) / sections[currentSection].pages.length * 100);
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_textboxfield: '', // Or remove the key if you prefer
+            }));
         } else if (currentSection > 0) {
             setCurrentSection(currentSection - 1);
             setCurrentPage(sections[currentSection - 1].pages.length - 1);
@@ -43,32 +59,36 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     };
 
     const renderQuestion = (question) => {
+        if (!question) {
+            return <p>No question data available.</p>;
+        }
         console.log(question)
         switch (question.component_type) {
             case 'textboxfield':
-                return <TextBoxField preview helpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                // question_id={question?.question_id} validationErrors={validationErrors} options={question?.options} HelpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''}
+                return <TextBoxField preview question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
             case 'displayfield':
-                return <DIsplayContentField />;
+                return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
-                return <p>GPS Field</p>;
+                return <GPSField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'signaturefield':
-                return <p>Signature Field</p>;
+                return <SignatureField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
-                return <p>File Field</p>;
+                return <FileField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <p>Choice Box Field</p>;
+                return <ChoiceBoxField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
-                return <DateTimeField preview helpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
-                return <p>Number Field</p>;
+                return <NumberField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
-                return <p>Asset Location Field</p>;
+                return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
-                return <FloorPlanField />;
+                return <FloorPlanField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'photofield':
-                return <p>Photo Field</p>;
+                return <PhotoField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
-                return <p>Video Field</p>;
+                return <VideoField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             default:
                 return <p>Unknown Field</p>;
         }
@@ -78,6 +98,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
     useOnClickOutside(modalRef, () => {
         dispatch(setModalOpen(false));
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_textboxfield: '', // Or remove the key if you prefer
+        }));
     });
 
     return (
@@ -89,10 +113,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
                     <Image src={src} className={`${className} mx-auto`} />
                 </div>
-                <div className='h-full w-full bg-slate-100 rounded-md'>
+                <div className='h-[calc(100vh-280px)] overflow-y-scroll scrollBar w-full bg-slate-100 rounded-md'>
                     <div>
                         <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
-                            {sections[currentSection].section_name}
+                            {formDefaultInfo?.internal_name}
                         </p>
                         <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                             <input className="bg-[#2B333B] absolute appearance-none h-2.5 rounded-l" value={sliderValue} onChange={(e) => setSliderValue(e.target.value)} style={{ width: { sliderValue } }}></input>
@@ -103,11 +127,17 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
                     </div>
                     <div className='mt-12'>
-                        {sections[currentSection].pages[currentPage].questions.map((question, index) => (
-                            <div className=''>
-                                <div className='px-2' key={index}>{renderQuestion(question)}</div>
-                            </div>
-                        ))}
+                        <div className='bg-white p-[10px] mb-[10px]'>{sections[currentSection].pages[currentPage].page_name}</div>
+                        {sections[currentSection]?.pages[currentPage]?.questions?.length > 0 ? (
+                            sections[currentSection].pages[currentPage].questions.map((question, index) => (
+                                <div className='mt-5' key={index}>
+                                    
+                                    <div className='px-2'>{renderQuestion(question)}</div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">No questions available.</p>
+                        )}
                     </div>
                 </div>
                 <div className='mt-5 flex items-center justify-between'>

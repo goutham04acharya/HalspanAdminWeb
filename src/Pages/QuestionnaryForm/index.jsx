@@ -618,7 +618,7 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    conditional_logic:question?.conditional_logic
+                    conditional_logic: question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -679,7 +679,8 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
+    const handleSaveSection = useCallback(async (sectionId, isSaving = true, payloadString) => {
+        console.log(fieldSettingParams, 'field aefkjafkkmafmfa akjfk')
         handleSectionSaveOrder(sections)
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
@@ -702,7 +703,7 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),                        component_type: fieldSettingParams[question.question_id].componentType,
+                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''), component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
                         placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
@@ -718,7 +719,7 @@ const QuestionnaryForm = () => {
                         admin_field_notes: fieldSettingParams[question.question_id].note,
                         source: fieldSettingParams[question.question_id].source,
                         source_value:
-                            question.source === 'fixedList' ?
+                        fieldSettingParams[question.question_id].source === 'fixedList' ?
                                 fieldSettingParams[question.question_id].fixedChoiceArray :
                                 fieldSettingParams[question.question_id].lookupOptionChoice
                         ,
@@ -759,7 +760,7 @@ const QuestionnaryForm = () => {
                     }))
                 }))
             };
-            console.log(fieldSettingParams, 'fieldSettingParams')
+            console.log(body, 'body jkaefjjfa')
 
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
@@ -776,6 +777,8 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
+            console.log(body, 'body tttttttttttt')
+
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -802,7 +805,7 @@ const QuestionnaryForm = () => {
             }
         }
 
-    };
+    }, [fieldSettingParams]);
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1214,7 +1217,9 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={()=>setPreviewModal(true)}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
+                                setPreviewModal(true)
+                            }}>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
@@ -1250,7 +1255,7 @@ const QuestionnaryForm = () => {
                                         conditionalLogic: conditionalLogic,
                                         questionData: dataIsSame[selectedSectionData],
                                         setValidationErrors: setValidationErrors,
-                                        
+
 
                                     }
                                 )
@@ -1337,15 +1342,18 @@ const QuestionnaryForm = () => {
                     handleSaveSection={handleSaveSection}
                 />
 
-            )}  
-            {previewModal && <PreviewModal
+            )}
+            {previewModal ===true && <PreviewModal
                 isModalOpen={previewModal}
                 setModalOpen={setPreviewModal}
                 Button1text={'Back'}
                 Button2text={'Next'}
                 src=''
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-
+                sections={sections}
+                setValidationErrors={setValidationErrors}
+                validationErrors={validationErrors}
+                formDefaultInfo={formDefaultInfo}
             />}
         </>
     );

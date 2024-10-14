@@ -11,8 +11,6 @@ import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
-import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
-import { useSelector } from 'react-redux';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { RegExpValidator } from 'regexpp';
 
@@ -22,14 +20,15 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
+  // setFieldSettingParameters,
+  handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
   validationErrors,
-  setConditionalLogic,
-  conditionalLogic,
   setValidationErrors
 }) {
+
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
@@ -38,9 +37,6 @@ function TestFieldSetting({
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
-  console.log(allSectionDetails?.data?.sections, 'nayanayan')
-
   const [isValid, setIsValid] = useState(false)
 
   console.log(fieldSettingParameters, 'fieldSettingParameters')
@@ -70,7 +66,7 @@ function TestFieldSetting({
   const validateRegex = (e) => {
     const value = e.target.value;
     console.log(value, 'value');
-  
+
     // Check if the value is empty
     if (!value) {
       setValidationErrors((prevErrors) => ({
@@ -79,7 +75,7 @@ function TestFieldSetting({
       }));
       return;
     }
-  
+
     // Try creating a RegExp to check for validity
     try {
       new RegExp(value);
@@ -94,7 +90,8 @@ function TestFieldSetting({
       }));
     }
   };
-  
+
+
 
 
   const handleRegularExpression = (event) => {
@@ -196,6 +193,27 @@ function TestFieldSetting({
     if (node) observer.current.observe(node);
   }, [loading, isFetchingMore, fieldSettingParameters?.type]);
 
+  function isValidRegex(pattern) {
+    console.log(pattern, 'pattern')
+    try {
+      new RegExp(pattern);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // useEffect(() => {
+  //   document.getElementById('regular_expression').onblur = function () {
+  //     if (isValidRegex(this.value)) {
+  //       console.log('Valid regex');
+  //       // Additional actions for valid input
+  //     } else {
+  //       console.log('Invalid regex');
+  //       // Handle invalid input (e.g., show error message)
+  //     }
+  //   };
+  // }, [])
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
@@ -411,17 +429,10 @@ function TestFieldSetting({
               maxLength={500}
               handleChange={(e) => handleInputChange(e)} />
           </div>
-          <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-            <button
-              type='button'
-              className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-              onClick={() => setConditionalLogic(true)}  // Use arrow function
-            >
+          <div className='mx-auto mt-7 flex items-center w-full'>
+            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
               Add Conditional Logic
             </button>
-            {fieldSettingParameters.conditional_logic &&
-              <p className='text-center italic mt-1'>Conditional Logic Added</p>
-            }
           </div>
         </div>
       </div>

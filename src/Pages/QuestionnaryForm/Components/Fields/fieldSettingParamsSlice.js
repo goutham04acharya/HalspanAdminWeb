@@ -148,6 +148,7 @@ const fieldSettingParamsSlice = createSlice({
                     postField: item?.postField,
                     preField: item?.preField,
                     source: item?.source,
+                    source_value: item?.source_value,
                     draw_image: item?.asset_extras?.draw_image,
                     pin_drop: item?.asset_extras?.pin_drop,
                     include_metadata: item?.asset_extras?.include_metadata,

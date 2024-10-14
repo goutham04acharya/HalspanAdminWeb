@@ -10,6 +10,7 @@ function NumberField({
     className,
     handleChange,
     fieldSettingParameters,
+    preview
 
 }) {
     const dispatch = useDispatch();
@@ -74,7 +75,7 @@ function NumberField({
                     type={type}
                     id={textId}
                     value={`${fieldSettingParameters?.preField ? fieldSettingParameters.preField : ''}${fieldSettingParameters?.postField ? ` ${fieldSettingParameters.postField}` : ''}`}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-5 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={fieldSettingParameters?.placeholderContent}
                     onChange={() => handleChange(fieldSettingParameters)}
                 />
@@ -83,9 +84,9 @@ function NumberField({
                 <div data-testid="slider" className=''>
                     <div className='flex items-center w-full'>
                         {fieldSettingParameters?.preField &&
-                            <p className='w-auto max-w-[20%] break-all overflow-auto mt-5 mr-2'>{fieldSettingParameters?.preField}</p>
+                            <p className={`w-auto max-w-[20%] break-all overflow-auto ${preview ? 'mt-1' : 'mt-5'} mr-2`}>{fieldSettingParameters?.preField}</p>
                         }
-                        <p className='w-auto max-w-[10%] break-all overflow-auto mt-5 mr-2'>{fieldSettingParameters?.min}</p>
+                        <p className={`w-auto max-w-[10%] break-all overflow-auto ${preview ? 'mt-1' : 'mt-5'} mr-2`}>{fieldSettingParameters?.min}</p>
 
                         <div className='w-[40%]'>
                             <input
@@ -101,7 +102,7 @@ function NumberField({
                                 className='mt-6 custom-slider w-full'
                             />
                         </div>
-                        <p className='w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2'>{fieldSettingParameters?.max}</p>
+                        <p className={`w-auto max-w-[10%] break-all overflow-auto ${preview ? 'mt-1' : 'mt-5'} ml-2`}>{fieldSettingParameters?.max}</p>
                         {fieldSettingParameters?.postField &&
                             <p className='w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2'>{fieldSettingParameters?.postField}</p>}
                     </div>
