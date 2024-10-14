@@ -480,19 +480,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
                 if (matches) {
+
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
 
-
                         question_name = question_name.replace('.length', '');
-                    }
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
-                    if (question.component_type === 'dateTimefield') {
+                    if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
                             value = 'new Date()';
@@ -541,6 +540,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             condition_dropdown: false,
                             condition_type: question?.component_type
                         };
+
                     }
                     if (negate) {
                         if (condition_logic.includes('includes')) {
@@ -701,6 +701,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+
 
             let expression = evalInputValue.toString();
 
