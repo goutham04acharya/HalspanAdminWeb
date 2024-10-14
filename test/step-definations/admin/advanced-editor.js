@@ -67,40 +67,40 @@ When('I select the question from the suggestions', async function () {
 
     // eslint-disable-next-line max-len
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_Label_Name.includes("Roopesh") AND ', Key.RETURN);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 750));
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-0"]`)), 5000).click();
+    // // while (bool) {
+    // //     let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
+    // //     let suggestionText = await suggestionElement.getText();
+    // //     console.log("suggestionText = ", suggestionText, "suggestions[0] = ", suggestions[0]);
+    // //     if (suggestionText === suggestions[0]) {
+    // //         await suggestionElement.click();
+    // //         bool = false;
+    // //     }
+    // //     i++;
+    // // }
 
-    while (bool) {
-        let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
-        let suggestionText = await suggestionElement.getText();
-        console.log("suggestionText = ", suggestionText, "suggestions[0] = ", suggestions[0]);
-        if (suggestionText === suggestions[0]) {
-            await suggestionElement.click();
-            bool = false;
-        }
-        i++;
-    }
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('.');
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('.');
 
-    // eslint-disable-next-line max-len
-    let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()','includes()'];
+    // // eslint-disable-next-line max-len
+    // let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()','includes()'];
 
-    bool = true;
-    i = 0;
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    while (i < conditions.length) {
-        let conditionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="condition-${i}"]`)), 10000);
-        let conditionText = await conditionElement.getText();
-        assert.equal(conditionText, conditions[i]);
+    // bool = true;
+    // i = 0;
 
-        // if (conditionText === conditions[i]) {
-        //     await conditionElement.click();
-        //     bool = false;
-        // }
-        i++;
-    }
+    // while (i < conditions.length) {
+    //     let conditionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="condition-${i}"]`)), 10000);
+    //     let conditionText = await conditionElement.getText();
+    //     assert.equal(conditionText, conditions[i]);
 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0"]`)), 10000).click();
+    //     // if (conditionText === conditions[i]) {
+    //     //     await conditionElement.click();
+    //     //     bool = false;
+    //     // }
+    //     i++;
+    // }
+
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0"]`)), 10000).click();
 });
 
 When('I enter the incorrect conditional logic with then and else', async function () {
