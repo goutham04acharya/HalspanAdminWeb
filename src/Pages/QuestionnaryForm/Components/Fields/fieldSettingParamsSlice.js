@@ -55,7 +55,7 @@ const fieldSettingParamsSlice = createSlice({
     initialState,
     reducers: {
         setNewComponent: (state, action) => {
-            debugger
+            // debugger
             const { questionId, id, value } = action.payload;
             console.log(action.payload, 'action.payload')
             console.log(state.currentData[questionId], 'state.currentData[questionId]')
