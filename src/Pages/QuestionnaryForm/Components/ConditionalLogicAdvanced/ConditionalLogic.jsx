@@ -231,7 +231,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
-            console.log(selectedFieldType, 'type')
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -639,13 +638,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Apply the formatDates function
             evalInputValue = formatDates(evalInputValue);
             // Log the updated input after date replacement
-            console.log(evalInputValue, 'after');
-
 
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            console.log(evalInputValue, 'after')
 
             let expression = evalInputValue.toString();
 
@@ -669,7 +665,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
-            console.log(payloadString, 'evalInputValue')
 
             // Extract variable names from the payloadString using a regex
             const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
