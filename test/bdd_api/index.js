@@ -8,7 +8,6 @@ async function createQuestionnaire(payload) {
     try{
         for(i = 0; i <= 10; i++){
             response = await axios.post(`https://${process.env.VITE_DOMAIN_NAME}/v1/questionnaires`, payload, {headers: API_HEADERS })
-            console.log('response', response)
             return response
         }
     }catch(err){
