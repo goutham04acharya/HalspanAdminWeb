@@ -88,7 +88,7 @@ function QuestionnarySettings({
         
         <div className='mt-9'>
             <p className='font-medium text-[22px] text-[#2B333B]'>Questionnaire settings</p>
-            <div className='mt-[22px] h-customh12 overflow-auto default-sidebar overflow-x-hidden'>
+            <div className='mt-[22px] h-customh11 overflow-auto default-sidebar overflow-x-hidden'>
                 <div className='w-full mr-[114px]'>
                     <InputField
                         autoComplete='off'
