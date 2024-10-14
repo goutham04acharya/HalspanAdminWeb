@@ -48,6 +48,6 @@ Feature: Halspan - Admin - Regular expression for pattern matching
     * I enter the minimum and maximum number of characters
     * I enter the admin field notes
 
-#     Examples:
-#       | type          | format                      |
-#       | "single_line" | "custom-regular-expression" |
+    Examples:
+      | type          | format                      |
+      | "single_line" | "custom-regular-expression" |
