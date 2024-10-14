@@ -356,7 +356,7 @@ function TestFieldSetting({
                 handleBlur={(e) => validateRegex(e)}
                 handleChange={(e) => handleInputChange(e)}
                 // onBlur={(e)=>}
-                data-testid="placeholder-input"
+                testId="regex-input"
                 maxLength={50}
                 validationError={isValid ? 'Invalid Expression' : ''}
               />
@@ -377,7 +377,7 @@ function TestFieldSetting({
               value={fieldSettingParameters?.format_error}
               handleChange={(e) => handleInputChange(e)}
 
-              data-testid="placeholder-input"
+              testId="format-error-input"
               maxLength={50} />
           </div>}
           <div className='mt-7'>
