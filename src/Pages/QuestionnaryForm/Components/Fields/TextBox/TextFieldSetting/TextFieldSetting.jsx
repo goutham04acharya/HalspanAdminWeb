@@ -12,7 +12,8 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
-import { RegExpValidator } from 'regexpp';
+
+import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
 
 function TestFieldSetting({
@@ -27,7 +28,9 @@ function TestFieldSetting({
   isThreedotLoader,
   handleBlur,
   validationErrors,
-  setValidationErrors
+  setValidationErrors,
+  setConditionalLogic,
+  conditionalLogic
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);

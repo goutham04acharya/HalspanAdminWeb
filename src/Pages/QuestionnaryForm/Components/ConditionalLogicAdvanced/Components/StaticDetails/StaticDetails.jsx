@@ -58,6 +58,10 @@ function StaticDetails({
                             <p className='font-semibold text-base text-[#000000]'>Does not Include</p>
                             <p className='font-normal text-base text-[#000000]'>=(!AssetName.Includes("Door"))</p>
                         </div>
+                        <div className='mt-4'>
+                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
+                            <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) </p>
+                        </div>
                     </div>
                 )}
                 {activeTab === 'number' && (
@@ -73,19 +77,23 @@ function StaticDetails({
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Smaller</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetName &gt; 20)</p>
+                            <p className='font-normal text-base text-[#000000]'>=(AssetName {'<'} 20)</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Larger</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetName &lt; 20)</p>
+                            <p className='font-normal text-base text-[#000000]'>=(AssetName {'>'} 20)</p>
                         </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Smaller or Equal</p>
-                            <p className='font-normal text-base text-[#000000]'>= (AssetNumber &lt;= 20)</p>
-                            </div>
+                            <p className='font-normal text-base text-[#000000]'>=(AssetNumber {'<='} 20)</p>
+                        </div>
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Larger or Equal</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetNumber &gt;= 20)</p>
+                            <p className='font-normal text-base text-[#000000]'>=(AssetNumber {'>='} 20)</p>
+                        </div>
+                        <div className='mt-4'>
+                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
+                            <p className='font-normal text-base text-[#000000]'>=If ((Quantity {'>'} 5 AND Number1 {'<'} 10) OR Number2 {'>'} 20)</p>
                         </div>
                     </div>
                 )}
@@ -111,6 +119,10 @@ function StaticDetails({
                         <div className='mt-3'>
                             <p className='font-semibold text-base text-[#000000]'>Date is with "X" days of Set date</p>
                             <p className='font-normal text-base text-[#000000]'>=(Math.abs(startDate - setDate) == 5)</p>
+                        </div>
+                        <div className='mt-4'>
+                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
+                            <p className='font-normal text-base text-[#000000]'>=If ((StartDate.getFullYear() {'>'} 2000 AND EndDate.getMonth() {'<'} 10) OR StartDate.getMonth() {'>'} 3 )</p>
                         </div>
                     </div>
                 )}

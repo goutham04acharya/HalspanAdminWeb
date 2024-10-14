@@ -15,7 +15,6 @@ function NumberFieldSetting({
     fieldSettingParameters,
     handleRadiobtn,
     selectedQuestionId,
-    handleAutoSaveSettings,
     validationErrors,
     setConditionalLogic,
 }) {

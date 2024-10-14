@@ -15,6 +15,8 @@ import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
+import { reverseFormat } from '../../../../CommonMethods/FormatDate';
+import dayjs from 'dayjs';
 
 
 
@@ -37,11 +39,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
-    const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const [selectedType, setSelectedType] = useState('');
     const [tab, setTab] = useState(false);
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    const [selectionArray, setSelectionArray] = useState([])
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -61,22 +62,39 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+    const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
         let fieldType;
 
         switch (componentType) {
-            case 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield':  // Handle both cases if they map to 'string'
-                fieldType = '';
+            case 'textboxfield':
+            case 'choiceboxfield':
+            case 'assetLocationfield':
+            case 'floorPlanfield':
+            case 'signaturefield':
+            case 'gpsfield':
+            case 'displayfield':
+                fieldType = 's';  // Handle all these cases similarly
                 break;
             case 'dateTimefield':
                 fieldType = new Date();
                 break;
-            case 'numberfield, photofield, videofield, filefield':
-                fieldType = 1;
+            case 'numberfield':
+                fieldType = 1;  // Handle all numeric-related fields similarly
                 break;
-            default: fieldType = ''
+            case 'photofield':
+                fieldType = [];
+                break;
+            case 'videofield':
+                fieldType = [];
+                break;
+            case 'filefield':
+                fieldType = [];
+                break;
+            default:
+                fieldType = '';
         }
 
         return fieldType;
@@ -112,8 +130,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
-                    const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
-                    sectionDetailsArray.push(questionName); // Add section.page.question
+                    if (question.question_id !== selectedQuestionId) {
+                        const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                        sectionDetailsArray.push(questionName); // Add section.page.question
+                    }
                 });
             });
         });
@@ -172,7 +192,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [allSectionDetails]);
 
-    //this is my function to store the cbasic sticture of my entire questionnary object
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
@@ -221,10 +240,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'numberfield, photofield, videofield, filefield') {
-                setShowMethodSuggestions(false);
+            } else if (selectedFieldType.includes('photofield')) {
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
+            } else if (selectedFieldType.includes('videofield')) {
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
+            } else if (selectedFieldType.includes('filefield')) {
+                setSuggestions(fileMethods);
+                setShowMethodSuggestions(true); // Reset method suggestions
+            } else if (selectedFieldType === 'numberfield') {
                 setSuggestions('')
-
+                setShowMethodSuggestions(false); // Reset method suggestions
             } else {
                 const cursorPosition = event.target.selectionStart; // Get the cursor position
 
@@ -256,6 +283,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         setShowMethodSuggestions(true);
                         break;
                     case 'number':
+                        setShowMethodSuggestions(false);
+                        break;
+                    case 'file':
+                        setSuggestions(fileMethods);
                         setShowMethodSuggestions(true);
                         break;
                     default:
@@ -268,29 +299,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
 
-        // Automatically insert closing parentheses or brackets when typed
-        if (lastChar === '(') {
-            insertAtCaret(event.target, ')');
-        } else if (lastChar === '[') {
-            insertAtCaret(event.target, ']');
-        } else if (lastChar === '{') {
-            insertAtCaret(event.target, '}');
-        }
-
-    };
-
-    const insertAtCaret = (element, closingChar) => {
-        const start = element.selectionStart;
-        const end = element.selectionEnd;
-        const textBefore = element.value.substring(0, start);
-        const textAfter = element.value.substring(end);
-        const newText = textBefore + closingChar + textAfter;
-
-        element.value = newText;
-
-        setTimeout(() => {
-            element.selectionStart = element.selectionEnd = start;
-        }, 0);
     };
 
     // Combined function to insert either a question or a method
@@ -300,15 +308,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
 
+
             // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
+
 
             // Check if there's a space or if the input is empty
             const lastChar = textBefore.slice(-1);
             let newText;
 
-            if (lastChar === ' ' || textBefore.length === 0) {
+            if ((lastChar === ' ' || lastChar === '.') || textBefore.length === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
             } else {
@@ -318,11 +328,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 newText = textToKeep + textToInsert + textAfter;
             }
 
+
             // Update the textarea value
             textarea.value = newText;
             setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
         }
+
 
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
@@ -330,19 +342,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let fieldType = '';
             switch (componentType) {
                 case 'string':
-                    fieldType = 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield';
+                    fieldType = [
+                        'textboxfield',
+                        'choiceboxfield',
+                        'assetLocationfield',
+                        'floorPlanfield',
+                        'signaturefield',
+                        'gpsfield',
+                        'displayfield'
+                    ];
                     break;
                 case 'number':
-                    fieldType = 'numberfield ,photofield, videofield, filefield';
+                    fieldType = [
+                        'numberfield',
+                    ];
+                    break;
+                case 'array':
+                    fieldType = [
+                        'photofield',
+                        'videofield',
+                        'filefield'
+                    ];
                     break;
                 case 'date':
                     fieldType = 'dateTimefield';
                     break;
+                default:
+                    fieldType = ''; // Handle any unexpected cases
             }
+
             setSelectedFieldType(fieldType);
         }
     };
-
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -395,88 +426,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return trimmedExpression;
     };
 
-    // Main function to split the expression and reconstruct conditions
-    // const parseLogicExpression = (expression) => {
-    //     const conditionGroups = expression.split('||').map(group => trimParentheses(group));
-
-    //     return conditionGroups.map(group => {
-    //         const conditions = group.split('&&').map(condition => {
-    //             condition = trimParentheses(condition);
-
-    //             // Adjust regex to capture question name, logic, and value with optional spaces
-    //             const matches = condition.match(/([\w.]+)\s*(!?)(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
-
-    //             if (matches) {
-    //                 // Destructure the match to extract question name, logic, and value
-    //                 let [, question_name, negate, condition_logic, value] = matches;
-
-    //                 // If the negate flag is present, adjust the condition logic
-    //                 if (negate) {
-    //                     if (condition_logic === 'includes') {
-    //                         condition_logic = 'does not include';
-    //                     } else {
-    //                         // Convert logical operators to corresponding values in conditions
-    //                         if (condition_logic === '===') condition_logic = 'equals';
-    //                         else if (condition_logic === '!==') condition_logic = 'not equals to';
-    //                         else if (condition_logic === '<') condition_logic = 'smaller';
-    //                         else if (condition_logic === '>') condition_logic = 'larger';
-    //                         else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-    //                         else if (condition_logic === '>=') condition_logic = 'larger or equal';
-    //                     }
-    //                 } else {
-    //                     // Convert logical operators to corresponding values in conditions
-    //                     if (condition_logic === '===') condition_logic = 'equals';
-    //                     else if (condition_logic === '!==') condition_logic = 'not equals to';
-    //                     else if (condition_logic === '<') condition_logic = 'smaller';
-    //                     else if (condition_logic === '>') condition_logic = 'larger';
-    //                     else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-    //                     else if (condition_logic === '>=') condition_logic = 'larger or equal';
-    //                 }
-
-    //                 // Remove quotes if the value is a string
-    //                 value = value.startsWith("'") ? value.slice(1, -1) : Number(value);
-
-    //                 // Return the object in the correct structure
-    //                 return {
-    //                     question_name: question_name.trim(),
-    //                     condition_logic: condition_logic.trim(),
-    //                     value: value,
-    //                     dropdown: false,
-    //                     condition_dropdown: false,
-    //                     condition_type: 'textboxfield'
-    //                 };
-    //             }
-
-    //             // Return null or handle errors if format doesn't match
-    //             return null;
-    //         });
-    //         if (conditions.filter(cond => cond !== null).length > 0) {
-    //             return {
-    //                 conditions: conditions.filter(cond => cond !== null)
-    //             };
-    //         } else {
-    //             if (!tab) {
-    //                 setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
-    //             }
-    //             return {
-    //                 conditions: [
-    //                     {
-    //                         'question_name': '',
-    //                         'condition_logic': '',
-    //                         'value': '',
-    //                         'dropdown': false,
-    //                         'condition_dropdown': false,
-    //                         'condition_type': 'textboxfield'
-    //                     },
-    //                 ]
-    //             };
-    //         }
-
-    //     });
-    // };
     const parseLogicExpression = (expression) => {
-        console.log(expression, 'iiiiiiii');
-
         if (!expression) {
             return [{
                 'conditions': [
@@ -497,18 +447,101 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parsedConditions = conditionGroups.map(group => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                console.log(condition, 'kkkkkkkkkk')
+                if (condition.includes('Math.abs')) {
+                    const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
+                    const matching = condition.match(regex);
+                    if (matching) {
+                        const questionName = matching[1];  // Captures everything inside the parentheses
+                        const dateKey = matching[2];       // Captures the date in dd/mm/yyyy format
+                        const value = matching[3];         // Captures the numeric value after ==
+
+                        let question = getDetails(questionName.trim(), allSectionDetails.data)
+                        let condition_logic = 'date is “X” date of set date'
+                        const date = dayjs(dateKey, 'DD/MM/YYYY');
+                        return {
+                            question_name: questionName.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: value,
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type,
+                            date
+
+                        };
+
+                    }
+                }
                 // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
-                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+
 
                 if (matches) {
 
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
+                    if (question_name.includes('.length')) {
+
+                        question_name = question_name.replace('.length', '');
+                    }
+                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+
+                    //this if block is for dateTime only. returning value inside this if block to stop further execution
+                    if (question?.component_type === 'dateTimefield') {
+                        //assigning new Date() value
+                        if (value.includes('new Date()')) {
+                            value = 'new Date()';
+                        }
+                        if (condition_logic === '<') condition_logic = 'date is before today'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'date is after or equal to today';
+                        else if (condition_logic === '<=' || condition_logic === '=<') condition_logic = 'date is before or equal to today';
+                        else if (condition_logic === '>') condition_logic = 'date is after today'
+
+                        return {
+                            question_name: question_name.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: '',
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type
+                        };
+                    }
+
+
+                    if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
+                        if (value.startsWith("(") && value.endsWith(")")) {
+                            // If the value is enclosed in parentheses, treat it as a string
+                            value = value.slice(2, -2); // Remove parentheses
+                        } else if (value.startsWith("'") && value.endsWith("'")) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else if (value.startsWith('"') && value.endsWith('"')) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else {
+                            // Convert to a number if it's not a string
+                            value = Number(value);
+                        }
+                        if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
+                        else if (condition_logic === '===') condition_logic = 'number of file is';
+
+
+
+                        return {
+                            question_name: question_name.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: value,
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type
+                        };
+
+                    }
                     if (negate) {
                         if (condition_logic.includes('includes')) {
                             condition_logic = 'does not include';
@@ -548,7 +581,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
 
                     // Return the object in the correct structure
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -618,13 +651,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 });
             });
         };
-
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
 
         }
     }, [selectedQuestionId, allSectionDetails, tab]);
-
 
     // Your handleSave function
     const handleSave = async () => {
@@ -635,10 +666,45 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
+
+            // New function to modify string (replace () with length())
+            const modifyString = (input) => {
+                if (selectedType === 'array') {
+                    const lastIndex = input.lastIndexOf('()');
+                    if (lastIndex !== -1) {
+                        return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
+                    }
+                }
+                return input;
+            };
+
             // Apply the section prefix function to the inputValue
-            let evalInputValue = (inputValue)
-            evalInputValue.replaceAll('AddDays', 'setDate') // Replace AddDays with addDays function
-            evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+            let evalInputValue = modifyString(inputValue);
+
+            // New function to format dates and remove quotes from new Date
+            const formatDates = (input) => {
+                // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
+                let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
+                    return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
+                });
+
+                // Then, remove quotes from around new Date expressions
+                formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
+
+                return formatted;
+            };
+
+            // Apply the formatDates function
+            evalInputValue = formatDates(evalInputValue);
+            // Log the updated input after date replacement
+
+            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
+            evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+            evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+
+
             let expression = evalInputValue.toString();
 
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
@@ -648,13 +714,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = expression
 
             // Check for the "includes" method being used without a parameter
-            const includesRegex = /\.includes\(\)/;
-            if (includesRegex.test(evalInputValue)) {
+            let methods = [
+                "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
+                "getDay", "getHours", "getMinutes", "getSeconds", "getMilliseconds",
+                "getTime", "Date", "Today", "setDate", "includes"
+            ]
+            const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
+            if (functionCallRegex.test(evalInputValue)) {
                 setError('Please pass the parameter inside the function');
                 setIsThreedotLoader(false);
                 return; // Stop execution if validation fails
             }
-
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
@@ -674,7 +744,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
             if (!error) {
-                setError(result);
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
@@ -696,18 +765,36 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     };
 
+    const showInputValue = (key) => {
+        //this is the array of cndition where the input value  tap will not be  shown
+        let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
+        // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
+        if (arr.includes(key)) {
+            return true;
+        }
+        // if  its not there then return tru as the input box is required for  other condiitons 
+        return false;
+    }
+
     const validateConditions = () => {
         for (let i = 0; i < conditions.length; i++) {
             for (let j = 0; j < conditions[i].conditions.length; j++) {
                 const condition = conditions[i].conditions[j];
-                if (
+                if (showInputValue(condition.condition_logic)) {
 
-                    condition.question_name === '' ||
-                    condition.condition_logic === '' ||
-                    condition.value === ''
-                ) {
-                    return true;  // Return true if any key is empty
+                    if (condition.question_name === '' || condition.condition_logic === '') {
+                        return true;
+                    }
+                } else {
+                    if (
+                        condition.question_name === '' ||
+                        condition.condition_logic === '' ||
+                        condition.value === ''
+                    ) {
+                        return true;  // Return true if any key is empty
+                    }
                 }
+
             }
         }
         return false;  // Return false if all keys have values
@@ -718,8 +805,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (validateConditions()) {
             return;
         }
+        let condition_logic;
+        try {
+            condition_logic = buildConditionExpression(conditions);
+        } catch (error) {
+        }
         const sectionId = selectedQuestionId.split('_')[0];
-        let condition_logic = buildConditionExpression(conditions);
+
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
@@ -747,6 +839,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}
                                     selectedFieldType={selectedFieldType}
+                                    setSelectedType={setSelectedType}
                                 />
                             </div>
                             <div className='w-[40%]'>
@@ -771,7 +864,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     <div className='flex justify-between items-end'>
                         <div className='flex gap-5 items-end'>
                             <p onClick={() => setTab(false)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                            <p onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                            <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                         </div>
                         <div>
                             <Button2

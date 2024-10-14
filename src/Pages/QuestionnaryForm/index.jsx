@@ -27,8 +27,8 @@ import Sections from './Components/DraggableItem/Sections/Sections.jsx';
 import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
-import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 import PreviewModal from './Components/Preview.jsx';
+import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -58,9 +58,10 @@ const QuestionnaryForm = () => {
     const [validationErrors, setValidationErrors] = useState({});
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [conditionalLogic, setConditionalLogic] = useState(false);
     const [previewModal, setPreviewModal] = useState(false)
-    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
+    const [conditionalLogic, setConditionalLogic] = useState(false);
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -458,7 +459,6 @@ const QuestionnaryForm = () => {
         }
     }
 
-
     const handleAddRemovePage = (event, sectionIndex, pageIndex, sectionId) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -513,14 +513,7 @@ const QuestionnaryForm = () => {
             // Update the state with the new sections array
             setSections(SectionData);
 
-            // Call handleSaveSection with the updated section data
-            // if (isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, SectionData, false);
-            // }
-            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
-
-
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
@@ -703,7 +696,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''), component_type: fieldSettingParams[question.question_id].componentType,
+                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
                         placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
@@ -1251,11 +1245,10 @@ const QuestionnaryForm = () => {
                                         setReplaceModal: setReplaceModal,
                                         setInputValue: setInputValue,
                                         inputValue: inputValue,
-                                        setConditionalLogic: setConditionalLogic,
-                                        conditionalLogic: conditionalLogic,
                                         questionData: dataIsSame[selectedSectionData],
                                         setValidationErrors: setValidationErrors,
-
+                                        setConditionalLogic: setConditionalLogic,
+                                        conditionalLogic: conditionalLogic,
 
                                     }
                                 )
