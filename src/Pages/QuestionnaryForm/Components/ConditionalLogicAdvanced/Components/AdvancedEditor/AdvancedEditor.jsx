@@ -34,7 +34,7 @@ function AdvancedEditor({
         // Find the index of the last space before the cursor and the next space after the cursor
         const startOfWord = leftPart.lastIndexOf(' ') + 1;
         const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
-        
+
 
         const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord).trim();
         // Check for specific characters and prevent showing the error
@@ -56,10 +56,8 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
-
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
-        console.log(valueType)
         setSelectedType(valueType);
 
         handleClickToInsert(suggestion, false, valueType);
@@ -71,7 +69,7 @@ function AdvancedEditor({
 
     const handleKeyDown = (event) => {
         // Prevent single quote key (keyCode 222 is the code for single quote)
-        if (event.key === "'" ) {
+        if (event.key === "'") {
             event.preventDefault(); // Stop the default behavior (inserting the single quote)
         }
     };
