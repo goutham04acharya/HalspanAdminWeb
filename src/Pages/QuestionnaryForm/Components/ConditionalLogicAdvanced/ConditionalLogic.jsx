@@ -15,6 +15,9 @@ import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
+import { reverseFormat } from '../../../../CommonMethods/FormatDate';
+import dayjs from 'dayjs';
+
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
@@ -444,10 +447,40 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parsedConditions = conditionGroups.map(group => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
+                if (condition.includes('Math.abs')) {
+                    const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
+                    const matching = condition.match(regex);
+                    if (matching) {
+                        const questionName = matching[1];  // Captures everything inside the parentheses
+                        const dateKey = matching[2];       // Captures the date in dd/mm/yyyy format
+                        const value = matching[3];         // Captures the numeric value after ==
+
+                        let question = getDetails(questionName.trim(), allSectionDetails.data)
+                        let condition_logic = 'date is “X” date of set date'
+                        const date = dayjs(dateKey, 'DD/MM/YYYY');
+                        return {
+                            question_name: questionName.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: value,
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type,
+                            date
+
+                        };
+
+                    }
+                }
                 // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
-                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+
 
                 if (matches) {
+
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
@@ -456,6 +489,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         question_name = question_name.replace('.length', '');
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
+
+                    //this if block is for dateTime only. returning value inside this if block to stop further execution
+                    if (question?.component_type === 'dateTimefield') {
+                        //assigning new Date() value
+                        if (value.includes('new Date()')) {
+                            value = 'new Date()';
+                        }
+                        if (condition_logic === '<') condition_logic = 'date is before today'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'date is after or equal to today';
+                        else if (condition_logic === '<=' || condition_logic === '=<') condition_logic = 'date is before or equal to today';
+                        else if (condition_logic === '>') condition_logic = 'date is after today'
+
+                        return {
+                            question_name: question_name.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: '',
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type
+                        };
+                    }
+
+
                     if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
                         if (value.startsWith("(") && value.endsWith(")")) {
                             // If the value is enclosed in parentheses, treat it as a string
@@ -472,7 +528,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                         if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
                         else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
-                        else if (condition_logic === '===') condition_logic = 'number of files is';
+                        else if (condition_logic === '===') condition_logic = 'number of file is';
+
+
 
                         return {
                             question_name: question_name.trim(),
@@ -482,6 +540,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             condition_dropdown: false,
                             condition_type: question?.component_type
                         };
+
                     }
                     if (negate) {
                         if (condition_logic.includes('includes')) {
@@ -642,6 +701,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+
 
             let expression = evalInputValue.toString();
 
@@ -703,11 +765,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     };
 
+    const showInputValue = (key) => {
+        //this is the array of cndition where the input value  tap will not be  shown
+        let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
+        // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
+        if (arr.includes(key)) {
+            return true;
+        }
+        // if  its not there then return tru as the input box is required for  other condiitons 
+        return false;
+    }
+
     const validateConditions = () => {
         for (let i = 0; i < conditions.length; i++) {
             for (let j = 0; j < conditions[i].conditions.length; j++) {
                 const condition = conditions[i].conditions[j];
-                if (condition.condition_logic === 'has atleast one file' || condition.condition_logic === 'has no files') {
+                if (showInputValue(condition.condition_logic)) {
 
                     if (condition.question_name === '' || condition.condition_logic === '') {
                         return true;
