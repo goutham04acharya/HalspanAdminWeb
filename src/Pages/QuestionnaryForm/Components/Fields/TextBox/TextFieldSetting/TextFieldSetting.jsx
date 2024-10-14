@@ -12,6 +12,7 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
+import { RegExpValidator } from 'regexpp';
 
 import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
@@ -66,20 +67,36 @@ function TestFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
     // dispatch(setShouldAutoSave(true));
   };
-  const validateRegex = (value) => {  
-    const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-    if (!regexPattern.test(value) || value.trim() === '') {  
-     setValidationErrors((prevErrors) => ({  
-      ...prevErrors,  
-      regular_expression: 'Invalid regular expression',  
-     }));  
-    } else {  
-     setValidationErrors((prevErrors) => ({  
-      ...prevErrors,  
-      regular_expression: '',  
-     }));  
-    }  
+  const validateRegex = (e) => {
+    const value = e.target.value;
+    console.log(value, 'value');
+  
+    // Check if the value is empty
+    if (!value) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        regular_expression: 'Regular expression cannot be empty',
+      }));
+      return;
+    }
+  
+    // Try creating a RegExp to check for validity
+    try {
+      new RegExp(value);
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        regular_expression: '',
+      }));
+    } catch (err) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        regular_expression: 'Invalid regular expression',
+      }));
+    }
   };
+  
+
+
   const handleRegularExpression = (event) => {
     // debugger
     const value = event.target.value;
@@ -93,7 +110,7 @@ function TestFieldSetting({
     // }else{
     //   setToastError('Not a valid regex')
     // }
-    if ( value === '' || validateRegex(value)) {
+    if (value === '' || validateRegex(value)) {
       // console.log(value, 'value')
       dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
       // dispatch(setShouldAutoSave(true));
@@ -103,6 +120,27 @@ function TestFieldSetting({
     }
 
   };
+
+  // const handleBlurRegex = (e) => {
+  //   const { id, value } = e.target;
+  //   if (id === 'regular_expression') {
+  //     const validator = new RegExpValidator();
+  //     try {
+  //       validator.validateLiteral(value);
+  //       setValidationErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         regular_expression: '',
+  //       }));
+  //     } catch (error) {
+  //       setValidationErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         regular_expression: 'Invalid regular expression',
+  //       }));
+  //     }
+  //   }
+  // };
+
+
 
 
   const handleErrorMessage = (event) => {
@@ -158,6 +196,27 @@ function TestFieldSetting({
     if (node) observer.current.observe(node);
   }, [loading, isFetchingMore, fieldSettingParameters?.type]);
 
+  function isValidRegex(pattern) {
+    console.log(pattern, 'pattern')
+    try {
+      new RegExp(pattern);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // useEffect(() => {
+  //   document.getElementById('regular_expression').onblur = function () {
+  //     if (isValidRegex(this.value)) {
+  //       console.log('Valid regex');
+  //       // Additional actions for valid input
+  //     } else {
+  //       console.log('Invalid regex');
+  //       // Handle invalid input (e.g., show error message)
+  //     }
+  //   };
+  // }, [])
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
@@ -297,7 +356,7 @@ function TestFieldSetting({
                 handleBlur={(e) => validateRegex(e)}
                 handleChange={(e) => handleInputChange(e)}
                 // onBlur={(e)=>}
-                data-testid="placeholder-input"
+                testId="regex-input"
                 maxLength={50}
                 validationError={isValid ? 'Invalid Expression' : ''}
               />
@@ -318,7 +377,7 @@ function TestFieldSetting({
               value={fieldSettingParameters?.format_error}
               handleChange={(e) => handleInputChange(e)}
 
-              data-testid="placeholder-input"
+              testId="format-error-input"
               maxLength={50} />
           </div>}
           <div className='mt-7'>

@@ -106,5 +106,5 @@ When('I select the question from the suggestions', async function () {
 When('I enter the incorrect conditional logic with then and else', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys("Section_1.Page_1.Sample_Label_Name.includes('roopesh') then 'hi' else 'raining'");
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(`Section_1.Page_1.Sample_Label_Name.includes('roopesh') then "hi" else "raining"`);
 });
