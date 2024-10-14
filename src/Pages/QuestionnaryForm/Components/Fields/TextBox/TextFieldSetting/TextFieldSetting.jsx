@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputWithDropDown from '../../../../../../Components/InputField/InputWithDropDown'
 import InputField from '../../../../../../Components/InputField/InputField';
@@ -11,11 +11,14 @@ import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import GlobalContext from '../../../../../../Components/Context/GlobalContext';
+
 import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
 
 function TestFieldSetting({
   handleInputChange,
+  dataIsSame,
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
@@ -23,16 +26,21 @@ function TestFieldSetting({
   isThreedotLoader,
   handleBlur,
   validationErrors,
+  setValidationErrors,
   setConditionalLogic,
   conditionalLogic
 }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
+  const { setToastError, setToastSuccess } = useContext(GlobalContext);
 
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isValid, setIsValid] = useState(false)
+
+  console.log(fieldSettingParameters, 'fieldSettingParameters')
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
 
   const lastEvaluatedKeyRef = useRef(null);
@@ -48,15 +56,60 @@ function TestFieldSetting({
     { value: 'Alpha', label: 'Alpha' },
     { value: 'Alphanumeric', label: 'Alphanumeric' },
     { value: 'Numeric', label: 'Numeric' },
-    { value: 'Custom Regular Expression', label: 'Custom Regular Expression' }
+    ...(fieldSettingParameters?.options?.field_validation ? [{ value: 'Custom Regular Expression', label: 'Custom Regular Expression' }] : [])
   ];
+
+  console.log(fieldSettingParameters, 'kjskjsckj')
 
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
-    dispatch(setShouldAutoSave(true));
+    // dispatch(setShouldAutoSave(true));
+  };
+  const validateRegex = (value) => {  
+    const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
+    if (!regexPattern.test(value) || value.trim() === '') {  
+     setValidationErrors((prevErrors) => ({  
+      ...prevErrors,  
+      regular_expression: 'Invalid regular expression',  
+     }));  
+    } else {  
+     setValidationErrors((prevErrors) => ({  
+      ...prevErrors,  
+      regular_expression: '',  
+     }));  
+    }  
+  };
+  const handleRegularExpression = (event) => {
+    // debugger
+    const value = event.target.value;
+    console.log(value, 'value')
+    // const isValidate = validateRegex(value);
+    // console.log(isValidate,'isValidate')
+    // if (isValid) {
+    // console.log(value, 'value')
+    // dispatch(setNewComponent({ id: 'regular_expression', value, questionId: selectedQuestionId }));
+    // dispatch(setShouldAutoSave(true));
+    // }else{
+    //   setToastError('Not a valid regex')
+    // }
+    if ( value === '' || validateRegex(value)) {
+      // console.log(value, 'value')
+      dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
+      // dispatch(setShouldAutoSave(true));
+    } else {
+      // setToastError('Not a valid regex')
+      // return false;
+    }
+
   };
 
+
+  const handleErrorMessage = (event) => {
+    const value = event.target.value;
+    dispatch(setNewComponent({ id: 'format_error', value, questionId: selectedQuestionId }));
+    dispatch(setShouldAutoSave(true));
+  };
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
@@ -209,6 +262,7 @@ function TestFieldSetting({
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}
+
             </div>
           </div>
           <div className='mt-7'>
@@ -228,6 +282,45 @@ function TestFieldSetting({
               options={options}
             />
           </div>
+          {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true)
+            && <><div className='flex flex-col justify-start mt-7'>
+              <label
+                // htmlFor={placeholderContentId}
+                className='font-semibold text-base text-[#2B333B]'>Regular Expression
+              </label>
+              <InputField
+                type="text"
+                id="regular_expression"
+                className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                placeholder="Regex pattern (e.g. ^[a-zA-Z0-9]+$)"
+                value={fieldSettingParameters?.regular_expression}
+                handleBlur={(e) => validateRegex(e)}
+                handleChange={(e) => handleInputChange(e)}
+                // onBlur={(e)=>}
+                data-testid="placeholder-input"
+                maxLength={50}
+                validationError={isValid ? 'Invalid Expression' : ''}
+              />
+            </div>{validationErrors?.regular_expression && (
+              <ErrorMessage error={validationErrors?.regular_expression} />
+            )}</>}
+
+          {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true) && <div className='flex flex-col justify-start mt-7'>
+            <label
+              // htmlFor={placeholderContentId}
+              className='font-semibold text-base text-[#2B333B]'>Format Error Message
+            </label>
+            <InputField
+              type="text"
+              id="format_error"
+              className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+              placeholder="Enter a custom error message for invalid input"
+              value={fieldSettingParameters?.format_error}
+              handleChange={(e) => handleInputChange(e)}
+
+              data-testid="placeholder-input"
+              maxLength={50} />
+          </div>}
           <div className='mt-7'>
             <p className='font-semibold text-base text-[#2B333B]'>Number of Characters</p>
             <div className='flex items-center mt-3'>

@@ -12,7 +12,6 @@ const TextBoxField = ({
     testId
 
 }) => {
-
     return (
         <div>
             <label
