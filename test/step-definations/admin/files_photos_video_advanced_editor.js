@@ -31,7 +31,7 @@ When('I select the question from the suggestions for files', async function () {
 
     // eslint-disable-next-line max-len
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Files_label_name > 0 AND ', Key.RETURN);
-
+    await new Promise(resolve => setTimeout(resolve, 1000));
     while (bool) {
         let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
         let suggestionText = await suggestionElement.getText();
@@ -42,6 +42,6 @@ When('I select the question from the suggestions for files', async function () {
         }
         i++;
     }
-
+    await new Promise(resolve => setTimeout(resolve, 1000));
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('< 20');
 });

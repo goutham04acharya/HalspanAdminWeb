@@ -67,6 +67,7 @@ When('I select the question from the suggestions', async function () {
 
     // eslint-disable-next-line max-len
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_Label_Name.includes("Roopesh") AND ', Key.RETURN);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     while (bool) {
         let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
@@ -78,7 +79,7 @@ When('I select the question from the suggestions', async function () {
         }
         i++;
     }
-
+    await new Promise(resolve => setTimeout(resolve, 500));
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('.');
 
     // eslint-disable-next-line max-len
@@ -86,7 +87,7 @@ When('I select the question from the suggestions', async function () {
 
     bool = true;
     i = 0;
-
+    await new Promise(resolve => setTimeout(resolve, 1000));
     while (i < conditions.length) {
         let conditionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="condition-${i}"]`)), 10000);
         let conditionText = await conditionElement.getText();
