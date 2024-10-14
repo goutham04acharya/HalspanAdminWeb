@@ -679,7 +679,7 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = useCallback(async (sectionId, isSaving = true, payloadString) => {
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
         console.log(fieldSettingParams, 'field aefkjafkkmafmfa akjfk')
         handleSectionSaveOrder(sections)
         // Find the section to save  
@@ -804,7 +804,7 @@ const QuestionnaryForm = () => {
             }
         }
 
-    }, [fieldSettingParams]);
+    }
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {

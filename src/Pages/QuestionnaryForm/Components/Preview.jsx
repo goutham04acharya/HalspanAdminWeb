@@ -27,20 +27,20 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     console.log(sections, 'sections mmdmd')
     const totalPages = Array.isArray(sections) ? sections.reduce((acc, section) => acc + (Array.isArray(section.pages) ? section.pages.length : 0), 0) : 0;
 
-    const handleNextClick = () => {
-        if (currentPage < sections[currentSection].pages.length - 1) {
-            setCurrentPage(currentPage + 1);
-            setSliderValue((currentPage + 1) / sections[currentSection].pages.length * 100);
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: '', // Or remove the key if you prefer
-            }));
-        } else if (currentSection < sections.length - 1) {
-            setCurrentSection(currentSection + 1);
-            setCurrentPage(0);
-            // setSliderValue(0);
-        }
-    };
+    // const handleNextClick = () => {
+    //     if (currentPage < sections[currentSection].pages.length - 1) {
+    //         setCurrentPage(currentPage + 1);
+    //         setSliderValue((currentPage + 1) / sections[currentSection].pages.length * 100);
+    //         setValidationErrors((prevErrors) => ({
+    //             ...prevErrors,
+    //             preview_textboxfield: '', // Or remove the key if you prefer
+    //         }));
+    //     } else if (currentSection < sections.length - 1) {
+    //         setCurrentSection(currentSection + 1);
+            // setCurrentPage(0);
+    //         // setSliderValue(0);
+    //     }
+    // };
     // console.log((currentPage + 1) / sections[currentSection].pages.length * 100, '(currentPage + 1) / sections[currentSection].pages.length * 100')
 
     const handleBackClick = () => {
@@ -57,6 +57,32 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             // setSliderValue(100);
         }
     };
+    const handleNextClick = () => {
+        const questions = sections[currentSection].pages[currentPage].questions;
+        const errors = questions.reduce((acc, question) => {
+            if (!question?.options?.optional && question?.component_type === 'textboxfield') {
+                acc[question.question_id] = 'This is a mandatory field';
+            }
+            return acc;
+        }, {});
+
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_textboxfield: errors,
+            }));
+        } else {
+            if (currentPage < sections[currentSection].pages.length - 1) {
+                setCurrentPage(currentPage + 1);
+                setSliderValue((currentPage + 1) / sections[currentSection].pages.length * 100);
+            } else if (currentSection < sections.length - 1) {
+                setCurrentSection(currentSection + 1);
+                setCurrentPage(0);
+                // setSliderValue(0);  
+            }
+        }
+    };
+
 
     const renderQuestion = (question) => {
         if (!question) {
@@ -131,7 +157,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         {sections[currentSection]?.pages[currentPage]?.questions?.length > 0 ? (
                             sections[currentSection].pages[currentPage].questions.map((question, index) => (
                                 <div className='mt-5' key={index}>
-                                    
+
                                     <div className='px-2'>{renderQuestion(question)}</div>
                                 </div>
                             ))

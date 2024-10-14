@@ -41,7 +41,7 @@ const processDisplayType = (item, displayType) => {
 
 // Helper function to process source
 const processSource = (item) => {
-    if (item.source === 'fixed_list') {
+    if (item.source === 'fixedList') {
         return { fixedChoiceArray: item.source_value };
     } else if (item.source === 'lookup') {
         return { lookupOptionChoice: item.source_value };
@@ -148,13 +148,12 @@ const fieldSettingParamsSlice = createSlice({
                     postField: item?.postField,
                     preField: item?.preField,
                     source: item?.source,
-                    source_value: item?.source_value,
                     draw_image: item?.asset_extras?.draw_image,
                     pin_drop: item?.asset_extras?.pin_drop,
                     include_metadata: item?.asset_extras?.include_metadata,
                     file_size: item?.asset_extras?.fileSize,
                     file_type: item?.asset_extras?.fileType,
-                    conditional_logic: item?.conditional_logic,
+
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };
