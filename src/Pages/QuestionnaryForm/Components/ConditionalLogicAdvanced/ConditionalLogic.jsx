@@ -701,8 +701,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+            // evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            // evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
 
 
             let expression = evalInputValue.toString();
