@@ -31,7 +31,8 @@ Feature: Halspan - Admin - Edit the Questionnaire
     When I click on edit option
     Then I should see a pop up for selecting the version of the questionnaire
     When I select the version
-    When I click the cancel button
+    # When I click the cancel button
+    When I click the modal cancel button
     When I click on edit option
     Then I should see a pop up for selecting the version of the questionnaire
     When I select the version

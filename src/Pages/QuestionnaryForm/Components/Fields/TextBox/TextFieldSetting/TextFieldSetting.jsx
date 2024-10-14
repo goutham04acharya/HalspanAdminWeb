@@ -14,21 +14,23 @@ import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { RegExpValidator } from 'regexpp';
 
+import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
+import { useSelector } from 'react-redux';
+
 function TestFieldSetting({
   handleInputChange,
   dataIsSame,
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  // setFieldSettingParameters,
-  handleSaveSettings,
   selectedQuestionId,
   isThreedotLoader,
   handleBlur,
   validationErrors,
-  setValidationErrors
+  setValidationErrors,
+  setConditionalLogic,
+  conditionalLogic
 }) {
-
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
@@ -40,6 +42,8 @@ function TestFieldSetting({
   const [isValid, setIsValid] = useState(false)
 
   console.log(fieldSettingParameters, 'fieldSettingParameters')
+  const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
+
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
 
@@ -428,10 +432,18 @@ function TestFieldSetting({
               maxLength={500}
               handleChange={(e) => handleInputChange(e)} />
           </div>
-          <div className='mx-auto mt-7 flex items-center w-full'>
-            <button type='button' className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
+          <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+            <button
+              type='button'
+              data-testid="add-conditional-logic"
+              className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+              onClick={() => setConditionalLogic(true)}  // Use arrow function
+            >
               Add Conditional Logic
             </button>
+            {fieldSettingParameters.conditional_logic &&
+              <p className='text-center italic mt-1'>Conditional Logic Added</p>
+            }
           </div>
         </div>
       </div>

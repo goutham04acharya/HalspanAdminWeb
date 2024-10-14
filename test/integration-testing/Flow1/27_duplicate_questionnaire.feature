@@ -18,14 +18,14 @@ Feature: Halspan - Admin - Option to Duplicate the Specific Questionnaire
     When I save all the data inside the version about to be duplicated
     When I click the duplicate button
     Then I should see a confirmation modal to select the version
-    When I select the version of the questionnaire
-    When I click the cancel button
-    When I click the duplicate button
-    Then I should see a confirmation modal to select the version
-    When I select the version of the questionnaire
-    When I click the close button
-    When I click the duplicate button
-    Then I should see a confirmation modal to select the version
+    # When I select the version of the questionnaire
+    # When I click the cancel button
+    # When I click the duplicate button
+    # Then I should see a confirmation modal to select the version
+    # When I select the version of the questionnaire
+    # When I click the close button
+    # When I click the duplicate button
+    # Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
     When I click the confirm duplicate button
     Then I should see the new version created

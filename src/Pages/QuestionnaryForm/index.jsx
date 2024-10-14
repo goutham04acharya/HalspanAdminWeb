@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useState, useRef, useContext } from 'react';
 import SideLayout from '../../Pages/QuestionnaryForm/Components/SideLayout';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -27,6 +28,7 @@ import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSe
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
+import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -57,7 +59,9 @@ const QuestionnaryForm = () => {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [previewModal, setPreviewModal] = useState(false)
-    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
+    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
+    const [conditionalLogic, setConditionalLogic] = useState(false);
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -455,7 +459,6 @@ const QuestionnaryForm = () => {
         }
     }
 
-
     const handleAddRemovePage = (event, sectionIndex, pageIndex, sectionId) => {
         let currentSectionData = sections[sectionIndex];
         const update = { ...dataIsSame }
@@ -484,16 +487,11 @@ const QuestionnaryForm = () => {
                 // Update the state with the new sections array
                 setSections(SectionData);
 
-                // Call handleSaveSection with the updated section data
-                // if (isSectionSaved[sectionId] ) {
-                //     handleSaveSection(sectionId, SectionData, false);
-                // }
             } else {
                 setToastError("Limit reached: Maximum of 20 pages allowed.");
                 return; // Exit the function if the limit is reached
             }
             // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
-            console.log(isSectionSaved)
         } else if (event === 'remove') {
             // After any delete we remove focus on add question and change the field setting
             dispatch(setSelectedQuestionId(false));
@@ -515,14 +513,7 @@ const QuestionnaryForm = () => {
             // Update the state with the new sections array
             setSections(SectionData);
 
-            // Call handleSaveSection with the updated section data
-            // if (isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, SectionData, false);
-            // }
-            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         }
-
-
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
@@ -619,7 +610,8 @@ const QuestionnaryForm = () => {
                     format: question?.format,
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
-                    options: question?.options
+                    options: question?.options,
+                    conditional_logic: question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -636,7 +628,6 @@ const QuestionnaryForm = () => {
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
 
                 const sectionOrder = await GetSectionOrder();
-                console.log(sectionOrder, 'section order get form details')
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
                     return;
@@ -681,20 +672,19 @@ const QuestionnaryForm = () => {
         }
     }
 
-
-
-    const handleSaveSection = async (sectionId, isSaving = true) => {
-        // debugger
-
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
         handleSectionSaveOrder(sections)
-
-        console.log(sections, 'after save')
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
-
         if (sectionToSave) {
-
+            const isDataSame = dataIsSame[sectionId];
+            if (isDataSame && !payloadString) {
+                setIsThreedotLoader(false);
+                setConditionalLogic(false)
+                // If data is the same, return early and don't call the API  
+                return;
+            }
             // Create a new object containing only the selected section's necessary fields  
             let body = {
                 section_id: sectionToSave.section_id,
@@ -704,7 +694,8 @@ const QuestionnaryForm = () => {
                     page_name: page.page_name,
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
-                        question_name: question.question_name,
+                        question_name: fieldSettingParams[question.question_id].label,
+                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -778,19 +769,15 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-
             try {
                 if (isSaving) {
                     // ... call the API ...  
                     const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                    // console.log(body, 'body')
-
-                    if (!(response?.data?.error)) {
-
+                    // setSaveClick(true)
+                    if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
-
-
-
+                        setIsThreedotLoader(false);
+                        setConditionalLogic(false);
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -809,7 +796,6 @@ const QuestionnaryForm = () => {
         }
 
     };
-
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1014,7 +1000,6 @@ const QuestionnaryForm = () => {
                 id: section.section_id
             }))
         }
-        console.log(updatedSection, 'updated section dafafddafdafad')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -1030,7 +1015,6 @@ const QuestionnaryForm = () => {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            console.log(response, 'response get api layout')
             if (!response?.error) {
 
                 // Extract section IDs in the order provided
@@ -1076,18 +1060,8 @@ const QuestionnaryForm = () => {
     useEffect(() => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
-        // console.log(sections, 'inside useEffect')
     }, []);
 
-    // useEffect(() => {
-    //     if (shouldAutoSave) {
-    //         const questionId = selectedQuestionId.split('_')[0]
-    //         const sectionId = version_number + '_' + questionId
-    //         handleSaveSection(sectionId);
-    //         dispatch(setShouldAutoSave(false)); // Reset the flag after auto-saving
-    //     }
-    // }, [fieldSettingParams, shouldAutoSave]); // Add dependencies as needed
-    // console.log(navigate(-1), 'navigate -1')
     return (
         <>
             {pageLoading ? (
@@ -1140,6 +1114,7 @@ const QuestionnaryForm = () => {
                                                                         <img
                                                                             src="/Images/open-Filter.svg"
                                                                             alt="down-arrow"
+                                                                            data-testId={`open-${sectionIndex}`}
                                                                             className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? "rotate-180 ml-2" : "" // Rotate 180deg when expanded
                                                                                 }`}
                                                                             onClick={() => toggleSection(sectionIndex)} // Toggle section on click
@@ -1271,7 +1246,8 @@ const QuestionnaryForm = () => {
                                         inputValue: inputValue,
                                         questionData: dataIsSame[selectedSectionData],
                                         setValidationErrors: setValidationErrors,
-
+                                        setConditionalLogic: setConditionalLogic,
+                                        conditionalLogic: conditionalLogic,
 
                                     }
                                 )
@@ -1360,8 +1336,17 @@ const QuestionnaryForm = () => {
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
 
             />}
+            {conditionalLogic && (
+                <ConditionalLogic
+                    setConditionalLogic={setConditionalLogic}
+                    conditionalLogic={conditionalLogic}
+                    handleSaveSection={handleSaveSection}
+                />
+
+            )}
         </>
     );
 }
 
 export default QuestionnaryForm;
+

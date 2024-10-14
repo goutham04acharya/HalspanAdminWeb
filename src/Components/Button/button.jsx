@@ -18,7 +18,9 @@ const Button = ({
       disabled={disabled || isThreedotLoading}
       className={`rounded h-[50px] ${buttonColor ? buttonColor : 'bg-[#2B333B] hover:bg-[#000000]'} font-normal text-base text-[#FFFFFF] ${className} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
     >
-      {!isThreedotLoading ? text : <BeatLoader color="#fff" size={smallLoader ? '7px' : '10px'} />}
+      <div className='flex justify-center items-center gap-2' data-testid="save-conditional-logic">
+        {!isThreedotLoading ? text : <BeatLoader color="#fff" size={smallLoader ? '7px' : '10px'} />}
+      </div>
     </button>
   );
 };
