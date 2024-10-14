@@ -13,7 +13,7 @@ import DraggableList from 'react-draggable-list';
 import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
-import {setShouldAutoSave} from '../../../QuestionnaryFormSlice';
+import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -24,6 +24,7 @@ function ChoiceFieldSetting({
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
+    setConditionalLogic
 }) {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -114,82 +115,6 @@ function ChoiceFieldSetting({
     // Create a ref map to store input refs
     const inputRefs = useRef({});
 
-    // Function for dragging Choices
-    // const Item2 = React.memo(forwardRef(({ item, dragHandleProps, focusInput }, ref) => {
-    //     const dispatch = useDispatch();
-    //     const [localValue, setLocalValue] = useState(item.value || '');
-
-    //     // Handle input change
-    //     const handleFixedChoiceChange = useCallback((e) => {
-    //         const { value } = e.target;
-    //         setLocalValue(value);
-    //         dispatch(setFixedChoiceValue({ id: item.id, value, questionId: selectedQuestionId }));
-    //     }, [dispatch, item.id, selectedQuestionId]);
-
-    //     // Focus input when required
-    //     useEffect(() => {
-    //         console.log('helllo')
-    //         const element = document.getElementById(focusInput);
-    //         console.log(focusInput, 'aaa');
-    //         if (element) {
-    //             element.focus();
-    //         }
-    //     }, [item.id, focusInput, localValue]);
-
-    //     return (
-    //         <div className={`disable-select select-none w-full pt-3 rounded-[10px]`}>
-    //             <div className='flex justify-between items-start cursor-pointer'>
-    //                 <div className='flex items-center justify-center w-full'>
-    //                     <div
-    //                         className="disable-select dragHandle"
-    //                         onMouseDown={(e) => {
-    //                             document.body.style.overflow = "hidden";
-    //                             dragHandleProps.onMouseDown(e);
-    //                         }}
-    //                         onMouseUp={() => {
-    //                             document.body.style.overflow = "visible";
-    //                         }}
-    //                     >
-    //                         <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
-    //                     </div>
-    //                     <input
-    //                         type="text"
-    //                         className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-    //                         placeholder={`${getOrdinal(item?.index + 1)} Choice`}
-    //                         onChange={handleFixedChoiceChange}
-    //                         value={localValue}
-    //                         id={item.id}
-    //                         onClick={() => setFocusInput(item.id)} // Call focusInput on click
-    //                         onBlur={() => {
-    //                             handleBlur();
-    //                             setFocusInput('')
-    //                         }}
-    //                         data-testid={`choice-${item.index + 1}`}
-    //                         maxLength={50}
-    //                     />
-    //                     {fixedChoiceArray.length > 1 && <img
-    //                         src="/Images/trash-black.svg"
-    //                         alt="delete"
-    //                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-    //                         onClick={() => handleAddRemoveFixedChoice('remove', item.id)}
-    //                         data-testid={`delete-choice-${item.index + 1}`}
-    //                     />}
-    //                     <img
-    //                         src="/Images/add.svg"
-    //                         alt="add"
-    //                         data-testid={`add-choice-${item.index + 2}`}
-    //                         className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-    //                         onClick={() => handleAddRemoveFixedChoice('add', item.id)}
-    //                     />
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     );
-    // }));
-
-    // const handleMoveEnd = (newList) => {
-    //     dispatch(updateFixedChoiceArray({ questionId: selectedQuestionId, newList }));
-    // };
     const handleMoveEnd = (newList) => {
         // Remove any non-serializable values before dispatching
         const sanitizedNewList = newList.map(item => {
@@ -292,25 +217,6 @@ function ChoiceFieldSetting({
                                 Fixed List
                             </label>
                         </div>
-                        {/* {fieldSettingParameters?.source === 'fixedList' &&
-                            <DraggableList
-                                itemKey="id" // Adjust itemKey according to your unique identifier
-                                template={(props) => (
-                                    <Item2
-                                        {...props}
-                                        focusInput={focusInput}
-                                        ref={(ref) => {
-                                            inputRefs.current[props.item.id] = ref;
-                                        }}
-                                    />
-                                )}
-                                list={fixedChoiceArray.map((data, choiceIndex) => ({
-                                    ...data,
-                                    index: choiceIndex,
-                                }))}
-                                onMoveEnd={handleMoveEnd}
-                                container={() => document.body}
-                            />} */}
                         {fieldSettingParameters?.source === 'fixedList' &&
                             <DraggableList
                                 itemKey="id" // Adjust itemKey according to your unique identifier
@@ -368,10 +274,10 @@ function ChoiceFieldSetting({
                                 </button>
                             </div>}
                         {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
-                            <ErrorMessage error={'No lookup list available. Please create one'}/>
+                            <ErrorMessage error={'No lookup list available. Please create one'} />
                         )}
                         {/* OptionsComponent added here */}
-                        <OptionsComponent  selectedQuestionId={selectedQuestionId} />
+                        <OptionsComponent selectedQuestionId={selectedQuestionId} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'
@@ -389,15 +295,17 @@ function ChoiceFieldSetting({
                                 handleBlur={handleBlur}
                             />
                         </div>
-                        <div className='mx-auto mt-7 flex items-center w-full'>
-                            {/* <button className='bg-black py-[13px] font-semibold text-[#FFFFFF] text-base mr-3 rounded w-[30%]'
-                                onClick={handleSaveSettings}
+                        <div className='mx-auto mt-7 flex flex-col items-center w-full'>
+                            <button
+                                type='button'
+                                className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                                onClick={() => setConditionalLogic(true)}  // Use arrow function
                             >
-                                Save
-                            </button> */}
-                            <button type='button' className='w-[80%] mx-auto py-[13px] bg-[#2B333B] hover:bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'>
                                 Add Conditional Logic
                             </button>
+                            {fieldSettingParameters.conditional_logic &&
+                                <p className='text-center italic mt-1'>Conditional Logic Added</p>
+                            }
                         </div>
                     </div>
                 </div>

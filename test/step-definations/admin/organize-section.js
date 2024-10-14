@@ -21,6 +21,8 @@ Given('I am on the questionnaire management section', async function () {
 When('I click on add new section', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="open-1"]'))).click();
 });
 
 Then("I should see the new section added", async function () {
@@ -181,10 +183,10 @@ Then('I should see the section {int} saved', async function (sectionNumber) {
     await driver.wait(until.elementLocated(By.css(`[data-testid="save-${sectionNumber}"]`)));
 });
 
-// When('I click the save button for the questionnaire version', async function(){
-//     await new Promise((resolve) => setTimeout(resolve, 500));
-//     await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
-// });
+When('I click the save button for the questionnaire version', async function(){
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-0"]`))).click();
+});
 
 Then('I should see confirmation prompt for delete page', async function () {
     // Write code here that turns the phrase above into concrete actions
