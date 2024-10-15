@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -57,7 +57,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         ]
     },
     ])
-
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -107,6 +106,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleClose = () => {
         setConditionalLogic(false);
+        setIsDefaultLogic(false);
     };
 
     useOnClickOutside(modalRef, () => {
@@ -298,7 +298,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSuggestions([]);
             setShowMethodSuggestions(false); // Reset method suggestions
         }
-
     };
 
     // Combined function to insert either a question or a method
@@ -478,9 +477,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
                 const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
-
                 if (matches) {
-
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
@@ -511,7 +508,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         };
                     }
 
-
                     if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
                         if (value.startsWith("(") && value.endsWith(")")) {
                             // If the value is enclosed in parentheses, treat it as a string
@@ -529,8 +525,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
                         else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
                         else if (condition_logic === '===') condition_logic = 'number of file is';
-
-
 
                         return {
                             question_name: question_name.trim(),
@@ -580,8 +574,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         value = Number(value);
                     }
 
-                    // Return the object in the correct structure
-
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -625,7 +617,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (totalConditions > 10) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
         }
-
         return parsedConditions;
     };
 
@@ -645,7 +636,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                             setInputValue(conditionalLogic);
                             setConditions(parseLogicExpression(question.conditional_logic));
-
                         }
                     });
                 });
@@ -653,7 +643,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
-
         }
     }, [selectedQuestionId, allSectionDetails, tab]);
 
@@ -690,7 +679,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Then, remove quotes from around new Date expressions
                 formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
-
                 return formatted;
             };
 
@@ -701,9 +689,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            // evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
-            // evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
-
+            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
 
             let expression = evalInputValue.toString();
 
@@ -794,7 +781,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         return true;  // Return true if any key is empty
                     }
                 }
-
             }
         }
         return false;  // Return false if all keys have values
@@ -820,10 +806,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                 <div className='w-full'>
-                    {tab ?
+                    {(tab || isDefaultLogic) ? (
                         <div className='flex h-customh14'>
                             <div className='w-[60%]'>
-                                <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                {!isDefaultLogic ?
+                                    <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                    :
+                                    <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                }
                                 <AdvancedEditor
                                     handleListSectionDetails={handleListSectionDetails}
                                     showSectionList={showSectionList}
@@ -846,26 +836,33 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <StaticDetails
                                     handleTabClick={handleTabClick}
                                     activeTab={activeTab}
-                                    setActiveTab={setActiveTab} />
+                                    setActiveTab={setActiveTab}
+                                    isDefaultLogic={isDefaultLogic}
+                                    selectedFieldType={selectedFieldType}
+                                />
                             </div>
-                        </div> :
-                        <BasicEditor
-                            secDetailsForSearching={filterQuestions()}
-                            questions={allSectionDetails.data}
-                            sections={sections}
-                            setShowMethodSuggestions={setShowMethodSuggestions}
-                            isThreedotLoaderBlack={isThreedotLoaderBlack}
-                            conditions={conditions}
-                            setConditions={setConditions}
-                            submitSelected={submitSelected}
-                            setSubmitSelected={setSubmitSelected}
-                        />
-                    }
-                    <div className='flex justify-between items-end'>
-                        <div className='flex gap-5 items-end'>
-                            <p onClick={() => setTab(false)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                            <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                        </div>
+                        </div>) : (
+                        !isDefaultLogic && (
+                            <BasicEditor
+                                secDetailsForSearching={filterQuestions()}
+                                questions={allSectionDetails.data}
+                                sections={sections}
+                                setShowMethodSuggestions={setShowMethodSuggestions}
+                                isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                conditions={conditions}
+                                setConditions={setConditions}
+                                submitSelected={submitSelected}
+                                setSubmitSelected={setSubmitSelected}
+                            />
+                        )
+                    )}
+                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                        {!isDefaultLogic &&
+                            <div className='flex gap-5 items-end'>
+                                <p onClick={() => setTab(true)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
+                                <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                            </div>
+                        }
                         <div>
                             <Button2
                                 text='Cancel'

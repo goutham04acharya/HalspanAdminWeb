@@ -16,7 +16,6 @@ const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
         const { value } = e.target;
         setLocalValue(value);
         dispatch(setFixedChoiceValue({ id, value, questionId: selectedQuestionId }));
-        console.log('dispatched....')
         
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {

@@ -6,7 +6,6 @@ function RangeSlider() {
 
   const handleMinSliderChange = (event) => {
     const value = parseInt(event.target.value, 10);
-    console.log('val', value)
     if (value <= maxPrice) {
       setMinPrice(value);
     }

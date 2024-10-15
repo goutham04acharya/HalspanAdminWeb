@@ -29,7 +29,6 @@ const DatePicker = ({
     const [open, setOpen] = useState(false)
     const calederRef = useRef()
     useOnClickOutside(calederRef, () => setOpen(false))
-    console.log(value, 'value')
     return (
         <div className='w-full relative' ref={calederRef} >
             <div className='relative' onClick={() => setOpen(!open)}>

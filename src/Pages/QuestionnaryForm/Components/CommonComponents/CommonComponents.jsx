@@ -35,7 +35,6 @@ function CommonComponents({
                     data-testid="label-name-input"
                     maxLength={100}
                     onFocus={() => {
-                        console.log('focus');
                         if (setFocusInput) {
                             setFocusInput('');
                         }
@@ -59,16 +58,13 @@ function CommonComponents({
                     data-testid="help-text-input"
                     maxLength={150}
                     onFocus={() => {
-                        console.log('focus');
                         if (setFocusInput) {
                             setFocusInput('');
                         }
                     }}
                     onMouseDown={(e) => {
-                        console.log('mouse down');
                         // Get the position where the mouse was clicked
                         const clickPosition = e.currentTarget.selectionStart;
-                        console.log('Cursor position:', clickPosition);
                     }}
 
                 />
@@ -91,7 +87,6 @@ function CommonComponents({
                     data-testid="placeholder-input"
                     maxLength={50}
                     onFocus={() => {
-                        console.log('focus');
                         if (setFocusInput) {
                             setFocusInput('');
                         }

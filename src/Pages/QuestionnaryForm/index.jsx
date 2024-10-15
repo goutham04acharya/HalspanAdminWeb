@@ -62,6 +62,7 @@ const QuestionnaryForm = () => {
     // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
     const [conditionalLogic, setConditionalLogic] = useState(false);
+    const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -87,8 +88,6 @@ const QuestionnaryForm = () => {
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
 
-    console.log(selectedSectionData, 'selectedSectionData')
-
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -97,9 +96,7 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-
-
-    // // to open and close the sections
+    // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
             ...prev,
@@ -153,48 +150,6 @@ const QuestionnaryForm = () => {
                 regular_expression: '',
             }));
         }
-        // if (id === 'regular_expression') {
-        //     // Update the state with the new value
-        //     dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
-
-        //     // Validate the regex pattern
-        //     try {
-        //         // Attempt to create a RegExp object with the current input
-        //         new RegExp(updatedValue);
-
-        //         // If successful, clear any existing error
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: '',
-        //         }));
-
-        //         // Test the regex against all relevant values
-        //         const relevantValues = [
-        //             fieldSettingParams[selectedQuestionId]?.min,
-        //             fieldSettingParams[selectedQuestionId]?.max,
-        //             // Add any other relevant values you want to test here
-        //         ];
-
-        //         const regexObj = new RegExp(updatedValue);
-        //         const invalidValues = relevantValues.filter(val => {
-        //             return val !== undefined && !regexObj.test(String(val));
-        //         });
-
-        //         if (invalidValues.length > 0) {
-        //             setValidationErrors((prevErrors) => ({
-        //                 ...prevErrors,
-        //                 regular_expression: `Regex doesn't match all values`,
-        //             }));
-        //         }
-        //     } catch (error) {
-        //         // If RegExp creation fails, set an error message
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: 'Invalid regular expression: ',
-        //         }));
-        //     }
-        // }
-        // ... (keep the rest of the function as is)
 
         // Don't forget to update the state and trigger auto-save
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
@@ -204,21 +159,6 @@ const QuestionnaryForm = () => {
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
-        // if (id === 'regular_expression') {
-        //     const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-        //     console.log(fieldSettingParams[selectedQuestionId]?.regular_expression,'nhyu')
-        //     if (!regexPattern.test(fieldSettingParams[selectedQuestionId]?.regular_expression) || value.trim() === '') {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: 'Invalid regular expression',
-        //         }));
-        //     } else {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: '',
-        //         }));
-        //     }
-        // }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -383,7 +323,6 @@ const QuestionnaryForm = () => {
             if (newState.hasOwnProperty(indexToRemove)) {
                 delete newState[indexToRemove];
             }
-
             return newState;
         }));;
     };
@@ -512,7 +451,6 @@ const QuestionnaryForm = () => {
 
             // Update the state with the new sections array
             setSections(SectionData);
-
         }
     };
 
@@ -611,7 +549,8 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    conditional_logic: question?.conditional_logic
+                    conditional_logic: question?.conditional_logic,
+                    default_conditional_logic: question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -696,6 +635,7 @@ const QuestionnaryForm = () => {
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
                         conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        default_conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -778,6 +718,7 @@ const QuestionnaryForm = () => {
                         setToastSuccess(response?.data?.message);
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
+                        setIsDefaultLogic(false);
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -819,7 +760,6 @@ const QuestionnaryForm = () => {
         } else {
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
-            console.log(value, 'jnackjakjcn')
         }
 
         // Update the sections state
@@ -1248,6 +1188,8 @@ const QuestionnaryForm = () => {
                                         setValidationErrors: setValidationErrors,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
+                                        setIsDefaultLogic: setIsDefaultLogic,
+                                        isDefaultLogic: isDefaultLogic,
 
                                     }
                                 )
@@ -1336,11 +1278,14 @@ const QuestionnaryForm = () => {
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
 
             />}
-            {conditionalLogic && (
+            {(conditionalLogic || isDefaultLogic) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
                     conditionalLogic={conditionalLogic}
                     handleSaveSection={handleSaveSection}
+                    isDefaultLogic={isDefaultLogic}
+                    setIsDefaultLogic={setIsDefaultLogic}
+                    
                 />
 
             )}
