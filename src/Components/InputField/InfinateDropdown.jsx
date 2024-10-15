@@ -20,9 +20,9 @@ function InfinateDropdown({
     close,
     setSelectedOption,
     lastElementRef,
-    handleRemoveLookup
+    handleRemoveLookup,
+    preview
 }) {
-
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>{label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
@@ -33,7 +33,7 @@ function InfinateDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
-                    value={selectedOption ? selectedOption.label : ''}
+                    value={preview ? selectedOption  :(selectedOption ? selectedOption.label : '')}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
@@ -46,14 +46,14 @@ function InfinateDropdown({
             </div>
             {isDropdownOpen && (
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10 max-h-[300px] overflow-auto scrollBar">
-                    {options.map((option, index) => (
-                        <li key={option.value}
+                    {options ? options?.map((option, index) => (
+                        <li key={preview ? option.id : option.value}
                             data-testid={`${labeltestID}-${index}`}
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
-                            {option.label}
+                            {preview ? option.value : option.label}
                         </li>
-                    ))}
+                    )) : <p className='p-5'>No choice's to be displayed</p>}
                     <li ref={lastElementRef} className='h-1'></li>
                 </ul>
             )}

@@ -18,10 +18,27 @@ const TextBoxField = ({
     question_id,
     question
 }) => {
+    const validateFormat = (value, format, regex) => {
+        switch (format) {
+            case 'Alpha':
+                return /^[a-zA-Z]+$/.test(value);
+            case 'Alphanumeric':
+                return /^[a-zA-Z0-9]+$/.test(value);
+            case 'Numeric':
+                return /^[0-9]+$/.test(value);
+            case 'Custom Regular Expression':
+                return new RegExp(regex).test(value);
+            default:
+                return true; // Allow any format if not specified  
+        }
+    };
+
     const handleInputChange = (e) => {
         const newValue = e.target.value;
+        const format = question.format;
+        const regex = question.regular_expression;
 
-        // Check for validation if the field is not optional  
+        // Check for validation if the field is not optional   
         if (!question?.options?.optional && newValue.trim() === '') {
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -30,8 +47,16 @@ const TextBoxField = ({
                     [question.question_id]: 'This is a mandatory field',
                 },
             }));
+        } else if (!validateFormat(newValue, format, regex)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_textboxfield: {
+                    ...prevErrors.preview_textboxfield,
+                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
+                },
+            }));
         } else {
-            // Clear the error if the field is filled  
+            // Clear the error if the field is filled and format is valid   
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: {
@@ -41,6 +66,7 @@ const TextBoxField = ({
             }));
         }
     };
+
 
 
     return (
@@ -63,13 +89,53 @@ const TextBoxField = ({
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
                     onBlur={(e) => handleInputChange(e)}
-                    onChange={()=>(setValidationErrors((prevErrors) => ({
+                    onKeyDown={(e) => {
+                        const format = question.format;
+                        const regex = question.regular_expression;
+                        const keyValue = e.key;
+
+                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only alphabets are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only numbers are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
+                                },
+                            }));
+                        }
+                    }}
+                    onChange={() => (setValidationErrors((prevErrors) => ({
                         ...prevErrors,
                         preview_textboxfield: {
                             ...prevErrors.preview_textboxfield,
                             [question.question_id]: null,
                         },
                     })))}
+                    maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
                 />
                 :
@@ -82,7 +148,46 @@ const TextBoxField = ({
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
                     onBlur={(e) => handleInputChange(e)}
-                    onChange={()=>(setValidationErrors((prevErrors) => ({
+                    onKeyDown={(e) => {
+                        const format = question.format;
+                        const regex = question.regular_expression;
+                        const keyValue = e.key;
+
+                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only alphabets are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: `Only numbers are allowed.`,
+                                },
+                            }));
+                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
+                            setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_textboxfield: {
+                                    ...prevErrors.preview_textboxfield,
+                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
+                                },
+                            }));
+                        }
+                    }}
+                    onChange={() => (setValidationErrors((prevErrors) => ({
                         ...prevErrors,
                         preview_textboxfield: {
                             ...prevErrors.preview_textboxfield,

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from '../../../../../Components/Image/Image';
 import RadioButtonGroup from '../../../../../Components/RadioButtonGroup/RadioButtonGroup';
 import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/CheckboxButtonGroup';
+import InfinateDropdown from '../../../../../Components/InputField/InfinateDropdown';
 
 const ChoiceBoxField = ({
     label,
@@ -17,10 +18,16 @@ const ChoiceBoxField = ({
     preview,
     question
 }) => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [optionSelected, setOptionSelected] = useState('')
 
     const handleRadioChange = (selectedValue) => {
         console.log('Selected value:', selectedValue);
     };
+    const handleCheckBoxClick = (selectedOption) => {
+        setOptionSelected(selectedOption?.value);
+        setIsDropdownOpen(false)
+    }
 
     const renderInputGroup = () => {
         const { source, type, fixedChoiceArray, lookupOptionChoice } = fieldSettingParameters;
@@ -35,7 +42,6 @@ const ChoiceBoxField = ({
             return <CheckboxButtonGroup testId={testId} preview values={values} name={source} onChange={handleRadioChange} />;
         }
     };
-
     return (
         <div>
             <label
@@ -53,27 +59,43 @@ const ChoiceBoxField = ({
                 </div>
             ) : (
                 <div className='relative'>
-                    <input
+                    {!preview ? <><input
                         data-testid='input'
                         type={type}
                         id={textId}
                         value={value}
                         className={`w-full h-auto break-words border border-[#AEB3B7] ${preview ? 'mt-1' : 'mt-5'} rounded-lg bg-white py-3 pl-4 pr-12 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                        placeholder={preview ? question?.placeholder_content:fieldSettingParameters?.placeholderContent}
-                        onClick={handleChange}
-                    />
-                    <div className='absolute right-4 top-[65%] -translate-y-1/2'>
-                        <Image src='down' />
-                    </div>
+                        placeholder={fieldSettingParameters?.placeholderContent}
+                        onClick={handleChange} /><div className='absolute right-4 top-[65%] -translate-y-1/2'>
+                            <Image src='down' />
+                        </div></> :
+                        <InfinateDropdown
+                            label=''
+                            id='lookup'
+                            placeholder={question?.placeholder_content}
+                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
+                            testID='lookup-dropdown'
+                            labeltestID='lookup-list'
+                            isDropdownOpen={isDropdownOpen}
+                            setDropdownOpen={setIsDropdownOpen}
+                            handleOptionClick={handleCheckBoxClick}
+                            top='20px'
+                            // close='true'
+                            options={question?.source_value ? question?.source_value : null}
+                            selectedOption={optionSelected}
+                            preview
+                            // lastElementRef={lastElementRef}
+                        />
+                    }
                 </div>
             )}
 
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'
-                title={preview ? question?.help_text :fieldSettingParameters?.helptext}
+                title={preview ? question?.help_text : fieldSettingParameters?.helptext}
             >
-                {preview ? question?.help_text :fieldSettingParameters?.helptext}
+                {preview ? question?.help_text : fieldSettingParameters?.helptext}
             </p>
         </div>
     );
