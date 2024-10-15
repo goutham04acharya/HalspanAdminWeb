@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { setModalOpen } from '../QuestionnaryFormSlice';
+import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
 import Button2 from '../../../../Components/Button2/ButtonLight';
 import Button from '../../../../Components/Button/button';
@@ -17,6 +17,7 @@ import { buildConditionExpression, buildLogicExpression } from '../../../../Comm
 import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
+import moment from 'moment/moment';
 
 
 
@@ -37,6 +38,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
+    
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
     const [selectedType, setSelectedType] = useState('');
@@ -648,6 +651,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Your handleSave function
     const handleSave = async () => {
+        debugger
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
@@ -699,7 +703,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
-
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
@@ -730,6 +733,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Evaluate the modified string
             const result = eval(evalInputValue);
             setIsThreedotLoader(true);
+            console.log(evalInputValue, 'nnnnnnnnnnnnn')
+            if (selectedComponent === 'choiceboxfield') {
+                const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
+                console.log(defaultResult, 'defaultResult');
+                setIsThreedotLoader(true);
+                if(defaultResult.isValid()){
+                    console.log('');
+                }else{
+                    setError('Please follow the DD/MM/YYYY date format');
+                    return;
+                }
+            }
+            
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
@@ -875,7 +891,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             </Button2>
                             <Button
                                 text='Save'
-                                onClick={tab ? handleSave : handleSaveBasicEditor}
+                                onClick={tab || isDefaultLogic ? handleSave : handleSaveBasicEditor}
                                 type='button'
                                 data-testid='cancel'
                                 className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

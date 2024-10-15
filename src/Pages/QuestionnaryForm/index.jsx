@@ -550,7 +550,7 @@ const QuestionnaryForm = () => {
                     format_error: question?.format_error,
                     options: question?.options,
                     conditional_logic: question?.conditional_logic,
-                    default_conditional_logic: question?.conditional_logic
+                    // default_conditional_logic: question?.conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -635,7 +635,7 @@ const QuestionnaryForm = () => {
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
                         conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
-                        default_conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        // default_conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
