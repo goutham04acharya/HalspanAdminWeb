@@ -225,12 +225,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
-        setSelectedFieldType('')
+        console.log(selectedFieldType, "selectedFieldType")
+        // setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
         setInputValue(value); // Update input value
-
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -365,13 +365,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     ];
                     break;
                 case 'date':
-                    fieldType = 'dateTimefield';
+                    fieldType = ['dateTimefield'];
                     break;
                 default:
-                    fieldType = ''; // Handle any unexpected cases
+                    fieldType = []; // Handle any unexpected cases
             }
 
-            setSelectedFieldType(fieldType);
+            setSelectedFieldType(fieldType.join(', '));
         }
     };
     function getDetails(path, data) {
@@ -701,8 +701,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
             evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+            // evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+            // evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
 
 
             let expression = evalInputValue.toString();

@@ -150,7 +150,7 @@ Before("@create_questionnaire", async function () {
         global.questionary_payload= await create_questionnaire_payload();
         console.log(global.questionary_payload, "Questionary Payload")
         let response = await createQuestionnaire(global.questionary_payload)
-        console.log(response, "Questionary Response")
+        console.log(response.text, "Questionary Response")
     } catch (err) {
         console.log(err)
     }

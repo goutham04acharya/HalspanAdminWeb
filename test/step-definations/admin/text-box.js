@@ -90,6 +90,9 @@ When('I select the format as {string}', async function (format) {
     case "alphanumeric":
         await driver.wait(until.elementLocated(By.css(`[data-testid="format-list-1"]`))).click();
         break;
+    case "custom-regular-expression":
+        await driver.wait(until.elementLocated(By.css(`[data-testid="format-list-3"]`))).click();
+        break;
     default:
         await driver.wait(until.elementLocated(By.css(`[data-testid="format-list-1"]`))).click();
         break;
