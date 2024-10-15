@@ -24,44 +24,47 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [currentSection, setCurrentSection] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [sliderValue, setSliderValue] = useState(0);
-    console.log(sections, 'sections mmdmd')
+    const [textBoxValue, setTextBoxValue] = useState({})
+    const [value, setValue] = useState({})
+    const [isFormatError, setIsFormatError] = useState(false);
     const totalPages = Array.isArray(sections) ? sections.reduce((acc, section) => acc + (Array.isArray(section.pages) ? section.pages.length : 0), 0) : 0;
 
-    // const handleNextClick = () => {
-    //     if (currentPage < sections[currentSection].pages.length - 1) {
-    //         setCurrentPage(currentPage + 1);
-    //         setSliderValue((currentPage + 1) / sections[currentSection].pages.length * 100);
-    //         setValidationErrors((prevErrors) => ({
-    //             ...prevErrors,
-    //             preview_textboxfield: '', // Or remove the key if you prefer
-    //         }));
-    //     } else if (currentSection < sections.length - 1) {
-    //         setCurrentSection(currentSection + 1);
-            // setCurrentPage(0);
-    //         // setSliderValue(0);
-    //     }
-    // };
-    // console.log((currentPage + 1) / sections[currentSection].pages.length * 100, '(currentPage + 1) / sections[currentSection].pages.length * 100')
-
-    const handleBackClick = () => {
-        if (currentPage > 0) {
-            setCurrentPage(currentPage - 1);
-            setSliderValue((currentPage - 1) / sections[currentSection].pages.length * 100);
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: '', // Or remove the key if you prefer
-            }));
-        } else if (currentSection > 0) {
-            setCurrentSection(currentSection - 1);
-            setCurrentPage(sections[currentSection - 1].pages.length - 1);
-            // setSliderValue(100);
+    const validateFormat = (value, format, regex) => {
+        switch (format) {
+            case 'Alpha':
+                return /^[a-zA-Z]+$/.test(value);
+            case 'Alphanumeric':
+                return /^[a-zA-Z0-9]+$/.test(value);
+            case 'Numeric':
+                return /^[0-9]+$/.test(value);
+            case 'Custom Regular Expression':
+                return new RegExp(regex).test(value);
+            default:
+                return true; // Allow any format if not specified   
         }
     };
+
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            if (!question?.options?.optional && question?.component_type === 'textboxfield') {
-                acc[question.question_id] = 'This is a mandatory field';
+            if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
+                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                } else if (question?.format_error && !validateFormat(value[question?.question_id], question?.format, question?.regular_expression)) {
+                    acc[question.question_id] = question?.format_error;
+                }
+            }else if(question?.component_type === 'choiceboxfield' && !question?.options?.optional){
+                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                } else {
+                    acc[question.question_id] = '';
+                }
+            }else if(question?.component_type === 'signaturefield' && !question?.options?.optional){
+                if (value[question?.question_id] === true || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                } else {
+                    acc[question.question_id] = '';
+                }
             }
             return acc;
         }, {});
@@ -70,6 +73,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: errors,
+                preview_choiceboxfield: errors,
+                preview_signaturefield: errors
             }));
         } else {
             if (currentPage < sections[currentSection].pages.length - 1) {
@@ -78,31 +83,47 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             } else if (currentSection < sections.length - 1) {
                 setCurrentSection(currentSection + 1);
                 setCurrentPage(0);
-                // setSliderValue(0);  
+                // setSliderValue(0);    
             }
         }
     };
 
 
+    const handleBackClick = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+            setSliderValue((currentPage - 1) / sections[currentSection].pages.length * 100);
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_textboxfield: '', // Or remove the key if you prefer  
+            }));
+        } else if (currentSection > 0) {
+            setCurrentSection(currentSection - 1);
+            setCurrentPage(sections[currentSection - 1].pages.length - 1);
+            // setSliderValue(100);  
+        }
+    };
+
+    console.log(value, 'ooooooooooo')
+
     const renderQuestion = (question) => {
         if (!question) {
             return <p>No question data available.</p>;
         }
-        console.log(question)
         switch (question.component_type) {
             case 'textboxfield':
                 // question_id={question?.question_id} validationErrors={validationErrors} options={question?.options} HelpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''}
-                return <TextBoxField preview question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
+                return <TextBoxField setIsFormatError={setIsFormatError} id={question?.question_id} preview value={value[question?.question_id]} setValue={setValue} setTextBoxValue={setTextBoxValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
                 return <GPSField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'signaturefield':
-                return <SignatureField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
                 return <FileField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <ChoiceBoxField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <ChoiceBoxField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
                 return <DateTimeField preview helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
@@ -134,7 +155,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
 
             <div ref={modalRef} className='h-[740px] flex justify-between flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
-                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>Installation</p>
+                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
                 <div>
                     {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
                     <Image src={src} className={`${className} mx-auto`} />
@@ -142,7 +163,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll scrollBar w-full bg-slate-100 rounded-md'>
                     <div>
                         <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
-                            {formDefaultInfo?.internal_name}
+                            {sections[currentSection]?.section_name}
                         </p>
                         <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                             <input className="bg-[#2B333B] absolute appearance-none h-2.5 rounded-l" value={sliderValue} onChange={(e) => setSliderValue(e.target.value)} style={{ width: { sliderValue } }}></input>

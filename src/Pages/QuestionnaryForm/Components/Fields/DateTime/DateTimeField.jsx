@@ -11,9 +11,15 @@ function DateTimeField({
     fieldSettingParameters,
     testId,
     preview,
-    question
+    question,
+    validationErrors,
+    setValidationErrors,
+    setValue,
+    choiceValue
 }) {
-    console.log(fieldSettingParameters, 'fieldSettingParametersfieldSettingParametersfieldSettingParameters')
+    function handleFunction(){
+
+    }
     return (
         <div>
             <label
@@ -21,7 +27,7 @@ function DateTimeField({
                 htmlFor={textId}
                 title={preview ? question?.label : fieldSettingParameters?.label}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all  break-words block w-full max-w-[85%] ${(preview ? question?.label : fieldSettingParameters?.label) === '' ? 'h-[20px]' : 'h-auto'}`}>
-                {preview ? question?.label : fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
             <div className='relative'>
                 <input
@@ -36,7 +42,7 @@ function DateTimeField({
                             : (preview ? question?.type : fieldSettingParameters?.type) === 'time'
                                 ? 'hh:mm:ss'
                                 : 'dd/mm/yyyy hh:mm:ss')}
-                    onClick={() => handleChange(fieldSettingParameters)}
+                    onClick={() => {preview ? handleFunction() : handleChange(fieldSettingParameters)}}
                 />
                 {(preview ? false : fieldSettingParameters?.type) === 'date' &&
                     <img src="/Images/calendar.svg" alt="calender" className={`absolute ${preview ? 'top-4' : 'top-8'} right-3 cursor-pointer`} />}

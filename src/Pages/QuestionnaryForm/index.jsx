@@ -87,8 +87,6 @@ const QuestionnaryForm = () => {
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
 
-    console.log(selectedSectionData, 'selectedSectionData')
-
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -111,20 +109,6 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-    const validateRegex = (value) => {
-        const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-        if (!regexPattern.test(value) || value.trim() === '') {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: 'Invalid regular expression',
-            }));
-        } else {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: '',
-            }));
-        }
-    };
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -153,48 +137,6 @@ const QuestionnaryForm = () => {
                 regular_expression: '',
             }));
         }
-        // if (id === 'regular_expression') {
-        //     // Update the state with the new value
-        //     dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
-
-        //     // Validate the regex pattern
-        //     try {
-        //         // Attempt to create a RegExp object with the current input
-        //         new RegExp(updatedValue);
-
-        //         // If successful, clear any existing error
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: '',
-        //         }));
-
-        //         // Test the regex against all relevant values
-        //         const relevantValues = [
-        //             fieldSettingParams[selectedQuestionId]?.min,
-        //             fieldSettingParams[selectedQuestionId]?.max,
-        //             // Add any other relevant values you want to test here
-        //         ];
-
-        //         const regexObj = new RegExp(updatedValue);
-        //         const invalidValues = relevantValues.filter(val => {
-        //             return val !== undefined && !regexObj.test(String(val));
-        //         });
-
-        //         if (invalidValues.length > 0) {
-        //             setValidationErrors((prevErrors) => ({
-        //                 ...prevErrors,
-        //                 regular_expression: `Regex doesn't match all values`,
-        //             }));
-        //         }
-        //     } catch (error) {
-        //         // If RegExp creation fails, set an error message
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: 'Invalid regular expression: ',
-        //         }));
-        //     }
-        // }
-        // ... (keep the rest of the function as is)
 
         // Don't forget to update the state and trigger auto-save
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
@@ -204,21 +146,6 @@ const QuestionnaryForm = () => {
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
-        // if (id === 'regular_expression') {
-        //     const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-        //     console.log(fieldSettingParams[selectedQuestionId]?.regular_expression,'nhyu')
-        //     if (!regexPattern.test(fieldSettingParams[selectedQuestionId]?.regular_expression) || value.trim() === '') {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: 'Invalid regular expression',
-        //         }));
-        //     } else {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             regular_expression: '',
-        //         }));
-        //     }
-        // }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -673,7 +600,6 @@ const QuestionnaryForm = () => {
     }
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
-        console.log(fieldSettingParams, 'field aefkjafkkmafmfa akjfk')
         handleSectionSaveOrder(sections)
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id === sectionId);
@@ -770,7 +696,6 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-            console.log(body, 'body tttttttttttt')
 
             try {
                 if (isSaving) {
@@ -822,7 +747,6 @@ const QuestionnaryForm = () => {
         } else {
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
-            console.log(value, 'jnackjakjcn')
         }
 
         // Update the sections state

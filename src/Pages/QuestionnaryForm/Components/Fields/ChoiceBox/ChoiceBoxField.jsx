@@ -3,6 +3,7 @@ import Image from '../../../../../Components/Image/Image';
 import RadioButtonGroup from '../../../../../Components/RadioButtonGroup/RadioButtonGroup';
 import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/CheckboxButtonGroup';
 import InfinateDropdown from '../../../../../Components/InputField/InfinateDropdown';
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 const ChoiceBoxField = ({
     label,
@@ -16,17 +17,32 @@ const ChoiceBoxField = ({
     fieldSettingParameters,
     testId,
     preview,
-    question
+    question,
+    validationErrors,
+    setValidationErrors,
+    setValue,
+    choiceValue
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [optionSelected, setOptionSelected] = useState('')
 
     const handleRadioChange = (selectedValue) => {
-        console.log('Selected value:', selectedValue);
+        // console.log('Selected value:', selectedValue);
     };
     const handleCheckBoxClick = (selectedOption) => {
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: selectedOption
+        }))
         setOptionSelected(selectedOption?.value);
         setIsDropdownOpen(false)
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors.preview_choiceboxfield,
+                [question.question_id]: null,
+            },
+        }))
     }
 
     const renderInputGroup = () => {
@@ -50,7 +66,7 @@ const ChoiceBoxField = ({
                 title={preview ? question?.label : fieldSettingParameters?.label}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}
             >
-                {preview ? question?.label : fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
 
             {['single_choice', 'multi_choice'].includes(fieldSettingParameters?.type) ? (
@@ -88,6 +104,9 @@ const ChoiceBoxField = ({
                         />
                     }
                 </div>
+            )}
+            {(question?.question_id && validationErrors?.preview_choiceboxfield && validationErrors.preview_choiceboxfield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_choiceboxfield[question.question_id]} />
             )}
 
             <p

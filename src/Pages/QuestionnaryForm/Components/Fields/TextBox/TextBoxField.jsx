@@ -16,7 +16,9 @@ const TextBoxField = ({
     setValidationErrors,
     validationErrors,
     question_id,
-    question
+    question,
+    setIsFormatError,
+    setValue
 }) => {
     const validateFormat = (value, format, regex) => {
         switch (format) {
@@ -32,14 +34,28 @@ const TextBoxField = ({
                 return true; // Allow any format if not specified  
         }
     };
+    console.log(question_id,'raheel')
+    console.log(value,'lololo')
 
     const handleInputChange = (e) => {
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_textboxfield: {
+                ...prevErrors.preview_textboxfield,
+                [question.question_id]: null,
+            },
+        }))
         const newValue = e.target.value;
         const format = question.format;
         const regex = question.regular_expression;
-
+        // console.log(newValue,'newValue')
+        setValue((prev) => ({
+            ...prev,
+            [question_id]: newValue
+        }))
         // Check for validation if the field is not optional   
         if (!question?.options?.optional && newValue.trim() === '') {
+            setIsFormatError(false)
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: {
@@ -48,6 +64,7 @@ const TextBoxField = ({
                 },
             }));
         } else if (!validateFormat(newValue, format, regex)) {
+            setIsFormatError(true)
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: {
@@ -56,7 +73,8 @@ const TextBoxField = ({
                 },
             }));
         } else {
-            // Clear the error if the field is filled and format is valid   
+            // Clear the error if the field is filled and format is valid 
+            setIsFormatError(false)  
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: {
@@ -66,7 +84,9 @@ const TextBoxField = ({
             }));
         }
     };
+    function handleFunction(){
 
+    }
 
 
     return (
@@ -77,8 +97,9 @@ const TextBoxField = ({
                 maxLength={100}
                 title={fieldSettingParameters?.label}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
-                {preview ? question?.label : fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
+            
             {(preview ? question?.type : fieldSettingParameters?.type) === 'multi_line' ?
                 <textarea
                     data-testid='input'
@@ -87,8 +108,8 @@ const TextBoxField = ({
                     value={value}
                     className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
-                    onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
-                    onBlur={(e) => handleInputChange(e)}
+                    onClick={preview ? handleFunction() : () => handleChange(fieldSettingParameters)}
+                    // onBlur={(e) => handleInputChange(e)}
                     onKeyDown={(e) => {
                         const format = question.format;
                         const regex = question.regular_expression;
@@ -119,6 +140,7 @@ const TextBoxField = ({
                                 },
                             }));
                         } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
+                            setIsFormatError(true)
                             setValidationErrors((prevErrors) => ({
                                 ...prevErrors,
                                 preview_textboxfield: {
@@ -128,13 +150,7 @@ const TextBoxField = ({
                             }));
                         }
                     }}
-                    onChange={() => (setValidationErrors((prevErrors) => ({
-                        ...prevErrors,
-                        preview_textboxfield: {
-                            ...prevErrors.preview_textboxfield,
-                            [question.question_id]: null,
-                        },
-                    })))}
+                    onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
                 />
@@ -143,11 +159,11 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={value}
+                    value={value ? value : ''}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
-                    onBlur={(e) => handleInputChange(e)}
+                    // onBlur={(e) => handleInputChange(e)}
                     onKeyDown={(e) => {
                         const format = question.format;
                         const regex = question.regular_expression;
@@ -178,6 +194,7 @@ const TextBoxField = ({
                                 },
                             }));
                         } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
+                            setIsFormatError(true)
                             setValidationErrors((prevErrors) => ({
                                 ...prevErrors,
                                 preview_textboxfield: {
@@ -187,13 +204,7 @@ const TextBoxField = ({
                             }));
                         }
                     }}
-                    onChange={() => (setValidationErrors((prevErrors) => ({
-                        ...prevErrors,
-                        preview_textboxfield: {
-                            ...prevErrors.preview_textboxfield,
-                            [question.question_id]: null,
-                        },
-                    })))}
+                    onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
                 />
