@@ -29,6 +29,8 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
+import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
+import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -86,6 +88,7 @@ const QuestionnaryForm = () => {
     const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
+    const [complianceLogic, setComplianceLogic] = useState([]);
 
     console.log(selectedSectionData, 'selectedSectionData')
 
@@ -306,6 +309,7 @@ const QuestionnaryForm = () => {
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
+        'compliancelogic': ComplianceFieldSetting
         // Add other mappings here...
     };
 
@@ -940,6 +944,17 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
         })
     });
+    // ffunction to handle the compliance logic click
+    const handleComplianceLogicClick = () => {
+        
+        let arr = complianceLogic;
+        arr.push({
+            label: `Status ${arr.length + 1}`,
+            default_content: ''
+        });
+        setComplianceLogic(arr)
+        dispatch(setSelectedComponent('compliancelogic'))
+    };
 
     const handleClick = useCallback((functionName) => {
         const functionMap = {
@@ -955,10 +970,11 @@ const QuestionnaryForm = () => {
             handleSignatureClick,
             handleGPSClick,
             handleDisplayClick,
+            handleComplianceLogicClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleComplianceLogicClick]);
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
@@ -1061,6 +1077,21 @@ const QuestionnaryForm = () => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
     }, []);
+    const addNewCompliance = (type, index) => {
+        debugger
+        let newArr = [...complianceLogic]; // Create a copy of the current state array
+        //type will be sent for deleting the  compliance logic state we will check for type if delete than splice array
+        if (type) {
+            newArr.splice(index, 1);
+            setComplianceLogic(newArr);
+            return
+        }
+        newArr.push({
+            label: `Status ${newArr.length + 1}`,
+            default_content: ''
+        });
+        setComplianceLogic(newArr); // Set the new array in state
+    }
 
     return (
         <>
@@ -1200,6 +1231,9 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
+                            {complianceLogic.length > 0 && <div>
+                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} />
+                            </div>}
                         </div>
                     </div>
                     <div className='w-[30%]'>
@@ -1248,7 +1282,8 @@ const QuestionnaryForm = () => {
                                         setValidationErrors: setValidationErrors,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
-
+                                        complianceLogic: complianceLogic,
+                                        setComplianceLogic: setComplianceLogic,
                                     }
                                 )
                             ) : (

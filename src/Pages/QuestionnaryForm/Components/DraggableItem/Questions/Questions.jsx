@@ -13,6 +13,7 @@ import SignatureField from '../../Fields/Signature/SignatureField';
 import GPSField from '../../Fields/GPS/GPSField';
 import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField';
 import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setShouldAutoSave, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../../QuestionnaryFormSlice'
+import ComplanceLogicField from '../../Fields/ComplianceLogic/ComplanceLogicField';
 
 
 const Questions = ({
@@ -81,6 +82,10 @@ const Questions = ({
             <DIsplayContentField
                 {...props}
             />,
+        compliancelogic: (props) =>
+            <ComplanceLogicField
+                {...props}
+            />
     };
 
     const handleQuestionIndexCapture = (question) => {

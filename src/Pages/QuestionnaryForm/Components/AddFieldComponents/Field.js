@@ -111,7 +111,8 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/complianceField.svg',
         testId: 'compliance',
-        type: 'compliance'
+        type: 'compliance',
+        onClick:'handleComplianceLogicClick'
     },
 
 ]
