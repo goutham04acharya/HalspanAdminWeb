@@ -151,6 +151,7 @@ function ChoiceFieldSetting({
                         <input
                             type="text"
                             id='Label'
+                            data-testid="default-value-input"
                             className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             value={defaultString || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                             onChange={(e) => setDefaultString(e.target.value)} // Update defaultString when input changes
@@ -159,6 +160,7 @@ function ChoiceFieldSetting({
                         <img
                             src="/Images/setting.svg"
                             alt="setting"
+                            data-testid="default-value"
                             className='absolute top-5 right-3 cursor-pointer'
                             onClick={() => {
                                 setIsDefaultLogic(true);

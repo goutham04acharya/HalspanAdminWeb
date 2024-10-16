@@ -649,7 +649,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Your handleSave function
     const handleSave = async () => {
-        const sectionId = version_number + '_' + selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             // Function to add "sections." to section IDs
@@ -692,6 +692,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
             evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
             evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+            evalInputValue = evalInputValue.replace('if', ''); // Replace () with length function
+
 
             let expression = evalInputValue.toString();
 

@@ -24,7 +24,7 @@ When('I enter the incorrect default value conditional logic for choice field', a
 
 Then('I click the save button for default value', async function () {
     await new Promise(resolve => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css('[data-testid="save-default-value"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="save-conditional-logic"]'))).click();
 });
 
 Then('I should see the default value suggestions for questions for choice', async function () {
@@ -94,6 +94,7 @@ When('I enter the default value correct conditional logic for choice field', asy
 
 Then('I should see the conditional logic in default value field', async function () {
     await new Promise(resolve => setTimeout(resolve, 950));
-    const default_value = await driver.wait(until.elementLocated(By.css(`[data-testid="default-value"]`))).getText();
-    assert.equal(this.default_value, default_value);
+    // eslint-disable-next-line max-len
+    const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
+    assert.equal(default_value, this.default_value);
 });
