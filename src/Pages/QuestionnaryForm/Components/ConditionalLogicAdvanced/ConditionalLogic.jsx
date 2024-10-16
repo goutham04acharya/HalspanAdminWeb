@@ -635,6 +635,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                             // Replace && with "and" and || with "or"
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
+                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
+                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
+                            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+
+
+
+
                             setInputValue(conditionalLogic);
                             setConditions(parseLogicExpression(question.conditional_logic));
                         }
@@ -670,7 +679,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Apply the section prefix function to the inputValue
             let evalInputValue = modifyString(inputValue);
-
+            let showdefaultValue = evalInputValue
             // New function to format dates and remove quotes from new Date
             const formatDates = (input) => {
                 // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
@@ -737,10 +746,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (isDefaultLogic === true) {
                 if (selectedComponent === 'choiceboxfield') {
                     setDefaultString(evalInputValue);
-                    console.log(defaultString, 'defaultString');
+
                 } else if (selectedComponent === 'dateTimefield') {
                     const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
-                    console.log(defaultResult, 'defaultResult');
                     setIsThreedotLoader(true);
                     if (defaultResult.isValid()) {
                         console.log('Successful');
@@ -749,7 +757,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         return;
                     }
                 } else if (selectedComponent === 'numberfield') { // Corrected this part
-                    console.log(evalInputValue, 'hhhhhhhhhhhhhhhh');
                     setDefaultString(evalInputValue);
                     console.log(defaultString, 'defaultString');
                 }
@@ -760,7 +767,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString);
-                dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+                dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
+                // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
                 setError(''); // Clear the error since result is valid
                 setIsThreedotLoader(false);
@@ -829,6 +837,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
+    // useEffect(() => {
+    //     let updatedString = defaultString
+    //         .replace(/^ /, 'if ')              // Replace the first space with 'if'
+    //         .replace(/sections\./g, '')        // Replace 'sections.' with empty space
+    //         .replace(/\?/g, ' then ')          // Replace '?' with ' then '
+    //         .replace(/\:/g, ' else ');         // Replace ':' with ' else '
+
+    //     // Update defaultString with the transformed value
+    //     setDefaultString(updatedString);
+    // }, []); // Empty depende
+    // console.log(defaultString, 'gfgfgg')
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

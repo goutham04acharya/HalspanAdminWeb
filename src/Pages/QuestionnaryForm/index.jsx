@@ -733,6 +733,7 @@ const QuestionnaryForm = () => {
         }
 
     };
+    
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
