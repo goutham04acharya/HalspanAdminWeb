@@ -58,7 +58,6 @@ function AdvancedEditor({
         let allSections = sections
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
-        console.log(JSON.stringify(allSections), "allSections", suggestion, eval(`allSections.${suggestion}`), getVariableType(eval(`allSections.${suggestion}`)))
         setSelectedType(valueType);
 
 

@@ -9,7 +9,6 @@ function OptionsComponent({ selectedQuestionId }) {
 
     // Get the current field settings from Redux
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    console.log(fieldSettingParams, 'adassa')
 
     // Define options based on componentType
     const getOptions = (componentType) => {

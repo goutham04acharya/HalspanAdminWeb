@@ -62,7 +62,6 @@ function VersionList() {
         setSelectedVersion('')
         setEdit(false)
         setDuplicate(false)
-        // console.log(version, 'on close')
     }
     const handleDropdownClick = () => {
         setDropdownsOpen(!dropdownsOpen)
@@ -90,7 +89,6 @@ function VersionList() {
                 };
 
                 const response = await PatchAPI('questionnaires/duplicate', payload);
-                console.log(response.status)
                 if (response.status === 204) {
                     setToastSuccess('Version duplicated successfully.');
                     handleClose(); // Close the modal
@@ -120,7 +118,6 @@ function VersionList() {
         setLoading(true)
         if (selectedVersionObj) {
             setSelectedStatus(selectedVersionObj); // Set the selected version object to state
-            console.log(selectedStatus.status, 'selectedStatus')
             if (selectedVersionObj.status === 'Draft') {
                 setVersion(false); // Proceed with navigation
                 navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
@@ -135,17 +132,11 @@ function VersionList() {
         setLoading(false)
     };
 
-    console.log(selectedVersion, 'asca')
-    useEffect(() => {
-        console.log(isCreateModalOpen, 'modal');
-    }, [isCreateModalOpen]);
-
     const handleVersionList = async () => {
         setDataLoading(true);
         setLoading(true);
         const response = await getAPI(`questionnaires/versions/${questionnaire_id}`)
         setVersionList(response?.data)
-        console.log(response)
         setLoading(false);
     }
     useEffect(() => {
@@ -156,7 +147,6 @@ function VersionList() {
         setLoading(true);
         setDataLoading(true);
         const response = await getAPI(`questionnaires/${questionnaire_id}`);
-        console.log(response, 'questionairre')
         setQueSettingDetails(response?.data);
         setDataLoading(false);
         setEditedDetails((prevState) => ({
