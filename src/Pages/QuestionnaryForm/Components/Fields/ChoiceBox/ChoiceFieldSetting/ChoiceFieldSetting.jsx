@@ -25,18 +25,17 @@ function ChoiceFieldSetting({
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
-    setIsDefaultLogic
+    setIsDefaultLogic,
+    defaultString,
+    setDefaultString
 }) {
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
+
     const [isLookupOpen, setIsLookupOpen] = useState(false);
-    const [selectedLookup, setSelectedLookup] = useState(null);
     const [optionData, setOptionData] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [focusInput, setFocusInput] = useState('');
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -149,15 +148,22 @@ function ChoiceFieldSetting({
                 <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                     <div className='relative w-full'>
-                        <input type="text" id='Label' className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder='Populates the content' />
-                        <img src="/Images/setting.svg" alt="setting"
+                        <input
+                            type="text"
+                            id='Label'
+                            className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                            value={defaultString || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                            onChange={(e) => setDefaultString(e.target.value)} // Update defaultString when input changes
+                            placeholder='Populates the content'
+                        />
+                        <img
+                            src="/Images/setting.svg"
+                            alt="setting"
                             className='absolute top-5 right-3 cursor-pointer'
                             onClick={() => {
-                                setIsDefaultLogic(true),
-                                    setConditionalLogic(false)
-                            }
-                            }
+                                setIsDefaultLogic(true);
+                                setConditionalLogic(false);
+                            }}
                         />
                     </div>
                 </div>

@@ -63,6 +63,7 @@ const QuestionnaryForm = () => {
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
+    const [defaultString, setDefaultString] = useState('')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -529,6 +530,7 @@ const QuestionnaryForm = () => {
                 //     setSections(sectionsData);  
                 //     return;  
                 //   } 
+                console.log(sectionsData, 'sectionsData')
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -550,7 +552,7 @@ const QuestionnaryForm = () => {
                     format_error: question?.format_error,
                     options: question?.options,
                     conditional_logic: question?.conditional_logic,
-                    // default_conditional_logic: question?.conditional_logic
+                    // default_conditional_logic: question?.default_conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -635,7 +637,7 @@ const QuestionnaryForm = () => {
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
                         conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
-                        // default_conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        default_conditional_logic: (question.question_id === selectedQuestionId && defaultString) ? defaultString : (fieldSettingParams[question.question_id]['default_conditional_logic'] || ''),
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -1190,6 +1192,8 @@ const QuestionnaryForm = () => {
                                         conditionalLogic: conditionalLogic,
                                         setIsDefaultLogic: setIsDefaultLogic,
                                         isDefaultLogic: isDefaultLogic,
+                                        setDefaultString:setDefaultString,
+                                        defaultString:defaultString
 
                                     }
                                 )
@@ -1285,7 +1289,8 @@ const QuestionnaryForm = () => {
                     handleSaveSection={handleSaveSection}
                     isDefaultLogic={isDefaultLogic}
                     setIsDefaultLogic={setIsDefaultLogic}
-                    
+                    setDefaultString={setDefaultString}
+                    defaultString={defaultString}
                 />
 
             )}

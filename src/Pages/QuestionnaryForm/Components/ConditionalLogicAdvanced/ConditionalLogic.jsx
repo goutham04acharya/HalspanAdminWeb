@@ -18,10 +18,11 @@ import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
+import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -39,7 +40,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
-    
+
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
     const [selectedType, setSelectedType] = useState('');
@@ -228,7 +229,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
-        console.log(selectedFieldType, "selectedFieldType")
         // setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
@@ -336,7 +336,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
         }
-
 
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
@@ -636,7 +635,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                             // Replace && with "and" and || with "or"
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
-
                             setInputValue(conditionalLogic);
                             setConditions(parseLogicExpression(question.conditional_logic));
                         }
@@ -651,7 +649,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Your handleSave function
     const handleSave = async () => {
-        debugger
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
@@ -730,22 +727,35 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return; // Stop execution if invalid variables are found
             }
+
             // Evaluate the modified string
             const result = eval(evalInputValue);
-            setIsThreedotLoader(true);
-            console.log(evalInputValue, 'nnnnnnnnnnnnn')
-            if (selectedComponent === 'choiceboxfield') {
-                const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
-                console.log(defaultResult, 'defaultResult');
-                setIsThreedotLoader(true);
-                if(defaultResult.isValid()){
-                    console.log('');
-                }else{
-                    setError('Please follow the DD/MM/YYYY date format');
-                    return;
+            setIsThreedotLoader(true)
+
+            if (isDefaultLogic === true) {
+                if (selectedComponent === 'choiceboxfield') {
+                    setDefaultString(evalInputValue);
+                    console.log(defaultString, 'defaultString');
+                } else if (selectedComponent === 'dateTimefield') {
+                    const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
+                    console.log(defaultResult, 'defaultResult');
+                    setIsThreedotLoader(true);
+                    if (defaultResult.isValid()) {
+                        console.log('Successful');
+                    } else {
+                        setError('Please follow the DD/MM/YYYY Date Format');
+                        return;
+                    }
+                } else if (selectedComponent === 'numberfield') { // Corrected this part
+                    console.log(evalInputValue, 'hhhhhhhhhhhhhhhh');
+                    setDefaultString(evalInputValue);
+                    console.log(defaultString, 'defaultString');
                 }
+            } else {
+                console.log('am ehere')
             }
-            
+
+
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
