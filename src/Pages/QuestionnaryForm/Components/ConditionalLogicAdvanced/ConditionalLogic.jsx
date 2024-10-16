@@ -649,7 +649,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Your handleSave function
     const handleSave = async () => {
-        const sectionId = version_number + '_' + selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             // Function to add "sections." to section IDs

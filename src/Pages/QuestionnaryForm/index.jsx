@@ -525,12 +525,6 @@ const QuestionnaryForm = () => {
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 const sectionsData = response?.data?.data?.sections || [];
-                // if (sectionsData.length === 1) {  
-                //     // If no sections are present, skip calling GetSectionOrder  
-                //     setSections(sectionsData);  
-                //     return;  
-                //   } 
-                console.log(sectionsData, 'sectionsData')
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -552,7 +546,7 @@ const QuestionnaryForm = () => {
                     format_error: question?.format_error,
                     options: question?.options,
                     conditional_logic: question?.conditional_logic,
-                    // default_conditional_logic: question?.default_conditional_logic
+                    default_conditional_logic: question?.default_conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -1192,8 +1186,8 @@ const QuestionnaryForm = () => {
                                         conditionalLogic: conditionalLogic,
                                         setIsDefaultLogic: setIsDefaultLogic,
                                         isDefaultLogic: isDefaultLogic,
-                                        setDefaultString:setDefaultString,
-                                        defaultString:defaultString
+                                        setDefaultString: setDefaultString,
+                                        defaultString: defaultString
 
                                     }
                                 )

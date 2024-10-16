@@ -126,7 +126,6 @@ function ChoiceFieldSetting({
     useEffect(() => {
         fetchLookupList();
     }, [fetchLookupList]);
-
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
@@ -152,7 +151,7 @@ function ChoiceFieldSetting({
                             type="text"
                             id='Label'
                             className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            value={defaultString || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                            value={fieldSettingParameters?.default_conditional_logic || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                             onChange={(e) => setDefaultString(e.target.value)} // Update defaultString when input changes
                             placeholder='Populates the content'
                         />
