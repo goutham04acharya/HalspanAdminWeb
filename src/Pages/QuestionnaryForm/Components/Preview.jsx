@@ -60,10 +60,9 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     acc[question.question_id] = '';
                 }
             }else if(question?.component_type === 'signaturefield' && !question?.options?.optional){
-                if (value[question?.question_id] === true || value[question?.question_id] === undefined) {
+                console.log(value[question?.question_id],'value[question?.question_id]')
+                if (value[question?.question_id] === false || value[question?.question_id] === null) {
                     acc[question.question_id] = 'This is a mandatory field';
-                } else {
-                    acc[question.question_id] = '';
                 }
             }
             return acc;
@@ -160,7 +159,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
                     <Image src={src} className={`${className} mx-auto`} />
                 </div>
-                <div className='h-[calc(100vh-280px)] overflow-y-scroll scrollBar w-full bg-slate-100 rounded-md'>
+                <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollBar w-full bg-slate-100 rounded-md'>
                     <div>
                         <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
                             {sections[currentSection]?.section_name}

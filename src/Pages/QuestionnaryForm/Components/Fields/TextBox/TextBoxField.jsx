@@ -95,7 +95,7 @@ const TextBoxField = ({
                 data-testid="label-name"
                 htmlFor={textId}
                 maxLength={100}
-                title={fieldSettingParameters?.label}
+                title={preview ? question?.label : fieldSettingParameters?.label}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>

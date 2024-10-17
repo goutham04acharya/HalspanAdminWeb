@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from '../../../../../Components/Image/Image';
 import RadioButtonGroup from '../../../../../Components/RadioButtonGroup/RadioButtonGroup';
 import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/CheckboxButtonGroup';
@@ -58,6 +58,9 @@ const ChoiceBoxField = ({
             return <CheckboxButtonGroup testId={testId} preview values={values} name={source} onChange={handleRadioChange} />;
         }
     };
+    useEffect(() => {  
+        setOptionSelected(choiceValue?.value);  
+     }, [choiceValue]);
     return (
         <div>
             <label

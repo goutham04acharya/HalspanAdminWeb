@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useCallback } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import CustomSignatureField from './CustomSignatureField';
 
 const SignatureField = ({
     label,
@@ -18,25 +19,6 @@ const SignatureField = ({
     setValue,
     choiceValue
 }) => {
-    const signatureRef = useRef(null); // Reference for SignatureCanvas
-    const [isSignatureEmpty, setIsSignatureEmpty] = useState(true); // State to track if the signature is empty
-
-    const handleSignatureEnd = () => {
-        if (signatureRef.current) {
-            const isEmpty = signatureRef.current.isEmpty();
-            console.log(isEmpty, 'isempty')
-            setIsSignatureEmpty(isEmpty); // Update state based on the canvas content
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: isEmpty
-            }))
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_signaturefield: ''
-            }));
-        }
-    };
-
     return (
         <div>
             <label
@@ -50,12 +32,13 @@ const SignatureField = ({
 
             {preview ? (
                 <div>
-                    <SignatureCanvas
-                        ref={signatureRef}
-                        penColor="black"
-                        canvasProps={{ width: 300, height: 200, className: 'signature-canvas bg-white rounded-lg border border-[#AEB3B7]' }}
-                        onEnd={handleSignatureEnd} // Check if the signature is empty on change
+                    <CustomSignatureField
+                        setValue={setValue}
+                        setValidationErrors={setValidationErrors}
+                        question={question}
+                        value={choiceValue}
                     />
+
                     {/* Optionally, display a message if the signature is empty */}
                     {(question?.question_id && validationErrors?.preview_signaturefield && validationErrors.preview_signaturefield[question.question_id]) && (
                         <ErrorMessage error={validationErrors.preview_signaturefield[question.question_id]} />
