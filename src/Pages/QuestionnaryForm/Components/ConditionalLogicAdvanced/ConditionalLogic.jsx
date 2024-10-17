@@ -375,6 +375,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSelectedFieldType(fieldType.join(', '));
         }
     };
+
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -758,7 +759,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     //                 }
     //             } else if (selectedComponent === 'numberfield') { // Corrected this part
     //                 setDefaultString(evalInputValue);
-    //                 console.log(defaultString, 'defaultString');
     //             }
     //         } else {
     //             console.log('am ehere')
@@ -821,17 +821,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 .replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression;
 
-            // Split and Validate Expression
-            const validationResult = splitAndValidate(evalInputValue);
-            console.log(validationResult, 'validate');  // Log the result of validation
-
-            // Return early if validation errors exist
-            if (validationResult.some(msg => msg.includes('Error'))) {
-                setError(validationResult.join('\n'));
-                setIsThreedotLoader(false);
-                return; // Stop execution if validation fails
-            }
-
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
@@ -841,7 +830,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Validate if all variable names exist in secDetailsForSearching
             const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
-            console.log(invalidVariables, 'gggggggg')
 
             if (invalidVariables.length > 0) {
                 setError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
@@ -850,6 +838,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             const result = eval(evalInputValue);
+
+            // Split and Validate Expression
+            const validationResult = splitAndValidate(evalInputValue);
+
+            // Return early if validation errors exist
+            if (validationResult.some(msg => msg.includes('Error'))) {
+                setError(validationResult.join('\n'));
+                setIsThreedotLoader(false);
+                return; // Stop execution if validation fails
+            }
             setIsThreedotLoader(true);
 
             if (isDefaultLogic === true) {
@@ -867,7 +865,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                 } else if (selectedComponent === 'numberfield') { // Corrected this part
                     setDefaultString(evalInputValue);
-                    console.log(defaultString, 'defaultString');
                 }
             } else {
                 console.log('Non-default logic');
@@ -893,75 +890,67 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     };
 
-    // Add your splitAndValidate function here(this solution is almost working now)
-    // function splitAndValidate(expression) {
-    //     // Step 1: Remove outer parentheses for cleaner handling
-    //     const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
-
-    //     // Step 2: Split the expression based on && / ||
-    //     const parts = cleanExpression.split(/\s*&&\s*|\s*\|\|\s*/);
-    //     const errors = [];
-
-    //     // Define a regex to match valid expressions
-    //     const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
-
-    //     // Define a regex to detect incomplete expressions (e.g., missing operators or values)
-    //     const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*$/;
-
-    //     // Step 3: Check each part of the split expression
-    //     parts.forEach((part, index) => {
-    //         // Trim extra whitespace and outer parentheses
-    //         part = part.trim().replace(/^\(|\)$/g, '');
-
-    //         // Check for incomplete expression (e.g., missing operator or value)
-    //         if (incompleteExpressionRegex.test(part)) {
-    //             errors.push(`Error in expression ${index + 1}: "${part}" is incomplete (missing operator or value).`);
-    //         }
-    //         // Check if the part matches the valid expression pattern
-    //         else if (!validExpressionRegex.test(part)) {
-    //             errors.push(`Error in expression ${index + 1}: "${part}" is incorrect.`);
-    //         }
-    //         // If the expression is correct, log that it's valid
-    //         else {
-    //             errors.push(`Expression ${index + 1} is correct.`);
-    //         }
-    //     });
-
-    //     return errors.length > 0 ? errors : ["All expressions are valid."];
-    // }
-
     function splitAndValidate(expression) {
         const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
         const parts = cleanExpression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
 
-        // Update the regex to match valid expressions
+        // Define the list of methods that don't require an operator
+        const typeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()", "includes()"];        // Update the regex to match valid expressions
+
         const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
 
         // Define a regex to detect incomplete expressions (e.g., missing operators or values)
         const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
 
+        // Regex for valid date format (dd/mm/yyyy)
+        const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
         parts.forEach((part, index) => {
             part = part.trim().replace(/^\(|\)$/g, '');
 
             // Check for incomplete expressions
-            if (incompleteExpressionRegex.test(part) && !part.endsWith(')')) {
-                errors.push(`Error in expression ${index + 1}: "${part}" is incomplete (missing operator or value).`);
+            part = trimParentheses(part)
+            const displayPart = part.replace(/sections\./g, '');
+            console.log(displayPart, 'displayPart')
+
+            console.log(part, 'part')
+            // Check if the expression contains any method from the typeMethods list
+            const containsTypeMethod = typeMethods.some(method => part.includes(method));
+
+            // If it contains a method that doesn't require an operator, mark as correct
+            if (containsTypeMethod) {
+                errors.push(`Expression is correct (contains a valid method).`);
+            }
+            else if (incompleteExpressionRegex.test(part) && !part.endsWith(')')) {
+                errors.push(`Error in expression: "${displayPart}" is incomplete (missing operator or value).`);
+            }
+            // Check if it's a date type
+            else if (selectedType === 'date') {
+                const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
+                if (dateMatch) {
+                    const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
+
+                    // Validate date value (either "Today" or a valid date format)
+                    if (value !== 'Today' && !validDateRegex.test(value)) {
+                        errors.push(`Error in expression: "${value}" is not a valid date. Use 'dd/mm/yyyy' or 'Today'.`);
+                    }
+                } else {
+                    errors.push(`Error in expression: Date field is missing or incorrectly formatted.`);
+                }
             }
             // Check if the part matches the valid expression pattern
             else if (!validExpressionRegex.test(part)) {
-                errors.push(`Error in expression ${index + 1}: "${part}" is incorrect.`);
+                errors.push(`Error in expression: "${displayPart}" is incorrect.`);
             }
             // If the expression is correct, log that it's valid
             else {
-                errors.push(`Expression ${index + 1} is correct.`);
+                console.log(`Expression is correct.`);
             }
         });
 
         return errors.length > 0 ? errors : ["All expressions are valid."];
     }
-
-
 
     const showInputValue = (key) => {
         //this is the array of cndition where the input value  tap will not be  shown
