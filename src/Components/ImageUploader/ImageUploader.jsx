@@ -46,6 +46,7 @@ function ImageUploader({ maxImages, drawOnImage }) {
 
     const handlePencilClick = () => {
         canvasRef.current.eraseMode(false);
+        setColorPicker(!colorPicker)
     };
 
     const handleEraserClick = () => {
@@ -122,20 +123,22 @@ function ImageUploader({ maxImages, drawOnImage }) {
                             backgroundImage={URL.createObjectURL(currentImage)}
                         />
                         <div className=' flex flex-col top-[-140px] mr-[650px] relative'>
-                            <button onClick={handlePencilClick} className='m-[2px]'><img src="/Images/pencil.svg" alt="" /></button>
-                            <div>
-                                <input
-                                    id='color-picker'
-                                    type='color'
-                                    onChange={(e) => setStrokeColor(e.target.value)}
-                                    value={strokeColor}
-                                    // style={{ display: 'none' }}
-                                    className=' top-[24%] w-[34px] h-[34px] left-0 bg-transparent ' 
-                                />
+                            <div className=' flex w-[100px] '>
+                                <button onClick={handlePencilClick} className='m-[2px]'><img src="/Images/pencil.svg" alt="" /></button>
+                                {colorPicker && <span>
+                                    <input
+                                        id='color-picker'
+                                        type='color'
+                                        onChange={(e) => setStrokeColor(e.target.value)}
+                                        value={strokeColor}
+                                        // style={{ display: 'none' }}
+                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent '
+                                    />
+                                </span>}
                             </div>
 
-                            <button onClick={handleEraserClick} className='m-[2px]'><img src="/Images/eraser.svg" alt="" /></button>
-                            <button onClick={handleResetClick} className='m-[2px]'><img src="/Images/reset.svg" alt="" /></button>
+                            <button onClick={handleEraserClick} className='m-[2px] w-[40px] h-[40px]'><img src="/Images/eraser.svg" alt="" /></button>
+                            <button onClick={handleResetClick} className='m-[2px] w-[40px] h-[40px]'><img src="/Images/reset.svg" alt="" /></button>
                             {/* <button onClick={handleExportClick}>Export</button> */}
                         </div>
                     </div> : <div>

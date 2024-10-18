@@ -1,4 +1,6 @@
 import React from 'react'
+import MyImageMarker from '../../../../../Components/ImageMarker/ImageMarker'
+import ImageZoomPin from '../../../../../Components/PinOnTheFloor/PinOnTheFloor'
 
 function DIsplayContentField({
     label,
@@ -9,25 +11,32 @@ function DIsplayContentField({
     className,
     handleChange,
     fieldSettingParameters,
-    testId
+    testId,
+    preview,
+    question
 }) {
     return (
         <div>
-            {fieldSettingParameters?.type === 'heading' &&
-                <p data-testid="heading" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.heading}</p>
+            {(preview ? question?.type === 'heading' :fieldSettingParameters?.type === 'heading') &&
+                <p data-testid="heading" className='font-normal text-xl text-[#2B333B] max-w-[90%] break-words py-3'>{preview ? question?.heading :fieldSettingParameters?.heading}</p>
             }
-            {fieldSettingParameters?.type === 'text' &&
-                <p data-testid="text" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3'>{fieldSettingParameters?.text}</p>
+            {(preview ? question?.type === 'text' :fieldSettingParameters?.type === 'text') &&
+                <p data-testid="text" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3'>{preview ? question?.text : fieldSettingParameters?.text}</p>
             }
-            {fieldSettingParameters?.type === 'image' && 
+            {(!preview && fieldSettingParameters?.type === 'image') && 
                 <img
-                    src={fieldSettingParameters?.image} // assuming 'fieldSettingParameters.image' holds the S3 URL of the uploaded image
+                    src={preview ? question?.image : fieldSettingParameters?.image} // assuming 'fieldSettingParameters.image' holds the S3 URL of the uploaded image
                     className="mt-8"
                     data-testid="uploaded-image"
                 />
             }
-            {fieldSettingParameters?.type === 'url' &&
-                <p data-testid="url" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3 cursor-pointer'><a href="#" className=''>{fieldSettingParameters?.urlValue}</a></p>
+            {(preview && (question?.type === 'image')) &&<div>
+                {/* <MyImageMarker imageSrc={question?.display_type?.image} /> */}
+                <ImageZoomPin imageSrc={question?.display_type?.image}  />
+                
+            </div>}
+            {(preview ? question?.type === 'url' : fieldSettingParameters?.type === 'url' )&&
+                <p data-testid="url" className='font-normal text-base text-[#2B333B] max-w-[90%] break-words py-3 cursor-pointer'><a href="#" className=''>{preview ? question?.urlValue : fieldSettingParameters?.urlValue}</a></p>
             }
         </div>
     )
