@@ -39,6 +39,7 @@ module.exports = {
             'test/integration-testing/Flow1/37_advanced_editor_date_time.feature',
             'test/integration-testing/Flow1/35_date_time_basic_editor.feature',
             'test/integration-testing/Flow1/39_default_value_choice.feature',
+            'test/integration-testing/Flow1/42_default_value_number.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }
