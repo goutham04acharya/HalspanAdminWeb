@@ -821,6 +821,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 .replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression;
 
+            //  Check for the "includes" method being used without a parameter
+            let methods = [
+                "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
+                "getDay", "getHours", "getMinutes", "getSeconds", "getMilliseconds",
+                "getTime", "Date", "Today", "setDate", "includes"
+            ]
+            const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
+            if (functionCallRegex.test(evalInputValue)) {
+                setError('Please pass the parameter inside the function');
+                setIsThreedotLoader(false);
+                return; // Stop execution if validation fails
+            }
+
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
@@ -912,9 +925,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Check for incomplete expressions
             part = trimParentheses(part)
             const displayPart = part.replace(/sections\./g, '');
-            console.log(displayPart, 'displayPart')
 
-            console.log(part, 'part')
             // Check if the expression contains any method from the typeMethods list
             const containsTypeMethod = typeMethods.some(method => part.includes(method));
 

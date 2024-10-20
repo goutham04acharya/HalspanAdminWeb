@@ -41,7 +41,6 @@ function TestFieldSetting({
   const [searchParams, setSearchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false)
 
-  console.log(fieldSettingParameters, 'fieldSettingParameters')
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
 
   const lastEvaluatedKeyRef = useRef(null);
@@ -60,8 +59,6 @@ function TestFieldSetting({
     ...(fieldSettingParameters?.options?.field_validation ? [{ value: 'Custom Regular Expression', label: 'Custom Regular Expression' }] : [])
   ];
 
-  console.log(fieldSettingParameters, 'kjskjsckj')
-
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
@@ -69,7 +66,6 @@ function TestFieldSetting({
   };
   const validateRegex = (e) => {
     const value = e.target.value;
-    console.log(value, 'value');
   
     // Check if the value is empty
     if (!value) {
@@ -100,18 +96,8 @@ function TestFieldSetting({
   const handleRegularExpression = (event) => {
     // debugger
     const value = event.target.value;
-    console.log(value, 'value')
-    // const isValidate = validateRegex(value);
-    // console.log(isValidate,'isValidate')
-    // if (isValid) {
-    // console.log(value, 'value')
-    // dispatch(setNewComponent({ id: 'regular_expression', value, questionId: selectedQuestionId }));
-    // dispatch(setShouldAutoSave(true));
-    // }else{
-    //   setToastError('Not a valid regex')
-    // }
     if (value === '' || validateRegex(value)) {
-      // console.log(value, 'value')
+
       dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
       // dispatch(setShouldAutoSave(true));
     } else {
@@ -197,7 +183,6 @@ function TestFieldSetting({
   }, [loading, isFetchingMore, fieldSettingParameters?.type]);
 
   function isValidRegex(pattern) {
-    console.log(pattern, 'pattern')
     try {
       new RegExp(pattern);
       return true;
@@ -206,17 +191,6 @@ function TestFieldSetting({
     }
   }
 
-  // useEffect(() => {
-  //   document.getElementById('regular_expression').onblur = function () {
-  //     if (isValidRegex(this.value)) {
-  //       console.log('Valid regex');
-  //       // Additional actions for valid input
-  //     } else {
-  //       console.log('Invalid regex');
-  //       // Handle invalid input (e.g., show error message)
-  //     }
-  //   };
-  // }, [])
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
