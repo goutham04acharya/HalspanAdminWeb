@@ -97,6 +97,7 @@ function TestFieldSetting({
     const value = event.target.value;
 
     if (value === '' || validateRegex(value)) {
+
       dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
       // dispatch(setShouldAutoSave(true));
     } else {

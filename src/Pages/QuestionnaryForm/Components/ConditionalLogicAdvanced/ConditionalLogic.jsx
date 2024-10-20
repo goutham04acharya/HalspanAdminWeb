@@ -2,6 +2,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
+import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
 import Button2 from '../../../../Components/Button2/ButtonLight';
 import Button from '../../../../Components/Button/button';
@@ -375,6 +376,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSelectedFieldType(fieldType.join(', '));
         }
     };
+
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -657,16 +659,144 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId, allSectionDetails, tab]);
 
     // Your handleSave function
+    // const handleSave = async () => {
+    //     const sectionId = selectedQuestionId.split('_')[0];
+    //     setShowSectionList(false);
+    //     try {
+    //         // Function to add "sections." to section IDs
+    //         const addSectionPrefix = (input) => {
+    //             return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+    //         };
+
+    //         // New function to modify string (replace () with length())
+    //         const modifyString = (input) => {
+    //             if (selectedType === 'array') {
+    //                 const lastIndex = input.lastIndexOf('()');
+    //                 if (lastIndex !== -1) {
+    //                     return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
+    //                 }
+    //             }
+    //             return input;
+    //         };
+
+    //         // Apply the section prefix function to the inputValue
+    //         let evalInputValue = modifyString(inputValue);
+    //         let showdefaultValue = evalInputValue
+    //         // New function to format dates and remove quotes from new Date
+    //         const formatDates = (input) => {
+    //             // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
+    //             let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
+    //                 return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
+    //             });
+
+    //             // Then, remove quotes from around new Date expressions
+    //             formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
+    //             return formatted;
+    //         };
+
+    //         // Apply the formatDates function
+    //         evalInputValue = formatDates(evalInputValue);
+    //         // Log the updated input after date replacement
+
+    //         evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
+    //         evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
+    //         evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
+    //         evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
+    //         evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+    //         evalInputValue = evalInputValue.replace('if', ''); // Replace () with length function
+
+
+    //         let expression = evalInputValue.toString();
+
+    //         // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
+    //         expression = expression.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
+    //         expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
+    //         expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
+    //         evalInputValue = expression
+    //         // Check for the "includes" method being used without a parameter
+    //         let methods = [
+    //             "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
+    //             "getDay", "getHours", "getMinutes", "getSeconds", "getMilliseconds",
+    //             "getTime", "Date", "Today", "setDate", "includes"
+    //         ]
+    //         const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
+    //         if (functionCallRegex.test(evalInputValue)) {
+    //             setError('Please pass the parameter inside the function');
+    //             setIsThreedotLoader(false);
+    //             return; // Stop execution if validation fails
+    //         }
+    //         let payloadString = expression;
+    //         evalInputValue = addSectionPrefix(evalInputValue);
+
+    //         // Extract variable names from the payloadString using a regex
+    //         const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+    //         const variableNames = payloadString.match(variableRegex) || [];
+
+    //         // Validate if all variable names exist in secDetailsForSearching
+    //         const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+
+    //         if (invalidVariables.length > 0) {
+    //             setError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
+    //             setIsThreedotLoader(false);
+    //             return; // Stop execution if invalid variables are found
+    //         }
+
+    //         // Evaluate the modified string
+    //         const result = eval(evalInputValue);
+    //         setIsThreedotLoader(true)
+
+    //         if (isDefaultLogic === true) {
+    //             if (selectedComponent === 'choiceboxfield') {
+    //                 setDefaultString(evalInputValue);
+
+    //             } else if (selectedComponent === 'dateTimefield') {
+    //                 const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
+    //                 setIsThreedotLoader(true);
+    //                 if (defaultResult.isValid()) {
+    //                     console.log('Successful');
+    //                 } else {
+    //                     setError('Please follow the DD/MM/YYYY Date Format');
+    //                     return;
+    //                 }
+    //             } else if (selectedComponent === 'numberfield') { // Corrected this part
+    //                 setDefaultString(evalInputValue);
+    //             }
+    //         } else {
+    //             console.log('am ehere')
+    //         }
+
+
+    //         if (!error) {
+    //             handleSaveSection(sectionId, true, payloadString);
+    //             dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
+    //             // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+    //         } else if (typeof result === 'boolean') {
+    //             setError(''); // Clear the error since result is valid
+    //             setIsThreedotLoader(false);
+    //         } else if (isNaN(result)) {
+    //             setError('Please pass the parameter inside the function');
+    //             setIsThreedotLoader(false);
+    //         } else {
+    //             console.log('Result is not a boolean:', result);
+    //             setError(result);
+    //             setIsThreedotLoader(false);
+    //         }
+    //     } catch (error) {
+    //         // Handle and log any evaluation errors
+    //         console.error('Error evaluating the expression:', error.message);
+    //         setError(error.message);
+    //         setIsThreedotLoader(false);
+    //     }
+    // };
+
     const handleSave = async () => {
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
-            // Function to add "sections." to section IDs
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
 
-            // New function to modify string (replace () with length())
             const modifyString = (input) => {
                 if (selectedType === 'array') {
                     const lastIndex = input.lastIndexOf('()');
@@ -677,8 +807,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return input;
             };
 
-            // Apply the section prefix function to the inputValue
             let evalInputValue = modifyString(inputValue);
+            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
+                .replaceAll('SubtractDays(', 'setDate(-')
+                .replace('Today()', 'new Date()')
+                .replace('else', ':')
+                .replace('then', '?')
+                .replace('if', '');
             let showdefaultValue = evalInputValue
             // New function to format dates and remove quotes from new Date
             const formatDates = (input) => {
@@ -723,6 +858,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return; // Stop execution if validation fails
             }
+
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
@@ -736,12 +872,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (invalidVariables.length > 0) {
                 setError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
                 setIsThreedotLoader(false);
-                return; // Stop execution if invalid variables are found
+                return;
             }
 
-            // Evaluate the modified string
             const result = eval(evalInputValue);
-            setIsThreedotLoader(true)
+
+            // Split and Validate Expression
+            const validationResult = splitAndValidate(evalInputValue);
+
+            // Return early if validation errors exist
+            if (validationResult.some(msg => msg.includes('Error'))) {
+                setError(validationResult.join('\n'));
+                setIsThreedotLoader(false);
+                return; // Stop execution if validation fails
+            }
+            setIsThreedotLoader(true);
 
             if (isDefaultLogic === true) {
                 if (selectedComponent === 'choiceboxfield') {
@@ -758,35 +903,98 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                 } else if (selectedComponent === 'numberfield') { // Corrected this part
                     setDefaultString(evalInputValue);
-                    console.log(defaultString, 'defaultString');
                 }
             } else {
-                console.log('am ehere')
+                console.log('Non-default logic');
             }
-
 
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
-                setError(''); // Clear the error since result is valid
+                setError('');  // Clear the error since the result is valid
                 setIsThreedotLoader(false);
             } else if (isNaN(result)) {
                 setError('Please pass the parameter inside the function');
                 setIsThreedotLoader(false);
             } else {
-                console.log('Result is not a boolean:', result);
                 setError(result);
                 setIsThreedotLoader(false);
             }
         } catch (error) {
-            // Handle and log any evaluation errors
             console.error('Error evaluating the expression:', error.message);
             setError(error.message);
             setIsThreedotLoader(false);
         }
     };
+
+    function splitAndValidate(expression) {
+        // const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
+        const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
+        const errors = [];
+
+        // Define the list of methods that don't require an operator
+        const typeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()", "includes()"];        // Update the regex to match valid expressions
+
+        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+
+        // Define a regex to detect incomplete expressions (e.g., missing operators or values)
+        const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
+
+        // Regex for valid date format (dd/mm/yyyy)
+        const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
+        parts.forEach((part, index) => {
+            part = part.replace(/^\s+|\s+$/g, '');
+
+            // Check for incomplete expressions
+            part = trimParentheses(part)
+            const displayPart = part.replace(/sections\./g, '');
+
+            // Check if the expression contains any method from the typeMethods list
+            const containsTypeMethod = typeMethods.some(method => part.includes(method));
+
+            //checking for the includes 
+            if (part.includes('includes(')) {
+                const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
+                if(!result){
+                    error.push(`Error in the ${part}: missing vaalues inside the function`)
+                }
+            }
+            // If it contains a method that doesn't require an operator, mark as correct
+            else if (containsTypeMethod) {
+                errors.push(`Expression is correct (contains a valid method).`);
+            }
+            else if (incompleteExpressionRegex.test(part) && !part.endsWith(')')) {
+                errors.push(`Error in expression: "${displayPart}" is incomplete (missing operator or value).`);
+            }
+            // Check if it's a date type
+            else if (selectedType === 'date') {
+                const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
+                if (dateMatch) {
+                    const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
+
+                    // Validate date value (either "Today" or a valid date format)
+                    if (value !== 'Today' && !validDateRegex.test(value)) {
+                        errors.push(`Error in expression: "${value}" is not a valid date. Use 'dd/mm/yyyy' or 'Today'.`);
+                    }
+                } else {
+                    errors.push(`Error in expression: Date field is missing or incorrectly formatted.`);
+                }
+            }
+            // Check if the part matches the valid expression pattern
+            else if (!validExpressionRegex.test(part)) {
+                errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+            }
+            // If the expression is correct, log that it's valid
+            else {
+                console.log(`Expression is correct.`);
+            }
+        });
+
+        return errors.length > 0 ? errors : ["All expressions are valid."];
+    }
 
     const showInputValue = (key) => {
         //this is the array of cndition where the input value  tap will not be  shown
@@ -837,17 +1045,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
-    // useEffect(() => {
-    //     let updatedString = defaultString
-    //         .replace(/^ /, 'if ')              // Replace the first space with 'if'
-    //         .replace(/sections\./g, '')        // Replace 'sections.' with empty space
-    //         .replace(/\?/g, ' then ')          // Replace '?' with ' then '
-    //         .replace(/\:/g, ' else ');         // Replace ':' with ' else '
 
-    //     // Update defaultString with the transformed value
-    //     setDefaultString(updatedString);
-    // }, []); // Empty depende
-    // console.log(defaultString, 'gfgfgg')
 
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
