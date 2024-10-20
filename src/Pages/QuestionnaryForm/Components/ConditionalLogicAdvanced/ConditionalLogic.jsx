@@ -904,8 +904,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
-        const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
-        const parts = cleanExpression.split(/\s*&&\s*|\s*\|\|\s*/);
+        // const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
+        const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
 
         // Define the list of methods that don't require an operator
@@ -920,7 +920,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
         parts.forEach((part, index) => {
-            part = part.trim().replace(/^\(|\)$/g, '');
+            part = part.replace(/^\s+|\s+$/g, '');
 
             // Check for incomplete expressions
             part = trimParentheses(part)
@@ -929,8 +929,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Check if the expression contains any method from the typeMethods list
             const containsTypeMethod = typeMethods.some(method => part.includes(method));
 
+            //checking for the includes 
+            if (part.includes('includes(')) {
+                const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
+                if(!result){
+                    error.push(`Error in the ${part}: missing vaalues inside the function`)
+                }
+            }
             // If it contains a method that doesn't require an operator, mark as correct
-            if (containsTypeMethod) {
+            else if (containsTypeMethod) {
                 errors.push(`Expression is correct (contains a valid method).`);
             }
             else if (incompleteExpressionRegex.test(part) && !part.endsWith(')')) {
