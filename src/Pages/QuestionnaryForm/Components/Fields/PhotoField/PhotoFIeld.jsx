@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import ImageUploader from '../../../../../Components/ImageUploader/ImageUploader';
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 function PhotoField({ label,
     type,
@@ -12,16 +13,39 @@ function PhotoField({ label,
     fieldSettingParameters,
     testId,
     preview,
-    question
+    question,
+    validationErrors,
+
 
 }) {
     const [fileName, setFileName] = useState('');
-
+    console.log(fileName, 'ssssssss')
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setFileName(file ? file.name : '');
         handleChange(fieldSettingParameters);
+        console.log(file, 'file akkaka')
+        // if (file.length < 1) {
+        //     setValue((prev) => ({
+        //         ...prev,
+        //         [question?.question_id]: true
+        //     }));
+        // }else{
+        //     setValue((prev) => ({
+        //         ...prev,
+        //         [question?.question_id]: false
+        //     }));
+        // }
+
     };
+    function handleFunction(e) {
+        const value = e.target.value;
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: value || false
+        }));
+        console.log(value, 'am checking e')
+    }
 
     return (
         <div>
@@ -55,6 +79,9 @@ function PhotoField({ label,
             </div> : <div className={``}>
                 <ImageUploader maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} />
             </div>}
+            {/* {(question?.question_id && validationErrors?.preview_photofield && validationErrors.preview_photofield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_photofield[question.question_id]} />
+            )} */}
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'

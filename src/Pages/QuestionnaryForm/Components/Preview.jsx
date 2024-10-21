@@ -24,13 +24,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [currentPage, setCurrentPage] = useState(0);
     const [value, setValue] = useState({})
     const [isFormatError, setIsFormatError] = useState(false);
-    const totalPages = Array.isArray(sections) ? sections.reduce((acc, section) => acc + (Array.isArray(section.pages) ? section.pages.length : 0), 0) : 0;
-    console.log(totalPages, 'total pages')
-    let counter = 0;
-    const pages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id, index: counter++ })));
+    const [totalPagesNavigated, setTotalPagesNavigated] = useState(0);
 
-    console.log(pages, 'pages')
-    // const [currentPage, setCurrentPage] = useState(0);
+    const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
+
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -42,14 +39,14 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'Custom Regular Expression':
                 return new RegExp(regex).test(value);
             default:
-                return true; // Allow any format if not specified    
+                return true; // Allow any format if not specified      
         }
     };
 
     const handleNextClick = () => {
-        const questions = sections[currentSection]?.pages[currentPage]?.questions;
-        console.log(questions, 'akjckjajk')
-        const errors = questions?.reduce((acc, question) => {
+        const questions = sections[currentSection].pages[currentPage].questions;
+        const errors = questions.reduce((acc, question) => {
+            console.log(value, 'naynaya')
             if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
@@ -61,38 +58,45 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     acc[question.question_id] = 'This is a mandatory field';
                 }
             } else if (question?.component_type === 'signaturefield' && !question?.options?.optional) {
-                console.log(value[question?.question_id] || value[question?.question_id])
                 if (value[question?.question_id] === false || value[question?.question_id] === null) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
             } else if (question?.component_type === 'numberfield' && !question?.options?.optional) {
-                console.log(value[question?.question_id], 'value number')
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
-            }
+            } else if (question?.component_type === 'dateTimefield' && !question?.options?.optional) {
+                if (!value[question?.question_id] || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                }
+            } 
+            // else if (question?.component_type === 'photofield' && !question?.options?.optional) {
+            //     if (value[question?.question_id]|| value[question?.question_id] === undefined) {
+            //         acc[question.question_id] = 'This is a mandatory field';
+            //     }
+            // }
             return acc;
         }, {});
-
         if (Object.keys(errors).length > 0) {
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: errors,
                 preview_choiceboxfield: errors,
                 preview_signaturefield: errors,
-                preview_numberfield: errors
+                preview_numberfield: errors,
+                preview_datetimefield: errors,
+                // preview_photofield: errors
             }));
         } else {
-            console.log(sections,'kokoo')
             if (currentPage < sections[currentSection].pages.length - 1) {
                 setCurrentPage(currentPage + 1);
-            } else if (currentSection < sections.length-1) {
-                const newCurrentPage = currentPage+1;
-                console.log(newCurrentPage,'new page')
+                setTotalPagesNavigated(totalPagesNavigated + 1);
+            } else if (currentSection < sections.length - 1) {
                 setCurrentSection(currentSection + 1);
-                setCurrentPage(newCurrentPage);
+                setCurrentPage(0);
+                setTotalPagesNavigated(totalPagesNavigated + 1);
             } else {
-                // Do nothing if you're on the last page of the last section  
+                // Do nothing if you're on the last page of the last section    
             }
         }
     };
@@ -100,23 +104,19 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const handleBackClick = () => {
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
+            setTotalPagesNavigated(totalPagesNavigated - 1);
         } else if (currentSection > 0) {
             setCurrentSection(currentSection - 1);
             setCurrentPage(sections[currentSection - 1].pages.length - 1);
+            setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
-
-
-
-    console.log(value, 'ooooooooooo')
-
     const renderQuestion = (question) => {
         if (!question) {
             return <p>No question data available.</p>;
         }
         switch (question.component_type) {
             case 'textboxfield':
-                // question_id={question?.question_id} validationErrors={validationErrors} options={question?.options} HelpText={question?.help_text} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''}  
                 return <TextBoxField setIsFormatError={setIsFormatError} id={question?.question_id} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -129,7 +129,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'choiceboxfield':
                 return <ChoiceBoxField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
-                return <DateTimeField preview setValue={setValue} choiceValue={value} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
                 return <NumberField preview setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
@@ -149,10 +149,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         dispatch(setModalOpen(false));
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
-            preview_textboxfield: '', // Or remove the key if you prefer  
+            preview_textboxfield: '', // Or remove the key if you prefer   
         }));
     });
-    console.log((currentPage + 1) / pages.length * 100, 'dhanush')
+
     return (
         <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
 
@@ -168,16 +168,18 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             {sections[currentSection]?.section_name}
                         </p>
                         <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
-                            <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((currentPage) / pages.length * 100).toFixed(1)}%` }}></div>
+                            <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%` }}></div>
                             <div className='flex justify-between pt-5'>
-                                <p>Step {currentPage + 1} of {pages.length}</p>
-                                <span className="text-sm text-gray-600">{((currentPage + 1) / pages.length * 100).toFixed(1)}%</span>
+                                <p>Step {totalPagesNavigated + 1} of {allPages.length}</p>
+                                <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%</span>
                             </div>
                         </div>
+
                     </div>
-                    <div className='mt-12'>
-                        <div className='bg-white p-[10px] mb-[10px]'>{pages[currentPage].page_name}</div>
-                        {currentPage < pages.length && sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id, questions: page.questions }))).find((page) => page.page_id === pages[currentPage].page_id).questions.map((question, index) => (
+                    <div className='bg-white p-[10px] mt-16'>{sections[currentSection].pages[currentPage].page_name}</div>
+                    <div className='flex flex-col justify-between'>
+
+                        {sections[currentSection].pages[currentPage].questions.map((question, index) => (
                             <div className='mt-5' key={index}>
                                 <div className='px-2'>{renderQuestion(question)}</div>
                             </div>
@@ -197,7 +199,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 onChange={handleButton1}
                                 disabled={isImportLoading}
                                 id="file-upload"
-                                style={{ display: 'none' }} // Hide the actual input field  
+                                style={{ display: 'none' }} // Hide the actual input field   
                             />
                             <label
                                 htmlFor="file-upload"

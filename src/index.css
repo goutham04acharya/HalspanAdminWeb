@@ -30,6 +30,7 @@ body {
 
 .scrollHide::-webkit-scrollbar {
   -webkit-appearance: none;
+  padding: none;
 }
 
 .scrollBar::-webkit-scrollbar:vertical {

@@ -20,6 +20,8 @@ const TextBoxField = ({
     setIsFormatError,
     setValue
 }) => {
+    console.log(validationErrors, 'validationErrors')
+
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -34,8 +36,6 @@ const TextBoxField = ({
                 return true; // Allow any format if not specified  
         }
     };
-    console.log(question_id,'raheel')
-    console.log(value,'lololo')
 
     const handleInputChange = (e) => {
         setValidationErrors((prevErrors) => ({
@@ -48,7 +48,6 @@ const TextBoxField = ({
         const newValue = e.target.value;
         const format = question.format;
         const regex = question.regular_expression;
-        // console.log(newValue,'newValue')
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imageSrc }) => {
+const ImageZoomPin = ({ imageSrc, floorPlan }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -131,7 +131,7 @@ const ImageZoomPin = ({ imageSrc }) => {
                 onClick={handleImageClick}
             >
                 <img
-                    src={imageSrc}
+                    src={floorPlan ? '/floorplan.png' :imageSrc}
                     alt="Thumbnail"
                     style={{
                         width: "100px",
@@ -173,6 +173,7 @@ const ImageZoomPin = ({ imageSrc }) => {
                             minScale={1}
                             maxScale={5}
                             onZoom={handleZoom}
+                            
                             disabled={isDrawMode || eraserClick || resetClick}
                         >
                             <TransformComponent pointerEvents="none"  >
@@ -181,6 +182,7 @@ const ImageZoomPin = ({ imageSrc }) => {
                                         width: imageSize.width,
                                         height: imageSize.height,
                                         position: "relative",
+                                        backgroundColor: "white"
                                     }}
                                     onClick={handleModalImageClick}
                                     onMouseMove={handlePinMouseMove}
@@ -188,7 +190,7 @@ const ImageZoomPin = ({ imageSrc }) => {
                                     ref={imageRef}
                                 >
                                     <img
-                                        src={imageSrc || "/sample.jpeg"}
+                                        src={floorPlan ? '/floorplan.png' : (imageSrc || "/sample.jpeg")}
                                         alt="Full Size"
                                         style={{
                                             width: "100%",

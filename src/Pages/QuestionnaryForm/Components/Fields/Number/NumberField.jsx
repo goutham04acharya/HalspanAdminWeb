@@ -85,7 +85,6 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-    console.log(question?.type, 'question?.typequestion?.typequestion?.type')
 
     return (
         <div>
