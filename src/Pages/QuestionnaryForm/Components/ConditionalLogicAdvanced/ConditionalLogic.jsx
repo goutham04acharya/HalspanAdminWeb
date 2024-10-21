@@ -48,7 +48,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
-    const [isStringMethodModal, setIsStringMethodModal] =useState(false)
+    const [isStringMethodModal, setIsStringMethodModal] = useState(false)
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -812,9 +812,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
                 .replace('Today()', 'new Date()')
-                .replace('else', ':')
-                .replace('then', '?')
-                .replace('if', '');
+            // .replace('else', ':')
+            // .replace('then', '?')
+            // .replace('if', '');
 
             // New function to format dates and remove quotes from new Date
             // const formatDates = (input) => {
@@ -878,26 +878,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             const result = eval(evalInputValue);
 
-            // Split and Validate Expression
-            const validationResult = splitAndValidate(evalInputValue);
-
-            // Return early if validation errors exist
-            if (validationResult.some(msg => msg.includes('Error'))) {
-                setError(validationResult.join('\n'));
-                setIsThreedotLoader(false);
-                return; // Stop execution if validation fails
-            }
-            setIsThreedotLoader(true);
-
             if (isDefaultLogic === true) {
+                evalInputValue = evalInputValue.replace('else', ':')
+                    .replace('then', '?')
+                    .replace('if', '');
+
                 if (selectedComponent === 'choiceboxfield') {
                     setDefaultString(evalInputValue);
+                    console.log(result, 'evalInputValue')
 
                 } else if (selectedComponent === 'dateTimefield') {
                     const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
                     setIsThreedotLoader(true);
                     if (defaultResult.isValid()) {
-                        console.log('Successful');
+                        console.log('Successfull');
                     } else {
                         setError('Please follow the DD/MM/YYYY Date Format');
                         return;
@@ -906,13 +900,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     setDefaultString(evalInputValue);
                 }
             } else {
-                console.log('Non-default logic');
+                const validationResult = splitAndValidate(evalInputValue);
+
+                // Return early if validation errors exist
+                if (validationResult.some(msg => msg.includes('Error'))) {
+                    setError(validationResult.join('\n'));
+                    setIsThreedotLoader(false);
+                    return; // Stop execution if validation fails
+                }
             }
 
+            // Split and Validate Expression
+
+            setIsThreedotLoader(true);
+            console.log(defaultString, 'defaultString')
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString);
                 dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+
             } else if (typeof result === 'boolean') {
                 setError('');  // Clear the error since the result is valid
                 setIsThreedotLoader(false);
@@ -1046,6 +1052,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
+    
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

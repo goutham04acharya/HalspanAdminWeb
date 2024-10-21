@@ -67,6 +67,7 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -84,6 +85,7 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
+    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
 
@@ -95,7 +97,9 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-    // to open and close the sections
+
+
+    // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
             ...prev,
@@ -320,6 +324,7 @@ const QuestionnaryForm = () => {
             if (newState.hasOwnProperty(indexToRemove)) {
                 delete newState[indexToRemove];
             }
+
             return newState;
         }));;
     };
@@ -448,6 +453,7 @@ const QuestionnaryForm = () => {
 
             // Update the state with the new sections array
             setSections(SectionData);
+
         }
     };
 
@@ -521,6 +527,11 @@ const QuestionnaryForm = () => {
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 const sectionsData = response?.data?.data?.sections || [];
+                // if (sectionsData.length === 1) {  
+                //     // If no sections are present, skip calling GetSectionOrder  
+                //     setSections(sectionsData);  
+                //     return;  
+                //   } 
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -603,7 +614,8 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
+        debugger
         handleSectionSaveOrder(sections)
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
@@ -685,7 +697,7 @@ const QuestionnaryForm = () => {
                     }))
                 }))
             };
-
+            console.log(body,'llllllll')
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -711,7 +723,6 @@ const QuestionnaryForm = () => {
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
-                        setIsDefaultLogic(false);
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -730,7 +741,6 @@ const QuestionnaryForm = () => {
         }
 
     };
-    
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1132,6 +1142,7 @@ const QuestionnaryForm = () => {
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
+
                             </div>
                         </div>
                     </div>
@@ -1194,6 +1205,7 @@ const QuestionnaryForm = () => {
                                     handleClick={handleClick}
                                 />
                             )}
+
                         </div>
                     </div>
                 </div>
