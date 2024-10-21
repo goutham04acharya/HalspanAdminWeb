@@ -152,9 +152,7 @@ const QuestionnaryForm = () => {
 
         // Don't forget to update the state and trigger auto-save
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-        // if (id === 'regular_expression') {
-        //     dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
-        // }
+
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
@@ -608,8 +606,8 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
         handleSectionSaveOrder(sections)
         // Find the section to save  
-        const sectionToSave = sections.find(section => section.section_id === sectionId);
-        const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+        const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
+        const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
             const isDataSame = dataIsSame[sectionId];
             if (isDataSame && !payloadString) {
@@ -710,6 +708,7 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
+                        dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
@@ -726,7 +725,7 @@ const QuestionnaryForm = () => {
                 }
 
             } catch (error) {
-                setToastError('Something went wrong.');
+                setToastError('Something went wrong');
             }
         }
 
