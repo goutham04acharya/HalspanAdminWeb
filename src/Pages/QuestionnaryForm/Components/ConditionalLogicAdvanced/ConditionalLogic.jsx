@@ -817,19 +817,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 .replace('if', '');
 
             // New function to format dates and remove quotes from new Date
-            const formatDates = (input) => {
-                // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
-                let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
-                    return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
-                });
+            // const formatDates = (input) => {
+            //     // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
+            //     let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
+            //         return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
+            //     });
 
-                // Then, remove quotes from around new Date expressions
-                formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
-                return formatted;
-            };
+            //     // Then, remove quotes from around new Date expressions
+            //     formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
+            //     return formatted;
+            // };
 
-            // Apply the formatDates function
-            evalInputValue = formatDates(evalInputValue);
+            // // Apply the formatDates function
+            // evalInputValue = formatDates(evalInputValue);
             // Log the updated input after date replacement
 
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
@@ -936,7 +936,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const errors = [];
 
         // Define the list of methods that don't require an operator
-        const typeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()", "includes()"];        // Update the regex to match valid expressions
+        const typeMethods = ["includes()"];        // Update the regex to match valid expressions
 
         const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
 
