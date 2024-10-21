@@ -23,58 +23,127 @@ Feature: Halspan - Admin - Preview the Questionnaire
     When I click the textbox button
     Then I should see field settings
     When I enter the label name for textbox for preview
-    Then I should see the label name updated in the section 1 page 1 question 1
+    Then I should see the label name for textbox updated in the section 1 page 1 question 1
     When I enter the help text for textbox for preview
-    Then I should see the help text updated in the section 1 page 1 question 1
+    Then I should see the help text for textbox updated in the section 1 page 1 question 1
     When I enter the placeholder content for textbox for preview
-    Then I should see the placeholder content updated in the section 1 page 1 question 1
-    When I click the save button for the questionnaire version
+    Then I should see the placeholder content for textbox updated in the section 1 page 1 question 1
+    When I click the save button for the questionnaire version for section 1
 
     When I add a new question to the page 1 in section 1
     When I click the choice button
     Then I should see field settings
     When I enter the label name for choice for preview
-    Then I should see the label name updated in the section 1 page 1 question 2
+    Then I should see the label name for choice updated in the section 1 page 1 question 2
     When I enter the help text for choice for preview
-    Then I should see the help text updated in the section 1 page 1 question 2
+    Then I should see the help text for choice updated in the section 1 page 1 question 2
     When I enter the placeholder content for choice for preview
-    Then I should see the placeholder content updated in the section 1 page 1 question 2
-    When I click the save button for the questionnaire version
+    Then I should see the placeholder content for choice updated in the section 1 page 1 question 2
+    When I click the save button for the questionnaire version for section 1
 
-    # When I add a new question to the page 1 in section 1
-    # When I click the choice button
-    # Then I should see field settings
-    # When I enter the label name for choice for preview
-    # Then I should see the label name updated in the section 1 page 1 question 2
-    # When I enter the help text for choice for preview
-    # Then I should see the help text updated in the section 1 page 1 question 2
-    # When I enter the placeholder content for choice for preview
-    # Then I should see the placeholder content updated in the section 1 page 1 question 2
-    # When I click the save button for the questionnaire version
+    When I add a new question to the page 1 in section 1
+    When I click the date/time button
+    Then I should see field settings
+    When I enter the label name for date/time for preview
+    Then I should see the label name for date/time updated in the section 1 page 1 question 3
+    When I enter the help text for date/time for preview
+    Then I should see the help text for date/time updated in the section 1 page 1 question 3
+    When I enter the placeholder content date/time for preview
+    Then I should see the placeholder content for date/time updated in the section 1 page 1 question 3
+    When I click the save button for the questionnaire version for section 1
 
     When I click on add new page for section 1
-    Then I should see the new page added 
+    Then I should see the new page added for section 1
     When I add a new question to the page 2 in section 1
-    When I click the choice button
+    When I click the photos button
     Then I should see field settings
-    When I enter the label name for choice for preview
-    Then I should see the label name updated in the section 1 page 2 question 1
-    When I enter the help text for choice for preview
-    Then I should see the help text updated in the section 1 page 2 question 1
-    When I enter the placeholder content for choice for preview
-    Then I should see the placeholder content updated in the section 1 page 2 question 1
-    When I click the save button for the questionnaire version
+    When I enter the label name for photo for preview
+    Then I should see the label name for photo updated in the section 1 page 2 question 1
+    When I enter the help text for photo for preview
+    Then I should see the help text for photo updated in the section 1 page 2 question 1
+    When I click the save button for the questionnaire version for section 1
 
     When I add a new question to the page 2 in section 1
-    When I click the date/time button
-    And I should see the date/time field added to the section 1 page 2 question 2
-    When I enter the label name for date/time for preview
-    Then I should see the label name for date/time updated in the section 1 page 2 question 1
-    When I enter the help text for date/time for preview
-    Then I should see the help text for date/time updated in the section 1 page 2 question 1
-    When I enter the placeholder content for date/time for preview
-    Then I should see the placeholder content for date/time updated in the section 1 page 2 question 1
-    
-    # When I click on add new section
-    # Then I should see the new section added
+    When I click the floorplan button
+    And I should see the floorplan field added to the section 1 page 2 question 2
+    When I enter the label name for floorplan for preview
+    Then I should see the label name for floorplan updated in the section 1 page 2 question 2
+    When I enter the help text for floorplan for preview
+    Then I should see the help text updated in the section 1 page 2 question 2
+    When I click the save button for the questionnaire version for section 1
 
+  Scenario: Admin adds all the fields from the add field section
+    Given I am on the Questionnaire management sections
+    When I click on add new section
+    Then I should see the new section added
+    Then I should see an add field section
+    When I add a new question to the page 1 in section 2
+    When I click the number button
+    Then I should see field settings
+    When I enter the label name for number for preview
+    Then I should see the label name for number updated in the section 2 page 1 question 1
+    When I enter the help text for number for preview
+    Then I should see the help text for number updated in the section 2 page 1 question 1
+    When I enter the placeholder content for number for preview
+    Then I should see the placeholder content for number updated in the section 2 page 1 question 1
+    When I click the save button for the questionnaire version for section 2
+
+    When I add a new question to the page 1 in section 2
+    When I click the signature button
+    Then I should see field settings
+    When I enter the label name for signature for preview
+    Then I should see the label name for signature updated in the section 2 page 1 question 2
+    When I enter the help text for signature for preview
+    Then I should see the help text for signature updated in the section 2 page 1 question 2
+    When I click the save button for the questionnaire version for section 2
+
+    When I add a new question to the page 1 in section 2
+    When I click the asset location button
+    Then I should see field settings
+    When I enter the label name for asset location for preview
+    Then I should see the label name for asset location updated in the section 2 page 1 question 3
+    When I enter the help text for asset location for preview
+    Then I should see the help text for asset location updated in the section 2 page 1 question 3
+    When I click the save button for the questionnaire version for section 2
+
+    When I click on add new page for section 2
+    Then I should see the new page added for section 2
+    When I add a new question to the page 2 in section 2
+    When I click the display button
+    Then I should see field settings
+    When I click the type as headings
+    When I enter the heading
+    Then I should be able see heading updated in question 1 page 2 section 2
+    When I click the save button for the questionnaire version for section 2
+
+    When I add a new question to the page 2 in section 2
+    When I click the gps button
+    Then I should see field settings
+    When I enter the label name for gps for preview
+    Then I should see the label name for gps updated in the section 2 page 2 question 2
+    When I enter the help text for gps for preview
+    Then I should see the help text for gps updated in the section 2 page 2 question 2
+    When I click the save button for the questionnaire version for section 2
+
+  Scenario: Admin validates all the data added on to the field settings of the questionnaire
+    Given I am on the Questionnaire management sections
+    When I click the preview button 
+    Then I should see the mobile preview
+    Then I validate the data entered exists in the mobile preview for section 1 page 1
+    When I enter the text in textbox for section 1 page 1 question 1
+    When I select the choice for section 1 page 1 question 2
+    When I enter the date/time for section 1 page 1 question 3
+    When I click the next button
+    Then I validate the data entered exists in the mobile preview for section 1 page 2
+    When I upload photo for section 1 page 2 question 1
+    When I see the floorplan for section 1 page 2 question 2
+    When I click the next button
+    Then I validate the data entered exists in the mobile preview for section 2 page 1
+    When I enter the number for section 2 page 1 question 1
+    When I enter the signature for section 2 page 1 question 2
+    When I select the location in asset location for section 2 page 1 question 3
+    When I click the next button
+    Then I validate the data entered exists in the mobile preview for section 2 page 2
+    When I see the display for section 2 page 2 question 1
+    When I see the gps for section 2 page 2 question 2
+    When I click the back button
