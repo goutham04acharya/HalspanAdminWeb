@@ -1,15 +1,15 @@
 import React, { useMemo, useRef } from "react";
-import Signature from '@uiw/react-signature';
+import SignatureCanvas from 'react-signature-canvas';
 
-const CustomSignatureField = ({value, setValue, setValidationErrors, question }) => {
+const CustomSignatureField = ({ value, setValue, setValidationErrors, question }) => {
     const memoizedValue = useMemo(() => value, [question?.question_id]);
-    const $svg = useRef(null);
-    console.log($svg, 'svg svg')
+    const signatureCanvasRef = useRef(null);
 
-    const handlePointer = (points) => {
+    const handleSignatureChange = () => {
+        const signatureData = signatureCanvasRef.current.toDataURL();
         setValue((prev) => ({
             ...prev,
-            [question?.question_id]: true
+            [question?.question_id]: signatureData
         }));
 
         setValidationErrors((prevErrors) => ({
@@ -18,19 +18,26 @@ const CustomSignatureField = ({value, setValue, setValidationErrors, question })
         }));
     };
 
-
     const handleClear = () => {
+        signatureCanvasRef.current.clear();
         setValue((prev) => ({
             ...prev,
-            [question?.question_id]: false
+            [question?.question_id]: ''
         }));
     };
 
-
     return (
         <>
-            <Signature ref={$svg} onPointer={handlePointer} />
-            <button onClick={handleClear}>Clear</button>
+            <SignatureCanvas
+                ref={signatureCanvasRef}
+                onEnd={handleSignatureChange}
+                canvasProps={{
+                    width: 400,
+                    height: 200,
+                    className: 'signature-canvas bg-white w-full'
+                }}
+            />
+            <button onClick={handleClear} className="bg-customTextColor mt-3 w-full text-white px-2 py-1.5 rounded-lg">Clear</button>
         </>
     );
 };

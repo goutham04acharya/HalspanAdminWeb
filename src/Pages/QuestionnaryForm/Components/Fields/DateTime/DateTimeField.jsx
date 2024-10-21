@@ -1,5 +1,6 @@
 import React from 'react';
 import TimePicker from '../../../../../Components/TimePicker/TimePicker';
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 function DateTimeField({
     label,
@@ -18,8 +19,16 @@ function DateTimeField({
     setValue,
     choiceValue
 }) {
-    function handleFunction() { }
-
+    function handleFunction(e) {
+        const newValue = e.target.value;
+        if (type === 'date' || type === 'datetime') {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: newValue
+            }));
+        }
+    }
+    console.log(choiceValue, 'kscjscj')
     return (
         <div>
             <label
@@ -41,43 +50,44 @@ function DateTimeField({
                         value={value}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder="dd/mm/yyyy"
-                        onClick={() => handleFunction()}
+                        onClick={(e) => handleFunction(e)}
                     />
                 )}
                 {preview && type === 'time' && (
-                    // <input
-                    //     data-testid="input"
-                    //     type="time"
-                    //     id={textId}
-                    //     value={value}
-                    //     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    //     placeholder="hh:mm:ss"
-                    //     onClick={() => handleFunction()}
-                    // />
-                    <TimePicker />
+                    <TimePicker
+                        onChange={(timeValue) => {
+                            setValue((prev) => ({
+                                ...prev,
+                                [question?.question_id]: timeValue
+                            }));
+                        }}
+                    />
                 )}
-                {preview && type === 'datetime' && (
-                    <div className='flex z-[-1]'><div className="flex">
-                        <input
-                            data-testid="input"
-                            type="date"
-                            id={textId}
-                            value={value}
-                            className={`w-[90%] h-[40px] break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                            placeholder="dd/mm/yyyy"
-                            onClick={() => handleFunction()} />
-                        {/* <input
-        data-testid="input"
-        type="time"
-        id={textId}
-        value={value}
-        className={`w-1/2 h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-        placeholder="hh:mm:ss"
-        onClick={() => handleFunction()}
-    /> */}
 
-                    </div><TimePicker /></div>
+                {preview && type === 'datetime' && (
+                    <div className='flex z-[-1]'>
+                        <div className="flex">
+                            <input
+                                data-testid="input"
+                                type="date"
+                                id={textId}
+                                value={value}
+                                className={`w-[90%] h-[40px] break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                                placeholder="dd/mm/yyyy"
+                                onClick={(e) => handleFunction(e)}
+                            />
+                        </div>
+                        <TimePicker
+                            onChange={(timeValue) => {
+                                setValue((prev) => ({
+                                    ...prev,
+                                    [question?.question_id]: `${prev[question?.question_id]} ${timeValue}`  
+                                }));
+                            }}
+                        />
+                    </div>
                 )}
+
                 {!preview && (
                     <input
                         data-testid="input"
@@ -106,6 +116,9 @@ function DateTimeField({
                     <img src="/Images/calendar-clock.svg" alt="calender-clock" className={`absolute ${preview ? 'top-4' : 'top-8'} right-3 cursor-pointer`} />
                 )}
             </div>
+            {(question?.question_id && validationErrors?.preview_datetimefield && validationErrors.preview_datetimefield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_datetimefield[question.question_id]} />
+            )}
             <p
                 data-testid="help-text"
                 className="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"

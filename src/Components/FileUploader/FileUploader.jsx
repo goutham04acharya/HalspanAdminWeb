@@ -8,7 +8,7 @@ const FileUploader = ({ fileType, fileSize, min, max }) => {
         const uploadedFiles = e.target.files;
 
         if (uploadedFiles.length > 0) {
-            const allowedTypes = fileType.split(',').map((type) => type.trim().toLowerCase());
+            const allowedTypes = fileType?.split(',').map((type) => type.trim().toLowerCase());
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
             const newFiles = [...files];
@@ -54,7 +54,7 @@ const FileUploader = ({ fileType, fileSize, min, max }) => {
                     type="file"
                     multiple
                     onChange={handleFileChange}
-                    accept={fileType}
+                    accept={fileType ? fileType : '*'}
                     className={`hidden-input ${files.length >= max && files.length > 0 ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                     disabled={files.length >= max && files.length > 0}
                 />

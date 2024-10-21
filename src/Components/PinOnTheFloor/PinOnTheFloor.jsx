@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imgSrc }) => {
+const ImageZoomPin = ({ imageSrc }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -11,12 +11,16 @@ const ImageZoomPin = ({ imgSrc }) => {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [isPinMode, setIsPinMode] = useState(false);
     const [isDrawMode, setIsDrawMode] = useState(false);
+    const [colorPicker, setColorPicker] = useState(false)
+    const [strokeColor, setStrokeColor] = useState('black');
+    const [eraserClick, setEraserClick] = useState(false)
+    const [resetClick, setResetClick] = useState(false)
     const BASE_PIN_SIZE = 30;
     const sketchCanvasRef = useRef(null);
 
     useEffect(() => {
         const img = new Image();
-        img.src = imgSrc || "/sample.jpeg";
+        img.src = imageSrc || "/sample.jpeg";
         img.onload = () => {
             const { width, height } = img;
             const aspectRatio = width / height;
@@ -32,7 +36,7 @@ const ImageZoomPin = ({ imgSrc }) => {
 
             setImageSize({ width: newWidth, height: newHeight });
         };
-    }, [imgSrc]);
+    }, [imageSrc]);
 
     const handleImageClick = () => {
         setModalOpen(true);
@@ -48,6 +52,7 @@ const ImageZoomPin = ({ imgSrc }) => {
             setPins((prevPins) => [...prevPins, newPin]);
         }
     };
+
 
     const handlePinMouseDown = (index, event) => {
         event.stopPropagation();
@@ -77,7 +82,7 @@ const ImageZoomPin = ({ imgSrc }) => {
 
     const handleZoom = (ref) => {
         setCurrentZoom(ref.state.scale);
-        
+
     };
 
     const handleRemovePin = (id) => {
@@ -87,11 +92,36 @@ const ImageZoomPin = ({ imgSrc }) => {
     const togglePinMode = () => {
         setIsPinMode(!isPinMode);
         setIsDrawMode(false);
+        setEraserClick(false)
+        setResetClick(false)
+        // setColorPicker(false)
     };
 
     const toggleDrawMode = () => {
         setIsDrawMode(!isDrawMode);
         setIsPinMode(false);
+        setColorPicker(!colorPicker)
+        setEraserClick(false)
+        setResetClick(false)
+    };
+
+    const handleEraserClick = () => {
+        sketchCanvasRef.current.eraseMode(true);
+        setEraserClick(!eraserClick)
+        setResetClick(false)
+        setIsPinMode(false);
+        setIsDrawMode(false);
+        // setColorPicker(false)
+
+    };
+
+    const handleResetClick = () => {
+        sketchCanvasRef.current.resetCanvas();
+        setResetClick(!resetClick)
+        setIsPinMode(false);
+        setIsDrawMode(false);
+        // setColorPicker(false)
+        setEraserClick(false)
     };
 
     return (
@@ -101,7 +131,7 @@ const ImageZoomPin = ({ imgSrc }) => {
                 onClick={handleImageClick}
             >
                 <img
-                    src={imgSrc || "/sample.jpeg"}
+                    src={imageSrc}
                     alt="Thumbnail"
                     style={{
                         width: "100px",
@@ -143,7 +173,7 @@ const ImageZoomPin = ({ imgSrc }) => {
                             minScale={1}
                             maxScale={5}
                             onZoom={handleZoom}
-                            disabled={isDrawMode}
+                            disabled={isDrawMode || eraserClick || resetClick}
                         >
                             <TransformComponent pointerEvents="none"  >
                                 <div
@@ -158,7 +188,7 @@ const ImageZoomPin = ({ imgSrc }) => {
                                     ref={imageRef}
                                 >
                                     <img
-                                        src={imgSrc || "/sample.jpeg"}
+                                        src={imageSrc || "/sample.jpeg"}
                                         alt="Full Size"
                                         style={{
                                             width: "100%",
@@ -172,7 +202,7 @@ const ImageZoomPin = ({ imgSrc }) => {
                                         width={`${imageSize.width}px`}
                                         height={`${imageSize.height}px`}
                                         strokeWidth={4}
-                                        strokeColor="red"
+                                        strokeColor={strokeColor}
                                         canvasColor="transparent"
                                         style={{
                                             position: "absolute",
@@ -208,12 +238,13 @@ const ImageZoomPin = ({ imgSrc }) => {
                                                         width: "20px",
                                                         height: "20px",
                                                         borderRadius: "50%",
-                                                        backgroundColor: "white",
+                                                        
                                                         display: "flex",
                                                         justifyContent: "center",
                                                         alignItems: "center",
                                                         cursor: "pointer",
                                                     }}
+                                                    className="bg-transparent"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleRemovePin(pin.id);
@@ -227,7 +258,7 @@ const ImageZoomPin = ({ imgSrc }) => {
                                                     position: "absolute",
                                                     top: `${pin.y * 100}%`,
                                                     left: `${pin.x * 100}%`,
-                                                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
                                                     padding: "5px",
                                                     borderRadius: "3px",
                                                     transform: "translate(-50%, 10px)",
@@ -241,56 +272,50 @@ const ImageZoomPin = ({ imgSrc }) => {
                             </TransformComponent>
                         </TransformWrapper>
                         <button
-                            style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "10px",
-                                padding: "5px 10px",
-                                backgroundColor: "#2B333B",
-                                color: "white",
-                                border: "1px solid black",
-                                borderRadius: "5px",
-                                cursor: "pointer",
+                            className=" absolute top-[20px] right-[20px] py-[3px] px-[3px] bg-transparent hover:bg-[rgba(0,0,0,0.2)] rounded-lg cursor-pointer"
+                            onClick={() => {
+                                setModalOpen(false)
+                                setStrokeColor('#000')
+                                setEraserClick(false)
+                                setResetClick(false)
+                                setIsPinMode(false);
+                                setIsDrawMode(false);
+                                setColorPicker(false)
                             }}
-                            onClick={() => setModalOpen(false)}
                         >
-                            Close
+                            <img src="/Images/close.svg" alt="" />
                         </button>
                         <div
-                            style={{
-                                position: "absolute",
-                                bottom: "10px",
-                                left: "10px",
-                                display: "flex",
-                                gap: "10px",
-                            }}
+
+                            className="absolute bottom-[10px] left-[10px] flex flex-col"
                         >
                             <button
-                                style={{
-                                    padding: "5px 10px",
-                                    backgroundColor: isPinMode ? "#4CAF50" : "#2B333B",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                }}
+                                className={` px-3 text-white rounded-lg cursor-pointer `}
                                 onClick={togglePinMode}
                             >
-                                {isPinMode ? "Disable Pin" : "Enable Pin"}
+                                <img src="/Images/pin-icon.svg" alt="" width={40} className={` ${isPinMode ? 'border border-white rounded-sm' : ' border border-transparent'}`} />
                             </button>
-                            <button
-                                style={{
-                                    padding: "5px 10px",
-                                    backgroundColor: isDrawMode ? "#4CAF50" : "#2B333B",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                }}
-                                onClick={toggleDrawMode}
-                            >
-                                {isDrawMode ? "Disable Draw" : "Enable Draw"}
-                            </button>
+                            <div className="flex flex-wrap">
+                                <button
+
+                                    className={` px-3 text-white rounded-lg cursor-pointer `}
+                                    onClick={toggleDrawMode}
+                                >
+                                    <img src="/Images/pencil.svg" alt="" className={`${isDrawMode ? 'border border-white rounded-sm' : ' border border-transparent'}`} />
+                                </button>
+                                {colorPicker && <span>
+                                    <input
+                                        id='color-picker'
+                                        type='color'
+                                        onChange={(e) => setStrokeColor(e.target.value)}
+                                        value={strokeColor}
+                                        // style={{ display: 'none' }}
+                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent '
+                                    />
+                                </span>}
+                            </div>
+                            <button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button>
+                            <button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button>
                         </div>
                     </div>
                 </div>
