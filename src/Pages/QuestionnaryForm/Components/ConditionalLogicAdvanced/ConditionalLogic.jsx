@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
-import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
 import Button2 from '../../../../Components/Button2/ButtonLight';
 import Button from '../../../../Components/Button/button';
@@ -19,7 +18,7 @@ import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
-import ChoiceBoxField from '../Fields/ChoiceBox/ChoiceBoxField';
+import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 
 
 
@@ -48,6 +47,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [tab, setTab] = useState(false);
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const [isOperatorModal, setIsOperatorModal] = useState(false);
+    const [isStringMethodModal, setIsStringMethodModal] =useState(false)
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -814,7 +815,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 .replace('else', ':')
                 .replace('then', '?')
                 .replace('if', '');
-            let showdefaultValue = evalInputValue
+
             // New function to format dates and remove quotes from new Date
             const formatDates = (input) => {
                 // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
@@ -958,7 +959,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             //checking for the includes 
             if (part.includes('includes(')) {
                 const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
-                if(!result){
+                if (!result) {
                     error.push(`Error in the ${part}: missing vaalues inside the function`)
                 }
             }
@@ -1045,93 +1046,104 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
-
-
     return (
-        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
-                <div className='w-full'>
-                    {(tab || isDefaultLogic) ? (
-                        <div className='flex h-customh14'>
-                            <div className='w-[60%]'>
-                                {!isDefaultLogic ?
-                                    <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
-                                    :
-                                    <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
-                                }
-                                <AdvancedEditor
-                                    handleListSectionDetails={handleListSectionDetails}
-                                    showSectionList={showSectionList}
-                                    inputValue={inputValue}
-                                    error={error}
-                                    showMethodSuggestions={showMethodSuggestions}
-                                    suggestions={suggestions}
-                                    handleClickToInsert={handleClickToInsert}
-                                    textareaRef={textareaRef}
-                                    handleInputField={handleInputField}
-                                    secDetailsForSearching={secDetailsForSearching}
+        <>
+            <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
+                <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
+                    <div className='w-full'>
+                        {(tab || isDefaultLogic) ? (
+                            <div className='flex h-customh14'>
+                                <div className='w-[60%]'>
+                                    {!isDefaultLogic ?
+                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                        :
+                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                    }
+                                    <AdvancedEditor
+                                        handleListSectionDetails={handleListSectionDetails}
+                                        showSectionList={showSectionList}
+                                        inputValue={inputValue}
+                                        error={error}
+                                        showMethodSuggestions={showMethodSuggestions}
+                                        suggestions={suggestions}
+                                        handleClickToInsert={handleClickToInsert}
+                                        textareaRef={textareaRef}
+                                        handleInputField={handleInputField}
+                                        secDetailsForSearching={secDetailsForSearching}
+                                        sections={sections}
+                                        setShowMethodSuggestions={setShowMethodSuggestions}
+                                        isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                        selectedFieldType={selectedFieldType}
+                                        setSelectedType={setSelectedType}
+                                    />
+                                </div>
+                                <div className='w-[40%]'>
+                                    <StaticDetails
+                                        handleTabClick={handleTabClick}
+                                        activeTab={activeTab}
+                                        setActiveTab={setActiveTab}
+                                        isDefaultLogic={isDefaultLogic}
+                                        selectedFieldType={selectedFieldType}
+                                        isOperatorModal={isOperatorModal}
+                                        setIsOperatorModal={setIsOperatorModal}
+                                        setIsStringMethodModal={setIsStringMethodModal}
+                                    />
+                                </div>
+                            </div>) : (
+                            !isDefaultLogic && (
+                                <BasicEditor
+                                    secDetailsForSearching={filterQuestions()}
+                                    questions={allSectionDetails.data}
                                     sections={sections}
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                    selectedFieldType={selectedFieldType}
-                                    setSelectedType={setSelectedType}
+                                    conditions={conditions}
+                                    setConditions={setConditions}
+                                    submitSelected={submitSelected}
+                                    setSubmitSelected={setSubmitSelected}
                                 />
+                            )
+                        )}
+                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                            {!isDefaultLogic &&
+                                <div className='flex gap-5 items-end'>
+                                    <p onClick={() => setTab(true)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
+                                    <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                </div>
+                            }
+                            <div>
+                                <Button2
+                                    text='Cancel'
+                                    type='button'
+                                    testId='cancel'
+                                    data-testid='button1'
+                                    className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                    onClick={() => handleClose()}
+                                >
+                                </Button2>
+                                <Button
+                                    text='Save'
+                                    onClick={tab || isDefaultLogic ? handleSave : handleSaveBasicEditor}
+                                    type='button'
+                                    data-testid='cancel'
+                                    className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                >
+                                </Button>
                             </div>
-                            <div className='w-[40%]'>
-                                <StaticDetails
-                                    handleTabClick={handleTabClick}
-                                    activeTab={activeTab}
-                                    setActiveTab={setActiveTab}
-                                    isDefaultLogic={isDefaultLogic}
-                                    selectedFieldType={selectedFieldType}
-                                />
-                            </div>
-                        </div>) : (
-                        !isDefaultLogic && (
-                            <BasicEditor
-                                secDetailsForSearching={filterQuestions()}
-                                questions={allSectionDetails.data}
-                                sections={sections}
-                                setShowMethodSuggestions={setShowMethodSuggestions}
-                                isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                conditions={conditions}
-                                setConditions={setConditions}
-                                submitSelected={submitSelected}
-                                setSubmitSelected={setSubmitSelected}
-                            />
-                        )
-                    )}
-                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                        {!isDefaultLogic &&
-                            <div className='flex gap-5 items-end'>
-                                <p onClick={() => setTab(true)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                                <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                            </div>
-                        }
-                        <div>
-                            <Button2
-                                text='Cancel'
-                                type='button'
-                                testId='cancel'
-                                data-testid='button1'
-                                className='w-[162px] h-[50px] text-black font-semibold text-base'
-                                onClick={() => handleClose()}
-                            >
-                            </Button2>
-                            <Button
-                                text='Save'
-                                onClick={tab || isDefaultLogic ? handleSave : handleSaveBasicEditor}
-                                type='button'
-                                data-testid='cancel'
-                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
-                            >
-                            </Button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
+            {(isOperatorModal || isStringMethodModal) &&
+                <OperatorsModal
+                    setIsOperatorModal={setIsOperatorModal}
+                    isOperatorModal={isOperatorModal}
+                    setIsStringMethodModal={setIsStringMethodModal}
+                    isStringMethodModal={isStringMethodModal}
+                />
+            }
+        </>
     );
 }
 

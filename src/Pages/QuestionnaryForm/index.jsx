@@ -67,7 +67,6 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -85,7 +84,6 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
-    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
 
@@ -1135,7 +1133,6 @@ const QuestionnaryForm = () => {
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
-
                             </div>
                         </div>
                     </div>
@@ -1198,7 +1195,6 @@ const QuestionnaryForm = () => {
                                     handleClick={handleClick}
                                 />
                             )}
-
                         </div>
                     </div>
                 </div>
