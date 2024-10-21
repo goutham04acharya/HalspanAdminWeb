@@ -810,9 +810,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
                 .replace('Today()', 'new Date()')
-                .replace('else', ':')
-                .replace('then', '?')
-                .replace('if', '');
+            // .replace('else', ':')
+            // .replace('then', '?')
+            // .replace('if', '');
 
             let expression = evalInputValue.toString();
             expression = expression.replaceAll(/\s+and\s+/g, " && ")
@@ -885,7 +885,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             if (!error) {
                 handleSaveSection(sectionId, true, evalInputValue);
-                dispatch(setNewComponent({ id: 'default_conditional_logic', value: evalInputValue, questionId: selectedQuestionId }));
             } else if (typeof result === 'boolean') {
                 setError('');  // Clear the error since the result is valid
                 setIsThreedotLoader(false);
@@ -932,7 +931,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             //checking for the includes 
             if (part.includes('includes(')) {
                 const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
-                if(!result){
+                if (!result) {
                     error.push(`Error in the ${part}: missing vaalues inside the function`)
                 }
             }

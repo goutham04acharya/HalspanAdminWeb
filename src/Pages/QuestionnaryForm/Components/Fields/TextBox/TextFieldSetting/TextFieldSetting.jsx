@@ -31,6 +31,7 @@ function TestFieldSetting({
   setConditionalLogic,
   conditionalLogic
 }) {
+
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
@@ -106,28 +107,6 @@ function TestFieldSetting({
     }
 
   };
-
-  // const handleBlurRegex = (e) => {
-  //   const { id, value } = e.target;
-  //   if (id === 'regular_expression') {
-  //     const validator = new RegExpValidator();
-  //     try {
-  //       validator.validateLiteral(value);
-  //       setValidationErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         regular_expression: '',
-  //       }));
-  //     } catch (error) {
-  //       setValidationErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         regular_expression: 'Invalid regular expression',
-  //       }));
-  //     }
-  //   }
-  // };
-
-
-
 
   const handleErrorMessage = (event) => {
     const value = event.target.value;

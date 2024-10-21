@@ -26,17 +26,11 @@ function ChoiceFieldSetting({
     handleBlur,
     setConditionalLogic
 }) {
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
     const [isLookupOpen, setIsLookupOpen] = useState(false);
-    const [selectedLookup, setSelectedLookup] = useState(null);
     const [optionData, setOptionData] = useState([]);
-
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [focusInput, setFocusInput] = useState('');
-
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
 
@@ -48,10 +42,6 @@ function ChoiceFieldSetting({
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
-        // setFieldSettingParameters((prevState) => ({
-        //     ...prevState,
-        //     lookupOption: option.value,
-        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -63,7 +53,6 @@ function ChoiceFieldSetting({
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
         dispatch(setShouldAutoSave(true));
     }
-
     // List Functions
     const fetchLookupList = useCallback(async () => {
         setLoading(true);

@@ -57,8 +57,6 @@ const fieldSettingParamsSlice = createSlice({
         setNewComponent: (state, action) => {
             // debugger
             const { questionId, id, value } = action.payload;
-            console.log(action.payload, 'action.payload')
-            console.log(state.currentData[questionId], 'state.currentData[questionId]')
             if (!state.currentData[questionId]) {
                 state.currentData[questionId] = {};
 
@@ -154,6 +152,7 @@ const fieldSettingParamsSlice = createSlice({
                     file_size: item?.asset_extras?.fileSize,
                     file_type: item?.asset_extras?.fileType,
                     conditional_logic: item?.conditional_logic,
+                    default_conditional_logic: item?.default_conditional_logic,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };
