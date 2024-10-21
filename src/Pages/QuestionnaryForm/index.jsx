@@ -69,7 +69,6 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -87,7 +86,6 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
-    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
@@ -531,12 +529,6 @@ const QuestionnaryForm = () => {
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 const sectionsData = response?.data?.data?.sections || [];
-                // if (sectionsData.length === 1) {  
-                //     // If no sections are present, skip calling GetSectionOrder  
-                //     setSections(sectionsData);  
-                //     return;  
-                //   } 
-                console.log(sectionsData, 'sectionsData')
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -558,7 +550,7 @@ const QuestionnaryForm = () => {
                     format_error: question?.format_error,
                     options: question?.options,
                     conditional_logic: question?.conditional_logic,
-                    // default_conditional_logic: question?.default_conditional_logic
+                    default_conditional_logic: question?.default_conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -745,6 +737,7 @@ const QuestionnaryForm = () => {
         }
 
     };
+    
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1173,7 +1166,6 @@ const QuestionnaryForm = () => {
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
-
                             </div>
                             {complianceLogic.length > 0 && <div>
                                 <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} />
@@ -1230,8 +1222,8 @@ const QuestionnaryForm = () => {
                                         setComplianceLogic: setComplianceLogic,                                        
                                         setIsDefaultLogic: setIsDefaultLogic,
                                         isDefaultLogic: isDefaultLogic,
-                                        setDefaultString:setDefaultString,
-                                        defaultString:defaultString
+                                        setDefaultString: setDefaultString,
+                                        defaultString: defaultString
 
                                     }
                                 )
@@ -1241,7 +1233,6 @@ const QuestionnaryForm = () => {
                                     handleClick={handleClick}
                                 />
                             )}
-
                         </div>
                     </div>
                 </div>
