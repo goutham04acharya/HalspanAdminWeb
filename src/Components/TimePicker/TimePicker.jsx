@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import useOnClickOutside from '../../CommonMethods/outSideClick';
 
-const TimePicker = () => {
+const TimePicker = ({onChange}) => {
     const [time, setTime] = useState('hh:mm:ss');
     const [isDropdownOpen, setIsDropdown] = useState(false);
     const [hour, setHour] = useState('');
@@ -20,11 +20,13 @@ const TimePicker = () => {
         setMinute(minute);
         setSecond(second);
         setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
+        onChange(time)
     };
 
     const handleHourChange = (hour) => {
         setHour(hour);
         setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
+        onChange(time)
     };
 
     const handleMinuteChange = (minute) => {
@@ -35,6 +37,7 @@ const TimePicker = () => {
     const handleSecondChange = (second) => {
         setSecond(second);
         setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
+        onChange(time)
     };
     // const outSideClick = (dropdownRef=()=>{
     //     setIsDropdown(false);
