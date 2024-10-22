@@ -60,12 +60,12 @@ function StaticDetails({
                         </div>
                         <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                            <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) </p>
+                            <p className='font-normal text-base text-[#000000]'>=If ((AssetName.toUpperCase() === "YES" AND AssetName.toLowerCase() === "no") OR AssetLastName.Includes("th")) </p>
                         </div>
                     </div>
                 )}
                 {activeTab === 'number' && (
-                    <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
+                    <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12 overflow-auto scrollbar_gray'>
                         <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                         <div className='mt-4'>
                             <p className='font-semibold text-base text-[#000000]'>Equals</p>

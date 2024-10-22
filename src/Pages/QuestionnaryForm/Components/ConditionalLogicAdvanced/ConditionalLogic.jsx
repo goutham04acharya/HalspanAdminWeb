@@ -641,8 +641,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-
-
+                            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
 
 
                             setInputValue(conditionalLogic);
@@ -810,9 +809,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
                 .replace('Today()', 'new Date()')
-            // .replace('else', ':')
-            // .replace('then', '?')
-            // .replace('if', '');
+                // .replace('else', ':')
+                // .replace('then', '?')
+                .replace('if', '');
 
             let expression = evalInputValue.toString();
             expression = expression.replaceAll(/\s+and\s+/g, " && ")
@@ -903,6 +902,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
+        // expression = trimParentheses(expression);
         // const cleanExpression = expression.replace(/^\(|\)$/g, '').trim();
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
@@ -923,6 +923,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Check for incomplete expressions
             part = trimParentheses(part)
+            if (part.includes('includes(')) {
+                
+            }else{
+                part = part.replace(/[()]/g, '')
+            }
+            //trimming the conditions to avoid space issue
+            part =  part.trim();
+            console.log(part, 'mmmmmmmmmmmm')
             const displayPart = part.replace(/sections\./g, '');
 
             // Check if the expression contains any method from the typeMethods list
@@ -1097,6 +1105,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 type='button'
                                 data-testid='cancel'
                                 className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                isThreedotLoading={isThreedotLoader}
                             >
                             </Button>
                         </div>

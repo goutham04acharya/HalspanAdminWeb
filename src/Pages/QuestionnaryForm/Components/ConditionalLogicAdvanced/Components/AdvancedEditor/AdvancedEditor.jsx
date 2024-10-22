@@ -100,7 +100,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
-                    <span data-testid="error-message" className='w-[6%]'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    <span data-testid="error-message" className='w-[12%]'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (
