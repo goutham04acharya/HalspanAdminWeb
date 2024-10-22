@@ -56,10 +56,11 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
+        console.log(allSections,suggestion, 'allSections')
         const getVariableType = a => a.constructor.name.toLowerCase();
+        console.log(getVariableType, 'valueType')
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
         setSelectedType(valueType);
-
 
         handleClickToInsert(suggestion, false, valueType);
 

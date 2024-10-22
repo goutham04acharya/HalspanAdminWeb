@@ -22,7 +22,8 @@ import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState,
+    setCompliancestate }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -48,7 +49,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
-    const [isStringMethodModal, setIsStringMethodModal] =useState(false)
+    const [isStringMethodModal, setIsStringMethodModal] = useState(false)
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -113,6 +114,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleClose = () => {
         setConditionalLogic(false);
         setIsDefaultLogic(false);
+        setCompliancestate(false);
     };
 
     useOnClickOutside(modalRef, () => {
@@ -307,6 +309,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        console.log(componentType, 'componentType')
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -791,7 +794,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // };
 
     const handleSave = async () => {
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = version_number + "_" + selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             const addSectionPrefix = (input) => {
@@ -879,14 +882,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const result = eval(evalInputValue);
 
             // Split and Validate Expression
-            const validationResult = splitAndValidate(evalInputValue);
+            // const validationResult = splitAndValidate(evalInputValue);
 
-            // Return early if validation errors exist
-            if (validationResult.some(msg => msg.includes('Error'))) {
-                setError(validationResult.join('\n'));
-                setIsThreedotLoader(false);
-                return; // Stop execution if validation fails
-            }
+            // // Return early if validation errors exist
+            // if (validationResult.some(msg => msg.includes('Error'))) {
+            //     setError(validationResult.join('\n'));
+            //     setIsThreedotLoader(false);
+            //     return; // Stop execution if validation fails
+            // }
             setIsThreedotLoader(true);
 
             if (isDefaultLogic === true) {
@@ -1041,7 +1044,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
         }
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = version_number + "_" + selectedQuestionId.split('_')[0];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
@@ -1051,7 +1054,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
                 <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
-                        {(tab || isDefaultLogic) ? (
+                        {(tab || isDefaultLogic || complianceState) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
@@ -1104,8 +1107,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 />
                             )
                         )}
-                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic &&
+                        <div className={`${isDefaultLogic || complianceState ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                            {!isDefaultLogic && !complianceState &&
                                 <div className='flex gap-5 items-end'>
                                     <p onClick={() => setTab(true)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
                                     <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
@@ -1123,7 +1126,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={tab || isDefaultLogic ? handleSave : handleSaveBasicEditor}
+                                    onClick={tab || isDefaultLogic || complianceState ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

@@ -1,28 +1,49 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
-import { setComplianceLogicId } from '../../QuestionnaryFormSlice';
+import { setComplianceLogicId, setSelectedComponent } from '../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 
-function  ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance }) {
+function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler }) {
 
   // const {complianceLogicId} = useSelector(state => state.)
   const dispatch = useDispatch()
   return (
     <div className='bg-white rounded-[10px] font-medium p-4 mt-8'>
-      <p className='text-xl text-[#2B333B] mb-7'>Compliance</p>
-      {complianceLogic.map((item, index) => (
+      <div className='flex justify-between'>
+        <p className='text-xl text-[#2B333B] mb-7'>Compliance</p>
+        <div className='flex'>
+          <img
+            src="/Images/trash-black.svg"
+            alt="delete"
+            title='Delete'
+            className=' cursor-pointer mr-4 z-[9] rounded-full hover:bg-[#FFFFFF] h-[26px]'
+            onClick={() => {
+              setComplianceLogic([]);
+              dispatch(setSelectedComponent(null))
+            }}
+          />
+          <img src="/Images/save.svg" onClick={()=>complianceSaveHandler()} alt="save" title="Save" data-testid="save-btn-1" class=" h-[26px] rounded-full hover:bg-[#FFFFFF] cursor-pointer" />
+        </div>
+      </div>
+
+      {complianceLogic.length > 0 && complianceLogic.map((item, index) => (
         <div data-testid="section-1-page-1-question-5" class="disable-select select-none w-full rounded-[10px] mb-4 p-4 hover:border border-[#2B333B] bg-[#EFF1F8]"
-          onClick={()=>dispatch(setComplianceLogicId(index))}
+          onClick={() => {
+            if (complianceLogic.length > 0) {
+              dispatch(setComplianceLogicId(index))
+              // dispatch(setSelectedComponent('compliancelogic'))
+            }
+          }}
         >
           <div className='flex justify-between items-start'>
-            <label data-testid="label-name" maxlength="100"  class="font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] h-auto">{item?.label}</label>
+            <label data-testid="label-name" maxlength="100" class="font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] h-auto">{item?.label}</label>
             <img
               src="/Images/trash-black.svg"
               alt="delete"
               title='Delete'
               className=' cursor-pointer mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]'
               onClick={() => {
-                addNewCompliance(true,index);
+                addNewCompliance(true, index);
               }}
             />
           </div>

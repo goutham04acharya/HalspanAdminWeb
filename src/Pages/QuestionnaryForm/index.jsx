@@ -89,6 +89,7 @@ const QuestionnaryForm = () => {
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
+    const [complianceState, setCompliancestate] = useState(false)
 
     console.log(selectedSectionData, 'selectedSectionData')
 
@@ -460,7 +461,6 @@ const QuestionnaryForm = () => {
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        // debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -528,6 +528,7 @@ const QuestionnaryForm = () => {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
+                console.log(response?.data?.data, 'kkkkkkkkkkkkkk')
                 const sectionsData = response?.data?.data?.sections || [];
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
@@ -613,7 +614,7 @@ const QuestionnaryForm = () => {
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
         handleSectionSaveOrder(sections)
-        // Find the section to save  
+        // Find the section to save 
         const sectionToSave = sections.find(section => section.section_id === sectionId);
         const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
         if (sectionToSave) {
@@ -737,7 +738,7 @@ const QuestionnaryForm = () => {
         }
 
     };
-    
+
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -883,7 +884,7 @@ const QuestionnaryForm = () => {
     });
     // ffunction to handle the compliance logic click
     const handleComplianceLogicClick = () => {
-        
+
         let arr = complianceLogic;
         arr.push({
             label: `Status ${arr.length + 1}`,
@@ -972,6 +973,7 @@ const QuestionnaryForm = () => {
 
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section?.id);
+                setComplianceLogic(response?.data?.data?.compliance_logic)
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -1015,11 +1017,13 @@ const QuestionnaryForm = () => {
         dispatch(setSavedSection(sections));
     }, []);
     const addNewCompliance = (type, index) => {
-        debugger
         let newArr = [...complianceLogic]; // Create a copy of the current state array
         //type will be sent for deleting the  compliance logic state we will check for type if delete than splice array
         if (type) {
             newArr.splice(index, 1);
+            if (newArr.length === 0) {
+                dispatch(setSelectedComponent(null))
+            }
             setComplianceLogic(newArr);
             return
         }
@@ -1028,6 +1032,22 @@ const QuestionnaryForm = () => {
             default_content: ''
         });
         setComplianceLogic(newArr); // Set the new array in state
+    }
+
+    const complianceSaveHandler = async() => {
+        const body = {
+            compliance_logic: complianceLogic,
+        }
+        try {
+            const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+            if (!(response?.data?.error)) {
+                // Success
+            } else {
+                setToastError('Something went wrong');
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+        }
     }
 
     return (
@@ -1157,7 +1177,6 @@ const QuestionnaryForm = () => {
                                 </DragDropContext>
                                 <button
                                     onClick={() => {
-                                        // debugger
                                         handleAddRemoveSection('add');
                                         handleSectionSaveOrder(sections);
                                     }}
@@ -1168,7 +1187,7 @@ const QuestionnaryForm = () => {
                                 </button>
                             </div>
                             {complianceLogic.length > 0 && <div>
-                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} />
+                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler}/>
                             </div>}
                         </div>
                     </div>
@@ -1219,12 +1238,14 @@ const QuestionnaryForm = () => {
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
                                         complianceLogic: complianceLogic,
-                                        setComplianceLogic: setComplianceLogic,                                        
+                                        setComplianceLogic: setComplianceLogic,
                                         setIsDefaultLogic: setIsDefaultLogic,
                                         isDefaultLogic: isDefaultLogic,
                                         setDefaultString: setDefaultString,
-                                        defaultString: defaultString
-
+                                        defaultString: defaultString,
+                                        complianceState: complianceState,
+                                        setCompliancestate: setCompliancestate,
+                                        complianceSaveHandler: complianceSaveHandler,
                                     }
                                 )
                             ) : (
@@ -1311,7 +1332,7 @@ const QuestionnaryForm = () => {
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
 
             />}
-            {(conditionalLogic || isDefaultLogic) && (
+            {(conditionalLogic || isDefaultLogic || complianceState) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
                     conditionalLogic={conditionalLogic}
@@ -1320,6 +1341,8 @@ const QuestionnaryForm = () => {
                     setIsDefaultLogic={setIsDefaultLogic}
                     setDefaultString={setDefaultString}
                     defaultString={defaultString}
+                    complianceState={complianceState}
+                    setCompliancestate={setCompliancestate}
                 />
 
             )}
