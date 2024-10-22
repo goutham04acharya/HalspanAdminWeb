@@ -309,7 +309,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        console.log(componentType, 'componentType')
         const textarea = textareaRef.current;
         if (textarea) {
             const start = textarea.selectionStart;
@@ -794,7 +793,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // };
 
     const handleSave = async () => {
-        const sectionId = version_number + "_" + selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
         try {
             const addSectionPrefix = (input) => {
@@ -882,14 +881,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const result = eval(evalInputValue);
 
             // Split and Validate Expression
-            // const validationResult = splitAndValidate(evalInputValue);
+            const validationResult = splitAndValidate(evalInputValue);
 
-            // // Return early if validation errors exist
-            // if (validationResult.some(msg => msg.includes('Error'))) {
-            //     setError(validationResult.join('\n'));
-            //     setIsThreedotLoader(false);
-            //     return; // Stop execution if validation fails
-            // }
+            // Return early if validation errors exist
+            if (validationResult.some(msg => msg.includes('Error'))) {
+                setError(validationResult.join('\n'));
+                setIsThreedotLoader(false);
+                return; // Stop execution if validation fails
+            }
             setIsThreedotLoader(true);
 
             if (isDefaultLogic === true) {
@@ -1044,7 +1043,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
         }
-        const sectionId = version_number + "_" + selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
