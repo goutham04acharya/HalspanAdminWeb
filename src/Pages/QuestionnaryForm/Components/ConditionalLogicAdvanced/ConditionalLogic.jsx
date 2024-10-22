@@ -648,7 +648,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
                             setInputValue(conditionalLogic);
-                            setConditions(parseLogicExpression(question.conditional_logic));
+                            {
+                                !isDefaultLogic &&
+                                    setConditions(parseLogicExpression(question.conditional_logic));
+                            }
                         }
                     });
                 });
@@ -809,36 +812,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             };
 
             let evalInputValue = modifyString(inputValue);
+            setDefaultString(evalInputValue);
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
                 .replace('Today()', 'new Date()')
-            // .replace('else', ':')
-            // .replace('then', '?')
-            // .replace('if', '');
-
-            // New function to format dates and remove quotes from new Date
-            // const formatDates = (input) => {
-            //     // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
-            //     let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
-            //         return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
-            //     });
-
-            //     // Then, remove quotes from around new Date expressions
-            //     formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
-            //     return formatted;
-            // };
-
-            // // Apply the formatDates function
-            // evalInputValue = formatDates(evalInputValue);
-            // Log the updated input after date replacement
-
-            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
-            evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
-            evalInputValue = evalInputValue.replace('if', ''); // Replace () with length function
-
 
             let expression = evalInputValue.toString();
 
@@ -875,18 +852,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
                 return;
             }
-
+            if (isDefaultLogic) {
+                evalInputValue = evalInputValue.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', '');
+                // Return null as JSX expects a valid return inside {}
+            }
             const result = eval(evalInputValue);
-
-            if (isDefaultLogic === true) {
-                evalInputValue = evalInputValue.replace('else', ':')
-                    .replace('then', '?')
-                    .replace('if', '');
-
+            if (isDefaultLogic) {
+                // Handle nested conditions
                 if (selectedComponent === 'choiceboxfield') {
-                    setDefaultString(evalInputValue);
-                    console.log(result, 'evalInputValue')
-
+                    // setDefaultString(evalInputValue);
+                    // Check if the result is a string
+                    if (typeof result !== 'string') {
+                        setError('The evaluated result is not a string. The choice field expects a string.');
+                    } else {
+                        console.log(result); // Assign the result if it's a string
+                    }
                 } else if (selectedComponent === 'dateTimefield') {
                     const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
                     setIsThreedotLoader(true);
@@ -897,7 +879,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         return;
                     }
                 } else if (selectedComponent === 'numberfield') { // Corrected this part
-                    setDefaultString(evalInputValue);
+                    // setDefaultString(evalInputValue);
                 }
             } else {
                 const validationResult = splitAndValidate(evalInputValue);
@@ -912,11 +894,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Split and Validate Expression
 
+            payloadString = evalInputValue;
             setIsThreedotLoader(true);
-            console.log(defaultString, 'defaultString')
             if (!error) {
-                handleSaveSection(sectionId, true, payloadString);
-                dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
+                handleSaveSection(sectionId, true, payloadString, defaultString);
+                // dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
 
             } else if (typeof result === 'boolean') {
@@ -1052,7 +1034,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
-    
+
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
@@ -1134,6 +1116,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                    isThreedotLoading={isThreedotLoader}
                                 >
                                 </Button>
                             </div>

@@ -25,11 +25,11 @@ function ChoiceFieldSetting({
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
+    isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
     setDefaultString
 }) {
-
     const [isLookupOpen, setIsLookupOpen] = useState(false);
     const [optionData, setOptionData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -120,7 +120,14 @@ function ChoiceFieldSetting({
     useEffect(() => {
         fetchLookupList();
     }, [fetchLookupList]);
-    
+
+    if (isDefaultLogic) {
+        defaultString = defaultString.replaceAll(':', 'else')
+            .replaceAll('?', 'then')
+            .replaceAll('', 'if');
+        // Return null as JSX expects a valid return inside {}
+    }
+
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
