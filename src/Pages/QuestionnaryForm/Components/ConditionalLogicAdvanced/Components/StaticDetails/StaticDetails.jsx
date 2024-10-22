@@ -175,7 +175,7 @@ function StaticDetails({
                             </div>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                                <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) </p>
+                                <p className='font-normal text-base text-[#000000]'>=If ((AssetName.toUpperCase === "YES" AND AssetName.toLowerCase === "no") OR AssetLastName.Includes("th")) </p>
                             </div>
                         </div>
                     )}
