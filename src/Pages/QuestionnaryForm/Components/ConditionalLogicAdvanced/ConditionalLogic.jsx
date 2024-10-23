@@ -634,7 +634,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     page.questions?.forEach((question) => {
                         if (question.question_id === selectedQuestionId) {
                             // Pre-fill the editor with the conditional logic of the selected question
-                            let conditionalLogic = question.conditional_logic || '';
+
+                            //adding this to check whether the advane editor or the default logic
+                            let conditionalLogic = ''
+                            if(isDefaultLogic){
+                                conditionalLogic = question.default_conditional_logic || '';
+                            }else{
+                                conditionalLogic = question.conditional_logic || '';
+                            }
+                            
 
                             // Replace && with "and" and || with "or"
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
@@ -899,7 +907,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             payloadString = evalInputValue;
             setIsThreedotLoader(true);
             if (!error) {
-                handleSaveSection(sectionId, true, payloadString, defaultString);
+                handleSaveSection(sectionId, true, payloadString, isDefaultLogic);
                 // dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
 

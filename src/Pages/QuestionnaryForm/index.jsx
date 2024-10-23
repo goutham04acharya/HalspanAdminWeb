@@ -711,6 +711,7 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
+            console.log(body,'kkkkkk')
             try {
                 if (isSaving) {
                     // ... call the API ...  

@@ -60,30 +60,30 @@ function StaticDetails({
                     }
                     {fieldSettingParams[selectedQuestionId].componentType === 'dateTimefield' &&
                         <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
-                            <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
+                            <p className='font-semibold text-lg text-[#2B333B]'>Common Date Calculations</p>
                             <div className='mt-3'>
-                                <p className='font-semibold text-base text-[#000000]'>Date is before Today</p>
-                                <p className='font-normal text-base text-[#000000]'>=(StartDate &lt; "Today")</p>
+                                <p className='font-semibold text-base text-[#000000]'>Constant Values</p>
+                                <p className='font-normal text-base text-[#000000]'>=”7/14/2022”</p>
                             </div>
                             <div className='mt-3'>
-                                <p className='font-semibold text-base text-[#000000]'>Date is before or equal to Today</p>
-                                <p className='font-normal text-base text-[#000000]'>=StartDate &lt;= Today</p>
+                                <p className='font-semibold text-base text-[#000000]'>Today</p>
+                                <p className='font-normal text-base text-[#000000]'>=DateTime.Today</p>
                             </div>
                             <div className='mt-3'>
-                                <p className='font-semibold text-base text-[#000000]'>Date is after Today</p>
-                                <p className='font-normal text-base text-[#000000]'>=(StartDate &gt; "Today")</p>
+                                <p className='font-semibold text-base text-[#000000]'>If-Then-Else</p>
+                                <p className='font-normal text-base text-[#000000]'>=If FirstDate &lt; SecondDate then FirstDate else SecondDate</p>
                             </div>
                             <div className='mt-3'>
-                                <p className='font-semibold text-base text-[#000000]'>Date is after or equal to Today</p>
-                                <p className='font-normal text-base text-[#000000]'>=(StartDate &gt;= "Today")</p>
+                                <p className='font-semibold text-base text-[#000000]'>Add Days</p>
+                                <p className='font-normal text-base text-[#000000]'>=StartDate.AddDays(10)</p>
                             </div>
                             <div className='mt-3'>
-                                <p className='font-semibold text-base text-[#000000]'>Date is with "X" days of Set date</p>
-                                <p className='font-normal text-base text-[#000000]'>=(Math.abs(startDate - setDate) == 5)</p>
+                                <p className='font-semibold text-base text-[#000000]'>Year of Date</p>
+                                <p className='font-normal text-base text-[#000000]'>=StartDate.Year</p>
                             </div>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                                <p className='font-normal text-base text-[#000000]'>=If ((StartDate.getFullYear() {'>'} 2000 AND EndDate.getMonth() {'<'} 10) OR StartDate.getMonth() {'>'} 3 )</p>
+                                <p className='font-normal text-base text-[#000000]'>=If ((StartDate.getFullYear() &gt; 2000 AND EndDate.getMonth() &lt; 10) OR StartDate.getMonth() &lt; 3 ) then 19/06/2024 else 20/04/2025</p>
                             </div>
                         </div>
                     }

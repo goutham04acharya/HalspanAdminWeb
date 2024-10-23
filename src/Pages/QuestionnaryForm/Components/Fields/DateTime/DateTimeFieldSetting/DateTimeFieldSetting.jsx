@@ -13,7 +13,8 @@ function DateTimeFieldSetting({
   handleRadiobtn,
   fieldSettingParameters,
   selectedQuestionId,
-  setConditionalLogic
+  setConditionalLogic,
+  setIsDefaultLogic
 
 }) {
   const dispatch = useDispatch();
@@ -52,7 +53,10 @@ function DateTimeFieldSetting({
             <div className='relative w-full'>
               <input type="text" id='Label' className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content' />
-              <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' />
+              <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' onClick={() => {
+                setIsDefaultLogic(true);
+                setConditionalLogic(false);
+              }} />
             </div>
           </div>
           <div className='mt-7'>
