@@ -145,22 +145,25 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
             {modalOpen && (
                 <div
                     style={{
-                        position: "fixed",
+                        position: "absolute",
                         top: 0,
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        backgroundColor: "rgba(0, 0, 0, 0.7)",
+                        backgroundColor: "white",
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
                         zIndex: 1000,
+                        width: '358px',
+                        borderRadius: '52px'
                     }}
+                    // className="mx-auto"
                 >
                     <div
                         style={{
                             backgroundColor: "transparent",
-                            padding: "20px",
+                            // padding: "20px",
                             borderRadius: "10px",
                             maxWidth: "90vw",
                             maxHeight: "90vh",
@@ -179,7 +182,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             <TransformComponent pointerEvents="none"  >
                                 <div
                                     style={{
-                                        width: imageSize.width,
+                                        width: '380px',
                                         height: imageSize.height,
                                         position: "relative",
                                         backgroundColor: "white"
@@ -195,7 +198,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                         style={{
                                             width: "100%",
                                             height: "100%",
-                                            objectFit: "contain",
+                                            objectFit: "cover",
                                         }}
                                         onMouseDown={(e) => e.preventDefault()}
                                     />
@@ -225,7 +228,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                     transform: `translate(-50%, -100%)`,
                                                     cursor: "move",
                                                 }}
-                                                onMouseDown={(e) => handlePinMouseDown(pin.id, e)}
+                                                // onMouseDown={(e) => handlePinMouseDown(pin.id, e)}
                                             >
                                                 <img
                                                     src="/Images/pin.svg"
@@ -266,7 +269,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                     transform: "translate(-50%, 10px)",
                                                 }}
                                             >
-                                                {`plan_x: ${pin.x.toFixed(2)}\nplan_y: ${pin.y.toFixed(2)}`}
+                                                {/* {`plan_x: ${pin.x.toFixed(2)}\nplan_y: ${pin.y.toFixed(2)}`} */}
                                             </div>
                                         </React.Fragment>
                                     ))}
@@ -274,7 +277,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             </TransformComponent>
                         </TransformWrapper>
                         <button
-                            className=" absolute top-[20px] right-[20px] py-[3px] px-[3px] bg-transparent hover:bg-[rgba(0,0,0,0.2)] rounded-lg cursor-pointer"
+                            className=" absolute top-0 right-0 py-[3px] px-[3px] bg-transparent hover:bg-[rgba(0,0,0,0.2)] rounded-lg cursor-pointer"
                             onClick={() => {
                                 setModalOpen(false)
                                 setStrokeColor('#000')
@@ -289,7 +292,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                         </button>
                         <div
 
-                            className="absolute bottom-[10px] left-[10px] flex flex-col"
+                            className="absolute bottom-[10px] left-0 flex flex-col"
                         >
                             <button
                                 className={` px-3 text-white rounded-lg cursor-pointer `}

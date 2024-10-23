@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import useOnClickOutside from '../../CommonMethods/outSideClick';
 
-const TimePicker = ({onChange, format, setErrorMessage}) => {
+const TimePicker = ({ onChange, format, setErrorMessage }) => {
     const [time, setTime] = useState('hh:mm:ss');
     const [isDropdownOpen, setIsDropdown] = useState(false);
     const [hour, setHour] = useState('');
@@ -12,38 +12,47 @@ const TimePicker = ({onChange, format, setErrorMessage}) => {
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
     const seconds = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
     const dropdownRef = useRef()
-    
-    const handleTimeChange = (e) => {  
-        const selectedTime = e.target.value;  
-        const [hour, minute, second] = selectedTime.split(':'); 
-        setHour(hour);  
-        setMinute(minute);  
-        setSecond(second);  
-        setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);  
-        onChange(time)  
-     };
+
+    const handleTimeChange = (e) => {
+        const selectedTime = e.target.value;
+        const [hour, minute, second] = selectedTime.split(':');
+        setHour(hour);
+        setMinute(minute);
+        setSecond(second);
+        if (hour && minute && second) {
+            setTime(`${hour}:${minute}:${second}`);
+            onChange(time);
+        }
+    };
 
     const handleHourChange = (hour) => {
         setHour(hour);
-        setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
-        onChange(time)
+        if (hour && minute && second) {
+            setTime(`${hour}:${minute}:${second}`);
+            onChange(time);
+        }
     };
 
     const handleMinuteChange = (minute) => {
         setMinute(minute);
-        setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
-        // onChange(time)
+        if (hour && minute && second) {
+            setTime(`${hour}:${minute}:${second}`);
+            onChange(time);
+        }
     };
 
     const handleSecondChange = (second) => {
         setSecond(second);
-        setTime(`${hour || '00'}:${minute || '00'}:${second || '00'}`);
-        onChange(time)
+        if (hour && minute && second) {
+            setTime(`${hour}:${minute}:${second}`);
+            onChange(time);
+        }
     };
+
     // const outSideClick = (dropdownRef=()=>{
     //     setIsDropdown(false);
     // })
-    useOnClickOutside(dropdownRef, ()=>{
+    useOnClickOutside(dropdownRef, () => {
         setIsDropdown(false);
     })
     return (

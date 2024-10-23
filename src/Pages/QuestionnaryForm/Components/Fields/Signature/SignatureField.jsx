@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useCallback } from 'react';
-import SignatureCanvas from 'react-signature-canvas';
+// import SignatureCanvas from 'react-signature-canvas';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
-import CustomSignatureField from './CustomSignatureField';
+import SignatureCanvas from './CustomSignatureField';
 
 const SignatureField = ({
     label,
@@ -32,7 +32,8 @@ const SignatureField = ({
 
             {preview ? (
                 <div>
-                    <CustomSignatureField
+                    <SignatureCanvas
+                        id={question.question_id}
                         setValue={setValue}
                         setValidationErrors={setValidationErrors}
                         question={question}

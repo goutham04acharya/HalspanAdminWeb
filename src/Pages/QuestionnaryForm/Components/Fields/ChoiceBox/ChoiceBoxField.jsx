@@ -103,6 +103,7 @@ const ChoiceBoxField = ({
                             options={question?.source_value ? question?.source_value : null}
                             selectedOption={optionSelected}
                             preview
+                            type={question?.type}
                             // lastElementRef={lastElementRef}
                         />
                     }

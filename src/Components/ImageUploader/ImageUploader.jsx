@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { ColorPicker } from 'antd';
 
-function ImageUploader({ maxImages, drawOnImage }) {
+function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, setValue, handleRemoveImage , question}) {
     const [images, setImages] = useState([]);
     const [currentImage, setCurrentImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -25,6 +25,8 @@ function ImageUploader({ maxImages, drawOnImage }) {
             }
         }
         setImages(newImages);
+        handleFileChange(e)
+        setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
     };
 
 
@@ -32,6 +34,7 @@ function ImageUploader({ maxImages, drawOnImage }) {
         const newImages = [...images];
         newImages.splice(index, 1);
         setImages(newImages);
+        setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
     };
 
     const handleImageClick = (image) => {
@@ -107,22 +110,22 @@ function ImageUploader({ maxImages, drawOnImage }) {
             )}
             {modalOpen && (
                 <div
-                    className="modal-overlay fixed top-0 flex-col left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
+                    className="modal-overlay absolute rounded-[50px] top-0 flex-col left-0 w-[356px] h-full bg-white flex justify-center items-center"
                 >
-                    <span className="close-icon delay-300 items-end text-[20px] ml-[650px] top-10 relative hover:bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer" onClick={handleModalClose}>
+                    <span className="close-icon delay-300 items-end text-[20px] ml-[325px] top-10 relative hover:bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer" onClick={handleModalClose}>
                         &#10005;
                     </span>
-                    {drawOnImage === true ? <div className="modal-content w-[700px] h-[500px] p-2 rounded-lg">
+                    {drawOnImage === true ? <div className="modal-content w-[370px] h-[400px] p-2 rounded-2xl">
                         <ReactSketchCanvas
                             ref={canvasRef}
                             // width="600"
                             // height="400"
                             strokeWidth={4}
                             strokeColor={strokeColor}
-                            style={{ backgroundColor: 'none' }}
+                            style={{ backgroundColor: 'none'}}
                             backgroundImage={URL.createObjectURL(currentImage)}
                         />
-                        <div className=' flex flex-col top-[-140px] mr-[650px] relative'>
+                        <div className=' flex flex-col top-[-140px] mr-[650px] relative '>
                             <div className=' flex w-[100px] '>
                                 <button onClick={handlePencilClick} className='m-[2px]'><img src="/Images/pencil.svg" alt="" /></button>
                                 {colorPicker && <span>
@@ -142,7 +145,7 @@ function ImageUploader({ maxImages, drawOnImage }) {
                             {/* <button onClick={handleExportClick}>Export</button> */}
                         </div>
                     </div> : <div>
-                        <img src={URL.createObjectURL(currentImage)} className='w-[700px] h-[500px] p-2 rounded-lg' alt="" />
+                        <img src={URL.createObjectURL(currentImage)} className='w-[374px] h-[500px] p-2 rounded-lg' alt="" />
                     </div>}
                 </div>
             )}

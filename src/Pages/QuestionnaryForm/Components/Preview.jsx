@@ -69,12 +69,19 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 if (!value[question?.question_id] || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
-            } 
-            // else if (question?.component_type === 'photofield' && !question?.options?.optional) {
-            //     if (value[question?.question_id]|| value[question?.question_id] === undefined) {
-            //         acc[question.question_id] = 'This is a mandatory field';
-            //     }
-            // }
+            }
+            else if (question?.component_type === 'photofield' && !question?.options?.optional) {
+                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
+                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                }
+            }
+            else if (question?.component_type === 'filefield' && !question?.options?.optional) {
+                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
+                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                }
+            }
             return acc;
         }, {});
         if (Object.keys(errors).length > 0) {
@@ -85,7 +92,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 preview_signaturefield: errors,
                 preview_numberfield: errors,
                 preview_datetimefield: errors,
-                // preview_photofield: errors
+                preview_photofield: errors,
+                preview_filefield: errors
             }));
         } else {
             if (currentPage < sections[currentSection].pages.length - 1) {
@@ -125,7 +133,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'signaturefield':
                 return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
-                return <FileField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <FileField preview setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
                 return <ChoiceBoxField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
@@ -137,7 +145,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'floorPlanfield':
                 return <FloorPlanField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'photofield':
-                return <PhotoField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <PhotoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
                 return <VideoField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             default:

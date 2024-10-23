@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FileUploader = ({ fileType, fileSize, min, max }) => {
+const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors }) => {
     const [files, setFiles] = useState([]);
     const [error, setError] = useState('');
 
@@ -35,6 +35,10 @@ const FileUploader = ({ fileType, fileSize, min, max }) => {
                 setError(`Maximum ${max} files allowed`);
             } else {
                 setError('');
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: '', // Or remove the key if you prefer     
+                }))
             }
 
             setFiles(newFiles);

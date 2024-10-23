@@ -21,13 +21,37 @@ function DateTimeField({
 }) {
     console.log(validationErrors, 'validationErrors')
     function handleFunction(e) {
-        const value = e.target.value;
-        setValue((prev) => ({
-            ...prev,
-            [question?.question_id]: value || false
-        }));
+        console.log(e, 'time')
+        if (type === 'time') {
+            const value = e
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: value || false
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_datetimefield: {
+                    ...prevErrors.preview_datetimefield,
+                    [question?.question_id]: '' // Only clear the error message for the current question  
+                }
+            }));
+        } else {
+            const value = e.target.value;
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: value || false
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_datetimefield: {
+                    ...prevErrors.preview_datetimefield,
+                    [question?.question_id]: '' // Only clear the error message for the current question  
+                }
+            }));
+        }
         console.log(value, 'am checking e')
     }
+
 
     return (
         <div>
@@ -57,6 +81,13 @@ function DateTimeField({
                     <TimePicker
                         onChange={handleFunction}
                         format={question?.format}
+                        setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
+                            ...prevErrors,
+                            preview_datetimefield: {
+                                ...prevErrors.preview_datetimefield,
+                                [question?.question_id]: errorMessage
+                            }
+                        }))}
                     />
                 )}
 
@@ -76,13 +107,20 @@ function DateTimeField({
                         <TimePicker
                             onChange={handleFunction}
                             format={question?.format}
+                            setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
+                                ...prevErrors,
+                                preview_datetimefield: {
+                                    ...prevErrors.preview_datetimefield,
+                                    [question?.question_id]: errorMessage
+                                }
+                            }))}
                         />
                     </div>
                 )}
                 {(question?.question_id && validationErrors?.preview_datetimefield && validationErrors?.preview_datetimefield[question?.question_id]) && (
                     <ErrorMessage error={validationErrors?.preview_datetimefield[question?.question_id]} />
                 )}
-                
+
 
                 {!preview && (
                     <input

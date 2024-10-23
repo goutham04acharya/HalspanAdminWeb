@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import FileUploader from '../../../../../Components/FileUploader/FileUploader';
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 function FileField({
     textId,
@@ -8,17 +9,54 @@ function FileField({
     handleChange,
     fieldSettingParameters,
     preview,
-    question
+    question,
+    setValue,
+    setValidationErrors,
+    validationErrors
 }) {
 
     const [fileName, setFileName] = useState('');
-
-
+    const [fileState, setFileState] = useState({}); // Create a state to store the filename   
 
     const handleFileChange = (e) => {
+        debugger
         const file = e.target.files[0];
         setFileName(file ? file.name : '');
-        handleChange(fieldSettingParameters);
+        // handleChange(fieldSettingParameters);    
+        console.log(file, 'file akkaka')
+        setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state    
+        if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: true
+            }));
+            setValidationErrors((prevErrors) => ({
+                
+                ...prevErrors,
+                preview_filefield: '', // Or remove the key if you prefer     
+            }))
+            console.log(validationErrors.preview_filefield, 'ffffffffffffffffffffffff')
+        } else {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: false
+            }));
+        }
+    };
+    
+
+    const handleFileRemove = (index) => {
+        setFileState((prev) => {
+            const newState = { ...prev };
+            delete newState[question?.question_id];
+            return newState;
+        });
+        if (Object.keys(fileState).length < question?.field_range?.min) {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: false
+            }));
+        }
     };
 
     return (
@@ -51,8 +89,11 @@ function FileField({
                     {fileName || (preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent) || 'No file chosen'}
                 </span>
             </div> : <div>
-                <FileUploader fileType={question?.asset_extras?.file_type} fileSize={question?.asset_extras?.file_size} min={question?.field_range?.min} max={question?.field_range?.max}/>
+                <FileUploader setValidationErrors={setValidationErrors} validationErrors={validationErrors} setValue={setValue} fileType={question?.asset_extras?.file_type} fileSize={question?.asset_extras?.file_size} min={question?.field_range?.min} max={question?.field_range?.max} handleFileChange={handleFileChange} handleFileRemove={handleFileRemove} />
             </div>}
+            {(question?.question_id && validationErrors?.preview_filefield && validationErrors.preview_filefield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_filefield[question.question_id]} />
+            )}
             <p
                 data-testid="help-text"
                 className={`italic mt-2 font-normal ${preview ? ' ml-1 text-xs' : 'text-sm'} text-[#2B333B] break-words max-w-[90%]`}
@@ -63,4 +104,4 @@ function FileField({
     )
 }
 
-export default FileField
+export default FileField;
