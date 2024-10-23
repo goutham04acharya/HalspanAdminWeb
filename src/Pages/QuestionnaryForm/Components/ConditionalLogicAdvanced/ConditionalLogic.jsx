@@ -19,6 +19,7 @@ import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
 import moment from 'moment/moment';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
+import { DateValidator } from './DateFieldChecker';
 
 
 
@@ -237,9 +238,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const value = event.target.value;
         if (isDefaultLogic) {
             dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
-        }else{
+        } else {
             dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
-        } 
+        }
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -342,7 +343,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             if (isDefaultLogic) {
                 dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
-            }else{
+            } else {
                 dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
             }  // Update the inputValue state
         }
@@ -645,12 +646,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                             //adding this to check whether the advane editor or the default logic
                             let conditionalLogic = ''
-                            if(isDefaultLogic){
+                            if (isDefaultLogic) {
                                 conditionalLogic = question.default_conditional_logic || '';
-                            }else{
+                            } else {
                                 conditionalLogic = question.conditional_logic || '';
                             }
-                            
+
 
                             // Replace && with "and" and || with "or"
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
@@ -661,8 +662,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
 
-                                dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
- 
+                            dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+
                             {
                                 !isDefaultLogic &&
                                     setConditions(parseLogicExpression(question.conditional_logic));
@@ -703,7 +704,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             };
 
             let modifyvalue
-            if(isDefaultLogic){
+            if (isDefaultLogic) {
                 modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
             } else {
                 modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
@@ -758,21 +759,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('if', '');
                 // Return null as JSX expects a valid return inside {}
             }
-            const result = eval(evalInputValue);
+            //just checking for datetimefield before the evaluating the eexpression (only for default checking)
+            if (isDefaultLogic && selectedComponent == "dateTimefield") {
+                console.log(evalInputValue,'hey')
+                let invalid = DateValidator(evalInputValue)
+                if(invalid){
+                    handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
+                    console.log('failed')
+                    return
+                }
+            }
 
+            const result = eval(evalInputValue);
+            console.log(result, 'hoi')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
                             handleError('The evaluated result is not a string. The field type expects a string.');
-                            return;
-                        }
-                        break;
-                    case 'dateTimefield':
-                        const defaultResult = moment(eval(evalInputValue), "DD/MM/YYYY", true);
-                        if (!defaultResult.isValid()) {
-                            handleError('Please follow the DD/MM/YYYY Date Format');
                             return;
                         }
                         break;
