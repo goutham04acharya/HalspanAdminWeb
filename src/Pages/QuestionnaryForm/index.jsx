@@ -1135,7 +1135,7 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
+                            <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
                                 setPreviewModal(true)
                             }}>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />

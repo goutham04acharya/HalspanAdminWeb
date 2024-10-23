@@ -26,7 +26,7 @@ function FileField({
         console.log(file, 'file akkaka')
         setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state    
         if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
-            debugger
+            // debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true

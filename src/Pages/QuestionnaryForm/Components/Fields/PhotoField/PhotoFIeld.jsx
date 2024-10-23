@@ -55,7 +55,7 @@ function PhotoField({ label,
             return newState;
         });
         if (Object.keys(fileState).length < question?.field_range?.min) {
-            debugger
+            // debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: false

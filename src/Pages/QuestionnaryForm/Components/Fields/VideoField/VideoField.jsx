@@ -29,7 +29,7 @@ function VideoField({ label,
         setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state   
         console.log(Object.keys({ ...fileState, [question?.question_id]: file.name }).length, 'jjjjjjjjjjjjjj') 
         if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
-            debugger
+            // debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true

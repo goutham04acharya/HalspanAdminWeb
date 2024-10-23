@@ -79,6 +79,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                     multiple
                     onChange={handleImageChange}
                     accept="image/*"
+                    data-testid="add-image"
                     className={`hidden-input ${!images?.length >= maxImages ? 'cursor-default' : 'cursor-pointer'}`}
                     disabled={images.length >= maxImages}
                 />

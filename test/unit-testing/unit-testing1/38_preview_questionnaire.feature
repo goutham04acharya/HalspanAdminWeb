@@ -29,6 +29,7 @@ Feature: Halspan - Admin - Preview the Questionnaire
     When I enter the placeholder content for textbox for preview
     Then I should see the placeholder content for textbox updated in the section 1 page 1 question 1
     When I select the type as "multi_line"
+    When I check the field validation 
     * I select the format as "custom-regular-expression"
     When I enter the custom regular expression as "^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
     When I enter the format error message as "Invalid PAN format"
@@ -86,9 +87,8 @@ Feature: Halspan - Admin - Preview the Questionnaire
 
   Scenario: Admin adds all the fields from the add field section
     Given I am on the Questionnaire management sections
-    When I click on add new section
+    When I click on add new section 2
     Then I should see the new section added
-    Then I should see an add field section
     When I add a new question to the page 1 in section 2
     When I click the number button
     Then I should see field settings
@@ -151,7 +151,7 @@ Feature: Halspan - Admin - Preview the Questionnaire
     When I click the next button
     Then I should read a message stating that "This is a mandatory field"
     Then I validate the data entered exists in the mobile preview for section 1 page 1
-    When I enter invalid text for custom regular expression
+    When I enter invalid text for custom regular expression for section 1 page 1 question 1
     Then I should read a message stating that "Invalid PAN format"
     When I enter the text in textbox for section 1 page 1 question 1
     When I select the choice for section 1 page 1 question 2
