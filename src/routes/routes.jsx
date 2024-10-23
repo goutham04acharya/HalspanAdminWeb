@@ -14,7 +14,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   const { logout } = useAuth0();
   useEffect(() => {
-    debugger
     let body = localStorage.getItem(`@@auth0spajs@@::${auth0ClientID}::default::openid profile email`);
     body = JSON.parse(body)
     if (body) {
