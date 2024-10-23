@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors }) => {
-    const [files, setFiles] = useState([]);
+const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handleChange, handleRemove, setFileState, fileState }) => {
+    const [files, setFiles] = useState(fileState.files || []);
     const [error, setError] = useState('');
 
     const handleFileChange = (e) => {
@@ -43,13 +43,23 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors }) => 
 
             setFiles(newFiles);
         }
+        handleChange(e)
     };
 
     const handleRemoveFile = (index) => {
         const newFiles = [...files];
         newFiles.splice(index, 1);
+
         setFiles(newFiles);
+
+        setFileState((prevState) => ({
+            ...prevState,
+            files: newFiles,
+        }));
+
+        handleRemove(index);
     };
+
 
     return (
         <div className=' w-full '>
@@ -71,7 +81,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors }) => 
                 <ul>
                     {files.map((file, index) => (
                         <li key={index} className='bg-[#DFE0E2] my-2 p-2 rounded flex justify-between'>
-                            <span className='truncate'>{file.name}</span>
+                            <span className='truncate w-[190px]'>{file.name}</span>
                             <div className=' flex gap-2'>
                                 <span className='text-[#2B333B]'>
                                     {file.size < 1024 * 1024

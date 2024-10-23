@@ -75,9 +75,9 @@ const AssetLocationField = ({
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'
-                title={fieldSettingParameters?.helptext}
+                title={preview ? question?.help_text : fieldSettingParameters?.helptext}
             >
-                {fieldSettingParameters?.helptext}
+                {preview ? question?.help_text : fieldSettingParameters?.helptext}
             </p>
         </div>
     );

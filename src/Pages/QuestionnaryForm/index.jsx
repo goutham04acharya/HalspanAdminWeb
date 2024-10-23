@@ -1271,6 +1271,9 @@ const QuestionnaryForm = () => {
                 setValidationErrors={setValidationErrors}
                 validationErrors={validationErrors}
                 formDefaultInfo={formDefaultInfo}
+                questionnaire_id={questionnaire_id}
+                version_number={version_number}
+                fieldSettingParameters={fieldSettingParams}
             />}
         </>
     );

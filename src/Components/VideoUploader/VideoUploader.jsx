@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-const VideoUploader = ({ fileSize, min, max }) => {
+const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange }) => {
+
+
     const [files, setFiles] = useState([]);
     const [error, setError] = useState('');
 
@@ -34,17 +36,21 @@ const VideoUploader = ({ fileSize, min, max }) => {
                 setError(`Maximum ${max} files allowed`);
             } else {
                 setError('');
+                setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
             }
 
             setFiles(newFiles);
         }
+        handleChange(e)
     };
 
     const handleRemoveFile = (index) => {
         const newFiles = [...files];
         newFiles.splice(index, 1);
         setFiles(newFiles);
+        setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
     };
+
 
     return (
         <div className="w-full">

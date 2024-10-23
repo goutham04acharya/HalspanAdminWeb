@@ -13,7 +13,6 @@ const ChoiceBoxField = ({
     value,
     className,
     handleChange,
-    // above are not sent
     fieldSettingParameters,
     testId,
     preview,
@@ -23,44 +22,71 @@ const ChoiceBoxField = ({
     setValue,
     choiceValue
 }) => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    const [optionSelected, setOptionSelected] = useState('')
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [optionSelected, setOptionSelected] = useState('');
+    console.log(fieldSettingParameters, 'ggggggggggggggggg');
 
     const handleRadioChange = (selectedValue) => {
-        // console.log('Selected value:', selectedValue);
-    };
-    const handleCheckBoxClick = (selectedOption) => {
+        // Update the selected value in the parent state for the specific question
         setValue((prev) => ({
             ...prev,
-            [question?.question_id]: selectedOption
-        }))
-        setOptionSelected(selectedOption?.value);
-        setIsDropdownOpen(false)
+            [question?.question_id]: selectedValue,
+        }));
+
+        // Optionally reset validation errors for this question
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_choiceboxfield: {
                 ...prevErrors.preview_choiceboxfield,
                 [question.question_id]: null,
             },
-        }))
-    }
+        }));
+
+        // Set the selected value locally for dropdown purposes or other UI updates
+        setOptionSelected(selectedValue);
+    };
+
+    const handleCheckBoxClick = (selectedOption) => {
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: selectedOption
+        }));
+        setOptionSelected(selectedOption?.value);
+        setIsDropdownOpen(false);
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors.preview_choiceboxfield,
+                [question.question_id]: null,
+            },
+        }));
+    };
 
     const renderInputGroup = () => {
         const { source, type, fixedChoiceArray, lookupOptionChoice } = fieldSettingParameters;
+        let values = [];
 
-        const values = source === 'fixedList'
-            ? fixedChoiceArray?.map(choice => choice.value) || []
-            : lookupOptionChoice || [];
+        if (preview) {
+            values = (question?.source === 'fixedList')
+                ? question?.source_value?.map(choice => choice.value) || []
+                : lookupOptionChoice || [];
+        } else {
+            values = (source === 'fixedList')
+                ? fixedChoiceArray?.map(choice => choice.value) || []
+                : lookupOptionChoice || [];
+        }
 
         if (type === 'single_choice') {
-            return <RadioButtonGroup testId={testId} preview values={values} name={source} onChange={handleRadioChange} />;
+            return <RadioButtonGroup testId={testId} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
         } else if (type === 'multi_choice') {
-            return <CheckboxButtonGroup testId={testId} preview values={values} name={source} onChange={handleRadioChange} />;
+            return <CheckboxButtonGroup testId={testId} preview values={values} question={question} name={source} onChange={handleCheckBoxClick} />;
         }
     };
-    useEffect(() => {  
-        setOptionSelected(choiceValue?.value);  
-     }, [choiceValue]);
+
+    useEffect(() => {
+        setOptionSelected(choiceValue?.value);
+    }, [choiceValue]);
+
     return (
         <div>
             <label
@@ -72,41 +98,41 @@ const ChoiceBoxField = ({
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
 
-            {['single_choice', 'multi_choice'].includes(fieldSettingParameters?.type) ? (
-                <div className={`relative ${fieldSettingParameters?.type}`}>
+            {['single_choice', 'multi_choice'].includes(preview ? question?.type : fieldSettingParameters?.type) ? (
+                <div className={`relative ${preview ? question?.type : fieldSettingParameters?.type}`}>
                     {renderInputGroup()}
                 </div>
             ) : (
                 <div className='relative'>
-                    {!preview ? <><input
-                        data-testid='input'
-                        type={type}
-                        id={textId}
-                        value={value}
-                        className={`w-full h-auto break-words border border-[#AEB3B7] ${preview ? 'mt-1' : 'mt-5'} rounded-lg bg-white py-3 pl-4 pr-12 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                        placeholder={fieldSettingParameters?.placeholderContent}
-                        onClick={handleChange} /><div className='absolute right-4 top-[65%] -translate-y-1/2'>
+                    {!preview && <>
+                        <input
+                            data-testid='input'
+                            type={type}
+                            id={textId}
+                            value={value}
+                            className={`w-full h-auto break-words border border-[#AEB3B7] ${preview ? 'mt-1' : 'mt-5'} rounded-lg bg-white py-3 pl-4 pr-12 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                            placeholder={fieldSettingParameters?.placeholderContent}
+                            onClick={handleChange} />
+                        <div className='absolute right-4 top-[65%] -translate-y-1/2'>
                             <Image src='down' />
-                        </div></> :
-                        <InfinateDropdown
-                            label=''
-                            id='lookup'
-                            placeholder={question?.placeholder_content}
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                            testID='lookup-dropdown'
-                            labeltestID='lookup-list'
-                            isDropdownOpen={isDropdownOpen}
-                            setDropdownOpen={setIsDropdownOpen}
-                            handleOptionClick={handleCheckBoxClick}
-                            top='20px'
-                            // close='true'
-                            options={question?.source_value ? question?.source_value : null}
-                            selectedOption={optionSelected}
-                            preview
-                            type={question?.type}
-                            // lastElementRef={lastElementRef}
-                        />
-                    }
+                        </div>
+                    </>}
+                    {(preview && question?.type === 'dropdown') && <InfinateDropdown
+                        label=''
+                        id='lookup'
+                        placeholder={question?.placeholder_content}
+                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
+                        testID='lookup-dropdown'
+                        labeltestID='lookup-list'
+                        isDropdownOpen={isDropdownOpen}
+                        setDropdownOpen={setIsDropdownOpen}
+                        handleOptionClick={handleCheckBoxClick}
+                        top='20px'
+                        options={question?.source_value ? question?.source_value : null}
+                        selectedOption={optionSelected}
+                        preview
+                        type={question?.type}
+                    />}
                 </div>
             )}
             {(question?.question_id && validationErrors?.preview_choiceboxfield && validationErrors.preview_choiceboxfield[question.question_id]) && (

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from '../../../Components/Image/Image.jsx';
 import useOnClickOutside from '../../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
@@ -15,16 +15,34 @@ import NumberField from './Fields/Number/NumberField.jsx';
 import AssetLocationField from './Fields/AssetLocation/AssetLocationField.jsx';
 import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
+// import axios from 'axios';
+import useApi from '../../../services/CustomHook/useApi.js';
 
-function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, sections, setValidationErrors, validationErrors, formDefaultInfo }) {
+function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
 
     const modalRef = useRef();
+    const { getAPI } = useApi();
     const dispatch = useDispatch();
     const [currentSection, setCurrentSection] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [value, setValue] = useState({})
     const [isFormatError, setIsFormatError] = useState(false);
     const [totalPagesNavigated, setTotalPagesNavigated] = useState(0);
+    const [sections, setSections] = useState([]);
+    // console.log(sections, 'sections llllll')
+    useEffect(() => {
+        const fetchSections = async () => {
+            try {
+                const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+
+                // console.log(response, 'dddd')
+                setSections(response?.data?.data?.sections);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchSections();
+    }, [questionnaire_id, version_number]);
 
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
@@ -39,7 +57,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'Custom Regular Expression':
                 return new RegExp(regex).test(value);
             default:
-                return true; // Allow any format if not specified      
+                return true; // Allow any format if not specified       
         }
     };
 
@@ -82,6 +100,13 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     acc[question.question_id] = 'This is a mandatory field';
                 }
             }
+            else if (question?.component_type === 'videofield' && !question?.options?.optional) {
+
+                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
+                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                }
+            }
             return acc;
         }, {});
         if (Object.keys(errors).length > 0) {
@@ -93,7 +118,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 preview_numberfield: errors,
                 preview_datetimefield: errors,
                 preview_photofield: errors,
-                preview_filefield: errors
+                preview_filefield: errors,
+                preview_videofield: errors
             }));
         } else {
             if (currentPage < sections[currentSection].pages.length - 1) {
@@ -104,7 +130,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 setCurrentPage(0);
                 setTotalPagesNavigated(totalPagesNavigated + 1);
             } else {
-                // Do nothing if you're on the last page of the last section    
+                // Do nothing if you're on the last page of the last section    
             }
         }
     };
@@ -135,7 +161,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'filefield':
                 return <FileField preview setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <ChoiceBoxField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <ChoiceBoxField preview fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors}  question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
                 return <DateTimeField preview setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
@@ -147,7 +173,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'photofield':
                 return <PhotoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
-                return <VideoField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <VideoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             default:
                 return <p>Unknown Field</p>;
         }
@@ -157,7 +183,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         dispatch(setModalOpen(false));
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
-            preview_textboxfield: '', // Or remove the key if you prefer   
+            preview_textboxfield: '', // Or remove the key if you prefer    
         }));
     });
 
@@ -184,10 +210,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
 
                     </div>
-                    <div className='bg-white p-[10px] mt-16'>{sections[currentSection].pages[currentPage].page_name}</div>
+                    <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
                     <div className='flex flex-col justify-between'>
 
-                        {sections[currentSection].pages[currentPage].questions.map((question, index) => (
+                        {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
                             <div className='mt-5' key={index}>
                                 <div className='px-2'>{renderQuestion(question)}</div>
                             </div>
@@ -207,7 +233,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 onChange={handleButton1}
                                 disabled={isImportLoading}
                                 id="file-upload"
-                                style={{ display: 'none' }} // Hide the actual input field   
+                                style={{ display: 'none' }} // Hide the actual input field    
                             />
                             <label
                                 htmlFor="file-upload"

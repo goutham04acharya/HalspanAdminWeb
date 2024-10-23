@@ -16,16 +16,17 @@ function FileField({
 }) {
 
     const [fileName, setFileName] = useState('');
-    const [fileState, setFileState] = useState({}); // Create a state to store the filename   
+    const [fileState, setFileState] = useState({ files: [] });   
 
     const handleFileChange = (e) => {
-        debugger
+        // debugger
         const file = e.target.files[0];
         setFileName(file ? file.name : '');
         // handleChange(fieldSettingParameters);    
         console.log(file, 'file akkaka')
         setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state    
         if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
+            debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
@@ -89,7 +90,7 @@ function FileField({
                     {fileName || (preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent) || 'No file chosen'}
                 </span>
             </div> : <div>
-                <FileUploader setValidationErrors={setValidationErrors} validationErrors={validationErrors} setValue={setValue} fileType={question?.asset_extras?.file_type} fileSize={question?.asset_extras?.file_size} min={question?.field_range?.min} max={question?.field_range?.max} handleFileChange={handleFileChange} handleFileRemove={handleFileRemove} />
+                <FileUploader setValidationErrors={setValidationErrors} validationErrors={validationErrors} setValue={setValue} fileType={question?.asset_extras?.file_type} fileSize={question?.asset_extras?.file_size} min={question?.field_range?.min} max={question?.field_range?.max} handleChange={handleFileChange} setFileState={setFileState} handleRemove={handleFileRemove} fileState={fileState} />
             </div>}
             {(question?.question_id && validationErrors?.preview_filefield && validationErrors.preview_filefield[question.question_id]) && (
                 <ErrorMessage error={validationErrors.preview_filefield[question.question_id]} />
