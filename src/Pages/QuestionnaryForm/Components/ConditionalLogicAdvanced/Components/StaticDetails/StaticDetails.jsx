@@ -1,15 +1,24 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
+import OperatorsModal from '../../../../../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 
 function StaticDetails({
     activeTab,
-    setActiveTab,
     handleTabClick,
-    setSelectedType,
     isDefaultLogic,
+    setIsOperatorModal,
+    setIsStringMethodModal
 }) {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+
+    const handleOperatorsModal = () => {
+        setIsOperatorModal(true);
+    }
+
+    const handleStringMethodsModal = () => {
+        setIsStringMethodModal(true);
+    }
 
     return (
         <div className=''>
@@ -17,29 +26,37 @@ function StaticDetails({
                 ?
                 <div>
                     {['choiceboxfield', 'textboxfield'].includes(fieldSettingParams[selectedQuestionId].componentType) &&
-                    <div className='p-[18px] bg-[#EFF1F8] h-customh12'>
-                        <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Equals</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetName == "Door")</p>
+                        <div className='p-[18px] bg-[#EFF1F8] h-customh12'>
+                            <p className='font-semibold text-lg text-[#2B333B]'>Common Text Calculations</p>
+                            <div className='mt-4'>
+                                <p className='font-semibold text-base text-[#000000]'>Constant Values</p>
+                                <p className='font-normal text-base text-[#000000]'>=”Text Inside Quotes”</p>
+                            </div>
+                            <div className='mt-4'>
+                                <p className='font-semibold text-base text-[#000000]'>Concatenation</p>
+                                <p className='font-normal text-base text-[#000000]'>=Firstname + ” “ + Lastname</p>
+                            </div>
+                            <div className='mt-4'>
+                                <p className='font-semibold text-base text-[#000000] flex items-center'>If-Then-Else
+                                    <span className='ml-2 cursor-pointer'>
+                                        <img src="/Images/help-circle.svg" alt="help" onClick={() => handleOperatorsModal()} />
+                                    </span>
+                                </p>
+                                <p className='font-normal text-base text-[#000000]'>=If Firstname == "Joe" then "Snowing" else "Raining"</p>
+                            </div>
+                            <div className='mt-4'>
+                                <p className='font-semibold text-base text-[#000000] flex items-center'>String Manipulation
+                                    <span className='ml-2 cursor-pointer'>
+                                        <img src="/Images/help-circle.svg" alt="help" onClick={() => handleStringMethodsModal()} />
+                                    </span>
+                                </p>
+                                <p className='font-normal text-base text-[#000000]'>=Firstname.toLowerCase()</p>
+                            </div>
+                            <div className='mt-4'>
+                                <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
+                                <p className='font-normal text-base text-[#000000]'>=If ((Firstname.StartsWith("J") AND Firstname.EndsWith("th")) OR Lastname.Includes("th")) then "Snowing" else "Raining"</p>
+                            </div>
                         </div>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Includes</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetName.Includes("Door"))</p>
-                        </div>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Not Equal to</p>
-                            <p className='font-normal text-base text-[#000000]'>=(AssetName != "Door")</p>
-                        </div>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Does not Include</p>
-                            <p className='font-normal text-base text-[#000000]'>=(!AssetName.Includes("Door"))</p>
-                        </div>
-                        <div className='mt-4'>
-                            <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                            <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) </p>
-                        </div>
-                    </div>
                     }
                     {fieldSettingParams[selectedQuestionId].componentType === 'dateTimefield' &&
                         <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
@@ -158,7 +175,7 @@ function StaticDetails({
                             </div>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Combined Logic</p>
-                                <p className='font-normal text-base text-[#000000]'>=If ((AssetName.StartsWith("J") AND AssetName.EndsWith("th")) OR AssetLastName.Includes("th")) </p>
+                                <p className='font-normal text-base text-[#000000]'>=If ((AssetName.toUpperCase === "YES" AND AssetName.toLowerCase === "no") OR AssetLastName.Includes("th")) </p>
                             </div>
                         </div>
                     )}

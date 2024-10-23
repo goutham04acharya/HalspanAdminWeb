@@ -25,14 +25,13 @@ function ChoiceFieldSetting({
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
+    isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
     setDefaultString
 }) {
-
     const [isLookupOpen, setIsLookupOpen] = useState(false);
     const [optionData, setOptionData] = useState([]);
-
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -48,10 +47,6 @@ function ChoiceFieldSetting({
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const handleLookupOption = (option) => {
-        // setFieldSettingParameters((prevState) => ({
-        //     ...prevState,
-        //     lookupOption: option.value,
-        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -63,7 +58,6 @@ function ChoiceFieldSetting({
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
         dispatch(setShouldAutoSave(true));
     }
-
     // List Functions
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
@@ -126,7 +120,14 @@ function ChoiceFieldSetting({
     useEffect(() => {
         fetchLookupList();
     }, [fetchLookupList]);
-    
+
+    if (isDefaultLogic) {
+        defaultString = defaultString.replaceAll(':', 'else')
+            .replaceAll('?', 'then')
+            .replaceAll('', 'if');
+        // Return null as JSX expects a valid return inside {}
+    }
+
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>

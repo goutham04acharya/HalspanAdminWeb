@@ -56,10 +56,11 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
+        console.log(sections, 'sections')
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`allSections.${suggestion}`))
         setSelectedType(valueType);
-
+        console.log(valueType)
 
         handleClickToInsert(suggestion, false, valueType);
 
@@ -100,7 +101,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
-                    <span data-testid="error-message" className='w-[6%]'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    <span data-testid="error-message" className='w-[10%]'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (
