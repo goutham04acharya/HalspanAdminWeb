@@ -637,8 +637,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString && !defaultString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
-                        default_conditional_logic: (question.question_id === selectedQuestionId && defaultString) ? payloadString : (fieldSettingParams[question.question_id]['default_conditional_logic'] || ''),
+                        conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                        default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -719,11 +719,6 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
-                        if(defaultString){
-                            dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }));
-                        }else{
-                            dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
-                        }
                        
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
