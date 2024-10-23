@@ -24,6 +24,7 @@ const ChoiceBoxField = ({
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
+    const [selectedValues, setSelectedValues] = useState([]);
     console.log(fieldSettingParameters, 'ggggggggggggggggg');
 
     const handleRadioChange = (selectedValue) => {
@@ -46,20 +47,39 @@ const ChoiceBoxField = ({
         setOptionSelected(selectedValue);
     };
 
-    const handleCheckBoxClick = (selectedOption) => {
-        setValue((prev) => ({
-            ...prev,
-            [question?.question_id]: selectedOption
-        }));
-        setOptionSelected(selectedOption?.value);
-        setIsDropdownOpen(false);
-        setValidationErrors((prevErrors) => ({
-            ...prevErrors,
-            preview_choiceboxfield: {
-                ...prevErrors.preview_choiceboxfield,
-                [question.question_id]: null,
-            },
-        }));
+    const handleCheckboxChange = (value) => {
+        setSelectedValues(prev => {
+            let newSelected;
+            if (prev.includes(value)) {
+                newSelected = prev.filter(item => item !== value);
+            } else {
+                newSelected = [...prev, value];
+            }
+
+            // Update parent component state
+            if (newSelected.length === 0) {
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: '',
+                }));
+            } else {
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: newSelected,
+                }));
+            }
+
+            // Clear validation errors
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_choiceboxfield: {
+                    ...prevErrors?.preview_choiceboxfield,
+                    [question?.question_id]: null,
+                },
+            }));
+
+            return newSelected;
+        });
     };
 
     const renderInputGroup = () => {
@@ -77,9 +97,9 @@ const ChoiceBoxField = ({
         }
 
         if (type === 'single_choice') {
-            return <RadioButtonGroup testId={testId} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
+            return <RadioButtonGroup testId={testId} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
         } else if (type === 'multi_choice') {
-            return <CheckboxButtonGroup testId={testId} preview values={values} question={question} name={source} onChange={handleCheckBoxClick} />;
+            return <CheckboxButtonGroup testId={testId} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
         }
     };
 
@@ -126,7 +146,7 @@ const ChoiceBoxField = ({
                         labeltestID='lookup-list'
                         isDropdownOpen={isDropdownOpen}
                         setDropdownOpen={setIsDropdownOpen}
-                        handleOptionClick={handleCheckBoxClick}
+                        handleOptionClick={handleCheckboxChange}
                         top='20px'
                         options={question?.source_value ? question?.source_value : null}
                         selectedOption={optionSelected}

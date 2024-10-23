@@ -63,8 +63,8 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
                 onBlur={handleTimeChange}
                 // placeholder="hh:mm:ss"
                 className="time-input w-full h-[40px] break-words border  border-[#AEB3B7] rounded-lg mt-1 px-4"
-                onClick={() => setIsDropdown(!isDropdownOpen)}
-            /><img src="/Images/clock.svg" alt="clock" className={`absolute text-[#2B333B] w-[15px] top-4 right-3 cursor-pointer`} />
+                onClick={(e) => setIsDropdown(!isDropdownOpen)}
+            /><img src="/Images/clock-primary.svg" alt="clock" onClick={() => setIsDropdown(!isDropdownOpen)} className={`absolute text-[#2B333B] w-[15px] top-4 right-3 cursor-pointer`} />
             {isDropdownOpen && (
                 <div ref={dropdownRef} className=" bg-white flex w-full border border-[#AEB3B7]  absolute mt-12">
                     <div className="flex flex-col w-1/3 h-[100px] items-center overflow-y-scroll border-r border-[#AEB3B7] overflow-x-hidden scrollHide">

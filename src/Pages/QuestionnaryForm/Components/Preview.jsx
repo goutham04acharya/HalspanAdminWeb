@@ -15,7 +15,7 @@ import NumberField from './Fields/Number/NumberField.jsx';
 import AssetLocationField from './Fields/AssetLocation/AssetLocationField.jsx';
 import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
-// import axios from 'axios';
+// import axios from 'axios';  
 import useApi from '../../../services/CustomHook/useApi.js';
 
 function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
@@ -29,16 +29,19 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [isFormatError, setIsFormatError] = useState(false);
     const [totalPagesNavigated, setTotalPagesNavigated] = useState(0);
     const [sections, setSections] = useState([]);
-    // console.log(sections, 'sections llllll')
+    const [loading, setLoading] = useState(false); // Add a loading state  
+
     useEffect(() => {
         const fetchSections = async () => {
+            setLoading(true); // Set loading to true when API call starts  
             try {
                 const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
 
-                // console.log(response, 'dddd')
                 setSections(response?.data?.data?.sections);
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false); // Set loading to false when API call ends  
             }
         };
         fetchSections();
@@ -57,14 +60,13 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'Custom Regular Expression':
                 return new RegExp(regex).test(value);
             default:
-                return true; // Allow any format if not specified       
+                return true; // Allow any format if not specified  
         }
     };
 
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            console.log(value, 'naynaya')
             if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
@@ -89,20 +91,16 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 }
             }
             else if (question?.component_type === 'photofield' && !question?.options?.optional) {
-                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
             }
             else if (question?.component_type === 'filefield' && !question?.options?.optional) {
-                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
             }
             else if (question?.component_type === 'videofield' && !question?.options?.optional) {
-
-                console.log(value[question?.question_id], 'value[question?.question_id] photofield')
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
@@ -130,7 +128,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 setCurrentPage(0);
                 setTotalPagesNavigated(totalPagesNavigated + 1);
             } else {
-                // Do nothing if you're on the last page of the last section    
+                // Do nothing if you're on the last page of the last section  
             }
         }
     };
@@ -145,13 +143,14 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
+
     const renderQuestion = (question) => {
         if (!question) {
             return <p>No question data available.</p>;
         }
         switch (question.component_type) {
             case 'textboxfield':
-                return <TextBoxField setIsFormatError={setIsFormatError} id={question?.question_id} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
+                return <TextBoxField setIsFormatError={setIsFormatError} id={question?.question_id} testId={`preview`} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
@@ -161,7 +160,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'filefield':
                 return <FileField preview setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <ChoiceBoxField preview fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors}  question={question} validationErrors={validationErrors} />;
+                return <ChoiceBoxField preview fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
                 return <DateTimeField preview setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
@@ -183,12 +182,12 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         dispatch(setModalOpen(false));
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
-            preview_textboxfield: '', // Or remove the key if you prefer    
+            preview_textboxfield: '', // Or remove the key if you prefer  
         }));
     });
 
     return (
-        <div className='bg-[#3931313b] w-full h-screen pointer-events-auto absolute top-0 flex flex-col items-center justify-center z-[999]'>
+        <div className='bg-[#3931313b] pointer-events-auto w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
 
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
@@ -197,32 +196,37 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     <Image src={src} className={`${className} mx-auto`} />
                 </div>
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollBar w-full bg-slate-100 rounded-md'>
-                    <div>
-                        <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
-                            {sections[currentSection]?.section_name}
-                        </p>
-                        <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
-                            <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%` }}></div>
-                            <div className='flex justify-between pt-5'>
-                                <p>Step {totalPagesNavigated + 1} of {allPages.length}</p>
-                                <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%</span>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-full">
+                            <BeatLoader color="#2B333B" size='20px' />
+                        </div>
+                    ) : (
+                        <div>
+                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
+                                {sections[currentSection]?.section_name}
+                            </p>
+                            <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
+                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%` }}></div>
+                                <div className='flex justify-between pt-5'>
+                                    <p>Step {totalPagesNavigated + 1} of {allPages.length}</p>
+                                    <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%</span>
+                                </div>
+                            </div>
+
+                            <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
+                            <div className='flex flex-col justify-between'>
+
+                                {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
+                                    <div className='mt-5' key={index}>
+                                        <div className='px-2'>{renderQuestion(question)}</div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-
-                    </div>
-                    <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
-                    <div className='flex flex-col justify-between'>
-
-                        {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
-                            <div className='mt-5' key={index}>
-                                <div data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`} className='px-2'>{renderQuestion(question)}</div>
-                            </div>
-                        ))}
-                    </div>
-
+                    )}
                 </div>
                 <div className='mt-5 flex items-center justify-between'>
-                    {!showLabel ? <button type='button' data-testid="back" className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
+                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
@@ -233,7 +237,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 onChange={handleButton1}
                                 disabled={isImportLoading}
                                 id="file-upload"
-                                style={{ display: 'none' }} // Hide the actual input field    
+                                style={{ display: 'none' }} // Hide the actual input field  
                             />
                             <label
                                 htmlFor="file-upload"
@@ -247,7 +251,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 )}
                             </label>
                         </>}
-                    <button type='button' data-testid="next" onClick={handleNextClick} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}>
+                    <button type='button' data-testid={testIDBtn2} onClick={handleNextClick} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}>
                         Next
                     </button>
                 </div>

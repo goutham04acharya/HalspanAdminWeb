@@ -1,45 +1,55 @@
 import React, { useState } from 'react';
 
-const RadioButtonGroup = ({ values, name, onChange, testId, preview, question }) => {
-    const [selectedValue, setSelectedValue] = useState(values[0]);
-    // console.log(values[0],'assaasasasassssssssssssssssssssssssssssssssssssssssssss')
+const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidationErrors, preview, question }) => {
+    const [selectedValue, setSelectedValue] = useState('');
+
     const handleChange = (event) => {
-
-        console.log(event, 'event')
         const newValue = event.target.value;
-        setSelectedValue(event.target.value);
-        console.log(newValue, 'new value')
-        // onChange(newValue)
-    };
-    console.log(selectedValue,'ddsdsdsdsdsds')
+        setSelectedValue(newValue);
+        // onChange(newValue)  
+        // setValue((prev) => ({
+        //     ...prev,
+        //     [question?.question_id]: selectedValue,
+        // }));
 
+        // // Optionally reset validation errors for this question
+        // setValidationErrors((prevErrors) => ({
+        //     ...prevErrors,
+        //     preview_choiceboxfield: {
+        //         ...prevErrors.preview_choiceboxfield,
+        //         [question.question_id]: null,
+        //     },
+        // }));
+        onChange(newValue)
+    };
 
     return (
         <div className="space-y-2 mt-4">
-            {values.map((value, index) => (
-                <div key={index} className="relative custom-radioBlue py-2">
-                    <input
-                        data-testid={`${testId}-choice-${index}`}
-                        id={`radio-${index}`}
-                        type="radio"
-                        name={'name'}
-                        value={value}
-                        onChange={(event)=>handleChange(event)}
-                        checked // Ensure checked is correctly tied to selectedValue
-                        className="hidden"
-                        // maxLength={100}
-                    />
+            <div className="space-y-2 mt-4 flex flex-col relative">
+                {values.map((option, index) => (
                     <label
-                        htmlFor={`radio-${index}`}
-                        data-testid={`${testId}-choice-${index + 1}`}
-                        maxLength={50}
-                        
-                        className="h-5 flex items-center cursor-pointer relative pl-6 text-neutral-primary text-[16px] leading-[20px] font-normal break-words flex-wrap overflow-hidden"
+                        key={index}
+                        className="flex items-center cursor-pointer group space-x-2"
                     >
-                        {value}
+                        <div className="relative flex items-center">
+                            <input
+                                type="radio"
+                                value={option}
+                                checked={selectedValue === option}
+                                onChange={(e) => setSelectedValue(e.target.value)}
+                                onClick={(e) => handleChange(e)}
+                                className="absolute w-0 h-0 opacity-0"
+                            />
+                            <div className="w-5 h-5 border-2 border-[#2B333B] rounded-full">
+                                {selectedValue === option && (
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#2B333B] rounded-full" />
+                                )}
+                            </div>
+                        </div>
+                        <span className="text-sm text-gray-700">{option}</span>
                     </label>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 };
