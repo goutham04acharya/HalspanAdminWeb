@@ -458,7 +458,6 @@ const QuestionnaryForm = () => {
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        // debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -1132,7 +1131,6 @@ const QuestionnaryForm = () => {
                                 </DragDropContext>
                                 <button
                                     onClick={() => {
-                                        // debugger
                                         handleAddRemoveSection('add');
                                         handleSectionSaveOrder(sections);
                                     }}

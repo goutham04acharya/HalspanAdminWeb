@@ -198,13 +198,15 @@ function TestFieldSetting({
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
             <div className='relative w-full'>
               <input type="text" id='Label'
+                data-testid="default-value-input"
                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content'
                 value={fieldSettingParameters?.default_conditional_logic || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                 onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))} />
-                <img
+              <img
                 src="/Images/setting.svg"
                 alt="setting"
+                data-testid="default-value"
                 className='absolute top-5 right-3 cursor-pointer'
                 onClick={() => {
                   setIsDefaultLogic(true);
