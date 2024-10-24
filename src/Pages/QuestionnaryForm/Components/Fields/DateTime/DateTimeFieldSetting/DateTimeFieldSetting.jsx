@@ -55,13 +55,16 @@ function DateTimeFieldSetting({
                 value={fieldSettingParameters?.default_conditional_logic || ''}
                 type="text"
                 id='Label'
+                data-testid="default-value-input"
                 onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content' />
-              <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' onClick={() => {
-                setIsDefaultLogic(true);
-                setConditionalLogic(false);
-              }} />
+              <img src="/Images/setting.svg" alt="setting"
+                data-testid="default-value"
+                className='absolute top-5 right-3 cursor-pointer' onClick={() => {
+                  setIsDefaultLogic(true);
+                  setConditionalLogic(false);
+                }} />
             </div>
           </div>
           <div className='mt-7'>
