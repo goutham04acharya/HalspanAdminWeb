@@ -41,6 +41,7 @@ module.exports = {
             'test/integration-testing/Flow1/39_default_value_choice.feature',
             'test/integration-testing/Flow1/41_default_value_date_time.feature',
             'test/integration-testing/Flow1/41_default_value_textbox.feature',
+            'test/integration-testing/Flow1/42_default_value_number.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

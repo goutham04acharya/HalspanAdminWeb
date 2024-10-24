@@ -45,7 +45,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
     const [selectedType, setSelectedType] = useState('');
-    const [tab, setTab] = useState(false);
+    const [tab, setTab] = useState('basic');
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
@@ -109,8 +109,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     // Handlers to switch tabs
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
+    const handleTabClick = (event) => {
+        setActiveTab(event);
     };
 
     const handleClose = () => {
@@ -676,7 +676,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
-    }, [selectedQuestionId, allSectionDetails, tab]);
+    }, [selectedQuestionId, allSectionDetails]);
 
 
     const handleSave = async () => {
@@ -771,7 +771,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             const result = eval(evalInputValue);
-            console.log(result, 'hoi')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -782,7 +781,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                         break;
                     case 'numberfield':
-                        // Number field specific logic (if any)
+                       // Attempt to parse result as a number
+                        const parsedResult = Number(result);
+
+                        // Check if the type is 'integer'
+                        if (fieldSettingParams[selectedQuestionId].type === 'integer') {
+                            // Ensure result is an integer
+                            if (!Number.isInteger(parsedResult) || result.toString().includes('.')) {
+                                handleError('The evaluated result should only be an integer.');
+                                return;
+                            }
+                        }
+                        // Check if the type is 'float'
+                        else if (fieldSettingParams[selectedQuestionId].type === 'float') {
+                            // Ensure result is a valid float (allow dot and digits)
+                            if (!/^\d+(\.\d+)?$/.test(result)) {
+                                handleError('The evaluated result should be a valid float (number and dot).');
+                                return;
+                            }
+                        } else {
+                            setError('');  // No error, valid number
+                        }
                         break;
                     default:
                         break;
@@ -816,7 +835,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         } catch (error) {
             console.error(error, 'error')
-            // handleError(`Error evaluating the expression: ${error.message}`);
+            handleError(`Error evaluating the expression: ${error.message}`);
         }
     };
 
@@ -949,7 +968,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
                 <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
-                        {(tab || isDefaultLogic) ? (
+                        {(tab === 'advance' || isDefaultLogic) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
@@ -1006,8 +1025,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                             {!isDefaultLogic &&
                                 <div className='flex gap-5 items-end'>
-                                    <p onClick={() => setTab(true)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                                    <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                    <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                    <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                 </div>
                             }
                             <div>
@@ -1022,7 +1041,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={tab || isDefaultLogic ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
