@@ -101,10 +101,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
-            } else if (question?.component_type === 'signaturefield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === null) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
             } else if (question?.component_type === 'numberfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
@@ -128,6 +124,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
+            }else if (question?.component_type === 'gpsfield' && !question?.options?.optional) {
+                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                    acc[question.question_id] = 'This is a mandatory field';
+                }
             }
             return acc;
         }, {});
@@ -136,12 +136,12 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 ...prevErrors,
                 preview_textboxfield: errors,
                 preview_choiceboxfield: errors,
-                preview_signaturefield: errors,
                 preview_numberfield: errors,
                 preview_datetimefield: errors,
                 preview_photofield: errors,
                 preview_filefield: errors,
-                preview_videofield: errors
+                preview_videofield: errors,
+                preview_gpsfield: errors,
             }));
         } else {
             if (currentPage < sections[currentSection].pages.length - 1) {
@@ -208,7 +208,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             ...prevErrors,
             preview_textboxfield: '',
             preview_choiceboxfield: '',
-            preview_signaturefield: '',
             preview_numberfield: '',
             preview_datetimefield: '',
             preview_photofield: '',

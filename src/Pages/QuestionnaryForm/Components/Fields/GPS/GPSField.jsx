@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 function GPSField({
     type,
@@ -12,10 +13,12 @@ function GPSField({
     setValue,
     setValidationErrors,
     validationErrors
+
 }) {
+
     const [location, setLocation] = useState('');
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true); // Add loading states
 
     useEffect(() => {
         const fetchLocation = () => {
@@ -27,72 +30,34 @@ function GPSField({
                             position.coords.longitude
                         );
                         setLocation(formattedLocation);
-                        setLoading(false);
-
-                        // Set value to true when location is successfully obtained
-                        if (question?.question_id) {
-                            setValue((prev) => ({
-                                ...prev,
-                                [question.question_id]: true
-                            }));
-                        }
-
-                        // Clear validation errors
+                        setLoading(false); // Stop loading once location is fetched
+                        setValue((prev) => ({
+                            ...prev,
+                            [question?.question_id]: true
+                        }))
                         setValidationErrors((prevErrors) => ({
                             ...prevErrors,
-                            preview_gpsfield: {
-                                ...prevErrors?.preview_gpsfield,
-                                [question?.question_id]: ''
-                            }
-                        }));
+                            preview_gpsfield: '', // Or remove the key if you prefer     
+                        }))
                     },
                     (err) => {
                         setError(err.message);
-                        setLoading(false);
-
-                        // Set value to false when location access fails
-                        if (question?.question_id) {
-                            setValue((prev) => ({
-                                ...prev,
-                                [question.question_id]: false
-                            }));
-                        }
-
-                        // Set validation error message
-                        setValidationErrors((prevErrors) => ({
-                            ...prevErrors,
-                            preview_gpsfield: {
-                                ...prevErrors?.preview_gpsfield,
-                                [question?.question_id]: 'Location access denied'
-                            }
-                        }));
+                        setLoading(false); // Stop loading once location is fetched
                     }
                 );
+
             } else {
                 setError("Geolocation is not supported by this browser.");
-                setLoading(false);
-
-                // Set value to false when geolocation is not supported
-                if (question?.question_id) {
-                    setValue((prev) => ({
-                        ...prev,
-                        [question.question_id]: false
-                    }));
-                }
-
-                // Set validation error message
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_gpsfield: {
-                        ...prevErrors?.preview_gpsfield,
-                        [question?.question_id]: 'Geolocation not supported'
-                    }
-                }));
+                setLoading(false); // Stop loading once location is fetched
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: false
+                }))
             }
         };
 
         fetchLocation();
-    }, [question?.question_id, setValue, setValidationErrors]);
+    }, []);
 
     // Memoize the formatted location to prevent unnecessary re-renders
     const memoizedLocation = useMemo(() => location, [location]);
@@ -107,6 +72,7 @@ function GPSField({
         return `${formattedLat}, ${formattedLon}`;
     };
 
+
     return (
         <div>
             <label
@@ -118,7 +84,7 @@ function GPSField({
                 {preview ? question?.label : fieldSettingParameters?.label}
             </label>
             <div className={`${preview ? 'mt-3' : 'mt-7'} ml-4`}>
-                {loading ? (
+                {loading ? ( // Display a loading message while fetching location
                     <p>Loading location...</p>
                 ) : error ? (
                     <p>Error: {error}</p>

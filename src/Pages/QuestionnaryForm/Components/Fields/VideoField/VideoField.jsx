@@ -69,7 +69,7 @@ function VideoField({ label,
                 maxLength={100}
                 title={preview ? question?.label : fieldSettingParameters?.label}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all  break-words block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
-                {preview ? question?.label : fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
             {!preview ? <div className={`custom-file-input-wrapper w-full h-auto mt-5 flex items-center bg-white border border-[#AEB3B7] p-2 rounded-lg`}>
                 <label
