@@ -129,6 +129,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
             <div
                 style={{ width: "100px", height: "100px", position: "relative", cursor: "pointer" }}
                 onClick={handleImageClick}
+                data-testid="floorplan-image"
             >
                 <img
                     src={floorPlan ? '/floorplan.png' :imageSrc}

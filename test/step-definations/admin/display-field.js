@@ -25,12 +25,12 @@ When('I click the type as headings', async function () {
 When('I enter the heading', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const headingInput = await driver.wait(until.elementLocated(By.css('[data-testid="heading-input"]')));
-    headingInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
+    headingInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     this.heading = 'Display content as field';
     await headingInput.sendKeys(this.heading);
 });
 
-Then('I should be able see heading updated in question {int} page {int} section {int}', async function (sectionNumber, pageNumber, questionNumber) {
+Then('I should be able see heading updated in question {int} page {int} section {int}', async function (questionNumber, pageNumber, sectionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const heading = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${questionNumber}"] [data-testid="heading"]`)));
     await driver.wait(until.elementIsVisible(heading), 2000);

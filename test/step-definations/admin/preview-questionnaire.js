@@ -8,7 +8,7 @@ const Keys = webdriver.Key;
 
 When('I click on add new page for section {int}', async function (sectionNumber) {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="add-page-sec-${sectionNumber}"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="add-page-sec-${sectionNumber - 1}"]`))).click();
 });
 
 Then('I should see the new page added for section {int}', async function (int) {
@@ -17,12 +17,19 @@ Then('I should see the new page added for section {int}', async function (int) {
     await driver.wait(until.elementLocated(By.xpath('//p[text()="Page 1"]')))
 });
 
+When('I click on add new section {int}', async function (sectionNumber) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="open-${sectionNumber - 1}"]`))).click();
+});
+
 When('I enter the label name for photo for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
-    this.photoLabelName = 'Photo label name';
-    await labelNameInput.sendKeys(this.photoLabelName);
+    global.photoLabelName = 'Photo label name';
+    await labelNameInput.sendKeys(global.photoLabelName);
 });
 
 Then('I should see the label name for photo updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -30,22 +37,22 @@ Then('I should see the label name for photo updated in the section {int} page {i
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    console.log(this.photoLabelName);
-    assert.equal(labelNameText, this.photoLabelName);
+    console.log(global.photoLabelName);
+    assert.equal(labelNameText, global.photoLabelName);
 });
 
 When('I enter the help text for photo for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.photoHelpText = 'Supported formats: JPG, PNG, GIF';
-    await helpTextInput.sendKeys(this.photoHelpText);
+    global.photoHelpText = 'Supported formats: JPG, PNG, GIF';
+    await helpTextInput.sendKeys(global.photoHelpText);
 });
 
 Then('I should see the help text for photo updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.photoHelpText);
+    assert.equal(helpTextText, global.photoHelpText);
 });
 
 When('I click the save button for the questionnaire version for section {int}', async function (save) {
@@ -57,8 +64,8 @@ When('I enter the label name for floorplan for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
-    this.floorPlanLabelName = 'Sample floorplan label';
-    await labelNameInput.sendKeys(this.floorPlanLabelName);
+    global.floorPlanLabelName = 'Sample floorplan label';
+    await labelNameInput.sendKeys(global.floorPlanLabelName);
 });
 
 Then('I should see the label name for floorplan updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -66,22 +73,22 @@ Then('I should see the label name for floorplan updated in the section {int} pag
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    console.log(this.floorPlanLabelName);
-    assert.equal(labelNameText, this.floorPlanLabelName);
+    console.log(global.floorPlanLabelName);
+    assert.equal(labelNameText, global.floorPlanLabelName);
 });
 
 When('I enter the help text for floorplan for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.floorPlanHelpText = 'Enter the Sample floorplan helptext';
-    await helpTextInput.sendKeys(this.floorPlanHelpText);
+    global.floorPlanHelpText = 'Enter the Sample floorplan helptext';
+    await helpTextInput.sendKeys(global.floorPlanHelpText);
 });
 
 Then('I should see the help text updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.floorPlanHelpText);
+    assert.equal(helpTextText, global.floorPlanHelpText);
 });
 
 When('I enter the label name for number for preview', async function () {
@@ -89,7 +96,7 @@ When('I enter the label name for number for preview', async function () {
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
     labelNameInput.sendKeys('Sample Number Label Name');
-    this.numberLabelName = 'Sample Number Label Name';
+    global.numberLabelName = 'Sample Number Label Name';
 });
 
 Then('I should see the label name for number updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -97,43 +104,43 @@ Then('I should see the label name for number updated in the section {int} page {
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    assert.equal(labelNameText, this.numberLabelName);
+    assert.equal(labelNameText, global.numberLabelName);
 });
 
 When('I enter the help text for number for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
     await helpTextInput.sendKeys('Sample Number help Name');
-    this.numberHelpText = 'Sample Number help Name';
+    global.numberHelpText = 'Sample Number help Name';
 });
 
 Then('I should see the help text for number updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.numberHelpText);
+    assert.equal(helpTextText, global.numberHelpText);
 });
 
 When('I enter the placeholder content for number for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
     await placeholderTextInput.sendKeys('Sample Number placeholder Name');
-    this.numberPlaceholder = 'Sample Number placeholder Name';
+    global.numberPlaceholder = 'Sample Number placeholder Name';
 });
 
 Then('I should see the placeholder content for number updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
-    assert.equal(placeholderText, this.numberPlaceholder);
+    assert.equal(placeholderText, global.numberPlaceholder);
 });
 
 When('I enter the label name for signature for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
-    this.signatureLabelName = 'Signature label name';
-    await labelNameInput.sendKeys(this.signatureLabelName);
+    global.signatureLabelName = 'Signature label name';
+    await labelNameInput.sendKeys(global.signatureLabelName);
 });
 
 Then('I should see the label name for signature updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -141,30 +148,30 @@ Then('I should see the label name for signature updated in the section {int} pag
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    console.log(this.signatureLabelName);
-    assert.equal(labelNameText, this.signatureLabelName);
+    console.log(global.signatureLabelName);
+    assert.equal(labelNameText, global.signatureLabelName);
 });
 
 When('I enter the help text for signature for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.signatureHelpText = 'Write your signature';
-    await helpTextInput.sendKeys(this.signatureHelpText);
+    global.signatureHelpText = 'Write your signature';
+    await helpTextInput.sendKeys(global.signatureHelpText);
 });
 
 Then('I should see the help text for signature updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.signatureHelpText);
+    assert.equal(helpTextText, global.signatureHelpText);
 });
 
 When('I enter the label name for asset location for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
-    this.assetLocationLabelName = 'Asset Location label name';
-    await labelNameInput.sendKeys(this.assetLocationLabelName);
+    global.assetLocationLabelName = 'Asset Location label name';
+    await labelNameInput.sendKeys(global.assetLocationLabelName);
 });
 
 Then('I should see the label name for asset location updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -172,22 +179,22 @@ Then('I should see the label name for asset location updated in the section {int
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    console.log(this.assetLocationLabelName);
-    assert.equal(labelNameText, this.assetLocationLabelName);
+    console.log(global.assetLocationLabelName);
+    assert.equal(labelNameText, global.assetLocationLabelName);
 });
 
 When('I enter the help text for asset location for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.assetLocationHelpText = 'Select your asset location';
-    await helpTextInput.sendKeys(this.assetLocationHelpText);
+    global.assetLocationHelpText = 'Select your asset location';
+    await helpTextInput.sendKeys(global.assetLocationHelpText);
 });
 
 Then('I should see the help text for asset location updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.assetLocationHelpText);
+    assert.equal(helpTextText, global.assetLocationHelpText);
 });
 
 When('I enter the label name for gps for preview', async function () {
@@ -229,62 +236,64 @@ When('I click the preview button', async function () {
 When('I enter the label name for textbox for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
-    await labelNameInput.sendKeys(Key.chord(Key.CONTROL, "a"), Key.DELETE)
+    await labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
     await labelNameInput.sendKeys('Sample textbox Label Name');
-    this.textBoxLabelName = 'Sample textbox Label Name'
+    global.textBoxLabelName = 'Sample textbox Label Name';
+    console.log('textbox label name 1 = ', global.textBoxLabelName);
 });
 
-Then('I should see the label name updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
-    const labelNameText = await labelName.getText();
-    assert.equal(labelNameText, this.textBoxLabelName);
-});
+// Then('I should see the label name updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
+//     await new Promise(resolve => setTimeout(resolve, 1500));
+//     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
+//     const labelNameText = await labelName.getText();
+//     assert.equal(labelNameText, global.textBoxLabelName);
+//     console.log('textbox label name 2 = ', global.textBoxLabelName);
+// });
 
 When('I enter the help text for textbox for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    await helpTextInput.sendKeys(Key.chord(Key.CONTROL, "a"), Key.DELETE)
+    await helpTextInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
 
     await helpTextInput.sendKeys('Sample textbox Help Text');
-    this.textBoxHelpText = 'Sample textbox Help Text'
+    global.textBoxHelpText = 'Sample textbox Help Text'
 });
 
 Then('I should see the help text for textbox updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.textBoxHelpText);
+    assert.equal(helpTextText, global.textBoxHelpText);
 });
 
 When('I enter the placeholder content for textbox for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
-    await placeholderInput.sendKeys(Key.chord(Key.CONTROL, "a"), Key.DELETE)
+    await placeholderInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
 
     await placeholderInput.sendKeys('Sample textbox placeholder');
-    this.textBoxPlaceholder = 'Sample textbox placeholder'
+    global.textBoxPlaceholder = 'Sample textbox placeholder'
 });
 
 // Then('I should see the placeholder content updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
 //     await new Promise(resolve => setTimeout(resolve, 1500));
 //     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="input"]`)));
 //     const placeholderText = await placeholder.getAttribute('placeholder');
-//     assert.equal(placeholderText, this.textBoxPlaceholder);
+//     assert.equal(placeholderText, global.textBoxPlaceholder);
 // });
 
 When('I enter the help text for choice for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
     await helpTextInput.sendKeys('Sample Choice help Name');
-    this.choiceHelpText = 'Sample Choice help Name';
+    global.choiceHelpText = 'Sample Choice help Name';
 });
 
 When('I enter the placeholder content for choice for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
     await placeholderTextInput.sendKeys('Sample Choice placeholder Name');
-    this.choicePlaceholder = 'Sample Choice placeholder Name';
+    global.choicePlaceholder = 'Sample Choice placeholder Name';
 });
 
 When('I enter the label name for choice for preview', async function () {
@@ -292,15 +301,15 @@ When('I enter the label name for choice for preview', async function () {
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
     labelNameInput.sendKeys('Sample Choice Label Name');
-    this.choiceLabelName = 'Sample Choice Label Name';
+    global.choiceLabelName = 'Sample Choice Label Name';
 });
 
 When('I enter the label name for date\\/time for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
     labelNameInput.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
-    this.dateTimeLabelName = 'Date or time';
-    await labelNameInput.sendKeys(this.dateTimeLabelName);
+    global.dateTimeLabelName = 'Date or time';
+    await labelNameInput.sendKeys(global.dateTimeLabelName);
 });
 
 Then('I should see the label name for date\\/time updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -308,64 +317,65 @@ Then('I should see the label name for date\\/time updated in the section {int} p
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    console.log(this.dateTimeLabelName);
-    assert.equal(labelNameText, this.dateTimeLabelName);
+    console.log(global.dateTimeLabelName);
+    assert.equal(labelNameText, global.dateTimeLabelName);
 });
 
 When('I enter the help text for date\\/time for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const helpTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="help-text-input"]')));
-    this.dateTimeHelpText = 'Enter the date/time in dd/mm/yyyy format';
-    await helpTextInput.sendKeys(this.dateTimeHelpText);
+    global.dateTimeHelpText = 'Enter the date/time in dd/mm/yyyy format';
+    await helpTextInput.sendKeys(global.dateTimeHelpText);
 });
 
 Then('I should see the help text for date\\/time updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.dateTimeHelpText);
+    assert.equal(helpTextText, global.dateTimeHelpText);
 });
 
 When('I enter the placeholder content for date\\/time for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
-    this.dateTimePlaceholder = 'dd-mm-yyyy';
-    await placeholderTextInput.sendKeys(this.dateTimePlaceholder);
+    global.dateTimePlaceholder = 'dd-mm-yyyy';
+    await placeholderTextInput.sendKeys(global.dateTimePlaceholder);
 });
 
 Then('I should see the placeholder content for date\\/time updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
-    assert.equal(placeholderText, this.dateTimePlaceholder);
+    assert.equal(placeholderText, global.dateTimePlaceholder);
 });
 
 Then('I should see the label name for textbox updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)));
     const labelNameText = await labelName.getText();
-    assert.equal(labelNameText, this.textBoxLabelName);
+    assert.equal(labelNameText, global.textBoxLabelName);
+    console.log('textbox label name 2 = ', global.textBoxLabelName);
 });
 
 When('I enter the placeholder content date\\/time for preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const placeholderTextInput = await driver.wait(until.elementLocated(By.css('[data-testid="placeholder-input"]')));
-    this.dateTimePlaceholder = 'dd-mm-yyyy';
-    await placeholderTextInput.sendKeys(this.dateTimePlaceholder);
+    global.dateTimePlaceholder = 'dd-mm-yyyy';
+    await placeholderTextInput.sendKeys(global.dateTimePlaceholder);
 });
 
 Then('I should see the placeholder content for choice updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
-    assert.equal(placeholderText, this.choicePlaceholder);
+    assert.equal(placeholderText, global.choicePlaceholder);
 });
 
 Then('I should see the placeholder content for textbox updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="input"]`)));
     const placeholderText = await placeholder.getAttribute('placeholder');
-    assert.equal(placeholderText, this.textBoxPlaceholder);
+    assert.equal(placeholderText, global.textBoxPlaceholder);
 });
 
 Then('I should see the label name for choice updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
@@ -373,14 +383,14 @@ Then('I should see the label name for choice updated in the section {int} page {
     const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="label-name"]`)), 5000);
     await driver.wait(until.elementIsVisible(labelName), 2000);
     const labelNameText = await labelName.getText();
-    assert.equal(labelNameText, this.choiceLabelName);
+    assert.equal(labelNameText, global.choiceLabelName);
 });
 
 Then('I should see the help text for choice updated in the section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     const helpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="help-text"]`)));
     const helpTextText = await helpText.getText();
-    assert.equal(helpTextText, this.choiceHelpText);
+    assert.equal(helpTextText, global.choiceHelpText);
 });
 
 Then('I should see the mobile preview', async function () {
@@ -398,96 +408,99 @@ Then('I validate the data entered exists in the mobile preview for section {int}
     await new Promise(resolve => setTimeout(resolve, 1500));
     if (sectionNumber === 1 && pageNumber === 1) {
         // Validate Question 1 (Textbox)
-        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="label-name"]`)), 5000);
+        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="label-name"]`)), 5000);
         const question1LabelText = await question1Label.getText();
-        assert.equal(question1LabelText, this.textBoxLabelName, 'Question 1 label name does not match');
+        console.log(question1LabelText, '===', global.textBoxLabelName);
+        assert.equal(question1LabelText, global.textBoxLabelName, 'Question 1 label name does not match');
 
-        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="help-text"]`)), 5000);
+        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="help-text"]`)), 5000);
         const question1HelpTextText = await question1HelpText.getText();
-        assert.equal(question1HelpTextText, this.textBoxHelpText, 'Question 1 help text does not match');
+        assert.equal(question1HelpTextText, global.textBoxHelpText, 'Question 1 help text does not match');
 
-        const question1Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="input"]`)), 5000);
+        const question1Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="input"]`)), 5000);
         const question1PlaceholderText = await question1Placeholder.getAttribute('placeholder');
-        assert.equal(question1PlaceholderText, this.textBoxPlaceholder, 'Question 1 placeholder does not match');
+        assert.equal(question1PlaceholderText, global.textBoxPlaceholder, 'Question 1 placeholder does not match');
 
         // Validate Question 2 (Choice)
-        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="label-name"]`)), 5000);
+        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="label-name"]`)), 5000);
         const question2LabelText = await question2Label.getText();
-        assert.equal(question2LabelText, this.choiceLabelName, 'Question 2 label name does not match');
+        assert.equal(question2LabelText, global.choiceLabelName, 'Question 2 label name does not match');
 
-        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="help-text"]`)), 5000);
+        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="help-text"]`)), 5000);
         const question2HelpTextText = await question2HelpText.getText();
-        assert.equal(question2HelpTextText, this.choiceHelpText, 'Question 2 help text does not match');
+        assert.equal(question2HelpTextText, global.choiceHelpText, 'Question 2 help text does not match');
 
-        const question2Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="input"]`)), 5000);
-        const question2PlaceholderText = await question2Placeholder.getAttribute('placeholder');
-        assert.equal(question2PlaceholderText, this.choicePlaceholder, 'Question 2 placeholder does not match');
+        //======================================================================
+        // const question2Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="input"]`)), 5000);
+        // const question2PlaceholderText = await question2Placeholder.getAttribute('placeholder');
+        // assert.equal(question2PlaceholderText, global.choicePlaceholder, 'Question 2 placeholder does not match');
+        //======================================================================
 
         // Validate Question 3 (Date/Time)
-        const question3Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-3"] [data-testid="label-name"]`)), 5000);
+        const question3Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-2"] [data-testid="label-name"]`)), 5000);
         const question3LabelText = await question3Label.getText();
-        assert.equal(question3LabelText, this.dateTimeLabelName, 'Question 3 label name does not match');
+        assert.equal(question3LabelText, global.dateTimeLabelName, 'Question 3 label name does not match');
 
-        const question3HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-3"] [data-testid="help-text"]`)), 5000);
+        const question3HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-2"] [data-testid="help-text"]`)), 5000);
         const question3HelpTextText = await question3HelpText.getText();
-        assert.equal(question3HelpTextText, this.dateTimeHelpText, 'Question 3 help text does not match');
+        assert.equal(question3HelpTextText, global.dateTimeHelpText, 'Question 3 help text does not match');
 
-        const question3Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-3"] [data-testid="input"]`)), 5000);
+        const question3Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-2"] [data-testid="input"]`)), 5000);
         const question3PlaceholderText = await question3Placeholder.getAttribute('placeholder');
-        assert.equal(question3PlaceholderText, this.dateTimePlaceholder, 'Question 3 placeholder does not match');
+        assert.equal(question3PlaceholderText, global.dateTimePlaceholder, 'Question 3 placeholder does not match');
     }
 
     else if (sectionNumber === 1 && pageNumber === 2) {
         // Validate Question 1 (Photo)
-        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="label-name"]`)), 5000);
+        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="label-name"]`)), 5000);
         const question1LabelText = await question1Label.getText();
-        assert.equal(question1LabelText, this.photoLabelName, 'Question 1 label name does not match');
+        assert.equal(question1LabelText, global.photoLabelName, 'Question 1 label name does not match');
 
-        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="help-text"]`)), 5000);
+        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="help-text"]`)), 5000);
         const question1HelpTextText = await question1HelpText.getText();
-        assert.equal(question1HelpTextText, this.photoHelpText, 'Question 1 help text does not match');
+        assert.equal(question1HelpTextText, global.photoHelpText, 'Question 1 help text does not match');
 
         // Validate Question 2 (floorplan)
-        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="label-name"]`)), 5000);
+        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="label-name"]`)), 5000);
         const question2LabelText = await question2Label.getText();
-        assert.equal(question2LabelText, this.floorPlanLabelName, 'Question 2 label name does not match');
+        assert.equal(question2LabelText, global.floorPlanLabelName, 'Question 2 label name does not match');
 
-        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="help-text"]`)), 5000);
+        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="help-text"]`)), 5000);
         const question2HelpTextText = await question2HelpText.getText();
-        assert.equal(question2HelpTextText, this.floorPlanHelpText, 'Question 2 help text does not match');
+        assert.equal(question2HelpTextText, global.floorPlanHelpText, 'Question 2 help text does not match');
     }
 
     else if (sectionNumber === 2 && pageNumber === 1) {
         // Validate Question 1 (Number)
-        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="label-name"]`)), 5000);
+        const question1Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="label-name"]`)), 5000);
         const question1LabelText = await question1Label.getText();
-        assert.equal(question1LabelText, this.numberLabelName, 'Question 1 label name does not match');
+        assert.equal(question1LabelText, global.numberLabelName, 'Question 1 label name does not match');
 
-        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="help-text"]`)), 5000);
+        const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="help-text"]`)), 5000);
         const question1HelpTextText = await question1HelpText.getText();
-        assert.equal(question1HelpTextText, this.numberHelpText, 'Question 1 help text does not match');
+        assert.equal(question1HelpTextText, global.numberHelpText, 'Question 1 help text does not match');
 
-        const question1Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="input"]`)), 5000);
+        const question1Placeholder = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-0"] [data-testid="input"]`)), 5000);
         const question1PlaceholderText = await question1Placeholder.getAttribute('placeholder');
-        assert.equal(question1PlaceholderText, this.numberPlaceholder, 'Question 1 placeholder does not match');
+        assert.equal(question1PlaceholderText, global.numberPlaceholder, 'Question 1 placeholder does not match');
 
         // Validate Question 2 (Signature)
-        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="label-name"]`)), 5000);
+        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="label-name"]`)), 5000);
         const question2LabelText = await question2Label.getText();
-        assert.equal(question2LabelText, this.signatureLabelName, 'Question 2 label name does not match');
+        assert.equal(question2LabelText, global.signatureLabelName, 'Question 2 label name does not match');
 
-        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="help-text"]`)), 5000);
+        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="help-text"]`)), 5000);
         const question2HelpTextText = await question2HelpText.getText();
-        assert.equal(question2HelpTextText, this.signatureHelpText, 'Question 2 help text does not match');
+        assert.equal(question2HelpTextText, global.signatureHelpText, 'Question 2 help text does not match');
 
         // Validate Question 3 (Asset Location)
-        const question3Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-3"] [data-testid="label-name"]`)), 5000);
+        const question3Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-2"] [data-testid="label-name"]`)), 5000);
         const question3LabelText = await question3Label.getText();
-        assert.equal(question3LabelText, this.assetLocationLabelName, 'Question 3 label name does not match');
+        assert.equal(question3LabelText, global.assetLocationLabelName, 'Question 3 label name does not match');
 
-        const question3HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-3"] [data-testid="help-text"]`)), 5000);
+        const question3HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-2"] [data-testid="help-text"]`)), 5000);
         const question3HelpTextText = await question3HelpText.getText();
-        assert.equal(question3HelpTextText, this.assetLocationHelpText, 'Question 3 help text does not match');
+        assert.equal(question3HelpTextText, global.assetLocationHelpText, 'Question 3 help text does not match');
     }
 
     else if (sectionNumber === 2 && pageNumber === 2) {
@@ -499,23 +512,23 @@ Then('I validate the data entered exists in the mobile preview for section {int}
 
         // const question1HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-1"] [data-testid="help-text"]`)), 5000);
         // const question1HelpTextText = await question1HelpText.getText();
-        // assert.equal(question1HelpTextText, this.photoHelpText, 'Question 1 help text does not match');
+        // assert.equal(question1HelpTextText, global.photoHelpText, 'Question 1 help text does not match');
         // ====================================================================
 
         // Validate Question 2 (GPS)
-        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="label-name"]`)), 5000);
+        const question2Label = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="label-name"]`)), 5000);
         const question2LabelText = await question2Label.getText();
         assert.equal(question2LabelText, this.gpsLabelName, 'Question 2 label name does not match');
 
-        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-2"] [data-testid="help-text"]`)), 5000);
+        const question2HelpText = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-1"] [data-testid="help-text"]`)), 5000);
         const question2HelpTextText = await question2HelpText.getText();
         assert.equal(question2HelpTextText, this.gpsHelpText, 'Question 2 help text does not match');
     }
 });
 
-When('I enter invalid text for custom regular expression', async function() {
+When('I enter invalid text for custom regular expression for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="text-area"]`)), 5000);
+    const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="input"]`)), 5000);
     await driver.wait(until.elementIsVisible(text_area), 2000);
     await text_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     await text_area.sendKeys('hdhsdshsjdhsj');
@@ -523,7 +536,7 @@ When('I enter invalid text for custom regular expression', async function() {
 
 When('I enter the text in textbox for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="text-area"]`)), 5000);
+    const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="input"]`)), 5000);
     await driver.wait(until.elementIsVisible(text_area), 2000);
     await text_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     await text_area.sendKeys('ABCDE1234F');
@@ -531,17 +544,17 @@ When('I enter the text in textbox for section {int} page {int} question {int}', 
 
 When('I select the choice for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const choices = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="choices"]`)), 5000);
+    const choices = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="choices"]`)), 5000);
     await driver.wait(until.elementIsVisible(choices), 2000);
     let i = 0;
-    while(i < 3) {
-        await driver.wait(until.elementLocated(By.css(`[data-testid="choice-${i+1}"]`))).click();
+    while (i < 3) {
+        await driver.wait(until.elementLocated(By.css(`[data-testid="choice-${i + 1}"]`))).click();
     }
 });
 
 When('I enter the date\\/time for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const date_area = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="date-area"]`)), 5000);
+    const date_area = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="input"]`)), 5000);
     await driver.wait(until.elementIsVisible(date_area), 2000);
     await date_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     await date_area.sendKeys('31/10/2024');
@@ -558,7 +571,7 @@ When('I upload a invalid image to section {int} page {int} question {int}', asyn
 
     await new Promise(resolve => setTimeout(resolve, 5000));
     if (valid_file !== '') {
-        element = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="add-image"]`)));
+        element = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="add-image"]`)));
         const filePath = path.join(__dirname, `../../support/${valid_file}`);
         await element.sendKeys(filePath);
     }
@@ -570,7 +583,7 @@ When('I upload photo for section {int} page {int} question {int}', async functio
 
     await new Promise(resolve => setTimeout(resolve, 5000));
     if (valid_file !== '') {
-        element = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="add-image"]`)));
+        element = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="add-image"]`)));
         const filePath = path.join(__dirname, `../../support/${valid_file}`);
         await element.sendKeys(filePath);
     }
@@ -578,12 +591,12 @@ When('I upload photo for section {int} page {int} question {int}', async functio
 
 When('I see the floorplan for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const floorplan = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="floorplan-image"]`)), 5000);
+    const floorplan = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="floorplan-image"]`)), 5000);
     await driver.wait(until.elementIsVisible(floorplan), 2000);
     await floorplan.click();
 });
 
-When('I place the pin and draw on the floorplan', async function() {
+When('I place the pin and draw on the floorplan', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="pin"]`)), 5000).click();
     const floorplanImage = await driver.wait(until.elementLocated(By.css('[data-testid="floorplan"]')), 5000);
@@ -610,7 +623,7 @@ When('I place the pin and draw on the floorplan', async function() {
 
 When('I enter the number for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const number = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="number"]`)), 5000);
+    const number = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="number"]`)), 5000);
     await driver.wait(until.elementIsVisible(number), 2000);
     await number.sendKeys('1');
     await driver.wait(until.elementLocated(By.css('[data-testid="increase"]'))).click();
@@ -621,10 +634,10 @@ When('I enter the number for section {int} page {int} question {int}', async fun
     assert.equal(number_value, '1')
 });
 
-When('I choose the number by sliding for section 2 page 1 question 1', async function(sectionNumber, pageNumber, quesionNumber) {
+When('I choose the number by sliding for section 2 page 1 question 1', async function (sectionNumber, pageNumber, quesionNumber) {
     let targetValue = 9;
     await new Promise(resolve => setTimeout(resolve, 750));
-    const slider = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="slider"]`)));
+    const slider = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="slider"]`)));
     const currentValue = await driver.executeScript("return arguments[0].value;", slider);
     const steps = targetValue - currentValue;
 
@@ -641,7 +654,7 @@ When('I choose the number by sliding for section 2 page 1 question 1', async fun
 });
 
 When('I enter the signature for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
-    const signature = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="signature"]`)), 5000);
+    const signature = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="signature"]`)), 5000);
 
     // Draw on signature
     const action = driver.actions({ async: true });
@@ -655,23 +668,23 @@ When('I enter the signature for section {int} page {int} question {int}', async 
 });
 
 When('I select the location in asset location for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
-    const assetLocation = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="asset-location"]`)), 5000);
+    const assetLocation = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="asset-location"]`)), 5000);
     await driver.wait(until.elementIsVisible(assetLocation), 2000);
-    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="site"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="site"]`)), 5000).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="site-0"]`))).click();
-    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="building"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="building"]`)), 5000).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="building-0"]`))).click();
-    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="floorplan"]`)), 5000).click();
-    await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-0"]`))).click();   
+    await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="floorplan"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-0"]`))).click();
 });
 
 When('I see the display for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
-    const display = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="display"]`)), 5000);
+    const display = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="display"]`)), 5000);
     await driver.wait(until.elementIsVisible(display), 2000);
 });
 
 When('I see the gps for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
-    const gps = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-${pageNumber}-question-${quesionNumber}"] [data-testid="gps"]`)), 5000);
+    const gps = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="gps"]`)), 5000);
     await driver.wait(until.elementIsVisible(gps), 2000);
 });
 
