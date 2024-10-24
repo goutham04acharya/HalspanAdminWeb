@@ -25,14 +25,13 @@ function ChoiceFieldSetting({
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
+    isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
     setDefaultString
 }) {
-
     const [isLookupOpen, setIsLookupOpen] = useState(false);
     const [optionData, setOptionData] = useState([]);
-
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -46,12 +45,8 @@ function ChoiceFieldSetting({
 
     // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
-
+    console.log(fieldSettingParameters, 'nauanya')
     const handleLookupOption = (option) => {
-        // setFieldSettingParameters((prevState) => ({
-        //     ...prevState,
-        //     lookupOption: option.value,
-        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -63,7 +58,6 @@ function ChoiceFieldSetting({
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
         dispatch(setShouldAutoSave(true));
     }
-
     // List Functions
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
@@ -126,7 +120,14 @@ function ChoiceFieldSetting({
     useEffect(() => {
         fetchLookupList();
     }, [fetchLookupList]);
-    
+
+    if (isDefaultLogic) {
+        defaultString = defaultString.replaceAll(':', 'else')
+            .replaceAll('?', 'then')
+            .replaceAll('', 'if');
+        // Return null as JSX expects a valid return inside {}
+    }
+    console.log(defaultString,'hey here')
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
@@ -153,8 +154,10 @@ function ChoiceFieldSetting({
                             id='Label'
                             data-testid="default-value-input"
                             className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            value={defaultString || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
-                            onChange={(e) => setDefaultString(e.target.value)} // Update defaultString when input changes
+                            value={fieldSettingParameters?.default_conditional_logic || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                            onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))
+                        } 
+                            // Update defaultString when input changes
                             placeholder='Populates the content'
                         />
                         <img

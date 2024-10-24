@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { BeatLoader } from 'react-spinners';
+import { setNewComponent } from '../../../Fields/fieldSettingParamsSlice';
+import { useDispatch } from 'react-redux';
 
 function AdvancedEditor({
     showSectionList,
@@ -15,12 +18,16 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
-    setSelectedType
+    setSelectedType,
+    isDefaultLogic
 }) {
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
+    const dispatch = useDispatch()
     // Handle user input change and filter suggestions
     const handleSearchChange = (event) => {
         const value = event.target.value;
@@ -58,8 +65,7 @@ function AdvancedEditor({
         let allSections = sections
         console.log(allSections,suggestion, 'allSections')
         const getVariableType = a => a.constructor.name.toLowerCase();
-        console.log(getVariableType, 'valueType')
-        let valueType = getVariableType(eval(`allSections.${suggestion}`))
+        let valueType = getVariableType(eval(`sections.${suggestion}`))
         setSelectedType(valueType);
 
         handleClickToInsert(suggestion, false, valueType);
@@ -90,10 +96,13 @@ function AdvancedEditor({
                     id="editor"
                     data-testid="conditional-logic-text"
                     className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
-                    onChange={(event) => { handleInputField(event, sections); handleSearchChange(event); }}
+                    onChange={(event) => {
+                        handleInputField(event, sections); handleSearchChange(event);
+                    }}
                     onKeyDown={handleKeyDown} // Intercept key presses
                     ref={textareaRef}
                     value={inputValue}
+                    // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
                 ></textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
@@ -101,7 +110,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
-                    <span data-testid="error-message" className='w-[6%]'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    <span data-testid="error-message" className='w-[10%]'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (

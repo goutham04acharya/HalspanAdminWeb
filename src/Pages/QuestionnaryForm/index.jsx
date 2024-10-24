@@ -69,6 +69,7 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -86,6 +87,7 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
+    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
@@ -101,7 +103,9 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-    // to open and close the sections
+
+
+    // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
             ...prev,
@@ -158,9 +162,7 @@ const QuestionnaryForm = () => {
 
         // Don't forget to update the state and trigger auto-save
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-        // if (id === 'regular_expression') {
-        //     dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
-        // }
+
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
@@ -329,6 +331,7 @@ const QuestionnaryForm = () => {
             if (newState.hasOwnProperty(indexToRemove)) {
                 delete newState[indexToRemove];
             }
+
             return newState;
         }));;
     };
@@ -457,6 +460,7 @@ const QuestionnaryForm = () => {
 
             // Update the state with the new sections array
             setSections(SectionData);
+
         }
     };
 
@@ -530,6 +534,11 @@ const QuestionnaryForm = () => {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 console.log(response?.data?.data, 'kkkkkkkkkkkkkk')
                 const sectionsData = response?.data?.data?.sections || [];
+                // if (sectionsData.length === 1) {  
+                //     // If no sections are present, skip calling GetSectionOrder  
+                //     setSections(sectionsData);  
+                //     return;  
+                //   } 
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -612,11 +621,11 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
         handleSectionSaveOrder(sections)
-        // Find the section to save 
-        const sectionToSave = sections.find(section => section.section_id === sectionId);
-        const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+        // Find the section to save  
+        const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
+        const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
             const isDataSame = dataIsSame[sectionId];
             if (isDataSame && !payloadString) {
@@ -635,8 +644,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
-                        default_conditional_logic: (question.question_id === selectedQuestionId && defaultString) ? defaultString : (fieldSettingParams[question.question_id]['default_conditional_logic'] || ''),
+                        conditional_logic: (!defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                        default_conditional_logic: (defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -694,7 +703,6 @@ const QuestionnaryForm = () => {
                     }))
                 }))
             };
-
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -710,6 +718,7 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
+            console.log(body, 'kkkkkk')
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -717,6 +726,11 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
+                        if (defaultString) {
+                            dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        } else {
+                            dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        }
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
@@ -728,17 +742,17 @@ const QuestionnaryForm = () => {
                         setSaveClick(false)
 
                     } else {
+                        console.log(error)
                         setToastError('Something went wrong.');
                     }
                 }
 
             } catch (error) {
-                setToastError('Something went wrong.');
+                setToastError('Something went wrong');
             }
         }
 
     };
-
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1185,6 +1199,7 @@ const QuestionnaryForm = () => {
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
+
                             </div>
                             {complianceLogic.length > 0 && <div>
                                 <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler}/>
@@ -1254,6 +1269,7 @@ const QuestionnaryForm = () => {
                                     handleClick={handleClick}
                                 />
                             )}
+
                         </div>
                     </div>
                 </div>
