@@ -236,11 +236,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        if (isDefaultLogic) {
-            dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
-        } else {
-            dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
-        }
+        setInputValue(value)
+        // if (isDefaultLogic) {
+        //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
+        // } else {
+        //     dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
+        // }
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -341,6 +342,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Update the textarea value
             textarea.value = newText;
             setShowSectionList(false);
+            setInputValue(newText)
             if (isDefaultLogic) {
                 dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
             } else {
@@ -662,7 +664,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
 
-                            dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+                            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+                            setInputValue(conditionalLogic)
 
                             {
                                 !isDefaultLogic &&
@@ -703,14 +706,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
 
-            let modifyvalue
-            if (isDefaultLogic) {
-                modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
-            } else {
-                modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
-            }
+            // let modifyvalue
+            // if (isDefaultLogic) {
+            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
+            // } else {
+            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
+            // }
 
-            let evalInputValue = modifyString(modifyvalue);
+            let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic) {
                 setDefaultString(evalInputValue);
@@ -817,7 +820,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             // Split and Validate Expression
-            payloadString = evalInputValue;
+            payloadString = expression;
 
             setIsThreedotLoader(true);
             if (!error) {
@@ -835,6 +838,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         } catch (error) {
             console.error(error, 'error')
+            const handleError = (message) => {
+                setError(message);
+                setIsThreedotLoader(false);
+            };
             handleError(`Error evaluating the expression: ${error.message}`);
         }
     };

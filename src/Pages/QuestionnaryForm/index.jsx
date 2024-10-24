@@ -29,7 +29,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
-
+// import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 
 const QuestionnaryForm = () => {
     const { questionnaire_id, version_number } = useParams();
@@ -636,8 +636,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                        default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                        conditional_logic: (!defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                        default_conditional_logic: (defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -710,7 +710,7 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-            console.log(body,'kkkkkk')
+            console.log(body, 'kkkkkk')
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -718,7 +718,11 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
-                       
+                        if (defaultString) {
+                            dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        } else {
+                            dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        }
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
@@ -730,6 +734,7 @@ const QuestionnaryForm = () => {
                         setSaveClick(false)
 
                     } else {
+                        console.log(error)
                         setToastError('Something went wrong.');
                     }
                 }

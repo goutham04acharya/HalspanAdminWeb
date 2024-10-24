@@ -64,7 +64,7 @@ function AdvancedEditor({
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
         const getVariableType = a => a.constructor.name.toLowerCase();
-        let valueType = getVariableType(eval(`allSections.${suggestion}`))
+        let valueType = getVariableType(eval(`sections.${suggestion}`))
         setSelectedType(valueType);
 
         handleClickToInsert(suggestion, false, valueType);
@@ -100,7 +100,8 @@ function AdvancedEditor({
                     }}
                     onKeyDown={handleKeyDown} // Intercept key presses
                     ref={textareaRef}
-                    value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
+                    value={inputValue}
+                    // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
                 ></textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
