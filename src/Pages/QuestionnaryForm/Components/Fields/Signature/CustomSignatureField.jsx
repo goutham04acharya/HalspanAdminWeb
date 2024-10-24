@@ -229,6 +229,7 @@ const SignatureCanvas = ({ id }) => {
                 // width={400}
                 height={200}
                 // style={{ border: '1px solid c' }}
+                data-testid="signature"
                 className='w-full bg-white rounded-lg border border-[#AEB3B7]'
             />
             <div>
