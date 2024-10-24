@@ -29,7 +29,8 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
-
+import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
+// import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 
 const QuestionnaryForm = () => {
     const { questionnaire_id, version_number } = useParams();
@@ -62,6 +63,8 @@ const QuestionnaryForm = () => {
     // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
     const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
     const [conditionalLogic, setConditionalLogic] = useState(false);
+    const [isDefaultLogic, setIsDefaultLogic] = useState(false);
+    const [defaultString, setDefaultString] = useState('')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -140,9 +143,7 @@ const QuestionnaryForm = () => {
 
         // Don't forget to update the state and trigger auto-save
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
-        // if (id === 'regular_expression') {
-        //     dispatch(setNewComponent({ id: 'regular_expression', value: updatedValue, questionId: selectedQuestionId }));
-        // }
+
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
@@ -233,6 +234,7 @@ const QuestionnaryForm = () => {
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
+        "tagScanfield":TagScanFieldSetting,
         // Add other mappings here...
     };
 
@@ -444,7 +446,6 @@ const QuestionnaryForm = () => {
     };
 
     const handleAddRemoveQuestion = (event, sectionIndex, pageIndex, questionIndex, pageId) => {
-        // debugger
         let currentPageData = { ...sections[sectionIndex].pages[pageIndex] }; // Clone currentPageData
         const update = { ...dataIsSame };
         update[sections[sectionIndex].section_id] = false;
@@ -538,7 +539,8 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    conditional_logic: question?.conditional_logic
+                    conditional_logic: question?.conditional_logic,
+                    default_conditional_logic: question?.default_conditional_logic
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -599,11 +601,11 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString) => {
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
         handleSectionSaveOrder(sections)
         // Find the section to save  
-        const sectionToSave = sections.find(section => section.section_id === sectionId);
-        const sectionIndex = sections.findIndex(section => section.section_id === sectionId);
+        const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
+        const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
             const isDataSame = dataIsSame[sectionId];
             if (isDataSame && !payloadString) {
@@ -622,7 +624,8 @@ const QuestionnaryForm = () => {
                     questions: page.questions.map(question => ({
                         question_id: question.question_id,
                         question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (question.question_id === selectedQuestionId && payloadString) ? payloadString : (fieldSettingParams[question.question_id]['conditional_logic'] || ''),
+                        conditional_logic: (!defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                        default_conditional_logic: (defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
                         component_type: fieldSettingParams[question.question_id].componentType,
                         label: fieldSettingParams[question.question_id].label,
                         help_text: fieldSettingParams[question.question_id].helptext,
@@ -680,7 +683,6 @@ const QuestionnaryForm = () => {
                     }))
                 }))
             };
-
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -696,7 +698,6 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -704,8 +705,14 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
+                        if (defaultString) {
+                            dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        } else {
+                            dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                        }
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
+                        setIsDefaultLogic(false);
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -714,12 +721,13 @@ const QuestionnaryForm = () => {
                         setSaveClick(false)
 
                     } else {
+                        console.log(error)
                         setToastError('Something went wrong.');
                     }
                 }
 
             } catch (error) {
-                setToastError('Something went wrong.');
+                setToastError('Something went wrong');
             }
         }
 
@@ -868,6 +876,14 @@ const QuestionnaryForm = () => {
         })
     });
 
+    const handleTagScanClick = useCallback(() => {
+        addNewQuestion('tagScanfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'NFC', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId }));
+
+        });
+    }, [addNewQuestion]);
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -882,10 +898,11 @@ const QuestionnaryForm = () => {
             handleSignatureClick,
             handleGPSClick,
             handleDisplayClick,
+            handleTagScanClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleTagScanClick]);
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
@@ -1116,7 +1133,6 @@ const QuestionnaryForm = () => {
                                 </DragDropContext>
                                 <button
                                     onClick={() => {
-                                        // debugger
                                         handleAddRemoveSection('add');
                                         handleSectionSaveOrder(sections);
                                     }}
@@ -1173,6 +1189,10 @@ const QuestionnaryForm = () => {
                                         setValidationErrors: setValidationErrors,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
+                                        setIsDefaultLogic: setIsDefaultLogic,
+                                        isDefaultLogic: isDefaultLogic,
+                                        setDefaultString: setDefaultString,
+                                        defaultString: defaultString
 
                                     }
                                 )
@@ -1252,11 +1272,15 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
-            {conditionalLogic && (
+            {(conditionalLogic || isDefaultLogic) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
                     conditionalLogic={conditionalLogic}
                     handleSaveSection={handleSaveSection}
+                    isDefaultLogic={isDefaultLogic}
+                    setIsDefaultLogic={setIsDefaultLogic}
+                    setDefaultString={setDefaultString}
+                    defaultString={defaultString}
                 />
 
             )}

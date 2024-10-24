@@ -50,7 +50,7 @@ const processSource = (item) => {
 };
 
 const fieldSettingParamsSlice = createSlice({
-    
+
     name: 'FieldSettingParams',
     initialState,
     reducers: {
@@ -150,7 +150,8 @@ const fieldSettingParamsSlice = createSlice({
                     include_metadata: item?.asset_extras?.include_metadata,
                     file_size: item?.asset_extras?.fileSize,
                     file_type: item?.asset_extras?.fileType,
-
+                    conditional_logic: item?.conditional_logic,
+                    default_conditional_logic: item?.default_conditional_logic,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };

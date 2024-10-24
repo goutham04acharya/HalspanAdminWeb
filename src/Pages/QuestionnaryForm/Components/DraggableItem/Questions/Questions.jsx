@@ -13,6 +13,7 @@ import SignatureField from '../../Fields/Signature/SignatureField';
 import GPSField from '../../Fields/GPS/GPSField';
 import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField';
 import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setShouldAutoSave, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../../QuestionnaryFormSlice'
+import TagScanField from '../../Fields/TagScan/TagScanField';
 
 
 const Questions = ({
@@ -79,6 +80,10 @@ const Questions = ({
             />,
         displayfield: (props) =>
             <DIsplayContentField
+                {...props}
+            />,
+        tagScanfield: (props) =>
+            <TagScanField
                 {...props}
             />,
     };

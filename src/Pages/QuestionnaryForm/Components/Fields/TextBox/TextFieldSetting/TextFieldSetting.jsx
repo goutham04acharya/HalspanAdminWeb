@@ -25,12 +25,13 @@ function TestFieldSetting({
   // setFieldSettingParameters,
   handleSaveSettings,
   selectedQuestionId,
-  isThreedotLoader,
   handleBlur,
   validationErrors,
   setValidationErrors,
   setConditionalLogic,
-  conditionalLogic
+  setIsDefaultLogic,
+  defaultString,
+  setDefaultString
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -60,8 +61,6 @@ function TestFieldSetting({
     ...(fieldSettingParameters?.options?.field_validation ? [{ value: 'Custom Regular Expression', label: 'Custom Regular Expression' }] : [])
   ];
 
-  console.log(fieldSettingParameters, 'kjskjsckj')
-
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
@@ -69,7 +68,6 @@ function TestFieldSetting({
   };
   const validateRegex = (e) => {
     const value = e.target.value;
-    console.log(value, 'value');
 
     // Check if the value is empty
     if (!value) {
@@ -97,22 +95,11 @@ function TestFieldSetting({
 
 
 
-
   const handleRegularExpression = (event) => {
-    // debugger
     const value = event.target.value;
-    console.log(value, 'value')
-    // const isValidate = validateRegex(value);
-    // console.log(isValidate,'isValidate')
-    // if (isValid) {
-    // console.log(value, 'value')
-    // dispatch(setNewComponent({ id: 'regular_expression', value, questionId: selectedQuestionId }));
-    // dispatch(setShouldAutoSave(true));
-    // }else{
-    //   setToastError('Not a valid regex')
-    // }
+
     if (value === '' || validateRegex(value)) {
-      // console.log(value, 'value')
+
       dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
       // dispatch(setShouldAutoSave(true));
     } else {
@@ -121,28 +108,6 @@ function TestFieldSetting({
     }
 
   };
-
-  // const handleBlurRegex = (e) => {
-  //   const { id, value } = e.target;
-  //   if (id === 'regular_expression') {
-  //     const validator = new RegExpValidator();
-  //     try {
-  //       validator.validateLiteral(value);
-  //       setValidationErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         regular_expression: '',
-  //       }));
-  //     } catch (error) {
-  //       setValidationErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         regular_expression: 'Invalid regular expression',
-  //       }));
-  //     }
-  //   }
-  // };
-
-
-
 
   const handleErrorMessage = (event) => {
     const value = event.target.value;
@@ -198,7 +163,6 @@ function TestFieldSetting({
   }, [loading, isFetchingMore, fieldSettingParameters?.type]);
 
   function isValidRegex(pattern) {
-    console.log(pattern, 'pattern')
     try {
       new RegExp(pattern);
       return true;
@@ -207,17 +171,6 @@ function TestFieldSetting({
     }
   }
 
-  // useEffect(() => {
-  //   document.getElementById('regular_expression').onblur = function () {
-  //     if (isValidRegex(this.value)) {
-  //       console.log('Valid regex');
-  //       // Additional actions for valid input
-  //     } else {
-  //       console.log('Invalid regex');
-  //       // Handle invalid input (e.g., show error message)
-  //     }
-  //   };
-  // }, [])
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
@@ -244,9 +197,21 @@ function TestFieldSetting({
           <div className='flex flex-col justify-start mt-7 w-full relative'>
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
             <div className='relative w-full'>
-              <input type="text" id='Label' className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                placeholder='Populates the content' />
-              <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' />
+              <input type="text" id='Label'
+                data-testid="default-value-input"
+                className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                placeholder='Populates the content'
+                value={fieldSettingParameters?.default_conditional_logic || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))} />
+              <img
+                src="/Images/setting.svg"
+                alt="setting"
+                data-testid="default-value"
+                className='absolute top-5 right-3 cursor-pointer'
+                onClick={() => {
+                  setIsDefaultLogic(true);
+                  setConditionalLogic(false);
+                }} />
             </div>
           </div>
           <div className='mt-7'>

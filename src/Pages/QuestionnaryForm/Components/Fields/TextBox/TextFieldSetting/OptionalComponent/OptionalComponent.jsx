@@ -9,7 +9,6 @@ function OptionsComponent({ selectedQuestionId }) {
 
     // Get the current field settings from Redux
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    console.log(fieldSettingParams, 'adassa')
 
     // Define options based on componentType
     const getOptions = (componentType) => {
@@ -22,7 +21,7 @@ function OptionsComponent({ selectedQuestionId }) {
                 'Remember allowed',
                 'Field validation',
             ];
-        } else if (componentType === 'photofield') {
+        } else if (componentType === 'photofield' || componentType === 'tagScanfield') {
             return [
                 'Visible',
                 'Optional',
