@@ -10,7 +10,10 @@ function FloorPlanField({
     fieldSettingParameters,
     helpText,
     preview,
-    question
+    question,
+    setValue,
+    setValidationErrors,
+    validationErrors
 }) {
     return (
         <div>
@@ -24,7 +27,7 @@ function FloorPlanField({
             </label>
             <div className='mt-2'>
                 {/* <img src="/Images/HalspanGrayLogo.svg" alt="image" /> */}
-                {preview && <ImageZoomPin floorPlan />}
+                {preview && <ImageZoomPin floorPlan setValidationErrors={setValidationErrors} setValue={setValue} />}
             </div>
             <p
                 data-testid="help-text"

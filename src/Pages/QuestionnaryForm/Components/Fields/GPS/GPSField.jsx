@@ -8,13 +8,14 @@ function GPSField({
     handleChange,
     fieldSettingParameters,
     question,
-    preview
-
+    preview,
+    setValue,
+    setValidationErrors,
+    validationErrors
 }) {
-
     const [location, setLocation] = useState('');
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true); // Add loading states
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchLocation = () => {
@@ -26,22 +27,72 @@ function GPSField({
                             position.coords.longitude
                         );
                         setLocation(formattedLocation);
-                        setLoading(false); // Stop loading once location is fetched
+                        setLoading(false);
 
+                        // Set value to true when location is successfully obtained
+                        if (question?.question_id) {
+                            setValue((prev) => ({
+                                ...prev,
+                                [question.question_id]: true
+                            }));
+                        }
+
+                        // Clear validation errors
+                        setValidationErrors((prevErrors) => ({
+                            ...prevErrors,
+                            preview_gpsfield: {
+                                ...prevErrors?.preview_gpsfield,
+                                [question?.question_id]: ''
+                            }
+                        }));
                     },
                     (err) => {
                         setError(err.message);
-                        setLoading(false); // Stop loading once location is fetched
+                        setLoading(false);
+
+                        // Set value to false when location access fails
+                        if (question?.question_id) {
+                            setValue((prev) => ({
+                                ...prev,
+                                [question.question_id]: false
+                            }));
+                        }
+
+                        // Set validation error message
+                        setValidationErrors((prevErrors) => ({
+                            ...prevErrors,
+                            preview_gpsfield: {
+                                ...prevErrors?.preview_gpsfield,
+                                [question?.question_id]: 'Location access denied'
+                            }
+                        }));
                     }
                 );
             } else {
                 setError("Geolocation is not supported by this browser.");
-                setLoading(false); // Stop loading once location is fetched
+                setLoading(false);
+
+                // Set value to false when geolocation is not supported
+                if (question?.question_id) {
+                    setValue((prev) => ({
+                        ...prev,
+                        [question.question_id]: false
+                    }));
+                }
+
+                // Set validation error message
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_gpsfield: {
+                        ...prevErrors?.preview_gpsfield,
+                        [question?.question_id]: 'Geolocation not supported'
+                    }
+                }));
             }
         };
 
         fetchLocation();
-    }, []);
+    }, [question?.question_id, setValue, setValidationErrors]);
 
     // Memoize the formatted location to prevent unnecessary re-renders
     const memoizedLocation = useMemo(() => location, [location]);
@@ -56,19 +107,18 @@ function GPSField({
         return `${formattedLat}, ${formattedLon}`;
     };
 
-
     return (
         <div>
             <label
                 data-testid="label-name"
                 htmlFor={textId}
-                title={preview ? question?.label :fieldSettingParameters?.label}
+                title={preview ? question?.label : fieldSettingParameters?.label}
                 maxLength={100}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
-                {preview ? question?.label :fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}
             </label>
             <div className={`${preview ? 'mt-3' : 'mt-7'} ml-4`}>
-                {loading ? ( // Display a loading message while fetching location
+                {loading ? (
                     <p>Loading location...</p>
                 ) : error ? (
                     <p>Error: {error}</p>
@@ -76,6 +126,9 @@ function GPSField({
                     <p className={className}>{memoizedLocation}</p>
                 )}
             </div>
+            {(question?.question_id && validationErrors?.preview_gpsfield && validationErrors.preview_gpsfield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_gpsfield[question.question_id]} />
+            )}
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'

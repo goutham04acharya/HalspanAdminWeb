@@ -125,19 +125,19 @@ function NumberField({
                                     'text'
                     }
                     step={question?.type === 'float' ? 'any' : ''}
-                    value={`${question?.field_texts?.pre_field_text ? question?.field_texts?.pre_field_text : ''}${fieldValue || ''}${question?.field_texts?.post_field_text ? ` ${question?.field_texts?.post_field_text}` : ''}`}
+                    value={value}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                     onChange={(e) => handleInputChange(e)}
                 /> : ''}
             {((preview ? question?.source === 'slider' : fieldSettingParameters?.source === 'slider') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
                 <div data-testid="slider" className=''>
                     <div className='flex items-center w-full'>
-                        {preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField &&
-                            <p className={`w-auto max-w-[20%] break-all overflow-auto ${preview ? 'mt-1' : 'mt-5'} mr-2`}>{preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField}</p>
-                        }
-                        <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 mr-2`}>{preview ? question?.field_range?.min : fieldSettingParameters?.min}</p>
+                        <p className={`w-auto max-w-[20%] break-all overflow-auto mt-5 mr-2`}>{preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField}</p>
+                        <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 mr-2`}>
+                            {preview ? question?.field_range?.min : fieldSettingParameters?.min}
+                        </p>
 
-                        <div className='w-[40%]'>
+                        <div className='w-[60%]'>
                             <input
                                 type="range"
                                 min={preview ? question?.field_range?.min : minRange}
@@ -152,8 +152,7 @@ function NumberField({
                             />
                         </div>
                         <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_range?.max : fieldSettingParameters?.max}</p>
-                        {preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField &&
-                            <p className='w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2'>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>}
+                        <p className={`w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>
                     </div>
                     {!preview ? <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
                         Select Value: {fieldSettingParameters?.type === 'float' ? sliderValue.toFixed(2) : sliderValue}

@@ -112,7 +112,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                 <div
                     className="modal-overlay absolute rounded-[50px] top-0 flex-col left-0 w-[356px] h-full bg-white flex justify-center items-center"
                 >
-                    <span className="close-icon delay-300 items-end text-[20px] ml-[325px] top-10 relative hover:bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer" onClick={handleModalClose}>
+                    <span className="close-icon delay-300 z-[2] items-end text-[20px] ml-[325px] top-10 relative hover:bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer" onClick={handleModalClose}>
                         &#10005;
                     </span>
                     {drawOnImage === true ? <div className="modal-content w-[370px] h-[400px] p-2 rounded-2xl">
@@ -144,7 +144,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                             <button onClick={handleResetClick} className='m-[2px] w-[40px] h-[40px]'><img src="/Images/reset.svg" alt="" /></button>
                             {/* <button onClick={handleExportClick}>Export</button> */}
                         </div>
-                    </div> : <div>
+                    </div> : <div className='z-[1]'>
                         <img src={URL.createObjectURL(currentImage)} className='w-[374px] h-[500px] p-2 rounded-lg' alt="" />
                     </div>}
                 </div>

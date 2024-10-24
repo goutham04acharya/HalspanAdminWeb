@@ -33,19 +33,43 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
     useEffect(() => {
         const fetchSections = async () => {
-            setLoading(true); // Set loading to true when API call starts  
+            setLoading(true); // Set loading to true when API call starts   
             try {
-                const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+                const response1 = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+                const response2 = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
 
-                setSections(response?.data?.data?.sections);
+                // Get sections from questionnaire API  
+                const questionnaireSections = response2?.data?.data?.sections;
+                console.log(questionnaireSections, 'questionnaireSections')
+
+                // Get sections from layout API  
+                const layoutSections = response1?.data?.data?.sections;
+                console.log(layoutSections, 'layoutSections')
+
+                // Create a map to store section IDs from layout API  
+                const sectionIdMap = {};
+                layoutSections.forEach((section) => {
+                    sectionIdMap[section.id] = section.index;
+                });
+                console.log(sectionIdMap, 'sectionIdMap')
+
+                // Reorganize sections from questionnaire API based on section IDs from layout API  
+                const reorganizedSections = questionnaireSections.sort((a, b) => {
+                    return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
+                });
+                console.log(reorganizedSections, 'reorganizedSections')
+
+                setSections(reorganizedSections);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false); // Set loading to false when API call ends  
+                setLoading(false); // Set loading to false when API call ends   
             }
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+
+
 
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
@@ -154,7 +178,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
-                return <GPSField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <GPSField preview setValidationErrors={setValidationErrors} setValue={setValue} question={question} validationErrors={validationErrors} />;
             case 'signaturefield':
                 return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
@@ -168,7 +192,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'assetLocationfield':
                 return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
-                return <FloorPlanField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <FloorPlanField preview setValidationErrors={setValidationErrors} setValue={setValue} question={question} validationErrors={validationErrors} />;
             case 'photofield':
                 return <PhotoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
@@ -182,7 +206,14 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         dispatch(setModalOpen(false));
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
-            preview_textboxfield: '', // Or remove the key if you prefer  
+            preview_textboxfield: '',
+            preview_choiceboxfield: '',
+            preview_signaturefield: '',
+            preview_numberfield: '',
+            preview_datetimefield: '',
+            preview_photofield: '',
+            preview_filefield: '',
+            preview_videofield: ''
         }));
     });
 
