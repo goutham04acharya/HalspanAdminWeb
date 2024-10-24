@@ -89,13 +89,13 @@ const TextBoxField = ({
 
 
     return (
-        <div>
+        <div className=''>
             <label
                 data-testid="label-name"
                 htmlFor={textId}
                 maxLength={100}
                 title={preview ? question?.label : fieldSettingParameters?.label}
-                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
+                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${preview ? question?.label :fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
             
@@ -215,7 +215,7 @@ const TextBoxField = ({
 
             <p
                 data-testid="help-text"
-                className={`italic ${preview ? 'mb-2 text-xs' : 'mt-2 text-sm'} font-normal  text-[#2B333B] break-words max-w-[90%]`}
+                className={`italic ${preview ? 'mb-2 mt-1 text-xs' : 'mt-2 text-sm'} font-normal  text-[#2B333B] break-words max-w-[90%]`}
                 title={preview ? question?.help_text : fieldSettingParameters?.helptext}
             >
                 {preview ? question?.help_text : fieldSettingParameters?.helptext}</p>

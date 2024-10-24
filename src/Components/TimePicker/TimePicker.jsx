@@ -56,7 +56,7 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
         setIsDropdown(false);
     })
     return (
-        <div className="time-picker flex flex-col text-[#2B333B] relative ">
+        <div className="time-picker w-full flex flex-col text-[#2B333B] relative ">
             <input
                 type="text"
                 value={time}
@@ -64,7 +64,7 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
                 // placeholder="hh:mm:ss"
                 className="time-input w-full h-[40px] break-words border  border-[#AEB3B7] rounded-lg mt-1 px-4"
                 onClick={(e) => setIsDropdown(!isDropdownOpen)}
-            /><img src="/Images/clock-primary.svg" alt="clock" onClick={() => setIsDropdown(!isDropdownOpen)} className={`absolute text-[#2B333B] w-[15px] top-4 right-3 cursor-pointer`} />
+            /><img src="/Images/clock-primary.svg" alt="clock" onClick={() => setIsDropdown(!isDropdownOpen)} className={`absolute text-[#2B333B] w-[15px] top-4 right-[19px] cursor-pointer`} />
             {isDropdownOpen && (
                 <div ref={dropdownRef} className=" bg-white flex w-full border border-[#AEB3B7]  absolute mt-12">
                     <div className="flex flex-col w-1/3 h-[100px] items-center overflow-y-scroll border-r border-[#AEB3B7] overflow-x-hidden scrollHide">

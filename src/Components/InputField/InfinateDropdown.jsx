@@ -22,6 +22,7 @@ function InfinateDropdown({
     lastElementRef,
     handleRemoveLookup,
     preview,
+    assets,
     type, // 'multi_choice', 'single_choice', or other
     handleMultiSelectChange // for multi-choice
 }) {
@@ -44,7 +45,7 @@ function InfinateDropdown({
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[11px]`} onClick={() => handleRemoveLookup()} />
                     :
-                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 ${assets ? 'bottom-5' : ''} transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />
                 }
             </div>

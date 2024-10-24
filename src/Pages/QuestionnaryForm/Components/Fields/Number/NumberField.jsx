@@ -128,6 +128,7 @@ function NumberField({
                     value={value}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                     onChange={(e) => handleInputChange(e)}
+                    placeholder={question?.placeholder_content}
                 /> : ''}
             {((preview ? question?.source === 'slider' : fieldSettingParameters?.source === 'slider') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
                 <div data-testid="slider" className=''>

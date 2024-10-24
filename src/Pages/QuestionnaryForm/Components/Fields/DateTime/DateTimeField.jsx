@@ -73,7 +73,7 @@ function DateTimeField({
                         id={textId}
                         value={value}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                        placeholder="dd/mm/yyyy"
+                        placeholder={question?.placeholder_content || fieldSettingParameters?.placeholderContent}
                         onChange={(e) => handleFunction(e)}
                     />
                 )}
@@ -92,15 +92,15 @@ function DateTimeField({
                 )}
 
                 {preview && type === 'datetime' && (
-                    <div className='flex z-[-1]'>
-                        <div className="flex">
+                    <div className='flex flex-wrap z-[-1] w-full'>
+                        <div className="flex w-full flex-wrap mb-2 flex-col">
                             <input
                                 data-testid="input"
                                 type="date"
                                 id={textId}
                                 value={value}
-                                className={`w-[90%] h-[40px] break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                                placeholder="dd/mm/yyyy"
+                                className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-lg mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                                placeholder={question?.placeholder_content}
                                 onChange={(e) => handleFunction(e)}
                             />
                         </div>

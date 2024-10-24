@@ -17,6 +17,7 @@ import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
 // import axios from 'axios';  
 import useApi from '../../../services/CustomHook/useApi.js';
+import TagScanField from './Fields/TagScan/TagScanField.jsx';
 
 function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
 
@@ -124,7 +125,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
-            }else if (question?.component_type === 'gpsfield' && !question?.options?.optional) {
+            } else if (question?.component_type === 'gpsfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
                 }
@@ -197,6 +198,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 return <PhotoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
                 return <VideoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+            case 'tagScanfield':
+                return <TagScanField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             default:
                 return <p>Unknown Field</p>;
         }
@@ -247,7 +250,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
-                                    <div data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`} className='mt-5' key={index}>
+                                    <div data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`} className='mt-3 mb-3 bg-white mx-4 rounded-xl py-4 px-2' key={index}>
                                         <div className='px-2'>{renderQuestion(question)}</div>
                                     </div>
                                 ))}
