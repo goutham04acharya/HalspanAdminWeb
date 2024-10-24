@@ -30,6 +30,7 @@ const Fieldsneeded = [
         buttonNumber: 2,
         buttonIcon: '/Images/TagField.svg',
         testId: 'tag-scan',
+        onClick: 'handleTagScanClick',
         type: 'tagscan'
     },
     {
