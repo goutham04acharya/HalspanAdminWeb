@@ -247,7 +247,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
-                                    <div className='mt-5' key={index}>
+                                    <div data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`} className='mt-5' key={index}>
                                         <div className='px-2'>{renderQuestion(question)}</div>
                                     </div>
                                 ))}
@@ -255,7 +255,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
                     )}
                 </div>
-                <div className='mt-5 flex items-center justify-between'>
+                <div data-testid="back" className='mt-5 flex items-center justify-between'>
                     {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
                         Back
                     </button> :
@@ -281,7 +281,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 )}
                             </label>
                         </>}
-                    <button type='button' data-testid={testIDBtn2} onClick={handleNextClick} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}>
+                    <button type='button' data-testid="next" onClick={handleNextClick} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}>
                         Next
                     </button>
                 </div>

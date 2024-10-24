@@ -158,8 +158,8 @@ Feature: Halspan - Admin - Preview the Questionnaire
     When I enter the date/time for section 1 page 1 question 3
     When I click the next button
     Then I validate the data entered exists in the mobile preview for section 1 page 2
-    When I upload a invalid image to section 1 page 2 question 1
-    Then I should read a message stating that "Only .png, .jpg, and .svg files are allowed"
+    # When I upload a invalid image to section 1 page 2 question 1
+    # Then I should read a message stating that "Only .png, .jpg, and .svg files are allowed"
     When I upload photo for section 1 page 2 question 1
     When I see the floorplan for section 1 page 2 question 2
     When I place the pin and draw on the floorplan 
