@@ -30,6 +30,7 @@ body {
 
 .scrollHide::-webkit-scrollbar {
   -webkit-appearance: none;
+  padding: none;
 }
 
 .scrollBar::-webkit-scrollbar:vertical {
@@ -536,4 +537,33 @@ custom-toggle-switch input:checked+.slider::before {
   margin-left: 10px;
   color: #9FACB9;
   font-size: 1rem;
+}
+
+/* Image uploader */
+.image-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.upload-button, .remove-button {
+  padding: 10px 20px;
+  margin: 10px 0;
+  border: none;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+}
+
+.upload-button:hover, .remove-button:hover {
+  background-color: #0056b3;
+}
+
+
+
+.preview-img {
+  max-width: 300px;
+  max-height: 300px;
+  margin: 10px 0;
 }

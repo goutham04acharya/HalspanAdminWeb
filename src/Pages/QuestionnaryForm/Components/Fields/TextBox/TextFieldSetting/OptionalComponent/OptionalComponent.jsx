@@ -59,7 +59,7 @@ function OptionsComponent({ selectedQuestionId }) {
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams?.[selectedQuestionId]?.options?.load_from_previous || false,
                 'Read only': fieldSettingParams?.[selectedQuestionId]?.options?.read_only || false,
-                'Visible': fieldSettingParams?.[selectedQuestionId]?.options?.visible || false,
+                'Visible': fieldSettingParams?.[selectedQuestionId]?.options?.visible || true,
                 'Optional': fieldSettingParams?.[selectedQuestionId]?.options?.optional || false,
                 'Remember allowed': fieldSettingParams?.[selectedQuestionId]?.options?.remember_allowed || false,
                 'Field validation': fieldSettingParams?.[selectedQuestionId]?.options?.field_validation || false,

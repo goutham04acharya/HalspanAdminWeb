@@ -611,7 +611,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     conditions: conditions.filter(cond => cond !== null)
                 };
             } else {
-                if (!tab) {
+                if (tab !== 'Advance') {
                     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
                 }
                 return {
@@ -1050,7 +1050,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={tab || isDefaultLogic || complianceState ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'Advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

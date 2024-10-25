@@ -118,20 +118,6 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-    const validateRegex = (value) => {
-        const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-        if (!regexPattern.test(value) || value.trim() === '') {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: 'Invalid regular expression',
-            }));
-        } else {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: '',
-            }));
-        }
-    };
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -664,7 +650,7 @@ const QuestionnaryForm = () => {
                         admin_field_notes: fieldSettingParams[question.question_id].note,
                         source: fieldSettingParams[question.question_id].source,
                         source_value:
-                            question.source === 'fixedList' ?
+                        fieldSettingParams[question.question_id].source === 'fixedList' ?
                                 fieldSettingParams[question.question_id].fixedChoiceArray :
                                 fieldSettingParams[question.question_id].lookupOptionChoice
                         ,
@@ -753,7 +739,7 @@ const QuestionnaryForm = () => {
             }
         }
 
-    };
+    }
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1222,11 +1208,9 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button onClick={() => {
-                                // Open the custom modal  
+                            <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
                                 setPreviewModal(true)
-
-                            }} className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            }}>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
@@ -1370,6 +1354,21 @@ const QuestionnaryForm = () => {
                 />
 
             )}
+            {previewModal ===true && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                sections={sections}
+                setValidationErrors={setValidationErrors}
+                validationErrors={validationErrors}
+                formDefaultInfo={formDefaultInfo}
+                questionnaire_id={questionnaire_id}
+                version_number={version_number}
+                fieldSettingParameters={fieldSettingParams}
+            />}
         </>
     );
 }

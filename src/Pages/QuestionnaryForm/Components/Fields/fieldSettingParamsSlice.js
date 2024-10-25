@@ -41,7 +41,7 @@ const processDisplayType = (item, displayType) => {
 
 // Helper function to process source
 const processSource = (item) => {
-    if (item.source === 'fixed_list') {
+    if (item.source === 'fixedList') {
         return { fixedChoiceArray: item.source_value };
     } else if (item.source === 'lookup') {
         return { lookupOptionChoice: item.source_value };

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 
 function GPSField({
     type,
@@ -7,6 +8,11 @@ function GPSField({
     className,
     handleChange,
     fieldSettingParameters,
+    question,
+    preview,
+    setValue,
+    setValidationErrors,
+    validationErrors
 
 }) {
 
@@ -25,16 +31,28 @@ function GPSField({
                         );
                         setLocation(formattedLocation);
                         setLoading(false); // Stop loading once location is fetched
-
+                        setValue((prev) => ({
+                            ...prev,
+                            [question?.question_id]: true
+                        }))
+                        setValidationErrors((prevErrors) => ({
+                            ...prevErrors,
+                            preview_gpsfield: '', // Or remove the key if you prefer     
+                        }))
                     },
                     (err) => {
                         setError(err.message);
                         setLoading(false); // Stop loading once location is fetched
                     }
                 );
+
             } else {
                 setError("Geolocation is not supported by this browser.");
                 setLoading(false); // Stop loading once location is fetched
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: false
+                }))
             }
         };
 
@@ -59,12 +77,12 @@ function GPSField({
             <label
                 data-testid="label-name"
                 htmlFor={textId}
-                title={fieldSettingParameters?.label}
+                title={preview ? question?.label : fieldSettingParameters?.label}
                 maxLength={100}
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
-                {fieldSettingParameters?.label}
+                {preview ? question?.label : fieldSettingParameters?.label}
             </label>
-            <div className='mt-7 ml-4'>
+            <div data-testid="gps" className={`${preview ? 'mt-3' : 'mt-7'} ml-4`}>
                 {loading ? ( // Display a loading message while fetching location
                     <p>Loading location...</p>
                 ) : error ? (
@@ -73,12 +91,15 @@ function GPSField({
                     <p className={className}>{memoizedLocation}</p>
                 )}
             </div>
+            {(question?.question_id && validationErrors?.preview_gpsfield && validationErrors.preview_gpsfield[question.question_id]) && (
+                <ErrorMessage error={validationErrors.preview_gpsfield[question.question_id]} />
+            )}
             <p
                 data-testid="help-text"
                 className='italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]'
-                title={fieldSettingParameters?.helptext}
+                title={preview ? question?.help_text : fieldSettingParameters?.helptext}
             >
-                {fieldSettingParameters?.helptext}</p>
+                {preview ? question?.help_text : fieldSettingParameters?.helptext}</p>
         </div>
     )
 }

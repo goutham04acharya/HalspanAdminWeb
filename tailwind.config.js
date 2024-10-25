@@ -19,6 +19,9 @@ export default {
                 'customh13': 'calc(100vh - 315px)',
                 'customh14': 'calc(100vh - 250px)',
 
+            },
+            colors: {
+                'customTextColor': '#2B333B'
             }
         },
     },
