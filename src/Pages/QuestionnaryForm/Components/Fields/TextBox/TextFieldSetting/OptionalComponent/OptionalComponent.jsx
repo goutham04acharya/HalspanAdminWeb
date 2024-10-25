@@ -21,7 +21,7 @@ function OptionsComponent({ selectedQuestionId }) {
                 'Remember allowed',
                 'Field validation',
             ];
-        } else if (componentType === 'photofield') {
+        } else if (componentType === 'photofield' || componentType === 'tagScanfield') {
             return [
                 'Visible',
                 'Optional',

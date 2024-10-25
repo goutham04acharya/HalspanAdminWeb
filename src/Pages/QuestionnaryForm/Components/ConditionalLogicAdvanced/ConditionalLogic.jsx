@@ -345,11 +345,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             textarea.value = newText;
             setShowSectionList(false);
             setInputValue(newText)
-            if (isDefaultLogic) {
-                dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
-            } else {
-                dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
-            }  // Update the inputValue state
+            // if (isDefaultLogic) {
+            //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
+            // } else {
+            //     dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
+            // }  // Update the inputValue state
         }
 
         if (isMethod) {

@@ -29,6 +29,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
+import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
 
@@ -254,6 +255,7 @@ const QuestionnaryForm = () => {
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
         'compliancelogic': ComplianceFieldSetting
+        "tagScanfield":TagScanFieldSetting,
         // Add other mappings here...
     };
 
@@ -908,6 +910,14 @@ const QuestionnaryForm = () => {
         dispatch(setSelectedComponent('compliancelogic'))
     };
 
+    const handleTagScanClick = useCallback(() => {
+        addNewQuestion('tagScanfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'NFC', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId }));
+
+        });
+    }, [addNewQuestion]);
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -923,10 +933,11 @@ const QuestionnaryForm = () => {
             handleGPSClick,
             handleDisplayClick,
             handleComplianceLogicClick,
+            handleTagScanClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleComplianceLogicClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleComplianceLogicClick, handleTagScanClick]);
 
     //function for handle radio button
     const handleRadiobtn = (type) => {

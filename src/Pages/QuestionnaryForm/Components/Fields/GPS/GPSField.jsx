@@ -54,7 +54,6 @@ function GPSField({
         return `${formattedLat}, ${formattedLon}`;
     };
 
-
     return (
         <div>
             <label

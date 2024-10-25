@@ -14,6 +14,7 @@ import GPSField from '../../Fields/GPS/GPSField';
 import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField';
 import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setShouldAutoSave, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../../QuestionnaryFormSlice'
 import ComplanceLogicField from '../../Fields/ComplianceLogic/ComplanceLogicField';
+import TagScanField from '../../Fields/TagScan/TagScanField';
 
 
 const Questions = ({
@@ -86,6 +87,10 @@ const Questions = ({
             <ComplanceLogicField
                 {...props}
             />
+        tagScanfield: (props) =>
+            <TagScanField
+                {...props}
+            />,
     };
 
     const handleQuestionIndexCapture = (question) => {
