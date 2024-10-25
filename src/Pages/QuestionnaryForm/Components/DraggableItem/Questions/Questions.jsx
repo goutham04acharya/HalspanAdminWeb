@@ -86,7 +86,7 @@ const Questions = ({
         compliancelogic: (props) =>
             <ComplanceLogicField
                 {...props}
-            />
+            />,
         tagScanfield: (props) =>
             <TagScanField
                 {...props}

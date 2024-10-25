@@ -254,7 +254,7 @@ const QuestionnaryForm = () => {
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
-        'compliancelogic': ComplianceFieldSetting
+        'compliancelogic': ComplianceFieldSetting,
         "tagScanfield":TagScanFieldSetting,
         // Add other mappings here...
     };
@@ -720,7 +720,6 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-            console.log(body, 'kkkkkk')
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -1212,7 +1211,7 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
-                            {complianceLogic.length > 0 && <div>
+                            {complianceLogic?.length > 0 && <div>
                                 <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler}/>
                             </div>}
                         </div>
@@ -1231,14 +1230,12 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-
                             <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
 
                                 handleSaveSection(latestSectionId);
                             }}>
                                 Save
                             </button>
-
                         </div>
                         <div>
                             {selectedComponent ? (
