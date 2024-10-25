@@ -757,16 +757,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return;
             }
             if (isDefaultLogic) {
+                payloadString = payloadString.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', ' ');
                 evalInputValue = evalInputValue.replaceAll('else', ':')
                     .replaceAll('then', '?')
-                    .replaceAll('if', '');
+                    .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the eexpression (only for default checking)
             if (isDefaultLogic && selectedComponent == "dateTimefield") {
-                console.log(evalInputValue,'hey')
+                console.log(evalInputValue, 'hey')
                 let invalid = DateValidator(evalInputValue)
-                if(invalid){
+                if (invalid) {
                     handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
                     console.log('failed')
                     return
@@ -779,12 +782,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
+                            console.log(result, 'mjmjmjm')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
                         break;
                     case 'numberfield':
-                       // Attempt to parse result as a number
+                        // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
                         // Check if the type is 'integer'
@@ -820,7 +824,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             // Split and Validate Expression
-            payloadString = expression;
+            // payloadString =evalInputValue;
 
             setIsThreedotLoader(true);
             if (!error) {
@@ -1048,7 +1052,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == "advanced" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

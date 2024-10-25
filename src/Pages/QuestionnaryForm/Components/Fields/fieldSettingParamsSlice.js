@@ -131,7 +131,7 @@ const fieldSettingParamsSlice = createSlice({
                     label: item.label,
                     helptext: item.help_text,
                     placeholderContent: item.placeholder_content,
-                    defaultContent: item.default_content,
+                    default_content: item.default_content,
                     type: item.type,
                     format: item.format,
                     regular_expression: item?.regular_expression,

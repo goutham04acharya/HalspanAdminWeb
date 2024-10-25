@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetFixedChoice, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -81,6 +81,7 @@ const QuestionnaryForm = () => {
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
@@ -551,6 +552,7 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
+                    default_content : question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
                     default_conditional_logic: question?.default_conditional_logic
                 }))));
@@ -630,71 +632,73 @@ const QuestionnaryForm = () => {
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name,
-                pages: sectionToSave.pages.map(page => ({
-                    page_id: page.page_id,
-                    page_name: page.page_name,
-                    questions: page.questions.map(question => ({
-                        question_id: question.question_id,
-                        question_name: fieldSettingParams[question.question_id].label,
-                        conditional_logic: (!defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                        default_conditional_logic: (defaultString && payloadString) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
-                        component_type: fieldSettingParams[question.question_id].componentType,
-                        label: fieldSettingParams[question.question_id].label,
-                        help_text: fieldSettingParams[question.question_id].helptext,
-                        placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                        default_content: fieldSettingParams[question.question_id].defaultContent,
-                        type: fieldSettingParams[question.question_id].type,
-                        format: fieldSettingParams[question.question_id].format,
-                        regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
-                        format_error: fieldSettingParams[question?.question_id]?.format_error,
-                        field_range: {
-                            min: fieldSettingParams[question.question_id].min,
-                            max: fieldSettingParams[question.question_id].max,
-                        },
-                        admin_field_notes: fieldSettingParams[question.question_id].note,
-                        source: fieldSettingParams[question.question_id].source,
-                        source_value:
-                            question.source === 'fixedList' ?
-                                fieldSettingParams[question.question_id].fixedChoiceArray :
-                                fieldSettingParams[question.question_id].lookupOptionChoice
-                        ,
-                        lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                        options: fieldSettingParams[question.question_id].options,
-                        default_value: fieldSettingParams[question.question_id].defaultValue,
-                        increment_by: fieldSettingParams[question.question_id].incrementby,
-                        field_texts: {
-                            pre_field_text: fieldSettingParams[question.question_id].preField,
-                            post_field_text: fieldSettingParams[question.question_id].postField
-                        },
-                        asset_extras: {
-                            draw_image: fieldSettingParams[question.question_id].draw_image,
-                            pin_drop: fieldSettingParams[question.question_id].pin_drop,
-                            include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                            file_size: fieldSettingParams[question.question_id].fileSize,
-                            file_type: fieldSettingParams[question.question_id].fileType,
-                        },
-                        display_type: (() => {
-                            switch (fieldSettingParams[question.question_id].type) {
-                                case 'heading':
-                                    return { heading: fieldSettingParams[question.question_id].heading };
-                                case 'text':
-                                    return { text: fieldSettingParams[question.question_id].text };
-                                case 'image':
-                                    return { image: fieldSettingParams[question.question_id].image };
-                                case 'url':
-                                    return {
-                                        url: {
-                                            type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
-                                            value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
-                                        }
-                                    };
-                                default:
-                                    return {}; // Return an empty object if componentType doesn't match any case  
-                            }
-                        })(),
+                pages: sectionToSave.pages.map(page => (
+                    {
+                        page_id: page.page_id,
+                        page_name: page.page_name,
+                        questions: page.questions.map(question => ({
+                            question_id: question.question_id,
+                            question_name: fieldSettingParams[question.question_id].label,
+                            conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                            default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                            component_type: fieldSettingParams[question.question_id].componentType,
+                            label: fieldSettingParams[question.question_id].label,
+                            help_text: fieldSettingParams[question.question_id].helptext,
+                            placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
+                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advanced' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
+                            type: fieldSettingParams[question.question_id].type,
+                            format: fieldSettingParams[question.question_id].format,
+                            regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+                            format_error: fieldSettingParams[question?.question_id]?.format_error,
+                            field_range: {
+                                min: fieldSettingParams[question.question_id].min,
+                                max: fieldSettingParams[question.question_id].max,
+                            },
+                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                            source: fieldSettingParams[question.question_id].source,
+                            source_value:
+                                question.source === 'fixedList' ?
+                                    fieldSettingParams[question.question_id].fixedChoiceArray :
+                                    fieldSettingParams[question.question_id].lookupOptionChoice
+                            ,
+                            lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                            options: fieldSettingParams[question.question_id].options,
+                            default_value: fieldSettingParams[question.question_id].defaultValue,
+                            increment_by: fieldSettingParams[question.question_id].incrementby,
+                            field_texts: {
+                                pre_field_text: fieldSettingParams[question.question_id].preField,
+                                post_field_text: fieldSettingParams[question.question_id].postField
+                            },
+                            asset_extras: {
+                                draw_image: fieldSettingParams[question.question_id].draw_image,
+                                pin_drop: fieldSettingParams[question.question_id].pin_drop,
+                                include_metadata: fieldSettingParams[question.question_id].include_metadata,
+                                file_size: fieldSettingParams[question.question_id].fileSize,
+                                file_type: fieldSettingParams[question.question_id].fileType,
+                            },
+                            display_type: (() => {
+                                switch (fieldSettingParams[question.question_id].type) {
+                                    case 'heading':
+                                        return { heading: fieldSettingParams[question.question_id].heading };
+                                    case 'text':
+                                        return { text: fieldSettingParams[question.question_id].text };
+                                    case 'image':
+                                        return { image: fieldSettingParams[question.question_id].image };
+                                    case 'url':
+                                        return {
+                                            url: {
+                                                type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
+                                                value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
+                                            }
+                                        };
+                                    default:
+                                        return {}; // Return an empty object if componentType doesn't match any case  
+                                }
+                            })(),
+                        }))
                     }))
-                }))
             };
+            console.log(body, 'ololololol')
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -723,6 +727,7 @@ const QuestionnaryForm = () => {
                         } else {
                             dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                         }
+                        dispatch(saveCurrentData());
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
@@ -740,6 +745,7 @@ const QuestionnaryForm = () => {
                 }
 
             } catch (error) {
+                console.log(error)
                 setToastError('Something went wrong');
             }
         }

@@ -14,6 +14,7 @@ import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -154,7 +155,7 @@ function ChoiceFieldSetting({
                             id='Label'
                             data-testid="default-value-input"
                             className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            value={fieldSettingParameters?.default_conditional_logic || ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                            value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                             onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))
                         } 
                             // Update defaultString when input changes
