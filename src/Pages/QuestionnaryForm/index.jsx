@@ -885,8 +885,8 @@ const QuestionnaryForm = () => {
     });
     // ffunction to handle the compliance logic click
     const handleComplianceLogicClick = () => {
-
-        let arr = complianceLogic;
+        debugger
+        let arr = complianceLogic || [];
         arr.push({
             label: `Status ${arr.length + 1}`,
             default_content: ''
@@ -1026,14 +1026,13 @@ const QuestionnaryForm = () => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
     }, []);
+
     const addNewCompliance = (type, index) => {
         let newArr = [...complianceLogic]; // Create a copy of the current state array
         //type will be sent for deleting the  compliance logic state we will check for type if delete than splice array
         if (type) {
             newArr.splice(index, 1);
-            if (newArr.length === 0) {
-                dispatch(setSelectedComponent(null))
-            }
+            dispatch(setSelectedComponent(null))
             setComplianceLogic(newArr);
             return
         }
