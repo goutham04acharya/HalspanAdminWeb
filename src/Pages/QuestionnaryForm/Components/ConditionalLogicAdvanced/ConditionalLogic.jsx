@@ -762,14 +762,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return;
             }
             if (isDefaultLogic || complianceState) {
+                payloadString = payloadString.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', ' ');
                 evalInputValue = evalInputValue.replaceAll('else', ':')
                     .replaceAll('then', '?')
-                    .replaceAll('if', '');
+                    .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the expression (only for default checking)
             if (isDefaultLogic && selectedComponent == "dateTimefield") {
                 let invalid = DateValidator(evalInputValue)
+                if (invalid) {
                 if (invalid) {
                     handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
                     console.log('failed')
@@ -788,6 +792,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                         break;
                     case 'numberfield':
+                        // Attempt to parse result as a number
                         // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
@@ -848,7 +853,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             // Split and Validate Expression
-            payloadString = expression;
+            // payloadString =evalInputValue;
 
             setIsThreedotLoader(true);
             if (!error) {
