@@ -275,8 +275,9 @@ const AssetLocationField = ({
                     <InfinateDropdown
                         assets
                         label='Site'
-                        testID='input'
+                        testID='site'
                         type={type}
+                        labeltestID='site'
                         id='Site'
                         isDropdownOpen={isSiteDropdownOpen}
                         setDropdownOpen={setIsSiteDropdownOpen}
@@ -291,7 +292,7 @@ const AssetLocationField = ({
             {(preview && !selectedSite) && <div className={`relative ${preview ? 'mt-5' : 'mt-8'}`}>
                 <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
                 <input
-                    data-testid='input'
+                    data-testid='building'
                     type={type}
                     id={textId}
                     value={value}
@@ -307,8 +308,9 @@ const AssetLocationField = ({
                     {/* <label htmlFor={textId} className='font-medium text-base text-black'>Location</label> */}
                     <InfinateDropdown
                         assets
-                        label='Location'
-                        testID='input'
+                        label='Building'
+                        testID='location'
+                        labeltestID='building'
                         type={type}
                         id='Location'
                         isDropdownOpen={isLocationDropdownOpen}
@@ -316,15 +318,15 @@ const AssetLocationField = ({
                         selectedOption={selectedLocation}
                         options={locationOptions.filter(location => location.site === selectedSite.value)}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                        placeholder='Location'
+                        placeholder='Building'
                         handleOptionClick={(locationId) => handleLocationChange(locationId)}
                     />
                 </div>
             )}
             {(preview && !selectedLocation) && <div className={`relative ${preview ? 'mt-5' : 'mt-8'}`}>
-                <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
+                <label htmlFor={textId} className='font-medium text-base text-black'>Floor</label>
                 <input
-                    data-testid='input'
+                    data-testid='floorplan'
                     type={type}
                     id={textId}
                     value={value}
@@ -340,8 +342,9 @@ const AssetLocationField = ({
                     {/* <label htmlFor={textId} className='font-medium text-base text-black'>Level</label> */}
                     <InfinateDropdown
                         assets
-                        label='Level'
-                        testID='input'
+                        label='Floor'
+                        testID='level'
+                        labeltestID='floor'
                         type={type}
                         id='Level'
                         isDropdownOpen={isLevelDropdownOpen}
@@ -349,7 +352,7 @@ const AssetLocationField = ({
                         selectedOption={selectedLevel}
                         options={levelOptions.filter(level => level.location === selectedLocation.value)}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                        placeholder='Level'
+                        placeholder='Floor'
                         handleOptionClick={(levelId) => handleLevelChange(levelId)}
                     />
                 </div>
@@ -357,7 +360,7 @@ const AssetLocationField = ({
             {!preview && <><div className={`relative ${preview ? 'mt-3' : 'mt-5'}`}>
                 <label htmlFor={textId} className='font-medium text-base text-black'>Site</label>
                 <input
-                    data-testid='input'
+                    data-testid='site'
                     type={type}
                     id={textId}
                     value={value}
@@ -370,7 +373,7 @@ const AssetLocationField = ({
             </div><div className={`relative ${preview ? 'mt-5' : 'mt-8'}`}>
                     <label htmlFor={textId} className='font-medium text-base text-black'>Building</label>
                     <input
-                        data-testid='input'
+                        data-testid='building'
                         type={type}
                         id={textId}
                         value={value}
@@ -383,7 +386,7 @@ const AssetLocationField = ({
                 </div><div className={`relative ${preview ? 'mt-4' : 'mt-8'}`}>
                     <label htmlFor={textId} className='font-medium text-base text-black'>Floor</label>
                     <input
-                        data-testid='input'
+                        data-testid='floorplan'
                         type={type}
                         id={textId}
                         value={value}

@@ -150,6 +150,7 @@ function NumberField({
                                     '--percent': `${sliderPercentage}%`
                                 }}
                                 className='mt-6 custom-slider w-full'
+                                data-testid="number-slider"
                             />
                         </div>
                         <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_range?.max : fieldSettingParameters?.max}</p>

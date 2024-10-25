@@ -278,6 +278,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             </TransformComponent>
                         </TransformWrapper>
                         <button
+                            data-testid="close-floorplan"
                             className=" absolute top-0 right-0 py-[3px] px-[3px] bg-transparent hover:bg-[rgba(0,0,0,0.2)] rounded-lg cursor-pointer"
                             onClick={() => {
                                 setModalOpen(false)
@@ -296,6 +297,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             className="absolute bottom-[10px] left-0 flex flex-col"
                         >
                             <button
+                                data-testid="floorplan-pin"
                                 className={` px-3 text-white rounded-lg cursor-pointer `}
                                 onClick={togglePinMode}
                             >
@@ -303,7 +305,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             </button>
                             <div className="flex flex-wrap">
                                 <button
-
+                                    data-testid="floorplan-draw"
                                     className={` px-3 text-white rounded-lg cursor-pointer `}
                                     onClick={toggleDrawMode}
                                 >

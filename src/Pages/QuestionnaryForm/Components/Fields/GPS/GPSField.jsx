@@ -82,7 +82,7 @@ function GPSField({
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}
             </label>
-            <div className={`${preview ? 'mt-3' : 'mt-7'} ml-4`}>
+            <div data-testid="gps" className={`${preview ? 'mt-3' : 'mt-7'} ml-4`}>
                 {loading ? ( // Display a loading message while fetching location
                     <p>Loading location...</p>
                 ) : error ? (
