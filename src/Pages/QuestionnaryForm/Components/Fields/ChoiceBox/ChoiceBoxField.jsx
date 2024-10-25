@@ -25,7 +25,7 @@ const ChoiceBoxField = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(fieldSettingParameters, 'ggggggggggggggggg');
+    console.log(optionSelected, 'optionSelected');
 
     const handleRadioChange = (selectedValue) => {
         // Update the selected value in the parent state for the specific question
@@ -48,6 +48,8 @@ const ChoiceBoxField = ({
     };
 
     const handleCheckboxChange = (value) => {
+        setOptionSelected(value.value)
+        setIsDropdownOpen(false)
         setSelectedValues(prev => {
             let newSelected;
             if (prev.includes(value)) {
