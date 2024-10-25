@@ -48,7 +48,7 @@ const CustomCheckboxGroup = ({ values, onChange }) => {
                             )}
                         </div>
                     </div>
-                    <span className="text-sm text-gray-700">{value}</span>
+                    <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{value}</span>
                 </label>
             ))}
         </div>
