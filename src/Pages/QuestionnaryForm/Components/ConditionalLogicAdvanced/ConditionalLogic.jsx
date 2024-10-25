@@ -720,6 +720,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (isDefaultLogic) {
                 setDefaultString(evalInputValue);
             }
+            if (complianceState) {
+                setDefaultString(evalInputValue);
+            }
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
                 .replace('Today()', 'new Date()')
@@ -758,34 +761,34 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
                 return;
             }
-            if (isDefaultLogic) {
+            if (isDefaultLogic || complianceState) {
                 evalInputValue = evalInputValue.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', '');
                 // Return null as JSX expects a valid return inside {}
             }
-            //just checking for datetimefield before the evaluating the eexpression (only for default checking)
+            //just checking for datetimefield before the evaluating the expression (only for default checking)
             if (isDefaultLogic && selectedComponent == "dateTimefield") {
                 let invalid = DateValidator(evalInputValue)
-                if(invalid){
+                if (invalid) {
                     handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
                     console.log('failed')
                     return
                 }
             }
-
             const result = eval(evalInputValue);
+            console.log(result, 'result')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
-                            handleError('The evaluated result is not a string. The field type expects a string.');
+                            handleError('The evaluated result is not a string. Only expects a string.');
                             return;
                         }
                         break;
                     case 'numberfield':
-                       // Attempt to parse result as a number
+                        // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
                         // Check if the type is 'integer'
@@ -810,9 +813,33 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     default:
                         break;
                 }
+            } else if (complianceState) {
+                switch (selectedComponent) {
+                    case 'numberfield':
+                    case 'choiceboxfield':
+                    case 'textboxfield':
+                    case 'textboxfield':
+                    case 'dateTimefield':
+                    case 'assetLocationfield':
+                    case 'floorPlanfield':
+                    case 'photofield':
+                    case 'videofield':
+                    case 'filefield':
+                    case 'signaturefield':
+                    case 'gpsfield':
+                    case 'displayfield':
+                    case 'compliancelogic':
+                    case 'tagScanfield':
+
+                        if (typeof result !== 'string') {
+                            handleError('The evaluated result is not a string. The field type expects a string.');
+                            return;
+                        }
+                        break;
+                }
             }
 
-            if (!isDefaultLogic) {
+            if (!isDefaultLogic || !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
                 if (validationResult.some(msg => msg.includes('Error'))) {
                     handleError(validationResult.join('\n'));
@@ -975,7 +1002,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
                 <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
-                        {(tab || isDefaultLogic || complianceState) ? (
+                        {(tab === 'advance' || isDefaultLogic || complianceState) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
@@ -1048,7 +1075,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == 'Advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'Advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

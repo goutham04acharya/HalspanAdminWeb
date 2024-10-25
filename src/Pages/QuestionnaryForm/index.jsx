@@ -94,8 +94,6 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
 
-    console.log(selectedSectionData, 'selectedSectionData')
-
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -520,7 +518,6 @@ const QuestionnaryForm = () => {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
-                console.log(response?.data?.data, 'kkkkkkkkkkkkkk')
                 const sectionsData = response?.data?.data?.sections || [];
                 // if (sectionsData.length === 1) {  
                 //     // If no sections are present, skip calling GetSectionOrder  
@@ -721,6 +718,7 @@ const QuestionnaryForm = () => {
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
+                        setCompliancestate(false)
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -883,9 +881,8 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
         })
     });
-    // ffunction to handle the compliance logic click
+    // function to handle the compliance logic click
     const handleComplianceLogicClick = () => {
-        debugger
         let arr = complianceLogic || [];
         arr.push({
             label: `Status ${arr.length + 1}`,
@@ -939,8 +936,6 @@ const QuestionnaryForm = () => {
         // Auto-save the settings
         handleSaveSection();
     };
-
-    // 
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete  
@@ -997,7 +992,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-
     const onDragEnd = (result) => {
         if (!result.destination) return;
 
@@ -1010,7 +1004,6 @@ const QuestionnaryForm = () => {
         dispatch(setSavedSection(reorderedItems));
         handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
-
 
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
@@ -1032,7 +1025,7 @@ const QuestionnaryForm = () => {
         //type will be sent for deleting the  compliance logic state we will check for type if delete than splice array
         if (type) {
             newArr.splice(index, 1);
-            dispatch(setSelectedComponent(null))
+            dispatch(setSelectedComponent('null'))
             setComplianceLogic(newArr);
             return
         }

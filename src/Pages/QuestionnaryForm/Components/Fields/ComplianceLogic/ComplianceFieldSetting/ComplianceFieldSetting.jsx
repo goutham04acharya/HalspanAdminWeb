@@ -12,7 +12,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
     }
     return (
         <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
-            {complianceLogic.length > 0 &&
+            {/* {complianceLogic.length > 0 && */}
                 <div>
                     <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
                     <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
@@ -50,7 +50,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         </div>
                     </div>
                 </div>
-            }
+            {/* } */}
 
         </div>)
 }

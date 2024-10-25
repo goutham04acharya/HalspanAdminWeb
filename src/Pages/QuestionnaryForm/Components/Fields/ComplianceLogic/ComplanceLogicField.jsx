@@ -26,13 +26,13 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
         </div>
       </div>
 
-      {complianceLogic.length > 0 && complianceLogic.map((item, index) => (
+      {complianceLogic.map((item, index) => (
         <div data-testid="section-1-page-1-question-5" class="disable-select select-none w-full rounded-[10px] mb-4 p-4 hover:border border-[#2B333B] bg-[#EFF1F8]"
           onClick={() => {
-            if (complianceLogic.length > 0) {
+            // if (complianceLogic.length > 0) {
               dispatch(setComplianceLogicId(index))
-              // dispatch(setSelectedComponent('compliancelogic'))
-            }
+              dispatch(setSelectedComponent('compliancelogic'))
+            // }
           }}
         >
           <div className='flex justify-between items-start'>
