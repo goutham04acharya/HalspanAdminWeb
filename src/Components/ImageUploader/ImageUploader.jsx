@@ -96,7 +96,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                 <div className="w-full flex flex-wrap">
                     {images.map((image, index) => (
                         <div key={index} className="image-preview relative mt-2">
-                            <span className="close-icon ml-[60px] absolute hover:bg-slate-800 px-1 rounded-md text-white cursor-pointer" onClick={() => handleImageRemove(index)}>
+                            <span data-testid={`remove-${index}`} className="close-icon ml-[60px] absolute hover:bg-slate-800 px-1 rounded-md text-white cursor-pointer" onClick={() => handleImageRemove(index)}>
                                 &#10005;
                             </span>
                             <img
