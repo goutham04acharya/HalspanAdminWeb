@@ -782,7 +782,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
-                            console.log(result, 'mjmjmjm')
+                            console.log(result, 'mjmjmjmgit')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
@@ -1052,7 +1052,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == "advanced" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == "advance" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
