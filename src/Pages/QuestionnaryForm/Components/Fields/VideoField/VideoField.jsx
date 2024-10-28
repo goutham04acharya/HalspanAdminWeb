@@ -15,7 +15,6 @@ function VideoField({ label,
     const [fileName, setFileName] = useState('');
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
-    console.log(selectedQuestionId, 'selectedQuestionIdselectedQuestionId')
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setFileName(file ? file.name : '');

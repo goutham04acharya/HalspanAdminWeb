@@ -31,14 +31,6 @@ function Table({
         }
     }, [versionList]);
 
-    // const handleDropdownClick = (event, version_number) => {
-    //     console.log(version_number)
-    //     if ((version_number && event === 'Draft') || (version_number && event === 'Testing')) {
-    //         setDropdownOpen(!isDropdownOpen);
-    //         console.log(isDropdownOpen)
-    //     }
-    // };
-
     const handleOptionClick = async (status, questionnaire_id, version_number) => {
         const previousPublishedVersion = versionList?.data?.items.find(
             item => item.status === 'Published'

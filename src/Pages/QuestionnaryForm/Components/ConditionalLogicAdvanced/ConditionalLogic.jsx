@@ -1,7 +1,7 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { setModalOpen } from '../QuestionnaryFormSlice';
+import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
 import Button2 from '../../../../Components/Button2/ButtonLight';
 import Button from '../../../../Components/Button/button';
@@ -17,10 +17,13 @@ import { buildConditionExpression, buildLogicExpression } from '../../../../Comm
 import GlobalContext from '../../../../Components/Context/GlobalContext';
 import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
+import moment from 'moment/moment';
+import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
+import { DateValidator } from './DateFieldChecker';
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -37,12 +40,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+    const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
+
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
     const [selectedType, setSelectedType] = useState('');
-    const [tab, setTab] = useState(false);
+    const [tab, setTab] = useState('basic');
     const [submitSelected, setSubmitSelected] = useState(false);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+    const [isOperatorModal, setIsOperatorModal] = useState(false);
+    const [isStringMethodModal, setIsStringMethodModal] = useState(false)
+
+    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -57,7 +66,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         ]
     },
     ])
-
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -101,19 +109,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     // Handlers to switch tabs
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
+    const handleTabClick = (event) => {
+        setActiveTab(event);
     };
 
     const handleClose = () => {
         setConditionalLogic(false);
+        setIsDefaultLogic(false);
     };
 
     useOnClickOutside(modalRef, () => {
         dispatch(setModalOpen(false));
     });
 
-    //function for filtering the search
+    //function for filtering the search does not need section and page
     const filterSectionDetails = () => {
         // Initialize an empty array to hold the flattened details
         const sectionDetailsArray = [];
@@ -121,12 +130,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
             const sectionName = section.section_name.replace(/\s+/g, '_');
-            // sectionDetailsArray.push(sectionName); // Add the section name
 
             // Access pages within each section
             section.pages?.forEach((page) => {
                 const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
-                // sectionDetailsArray.push(pageName); // Add section.page
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
@@ -225,12 +232,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
-        console.log(selectedFieldType, "selectedFieldType")
         // setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        setInputValue(value); // Update input value
+        setInputValue(value)
+        // if (isDefaultLogic) {
+        //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
+        // } else {
+        //     dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
+        // }
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -298,7 +309,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSuggestions([]);
             setShowMethodSuggestions(false); // Reset method suggestions
         }
-
     };
 
     // Combined function to insert either a question or a method
@@ -331,10 +341,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Update the textarea value
             textarea.value = newText;
-            setInputValue(newText);  // Update the inputValue state
             setShowSectionList(false);
+            setInputValue(newText)
+            // if (isDefaultLogic) {
+            //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
+            // } else {
+            //     dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
+            // }  // Update the inputValue state
         }
-
 
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
@@ -374,6 +388,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSelectedFieldType(fieldType.join(', '));
         }
     };
+
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -478,9 +493,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
                 const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
-
                 if (matches) {
-
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
@@ -511,7 +524,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         };
                     }
 
-
                     if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
                         if (value.startsWith("(") && value.endsWith(")")) {
                             // If the value is enclosed in parentheses, treat it as a string
@@ -529,8 +541,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
                         else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
                         else if (condition_logic === '===') condition_logic = 'number of file is';
-
-
 
                         return {
                             question_name: question_name.trim(),
@@ -580,8 +590,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         value = Number(value);
                     }
 
-                    // Return the object in the correct structure
-
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -625,7 +633,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (totalConditions > 10) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
         }
-
         return parsedConditions;
     };
 
@@ -638,14 +645,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     page.questions?.forEach((question) => {
                         if (question.question_id === selectedQuestionId) {
                             // Pre-fill the editor with the conditional logic of the selected question
-                            let conditionalLogic = question.conditional_logic || '';
+
+                            //adding this to check whether the advane editor or the default logic
+                            let conditionalLogic = ''
+                            if (isDefaultLogic) {
+                                conditionalLogic = question.default_conditional_logic || '';
+                            } else {
+                                conditionalLogic = question.conditional_logic || '';
+                            }
+
 
                             // Replace && with "and" and || with "or"
                             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
+                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
+                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
+                            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
 
-                            setInputValue(conditionalLogic);
-                            setConditions(parseLogicExpression(question.conditional_logic));
+                            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+                            setInputValue(conditionalLogic)
 
+                            {
+                                !isDefaultLogic &&
+                                    setConditions(parseLogicExpression(question.conditional_logic));
+                            }
                         }
                     });
                 });
@@ -653,21 +678,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
-
         }
-    }, [selectedQuestionId, allSectionDetails, tab]);
+    }, [selectedQuestionId, allSectionDetails]);
 
-    // Your handleSave function
+
     const handleSave = async () => {
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
+
         try {
-            // Function to add "sections." to section IDs
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
             };
 
-            // New function to modify string (replace () with length())
             const modifyString = (input) => {
                 if (selectedType === 'array') {
                     const lastIndex = input.lastIndexOf('()');
@@ -678,32 +701,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return input;
             };
 
-            // Apply the section prefix function to the inputValue
-            let evalInputValue = modifyString(inputValue);
-
-            // New function to format dates and remove quotes from new Date
-            const formatDates = (input) => {
-                // First, replace MM/DD/YYYY format with new Date(YYYY, MM-1, DD)
-                let formatted = input.replace(/\b(\d{2})\/(\d{2})\/(\d{4})\b/g, (match, month, day, year) => {
-                    return `new Date(${year}, ${parseInt(month) - 1}, ${day})`;
-                });
-
-                // Then, remove quotes from around new Date expressions
-                formatted = formatted.replace(/"(new Date\([^)]+\))"/g, '$1');
-
-                return formatted;
+            const handleError = (message) => {
+                setError(message);
+                setIsThreedotLoader(false);
             };
 
-            // Apply the formatDates function
-            evalInputValue = formatDates(evalInputValue);
-            // Log the updated input after date replacement
+            // let modifyvalue
+            // if (isDefaultLogic) {
+            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
+            // } else {
+            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
+            // }
 
-            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(') // Replace AddDays with addDays function
-            evalInputValue = evalInputValue.replaceAll('SubtractDays(', 'setDate(-') // Replace SubtractDays with subtractDays function
-            evalInputValue = evalInputValue.replace('Today()', 'new Date()'); // Replace () with length function
-            // evalInputValue = evalInputValue.replace('else', ':'); // Replace () with length function
-            // evalInputValue = evalInputValue.replace('then', '?'); // Replace () with length function
+            let evalInputValue = modifyString(inputValue);
 
+            if (isDefaultLogic) {
+                setDefaultString(evalInputValue);
+            }
+            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
+                .replaceAll('SubtractDays(', 'setDate(-')
+                .replace('Today()', 'new Date()')
+                .replace('if', '');
 
             let expression = evalInputValue.toString();
 
@@ -712,7 +730,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
-
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
@@ -721,10 +738,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
-                setError('Please pass the parameter inside the function');
-                setIsThreedotLoader(false);
+                handleError('Please pass the parameter inside the function');
                 return; // Stop execution if validation fails
             }
+
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
 
@@ -736,34 +753,176 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
 
             if (invalidVariables.length > 0) {
-                setError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
-                setIsThreedotLoader(false);
-                return; // Stop execution if invalid variables are found
+                handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
+                return;
             }
-            // Evaluate the modified string
+            if (isDefaultLogic) {
+                payloadString = payloadString.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', ' ');
+                evalInputValue = evalInputValue.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', ' ');
+                // Return null as JSX expects a valid return inside {}
+            }
+            //just checking for datetimefield before the evaluating the eexpression (only for default checking)
+            if (isDefaultLogic && selectedComponent == "dateTimefield") {
+                console.log(evalInputValue, 'hey')
+                let invalid = DateValidator(evalInputValue)
+                if (invalid) {
+                    handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
+                    console.log('failed')
+                    return
+                }
+            }
+
             const result = eval(evalInputValue);
+            if (isDefaultLogic) {
+                switch (selectedComponent) {
+                    case 'choiceboxfield':
+                    case 'textboxfield':
+                        if (typeof result !== 'string') {
+                            console.log(result, 'mjmjmjmgit')
+                            handleError('The evaluated result is not a string. The field type expects a string.');
+                            return;
+                        }
+                        break;
+                    case 'numberfield':
+                        // Attempt to parse result as a number
+                        const parsedResult = Number(result);
+
+                        // Check if the type is 'integer'
+                        if (fieldSettingParams[selectedQuestionId].type === 'integer') {
+                            // Ensure result is an integer
+                            if (!Number.isInteger(parsedResult) || result.toString().includes('.')) {
+                                handleError('The evaluated result should only be an integer.');
+                                return;
+                            }
+                        }
+                        // Check if the type is 'float'
+                        else if (fieldSettingParams[selectedQuestionId].type === 'float') {
+                            // Ensure result is a valid float (allow dot and digits)
+                            if (!/^\d+(\.\d+)?$/.test(result)) {
+                                handleError('The evaluated result should be a valid float (number and dot).');
+                                return;
+                            }
+                        } else {
+                            setError('');  // No error, valid number
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!isDefaultLogic) {
+                const validationResult = splitAndValidate(evalInputValue);
+                if (validationResult.some(msg => msg.includes('Error'))) {
+                    handleError(validationResult.join('\n'));
+                    return; // Stop execution if validation fails
+                }
+            }
+
+            // Split and Validate Expression
+            // payloadString =evalInputValue;
+
             setIsThreedotLoader(true);
             if (!error) {
-                handleSaveSection(sectionId, true, payloadString);
-                dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+                handleSaveSection(sectionId, true, payloadString, isDefaultLogic);
+                // dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
+                // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+
             } else if (typeof result === 'boolean') {
-                setError(''); // Clear the error since result is valid
+                handleError('');  // Clear the error since the result is valid
                 setIsThreedotLoader(false);
             } else if (isNaN(result)) {
-                setError('Please pass the parameter inside the function');
-                setIsThreedotLoader(false);
+                handleError('Please pass the parameter inside the function');
             } else {
-                console.log('Result is not a boolean:', result);
-                setError(result);
-                setIsThreedotLoader(false);
+                handleError(result);
             }
         } catch (error) {
-            // Handle and log any evaluation errors
-            console.error('Error evaluating the expression:', error.message);
-            setError(error.message);
-            setIsThreedotLoader(false);
+            console.error(error, 'error')
+            const handleError = (message) => {
+                setError(message);
+                setIsThreedotLoader(false);
+            };
+            handleError(`Error evaluating the expression: ${error.message}`);
         }
     };
+
+
+    function splitAndValidate(expression) {
+        const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
+        const errors = [];
+
+        // Define the list of methods that don't require an operator
+        const typeMethods = ["includes()"];   // Update the regex to match valid expressions
+
+        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+
+        // Define a regex to detect incomplete expressions (e.g., missing operators or values)
+        const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
+
+        // Regex for valid date format (dd/mm/yyyy)
+        const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
+        parts.forEach((part, index) => {
+            part = part.replace(/^\s+|\s+$/g, '');
+
+            // Check for incomplete expressions
+            part = trimParentheses(part)
+            if (part.includes('includes(')) {
+
+            } else {
+                part = part.replace(/[()]/g, '')
+            }
+            //trimming the conditions to avoid space issue
+            part = part.trim();
+            const displayPart = part.replace(/sections\./g, '');
+
+            // Check if the expression contains any method from the typeMethods list
+            const containsTypeMethod = typeMethods.some(method => part.includes(method));
+
+            //checking for the includes 
+            if (part.includes('includes(')) {
+                const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
+                if (!result) {
+                    error.push(`Error in the ${part}: missing vaalues inside the function`)
+                }
+            }
+            // If it contains a method that doesn't require an operator, mark as correct
+            else if (containsTypeMethod) {
+                errors.push(`Expression is correct (contains a valid method).`);
+            }
+            else if (incompleteExpressionRegex.test(part) && !part.endsWith(')')) {
+                errors.push(`Error in expression: "${displayPart}" is incomplete (missing operator or value).`);
+            }
+            // Check if it's a date type
+            else if (selectedType === 'date') {
+                const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
+                if (dateMatch) {
+                    const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
+
+                    // Validate date value (either "Today" or a valid date format)
+                    if (value !== 'Today' && !validDateRegex.test(value)) {
+                        errors.push(`Error in expression: "${value}" is not a valid date. Use 'dd/mm/yyyy' or 'Today'.`);
+                    }
+                } else {
+                    errors.push(`Error in expression: Date field is missing or incorrectly formatted.`);
+                }
+            }
+            // Check if the part matches the valid expression pattern
+            else if (!validExpressionRegex.test(part)) {
+                errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+            }
+            // If the expression is correct, log that it's valid
+            else {
+                console.log(`Expression is correct.`);
+            }
+        });
+
+        return errors.length > 0 ? errors : ["All expressions are valid."];
+    }
 
     const showInputValue = (key) => {
         //this is the array of cndition where the input value  tap will not be  shown
@@ -794,7 +953,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         return true;  // Return true if any key is empty
                     }
                 }
-
             }
         }
         return false;  // Return false if all keys have values
@@ -817,79 +975,105 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     return (
-        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
-                <div className='w-full'>
-                    {tab ?
-                        <div className='flex h-customh14'>
-                            <div className='w-[60%]'>
-                                <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
-                                <AdvancedEditor
-                                    handleListSectionDetails={handleListSectionDetails}
-                                    showSectionList={showSectionList}
-                                    inputValue={inputValue}
-                                    error={error}
-                                    showMethodSuggestions={showMethodSuggestions}
-                                    suggestions={suggestions}
-                                    handleClickToInsert={handleClickToInsert}
-                                    textareaRef={textareaRef}
-                                    handleInputField={handleInputField}
-                                    secDetailsForSearching={secDetailsForSearching}
+        <>
+            <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
+                <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
+                    <div className='w-full'>
+                        {(tab === 'advance' || isDefaultLogic) ? (
+                            <div className='flex h-customh14'>
+                                <div className='w-[60%]'>
+                                    {!isDefaultLogic ?
+                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                        :
+                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                    }
+                                    <AdvancedEditor
+                                        handleListSectionDetails={handleListSectionDetails}
+                                        showSectionList={showSectionList}
+                                        inputValue={inputValue}
+                                        error={error}
+                                        showMethodSuggestions={showMethodSuggestions}
+                                        suggestions={suggestions}
+                                        handleClickToInsert={handleClickToInsert}
+                                        textareaRef={textareaRef}
+                                        handleInputField={handleInputField}
+                                        secDetailsForSearching={secDetailsForSearching}
+                                        sections={sections}
+                                        setShowMethodSuggestions={setShowMethodSuggestions}
+                                        isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                        selectedFieldType={selectedFieldType}
+                                        setSelectedType={setSelectedType}
+                                        isDefaultLogic={isDefaultLogic}
+                                    />
+                                </div>
+                                <div className='w-[40%]'>
+                                    <StaticDetails
+                                        handleTabClick={handleTabClick}
+                                        activeTab={activeTab}
+                                        setActiveTab={setActiveTab}
+                                        isDefaultLogic={isDefaultLogic}
+                                        selectedFieldType={selectedFieldType}
+                                        isOperatorModal={isOperatorModal}
+                                        setIsOperatorModal={setIsOperatorModal}
+                                        setIsStringMethodModal={setIsStringMethodModal}
+                                    />
+                                </div>
+                            </div>) : (
+                            !isDefaultLogic && (
+                                <BasicEditor
+                                    secDetailsForSearching={filterQuestions()}
+                                    questions={allSectionDetails.data}
                                     sections={sections}
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                    selectedFieldType={selectedFieldType}
-                                    setSelectedType={setSelectedType}
+                                    conditions={conditions}
+                                    setConditions={setConditions}
+                                    submitSelected={submitSelected}
+                                    setSubmitSelected={setSubmitSelected}
                                 />
+                            )
+                        )}
+                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                            {!isDefaultLogic &&
+                                <div className='flex gap-5 items-end'>
+                                    <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                    <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                </div>
+                            }
+                            <div>
+                                <Button2
+                                    text='Cancel'
+                                    type='button'
+                                    testId='cancel'
+                                    data-testid='button1'
+                                    className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                    onClick={() => handleClose()}
+                                >
+                                </Button2>
+                                <Button
+                                    text='Save'
+                                    onClick={(tab == "advance" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    type='button'
+                                    data-testid='cancel'
+                                    className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                    isThreedotLoading={isThreedotLoader}
+                                >
+                                </Button>
                             </div>
-                            <div className='w-[40%]'>
-                                <StaticDetails
-                                    handleTabClick={handleTabClick}
-                                    activeTab={activeTab}
-                                    setActiveTab={setActiveTab} />
-                            </div>
-                        </div> :
-                        <BasicEditor
-                            secDetailsForSearching={filterQuestions()}
-                            questions={allSectionDetails.data}
-                            sections={sections}
-                            setShowMethodSuggestions={setShowMethodSuggestions}
-                            isThreedotLoaderBlack={isThreedotLoaderBlack}
-                            conditions={conditions}
-                            setConditions={setConditions}
-                            submitSelected={submitSelected}
-                            setSubmitSelected={setSubmitSelected}
-                        />
-                    }
-                    <div className='flex justify-between items-end'>
-                        <div className='flex gap-5 items-end'>
-                            <p onClick={() => setTab(false)} className={tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</p>
-                            <p data-testId="advance-editor-tab" onClick={() => setTab(true)} className={!tab ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                        </div>
-                        <div>
-                            <Button2
-                                text='Cancel'
-                                type='button'
-                                testId='cancel'
-                                data-testid='button1'
-                                className='w-[162px] h-[50px] text-black font-semibold text-base'
-                                onClick={() => handleClose()}
-                            >
-                            </Button2>
-                            <Button
-                                text='Save'
-                                onClick={tab ? handleSave : handleSaveBasicEditor}
-                                type='button'
-                                data-testid='cancel'
-                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
-                            >
-                            </Button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
+            {(isOperatorModal || isStringMethodModal) &&
+                <OperatorsModal
+                    setIsOperatorModal={setIsOperatorModal}
+                    isOperatorModal={isOperatorModal}
+                    setIsStringMethodModal={setIsStringMethodModal}
+                    isStringMethodModal={isStringMethodModal}
+                />
+            }
+        </>
     );
 }
 

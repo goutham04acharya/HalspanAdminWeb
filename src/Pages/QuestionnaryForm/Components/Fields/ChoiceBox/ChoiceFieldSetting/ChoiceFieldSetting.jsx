@@ -14,6 +14,7 @@ import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -24,18 +25,17 @@ function ChoiceFieldSetting({
     handleSaveSettings,
     selectedQuestionId,
     handleBlur,
-    setConditionalLogic
+    setConditionalLogic,
+    isDefaultLogic,
+    setIsDefaultLogic,
+    defaultString,
+    setDefaultString
 }) {
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
     const [isLookupOpen, setIsLookupOpen] = useState(false);
-    const [selectedLookup, setSelectedLookup] = useState(null);
     const [optionData, setOptionData] = useState([]);
-
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [focusInput, setFocusInput] = useState('');
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -46,12 +46,8 @@ function ChoiceFieldSetting({
 
     // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
-
+    console.log(fieldSettingParameters, 'nauanya')
     const handleLookupOption = (option) => {
-        // setFieldSettingParameters((prevState) => ({
-        //     ...prevState,
-        //     lookupOption: option.value,
-        // }));
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: option.choices, questionId: selectedQuestionId }))
@@ -63,7 +59,6 @@ function ChoiceFieldSetting({
         dispatch(setNewComponent({ id: 'lookupOptionChoice', value: [], questionId: selectedQuestionId }))
         dispatch(setShouldAutoSave(true));
     }
-
     // List Functions
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
@@ -127,6 +122,13 @@ function ChoiceFieldSetting({
         fetchLookupList();
     }, [fetchLookupList]);
 
+    if (isDefaultLogic) {
+        defaultString = defaultString.replaceAll(':', 'else')
+            .replaceAll('?', 'then')
+            .replaceAll('', 'if');
+        // Return null as JSX expects a valid return inside {}
+    }
+    console.log(defaultString,'hey here')
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
@@ -148,9 +150,27 @@ function ChoiceFieldSetting({
                 <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                     <div className='relative w-full'>
-                        <input type="text" id='Label' className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            placeholder='Populates the content' />
-                        <img src="/Images/setting.svg" alt="setting" className='absolute top-5 right-3 cursor-pointer' />
+                        <input
+                            type="text"
+                            id='Label'
+                            data-testid="default-value-input"
+                            className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                            value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
+                            onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))
+                        } 
+                            // Update defaultString when input changes
+                            placeholder='Populates the content'
+                        />
+                        <img
+                            src="/Images/setting.svg"
+                            alt="setting"
+                            data-testid="default-value"
+                            className='absolute top-5 right-3 cursor-pointer'
+                            onClick={() => {
+                                setIsDefaultLogic(true);
+                                setConditionalLogic(false);
+                            }}
+                        />
                     </div>
                 </div>
                 <div className='mt-7'>
@@ -169,7 +189,6 @@ function ChoiceFieldSetting({
                                 Dropdown
                             </label>
                         </div>
-
                         <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
                                 type='radio'
@@ -299,7 +318,11 @@ function ChoiceFieldSetting({
                                 type='button'
                                 data-testId="add-conditional-logic"
                                 className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-                                onClick={() => setConditionalLogic(true)}  // Use arrow function
+                                onClick={() => {
+                                    setConditionalLogic(true),
+                                        setIsDefaultLogic(false)
+                                }
+                                }  // Use arrow function
                             >
                                 Add Conditional Logic
                             </button>

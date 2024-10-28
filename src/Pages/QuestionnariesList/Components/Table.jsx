@@ -4,7 +4,6 @@ import {useNavigate } from 'react-router-dom';
 
 function Table({ loading, QueList, lastElementRef }) {
     const navigate = useNavigate();
-    console.log(QueList, 'QueList')
 
     const getStatusStyles = (status) => {
         switch (status) {

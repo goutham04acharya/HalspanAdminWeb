@@ -15,7 +15,7 @@ Then('I should see the advanced editor for date\\/time field', async function ()
 When('I enter the correct conditional logic for date\\/time field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.setDate(20)');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.setDate(20) === "20/11/2024"');
 });
 
 When('I select the question from the suggestions for date\\/time field', async function () {
