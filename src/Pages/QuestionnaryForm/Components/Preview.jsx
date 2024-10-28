@@ -33,6 +33,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [loading, setLoading] = useState(false); // Add a loading state  
     const [conditionalValues, setConditionalValues] = useState({});
     console.log(conditionalValues, 'conditionalValues')
+    console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -231,7 +232,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'floorPlanfield':
                 return <FloorPlanField preview setValidationErrors={setValidationErrors} setValue={setValue} question={question} validationErrors={validationErrors} />;
             case 'photofield':
-                return <PhotoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
                 return <VideoField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'tagScanfield':
@@ -283,10 +284,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 {sections[currentSection]?.section_name}
                             </p>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
-                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%` }}></div>
+                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
                                     <p>Step {totalPagesNavigated + 1} of {allPages.length}</p>
-                                    <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(1)}%</span>
+                                    <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%</span>
                                 </div>
                             </div>
 

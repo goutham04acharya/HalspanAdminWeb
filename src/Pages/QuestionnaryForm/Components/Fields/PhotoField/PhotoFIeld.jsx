@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import ImageUploader from '../../../../../Components/ImageUploader/ImageUploader';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 function PhotoField({ label,
     type,
@@ -17,51 +18,126 @@ function PhotoField({ label,
     validationErrors,
     setValidationErrors,
     setValue,
-    photoValue
+    photoValue,
+    setConditionalValues,
+    sections
 
 
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename  
-
+    console.log(fileState, 'file state state')
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFileName(file ? file.name : '');
-        // handleChange(fieldSettingParameters);   
-        console.log(file, 'file akkaka')
-        setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state   
-        if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return; // Exit if no files are selected
+
+        // Create a new file list that includes existing files plus new selections
+        const newFilesList = [
+            ...(fileState[question?.question_id] || []), // Existing files
+            ...files.map(file => file) // New files
+        ];
+        console.log(newFilesList, 'new file list')
+        // Update fileName to display all file names as a comma-separated list
+        setFileName(newFilesList.map(file => file.name).join(', '));
+
+        // Update fileState with the new files list
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: newFilesList
+        }));
+
+        const updatedFileCount = newFilesList.length;
+
+        // Check if the minimum required number of files has been uploaded
+        if (updatedFileCount >= question?.field_range?.min) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
             }));
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
-                preview_photofield: '', // Or remove the key if you prefer    
-            }))
+                preview_filefield: '' // Clear validation error if criteria met
+            }));
         } else {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: false
             }));
         }
+
+        // Update conditional values to track the current file count
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newFilesList
+                }
+            }
+        }));
+
+        console.log(newFilesList, 'Updated File List');
+        console.log(updatedFileCount, 'Updated File Count');
     };
 
 
-    const handleImageRemove = (index) => {
+
+
+    const handleImageRemove = (fileNameToRemove) => {
+        console.log(fileNameToRemove, 'file name to remove')
         setFileState((prev) => {
-            const newState = { ...prev };
-            delete newState[question?.question_id];
-            return newState;
-        });
-        if (Object.keys(fileState).length < question?.field_range?.min) {
-            // debugger
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: false
+            // Directly filter the files array for the current question_id
+            const updatedFiles = prev[question?.question_id]?.filter(
+                (file) => file.name !== fileNameToRemove
+            ) || [];
+            // const updatedFiles = (prev[question?.question_id] || []).filter(
+            //     (fileName) => fileName !== fileNameToRemove
+            // );
+            const updatedFileCount = updatedFiles.length;
+            console.log(updatedFiles, 'updated files after removal');
+
+            // Update validation state based on the new file count
+            if (updatedFileCount < question?.field_range?.min) {
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: false
+                }));
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: 'Minimum file requirement not met'
+                }));
+            } else {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: ''
+                }));
+            }
+
+            // Update conditional values to reflect the new file count
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name],
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name],
+                        [label]: updatedFiles
+                    }
+                }
             }));
-        }
+
+            // Directly update fileState without creating a new object
+            console.log(updatedFiles, 'updatedFiles updatedFiles')
+            return {
+                ...prev,
+                [question?.question_id]: updatedFiles
+            };
+        });
     };
+
+
 
 
     function handleFunction(e) {
@@ -81,6 +157,7 @@ function PhotoField({ label,
             }));
         }
     }
+    console.log(fileState, 'ddddddkdkdkkdkdkdk')
 
     return (
         <div>
@@ -113,7 +190,7 @@ function PhotoField({ label,
                     {fileName || (fieldSettingParameters?.placeholderContent) || 'No file chosen'}
                 </span>
             </div> : <div className={``}>
-                <ImageUploader setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} />
+                <ImageUploader setFileState={setFileState} setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} />
             </div>}
             {(question?.question_id && validationErrors?.preview_photofield && validationErrors.preview_photofield[question.question_id]) && (
                 <ErrorMessage error={validationErrors.preview_photofield[question.question_id]} />
