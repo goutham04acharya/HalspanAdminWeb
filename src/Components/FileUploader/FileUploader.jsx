@@ -6,29 +6,29 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
 
     const handleFileChange = (e) => {
         const uploadedFiles = e.target.files;
-
+    
         if (uploadedFiles.length > 0) {
-            const allowedTypes = fileType?.split(',').map((type) => type.trim().toLowerCase());
+            const allowedTypes = (fileType ? fileType.split(',').map((type) => type.trim().toLowerCase()) : []);
             const maxSizeInBytes = fileSize * 1024 * 1024;
-
+    
             const newFiles = [...files];
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
                 const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                if (!allowedTypes.includes(fileExtension)) {
+    
+                if (allowedTypes.length > 0 && !allowedTypes.includes(fileExtension)) {
                     setError(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
                     return;
                 }
-
+    
                 if (file.size > maxSizeInBytes) {
                     setError(`File size exceeds ${fileSize}MB limit`);
                     return;
                 }
-
+    
                 newFiles.push(file);
             }
-
+    
             if (newFiles.length < min) {
                 setError(`Minimum ${min} files required`);
             } else if (newFiles.length > max) {
@@ -38,13 +38,14 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     preview_filefield: '', // Or remove the key if you prefer     
-                }))
+                }));
             }
-
+    
             setFiles(newFiles);
         }
-        handleChange(e)
+        handleChange(e);
     };
+    
 
     const handleRemoveFile = (index) => {
         const newFiles = [...files];

@@ -137,7 +137,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
-                    if (question.question_id !== selectedQuestionId) {
+                    if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
                     }
@@ -167,7 +167,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 page.questions?.forEach((question) => {
                     const questionId = question?.question_id;
                     const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
-                    if (questionId !== selectedQuestionId) {
+                    if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         sectionDetailsArray.push(questionName);
                     } else {
 
@@ -609,7 +609,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     conditions: conditions.filter(cond => cond !== null)
                 };
             } else {
-                if (tab !== 'Advance') {
+                if (tab !== 'advance') {
                     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
                 }
                 return {
@@ -757,16 +757,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return;
             }
             if (isDefaultLogic) {
+                payloadString = payloadString.replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('if', ' ');
                 evalInputValue = evalInputValue.replaceAll('else', ':')
                     .replaceAll('then', '?')
-                    .replaceAll('if', '');
+                    .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the eexpression (only for default checking)
             if (isDefaultLogic && selectedComponent == "dateTimefield") {
-                console.log(evalInputValue,'hey')
+                console.log(evalInputValue, 'hey')
                 let invalid = DateValidator(evalInputValue)
-                if(invalid){
+                if (invalid) {
                     handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
                     console.log('failed')
                     return
@@ -779,12 +782,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
+                            console.log(result, 'mjmjmjmgit')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
                         break;
                     case 'numberfield':
-                       // Attempt to parse result as a number
+                        // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
                         // Check if the type is 'integer'
@@ -820,7 +824,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             // Split and Validate Expression
-            payloadString = expression;
+            // payloadString =evalInputValue;
 
             setIsThreedotLoader(true);
             if (!error) {
@@ -955,6 +959,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
+        // debugger
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
@@ -964,7 +969,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
         }
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
@@ -1048,7 +1053,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == 'Advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == "advance" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

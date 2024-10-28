@@ -1,6 +1,7 @@
 import React from 'react';
 import TimePicker from '../../../../../Components/TimePicker/TimePicker';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 function DateTimeField({
     label,
@@ -17,7 +18,9 @@ function DateTimeField({
     validationErrors,
     setValidationErrors,
     setValue,
-    choiceValue
+    choiceValue,
+    setConditionalValues,
+    sections
 }) {
     console.log(validationErrors, 'validationErrors')
     function handleFunction(e) {
@@ -37,6 +40,17 @@ function DateTimeField({
             }));
         } else {
             const value = e.target.value;
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name], // Preserve existing entries for this section
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                        [label]: new Date(value.replace('/', ', ' )) // Add or update the label key with newValue
+                    }
+                }
+            }));
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false
@@ -49,7 +63,7 @@ function DateTimeField({
                 }
             }));
         }
-        console.log(value, 'am checking e')
+        console.log(new Date(value), 'am checking e')
     }
 
 

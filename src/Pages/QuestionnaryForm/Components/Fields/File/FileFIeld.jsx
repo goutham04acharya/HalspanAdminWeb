@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import FileUploader from '../../../../../Components/FileUploader/FileUploader';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 function FileField({
     textId,
@@ -12,54 +13,90 @@ function FileField({
     question,
     setValue,
     setValidationErrors,
-    validationErrors
+    validationErrors,
+    setConditionalValues,
+    sections
 }) {
 
     const [fileName, setFileName] = useState('');
-    const [fileState, setFileState] = useState({ files: [] });   
-
+    const [fileState, setFileState] = useState([]);   
+    
     const handleFileChange = (e) => {
-        // debugger
-        const file = e.target.files[0];
-        setFileName(file ? file.name : '');
-        // handleChange(fieldSettingParameters);    
-        console.log(file, 'file akkaka')
-        setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state    
-        if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
-            // debugger
+        const files = Array.from(e.target.files);
+        if (!files.length) return; // Exit if no files are selected
+    
+        const newFilesList = [
+            ...(fileState[question?.question_id] || []), 
+            ...files.map(file => file.name)
+        ];
+    
+        setFileName(newFilesList.join(', ')); // Update displayed file names
+    
+        // Update fileState directly with the new files
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: newFilesList
+        }));
+    
+        const updatedFileCount = newFilesList.length;
+    
+        // Check if the minimum required number of files has been uploaded
+        if (updatedFileCount >= question?.field_range?.min) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
             }));
             setValidationErrors((prevErrors) => ({
-                
                 ...prevErrors,
-                preview_filefield: '', // Or remove the key if you prefer     
-            }))
-            console.log(validationErrors.preview_filefield, 'ffffffffffffffffffffffff')
+                preview_filefield: ''
+            }));
         } else {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: false
             }));
         }
+    
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: updatedFileCount
+                }
+            }
+        }));
+    
+        console.log(newFilesList, 'newFilesList');
+        console.log(updatedFileCount, 'updatedFileCount');
     };
     
-
-    const handleFileRemove = (index) => {
+    
+    const handleFileRemove = (fileNameToRemove) => {
         setFileState((prev) => {
-            const newState = { ...prev };
-            delete newState[question?.question_id];
-            return newState;
+            const updatedFiles = (prev[question?.question_id] || []).filter(
+                (fileName) => fileName !== fileNameToRemove
+            );
+            
+            return {
+                ...prev,
+                [question?.question_id]: updatedFiles
+            };
         });
-        if (Object.keys(fileState).length < question?.field_range?.min) {
+    
+        // Re-check if the minimum number of files is still met after removal
+        if ((fileState[question?.question_id]?.length || 0) - 1 < question?.field_range?.min) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: false
             }));
         }
+        
     };
-
+    const fileCount = fileState[question?.question_id]?.length || 0;
+    console.log(fileCount, 'ppppppppppppppppppp')
     return (
         <div>
             <label

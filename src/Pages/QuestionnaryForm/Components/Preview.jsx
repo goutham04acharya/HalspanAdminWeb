@@ -31,7 +31,38 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [totalPagesNavigated, setTotalPagesNavigated] = useState(0);
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(false); // Add a loading state  
+    const [conditionalValues, setConditionalValues] = useState({});
+    console.log(conditionalValues, 'conditionalValues')
+    const handleConditionalLogic = async (data) => {
+        let result = {};
 
+        data.forEach((section, sectionIndex) => {
+            const sectionKey = section.section_name.replace(/\s+/g, '_')// Convert section name to key format
+            result[sectionKey] = {}; // Initialize the section key
+
+            section.pages.forEach((page, pageIndex) => {
+                const pageKey = page.page_name.replace(/\s+/g, '_') // Convert page name to key format
+                result[sectionKey][pageKey] = {}; // Initialize the page key within the section
+
+                page.questions.forEach((question, questionIndex) => {
+                    const questionKey = question.label.replace(/\s+/g, '_') // Convert label to key format
+                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                });
+            });
+        });
+        // console.log(result, 'result');
+        return result;
+
+
+    }
+    const updateConditionalValues = async (data) => {
+        const result = await handleConditionalLogic(data);
+        setConditionalValues(result);
+    };
+
+    // Call updateConditionalValues with the data object
+
+    console.log(conditionalValues, 'conditonal logic')
     useEffect(() => {
         const fetchSections = async () => {
             setLoading(true); // Set loading to true when API call starts   
@@ -61,6 +92,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 console.log(reorganizedSections, 'reorganizedSections')
 
                 setSections(reorganizedSections);
+                // setConditionalValues(handleConditionalLogic(reorganizedSections));
+                updateConditionalValues(reorganizedSections);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -68,6 +101,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             }
         };
         fetchSections();
+
     }, [questionnaire_id, version_number]);
 
 
@@ -170,12 +204,14 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     };
 
     const renderQuestion = (question) => {
+        // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
+
         if (!question) {
             return <p>No question data available.</p>;
         }
         switch (question.component_type) {
             case 'textboxfield':
-                return <TextBoxField setIsFormatError={setIsFormatError} id={question?.question_id} testId={`preview`} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
+                return <TextBoxField sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setIsFormatError={setIsFormatError} id={question?.question_id} testId={`preview`} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
@@ -183,13 +219,13 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'signaturefield':
                 return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
-                return <FileField preview setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <ChoiceBoxField preview fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <ChoiceBoxField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
-                return <DateTimeField preview setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
-                return <NumberField preview setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
+                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues}  setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
                 return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
@@ -217,6 +253,14 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             preview_filefield: '',
             preview_videofield: ''
         }));
+    });
+    // useEffect(() => {
+    //     Object.entries(obj).forEach(([key, value]) => {
+    //         eval(`var ${key} = ${JSON.stringify(value)}`);
+    //     });
+    // }, [conditionalValues]);
+    Object.entries(conditionalValues).forEach(([key, value]) => {
+        window[key] = value;
     });
 
     return (
@@ -249,11 +293,26 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
                             <div className='flex flex-col justify-between'>
 
-                                {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => (
-                                    <div data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`} className='mt-3 mb-3 bg-white mx-4 rounded-xl py-4 px-2' key={index}>
-                                        <div className='px-2'>{renderQuestion(question)}</div>
-                                    </div>
-                                ))}
+                                {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => {
+                                    if (question?.conditional_logic !== '') {
+                                        console.log(eval(question?.conditional_logic), 'ffff true or false')
+                                        // If the condition does not evaluate to true, skip rendering this item
+                                        if (!eval(question?.conditional_logic)) {
+                                            return null;
+                                        }
+                                    }
+
+                                    return (
+                                        <div
+                                            data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`}
+                                            className="mt-3 mb-3 bg-white mx-4 rounded-xl py-4 px-2"
+                                            key={index}
+                                        >
+                                            <div className="px-2">{renderQuestion(question)}</div>
+                                        </div>
+                                    );
+                                })}
+
                             </div>
                         </div>
                     )}

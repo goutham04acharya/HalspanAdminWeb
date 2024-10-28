@@ -5,6 +5,7 @@ import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/O
 import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -52,7 +53,7 @@ function DateTimeFieldSetting({
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
             <div className='relative w-full'>
               <input
-                value={fieldSettingParameters?.default_conditional_logic || ''}
+                value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : '' }
                 type="text"
                 id='Label'
                 data-testid="default-value-input"
