@@ -782,7 +782,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
-                            console.log(result, 'mjmjmjm')
+                            console.log(result, 'mjmjmjmgit')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
