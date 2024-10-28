@@ -18,8 +18,7 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
-    setSelectedType,
-    isDefaultLogic
+    setSelectedType
 }) {
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
@@ -28,6 +27,7 @@ function AdvancedEditor({
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
     const dispatch = useDispatch()
+
     // Handle user input change and filter suggestions
     const handleSearchChange = (event) => {
         const value = event.target.value;
@@ -63,7 +63,6 @@ function AdvancedEditor({
 
     const handleAddQuestion = (suggestion, sections) => {
         let allSections = sections
-        console.log(allSections,suggestion, 'allSections')
         const getVariableType = a => a.constructor.name.toLowerCase();
         let valueType = getVariableType(eval(`sections.${suggestion}`))
         setSelectedType(valueType);
@@ -102,7 +101,7 @@ function AdvancedEditor({
                     onKeyDown={handleKeyDown} // Intercept key presses
                     ref={textareaRef}
                     value={inputValue}
-                    // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
+                // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
                 ></textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>

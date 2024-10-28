@@ -19,9 +19,7 @@ function DateTimeField({
     setValue,
     choiceValue
 }) {
-    console.log(validationErrors, 'validationErrors')
     function handleFunction(e) {
-        console.log(e, 'time')
         if (type === 'time') {
             const value = e
             setValue((prev) => ({

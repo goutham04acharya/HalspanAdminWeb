@@ -20,7 +20,6 @@ const TextBoxField = ({
     setIsFormatError,
     setValue
 }) => {
-    console.log(validationErrors, 'validationErrors')
 
     const validateFormat = (value, format, regex) => {
         switch (format) {

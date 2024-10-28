@@ -241,7 +241,7 @@ const QuestionnaryForm = () => {
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
         'compliancelogic': ComplianceFieldSetting,
-        "tagScanfield":TagScanFieldSetting,
+        "tagScanfield": TagScanFieldSetting,
         // Add other mappings here...
     };
 
@@ -546,7 +546,7 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    default_content : question?.default_content || '',
+                    default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
                     default_conditional_logic: question?.default_conditional_logic
                 }))));
@@ -609,9 +609,17 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
-        handleSectionSaveOrder(sections)
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
+        handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        if (compliance) {
+            setIsThreedotLoader(false);
+            setConditionalLogic(false);
+            setIsDefaultLogic(false);
+            setCompliancestate(false);
+            setSaveClick(false);
+        }
+
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -692,7 +700,6 @@ const QuestionnaryForm = () => {
                         }))
                     }))
             };
-            console.log(body, 'ololololol')
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -958,16 +965,20 @@ const QuestionnaryForm = () => {
             dispatch(setModalOpen(false)); // Close the modal  
         }
     }
-    console.log(complianceState ,'nnnnnn')
 
-    const handleSectionSaveOrder = async (updatedSection) => {
+    const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({
                 index: index,
                 id: section.section_id
             })),
-            ...(complianceState && { "compliance_state": complianceLogic[complianceLogicId].default_content }) // Conditionally add compliance_state
+        }
+    
+        if (compliance) {
+            let compliance = [...complianceLogic]
+            compliance[complianceLogicId].default_content = payloadString;
+            body['compliance_logic'] = compliance;
         }
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
@@ -1046,11 +1057,10 @@ const QuestionnaryForm = () => {
         setComplianceLogic(newArr); // Set the new array in state
     }
 
-    const complianceSaveHandler = async() => {
+    const complianceSaveHandler = async () => {
         const body = {
             compliance_logic: complianceLogic,
         }
-        console.log(complianceLogic, 'complianceLogic')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -1200,11 +1210,9 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
-                            {/* {complianceLogic?.length > 0 &&  */}
                             <div>
-                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler}/>
+                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} />
                             </div>
-                            {/* } */}
                         </div>
                     </div>
                     <div className='w-[30%]'>
@@ -1356,10 +1364,11 @@ const QuestionnaryForm = () => {
                     defaultString={defaultString}
                     complianceState={complianceState}
                     setCompliancestate={setCompliancestate}
+                    complianceLogic={complianceLogic}
                 />
 
             )}
-            {previewModal ===true && <PreviewModal
+            {previewModal === true && <PreviewModal
                 isModalOpen={previewModal}
                 setModalOpen={setPreviewModal}
                 Button1text={'Back'}
