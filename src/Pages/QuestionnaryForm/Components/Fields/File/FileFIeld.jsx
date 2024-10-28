@@ -75,6 +75,7 @@ function FileField({
 
 
     const handleFileRemove = (fileNameToRemove) => {
+        console.log(fileNameToRemove, 'file name in file upload')
         setFileState((prev) => {
             const updatedFiles = (prev[question?.question_id] || []).filter(
                 (fileName) => fileName !== fileNameToRemove
