@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
 
-const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handleChange, handleRemove, setFileState, fileState }) => {
+const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handleChange, handleRemove, setFileState, fileState, setConditionalValues, sections, question }) => {
     const [files, setFiles] = useState(fileState.files || []);
     const [error, setError] = useState('');
 
@@ -8,15 +9,17 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
         const uploadedFiles = e.target.files;
 
         if (uploadedFiles.length > 0) {
-            const allowedTypes = fileType?.split(',').map((type) => type.trim().toLowerCase());
+            const allowedTypes = (fileType ? fileType.split(',').map((type) => type.trim().toLowerCase()) : []);
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
             const newFiles = [...files];
+            console.log(newFiles, ' aeeaeaaee')
+
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
                 const fileExtension = file.name.split('.').pop().toLowerCase();
 
-                if (!allowedTypes.includes(fileExtension)) {
+                if (allowedTypes.length > 0 && !allowedTypes.includes(fileExtension)) {
                     setError(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`);
                     return;
                 }
@@ -38,13 +41,13 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     preview_filefield: '', // Or remove the key if you prefer     
-                }))
+                }));
             }
-
             setFiles(newFiles);
         }
-        handleChange(e)
+        handleChange(e);
     };
+
 
     const handleRemoveFile = (index) => {
         const newFiles = [...files];
@@ -57,7 +60,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             files: newFiles,
         }));
 
-        handleRemove(index);
+        handleRemove(index); 
     };
 
 

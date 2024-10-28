@@ -1,5 +1,6 @@
 import React from 'react'
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 const TextBoxField = ({
     label,
@@ -18,10 +19,11 @@ const TextBoxField = ({
     question_id,
     question,
     setIsFormatError,
-    setValue
+    setValue,
+    setConditionalValues,
+    sections
 }) => {
-    console.log(validationErrors, 'validationErrors')
-
+    console.log(sections, 'sections sections')
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -38,6 +40,7 @@ const TextBoxField = ({
     };
 
     const handleInputChange = (e) => {
+
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_textboxfield: {
@@ -48,6 +51,18 @@ const TextBoxField = ({
         const newValue = e.target.value;
         const format = question.format;
         const regex = question.regular_expression;
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question_id)
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name], // Preserve existing entries for this section
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                    [label]: newValue // Add or update the label key with newValue
+                }
+            }
+        }));
+        
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
@@ -73,7 +88,7 @@ const TextBoxField = ({
             }));
         } else {
             // Clear the error if the field is filled and format is valid 
-            setIsFormatError(false)  
+            setIsFormatError(false)
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_textboxfield: {
@@ -83,7 +98,7 @@ const TextBoxField = ({
             }));
         }
     };
-    function handleFunction(){
+    function handleFunction() {
 
     }
 
@@ -95,10 +110,10 @@ const TextBoxField = ({
                 htmlFor={textId}
                 maxLength={100}
                 title={preview ? question?.label : fieldSettingParameters?.label}
-                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${preview ? question?.label :fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
+                className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] ${preview ? question?.label : fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
-            
+
             {(preview ? question?.type : fieldSettingParameters?.type) === 'multi_line' ?
                 <textarea
                     data-testid='input'

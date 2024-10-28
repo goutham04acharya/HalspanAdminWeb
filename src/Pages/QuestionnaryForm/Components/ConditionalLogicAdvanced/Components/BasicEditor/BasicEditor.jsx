@@ -200,7 +200,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             case "textboxfield":
             case "choiceboxfield":
             case "assetLocationfield":
-            case "floorPlanfield":
             case "signaturefield":
             case "gpsfield":
             case "displayfield":
@@ -210,6 +209,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             case "photofield":
             case "videofield":
             case "filefield":
+            case "floorPlanfield":
                 return conditionObj['file'];
             case "dateTimefield":
                 return conditionObj['date'];
@@ -245,7 +245,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         // if  its not there then return tru as the input box is required for  other condiitons 
         return true;
     }
-    
+
 
     //handler for datepicker
     const handleDatePicker = (dateString, mainIndex, subIndex) => {

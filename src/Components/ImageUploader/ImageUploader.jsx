@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { ColorPicker } from 'antd';
 
-function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, setValue, handleRemoveImage , question}) {
+function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, setValue, handleRemoveImage , question, setFileState}) {
     const [images, setImages] = useState([]);
     const [currentImage, setCurrentImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -35,6 +35,10 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
         newImages.splice(index, 1);
         setImages(newImages);
         setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
+        setFileState((prevState) => ({
+            ...prevState,
+            files: newImages,
+        }));
     };
 
     const handleImageClick = (image) => {
@@ -96,7 +100,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                 <div className="w-full flex flex-wrap">
                     {images.map((image, index) => (
                         <div key={index} className="image-preview relative mt-2">
-                            <span className="close-icon ml-[60px] absolute hover:bg-slate-800 px-1 rounded-md text-white cursor-pointer" onClick={() => handleImageRemove(index)}>
+                            <span data-testid={`remove-${index}`} className="close-icon ml-[60px] absolute hover:bg-slate-800 px-1 rounded-md text-white cursor-pointer" onClick={() => handleRemoveImage(index)}>
                                 &#10005;
                             </span>
                             <img
