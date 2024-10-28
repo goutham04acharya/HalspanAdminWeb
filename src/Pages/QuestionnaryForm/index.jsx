@@ -647,7 +647,7 @@ const QuestionnaryForm = () => {
                             admin_field_notes: fieldSettingParams[question.question_id].note,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
-                                question.source === 'fixedList' ?
+                                fieldSettingParams[question.question_id].source === 'fixedList' ?
                                     fieldSettingParams[question.question_id].fixedChoiceArray :
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
