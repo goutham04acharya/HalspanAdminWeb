@@ -49,14 +49,15 @@ function PhotoField({ label,
         const updatedFileCount = newFilesList.length;
 
         // Check if the minimum required number of files has been uploaded
-        if (updatedFileCount >= question?.field_range?.min) {
+        if (updatedFileCount >= (question?.field_range?.min || 0)) {
+            // debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
             }));
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
-                preview_filefield: '' // Clear validation error if criteria met
+                preview_photofield: '' // Clear validation error if criteria met
             }));
         } else {
             setValue((prev) => ({
@@ -85,57 +86,93 @@ function PhotoField({ label,
 
 
 
-    const handleImageRemove = (fileNameToRemove) => {
-        
+    const handleImageRemove = (newImages, fileNameToRemove) => {
+
         console.log(fileNameToRemove, 'file name to remove')
-        setFileState((prev) => {
-            // Directly filter the files array for the current question_id
-            const updatedFiles = (prev[question?.question_id] || [])?.filter(
-                (fileName) => fileName !== fileNameToRemove
-            ) ;
-            // const updatedFiles = (prev[question?.question_id] || []).filter(
-            //     (fileName) => fileName !== fileNameToRemove
-            // );
-            const updatedFileCount = updatedFiles.length;
-            console.log(updatedFiles, 'updated files after removal');
+        // setFileState((prev) => {
+        //     // Directly filter the files array for the current question_id
+        //     const updatedFiles = (prev[question?.question_id] || [])?.filter(
+        //         (fileName) => fileName !== fileNameToRemove
+        //     ) ;
+        //     // const updatedFiles = (prev[question?.question_id] || []).filter(
+        //     //     (fileName) => fileName !== fileNameToRemove
+        //     // );
+        //     const updatedFileCount = updatedFiles.length;
+        //     console.log(updatedFiles, 'updated files after removal');
 
-            // Update validation state based on the new file count
-            if (updatedFileCount < question?.field_range?.min) {
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: false
-                }));
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_filefield: 'Minimum file requirement not met'
-                }));
-            } else {
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_filefield: ''
-                }));
-            }
+        //     // Update validation state based on the new file count
+        //     if (updatedFileCount < question?.field_range?.min) {
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: false
+        //         }));
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: 'Minimum file requirement not met'
+        //         }));
+        //     } else {
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: ''
+        //         }));
+        //     }
 
-            // Update conditional values to reflect the new file count
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-            setConditionalValues((prevValues) => ({
-                ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name],
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name],
-                        [label]: updatedFileCount
-                    }
-                }
-            }));
+        //     // Update conditional values to reflect the new file count
+        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        //     setConditionalValues((prevValues) => ({
+        //         ...prevValues,
+        //         [section_name]: {
+        //             ...prevValues[section_name],
+        //             [page_name]: {
+        //                 ...prevValues[section_name]?.[page_name],
+        //                 [label]: newImages
+        //             }
+        //         }
+        //     }));
 
-            // Directly update fileState without creating a new object
-            console.log(updatedFiles, 'updatedFiles updatedFiles')
-            return {
+        //     // Directly update fileState without creating a new object
+        //     console.log(updatedFiles, 'updatedFiles updatedFiles')
+        //     return {
+        //         ...prev,
+        //         [question?.question_id]: updatedFiles
+        //     };
+        // });
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: newImages
+        }));
+        if (fileState.length >= (question?.field_range?.min || 0)) {
+            setValue((prev) => ({
                 ...prev,
-                [question?.question_id]: updatedFiles
-            };
-        });
+                [question?.question_id]: true
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_photofield: ''
+            }));
+        } else {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: false
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_photofield: 'Minimum file requirement not met'
+            }));
+        }
+
+        // Update conditional values to reflect the new file count
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newImages
+                }
+            }
+        }));
     };
 
 
