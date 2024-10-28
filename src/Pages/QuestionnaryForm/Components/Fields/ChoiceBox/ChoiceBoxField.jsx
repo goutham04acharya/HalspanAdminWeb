@@ -28,7 +28,7 @@ const ChoiceBoxField = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(fieldSettingParameters, 'ggggggggggggggggg');
+    console.log(optionSelected, 'optionSelected');
 
     const handleRadioChange = (selectedValue) => {
         console.log(selectedValue, 'selected radio value')
@@ -64,7 +64,6 @@ const ChoiceBoxField = ({
 
     const handleCheckboxChange = (value) => {
         setOptionSelected(value.value)
-        console.log(value, 'dddddddddddddd')
         setIsDropdownOpen(false)
         setSelectedValues(prev => {
             let newSelected;
