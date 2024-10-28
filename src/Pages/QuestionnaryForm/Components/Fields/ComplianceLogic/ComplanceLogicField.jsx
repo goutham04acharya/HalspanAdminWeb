@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux';
 import { setComplianceLogicId, setSelectedComponent } from '../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
+import { defaultContentConverter } from '../../../../../CommonMethods/defaultContentConverter';
 
 function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler }) {
 
@@ -47,8 +48,8 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
           </div>
           <input data-testid="input"
             class="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined"
-            value={item?.default_content || ''}
-          />
+            value={defaultContentConverter(item?.default_content || '')}
+            />
           <p data-testid="help-text" class="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"></p>
         </div>))
       }

@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import moment from 'moment/moment';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
+import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
 
 
 
@@ -648,9 +649,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Extract default_content based on selected index
                     const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
 
-                    // Set inputValue to the default_content of the selected item, or '' if not found
-                    setInputValue(selectedLogic ? selectedLogic.default_content : '');
-                    console.log(initialContent, 'nhanha');
+                    // Use defaultContentConverter to transform default_content if selectedLogic exists
+                    if (selectedLogic) {
+                        const transformedContent = defaultContentConverter(selectedLogic.default_content);
+                        setInputValue(transformedContent);
+                    } else {
+                        setInputValue('');
+                    }
                 } catch (error) {
                     console.error("Error fetching layout:", error);
                 }

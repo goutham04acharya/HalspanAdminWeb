@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
 function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
@@ -33,7 +34,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         <div className='relative w-full'>
                             <input type="text" id='Label'
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
-                                value={complianceLogic[complianceLogicId]?.default_content}
+                                value={defaultContentConverter(complianceLogic[complianceLogicId]?.default_content)}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 placeholder='Populates the content' />
                             <img src="/Images/setting.svg" alt="setting" onClick={() => setCompliancestate(true)} className='absolute top-5 right-3 cursor-pointer' />
