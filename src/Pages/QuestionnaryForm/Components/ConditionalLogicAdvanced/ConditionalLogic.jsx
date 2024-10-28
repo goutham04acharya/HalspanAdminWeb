@@ -767,7 +767,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             //just checking for datetimefield before the evaluating the eexpression (only for default checking)
             if (isDefaultLogic && selectedComponent == "dateTimefield") {
-                console.log(evalInputValue, 'hey')
                 let invalid = DateValidator(evalInputValue)
                 if (invalid) {
                     handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
@@ -841,7 +840,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(result);
             }
         } catch (error) {
-            console.error(error, 'error')
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
