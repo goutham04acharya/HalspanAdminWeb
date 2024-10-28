@@ -86,12 +86,13 @@ function PhotoField({ label,
 
 
     const handleImageRemove = (fileNameToRemove) => {
+        
         console.log(fileNameToRemove, 'file name to remove')
         setFileState((prev) => {
             // Directly filter the files array for the current question_id
-            const updatedFiles = prev[question?.question_id]?.filter(
-                (file) => file.name !== fileNameToRemove
-            ) || [];
+            const updatedFiles = (prev[question?.question_id] || [])?.filter(
+                (fileName) => fileName !== fileNameToRemove
+            ) ;
             // const updatedFiles = (prev[question?.question_id] || []).filter(
             //     (fileName) => fileName !== fileNameToRemove
             // );
@@ -123,7 +124,7 @@ function PhotoField({ label,
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: updatedFiles
+                        [label]: updatedFileCount
                     }
                 }
             }));
