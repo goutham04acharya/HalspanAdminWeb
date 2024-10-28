@@ -685,6 +685,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
     const handleSave = async () => {
+    
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
 
@@ -708,13 +709,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
 
-            // let modifyvalue
-            // if (isDefaultLogic) {
-            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
-            // } else {
-            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
-            // }
-
             let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic) {
@@ -722,6 +716,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             if (complianceState) {
                 setDefaultString(evalInputValue);
+                console.log(defaultString, 'defaultsrting')
             }
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
                 .replaceAll('SubtractDays(', 'setDate(-')
@@ -771,17 +766,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the expression (only for default checking)
-            if (isDefaultLogic && selectedComponent == "dateTimefield") {
+            if ((isDefaultLogic || complianceState) && selectedComponent == "dateTimefield") {
                 let invalid = DateValidator(evalInputValue)
                 if (invalid) {
-                if (invalid) {
-                    handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
-                    console.log('failed')
-                    return
+                    if (invalid) {
+                        handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
+                        console.log('failed')
+                        return
+                    }
                 }
             }
             const result = eval(evalInputValue);
-            console.log(result, 'result')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -823,7 +818,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'numberfield':
                     case 'choiceboxfield':
                     case 'textboxfield':
-                    case 'textboxfield':
                     case 'dateTimefield':
                     case 'assetLocationfield':
                     case 'floorPlanfield':
@@ -835,7 +829,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'displayfield':
                     case 'compliancelogic':
                     case 'tagScanfield':
-
                         if (typeof result !== 'string') {
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
@@ -844,8 +837,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
             }
 
-            if (!isDefaultLogic || !complianceState) {
+            if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
+
                 if (validationResult.some(msg => msg.includes('Error'))) {
                     handleError(validationResult.join('\n'));
                     return; // Stop execution if validation fails
@@ -854,12 +848,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Split and Validate Expression
             // payloadString =evalInputValue;
-
             setIsThreedotLoader(true);
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic);
-                // dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
-                // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -877,7 +868,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             handleError(`Error evaluating the expression: ${error.message}`);
         }
     };
-
 
     function splitAndValidate(expression) {
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
@@ -1080,7 +1070,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == 'Advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'

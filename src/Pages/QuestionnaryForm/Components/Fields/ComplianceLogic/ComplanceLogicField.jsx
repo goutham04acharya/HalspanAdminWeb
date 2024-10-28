@@ -22,17 +22,15 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
               dispatch(setSelectedComponent(null))
             }}
           />
-          <img src="/Images/save.svg" onClick={()=>complianceSaveHandler()} alt="save" title="Save" data-testid="save-btn-1" class=" h-[26px] rounded-full hover:bg-[#FFFFFF] cursor-pointer" />
+          <img src="/Images/save.svg" onClick={() => complianceSaveHandler()} alt="save" title="Save" data-testid="save-btn-1" class=" h-[26px] rounded-full hover:bg-[#FFFFFF] cursor-pointer" />
         </div>
       </div>
 
       {complianceLogic.map((item, index) => (
         <div data-testid="section-1-page-1-question-5" class="disable-select select-none w-full rounded-[10px] mb-4 p-4 hover:border border-[#2B333B] bg-[#EFF1F8]"
           onClick={() => {
-            // if (complianceLogic.length > 0) {
-              dispatch(setComplianceLogicId(index))
-              dispatch(setSelectedComponent('compliancelogic'))
-            // }
+            dispatch(setComplianceLogicId(index))
+            dispatch(setSelectedComponent('compliancelogic'))
           }}
         >
           <div className='flex justify-between items-start'>
@@ -47,7 +45,10 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
               }}
             />
           </div>
-          <input data-testid="input" class="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined" value="" />
+          <input data-testid="input"
+            class="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined"
+            value={item?.default_content || ''}
+          />
           <p data-testid="help-text" class="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"></p>
         </div>))
       }

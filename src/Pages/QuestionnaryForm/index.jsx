@@ -85,6 +85,7 @@ const QuestionnaryForm = () => {
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
+    const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
@@ -896,6 +897,7 @@ const QuestionnaryForm = () => {
         });
         setComplianceLogic(arr)
         dispatch(setSelectedComponent('compliancelogic'))
+
     };
 
     const handleTagScanClick = useCallback(() => {
@@ -956,6 +958,7 @@ const QuestionnaryForm = () => {
             dispatch(setModalOpen(false)); // Close the modal  
         }
     }
+    console.log(complianceState ,'nnnnnn')
 
     const handleSectionSaveOrder = async (updatedSection) => {
         const body = {
@@ -963,7 +966,8 @@ const QuestionnaryForm = () => {
             "sections": updatedSection.map((section, index) => ({
                 index: index,
                 id: section.section_id
-            }))
+            })),
+            ...(complianceState && { "compliance_state": complianceLogic[complianceLogicId].default_content }) // Conditionally add compliance_state
         }
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
@@ -1046,6 +1050,7 @@ const QuestionnaryForm = () => {
         const body = {
             compliance_logic: complianceLogic,
         }
+        console.log(complianceLogic, 'complianceLogic')
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -1195,9 +1200,11 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
-                            {complianceLogic?.length > 0 && <div>
+                            {/* {complianceLogic?.length > 0 &&  */}
+                            <div>
                                 <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler}/>
-                            </div>}
+                            </div>
+                            {/* } */}
                         </div>
                     </div>
                     <div className='w-[30%]'>
