@@ -4,7 +4,7 @@ const webdriver = require('selenium-webdriver');
 const { text } = require('express');
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
-const Key = webdriver.Key
+const Keys = webdriver.Key
 
 When('I enter the label name for compliance status', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));

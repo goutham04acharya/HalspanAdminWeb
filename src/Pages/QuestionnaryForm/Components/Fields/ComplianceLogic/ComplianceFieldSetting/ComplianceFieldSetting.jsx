@@ -24,6 +24,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         </label>
                         <input
                             type="text"
+                            data-testid="label-name-input"
                             className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             onChange={(e) => handleInputChange(complianceLogicId, e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
