@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const CustomCheckboxGroup = ({ values, onChange }) => {
     // Initialize with the first value selected by default
     const [selectedValues, setSelectedValues] = useState([]);
-
+    console.log(selectedValues, 'selected values fffffffffffffffff')
     const handleCheckboxChange = (value) => {
         setSelectedValues(prev => {
             if (prev.includes(value)) {
@@ -13,7 +13,6 @@ const CustomCheckboxGroup = ({ values, onChange }) => {
             }
         });
         if(selectedValues){
-
             onChange(value)
         }
     };
@@ -48,7 +47,7 @@ const CustomCheckboxGroup = ({ values, onChange }) => {
                             )}
                         </div>
                     </div>
-                    <span className="text-sm text-gray-700">{value}</span>
+                    <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{value}</span>
                 </label>
             ))}
         </div>

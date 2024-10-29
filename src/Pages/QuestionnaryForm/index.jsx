@@ -631,6 +631,7 @@ const QuestionnaryForm = () => {
                 return;
             }
             // Create a new object containing only the selected section's necessary fields  
+            
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name,
@@ -647,7 +648,7 @@ const QuestionnaryForm = () => {
                             label: fieldSettingParams[question.question_id].label,
                             help_text: fieldSettingParams[question.question_id].helptext,
                             placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advanced' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
+                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
                             type: fieldSettingParams[question.question_id].type,
                             format: fieldSettingParams[question.question_id].format,
                             regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
@@ -659,7 +660,7 @@ const QuestionnaryForm = () => {
                             admin_field_notes: fieldSettingParams[question.question_id].note,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
-                                question.source === 'fixedList' ?
+                                fieldSettingParams[question.question_id].source === 'fixedList' ?
                                     fieldSettingParams[question.question_id].fixedChoiceArray :
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,

@@ -4,6 +4,7 @@ import RadioButtonGroup from '../../../../../Components/RadioButtonGroup/RadioBu
 import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/CheckboxButtonGroup';
 import InfinateDropdown from '../../../../../Components/InputField/InfinateDropdown';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 const ChoiceBoxField = ({
     label,
@@ -20,14 +21,28 @@ const ChoiceBoxField = ({
     validationErrors,
     setValidationErrors,
     setValue,
-    choiceValue
+    choiceValue,
+    setConditionalValues,
+    sections
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(fieldSettingParameters, 'ggggggggggggggggg');
+    console.log(optionSelected, 'optionSelected');
 
     const handleRadioChange = (selectedValue) => {
+        console.log(selectedValue, 'selected radio value')
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name], // Preserve existing entries for this section
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                    [label]: selectedValue // Add or update the label key with newValue
+                }
+            }
+        }))
         // Update the selected value in the parent state for the specific question
         setValue((prev) => ({
             ...prev,
@@ -48,6 +63,8 @@ const ChoiceBoxField = ({
     };
 
     const handleCheckboxChange = (value) => {
+        setOptionSelected(value.value)
+        setIsDropdownOpen(false)
         setSelectedValues(prev => {
             let newSelected;
             if (prev.includes(value)) {
@@ -55,7 +72,18 @@ const ChoiceBoxField = ({
             } else {
                 newSelected = [...prev, value];
             }
-
+            console.log(newSelected, 'jsjsjs')
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name], // Preserve existing entries for this section
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                        [label]: newSelected.length > 1 ? newSelected : value // Add or update the label key with newValue
+                    }
+                }
+            }))
             // Update parent component state
             if (newSelected.length === 0) {
                 setValue((prev) => ({

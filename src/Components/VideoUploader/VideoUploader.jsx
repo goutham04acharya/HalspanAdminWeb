@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange }) => {
+const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, handleRemoveVideo }) => {
 
 
     const [files, setFiles] = useState([]);
@@ -49,6 +49,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange })
         newFiles.splice(index, 1);
         setFiles(newFiles);
         setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
+        handleRemoveVideo(index)
     };
 
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import VideoUploader from '../../../../../Components/VideoUploader/VideoUploader';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 
 function VideoField({ label,
     type,
@@ -16,51 +17,119 @@ function VideoField({ label,
     preview,
     validationErrors,
     setValidationErrors,
-    setValue
+    setValue,
+    setConditionalValues,
+    sections
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename   
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFileName(file ? file.name : '');
-        // handleChange(fieldSettingParameters);    
-        console.log(file, 'file akkaka')
-        setFileState((prev) => ({ ...prev, [question?.question_id]: file.name })); // Store the filename in the state   
-        console.log(Object.keys({ ...fileState, [question?.question_id]: file.name }).length, 'jjjjjjjjjjjjjj') 
-        if (Object.keys({ ...fileState, [question?.question_id]: file.name }).length >= question?.field_range?.min) {
-            // debugger
+        const files = Array.from(e.target.files);
+        if (!files.length) return; // Exit if no files are selected
+
+        // Combine new and existing files for the specified question_id
+        const newFilesList = [
+            ...(fileState[question?.question_id] || []), // Existing files
+            ...files // New files
+        ];
+        console.log(newFilesList, 'new file list');
+
+        // Update fileName to display all file names as a comma-separated list
+        setFileName(newFilesList.map(file => file.name).join(', '));
+
+        // Update fileState with the new files list
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: newFilesList
+        }));
+
+        const updatedFileCount = newFilesList.length;
+
+        // Check if the minimum required number of files has been uploaded
+        if (updatedFileCount >= question?.field_range?.min) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
             }));
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
-                preview_videofield: '', // Or remove the key if you prefer     
-            }))
-            console.log(validationErrors.preview_videofield[question.question_id], 'validationErrors.preview_videofield[question.question_id]validationErrors.preview_videofield[question.question_id]')
+                preview_filefield: '' // Clear validation error if criteria met
+            }));
         } else {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: false
             }));
         }
+
+        // Update conditional values with the current file list
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newFilesList
+                }
+            }
+        }));
+
+        console.log(newFilesList, 'Updated File List');
+        console.log(updatedFileCount, 'Updated File Count');
     };
 
-    const handleVideoRemove = (index) => {
+    const handleVideoRemove = (fileNameToRemove) => {
+        console.log(fileNameToRemove, 'file name to remove');
+    
         setFileState((prev) => {
-            const newState = { ...prev };
-            delete newState[question?.question_id];
-            return newState;
-        });
-        if (Object.keys(fileState).length < question?.field_range?.min) {
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: false
+            // Filter out the file to be removed from the files array for the question_id
+            const updatedFiles = (prev[question?.question_id] || []).filter(
+                (fileName) => fileName !== fileNameToRemove
+            );
+            const updatedFileCount = updatedFiles.length;
+            console.log(updatedFiles, 'updated files after removal');
+    
+            // Update validation state based on the new file count
+            if (updatedFileCount < question?.field_range?.min) {
+                setValue((prev) => ({
+                    ...prev,
+                    [question?.question_id]: false
+                }));
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: 'Minimum file requirement not met'
+                }));
+            } else {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: '' // Clear the validation error
+                }));
+            }
+    
+            // Update conditional values with the updated file count
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name],
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name],
+                        [label]: updatedFileCount
+                    }
+                }
             }));
-        }
+    
+            console.log(updatedFileCount, 'Final updated file list after removal');
+            return {
+                ...prev,
+                [question?.question_id]: updatedFiles
+            };
+        });
     };
     
+
     return (
         <div>
             <label

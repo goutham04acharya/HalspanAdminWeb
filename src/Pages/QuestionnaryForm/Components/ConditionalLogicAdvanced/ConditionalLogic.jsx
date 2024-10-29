@@ -140,7 +140,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
-                    if (question.question_id !== selectedQuestionId) {
+                    if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
                     }
@@ -170,7 +170,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 page.questions?.forEach((question) => {
                     const questionId = question?.question_id;
                     const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
-                    if (questionId !== selectedQuestionId) {
+                    if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         sectionDetailsArray.push(questionName);
                     } else {
 
@@ -612,7 +612,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     conditions: conditions.filter(cond => cond !== null)
                 };
             } else {
-                if (tab !== 'Advance') {
+                if (tab !== 'advance') {
                     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
                 }
                 return {
@@ -1019,6 +1019,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
+        // debugger
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
@@ -1028,7 +1029,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
         }
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
