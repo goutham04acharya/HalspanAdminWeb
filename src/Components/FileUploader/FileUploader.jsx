@@ -60,7 +60,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             files: newFiles,
         }));
 
-        handleRemove(index); 
+        handleRemove(newFiles,index); 
     };
 
 

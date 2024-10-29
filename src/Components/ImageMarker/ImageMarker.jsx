@@ -1,3 +1,9 @@
+/**
+ * The MyImageMarker component in React allows users to add and remove markers on an image.
+ * @returns The `MyImageMarker` component is being returned. It contains an `ImageMarker` component for
+ * displaying an image with markers that can be added and removed. The component also includes a button
+ * for removing markers.
+ */
 import React, { useState } from 'react';
 import ImageMarker from 'react-image-marker';
 
@@ -22,11 +28,7 @@ const MyImageMarker = ({ imageSrc }) => {
                 onRemoveMarker={handleRemoveMarker}
             />
             <ul>
-
-
                 <button onClick={() => handleRemoveMarker()} className='bg-[#2B333B] mt-3 rounded-lg text-white text-[12px] px-3 py-2'>Remove</button>
-
-
             </ul>
         </div>
     );
