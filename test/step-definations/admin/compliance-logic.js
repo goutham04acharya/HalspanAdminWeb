@@ -4,7 +4,7 @@ const webdriver = require('selenium-webdriver');
 const { text } = require('express');
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
-const Key = webdriver.Key
+const Keys = webdriver.Key
 
 When('I enter the label name for compliance status', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
@@ -16,13 +16,13 @@ When('I enter the label name for compliance status', async function () {
 
 Then('I should see the compliance logic advanced editor for choice field', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Shows when"]')));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="shows when..."]')));
 });
 
 Then('I should see the compliance logic suggestions for questions for choice', async function () {
     await new Promise(resolve => setTimeout(resolve, 500));
     let bool = true;
-    let suggestions = ['Section_1.Page_1.Compliance_Logic_Label_Name'];
+    let suggestions = ['Section_1.Page_1.Sample_Choice_Label_Name'];
     let i = 0;
     while (bool && i < suggestions.length) {
         let suggestion = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000).getText();
@@ -47,11 +47,11 @@ Then('I click the save button for compliance logic', async function () {
 
 When('I select the question from the compliance logic suggestions for choice field', async function () {
     let bool = true;
-    let suggestions = ['Section_1.Page_1.Compliance_Logic_Label_Name'];
+    let suggestions = ['Section_1.Page_1.Sample_Choice_Label_Name'];
     let i = 0;
 
     // eslint-disable-next-line max-len
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if (Section_1.Page_1.Compliance_Logic_Label_Name.includes("Roopesh") AND ', Key.RETURN);
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if (Section_1.Page_1.Sample_Choice_Label_Name.includes("Roopesh") AND ', Keys.RETURN);
     await new Promise(resolve => setTimeout(resolve, 750));
     while (bool) {
         let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
@@ -90,7 +90,7 @@ When('I select the question from the compliance logic suggestions for choice fie
 
 When('I enter the correct compliance logic for choice field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Compliance_Logic_Label_Name === "India") then "Yes" else "No"`;
+    const default_value = `if (Section_1.Page_1.Sample_Choice_Label_Name === "India") then "Yes" else "No"`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
     this.default_value = default_value;
 });
@@ -101,3 +101,8 @@ Then('I should see the compliance logic in default value field', async function 
     const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
     assert.equal(default_value, this.default_value);
 });
+
+When('I click the add compliance button', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="compliance"]'))).click();
+}); 

@@ -13,7 +13,6 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
 
     return (
         <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
-            {/* {complianceLogic.length > 0 && */}
             <div>
                 <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
                 <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
@@ -24,8 +23,9 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         </label>
                         <input
                             type="text"
+                            data-testid="label-name-input"
                             className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            onChange={(e) => handleInputChange(complianceLogicId, e.target.value)}
+                            onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
                         />
                     </div>
@@ -36,8 +36,9 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
                                 value={defaultContentConverter(complianceLogic[complianceLogicId]?.default_content)}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                                data-testid="default-value-input"
                                 placeholder='Populates the content' />
-                            <img src="/Images/setting.svg" alt="setting" onClick={() => setCompliancestate(true)} className='absolute top-5 right-3 cursor-pointer' />
+                            <img src="/Images/setting.svg" alt="setting" onClick={() => setCompliancestate(true)} className='absolute top-5 right-3 cursor-pointer' data-testid='default-value' />
                         </div>
                     </div>
                 </div>
