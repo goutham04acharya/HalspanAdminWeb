@@ -39,11 +39,13 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
     When I click the save button for the questionnaire version
 
     Examples:
-      | type            | choices   |
-      | "single_choice" | "Yes, No" |
+      | type            | choices          |
+      | "single_choice" | "Yes, No, Maybe" |
 
   Scenario: Admin adds the compliance logic to the questionnaire
     Given I am on the Questionnaire management sections
+    When I add a new question to the page 1 in section 1
+    When I click the add compliance button 
     When I enter the label name for compliance status
     When I click the add default value button
     Then I should see the compliance logic advanced editor for choice field
