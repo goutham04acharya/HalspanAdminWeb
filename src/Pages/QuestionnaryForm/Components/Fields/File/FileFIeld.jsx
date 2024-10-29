@@ -22,6 +22,7 @@ function FileField({
     const [fileState, setFileState] = useState([]);
 
     const handleFileChange = (e) => {
+
         const files = Array.from(e.target.files);
         if (!files.length) return; // Exit if no files are selected
 
@@ -37,11 +38,11 @@ function FileField({
             ...prev,
             [question?.question_id]: newFilesList
         }));
-        console.log(newFilesList, 'ghghhggghghghghg')
+        console.log(fileState, 'ghghhggghghghghg')
         const updatedFileCount = newFilesList.length;
-
+        console.log(updatedFileCount, 'ffille')
         // Check if the minimum required number of files has been uploaded
-        if (updatedFileCount >= question?.field_range?.min) {
+        if (updatedFileCount >= (question?.field_range?.min || 0)) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
@@ -74,48 +75,88 @@ function FileField({
     };
 
 
-    const handleFileRemove = (fileNameToRemove) => {
+    const handleFileRemove = (newFiles, fileNameToRemove) => {
+        // debugger
         console.log(fileNameToRemove, 'file name in file upload')
-        setFileState((prev) => {
-            const updatedFiles = (prev[question?.question_id] || []).filter(
-                (fileName) => fileName !== fileNameToRemove
-            );
+        // setFileState((prev) => {
+        //     // Re-check if the minimum number of files is still met after removal
+        //     if (newFiles.length >= (question?.field_range?.min || 0)) {
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: true
+        //         }));
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: ''
+        //         }));
+        //     }else{
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: false
+        //         }));
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: 'Minimum file requirement not met'
+        //         }));
+        //     }
 
-            const updatedFileCount = updatedFiles.length;
+        //     // Update conditional values after file removal
+        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        //     setConditionalValues((prevValues) => ({
+        //         ...prevValues,
+        //         [section_name]: {
+        //             ...prevValues[section_name],
+        //             [page_name]: {
+        //                 ...prevValues[section_name]?.[page_name],
+        //                 [label]: newFiles
+        //             }
+        //         }
+        //     }));
 
-            // Re-check if the minimum number of files is still met after removal
-            if (updatedFileCount < question?.field_range?.min) {
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: false
-                }));
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_filefield: 'Minimum file requirement not met'
-                }));
-            }
-
-            // Update conditional values after file removal
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-            setConditionalValues((prevValues) => ({
-                ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name],
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name],
-                        [label]: updatedFileCount
-                    }
-                }
-            }));
-
-            return {
+        //     return {
+        //         ...prev,
+        //         [question?.question_id]: newFiles
+        //     };
+        // });
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: newFiles
+        }))
+        if (fileState.length >= (question?.field_range?.min || 0)) {
+            setValue((prev) => ({
                 ...prev,
-                [question?.question_id]: updatedFiles
-            };
-        });
+                [question?.question_id]: true
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_filefield: ''
+            }));
+        } else {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: false
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_filefield: 'Minimum file requirement not met'
+            }));
+        }
+
+        // Update conditional values after file removal
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newFiles
+                }
+            }
+        }));
     };
 
-    
+    console.log(fileState, 'filestatejdjjdj')
     return (
         <div>
             <label

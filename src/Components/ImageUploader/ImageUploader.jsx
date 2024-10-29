@@ -26,7 +26,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
         }
         setImages(newImages);
         handleFileChange(e)
-        setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
+        // setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
     };
 
 
@@ -34,12 +34,12 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
         const newImages = [...images];
         newImages.splice(index, 1);
         setImages(newImages);
-        setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
+        // setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
         setFileState((prevState) => ({
             ...prevState,
             files: newImages,
         }));
-        handleRemoveImage(index)
+        handleRemoveImage(newImages, index)
     };
 
     const handleImageClick = (image) => {

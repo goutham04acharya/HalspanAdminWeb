@@ -127,6 +127,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
+            console.log(value, 'valueeeee eee eeee eee')
             if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
