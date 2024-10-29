@@ -1076,7 +1076,7 @@ const QuestionnaryForm = () => {
             setToastError('Something went wrong');
         }
     }
-
+    //this is the function called when you click on delete of compliance logic
     const handleDeleteComplianceLogic = async () => {
         const body = {
             compliance_logic: []
@@ -1091,8 +1091,7 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
-    console.log(selectedComponent, 'here')
-
+    console.log(complianceLogic, 'here')
     return (
         <>
             {pageLoading ? (
@@ -1230,7 +1229,7 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
-                            {selectedComponent === 'compliancelogic' && (
+                            {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
                                     <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} />
                                 </div>
