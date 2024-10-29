@@ -47,14 +47,14 @@ function VideoField({ label,
         const updatedFileCount = newFilesList.length;
 
         // Check if the minimum required number of files has been uploaded
-        if (updatedFileCount >= question?.field_range?.min) {
+        if (updatedFileCount >= (question?.field_range?.min || 0)) {
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true
             }));
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
-                preview_filefield: '' // Clear validation error if criteria met
+                preview_videofield: '' // Clear validation error if criteria met
             }));
         } else {
             setValue((prev) => ({
@@ -80,55 +80,93 @@ function VideoField({ label,
         console.log(updatedFileCount, 'Updated File Count');
     };
 
-    const handleVideoRemove = (fileNameToRemove) => {
+    const handleVideoRemove = (fileList, fileNameToRemove) => {
+        debugger
         console.log(fileNameToRemove, 'file name to remove');
-    
-        setFileState((prev) => {
-            // Filter out the file to be removed from the files array for the question_id
-            const updatedFiles = (prev[question?.question_id] || []).filter(
-                (fileName) => fileName !== fileNameToRemove
-            );
-            const updatedFileCount = updatedFiles.length;
-            console.log(updatedFiles, 'updated files after removal');
-    
-            // Update validation state based on the new file count
-            if (updatedFileCount < question?.field_range?.min) {
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: false
-                }));
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_filefield: 'Minimum file requirement not met'
-                }));
-            } else {
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    preview_filefield: '' // Clear the validation error
-                }));
-            }
-    
-            // Update conditional values with the updated file count
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-            setConditionalValues((prevValues) => ({
-                ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name],
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name],
-                        [label]: updatedFileCount
-                    }
-                }
-            }));
-    
-            console.log(updatedFileCount, 'Final updated file list after removal');
-            return {
+
+        // setFileState((prev) => {
+        //     // Filter out the file to be removed from the files array for the question_id
+        //     const updatedFiles = (prev[question?.question_id] || []).filter(
+        //         (fileName) => fileName !== fileNameToRemove
+        //     );
+        //     console.log(updatedFiles, 'updated files')
+        //     const updatedFileCount = updatedFiles.length;
+        //     console.log(updatedFiles, 'updated files after removal');
+
+        //     // Update validation state based on the new file count
+        //     if (updatedFileCount < question?.field_range?.min) {
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: false
+        //         }));
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: 'Minimum file requirement not met'
+        //         }));
+        //     } else {
+        //         setValidationErrors((prevErrors) => ({
+        //             ...prevErrors,
+        //             preview_filefield: '' // Clear the validation error
+        //         }));
+        //     }
+
+        //     // Update conditional values with the updated file count
+        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        //     setConditionalValues((prevValues) => ({
+        //         ...prevValues,
+        //         [section_name]: {
+        //             ...prevValues[section_name],
+        //             [page_name]: {
+        //                 ...prevValues[section_name]?.[page_name],
+        //                 [label]: fileList
+        //             }
+        //         }
+        //     }));
+
+        //     console.log(updatedFileCount, 'Final updated file list after removal');
+        //     return {
+        //         ...prev,
+        //         [question?.question_id]: updatedFiles
+        //     };
+        // });
+        setFileState((prev) => ({
+            ...prev,
+            [question?.question_id]: fileList
+        }))
+        if (fileState.length >= (question?.field_range?.min || 0)) {
+            setValue((prev) => ({
                 ...prev,
-                [question?.question_id]: updatedFiles
-            };
-        });
+                [question?.question_id]: true
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_videofield: '' // Clear the validation error
+            }));
+        } else {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: false
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_videofield: 'Minimum file requirement not met'
+            }));
+        }
+
+        // Update conditional values with the updated file count
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: fileList
+                }
+            }
+        }));
     };
-    
+
 
     return (
         <div>

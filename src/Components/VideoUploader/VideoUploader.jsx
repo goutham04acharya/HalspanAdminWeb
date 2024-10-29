@@ -36,7 +36,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                 setError(`Maximum ${max} files allowed`);
             } else {
                 setError('');
-                setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
+                // setValue((prev) => ({ ...prev, [question?.question_id]: true })); // Call setValue function here  
             }
 
             setFiles(newFiles);
@@ -45,11 +45,13 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
     };
 
     const handleRemoveFile = (index) => {
+        
         const newFiles = [...files];
         newFiles.splice(index, 1);
         setFiles(newFiles);
-        setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
-        handleRemoveVideo(index)
+        // setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
+        console.log(index, 'video upload index')
+        handleRemoveVideo(newFiles, index)
     };
 
 
