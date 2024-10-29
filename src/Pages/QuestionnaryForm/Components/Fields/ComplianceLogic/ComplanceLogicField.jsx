@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux';
 import { setComplianceLogicId, setSelectedComponent } from '../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 import { defaultContentConverter } from '../../../../../CommonMethods/defaultContentConverter';
+import useApi from '../../../../../services/CustomHook/useApi';
+import { useParams } from 'react-router-dom';
 
-function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler }) {
+function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic }) {
 
   // const {complianceLogicId} = useSelector(state => state.)
   const dispatch = useDispatch()
@@ -18,12 +20,11 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
             alt="delete"
             title='Delete'
             className=' cursor-pointer mr-4 z-[9] rounded-full hover:bg-[#FFFFFF] h-[26px]'
-            onClick={() => {
-              setComplianceLogic([]);
-              dispatch(setSelectedComponent(null))
-            }}
+            onClick={() => setIsDeleteComplianceLogic(true)}
           />
-          <img src="/Images/save.svg" onClick={() => complianceSaveHandler()} alt="save" title="Save" data-testid="save-btn-1" class=" h-[26px] rounded-full hover:bg-[#FFFFFF] cursor-pointer" />
+          <img src="/Images/save.svg"
+            onClick={() => complianceSaveHandler()}
+            alt="save" title="Save" data-testid="save-btn-1" class=" h-[26px] rounded-full hover:bg-[#FFFFFF] cursor-pointer" />
         </div>
       </div>
 
@@ -49,7 +50,7 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
           <input data-testid="input"
             class="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined"
             value={defaultContentConverter(item?.default_content || '')}
-            />
+          />
           <p data-testid="help-text" class="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"></p>
         </div>))
       }

@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -95,6 +95,7 @@ const QuestionnaryForm = () => {
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
+    const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -103,7 +104,6 @@ const QuestionnaryForm = () => {
             // handleSectionSaveOrder(sections)
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
-
 
 
     // // to open and close the sections
@@ -116,8 +116,10 @@ const QuestionnaryForm = () => {
 
     const handleCancel = () => {
         dispatch(setModalOpen(false));
+        setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -381,6 +383,7 @@ const QuestionnaryForm = () => {
             setSections([...sections]);
         }
     };
+
     const confirmDeletePage = () => {
         if (pageToDelete.sectionIndex !== null && pageToDelete.pageIndex !== null) {
             handleAddRemovePage('remove', pageToDelete.sectionIndex, pageToDelete.pageIndex, sections[pageToDelete.sectionIndex].section_id);
@@ -631,7 +634,7 @@ const QuestionnaryForm = () => {
                 return;
             }
             // Create a new object containing only the selected section's necessary fields  
-            
+
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name,
@@ -975,7 +978,7 @@ const QuestionnaryForm = () => {
                 id: section.section_id
             })),
         }
-    
+
         if (compliance) {
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
@@ -1065,7 +1068,7 @@ const QuestionnaryForm = () => {
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
-                // Success
+                setToastSuccess('Compliance Logic Saved Successfully')
             } else {
                 setToastError('Something went wrong');
             }
@@ -1073,6 +1076,22 @@ const QuestionnaryForm = () => {
             setToastError('Something went wrong');
         }
     }
+
+    const handleDeleteComplianceLogic = async () => {
+        const body = {
+            compliance_logic: []
+        };
+        try {
+            const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+            setComplianceLogic([]);
+            setIsDeleteComplianceLogic(false);
+            dispatch(setSelectedComponent(null));
+            setToastSuccess('Compliance Logic deleted Successfully')
+        } catch (error) {
+            console.error("Error deleting compliance logic:", error);
+        }
+    };
+    console.log(selectedComponent, 'here')
 
     return (
         <>
@@ -1211,9 +1230,11 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
-                            <div>
-                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} />
-                            </div>
+                            {selectedComponent === 'compliancelogic' && (
+                                <div>
+                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className='w-[30%]'>
@@ -1294,6 +1315,22 @@ const QuestionnaryForm = () => {
                     setModalOpen={setModalOpen}
                     handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
                     handleButton2={handleCancel} // Handle cancel button
+                />
+            )}
+            {isDeleteComplianceLogic && (
+                <ConfirmationModal
+                    text='Delete Compliance Logic'
+                    subText={`You are about to delete the Compliance Logic section containing multiple Status. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Delete'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={isDeleteComplianceLogic}
+                    setModalOpen={setIsDeleteComplianceLogic}
+                    handleButton1={handleDeleteComplianceLogic} // Call confirmDeleteSection on confirmation
+                    handleButton2={() => (setIsDeleteComplianceLogic(false))} // Handle cancel button
                 />
             )}
             {showPageDeleteModal && (
