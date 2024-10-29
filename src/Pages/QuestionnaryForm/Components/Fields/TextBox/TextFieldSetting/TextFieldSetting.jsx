@@ -22,8 +22,6 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  // setFieldSettingParameters,
-  handleSaveSettings,
   selectedQuestionId,
   handleBlur,
   validationErrors,
@@ -45,7 +43,6 @@ function TestFieldSetting({
   const [isValid, setIsValid] = useState(false)
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
 
-  console.log(fieldSettingParameters, 'fieldSettingParameters')
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
 
@@ -382,7 +379,7 @@ function TestFieldSetting({
             )}
           </div>
           {/* OptionsComponent added here */}
-          <OptionsComponent selectedQuestionId={selectedQuestionId} />
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} handleOptionClick={handleOptionClick} isDropdownOpen={isDropdownOpen} setDropdownOpen={setDropdownOpen}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'
