@@ -13,7 +13,6 @@ import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 
-import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 

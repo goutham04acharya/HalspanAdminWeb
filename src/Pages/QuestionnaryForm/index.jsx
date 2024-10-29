@@ -30,7 +30,9 @@ import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
 import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
-// import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
+import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
+
 
 const QuestionnaryForm = () => {
     const { questionnaire_id, version_number } = useParams();
@@ -83,6 +85,7 @@ const QuestionnaryForm = () => {
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
+    const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
@@ -90,6 +93,8 @@ const QuestionnaryForm = () => {
     const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
+    const [complianceLogic, setComplianceLogic] = useState([]);
+    const [complianceState, setCompliancestate] = useState(false)
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -235,7 +240,8 @@ const QuestionnaryForm = () => {
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
-        "tagScanfield":TagScanFieldSetting,
+        'compliancelogic': ComplianceFieldSetting,
+        "tagScanfield": TagScanFieldSetting,
         // Add other mappings here...
     };
 
@@ -540,7 +546,7 @@ const QuestionnaryForm = () => {
                     regular_expression: question?.regular_expression,
                     format_error: question?.format_error,
                     options: question?.options,
-                    default_content : question?.default_content || '',
+                    default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
                     default_conditional_logic: question?.default_conditional_logic
                 }))));
@@ -603,10 +609,17 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
-        // debugger
-        handleSectionSaveOrder(sections)
+    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
+        handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        if (compliance) {
+            setIsThreedotLoader(false);
+            setConditionalLogic(false);
+            setIsDefaultLogic(false);
+            setCompliancestate(false);
+            setSaveClick(false);
+        }
+
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -688,7 +701,6 @@ const QuestionnaryForm = () => {
                         }))
                     }))
             };
-            console.log(body, 'ololololol')
             // Recursive function to remove specified keys  
             const removeKeys = (obj) => {
                 if (Array.isArray(obj)) {
@@ -720,6 +732,7 @@ const QuestionnaryForm = () => {
                         setIsThreedotLoader(false);
                         setConditionalLogic(false);
                         setIsDefaultLogic(false);
+                        setCompliancestate(false)
                         // Update the saved status  
                         const update = { ...dataIsSame };
                         update[sections[sectionIndex].section_id] = true;
@@ -883,6 +896,17 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
         })
     });
+    // function to handle the compliance logic click
+    const handleComplianceLogicClick = () => {
+        let arr = complianceLogic || [];
+        arr.push({
+            label: `Status ${arr.length + 1}`,
+            default_content: ''
+        });
+        setComplianceLogic(arr)
+        dispatch(setSelectedComponent('compliancelogic'))
+
+    };
 
     const handleTagScanClick = useCallback(() => {
         addNewQuestion('tagScanfield', (questionId) => {
@@ -906,11 +930,12 @@ const QuestionnaryForm = () => {
             handleSignatureClick,
             handleGPSClick,
             handleDisplayClick,
+            handleComplianceLogicClick,
             handleTagScanClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleTagScanClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleComplianceLogicClick, handleTagScanClick]);
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
@@ -928,8 +953,6 @@ const QuestionnaryForm = () => {
         handleSaveSection();
     };
 
-    // 
-
     const handleDeleteModal = (sectionIndex, sectionData) => {
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete  
         dispatch(setSelectedSectionData(sectionData));
@@ -944,13 +967,19 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSectionSaveOrder = async (updatedSection) => {
+    const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({
                 index: index,
                 id: section.section_id
-            }))
+            })),
+        }
+    
+        if (compliance) {
+            let compliance = [...complianceLogic]
+            compliance[complianceLogicId].default_content = payloadString;
+            body['compliance_logic'] = compliance;
         }
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
@@ -971,6 +1000,7 @@ const QuestionnaryForm = () => {
 
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section?.id);
+                setComplianceLogic(response?.data?.data?.compliance_logic)
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -984,7 +1014,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-
     const onDragEnd = (result) => {
         if (!result.destination) return;
 
@@ -997,7 +1026,6 @@ const QuestionnaryForm = () => {
         dispatch(setSavedSection(reorderedItems));
         handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
-
 
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
@@ -1013,6 +1041,38 @@ const QuestionnaryForm = () => {
         formDefaultDetails();
         dispatch(setSavedSection(sections));
     }, []);
+
+    const addNewCompliance = (type, index) => {
+        let newArr = [...complianceLogic]; // Create a copy of the current state array
+        //type will be sent for deleting the  compliance logic state we will check for type if delete than splice array
+        if (type) {
+            newArr.splice(index, 1);
+            dispatch(setSelectedComponent('null'))
+            setComplianceLogic(newArr);
+            return
+        }
+        newArr.push({
+            label: `Status ${newArr.length + 1}`,
+            default_content: ''
+        });
+        setComplianceLogic(newArr); // Set the new array in state
+    }
+
+    const complianceSaveHandler = async () => {
+        const body = {
+            compliance_logic: complianceLogic,
+        }
+        try {
+            const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+            if (!(response?.data?.error)) {
+                // Success
+            } else {
+                setToastError('Something went wrong');
+            }
+        } catch (error) {
+            setToastError('Something went wrong');
+        }
+    }
 
     return (
         <>
@@ -1151,6 +1211,9 @@ const QuestionnaryForm = () => {
                                 </button>
 
                             </div>
+                            <div>
+                                <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} />
+                            </div>
                         </div>
                     </div>
                     <div className='w-[30%]'>
@@ -1165,14 +1228,12 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-
                             <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
 
                                 handleSaveSection(latestSectionId);
                             }}>
                                 Save
                             </button>
-
                         </div>
                         <div>
                             {selectedComponent ? (
@@ -1197,11 +1258,15 @@ const QuestionnaryForm = () => {
                                         setValidationErrors: setValidationErrors,
                                         setConditionalLogic: setConditionalLogic,
                                         conditionalLogic: conditionalLogic,
+                                        complianceLogic: complianceLogic,
+                                        setComplianceLogic: setComplianceLogic,
                                         setIsDefaultLogic: setIsDefaultLogic,
                                         isDefaultLogic: isDefaultLogic,
                                         setDefaultString: setDefaultString,
-                                        defaultString: defaultString
-
+                                        defaultString: defaultString,
+                                        complianceState: complianceState,
+                                        setCompliancestate: setCompliancestate,
+                                        complianceSaveHandler: complianceSaveHandler,
                                     }
                                 )
                             ) : (
@@ -1280,7 +1345,16 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
-            {(conditionalLogic || isDefaultLogic) && (
+            {previewModal && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+
+            />}
+            {(conditionalLogic || isDefaultLogic || complianceState) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
                     conditionalLogic={conditionalLogic}
@@ -1289,10 +1363,13 @@ const QuestionnaryForm = () => {
                     setIsDefaultLogic={setIsDefaultLogic}
                     setDefaultString={setDefaultString}
                     defaultString={defaultString}
+                    complianceState={complianceState}
+                    setCompliancestate={setCompliancestate}
+                    complianceLogic={complianceLogic}
                 />
 
             )}
-            {previewModal ===true && <PreviewModal
+            {previewModal === true && <PreviewModal
                 isModalOpen={previewModal}
                 setModalOpen={setPreviewModal}
                 Button1text={'Back'}

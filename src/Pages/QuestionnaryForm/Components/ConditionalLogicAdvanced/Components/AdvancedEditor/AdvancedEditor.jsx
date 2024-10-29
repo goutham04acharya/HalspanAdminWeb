@@ -18,8 +18,7 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
-    setSelectedType,
-    isDefaultLogic
+    setSelectedType
 }) {
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
@@ -28,6 +27,7 @@ function AdvancedEditor({
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
     const dispatch = useDispatch()
+
     // Handle user input change and filter suggestions
     const handleSearchChange = (event) => {
         const value = event.target.value;
@@ -101,7 +101,7 @@ function AdvancedEditor({
                     onKeyDown={handleKeyDown} // Intercept key presses
                     ref={textareaRef}
                     value={inputValue}
-                    // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
+                // value={isDefaultLogic ? fieldSettingParams[selectedQuestionId]?.default_conditional_logic : fieldSettingParams[selectedQuestionId]?.conditional_logic}
                 ></textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
@@ -109,7 +109,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
-                    <span data-testid="error-message" className='w-[10%]'><img src="/Images/alert-icon.svg" alt="" /></span>
+                    <span data-testid="error-message" className='w-[4%] mr-2'><img src="/Images/alert-icon.svg" alt="" /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (

@@ -20,10 +20,12 @@ import dayjs from 'dayjs';
 import moment from 'moment/moment';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
+import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState,
+    setCompliancestate, complianceLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -52,7 +54,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-
+    const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -116,6 +118,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleClose = () => {
         setConditionalLogic(false);
         setIsDefaultLogic(false);
+        setCompliancestate(false);
     };
 
     useOnClickOutside(modalRef, () => {
@@ -637,6 +640,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     useEffect(() => {
+        const fetchData = async () => {
+            if (complianceState) {
+                try {
+                    const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+                    console.log("API response:", response?.data?.data?.compliance_logic);
+
+                    // Extract default_content based on selected index
+                    const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
+
+                    // Use defaultContentConverter to transform default_content if selectedLogic exists
+                    if (selectedLogic) {
+                        const transformedContent = defaultContentConverter(selectedLogic.default_content);
+                        setInputValue(transformedContent);
+                    } else {
+                        setInputValue('');
+                    }
+                } catch (error) {
+                    console.error("Error fetching layout:", error);
+                }
+            }
+        };
+
+        fetchData();
+    }, [complianceState, questionnaire_id, version_number, complianceLogicId]);
+
+    useEffect(() => {
         // Assuming `allSectionDetails` contains the fetched data and 
         // you have a way to map `selectedQuestionId` to the relevant question
         const findSelectedQuestion = () => {
@@ -683,6 +712,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
     const handleSave = async () => {
+
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
 
@@ -706,16 +736,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
 
-            // let modifyvalue
-            // if (isDefaultLogic) {
-            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.default_conditional_logic
-            // } else {
-            //     modifyvalue = fieldSettingParams[selectedQuestionId]?.conditional_logic
-            // }
-
             let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic) {
+                setDefaultString(evalInputValue);
+            }
+            if (complianceState) {
                 setDefaultString(evalInputValue);
             }
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
@@ -743,6 +769,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             let payloadString = expression;
+            console.log(payloadString, 'dhauhs')
             evalInputValue = addSectionPrefix(evalInputValue);
 
             // Extract variable names from the payloadString using a regex
@@ -756,7 +783,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
                 return;
             }
-            if (isDefaultLogic) {
+            if (isDefaultLogic || complianceState) {
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', ' ');
@@ -765,28 +792,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
-            //just checking for datetimefield before the evaluating the eexpression (only for default checking)
-            if (isDefaultLogic && selectedComponent == "dateTimefield") {
+            //just checking for datetimefield before the evaluating the expression (only for default checking)
+            if ((isDefaultLogic || complianceState) && selectedComponent == "dateTimefield") {
                 let invalid = DateValidator(evalInputValue)
                 if (invalid) {
-                    handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
-                    console.log('failed')
-                    return
+                    if (invalid) {
+                        handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
+                        console.log('failed')
+                        return
+                    }
                 }
             }
-
             const result = eval(evalInputValue);
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
                     case 'textboxfield':
                         if (typeof result !== 'string') {
-                            console.log(result, 'mjmjmjmgit')
-                            handleError('The evaluated result is not a string. The field type expects a string.');
+                            handleError('The evaluated result is not a string. Only expects a string.');
                             return;
                         }
                         break;
                     case 'numberfield':
+                        // Attempt to parse result as a number
                         // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
@@ -812,24 +840,59 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     default:
                         break;
                 }
+            } else if (complianceState) {
+                switch (selectedComponent) {
+                    case 'numberfield':
+                    case 'choiceboxfield':
+                    case 'textboxfield':
+                    case 'dateTimefield':
+                    case 'assetLocationfield':
+                    case 'floorPlanfield':
+                    case 'photofield':
+                    case 'videofield':
+                    case 'filefield':
+                    case 'signaturefield':
+                    case 'gpsfield':
+                    case 'displayfield':
+                    case 'compliancelogic':
+                    case 'tagScanfield':
+                        if (typeof result !== 'string') {
+                            handleError('The evaluated result is not a string. The field type expects a string.');
+                            return;
+                        }
+                        break;
+                }
             }
 
-            if (!isDefaultLogic) {
+            if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
+
                 if (validationResult.some(msg => msg.includes('Error'))) {
                     handleError(validationResult.join('\n'));
                     return; // Stop execution if validation fails
                 }
             }
+            if (complianceState) {
+                setConditionalLogic((prevLogic) => {
+                    const updatedLogic = Array.isArray(prevLogic) ? [...prevLogic] : [];; // Clone the existing state array
 
+                    // Check if the index exists in the array
+                    if (updatedLogic[complianceLogicId]) {
+                        // Update the `defaultContent` key of the object at the specified index
+                        updatedLogic[complianceLogicId].default_content = payloadString; // Replace "yourPayloadString" with your actual payload
+
+                        // Return the updated array to set the new state
+                        return updatedLogic;
+                    }
+
+                    return prevLogic; // If index doesn't exist, return the original state without changes
+                });
+            }
             // Split and Validate Expression
             // payloadString =evalInputValue;
-
             setIsThreedotLoader(true);
             if (!error) {
-                handleSaveSection(sectionId, true, payloadString, isDefaultLogic);
-                // dispatch(setNewComponent({ id: 'default_conditional_logic', value: defaultString, questionId: selectedQuestionId }));
-                // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }));
+                handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -847,7 +910,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             handleError(`Error evaluating the expression: ${error.message}`);
         }
     };
-
 
     function splitAndValidate(expression) {
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
@@ -978,7 +1040,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
                 <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
-                        {(tab === 'advance' || isDefaultLogic) ? (
+                        {(tab === 'advance' || isDefaultLogic || complianceState) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
@@ -1032,8 +1094,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 />
                             )
                         )}
-                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic &&
+                        <div className={`${isDefaultLogic || complianceState ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                            {!isDefaultLogic && !complianceState &&
                                 <div className='flex gap-5 items-end'>
                                     <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                     <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
@@ -1051,7 +1113,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == "advance" || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
