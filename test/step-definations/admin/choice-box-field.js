@@ -69,7 +69,7 @@ When('I enter the text for choices as {string}', async function (choicesText) {
         const choiceNumber = i + 1;
         await driver.wait(until.elementLocated(By.css(`[data-testid="choice-${choiceNumber}"]`))).sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE)
         for (let char of choices[i]) {
-            await new Promise(resolve => setTimeout(resolve, 750)); // Adjust the delay as needed (e.g., 500 milliseconds)
+            await new Promise(resolve => setTimeout(resolve, 250)); // Adjust the delay as needed (e.g., 500 milliseconds)
             const choiceElement = await driver.wait(until.elementLocated(By.css(`[data-testid="choice-${choiceNumber}"]`)));
             await choiceElement.sendKeys(char);
         }
@@ -80,9 +80,10 @@ When('I enter the text for choices as {string}', async function (choicesText) {
 Then('I should see the choices updated on the section {int}', async function (sectionNumber) {
     if (this.choiceType !== 'dropdown') {
         for (let i = 0; i < this.enteredChoices.length; i++) {
-            const choiceNumber = i + 1;
-            console.log(`section-${sectionNumber}-page-1-question-1-choice-${choiceNumber}`, 'this is the log')
-            const choiceElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1-choice-${choiceNumber}"]`)));
+            const choiceNumber = i;
+            // console.log(`section-${sectionNumber}-page-1-question-1-choice-${choiceNumber}`, 'this is the log')
+            // const choiceElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1-choice-${choiceNumber}"]`)));
+            const choiceElement = await driver.wait(until.elementLocated(By.css(`[data-testid="choices-${choiceNumber}"]`)));
             const choiceText = await choiceElement.getText();
             assert.equal(choiceText, this.enteredChoices[i]);
         }

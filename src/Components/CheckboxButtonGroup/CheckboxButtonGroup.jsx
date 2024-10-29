@@ -1,39 +1,57 @@
 import React, { useState } from 'react';
 
-const CheckboxButtonGroup = ({ values, name, onChange, testId }) => {
-    const [selectedValue, setSelectedValue] = useState(values[0]);
-
-    // Handle radio button change
-    const handleChange = (event) => {
-        const newValue = event.target.value;
+const CustomCheckboxGroup = ({ values, onChange }) => {
+    // Initialize with the first value selected by default
+    const [selectedValues, setSelectedValues] = useState([]);
+    console.log(selectedValues, 'selected values fffffffffffffffff')
+    const handleCheckboxChange = (value) => {
+        setSelectedValues(prev => {
+            if (prev.includes(value)) {
+                return prev.filter(item => item !== value);
+            } else {
+                return [...prev, value];
+            }
+        });
+        if(selectedValues){
+            onChange(value)
+        }
     };
 
     return (
-        <div className="space-y-2 mt-4">
+        <div className="space-y-4 mt-4">
             {values.map((value, index) => (
-                <div key={index} className="relative checkbox py-2 z-[9]">
-                    <input
-                        id={`radio-${index}`}
-                        type="checkbox"
-                        value={value}
-                        onChange={handleChange}
-                        checked={selectedValue === value}
-                        className="hidden"
-                        maxLength={50}
-                    />
-                    <label
-                        htmlFor={`radio-${index}`}
-                        data-testid={`${testId}-choice-${index + 1}`}
-                        className="h-5 flex items-center cursor-pointer relative pl-8 text-neutral-primary text-[16px] leading-[20px] font-normal break-words z-[9]"
-                        maxLength={50}
-
-                    >
-                        {value}
-                    </label>
-                </div>
+                <label
+                    key={index}
+                    className="flex items-center cursor-pointer group space-x-2"
+                >
+                    <div className="relative flex items-center">
+                        <input
+                            type="checkbox"
+                            checked={selectedValues.includes(value)}
+                            onChange={() => handleCheckboxChange(value)}
+                            className="absolute w-0 h-0 opacity-0"
+                        />
+                        <div className={`w-5 h-5 border-2 border-[#2B333B] transition-colors`}>
+                            {selectedValues.includes(value) && (
+                                <svg
+                                    className="w-full h-full text-white bg-[#2B333B]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            )}
+                        </div>
+                    </div>
+                    <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{value}</span>
+                </label>
             ))}
         </div>
     );
 };
 
-export default CheckboxButtonGroup;
+export default CustomCheckboxGroup;

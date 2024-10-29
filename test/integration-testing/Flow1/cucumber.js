@@ -25,12 +25,14 @@ module.exports = {
             'test/integration-testing/Flow1/22_signature_as_field.feature',
             'test/integration-testing/Flow1/21_gps_as_field.feature',
             'test/integration-testing/Flow1/23_display_content_as_field.feature',
+            'test/integration-testing/Flow1/43_tag_scan.feature',
             'test/integration-testing/Flow1/28_save_questionnaire.feature',
             'test/integration-testing/Flow1/24_view_questionnaire.feature',
             'test/integration-testing/Flow1/26_change_status.feature',
             'test/integration-testing/Flow1/27_duplicate_questionnaire.feature',
             'test/integration-testing/Flow1/29_custom_regular_expression.feature',
             'test/integration-testing/Flow1/30_advanced_editor.feature',
+            'test/integration-testing/Flow1/29_custom_regular_expression.feature',
             'test/integration-testing/Flow1/31_basic_editor.feature',
             'test/integration-testing/Flow1/34_number_basic_editor.feature',
             'test/integration-testing/Flow1/36_files_basic_editor.feature',
@@ -38,10 +40,12 @@ module.exports = {
             'test/integration-testing/Flow1/33_files_photos_video_advanced_editor.feature',
             'test/integration-testing/Flow1/37_advanced_editor_date_time.feature',
             'test/integration-testing/Flow1/35_date_time_basic_editor.feature',
+            'test/integration-testing/Flow1/38_preview_questionnaire.feature',
             'test/integration-testing/Flow1/39_default_value_choice.feature',
             'test/integration-testing/Flow1/41_default_value_date_time.feature',
             'test/integration-testing/Flow1/41_default_value_textbox.feature',
             'test/integration-testing/Flow1/42_default_value_number.feature',
+            // 'test/integration-testing/Flow1/44_preview_response.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

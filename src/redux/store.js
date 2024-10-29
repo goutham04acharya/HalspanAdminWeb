@@ -6,6 +6,7 @@ import fieldSettingParamsSlice from '../Pages/QuestionnaryForm/Components/Fields
 import sliderSlice from '../Pages/QuestionnaryForm/Components/Fields/RangeSliderDataSlice';
 import questionnaryFormSlice from '../Pages/QuestionnaryForm/Components/QuestionnaryFormSlice';
 import allSectionDetailsSlice from '../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
+import signatureSlice from '../Pages/QuestionnaryForm/Components/Fields/Signature/signatureSlice';
 
 const persistConfig = {
     key: 'root', // key for the storage
@@ -20,6 +21,7 @@ const store = configureStore({
         sliderConfig: sliderSlice,  // Your slider reducer
         questionnaryForm: questionnaryFormSlice, // Add the question reducer to the store
         allsectiondetails: allSectionDetailsSlice,
+        signature: signatureSlice,
     },
 });
 

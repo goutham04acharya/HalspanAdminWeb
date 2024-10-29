@@ -101,9 +101,11 @@ Then('I verify that I am on the same questionnaire management section which was 
 });
 
 When('I add a new question to the page {int} in section {int}', async function (pageNumber, sectionNumber) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const addQuestionButton = await driver.wait(until.elementLocated(By.css(`[data-testid="add-question-btn-section-${sectionNumber}-page-${pageNumber}"]`)));
-    await addQuestionButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const element = await driver.wait(until.elementLocated(By.css(`[data-testid="add-question-btn-section-${sectionNumber}-page-${pageNumber}"]`)), 5000);
+    await driver.wait(until.elementIsVisible(element), 2000);
+    await element.click();
+    console.log(`New question has added to section ${sectionNumber} page ${pageNumber}`);
 });
 
 When('I enter the question in the page {int} in section {int}', async function (pageNumber, sectionNumber) {

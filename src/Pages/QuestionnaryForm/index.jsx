@@ -29,6 +29,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
 import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalLogic.jsx';
+import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 // import { setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 
 const QuestionnaryForm = () => {
@@ -112,20 +113,6 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(false));
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-    const validateRegex = (value) => {
-        const regexPattern = /^[a-zA-Z0-9\.\^\$\|\?\*\+\(\)\[\{\\\}\-\_\^\[\]\{\}\(\)\*\+\?\.\$\|\\]+$/;
-        if (!regexPattern.test(value) || value.trim() === '') {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: 'Invalid regular expression',
-            }));
-        } else {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                regular_expression: '',
-            }));
-        }
-    };
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -248,6 +235,7 @@ const QuestionnaryForm = () => {
         "signaturefield": SignatureFieldSetting,
         "gpsfield": GPSFieldSetting,
         "displayfield": DisplayFieldSetting,
+        "tagScanfield":TagScanFieldSetting,
         // Add other mappings here...
     };
 
@@ -616,6 +604,7 @@ const QuestionnaryForm = () => {
     }
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString) => {
+        // debugger
         handleSectionSaveOrder(sections)
         // Find the section to save  
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
@@ -629,6 +618,7 @@ const QuestionnaryForm = () => {
                 return;
             }
             // Create a new object containing only the selected section's necessary fields  
+            
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name,
@@ -645,7 +635,7 @@ const QuestionnaryForm = () => {
                             label: fieldSettingParams[question.question_id].label,
                             help_text: fieldSettingParams[question.question_id].helptext,
                             placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advanced' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
+                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
                             type: fieldSettingParams[question.question_id].type,
                             format: fieldSettingParams[question.question_id].format,
                             regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
@@ -657,7 +647,7 @@ const QuestionnaryForm = () => {
                             admin_field_notes: fieldSettingParams[question.question_id].note,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
-                                question.source === 'fixedList' ?
+                                fieldSettingParams[question.question_id].source === 'fixedList' ?
                                     fieldSettingParams[question.question_id].fixedChoiceArray :
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
@@ -714,7 +704,6 @@ const QuestionnaryForm = () => {
 
             // Remove keys from the cloned body  
             removeKeys(body);
-            console.log(body, 'kkkkkk')
             try {
                 if (isSaving) {
                     // ... call the API ...  
@@ -750,7 +739,7 @@ const QuestionnaryForm = () => {
             }
         }
 
-    };
+    }
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -895,6 +884,14 @@ const QuestionnaryForm = () => {
         })
     });
 
+    const handleTagScanClick = useCallback(() => {
+        addNewQuestion('tagScanfield', (questionId) => {
+            dispatch(setNewComponent({ id: 'type', value: 'NFC', questionId }));
+            dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId }));
+
+        });
+    }, [addNewQuestion]);
+
     const handleClick = useCallback((functionName) => {
         const functionMap = {
             handleTextboxClick,
@@ -909,10 +906,11 @@ const QuestionnaryForm = () => {
             handleSignatureClick,
             handleGPSClick,
             handleDisplayClick,
+            handleTagScanClick,
         };
 
         functionMap[functionName]?.();
-    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick]);
+    }, [handleTextboxClick, handleChoiceClick, handleDateTimeClick, handleAssetLocationClick, handleNumberClick, handleFloorPlanClick, handlePhotoClick, handleVideoClick, handleFileClick, handleSignatureClick, handleGPSClick, handleDisplayClick, handleTagScanClick]);
 
     //function for handle radio button
     const handleRadiobtn = (type) => {
@@ -1161,11 +1159,9 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
-                            <button onClick={() => {
-                                // Open the custom modal  
+                            <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
                                 setPreviewModal(true)
-
-                            }} className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'>
+                            }}>
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
@@ -1284,15 +1280,6 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
-            {previewModal && <PreviewModal
-                isModalOpen={previewModal}
-                setModalOpen={setPreviewModal}
-                Button1text={'Back'}
-                Button2text={'Next'}
-                src=''
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-
-            />}
             {(conditionalLogic || isDefaultLogic) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
@@ -1305,6 +1292,21 @@ const QuestionnaryForm = () => {
                 />
 
             )}
+            {previewModal ===true && <PreviewModal
+                isModalOpen={previewModal}
+                setModalOpen={setPreviewModal}
+                Button1text={'Back'}
+                Button2text={'Next'}
+                src=''
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                sections={sections}
+                setValidationErrors={setValidationErrors}
+                validationErrors={validationErrors}
+                formDefaultInfo={formDefaultInfo}
+                questionnaire_id={questionnaire_id}
+                version_number={version_number}
+                fieldSettingParameters={fieldSettingParams}
+            />}
         </>
     );
 }

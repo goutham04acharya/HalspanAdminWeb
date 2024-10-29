@@ -15,6 +15,7 @@ function FileFieldSetting({ handleInputChange,
     validationErrors,
     setConditionalLogic
 }) {
+    // console.log(fieldSettingParameters,'hsjdhdhjsh')
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>

@@ -12,7 +12,6 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
-import { RegExpValidator } from 'regexpp';
 
 import { setAllSectionDetails } from '../../../ConditionalLogicAdvanced/Components/SectionDetailsSlice';
 import { useSelector } from 'react-redux';
@@ -24,6 +23,8 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
+  // setFieldSettingParameters,
+  handleSaveSettings,
   selectedQuestionId,
   handleBlur,
   validationErrors,
@@ -43,9 +44,9 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false)
-
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
 
+  console.log(fieldSettingParameters, 'fieldSettingParameters')
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
 
@@ -53,7 +54,6 @@ function TestFieldSetting({
   const { getAPI } = useApi();
 
   const dispatch = useDispatch();
-
 
   const options = [
     { value: 'Alpha', label: 'Alpha' },

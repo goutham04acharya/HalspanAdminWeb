@@ -45,8 +45,8 @@ function ChoiceFieldSetting({
     const dispatch = useDispatch();
 
     // Use `useSelector` to get the `fixedChoiceArray` from the Redux store
+    // const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.source_value || []);
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
-    console.log(fieldSettingParameters, 'nauanya')
     const handleLookupOption = (option) => {
         setIsLookupOpen(false);
         dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }))
