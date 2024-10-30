@@ -431,8 +431,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
                     )}
                 </div>
-                <div data-testid="back" className='mt-5 flex items-center justify-between'>
-                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
+                <div className='mt-5 flex items-center justify-between'>
+                    {!showLabel ? <button type='button' data-testid="back" className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
