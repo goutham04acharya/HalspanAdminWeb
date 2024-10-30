@@ -1381,15 +1381,6 @@ const QuestionnaryForm = () => {
                     handleButton2={() => setReplaceModal(false)} // Handle cancel button
                 />
             )}
-            {previewModal && <PreviewModal
-                isModalOpen={previewModal}
-                setModalOpen={setPreviewModal}
-                Button1text={'Back'}
-                Button2text={'Next'}
-                src=''
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-
-            />}
             {(conditionalLogic || isDefaultLogic || complianceState) && (
                 <ConditionalLogic
                     setConditionalLogic={setConditionalLogic}
