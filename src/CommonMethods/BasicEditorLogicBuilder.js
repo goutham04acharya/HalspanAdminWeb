@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 
-import { formatDate } from "./FormatDate";
+import { formatDate, reverseFormat, reversingFormat } from "./FormatDate";
 
 // Function to handle logic transformation
 export const buildLogicExpression = (question_name, condition_logic, value, date) => {
@@ -37,7 +37,8 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         return `${question_name} >= new Date()`;
     case 'date is “X” date of set date':
         const formatteDate = formatDate(date);
-        return `Math.abs(${question_name} - ${formatteDate} ) == ${value}`
+        const actualFormat = reversingFormat(formatteDate)
+        return `Math.abs(${question_name} - ${actualFormat} ) == ${value * 24 * 60 * 60 * 1000}`
     default:
         // Fallback for other logic (you can add more cases here if needed)
         return `${question_name} ${condition_logic} '${value}'`;

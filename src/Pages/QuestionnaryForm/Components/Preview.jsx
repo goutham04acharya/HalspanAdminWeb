@@ -396,24 +396,35 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
                                     console.log(list, 'currentPage');
-
                                     if (list?.conditional_logic !== '') {
+                                        console.log(list?.conditional_logic,'pppppp')
+                                        console.log(Section_1.Page_1.Question_1,'dhanush')
                                         // Check if the conditional logic string contains "new Date()"
-                                        if (list?.conditional_logic.includes("new Date()")) {
+                                        if (list?.conditional_logic.includes("new Date(")) {
                                             // Replace "new Date()" with the correctly formatted date string in dd/mm/yyyy format
-                                            const convertedConditionalLogic = list?.conditional_logic.replace(
-                                                /new Date\(\)/g,
-                                                `"${new Date().toLocaleDateString("en-GB")}"`
-                                            );
-                                            console.log(convertedConditionalLogic, 'converted logic');
-
-                                            if (!eval(convertedConditionalLogic)) {
-                                                return null;
+                                            // const convertedConditionalLogic = list?.conditional_logic.replace(
+                                            //     /new Date\(\)/g,
+                                            //     `"${new Date()}"`
+                                            // );
+                                            console.log(new Date().setHours(0, 0, 0, 0),'iiii')
+                                            // console.log(convertedConditionalLogic, 'converted logic');
+                                            console.log(Section_1.Page_1.Question_1,'dhanush')
+                                            try {
+                                                if (!eval(list?.conditional_logic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error,'l')
                                             }
+                                            
                                         } else {
                                             // Directly evaluate conditional logic if it does not contain "new Date()"
-                                            if (!eval(list?.conditional_logic)) {
-                                                return null;
+                                            try {
+                                                if (!eval(list?.conditional_logic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error,'j')
                                             }
                                         }
                                     }

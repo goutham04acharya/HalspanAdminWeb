@@ -466,12 +466,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
                 if (condition.includes('Math.abs')) {
-                    const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
+                    // const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
+                    // const matching = condition.match(regex);
+                    const regex = /\s*\(\s*([^)]+)\s*-\s*new Date\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})\s*\)\s*\)\s*==\s*(\d+)/;
                     const matching = condition.match(regex);
                     if (matching) {
-                        const questionName = matching[1];  // Captures everything inside the parentheses
-                        const dateKey = matching[2];       // Captures the date in dd/mm/yyyy format
-                        const value = matching[3];         // Captures the numeric value after ==
+                        // const questionName = matching[1];  // Captures everything inside the parentheses
+                        // const dateKey = matching[2];       // Captures the date in dd/mm/yyyy format
+                        // const value = matching[3];         // Captures the numeric value after ==
+                        const questionName = matching[1];   // Captures everything inside the parentheses
+                        const year = matching[2];           // Captures the year from new Date
+                        const month = String(parseInt(matching[3], 10) + 1).padStart(2, '0'); // Adjust 0-indexed month and pad
+                        const day = String(matching[4]).padStart(2, '0'); // Capture day and pad
+                        const value = matching[5];
+                        const dateKey = `${day}/${month}/${year}`;
 
                         let question = getDetails(questionName.trim(), allSectionDetails.data)
                         let condition_logic = 'date is “X” date of set date'
@@ -479,7 +487,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         return {
                             question_name: questionName.trim(),
                             condition_logic: condition_logic.trim(),
-                            value: value,
+                            value: value / (24 * 60 * 60 * 1000),
                             dropdown: false,
                             condition_dropdown: false,
                             condition_type: question?.component_type,

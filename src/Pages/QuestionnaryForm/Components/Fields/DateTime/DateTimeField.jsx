@@ -22,6 +22,10 @@ function DateTimeField({
     setConditionalValues,
     sections
 }) {
+    const splitDate = (dateStr) => {
+        const [day, month, year] = dateStr.split("/");
+        return `${year}-${month}-${day}`;
+    }
     function handleFunction(e) {
         if (type === 'time') {
             const value = e
@@ -45,7 +49,7 @@ function DateTimeField({
                     ...prevValues[section_name], // Preserve existing entries for this section
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: new Date(value).toLocaleDateString() // Add or update the label key with newValue
+                        [label]: new Date(splitDate(value)) // Add or update the label key with newValue
                     }
                 }
             }));
