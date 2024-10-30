@@ -758,9 +758,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = expression
             // Check for the "includes" method being used without a parameter
             let methods = [
-                "AddDays", "SubtractDays", "getFullYear", "getMonth", "getDate",
-                "getDay", "getHours", "getMinutes", "getSeconds", "getMilliseconds",
-                "getTime", "Date", "Today", "setDate", "includes"
+                "AddDays", "SubtractDays", "Date", "includes"
             ]
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
@@ -769,7 +767,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             let payloadString = expression;
-            console.log(payloadString, 'dhauhs')
+            // console.log(payloadString, 'dhauhs')
             evalInputValue = addSectionPrefix(evalInputValue);
 
             // Extract variable names from the payloadString using a regex
