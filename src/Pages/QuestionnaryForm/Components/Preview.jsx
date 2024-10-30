@@ -227,7 +227,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'dateTimefield':
                 return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
-                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues}  setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
+                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
                 return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
@@ -235,7 +235,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'photofield':
                 return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'videofield':
-                return <VideoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues}  setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <VideoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'tagScanfield':
                 return <TagScanField preview setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             default:
@@ -243,32 +243,53 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         }
     };
 
-    useOnClickOutside(modalRef, () => {
-        dispatch(setModalOpen(false));
-        setValidationErrors((prevErrors) => ({
-            ...prevErrors,
-            preview_textboxfield: '',
-            preview_choiceboxfield: '',
-            preview_numberfield: '',
-            preview_datetimefield: '',
-            preview_photofield: '',
-            preview_filefield: '',
-            preview_videofield: ''
-        }));
-    });
-    // useEffect(() => {
-    //     Object.entries(obj).forEach(([key, value]) => {
-    //         eval(`var ${key} = ${JSON.stringify(value)}`);
-    //     });
-    // }, [conditionalValues]);
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
 
-    return (
-        <div className='bg-[#3931313b] pointer-events-auto w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
+    useEffect(() => {
+        console.log(sections, 'sec')
+        sections.forEach(section => {
+            section.pages.forEach(page => {
+                page.questions.forEach(question => {
+                    const { default_conditional_logic, default_content } = question;
 
-            <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
+                    // Check if default_conditional_logic is not empty
+                    if (default_conditional_logic) {
+                        try {
+                            // Evaluate the string expression
+                            if (default_content === "advance") {
+                                const result = eval(default_conditional_logic);
+                                console.log(`Evaluation of "${default_conditional_logic}":`, result);
+                                setValue((prev) => ({
+                                    ...prev,
+                                    [question.question_id]: result
+
+                                }))
+                            } else {
+                                setValue((prev) => ({
+                                    ...prev,
+                                    [question.question_id]: default_conditional_logic
+
+                                }))
+                            }
+
+                        } catch (error) {
+                            // Log the error if eval fails
+                            console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
+                        }
+                    }
+                });
+            });
+        });
+    }, [conditionalValues])
+
+    return (
+        <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
+            <div className='flex justify-end p-2'>
+                <img src='/Images/close-preview.svg' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => dispatch(setModalOpen(false))}></img>
+            </div>
+            <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
                 <div>
                     {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
@@ -295,26 +316,39 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
                             <div className='flex flex-col justify-between'>
 
-                                {sections[currentSection]?.pages[currentPage]?.questions?.map((question, index) => {
-                                    if (question?.conditional_logic !== '') {
-                                        console.log(eval(question?.conditional_logic), 'ffff true or false')
-                                        // If the condition does not evaluate to true, skip rendering this item
-                                        if (!eval(question?.conditional_logic)) {
-                                            return null;
+                                {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
+                                    console.log(list, 'currentPage');
+
+                                    if (list?.conditional_logic !== '') {
+                                        // Check if the conditional logic string contains "new Date()"
+                                        if (list?.conditional_logic.includes("new Date()")) {
+                                            // Replace "new Date()" with the correctly formatted date string in dd/mm/yyyy format
+                                            const convertedConditionalLogic = list?.conditional_logic.replace(
+                                                /new Date\(\)/g,
+                                                `"${new Date().toLocaleDateString("en-GB")}"`
+                                            );
+                                            console.log(convertedConditionalLogic, 'converted logic');
+
+                                            if (!eval(convertedConditionalLogic)) {
+                                                return null;
+                                            }
+                                        } else {
+                                            // Directly evaluate conditional logic if it does not contain "new Date()"
+                                            if (!eval(list?.conditional_logic)) {
+                                                return null;
+                                            }
                                         }
                                     }
-
                                     return (
                                         <div
                                             data-testid={`preview-section-${currentSection}-page-${currentPage}-question-${index}`}
                                             className="mt-3 mb-3 bg-white mx-4 rounded-xl py-4 px-2"
                                             key={index}
                                         >
-                                            <div className="px-2">{renderQuestion(question)}</div>
+                                            <div className="px-2">{renderQuestion(list)}</div>
                                         </div>
                                     );
                                 })}
-
                             </div>
                         </div>
                     )}
