@@ -90,7 +90,6 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
-    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
@@ -105,7 +104,6 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-    console.log(formDefaultInfo, 'nnnnnnnnnnnnnnn')
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
@@ -1238,7 +1236,7 @@ const QuestionnaryForm = () => {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${questionnaire_id}/${version_number}`)}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>

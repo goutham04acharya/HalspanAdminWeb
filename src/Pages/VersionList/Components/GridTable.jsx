@@ -117,15 +117,15 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
                                         <a data-testid={`version-${index}`} onClick={()=>navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
                                     </div>
-                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>
+                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
                                         {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
                                             day: 'numeric',
                                             month: 'short',
                                             year: 'numeric',
                                         })}
                                     </div>
-                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B]'>
-                                        {versionListInfo?.updated_by?.name}
+                                    <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
+                                        {versionListInfo?.updated_by?.name || '-'}
                                     </div>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tr-[10px] rounded-br-[10px] font-normal text-base text-[#2B333B]'>
                                         {versionListInfo?.status ? (
