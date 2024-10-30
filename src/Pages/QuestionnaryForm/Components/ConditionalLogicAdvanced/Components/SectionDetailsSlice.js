@@ -13,9 +13,10 @@ const allSectionDetailsSlice = createSlice({
     reducers: {
         setAllSectionDetails: (state, action) => {
             state.allSectionDetails = action.payload;
-        },
+        }
     },
 });
+
 
 
 // Export the actions

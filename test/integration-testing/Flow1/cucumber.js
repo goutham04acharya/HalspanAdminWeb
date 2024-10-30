@@ -42,6 +42,7 @@ module.exports = {
             'test/integration-testing/Flow1/35_date_time_basic_editor.feature',
             'test/integration-testing/Flow1/38_preview_questionnaire.feature',
             'test/integration-testing/Flow1/39_default_value_choice.feature',
+            'test/integration-testing/Flow1/40_compliance_status.feature',
             'test/integration-testing/Flow1/41_default_value_date_time.feature',
             'test/integration-testing/Flow1/41_default_value_textbox.feature',
             'test/integration-testing/Flow1/42_default_value_number.feature',

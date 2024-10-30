@@ -19,7 +19,8 @@ const initialState = {
     showquestionDeleteModal: '',
     showPageDeleteModal: '',
     isModalOpen: '',
-
+    complianceLogicId:0,
+    
 };
 
 
@@ -70,6 +71,9 @@ const questionnaryFormSlice = createSlice({
         setModalOpen: (state, action) => {
             state.isModalOpen = action.payload;
         },
+        setComplianceLogicId: (state, action) => {
+            state.complianceLogicId = action.payload;
+        },
     }
 });
 
@@ -89,7 +93,7 @@ export const {
     setShowquestionDeleteModal,
     setShowPageDeleteModal,
     setModalOpen,
-   
+    setComplianceLogicId,
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

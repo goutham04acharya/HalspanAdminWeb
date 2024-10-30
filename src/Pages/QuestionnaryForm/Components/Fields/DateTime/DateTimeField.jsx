@@ -22,9 +22,7 @@ function DateTimeField({
     setConditionalValues,
     sections
 }) {
-    console.log(validationErrors, 'validationErrors')
     function handleFunction(e) {
-        console.log(e, 'time')
         if (type === 'time') {
             const value = e
             setValue((prev) => ({
@@ -47,7 +45,7 @@ function DateTimeField({
                     ...prevValues[section_name], // Preserve existing entries for this section
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: new Date(value.replace('/', ', ' )) // Add or update the label key with newValue
+                        [label]: new Date(value).toLocaleDateString() // Add or update the label key with newValue
                     }
                 }
             }));
