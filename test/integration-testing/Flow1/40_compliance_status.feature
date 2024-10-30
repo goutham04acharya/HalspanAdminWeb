@@ -36,7 +36,8 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
       | "single_choice" | "Yes, No, Maybe" |
 
   Scenario: Admin adds the compliance logic to the questionnaire
-    Given I am on the Questionnaire management sections   
+    Given I am on the Questionnaire management sections
+    When I add a new question to the page 1 in section 1
     When I click the add compliance button 
     When I enter the label name for compliance status
     When I click the add default value button
