@@ -19,6 +19,8 @@ function Pages({ pageIndex,
 
   const pageRefs = useRef({});
   const dispatch = useDispatch();
+  const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+
   const selectedAddQuestion = useSelector(
     (state) => state?.questionnaryForm?.selectedAddQuestion
   );
@@ -62,7 +64,7 @@ function Pages({ pageIndex,
     // Call handleAutoSave with the correct sectionId and updated sections
     handleAutoSave(sectionId, updatedSections);
   };
-  console.log(selectedAddQuestion.questionId, 'selectedAddQuestion')
+  console.log(selectedAddQuestion.questionIndex, 'selectedAddQuestion')
 
   return (
     <div>
@@ -93,7 +95,7 @@ function Pages({ pageIndex,
           container={() => document.body}
         />
         <div
-          className={`${selectedAddQuestion === 'undefined' ? 'mt-0' : 'mt-4'} rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id
+          className={`${selectedAddQuestion.questionIndex === '' ? 'mt-0' : 'mt-4'} rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id
             ? "border bg-[#d1d3d9b7]"
             : "bg-[#EFF1F8]"
             }`}

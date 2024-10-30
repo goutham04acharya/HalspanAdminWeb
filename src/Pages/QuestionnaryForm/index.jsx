@@ -105,7 +105,7 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-    console.log(fieldSettingParams[selectedQuestionId], 'nnnnnnnnnnnnnnn')
+    console.log(formDefaultInfo, 'nnnnnnnnnnnnnnn')
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
