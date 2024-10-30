@@ -6,11 +6,11 @@
 # Node artifact files
 node_modules
 .env
-*.png
+test/step-definations/failed_scenarios/*.png
 *.xlsx
 # Compiled Java class files
 *.class
-*.png
+
 *.xlsx
 package-lock.json/
 # Compiled Python bytecode
