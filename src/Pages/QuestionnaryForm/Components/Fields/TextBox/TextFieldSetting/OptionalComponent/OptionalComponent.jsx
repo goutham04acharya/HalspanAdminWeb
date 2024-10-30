@@ -282,7 +282,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
                             id='format'
                             top='30px'
                             placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='format-dropdown'
                             labeltestID='format-list'
                             selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attributes)}
@@ -294,45 +294,61 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
                     )}
                     {activeTab === 'serviceRecord' && (
                         <div className="mt-4">
-                            <InputWithDropDown
-                                id='serviceRecord'
-                                top='30px'
-                                placeholder='Select'
-                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                testID='serviceRecord-dropdown'
-                                labeltestID='serviceRecord-list'
-                                selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.serviceRecordOptions)}
-                                handleOptionClick={handleOptionClick}
-                                isDropdownOpen={isServiceRecordDropdownOpen}
-                                setDropdownOpen={setServiceRecordDropdownOpen}
-                                options={serviceRecordOptions}
-                            />
-                            <InputWithDropDown
-                                id='questionnaireList'
-                                top='30px'
-                                placeholder='Select'
-                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                testID='questionnaireList-dropdown'
-                                labeltestID='questionnaireList-list'
-                                selectedOption={questionnaireOptions.find(option => questionnaireOptions.value === fieldSettingParameters?.questionnaireOptions)}
-                                handleOptionClick={handleOptionClick}
-                                isDropdownOpen={isQuestionnaireListDropdownOpen}
-                                setDropdownOpen={setQuestionnaireListDropdownOpen}
-                                options={questionnaireOptions}
-                            />
-                            <InputWithDropDown
-                                id='fieldList'
-                                top='30px'
-                                placeholder='Select'
-                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                testID='fieldList-dropdown'
-                                labeltestID='fieldList-list'
-                                selectedOption={fieldOptions.find(option => fieldOptions.value === fieldSettingParameters?.fieldOptions)}
-                                handleOptionClick={handleOptionClick}
-                                isDropdownOpen={isFieldListDropdownOpen}
-                                setDropdownOpen={setFieldListDropdownOpen}
-                                options={fieldOptions}
-                            />
+                            <div className=''>
+                                <InputWithDropDown
+                                    label='Service Record List'
+                                    labelStyle='font-semibold text-[#2B333B] text-base'
+                                    id='serviceRecord'
+                                    top='55px'
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                    testID='serviceRecord-dropdown'
+                                    labeltestID='serviceRecord-list'
+                                    selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.serviceRecordOptions)}
+                                    handleOptionClick={handleOptionClick}
+                                    isDropdownOpen={isServiceRecordDropdownOpen}
+                                    setDropdownOpen={setServiceRecordDropdownOpen}
+                                    options={serviceRecordOptions}
+                                />
+                            </div>
+                            {serviceRecordOptions.value && (
+                                <div className='mt-2'>
+                                    <InputWithDropDown
+                                        id='questionnaireList'
+                                        label='Questionnaire List'
+                                        labelStyle='font-semibold text-[#2B333B] text-base'
+                                        top='55px'
+                                        placeholder='Select'
+                                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                        testID='questionnaireList-dropdown'
+                                        labeltestID='questionnaireList-list'
+                                        selectedOption={questionnaireOptions.find(option => questionnaireOptions.value === fieldSettingParameters?.questionnaireOptions)}
+                                        handleOptionClick={handleOptionClick}
+                                        isDropdownOpen={isQuestionnaireListDropdownOpen}
+                                        setDropdownOpen={setQuestionnaireListDropdownOpen}
+                                        options={questionnaireOptions}
+                                    />
+                                </div>
+                            )}
+                            {questionnaireOptions.value && (
+                                <div>
+                                    <InputWithDropDown
+                                        id='fieldList'
+                                        top='55px'
+                                        label='Field List'
+                                        labelStyle='font-semibold text-[#2B333B] text-base'
+                                        placeholder='Select'
+                                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                        testID='fieldList-dropdown'
+                                        labeltestID='fieldList-list'
+                                        selectedOption={fieldOptions.find(option => fieldOptions.value === fieldSettingParameters?.fieldOptions)}
+                                        handleOptionClick={handleOptionClick}
+                                        isDropdownOpen={isFieldListDropdownOpen}
+                                        setDropdownOpen={setFieldListDropdownOpen}
+                                        options={fieldOptions}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

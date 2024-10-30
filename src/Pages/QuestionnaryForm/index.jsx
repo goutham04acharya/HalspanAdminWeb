@@ -105,7 +105,7 @@ const QuestionnaryForm = () => {
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
 
-
+    console.log(fieldSettingParams[selectedQuestionId], 'nnnnnnnnnnnnnnn')
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
@@ -1091,7 +1091,7 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
-    console.log(complianceLogic, 'here')
+    console.log(selectedSectionData, 'here')
     return (
         <>
             {pageLoading ? (
@@ -1303,7 +1303,7 @@ const QuestionnaryForm = () => {
             {isModalOpen && (
                 <ConfirmationModal
                     text='Delete Section'
-                    subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -1335,7 +1335,7 @@ const QuestionnaryForm = () => {
             {showPageDeleteModal && (
                 <ConfirmationModal
                     text='Delete Page'
-                    subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -1352,7 +1352,7 @@ const QuestionnaryForm = () => {
             {showquestionDeleteModal && (
                 <ConfirmationModal
                     text='Delete Question'
-                    subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'

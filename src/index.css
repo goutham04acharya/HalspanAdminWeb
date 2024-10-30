@@ -560,10 +560,13 @@ custom-toggle-switch input:checked+.slider::before {
   background-color: #0056b3;
 }
 
-
-
 .preview-img {
   max-width: 300px;
   max-height: 300px;
   margin: 10px 0;
 }
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
