@@ -15,7 +15,6 @@ import NumberField from './Fields/Number/NumberField.jsx';
 import AssetLocationField from './Fields/AssetLocation/AssetLocationField.jsx';
 import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
-// import axios from 'axios';  
 import useApi from '../../../services/CustomHook/useApi.js';
 import TagScanField from './Fields/TagScan/TagScanField.jsx';
 
@@ -63,50 +62,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         const result = await handleConditionalLogic(data);
         setConditionalValues(result);
     };
-
-    // Call updateConditionalValues with the data object
-
-    console.log(conditionalValues, 'conditonal logic')
-    // useEffect(() => {
-    //     const fetchSections = async () => {
-    //         setLoading(true); // Set loading to true when API call starts   
-    //         try {
-    //             const response1 = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-    //             const response2 = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-
-    //             // Get sections from questionnaire API  
-    //             const questionnaireSections = response2?.data?.data?.sections;
-    //             console.log(questionnaireSections, 'questionnaireSections')
-
-    //             // Get sections from layout API  
-    //             const layoutSections = response1?.data?.data?.sections;
-    //             console.log(layoutSections, 'layoutSections')
-
-    //             // Create a map to store section IDs from layout API  
-    //             const sectionIdMap = {};
-    //             layoutSections.forEach((section) => {
-    //                 sectionIdMap[section.id] = section.index;
-    //             });
-    //             console.log(sectionIdMap, 'sectionIdMap')
-
-    //             // Reorganize sections from questionnaire API based on section IDs from layout API  
-    //             const reorganizedSections = questionnaireSections.sort((a, b) => {
-    //                 return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
-    //             });
-    //             console.log(reorganizedSections, 'reorganizedSections')
-
-    //             setSections(reorganizedSections);
-    //             // setConditionalValues(handleConditionalLogic(reorganizedSections));
-    //             updateConditionalValues(reorganizedSections);
-    //         } catch (error) {
-    //             console.error(error);
-    //         } finally {
-    //             setLoading(false); // Set loading to false when API call ends   
-    //         }
-    //     };
-    //     fetchSections();
-
-    // }, [questionnaire_id, version_number]);
     useEffect(() => {
         const fetchSections = async () => {
             setLoading(true);
@@ -145,10 +100,23 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
-        return complianceLogic.map(rule => ({
-            label: rule.label,
-            result: eval(rule.default_content)
-        }));
+        return complianceLogic.map(rule => {
+            // Get the condition part before the question mark
+            const conditionPart = rule.default_content.split('?')[0].trim();
+
+            // Evaluate the condition to determine which path was executed
+            const conditionResult = eval(conditionPart);
+
+            // Get the full evaluation result
+            const result = eval(rule.default_content);
+
+            return {
+                label: rule.label,
+                result: result?.toString(),
+                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
+                tookIfPath: conditionResult
+            };
+        });
     };
 
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
@@ -240,18 +208,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 setTotalPagesNavigated(totalPagesNavigated + 1);
             }
         }
-        // else {
-        //     if (currentPage < sections[currentSection].pages.length - 1) {
-        //         setCurrentPage(currentPage + 1);
-        //         setTotalPagesNavigated(totalPagesNavigated + 1);
-        //     } else if (currentSection < sections.length - 1) {
-        //         setCurrentSection(currentSection + 1);
-        //         setCurrentPage(0);
-        //         setTotalPagesNavigated(totalPagesNavigated + 1);
-        //     } else {
-        //         // Do nothing if you're on the last page of the last section  
-        //     }
-        // }
     };
 
     const handleBackClick = () => {
@@ -311,6 +267,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
+    const isLastSectionAndPage = () => {
+        return currentSection === sections.length - 1 &&
+            currentPage === sections[currentSection]?.pages.length - 1;
+    };
 
     useEffect(() => {
         console.log(sections, 'sec')
@@ -366,15 +326,26 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <BeatLoader color="#2B333B" size='20px' />
                         </div>
                     ) : showComplianceScreen ? (
-                        <div className="p-4">
-                            <h2 className="text-2xl font-bold mb-4">Compliance Results</h2>
+                        <div className="p-4">  
+                            <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
-                                <div key={index} className="mb-4 p-4 bg-white rounded-lg shadow">
-                                    <h3 className="font-semibold">{result.label}</h3>
-                                    <p className={`mt-2 ${result.result === 'complaint' ? 'text-green-600' : 'text-red-600'
-                                        }`}>
-                                        Status: {result.result}
-                                    </p>
+                                <div
+                                    key={index}
+                                    className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="font-semibold text-[#2B333B]">{result.label}</h3>
+                                        <span
+                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result.tookIfPath
+                                                    ? 'bg-[#4CD95A] text-[#2B333B] border '
+                                                    : 'bg-[#FA303B] text-white border '
+                                                }`}
+                                        >
+                                            <img src={result.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
+                                            {result.result}
+                                        </span>
+                                    </div>
+                                    
                                 </div>
                             ))}
                         </div>
@@ -397,18 +368,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
                                     console.log(list, 'currentPage');
                                     if (list?.conditional_logic !== '') {
-                                        console.log(list?.conditional_logic,'pppppp')
-                                        console.log(Section_1.Page_1.Question_1,'dhanush')
-                                        // Check if the conditional logic string contains "new Date()"
                                         if (list?.conditional_logic.includes("new Date(")) {
-                                            // Replace "new Date()" with the correctly formatted date string in dd/mm/yyyy format
-                                            // const convertedConditionalLogic = list?.conditional_logic.replace(
-                                            //     /new Date\(\)/g,
-                                            //     `"${new Date()}"`
-                                            // );
-                                            console.log(new Date().setHours(0, 0, 0, 0),'iiii')
-                                            // console.log(convertedConditionalLogic, 'converted logic');
-                                            console.log(Section_1.Page_1.Question_1,'dhanush')
                                             try {
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
@@ -418,7 +378,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                             }
                                             
                                         } else {
-                                            // Directly evaluate conditional logic if it does not contain "new Date()"
                                             try {
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
@@ -468,13 +427,15 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 )}
                             </label>
                         </>}
-                    <button
-                        type='button'
-                        className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}
-                        onClick={showComplianceScreen ? "" : handleNextClick}
-                    >
-                        {showComplianceScreen ? 'Submit' : 'Next'}
-                    </button>
+                    {!showComplianceScreen && (
+                        <button
+                            type='button'
+                            className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}
+                            onClick={handleNextClick}
+                        >
+                            {isLastSectionAndPage() ? 'Submit' : 'Next'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
