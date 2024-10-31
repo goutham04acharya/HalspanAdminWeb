@@ -22,8 +22,6 @@ function TestFieldSetting({
   formParameters,
   handleRadiobtn,
   fieldSettingParameters,
-  // setFieldSettingParameters,
-  handleSaveSettings,
   selectedQuestionId,
   handleBlur,
   validationErrors,
@@ -45,7 +43,6 @@ function TestFieldSetting({
   const [isValid, setIsValid] = useState(false)
   const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
 
-  console.log(fieldSettingParameters, 'fieldSettingParameters')
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
 
@@ -308,7 +305,8 @@ function TestFieldSetting({
             />
           </div>
           {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true)
-            && <><div className='flex flex-col justify-start mt-7'>
+            && <>
+            <div className='flex flex-col justify-start mt-7'>
               <label
                 // htmlFor={placeholderContentId}
                 className='font-semibold text-base text-[#2B333B]'>Regular Expression
@@ -382,7 +380,7 @@ function TestFieldSetting({
             )}
           </div>
           {/* OptionsComponent added here */}
-          <OptionsComponent selectedQuestionId={selectedQuestionId} />
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'

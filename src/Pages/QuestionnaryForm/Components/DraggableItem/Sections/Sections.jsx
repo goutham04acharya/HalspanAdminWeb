@@ -192,7 +192,7 @@ const Sections = ({ sectionData,
               )
             }
             data-testid={`add-page-sec-${sectionIndex}`}
-            className="flex items-center justify-center w-full rounded-[10px] py-7 mt-6 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
+            className="flex items-center justify-center w-full rounded-[10px] py-7 mt-4 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
           >
             <span className="mr-[15px]">+</span>
             <span>Add page</span>

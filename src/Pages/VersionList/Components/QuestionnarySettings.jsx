@@ -125,7 +125,7 @@ function QuestionnarySettings({
                 </div>
                 <div className='w-full mt-6'>
                     <InputTextarea
-                        className='h-[146px] w-full mt-2.5'
+                        className='h-[146px] w-full mt-2.5 px-[11px]'
                         label='Description'
                         htmlFor='description'
                         id='description'

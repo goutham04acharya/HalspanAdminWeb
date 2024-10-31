@@ -1050,7 +1050,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
-                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>shows when...</p>
+                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>Shows when...</p>
                                         :
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
                                     }

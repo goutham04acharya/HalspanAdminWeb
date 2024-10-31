@@ -158,7 +158,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          <OptionsComponent selectedQuestionId={selectedQuestionId} />
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'

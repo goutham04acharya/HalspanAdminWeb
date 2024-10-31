@@ -19,6 +19,8 @@ function Pages({ pageIndex,
 
   const pageRefs = useRef({});
   const dispatch = useDispatch();
+  const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+
   const selectedAddQuestion = useSelector(
     (state) => state?.questionnaryForm?.selectedAddQuestion
   );
@@ -61,7 +63,8 @@ function Pages({ pageIndex,
 
     // Call handleAutoSave with the correct sectionId and updated sections
     handleAutoSave(sectionId, updatedSections);
-  };  
+  };
+  console.log(selectedAddQuestion.questionIndex, 'selectedAddQuestion')
 
   return (
     <div>
@@ -69,7 +72,7 @@ function Pages({ pageIndex,
         key={pageData?.page_id}
         id={pageData?.page_id}
         ref={(el) => (pageRefs.current[`${sectionIndex}-${pageIndex}`] = el)}
-        // className="mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] border border-transparent"
+      // className="mt-1 mx-1 bg-white rounded-[10px] px-4 pt-4 pb-[22px] hover:border-[#2B333B] border border-transparent"
       >
         <div className="flex items-start justify-between gap-7">
           <div className="flex items-center justify-end">
@@ -92,16 +95,14 @@ function Pages({ pageIndex,
           container={() => document.body}
         />
         <div
-          className={`mt-7 rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${
-            selectedAddQuestion?.pageId === pageData?.page_id
-              ? "border bg-[#d1d3d9b7]"
-              : "bg-[#EFF1F8]"
-          }`}
+          className={`${selectedAddQuestion.questionIndex === '' ? 'mt-0' : 'mt-4'} rounded-[10px] w-full px-3 hover:border border-[#2B333B] ${selectedAddQuestion?.pageId === pageData?.page_id
+            ? "border bg-[#d1d3d9b7]"
+            : "bg-[#EFF1F8]"
+            }`}
         >
           <button
-            data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${
-              pageIndex + 1
-            }`}
+            data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1
+              }`}
             onClick={() =>
               handleAddRemoveQuestion(
                 "add",

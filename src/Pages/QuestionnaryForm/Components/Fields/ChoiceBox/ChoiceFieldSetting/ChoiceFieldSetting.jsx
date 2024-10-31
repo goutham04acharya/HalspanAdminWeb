@@ -295,7 +295,7 @@ function ChoiceFieldSetting({
                             <ErrorMessage error={'No lookup list available. Please create one'} />
                         )}
                         {/* OptionsComponent added here */}
-                        <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                        <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'
