@@ -15,7 +15,7 @@ Then('I should see the advanced editor for files or photos or videos', async fun
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="advance-editor-tab"]`))).click();
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="shows when..."]')));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="Shows when..."]')));
 });
 
 When('I enter the incorrect conditional logic for files or photos or videos', async function () {

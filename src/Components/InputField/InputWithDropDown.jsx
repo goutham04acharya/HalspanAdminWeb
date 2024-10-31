@@ -29,7 +29,6 @@ function InputWithDropDown({
         setSelectedUrlOption('');
         dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
-
         setDropdownOpen(false);
 
     }
@@ -61,7 +60,9 @@ function InputWithDropDown({
                         <li key={option.value}
                             data-testid={`${labeltestID}-${index}`}                            
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
-                            onClick={() => handleOptionClick(option)}>
+                            onClick={() => {handleOptionClick(option)
+                                setDropdownOpen(false)}    // Close dropdown after selection
+                            }>
                             {option.label}
                         </li>
                     ))}

@@ -64,14 +64,14 @@ function NumberFieldSetting({
                                 value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                                 onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
                                 placeholder='Populates the content' />
-                            <img src="/Images/setting.svg" 
-                            alt="setting" 
-                            data-testid="default-value"
-                            onClick={() => {
-                                setIsDefaultLogic(true);
-                                setConditionalLogic(false);
-                            }}
-                            className='absolute top-5 right-3 cursor-pointer' />
+                            <img src="/Images/setting.svg"
+                                alt="setting"
+                                data-testid="default-value"
+                                onClick={() => {
+                                    setIsDefaultLogic(true);
+                                    setConditionalLogic(false);
+                                }}
+                                className='absolute top-5 right-3 cursor-pointer' />
                         </div>
                     </div>
                     <div className='mt-7'>
@@ -195,7 +195,7 @@ function NumberFieldSetting({
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Range</p>
-                        <div className='flex items-center mt-3'>
+                        <div className='flex items-center mt-3 w-full'>
                             <InputField
                                 autoComplete='off'
                                 label=''
@@ -302,7 +302,7 @@ function NumberFieldSetting({
                             </div>
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

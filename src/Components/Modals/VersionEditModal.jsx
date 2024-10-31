@@ -36,7 +36,7 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                 <p className={`${!version ? '' : 'text-center mt-5'} text-lg text-[#2B333B] font-semibold `}>{text}</p>
                 <p className={`font-normal text-base text-[#2B333B] mt-2 ${!version ? '' : 'text-center w-[348px] mx-auto mt-[17px] mb-[28px]'} break-words`}>{subText}</p>
                 {!version && <>
-                    <div className='flex w-full h-[36px] relative'>
+                    <div className='flex w-full h-[36px] mt-3 relative cursor-pointer'>
                         <input
                             type="text"
                             // id={versionListInfo?.version_number}
@@ -44,14 +44,14 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                             placeholder={'Select'}
                             onClick={handleDropdownClick}
                             value={selectedVersion ? `Version ${selectedVersion}` : ''}
-                            className={`border w-full border-[#AEB3B7] outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
+                            className={`border w-full border-[#AEB3B7] outline-0 rounded px-[18px] h-12 placeholder:font-normal cursor-pointer placeholder:text-base`}
                             readOnly
                         />
                         <img
                             src="/Images/open-status.svg"
                             alt="open-filter"
                             onClick={handleDropdownClick}
-                            className={`absolute mt-3 right-5 transition-transform duration-300 text-[#2B333B] ${dropdownsOpen ? 'rotate-180' : 'rotate-0'}`}
+                            className={`absolute top-5 right-5 transition-transform duration-300 text-[#2B333B] ${dropdownsOpen ? 'rotate-180' : 'rotate-0'}`}
                         />
                     </div>
                     {dropdownsOpen && (
@@ -68,7 +68,7 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                     )}
                 </>
                 }
-                {!version && <div className='mt-5 flex items-center justify-between'>
+                {!version && <div className='mt-10 flex items-center justify-between'>
                     {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
                         {!loading ? Button1text : <BeatLoader color="#fff" size={'10px'} /> }
                     </button> :

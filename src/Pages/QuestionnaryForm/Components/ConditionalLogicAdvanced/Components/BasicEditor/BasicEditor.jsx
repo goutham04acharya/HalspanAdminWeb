@@ -275,7 +275,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='w-[97%] -mx-2 flex'>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B]'>Select</p>
+                                                <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
                                                 <InputWithDropDown
                                                     label=''
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -299,7 +299,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B]'>Condition</p>
+                                                <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
                                                 <InputWithDropDown
                                                     // label='Format'
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -341,7 +341,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>}
                                         {showInputValue(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] mb-3'>Value</p>
+                                                <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
                                                 <InputField
                                                     autoComplete='off'
                                                     label=''

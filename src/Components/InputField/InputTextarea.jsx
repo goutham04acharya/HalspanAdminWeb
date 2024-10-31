@@ -26,7 +26,7 @@ function InputTextarea({
                 type={type}
                 value={value}
                 className={`placeholder:text-[#9FACB9] placeholder:font-normal placeholder:text-base overflow-auto default-sidebar
-                    px-4 py-3 resize-none scrollBar
+                     py-3 resize-none scrollBar
                     font-normal text-base leading-[22px] focus:outline-none border border-[#AEB3B7]
                     ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} ${className} rounded `}
                 placeholder={placeholder}

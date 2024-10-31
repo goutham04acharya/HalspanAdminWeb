@@ -90,7 +90,6 @@ const QuestionnaryForm = () => {
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
-    const [isSectionSaved, setIsSectionSaved] = useState({});
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
@@ -104,7 +103,6 @@ const QuestionnaryForm = () => {
             // handleSectionSaveOrder(sections)
         }
     }, [sections]); // This useEffect runs whenever `sections` changes
-
 
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
@@ -551,7 +549,9 @@ const QuestionnaryForm = () => {
                     options: question?.options,
                     default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
-                    default_conditional_logic: question?.default_conditional_logic
+                    default_conditional_logic: question?.default_conditional_logic,
+                    attribute_data_lfp:question?.attribute_data_lfp,
+                    service_record_lfp:question?.service_record_lfp,
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -682,6 +682,8 @@ const QuestionnaryForm = () => {
                                 file_size: fieldSettingParams[question.question_id].fileSize,
                                 file_type: fieldSettingParams[question.question_id].fileType,
                             },
+                            attribute_data_lfp:fieldSettingParams[question.question_id].attribute_data_lfp,
+                            service_record_lfp:fieldSettingParams[question.question_id].service_record_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1091,7 +1093,6 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
-    console.log(complianceLogic, 'here')
     return (
         <>
             {pageLoading ? (
@@ -1238,7 +1239,7 @@ const QuestionnaryForm = () => {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate('/questionnaries/create-questionnary')}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${questionnaire_id}/${version_number}`)}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>
@@ -1303,7 +1304,7 @@ const QuestionnaryForm = () => {
             {isModalOpen && (
                 <ConfirmationModal
                     text='Delete Section'
-                    subText={`You are about to delete the ${selectedSectionData?.section_name} section containing multiple pages. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -1335,7 +1336,7 @@ const QuestionnaryForm = () => {
             {showPageDeleteModal && (
                 <ConfirmationModal
                     text='Delete Page'
-                    subText={`You are about to delete the ${selectedSectionData?.page_name} page containing multiple questions. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -1352,7 +1353,7 @@ const QuestionnaryForm = () => {
             {showquestionDeleteModal && (
                 <ConfirmationModal
                     text='Delete Question'
-                    subText={`You are about to delete the ${selectedSectionData?.label} question. This action cannot be undone.`}
+                    subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'

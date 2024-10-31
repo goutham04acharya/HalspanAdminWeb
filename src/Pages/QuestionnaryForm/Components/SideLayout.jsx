@@ -37,7 +37,9 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                 handleSectionScroll(sectionIndex, sectionItem?.section_id);
                             }}
                             className={`${selectedSection === sectionIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-11 pr-3 cursor-pointer`}>
-                            <img src="/Images/down-arrow.svg" alt="down-arrow" />
+                            <img src="/Images/down-arrow.svg" alt="down-arrow"
+                                className={selectedSection === sectionIndex ? 'rotate-180' : ''}
+                            />
                             <p
                                 data-testid={`sidebar-section-${sectionIndex}`}
                                 title={sectionItem?.section_name}
