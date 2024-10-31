@@ -16,7 +16,7 @@ When('I enter the label name for compliance status', async function () {
 
 Then('I should see the compliance logic advanced editor for choice field', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="shows when..."]')));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="Shows when..."]')));
 });
 
 Then('I should see the compliance logic suggestions for questions for choice', async function () {
