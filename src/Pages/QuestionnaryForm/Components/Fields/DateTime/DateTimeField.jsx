@@ -18,7 +18,7 @@ function DateTimeField({
     validationErrors,
     setValidationErrors,
     setValue,
-    choiceValue,
+    dateValue,
     setConditionalValues,
     sections
 }) {
@@ -41,6 +41,7 @@ function DateTimeField({
                 }
             }));
         } else {
+            // debugger
             const value = e.target.value;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
@@ -55,7 +56,7 @@ function DateTimeField({
             }));
             setValue((prev) => ({
                 ...prev,
-                [question?.question_id]: value || false
+                [question?.question_id]: value
             }));
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -65,7 +66,6 @@ function DateTimeField({
                 }
             }));
         }
-        console.log(new Date(value), 'am checking e')
     }
 
 

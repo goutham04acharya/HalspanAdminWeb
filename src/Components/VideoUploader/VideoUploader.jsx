@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, handleRemoveVideo }) => {
 
-
     const [files, setFiles] = useState([]);
     const [error, setError] = useState('');
 
@@ -10,14 +9,13 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         const uploadedFiles = e.target.files;
 
         if (uploadedFiles.length > 0) {
-            const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
             const newFiles = [...files];
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
 
-                if (!allowedTypes.includes(file.type)) {
+                if (!file.type.startsWith("video/")) {
                     setError('Invalid file type. Only video files are allowed');
                     return;
                 }
@@ -41,7 +39,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
 
             setFiles(newFiles);
         }
-        handleChange(e)
+        handleChange(e);
     };
 
     const handleRemoveFile = (index) => {
@@ -50,10 +48,9 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         newFiles.splice(index, 1);
         setFiles(newFiles);
         // setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
-        console.log(index, 'video upload index')
-        handleRemoveVideo(newFiles, index)
+        console.log(index, 'video upload index');
+        handleRemoveVideo(newFiles, index);
     };
-
 
     return (
         <div className="w-full">

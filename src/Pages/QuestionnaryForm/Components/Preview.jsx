@@ -34,8 +34,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
-    console.log(conditionalValues, 'conditionalValues')
-    console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
+    console.log(value, 'values')
+    // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -101,21 +101,27 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
-            // Get the condition part before the question mark
-            const conditionPart = rule.default_content.split('?')[0].trim();
-
-            // Evaluate the condition to determine which path was executed
-            const conditionResult = eval(conditionPart);
-
-            // Get the full evaluation result
-            const result = eval(rule.default_content);
-
-            return {
-                label: rule.label,
-                result: result?.toString(),
-                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                tookIfPath: conditionResult
-            };
+            try {
+                debugger
+                console.log(rule, 'rule')
+                // {
+                //     "label": "Status 1",
+                //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
+                // }
+                const result = eval(rule?.default_content);
+                console.log(result, 'result kkk');
+                // v1 result kkk
+                const conditionResult = eval(rule?.default_content);
+                console.log(conditionResult, 'conditional result kkkkk')
+                // v1 conditional result kkkkk
+                return {
+                    label: rule?.label,
+                    result: result?.toString(),
+                    tookIfPath: conditionResult
+                };
+            } catch (error) {
+                console.log("Error while evaluating")
+            }
         });
     };
 
@@ -246,7 +252,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'choiceboxfield':
                 return <ChoiceBoxField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
-                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
                 return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
@@ -326,7 +332,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <BeatLoader color="#2B333B" size='20px' />
                         </div>
                     ) : showComplianceScreen ? (
-                        <div className="p-4">  
+                        <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
                                 <div
@@ -334,18 +340,18 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                     className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                 >
                                     <div className="flex justify-between items-center">
-                                        <h3 className="font-semibold text-[#2B333B]">{result.label}</h3>
+                                        <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
                                         <span
-                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result.tookIfPath
-                                                    ? 'bg-[#4CD95A] text-[#2B333B] border '
-                                                    : 'bg-[#FA303B] text-white border '
+                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result?.tookIfPath
+                                                ? 'bg-[#4CD95A] text-[#2B333B] border '
+                                                : 'bg-[#FA303B] text-white border '
                                                 }`}
                                         >
-                                            <img src={result.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
-                                            {result.result}
+                                            <img src={result?.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
+                                            {result?.result}
                                         </span>
                                     </div>
-                                    
+
                                 </div>
                             ))}
                         </div>
@@ -374,16 +380,16 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error,'l')
+                                                console.log(error, 'l')
                                             }
-                                            
+
                                         } else {
                                             try {
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error,'j')
+                                                console.log(error, 'j')
                                             }
                                         }
                                     }
@@ -402,7 +408,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     )}
                 </div>
                 <div className='mt-5 flex items-center justify-between'>
-                    {!showLabel ? <button type='button' data-testid="back" className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
+                    {!showLabel ? <button type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
@@ -430,7 +436,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     {!showComplianceScreen && (
                         <button
                             type='button'
-                            className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}
+                            className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`}
                             onClick={handleNextClick}
                         >
                             {isLastSectionAndPage() ? 'Submit' : 'Next'}
