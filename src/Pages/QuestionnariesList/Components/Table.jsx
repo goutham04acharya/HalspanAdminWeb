@@ -40,8 +40,8 @@ function Table({ loading, QueList, lastElementRef }) {
     };
 
     return (
-        <div className='overflow-auto default-sidebar h-customh4'>
-            <table>
+        <div className='overflow-auto scrollbar_gray h-customh4'>
+            <table className='w-full'>
                 <thead className='sticky top-0 bg-white z-[99]'>
                     <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>ID</th>
                     <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>INTERNAL NAME</th>

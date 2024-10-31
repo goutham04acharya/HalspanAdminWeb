@@ -196,7 +196,7 @@ body {
   -webkit-appearance: none;
 }
 .scrollbar_gray::-webkit-scrollbar:vertical{
-  width: 5px;
+  width: 10px;
   background-color: #fff;
   border: 1px solid #fff;
   border-radius: 8px !important;
@@ -212,6 +212,7 @@ body {
   border: 1px solid #DDDDDD;
   border-radius: 22px;
   height: 8px;
+  cursor: pointer;
 }
 
 /* to remove the default sidebar which is use in questionnary list */

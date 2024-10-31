@@ -5,7 +5,7 @@ import Image from '../../../Components/Image/Image';
 function LookupTable({ loading, LookupList, lastElementRef, handleView, setDeleteModal }) {
 
     return (
-        <div className='overflow-auto default-sidebar h-customh4'>
+        <div className='overflow-auto scrollbar_gray h-customh4'>
             <table className='w-full'>
                 <thead className='sticky top-0 bg-white z-[99]'>
                     <tr>

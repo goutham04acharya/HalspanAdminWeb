@@ -98,7 +98,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
         }
     };
     return (
-        <div className='overflow-auto default-sidebar h-customh11'>
+        <div className='overflow-auto scrollbar_gray h-customh11'>
             <div className='flex flex-col'>
                 <div className='sticky top-0 bg-white z-[99]'>
                     <div className='flex'>
