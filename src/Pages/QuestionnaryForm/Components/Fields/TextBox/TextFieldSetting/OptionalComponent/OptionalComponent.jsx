@@ -255,14 +255,14 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                 <div className="mt-4">
                     <div className="flex justify-between border-b border-gray-300 mb-2">
                         <p
-                            data-testid="pre-field-option"
+                            data-testid="attribute-data"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'attributeData' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
                             onClick={() => handleTabClick('attributeData')}
                         >
                             Attribute Data
                         </p>
                         <p
-                            data-testid="post-field-option"
+                            data-testid="service-record"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'serviceRecord' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
                             onClick={() => handleTabClick('serviceRecord')}
                         >
@@ -275,8 +275,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                             top='25px'
                             placeholder='Select'
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='format-dropdown'
-                            labeltestID='format-list'
+                            testID='select-attribute'
+                            labeltestID='attribute'
                             selectedOption={attributes.find(option => option.value === fieldSettingParameters?.attribute_data_lfp)}
                             handleOptionClick={handleAttributeClick}
                             isDropdownOpen={isAttributeDropdownOpen}
@@ -294,8 +294,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                                     top='50px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                    testID='serviceRecord-dropdown'
-                                    labeltestID='serviceRecord-list'
+                                    testID='select-service-record'
+                                    labeltestID='service-record'
                                     selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters?.service_record_lfp)}
                                     handleOptionClick={handleServiceClick}
                                     isDropdownOpen={isServiceRecordDropdownOpen}
