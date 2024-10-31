@@ -23,7 +23,6 @@ const TextBoxField = ({
     setConditionalValues,
     sections
 }) => {
-
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':

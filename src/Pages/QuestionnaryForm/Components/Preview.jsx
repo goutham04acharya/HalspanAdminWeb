@@ -15,7 +15,6 @@ import NumberField from './Fields/Number/NumberField.jsx';
 import AssetLocationField from './Fields/AssetLocation/AssetLocationField.jsx';
 import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
-// import axios from 'axios';  
 import useApi from '../../../services/CustomHook/useApi.js';
 import TagScanField from './Fields/TagScan/TagScanField.jsx';
 
@@ -32,8 +31,11 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(false); // Add a loading state  
     const [conditionalValues, setConditionalValues] = useState({});
-    console.log(conditionalValues, 'conditionalValues')
-    console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
+    const [complianceLogic, setComplianceLogic] = useState([]);
+    const [showComplianceScreen, setShowComplianceScreen] = useState(false);
+    const [isLastPage, setIsLastPage] = useState(false);
+    console.log(value, 'values')
+    // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -60,52 +62,68 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         const result = await handleConditionalLogic(data);
         setConditionalValues(result);
     };
-
-    // Call updateConditionalValues with the data object
-
-    console.log(conditionalValues, 'conditonal logic')
     useEffect(() => {
         const fetchSections = async () => {
-            setLoading(true); // Set loading to true when API call starts   
+            setLoading(true);
             try {
-                const response1 = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-                const response2 = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+                const [layoutResponse, questionnaireResponse] = await Promise.all([
+                    getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`),
+                    getAPI(`questionnaires/${questionnaire_id}/${version_number}`)
+                ]);
 
-                // Get sections from questionnaire API  
-                const questionnaireSections = response2?.data?.data?.sections;
-                console.log(questionnaireSections, 'questionnaireSections')
+                const questionnaireSections = questionnaireResponse?.data?.data?.sections;
+                const layoutSections = layoutResponse?.data?.data?.sections;
+                const complianceRules = layoutResponse?.data?.data?.compliance_logic;
 
-                // Get sections from layout API  
-                const layoutSections = response1?.data?.data?.sections;
-                console.log(layoutSections, 'layoutSections')
+                // Store compliance logic
+                setComplianceLogic(complianceRules || []);
 
-                // Create a map to store section IDs from layout API  
+                // ... rest of the section organization logic remains the same
                 const sectionIdMap = {};
                 layoutSections.forEach((section) => {
                     sectionIdMap[section.id] = section.index;
                 });
-                console.log(sectionIdMap, 'sectionIdMap')
 
-                // Reorganize sections from questionnaire API based on section IDs from layout API  
                 const reorganizedSections = questionnaireSections.sort((a, b) => {
                     return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
                 });
-                console.log(reorganizedSections, 'reorganizedSections')
 
                 setSections(reorganizedSections);
-                // setConditionalValues(handleConditionalLogic(reorganizedSections));
                 updateConditionalValues(reorganizedSections);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false); // Set loading to false when API call ends   
+                setLoading(false);
             }
         };
         fetchSections();
-
     }, [questionnaire_id, version_number]);
 
-
+    const evaluateComplianceLogic = () => {
+        return complianceLogic.map(rule => {
+            try {
+                debugger
+                console.log(rule, 'rule')
+                // {
+                //     "label": "Status 1",
+                //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
+                // }
+                const result = eval(rule?.default_content);
+                console.log(result, 'result kkk');
+                // v1 result kkk
+                const conditionResult = eval(rule?.default_content);
+                console.log(conditionResult, 'conditional result kkkkk')
+                // v1 conditional result kkkkk
+                return {
+                    label: rule?.label,
+                    result: result?.toString(),
+                    tookIfPath: conditionResult
+                };
+            } catch (error) {
+                console.log("Error while evaluating")
+            }
+        });
+    };
 
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
@@ -181,20 +199,30 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 preview_gpsfield: errors,
             }));
         } else {
-            if (currentPage < sections[currentSection].pages.length - 1) {
+            const isLastSection = currentSection === sections.length - 1;
+            const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
+
+            if (isLastSection && isLastPageInSection) {
+                setShowComplianceScreen(true);
+                setIsLastPage(true);
+            } else if (currentPage < sections[currentSection].pages.length - 1) {
                 setCurrentPage(currentPage + 1);
                 setTotalPagesNavigated(totalPagesNavigated + 1);
-            } else if (currentSection < sections.length - 1) {
+            } else {
                 setCurrentSection(currentSection + 1);
                 setCurrentPage(0);
                 setTotalPagesNavigated(totalPagesNavigated + 1);
-            } else {
-                // Do nothing if you're on the last page of the last section  
             }
         }
     };
 
     const handleBackClick = () => {
+        if (showComplianceScreen) {
+            setShowComplianceScreen(false);
+            setIsLastPage(false);
+            return;
+        }
+
         if (currentPage > 0) {
             setCurrentPage(currentPage - 1);
             setTotalPagesNavigated(totalPagesNavigated - 1);
@@ -204,7 +232,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
-
     const renderQuestion = (question) => {
         // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
 
@@ -225,7 +252,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'choiceboxfield':
                 return <ChoiceBoxField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'dateTimefield':
-                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} choiceValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
                 return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
             case 'assetLocationfield':
@@ -246,6 +273,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
+    const isLastSectionAndPage = () => {
+        return currentSection === sections.length - 1 &&
+            currentPage === sections[currentSection]?.pages.length - 1;
+    };
 
     useEffect(() => {
         console.log(sections, 'sec')
@@ -300,6 +331,30 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         <div className="flex justify-center items-center h-full">
                             <BeatLoader color="#2B333B" size='20px' />
                         </div>
+                    ) : showComplianceScreen ? (
+                        <div className="p-4">
+                            <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
+                            {evaluateComplianceLogic().map((result, index) => (
+                                <div
+                                    key={index}
+                                    className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
+                                        <span
+                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result?.tookIfPath
+                                                ? 'bg-[#4CD95A] text-[#2B333B] border '
+                                                : 'bg-[#FA303B] text-white border '
+                                                }`}
+                                        >
+                                            <img src={result?.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
+                                            {result?.result}
+                                        </span>
+                                    </div>
+
+                                </div>
+                            ))}
+                        </div>
                     ) : (
                         <div>
                             <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
@@ -318,24 +373,23 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
                                     console.log(list, 'currentPage');
-
                                     if (list?.conditional_logic !== '') {
-                                        // Check if the conditional logic string contains "new Date()"
-                                        if (list?.conditional_logic.includes("new Date()")) {
-                                            // Replace "new Date()" with the correctly formatted date string in dd/mm/yyyy format
-                                            const convertedConditionalLogic = list?.conditional_logic.replace(
-                                                /new Date\(\)/g,
-                                                `"${new Date().toLocaleDateString("en-GB")}"`
-                                            );
-                                            console.log(convertedConditionalLogic, 'converted logic');
-
-                                            if (!eval(convertedConditionalLogic)) {
-                                                return null;
+                                        if (list?.conditional_logic.includes("new Date(")) {
+                                            try {
+                                                if (!eval(list?.conditional_logic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error, 'l')
                                             }
+
                                         } else {
-                                            // Directly evaluate conditional logic if it does not contain "new Date()"
-                                            if (!eval(list?.conditional_logic)) {
-                                                return null;
+                                            try {
+                                                if (!eval(list?.conditional_logic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error, 'j')
                                             }
                                         }
                                     }
@@ -354,7 +408,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     )}
                 </div>
                 <div className='mt-5 flex items-center justify-between'>
-                    {!showLabel ? <button type='button' data-testid="back" className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={handleBackClick}>
+                    {!showLabel ? <button type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
@@ -379,9 +433,16 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 )}
                             </label>
                         </>}
-                    <button type='button' data-testid="next" onClick={handleNextClick} className={`w-[131px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`}>
-                        Next
-                    </button>
+                    {!showComplianceScreen && (
+                        <button
+                            type='button'
+                            data-testid="next"
+                            className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`}
+                            onClick={handleNextClick}
+                        >
+                            {isLastSectionAndPage() ? 'Submit' : 'Next'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
