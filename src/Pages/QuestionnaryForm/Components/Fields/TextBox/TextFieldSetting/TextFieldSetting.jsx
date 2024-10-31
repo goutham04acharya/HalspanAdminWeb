@@ -305,7 +305,8 @@ function TestFieldSetting({
             />
           </div>
           {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true)
-            && <><div className='flex flex-col justify-start mt-7'>
+            && <>
+            <div className='flex flex-col justify-start mt-7'>
               <label
                 // htmlFor={placeholderContentId}
                 className='font-semibold text-base text-[#2B333B]'>Regular Expression
@@ -379,7 +380,7 @@ function TestFieldSetting({
             )}
           </div>
           {/* OptionsComponent added here */}
-          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} handleOptionClick={handleOptionClick} isDropdownOpen={isDropdownOpen} setDropdownOpen={setDropdownOpen}/>
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'

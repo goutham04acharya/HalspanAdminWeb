@@ -549,7 +549,9 @@ const QuestionnaryForm = () => {
                     options: question?.options,
                     default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
-                    default_conditional_logic: question?.default_conditional_logic
+                    default_conditional_logic: question?.default_conditional_logic,
+                    attribute_data_lfp:question?.attribute_data_lfp,
+                    service_record_lfp:question?.service_record_lfp,
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -680,6 +682,8 @@ const QuestionnaryForm = () => {
                                 file_size: fieldSettingParams[question.question_id].fileSize,
                                 file_type: fieldSettingParams[question.question_id].fileType,
                             },
+                            attribute_data_lfp:fieldSettingParams[question.question_id].attribute_data_lfp,
+                            service_record_lfp:fieldSettingParams[question.question_id].service_record_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1089,7 +1093,6 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
-    console.log(selectedSectionData, 'here')
     return (
         <>
             {pageLoading ? (

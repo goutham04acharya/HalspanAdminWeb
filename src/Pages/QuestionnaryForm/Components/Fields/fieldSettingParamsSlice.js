@@ -153,6 +153,8 @@ const fieldSettingParamsSlice = createSlice({
                     file_type: item?.asset_extras?.fileType,
                     conditional_logic: item?.conditional_logic,
                     default_conditional_logic: item?.default_conditional_logic,
+                    service_record_lfp: item?.service_record_lfp,
+                    attribute_data_lfp:item?.attribute_data_lfp,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };

@@ -1,11 +1,10 @@
 // import React, { useEffect, useState } from 'react';
-// import { setNewComponent } from '../../../fieldSettingParamsSlice';
 // import { useDispatch, useSelector } from 'react-redux';
 // import {setShouldAutoSave} from '../../../../QuestionnaryFormSlice'
 
 // function OptionsComponent({ selectedQuestionId }) {
 
-//     const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
 //     // Get the current field settings from Redux
 //     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -137,7 +136,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
 
-function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOptionClick, isDropdownOpen, setDropdownOpen }) {
+function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -160,14 +159,19 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
     };
 
     const [toggleStates, setToggleStates] = useState({});
-    const [dropdownValue, setDropdownValue] = useState('');
     const [activeTab, setActiveTab] = useState('attributeData');
-    const [selectedServiceRecord, setSelectedServiceRecord] = useState(null);
-    const [selectedQuestionnaire, setSelectedQuestionnaire] = useState(null);
-    const [selectedField, setSelectedField] = useState(null);
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
-    const [isQuestionnaireListDropdownOpen, setQuestionnaireListDropdownOpen] = useState(false);
-    const [isFieldListDropdownOpen, setFieldListDropdownOpen] = useState(false);
+    const [isAttributeDropdownOpen, setIsAttributeDropdownOpen] = useState(false);
+
+    const handleServiceClick = (option) => {
+        dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
+        setIsAttributeDropdownOpen(false);
+    };
+
+    const handleAttributeClick = (option) => {
+        dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
+        setServiceRecordDropdownOpen(false);
+    };
 
     const attributes = [
         { value: 'Height', label: 'Height' },
@@ -179,18 +183,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
         { value: 'Last Inspection', label: 'Last Inspection' },
         { value: 'Maintenance Log', label: 'Maintenance Log' },
         { value: 'Repair History', label: 'Repair History' },
-    ];
-
-    const questionnaireOptions = [
-        { value: 'Simon Door Questionnaire', label: 'Simon Door Questionnaire' },
-        { value: 'Safety Check', label: 'Safety Check' },
-        { value: 'Quality Assurance', label: 'Quality Assurance' },
-    ];
-
-    const fieldOptions = [
-        { value: 'Sites', label: 'Sites' },
-        { value: 'Equipment', label: 'Equipment' },
-        { value: 'Personnel', label: 'Personnel' },
     ];
 
     useEffect(() => {
@@ -280,15 +272,15 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
                     {activeTab === 'attributeData' && (
                         <InputWithDropDown
                             id='format'
-                            top='30px'
+                            top='25px'
                             placeholder='Select'
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='format-dropdown'
                             labeltestID='format-list'
-                            selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attributes)}
-                            handleOptionClick={handleOptionClick}
-                            isDropdownOpen={isDropdownOpen}
-                            setDropdownOpen={setDropdownOpen}
+                            selectedOption={attributes.find(option => option.value === fieldSettingParameters?.attribute_data_lfp)}
+                            handleOptionClick={handleAttributeClick}
+                            isDropdownOpen={isAttributeDropdownOpen}
+                            setDropdownOpen={setIsAttributeDropdownOpen}
                             options={attributes}
                         />
                     )}
@@ -299,56 +291,18 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, handleOp
                                     label='Service Record List'
                                     labelStyle='font-semibold text-[#2B333B] text-base'
                                     id='serviceRecord'
-                                    top='55px'
+                                    top='50px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                                     testID='serviceRecord-dropdown'
                                     labeltestID='serviceRecord-list'
-                                    selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.serviceRecordOptions)}
-                                    handleOptionClick={handleOptionClick}
+                                    selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters?.service_record_lfp)}
+                                    handleOptionClick={handleServiceClick}
                                     isDropdownOpen={isServiceRecordDropdownOpen}
                                     setDropdownOpen={setServiceRecordDropdownOpen}
                                     options={serviceRecordOptions}
                                 />
                             </div>
-                            {serviceRecordOptions.value && (
-                                <div className='mt-2'>
-                                    <InputWithDropDown
-                                        id='questionnaireList'
-                                        label='Questionnaire List'
-                                        labelStyle='font-semibold text-[#2B333B] text-base'
-                                        top='55px'
-                                        placeholder='Select'
-                                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                        testID='questionnaireList-dropdown'
-                                        labeltestID='questionnaireList-list'
-                                        selectedOption={questionnaireOptions.find(option => questionnaireOptions.value === fieldSettingParameters?.questionnaireOptions)}
-                                        handleOptionClick={handleOptionClick}
-                                        isDropdownOpen={isQuestionnaireListDropdownOpen}
-                                        setDropdownOpen={setQuestionnaireListDropdownOpen}
-                                        options={questionnaireOptions}
-                                    />
-                                </div>
-                            )}
-                            {questionnaireOptions.value && (
-                                <div>
-                                    <InputWithDropDown
-                                        id='fieldList'
-                                        top='55px'
-                                        label='Field List'
-                                        labelStyle='font-semibold text-[#2B333B] text-base'
-                                        placeholder='Select'
-                                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                        testID='fieldList-dropdown'
-                                        labeltestID='fieldList-list'
-                                        selectedOption={fieldOptions.find(option => fieldOptions.value === fieldSettingParameters?.fieldOptions)}
-                                        handleOptionClick={handleOptionClick}
-                                        isDropdownOpen={isFieldListDropdownOpen}
-                                        setDropdownOpen={setFieldListDropdownOpen}
-                                        options={fieldOptions}
-                                    />
-                                </div>
-                            )}
                         </div>
                     )}
                 </div>
