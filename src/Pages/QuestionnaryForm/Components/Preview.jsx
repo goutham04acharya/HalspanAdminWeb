@@ -509,6 +509,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     {!showComplianceScreen && (
                         <button
                             type='button'
+                            data-testid="next"
                             className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`}
                             onClick={handleNextClick}
                         >
