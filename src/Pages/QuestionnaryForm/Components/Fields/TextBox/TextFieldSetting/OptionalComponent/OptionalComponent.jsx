@@ -3,6 +3,7 @@ import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
+import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
 
@@ -30,15 +31,19 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
     const [isAttributeDropdownOpen, setIsAttributeDropdownOpen] = useState(false);
+    const [attributeValue, setAttributeValue] = useState('')
+    const [serviceValue, setServiceValue] = useState('')
 
     const handleServiceClick = (option) => {
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
-        setIsAttributeDropdownOpen(false);
+        setServiceRecordDropdownOpen(false);
+        setServiceValue(option);
     };
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
-        setServiceRecordDropdownOpen(false);
+        setIsAttributeDropdownOpen(false);
+        setAttributeValue(option)
     };
 
     const attributes = [
@@ -139,14 +144,29 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                         </p>
                     </div>
                     {activeTab === 'attributeData' && (
-                        <InputWithDropDown
+                    //      <InfinateDropdown
+                    //      assets
+                    //      label='Building'
+                    //      testID='location'
+                    //      labeltestID='building'
+                    //      type={type}
+                    //      id='Location'
+                    //      isDropdownOpen={isLocationDropdownOpen}
+                    //      setDropdownOpen={setIsLocationDropdownOpen}
+                    //      selectedOption={selectedLocation}
+                    //      options={locationOptions.filter(location => location.site === selectedSite.value)}
+                    //      className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
+                    //      placeholder='Building'
+                    //      handleOptionClick={(locationId) => handleLocationChange(locationId)}
+                    //  />
+                        <InfinateDropdown
                             id='format'
                             top='25px'
                             placeholder='Select'
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-attribute'
                             labeltestID='attribute'
-                            selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attribute_data_lfp)}
+                            selectedOption={attributeValue}
                             handleOptionClick={handleAttributeClick}
                             isDropdownOpen={isAttributeDropdownOpen}
                             setDropdownOpen={setIsAttributeDropdownOpen}
@@ -154,7 +174,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                         />
                     )}
                     {activeTab === 'serviceRecord' && (
-                        <InputWithDropDown
+                        <InfinateDropdown
                             label='Service Record List'
                             labelStyle='font-semibold text-[#2B333B] text-base'
                             id='serviceRecord'
@@ -163,7 +183,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-service-record'
                             labeltestID='service-record'
-                            selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.service_record_lfp)}
+                            selectedOption={serviceValue}
                             handleOptionClick={handleServiceClick}
                             isDropdownOpen={isServiceRecordDropdownOpen}
                             setDropdownOpen={setServiceRecordDropdownOpen}

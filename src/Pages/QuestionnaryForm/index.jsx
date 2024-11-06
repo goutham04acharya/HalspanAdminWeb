@@ -35,7 +35,7 @@ import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/Complian
 
 
 const QuestionnaryForm = () => {
-    const { questionnaire_id, version_number } = useParams();
+    const { public_name, questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
@@ -1137,7 +1137,6 @@ const QuestionnaryForm = () => {
                                                                         ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
-
                                                                 className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
@@ -1239,7 +1238,7 @@ const QuestionnaryForm = () => {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${questionnaire_id}/${version_number}`)}>
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`)}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
                                 Cancel
                             </button>

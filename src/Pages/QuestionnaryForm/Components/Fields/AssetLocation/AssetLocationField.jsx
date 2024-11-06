@@ -234,7 +234,6 @@ const AssetLocationField = ({
         setSelectedLocation(null);
         setSelectedLevel(null);
     };
-    console.log(selectedSite, 'ffffffffff')
     const handleLocationChange = (locationId) => {
         setSelectedLocation(prev => {
             if (prev === locationId) {

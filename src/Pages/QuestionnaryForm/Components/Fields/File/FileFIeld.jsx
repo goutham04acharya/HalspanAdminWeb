@@ -38,9 +38,7 @@ function FileField({
             ...prev,
             [question?.question_id]: newFilesList
         }));
-        console.log(fileState, 'ghghhggghghghghg')
         const updatedFileCount = newFilesList.length;
-        console.log(updatedFileCount, 'ffille')
         // Check if the minimum required number of files has been uploaded
         if (updatedFileCount >= (question?.field_range?.min || 0)) {
             setValue((prev) => ({
@@ -70,14 +68,11 @@ function FileField({
             }
         }));
 
-        console.log(newFilesList.length, 'newFilesList');
-        console.log(updatedFileCount, 'updatedFileCount');
     };
 
 
     const handleFileRemove = (newFiles, fileNameToRemove) => {
         // debugger
-        console.log(fileNameToRemove, 'file name in file upload')
         // setFileState((prev) => {
         //     // Re-check if the minimum number of files is still met after removal
         //     if (newFiles.length >= (question?.field_range?.min || 0)) {
@@ -156,7 +151,6 @@ function FileField({
         }));
     };
 
-    console.log(fileState, 'filestatejdjjdj')
     return (
         <div>
             <label

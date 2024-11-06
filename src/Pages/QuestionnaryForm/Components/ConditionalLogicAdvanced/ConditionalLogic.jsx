@@ -766,7 +766,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = expression
             // Check for the "includes" method being used without a parameter
             let methods = [
-                "AddDays", "SubtractDays", "Date", "includes"
+                "AddDays", "SubtractDays", "includes"
             ]
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
