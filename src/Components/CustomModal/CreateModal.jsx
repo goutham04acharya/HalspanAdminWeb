@@ -27,7 +27,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                     validationError={errors?.name}
                 />
                 <InputTextarea
-                    className='h-[160px] w-full mt-2.5'
+                    className='h-[160px] w-full mt-2.5 px-2.5'
                     label='Choices (Comma separated)'
                     htmlFor='choices'
                     id='choices'
