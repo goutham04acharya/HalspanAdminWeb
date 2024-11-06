@@ -26,7 +26,6 @@ function PhotoField({ label,
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename  
-    console.log(fileState, 'file state state')
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (!files.length) return; // Exit if no files are selected
@@ -36,7 +35,6 @@ function PhotoField({ label,
             ...(fileState[question?.question_id] || []), // Existing files
             ...files.map(file => file) // New files
         ];
-        console.log(newFilesList, 'new file list')
         // Update fileName to display all file names as a comma-separated list
         setFileName(newFilesList.map(file => file.name).join(', '));
 
@@ -79,16 +77,10 @@ function PhotoField({ label,
             }
         }));
 
-        console.log(newFilesList, 'Updated File List');
-        console.log(updatedFileCount, 'Updated File Count');
     };
-
-
-
 
     const handleImageRemove = (newImages, fileNameToRemove) => {
 
-        console.log(fileNameToRemove, 'file name to remove')
         // setFileState((prev) => {
         //     // Directly filter the files array for the current question_id
         //     const updatedFiles = (prev[question?.question_id] || [])?.filter(
@@ -184,7 +176,6 @@ function PhotoField({ label,
             ...prev,
             [question?.question_id]: value || false
         }));
-        console.log(value, 'am checking e')
     }
 
     const handleBlur = (e) => {
@@ -195,7 +186,6 @@ function PhotoField({ label,
             }));
         }
     }
-    console.log(fileState, 'ddddddkdkdkkdkdkdk')
 
     return (
         <div>

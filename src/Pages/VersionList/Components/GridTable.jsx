@@ -15,7 +15,6 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
             [version_number]: !dropdownsOpen[version_number],
         });
     };
-
     const handleOptionClick = async (status, questionnaire_id, version_number) => {
         setLoading(true)
         const previousPublishedVersion = versionList?.data?.items.find(
@@ -56,12 +55,12 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 });
                 return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
             });
-            
+
             console.log('Status updated');
         } catch (error) {
             console.error('Error updating status:', error);
         }
-        
+
         // Close dropdown after selecting an option
         setDropdownsOpen((prev) => ({
             ...prev,
@@ -115,7 +114,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                             <React.Fragment key={index}>
                                 <div className='rounded-[10px] mt-[10px] flex w-full relative' ref={el => dropdownRefs.current[index] = el}>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
-                                        <a data-testid={`version-${index}`} onClick={()=>navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
+                                        <a data-testid={`version-${index}`} onClick={() => navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
                                     </div>
                                     <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
                                         {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
@@ -132,9 +131,9 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                             <div>
                                                 {(versionListInfo?.status === 'Draft' || versionListInfo?.status === 'Testing') ? (
                                                     <div className='flex w-[164px] h-[36px] border border-[#AEB3B7] rounded px-[18px] bg-white items-center cursor-pointer'
-                                                    onClick={() => handleDropdownClick(versionListInfo?.version_number)}>
-                                                        
-                                                        {loading ? <Shimmer column={1} row={1} dropdown /> :<input
+                                                        onClick={() => handleDropdownClick(versionListInfo?.version_number)}>
+
+                                                        {loading ? <Shimmer column={1} row={1} dropdown /> : <input
                                                             type="text"
                                                             data-testid="status"
                                                             id={versionListInfo?.version_number}
