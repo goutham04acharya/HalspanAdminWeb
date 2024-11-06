@@ -1,6 +1,8 @@
 import React from 'react'
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { useDispatch } from 'react-redux';
+import { setFieldEditable } from '../../defaultContentPreviewSlice';
 
 const TextBoxField = ({
     label,
@@ -21,8 +23,14 @@ const TextBoxField = ({
     setIsFormatError,
     setValue,
     setConditionalValues,
-    sections
+    sections,
+    isEditable,
+    onStartEdit,
+    // setFieldEditable,
+    setFieldValue,
+    values,
 }) => {
+    const dispatch = useDispatch();
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -39,17 +47,18 @@ const TextBoxField = ({
     };
 
     const handleInputChange = (e) => {
-
+        debugger
+        console.log(question?.question_id, 'question id question')
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_textboxfield: {
                 ...prevErrors.preview_textboxfield,
-                [question.question_id]: null,
+                [question_id]: null,
             },
         }))
         const newValue = e.target.value;
-        const format = question.format;
-        const regex = question.regular_expression;
+        const format = question?.format_error;
+        const regex = question?.regular_expression;
         const { section_name, page_name, label } = findSectionAndPageName(sections, question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -61,7 +70,17 @@ const TextBoxField = ({
                 }
             }
         }));
-        
+        // if (isEditable) {
+        //     onStartEdit();
+        // }
+        let obj = {
+            'fieldId': question_id,
+            isEditable: true
+        }
+        console.log(obj,'my object')
+
+        dispatch(setFieldEditable(obj));
+        console.log(newValue,'my new value')
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
@@ -100,7 +119,7 @@ const TextBoxField = ({
     function handleFunction() {
 
     }
-
+    console.log('recieved', values)
 
     return (
         <div className=''>
@@ -118,10 +137,10 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={value}
+                    value={values || ''}
                     className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
-                    onClick={preview ? handleFunction() : () => handleChange(fieldSettingParameters)}
+                    onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
                     // onBlur={(e) => handleInputChange(e)}
                     onKeyDown={(e) => {
                         const format = question.format;
@@ -172,10 +191,10 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={value ? value : ''}
+                    value={values || ''}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
-                    onClick={preview ? '' : () => handleChange(fieldSettingParameters)}
+                    onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
                     // onBlur={(e) => handleInputChange(e)}
                     onKeyDown={(e) => {
                         const format = question.format;
