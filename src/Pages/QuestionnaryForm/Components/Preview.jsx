@@ -335,7 +335,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                     // Check if default_conditional_logic is not empty
                     if (!fieldStatus[question?.question_id]) {
-                        debugger
+                        // debugger
                         // debugger
                         if (default_conditional_logic) {
                             try {
@@ -396,10 +396,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
-                <div>
-                    {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
-                    <Image src={src} className={`${className} mx-auto`} />
-                </div>
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollHide w-full bg-slate-100 rounded-md'>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
@@ -431,7 +427,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         </div>
                     ) : (
                         <div>
-                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
+                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-3 mb-3">
                                 {sections[currentSection]?.section_name}
                             </p>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">

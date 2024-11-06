@@ -23,6 +23,10 @@ const Sections = ({ sectionData,
   sections,
   setSections,
   handleAutoSave,
+  selectedSection,
+  setSelectedSection,
+  selectedPage,
+  setSelectedPage
 }) => {
 
   const sectionRefs = useRef([]);
@@ -30,7 +34,8 @@ const Sections = ({ sectionData,
   // const { onMouseDown, onTouchStart } = dragHandleProps;
 
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
-    
+
+    console.log(pageData, 'pageData')
     console.log(pageIndex, 'pageIndex')
     dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
     dispatch(setSelectedSectionData(pageData));
@@ -48,6 +53,7 @@ const Sections = ({ sectionData,
   // Save expanded sections to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
+
   }, [expandedSections]);
 
 
@@ -128,6 +134,9 @@ const Sections = ({ sectionData,
                               ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                               : "none", // Fallback in case transform is null/undefined
                           }}
+                          onClick={() => {
+                            setSelectedPage(pageIndex)
+                          }}
                           className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
                         >
                           <div className="flex justify-between">
@@ -155,7 +164,7 @@ const Sections = ({ sectionData,
                                 data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
                                 className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
                                 onClick={() => {
-                                 
+
                                   handleDeletePageModal(sectionIndex, pageIndex, pageData),
                                     dispatch(setShowPageDeleteModal(true));
                                 }}
