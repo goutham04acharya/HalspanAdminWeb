@@ -8,25 +8,60 @@ import Questionnaries from '../Pages/QuestionnariesList/index.jsx';
 import QuestionnaryForm from '../Pages/QuestionnaryForm/index.jsx';
 import LookupDataset from '../Pages/LookupDataset/index.jsx';
 import VersionList from '../Pages/VersionList/VersionList.jsx';
-import { auth0ClientID } from '../config/index.js';
 import { useAuth0 } from '@auth0/auth0-react';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
-  const { logout } = useAuth0();
+  const { logout, getAccessTokenSilently, getIdTokenClaims } = useAuth0();
+ 
+  /**
+   * The function `decodeJWT` decodes a JSON Web Token (JWT) by extracting the payload, base64 decoding
+   * it, and parsing it as JSON.
+   * @returns The function `decodeJWT` decodes a JSON Web Token (JWT) by extracting the payload from
+   * the token, base64 decoding it, and then parsing it as JSON. The decoded JSON payload is returned
+   * as the output of the function.
+   */
+  function decodeJWT(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  }
+
   useEffect(() => {
-    let body = localStorage.getItem(`@@auth0spajs@@::${auth0ClientID}::default::openid profile email`);
-    body = JSON.parse(body)
-    if (body) {
-      const expiryTimestamp = body.expiresAt * 1000; // Multiply by 1000 to convert to milliseconds
-      const currentTime = new Date().getTime(); // Get current time in milliseconds
+    const checkAuthentication = async () => {
+      //check if token is available
+      if (isAuthenticated) {
+        try {
+          // Attempt to token
+          const tokenClaims = await getIdTokenClaims();
+          const accessToken = tokenClaims.__raw;
 
-      if (currentTime >= expiryTimestamp) {
-        // If current time is greater than or equal to the expiry time, logout
-        logout({ logoutParams: { returnTo: window.location.origin } })
+          //decoding token
+          const decodeToken = decodeJWT(accessToken);
+          const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
+          // checking the expiry of the token 
+          if (decodeToken.exp < currentTime) {
+            logout({ returnTo: window.location.origin });
+          }
+        } catch (error) {
+          if (error.error === 'login_required' || error.error === 'consent_required') {
+            console.log("User needs to log in or consent.");
+
+          } else {
+            // Handle other errors (e.g., token refresh failure)
+            console.error("Error getting access token:", error);
+          }
+        }
+      } else {
+        console.log("User is not authenticated.");
       }
-    }
+    };
 
-  }, [])
+    checkAuthentication();
+  }, [isAuthenticated, getAccessTokenSilently, logout]);
   return (
     <>
       <AuthRedirect isAuthenticated={isAuthenticated} isLoading={isLoading} />
