@@ -152,6 +152,7 @@ Feature: Halspan - Admin - Preview the Questionnaire
     Then I should read a message stating that "This is a mandatory field"
     Then I validate the data entered exists in the mobile preview for section 1 page 1
     When I enter invalid text for custom regular expression for section 1 page 1 question 1
+    When I click the next button
     Then I should read a message stating that "Invalid PAN format"
     When I enter the text in textbox for section 1 page 1 question 1
     When I select the choice for section 1 page 1 question 2

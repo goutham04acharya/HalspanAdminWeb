@@ -17,8 +17,13 @@ import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
 import useApi from '../../../services/CustomHook/useApi.js';
 import TagScanField from './Fields/TagScan/TagScanField.jsx';
+import {
+    resetFields,
+    setFieldEditable,
+} from './defaultContentPreviewSlice.js';
+import { useSelector } from 'react-redux';
 
-function PreviewModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
+function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
 
     const modalRef = useRef();
     const { getAPI } = useApi();
@@ -35,6 +40,8 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
     console.log(value, 'values')
+    const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
+    // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
@@ -101,26 +108,25 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
 
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
-            try {
-                console.log(rule, 'rule')
-                // {
-                //     "label": "Status 1",
-                //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
-                // }
-                const result = eval(rule?.default_content);
-                console.log(result, 'result kkk');
-                // v1 result kkk
-                const conditionResult = eval(rule?.default_content);
-                console.log(conditionResult, 'conditional result kkkkk')
-                // v1 conditional result kkkkk
-                return {
-                    label: rule?.label,
-                    result: result?.toString(),
-                    tookIfPath: conditionResult
-                };
-            } catch (error) {
-                console.log("Error while evaluating")
-            }
+
+            // debugger
+            console.log(rule, 'rule')
+            // {
+            //     "label": "Status 1",
+            //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
+            // }
+            const result = eval(rule?.default_content);
+            console.log(result, 'result kkk');
+            // v1 result kkk
+            const conditionResult = eval(rule?.default_content);
+            console.log(conditionResult, 'conditional result kkkkk')
+            // v1 conditional result kkkkk
+            return {
+                label: rule?.label,
+                result: result?.toString(),
+                tookIfPath: conditionResult
+            };
+
         });
     };
 
@@ -231,15 +237,46 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
-    const renderQuestion = (question) => {
-        // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
+    console.log(fieldStatus, 'fieldStaus')
 
-        if (!question) {
-            return <p>No question data available.</p>;
-        }
-        switch (question.component_type) {
+    console.log(value, 'my value')
+
+    const renderQuestion = (question) => {
+        // debugger
+        // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
+        const commonProps = {
+            preview: true,
+            setValidationErrors,
+            validationErrors,
+            // onStartEdit: () => handleFieldEdit(question.question_id),
+            // value: fieldValue,
+            sections: sections[currentSection],
+            setConditionalValues,
+            conditionalValues,
+            // isEditable
+        };
+
+        // if (!question) {
+        //     return <p>No question data available.</p>;
+        // }
+        switch (question?.component_type) {
             case 'textboxfield':
-                return <TextBoxField sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setIsFormatError={setIsFormatError} id={question?.question_id} testId={`preview`} preview value={value[question?.question_id]} setValue={setValue} question_id={question?.question_id} question={question} setValidationErrors={setValidationErrors} validationErrors={validationErrors} />;
+                return <TextBoxField
+                    sections={sections[currentSection]}
+                    validationErrors={validationErrors}
+                    setValidationErrors={setValidationErrors}
+                    question={question}
+                    preview
+                    setConditionalValues={setConditionalValues}
+                    conditionalValues={setConditionalValues}
+                    setIsFormatError={setIsFormatError}
+                    question_id={question?.question_id}
+                    testId="preview"
+                    setValue={setValue}
+                    values={value[question?.question_id]}
+                // setFieldEditable={setFieldEditable}
+                // setFieldValue={setFieldValue}
+                />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'gpsfield':
@@ -249,7 +286,21 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             case 'filefield':
                 return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
-                return <ChoiceBoxField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} fieldSettingParameters={fieldSettingParameters[question?.question_id]} choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <ChoiceBoxField
+                sections={sections[currentSection]}
+                validationErrors={validationErrors}
+                setValidationErrors={setValidationErrors}
+                question={question}
+                preview
+                setConditionalValues={setConditionalValues}
+                conditionalValues={setConditionalValues}
+                setIsFormatError={setIsFormatError}
+                question_id={question?.question_id}
+                testId="preview"
+                setValue={setValue}
+                choiceValue={value[question?.question_id]}
+                fieldSettingParameters={question}
+                />
             case 'dateTimefield':
                 return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
             case 'numberfield':
@@ -285,47 +336,69 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                     const { default_conditional_logic, default_content } = question;
 
                     // Check if default_conditional_logic is not empty
-                    if (default_conditional_logic) {
-                        try {
-                            // Evaluate the string expression
-                            if (default_content === "advance") {
-                                const result = eval(default_conditional_logic);
-                                console.log(`Evaluation of "${default_conditional_logic}":`, result);
-                                setValue((prev) => ({
-                                    ...prev,
-                                    [question.question_id]: result
+                    if (!fieldStatus[question?.question_id]) {
+                        // debugger
+                        // debugger
+                        if (default_conditional_logic) {
+                            try {
+                                // Evaluate the string expression
+                                if (default_content === "advance") {
+                                    const result = eval(default_conditional_logic);
+                                    console.log(`Evaluation of "${default_conditional_logic}":`, result);
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        [question.question_id]: result
 
-                                }))
-                            } else {
-                                setValue((prev) => ({
-                                    ...prev,
-                                    [question.question_id]: default_conditional_logic
+                                    }))
+                                } else {
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        [question.question_id]: default_conditional_logic
 
-                                }))
+                                    }))
+                                }
+
+                            } catch (error) {
+                                // Log the error if eval fails
+                                console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
                             }
-
-                        } catch (error) {
-                            // Log the error if eval fails
-                            console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
                         }
                     }
                 });
             });
         });
     }, [conditionalValues])
+    const handleFieldEdit = (questionId) => {
+        dispatch(setFieldEditable({
+            fieldId: questionId,
+            isEditable: false
+        }));
+    };
 
+    const handleClose = () => {
+        setModalOpen(false)
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_textboxfield: '',
+            preview_choiceboxfield: '',
+            preview_numberfield: '',
+            preview_datetimefield: '',
+            preview_photofield: '',
+            preview_filefield: '',
+            preview_videofield: '',
+            preview_gpsfield: '',
+        }));
+        console.log('first i am here')
+        dispatch(resetFields())
+    }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
-                <img src='/Images/close-preview.svg' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => dispatch(setModalOpen(false))}></img>
+                <img src='/Images/close-preview.svg' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
-            <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
+            <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
-                <div>
-                    {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
-                    <Image src={src} className={`${className} mx-auto`} />
-                </div>
-                <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollBar w-full bg-slate-100 rounded-md'>
+                <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollHide w-full bg-slate-100 rounded-md'>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
                             <BeatLoader color="#2B333B" size='20px' />
@@ -356,7 +429,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
                     ) : (
                         <div>
-                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-7 mb-3">
+                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-3 mb-3">
                                 {sections[currentSection]?.section_name}
                             </p>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
@@ -367,11 +440,10 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                 </div>
                             </div>
 
-                            <div className='bg-white p-[10px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
+                            <div className='bg-white text-[#2B333B] py-[10px] px-[30px] mt-16'>{sections[currentSection]?.pages[currentPage]?.page_name}</div>
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list, 'currentPage');
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
@@ -406,7 +478,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                         </div>
                     )}
                 </div>
-                <div className='mt-5 flex items-center justify-between'>
+                <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`} onClick={handleBackClick}>
                         Back
                     </button> :

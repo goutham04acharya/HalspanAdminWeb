@@ -22,7 +22,7 @@ const Questions = ({
     dragHandleProps,
 
 }) => {
-
+    
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
     const { index, selectedQuestionId } = item;
