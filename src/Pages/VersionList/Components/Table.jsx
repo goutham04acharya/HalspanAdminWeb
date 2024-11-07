@@ -80,7 +80,6 @@ function Table({
                 return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
             });
     
-            console.log('Status updated');
         } catch (error) {
             console.error('Error updating status:', error);
         }

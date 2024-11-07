@@ -39,10 +39,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
-    console.log(value, 'values')
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -105,22 +103,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         fetchSections();
     }, [questionnaire_id, version_number]);
 
-    // const evaluateComplianceLogic = () => {
-    //     return complianceLogic.map(rule => {
-    //         try {
-    //             const result = eval(rule?.default_content);
-    //             // v1 result kkk
-    //             const conditionResult = eval(rule?.default_content);
-    //             return {
-    //                 label: rule?.label,
-    //                 result: result?.toString(),
-    //                 tookIfPath: conditionResult
-    //             };
-    //         } catch (error) {
-    //             console.log("Error while evaluating")
-    //         }
-    //     });
-    // };
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
             // Get the condition part before the question mark
@@ -247,9 +229,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
-    console.log(fieldStatus, 'fieldStaus')
-
-    console.log(value, 'my value')
 
     const renderQuestion = (question) => {
         // debugger
@@ -397,7 +376,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_videofield: '',
             preview_gpsfield: '',
         }));
-        console.log('first i am here')
         dispatch(resetFields())
     }
     return (

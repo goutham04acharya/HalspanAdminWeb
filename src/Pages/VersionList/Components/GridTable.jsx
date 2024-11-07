@@ -56,7 +56,6 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
             });
 
-            console.log('Status updated');
         } catch (error) {
             console.error('Error updating status:', error);
         }

@@ -80,54 +80,6 @@ function PhotoField({ label,
 
     const handleImageRemove = (newImages, fileNameToRemove) => {
 
-        // setFileState((prev) => {
-        //     // Directly filter the files array for the current question_id
-        //     const updatedFiles = (prev[question?.question_id] || [])?.filter(
-        //         (fileName) => fileName !== fileNameToRemove
-        //     ) ;
-        //     // const updatedFiles = (prev[question?.question_id] || []).filter(
-        //     //     (fileName) => fileName !== fileNameToRemove
-        //     // );
-        //     const updatedFileCount = updatedFiles.length;
-        //     console.log(updatedFiles, 'updated files after removal');
-
-        //     // Update validation state based on the new file count
-        //     if (updatedFileCount < question?.field_range?.min) {
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: false
-        //         }));
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: 'Minimum file requirement not met'
-        //         }));
-        //     } else {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: ''
-        //         }));
-        //     }
-
-        //     // Update conditional values to reflect the new file count
-        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-        //     setConditionalValues((prevValues) => ({
-        //         ...prevValues,
-        //         [section_name]: {
-        //             ...prevValues[section_name],
-        //             [page_name]: {
-        //                 ...prevValues[section_name]?.[page_name],
-        //                 [label]: newImages
-        //             }
-        //         }
-        //     }));
-
-        //     // Directly update fileState without creating a new object
-        //     console.log(updatedFiles, 'updatedFiles updatedFiles')
-        //     return {
-        //         ...prev,
-        //         [question?.question_id]: updatedFiles
-        //     };
-        // });
         setFileState((prev) => ({
             ...prev,
             [question?.question_id]: newImages

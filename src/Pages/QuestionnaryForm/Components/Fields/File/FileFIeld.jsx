@@ -70,7 +70,6 @@ function FileField({
 
     };
 
-
     const handleFileRemove = (newFiles, fileNameToRemove) => {
         // debugger
         // setFileState((prev) => {

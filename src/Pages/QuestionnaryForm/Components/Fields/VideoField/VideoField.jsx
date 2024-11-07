@@ -33,7 +33,6 @@ function VideoField({ label,
             ...(fileState[question?.question_id] || []), // Existing files
             ...files // New files
         ];
-        console.log(newFilesList, 'new file list');
 
         // Update fileName to display all file names as a comma-separated list
         setFileName(newFilesList.map(file => file.name).join(', '));
@@ -75,59 +74,10 @@ function VideoField({ label,
                 }
             }
         }));
-
-        console.log(newFilesList, 'Updated File List');
-        console.log(updatedFileCount, 'Updated File Count');
     };
 
     const handleVideoRemove = (fileList, fileNameToRemove) => {
-        console.log(fileNameToRemove, 'file name to remove');
 
-        // setFileState((prev) => {
-        //     // Filter out the file to be removed from the files array for the question_id
-        //     const updatedFiles = (prev[question?.question_id] || []).filter(
-        //         (fileName) => fileName !== fileNameToRemove
-        //     );
-        //     console.log(updatedFiles, 'updated files')
-        //     const updatedFileCount = updatedFiles.length;
-        //     console.log(updatedFiles, 'updated files after removal');
-
-        //     // Update validation state based on the new file count
-        //     if (updatedFileCount < question?.field_range?.min) {
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: false
-        //         }));
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: 'Minimum file requirement not met'
-        //         }));
-        //     } else {
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: '' // Clear the validation error
-        //         }));
-        //     }
-
-        //     // Update conditional values with the updated file count
-        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-        //     setConditionalValues((prevValues) => ({
-        //         ...prevValues,
-        //         [section_name]: {
-        //             ...prevValues[section_name],
-        //             [page_name]: {
-        //                 ...prevValues[section_name]?.[page_name],
-        //                 [label]: fileList
-        //             }
-        //         }
-        //     }));
-
-        //     console.log(updatedFileCount, 'Final updated file list after removal');
-        //     return {
-        //         ...prev,
-        //         [question?.question_id]: updatedFiles
-        //     };
-        // });
         setFileState((prev) => ({
             ...prev,
             [question?.question_id]: fileList

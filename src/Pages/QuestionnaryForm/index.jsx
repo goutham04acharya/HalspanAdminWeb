@@ -103,7 +103,7 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    const [selectedSection, setSelectedSection] = useState(null);
+    const [selectedSection, setSelectedSection] = useState(0);
     const [selectedPage, setSelectedPage] = useState(null);
     useEffect(() => {
         if (sections.length > 0) {
@@ -1170,7 +1170,6 @@ const QuestionnaryForm = () => {
             !compareData(fieldSettingParams, savedFieldSettingParams)
         );
     };
-    console.log(formDefaultInfo, 'formDefaultInfo')
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges()) {
@@ -1185,9 +1184,6 @@ const QuestionnaryForm = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
     };
-
-    console.log(sections, 'o')
-    console.log(compareSavedSections, 'pop')
 
     return (
         <>
@@ -1241,7 +1237,7 @@ const QuestionnaryForm = () => {
                                                                         ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
-                                                                className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
+                                                                className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>

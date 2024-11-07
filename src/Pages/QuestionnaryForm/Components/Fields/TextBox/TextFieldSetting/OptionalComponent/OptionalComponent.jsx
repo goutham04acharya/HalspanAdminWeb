@@ -108,10 +108,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
 
     const handleTabClick = (tab) => setActiveTab(tab);
     const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
-    console.log(componentType, 'componentType')
 
     const options = getOptions(componentType);
-    console.log(toggleStates,'lllll')
     return (
             <div className='mt-7 w-[97%]'>
                 <p className='font-semibold text-base text-[#2B333B]'>Options</p>

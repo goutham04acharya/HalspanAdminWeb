@@ -108,10 +108,8 @@ const ChoiceBoxField = ({
     };
 
     const renderInputGroup = () => {
-        console.log(fieldSettingParameters, 'field setting params')
         const { source, type, fixedChoiceArray, lookupOptionChoice } = fieldSettingParameters;
         let values = [];
-        console.log(question)
         if (preview) {
             values = (question?.source === 'fixedList')
                 ? question?.source_value?.map(choice => choice.value) || []

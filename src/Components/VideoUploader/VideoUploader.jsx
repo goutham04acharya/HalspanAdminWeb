@@ -48,7 +48,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         newFiles.splice(index, 1);
         setFiles(newFiles);
         // setValue((prev) => ({ ...prev, [question?.question_id]: false })); // Call setValue function here  
-        console.log(index, 'video upload index');
         handleRemoveVideo(newFiles, index);
     };
 
