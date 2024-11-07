@@ -44,7 +44,7 @@ function CreateQuestionnary() {
     const { value } = e.target;
 
     // Define a regular expression to allow only alphanumeric characters and spaces
-    const regex = /^[^?/=]*$/;
+    const regex = /^[^?/&]*$/;
 
     if (regex.test(value)) {
       setCreateDetails((prevState) => ({

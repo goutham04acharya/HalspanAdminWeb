@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -32,6 +32,8 @@ import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalL
 import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
+import { isEqual } from 'lodash'; // Import deep comparison library
+
 
 
 const QuestionnaryForm = () => {
@@ -55,6 +57,8 @@ const QuestionnaryForm = () => {
     }]);
 
     const sectionRefs = useRef([]);
+    const initialSections = useRef(sections); // Store initial sections
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
@@ -67,6 +71,7 @@ const QuestionnaryForm = () => {
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
+    const [hasChangesInData, setHasChangesInData] = useState(false); // Track if any changes were made
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -80,13 +85,14 @@ const QuestionnaryForm = () => {
     const pageToDelete = useSelector((state) => state?.questionnaryForm?.pageToDelete);
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
+    const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
+    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
@@ -95,6 +101,10 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
+    console.log(savedFieldSettingParams, 'savedFieldSettingParams')
+    console.log(fieldSettingParams, 'savedFieldSettingParams')
+
+    console.log(compareData(fieldSettingParams, savedFieldSettingParams), 'the compare')
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -550,8 +560,8 @@ const QuestionnaryForm = () => {
                     default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
                     default_conditional_logic: question?.default_conditional_logic,
-                    attribute_data_lfp:question?.attribute_data_lfp,
-                    service_record_lfp:question?.service_record_lfp,
+                    attribute_data_lfp: question?.attribute_data_lfp,
+                    service_record_lfp: question?.service_record_lfp,
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -682,8 +692,8 @@ const QuestionnaryForm = () => {
                                 file_size: fieldSettingParams[question.question_id].fileSize,
                                 file_type: fieldSettingParams[question.question_id].fileType,
                             },
-                            attribute_data_lfp:fieldSettingParams[question.question_id].attribute_data_lfp,
-                            service_record_lfp:fieldSettingParams[question.question_id].service_record_lfp,
+                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
+                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1093,6 +1103,22 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
+
+    //this functionis for checcing is there any chnages in the questionary and if i ccik on cancel it should show a confirmation prompt
+    const handleDataChanges = () => {
+        if (hasChangesInData) {
+            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are changes
+        } else {
+            navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+        }
+    };
+
+    // Confirmation modal's "Confirm" button action
+    const handleConfirmCancel = () => {
+        dispatch(setShowCancelModal(false));
+        navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+    };
+
     return (
         <>
             {pageLoading ? (
@@ -1238,8 +1264,9 @@ const QuestionnaryForm = () => {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`)}>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
+                                onClick={() => handleDataChanges()}>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
@@ -1363,6 +1390,22 @@ const QuestionnaryForm = () => {
                     setModalOpen={setShowquestionDeleteModal}
                     handleButton1={confirmDeleteQuestion}
                     handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
+                />
+            )}
+            {showCancelModal && (
+                <ConfirmationModal
+                    text='cancel Button'
+                    subText={`are you sure you want to go back question, you. This action cannot be undone.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Confirm'
+                    Button2text='Cancel'
+                    src='delete-gray'
+                    testIDBtn1='confirm-delete'
+                    testIDBtn2='cancel-delete'
+                    isModalOpen={showCancelModal}
+                    setModalOpen={setShowCancelModal}
+                    handleButton1={handleConfirmCancel}
+                    handleButton2={() => dispatch(setShowCancelModal(false))}
                 />
             )}
             {showReplaceModal && (
