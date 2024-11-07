@@ -76,7 +76,6 @@ function FileField({
 
 
     const handleFileRemove = (newFiles, fileNameToRemove) => {
-        // debugger
         console.log(fileNameToRemove, 'file name in file upload')
         // setFileState((prev) => {
         //     // Re-check if the minimum number of files is still met after removal

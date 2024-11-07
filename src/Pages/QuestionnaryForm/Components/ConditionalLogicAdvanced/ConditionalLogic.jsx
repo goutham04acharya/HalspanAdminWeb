@@ -1025,7 +1025,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
-        // debugger
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
