@@ -28,10 +28,8 @@ const ChoiceBoxField = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(optionSelected, 'optionSelected');
 
     const handleRadioChange = (selectedValue) => {
-        console.log(selectedValue, 'selected radio value')
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -72,7 +70,6 @@ const ChoiceBoxField = ({
             } else {
                 newSelected = [...prev, value];
             }
-            console.log(newSelected, 'jsjsjs')
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
                 ...prevValues,

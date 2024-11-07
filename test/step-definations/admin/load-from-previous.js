@@ -21,8 +21,10 @@ When('I select the attribute type', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     let i=0;
     while (i < 3){
-        await new Promise(resolve => setTimeout(resolve, 250));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log(`test-${i}`);
         await driver.wait(until.elementLocated(By.css(`[data-testid="select-attribute"]`))).click();
+        console.log(`test-1-${i}`);
         await driver.wait(until.elementLocated(By.css(`[data-testid="attribute-${i}"]`))).click();
         i++;
     }

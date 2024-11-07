@@ -22,15 +22,15 @@ function CreateQuestionnary() {
     internal_name: '',
     description: '',
     asset_type: '',
-    language: '',
+    language: 'UK- English',  // Default language set here
     is_adhoc: 'No',
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedOption, setSelectedOption] = useState({
     asset_type: null,
-    language: null,
-  });
+    language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
+});
   const [validationErrors, setValidationErrors] = useState({});
   const [publickey, setpublickey] = useState()
 
@@ -44,7 +44,7 @@ function CreateQuestionnary() {
     const { value } = e.target;
 
     // Define a regular expression to allow only alphanumeric characters and spaces
-    const regex = /^[a-zA-Z0-9 ]*$/;
+    const regex = /^[^?/=]*$/;
 
     if (regex.test(value)) {
       setCreateDetails((prevState) => ({
@@ -59,7 +59,6 @@ function CreateQuestionnary() {
       }));
     }
   };
-
 
   const handleNavigateBack = () => {
     navigate('/questionnaries');
@@ -275,7 +274,7 @@ function CreateQuestionnary() {
           </div>
           <div className='w-[30%] ml-[114px] mt-8'>
             <InputTextarea
-              className='h-[160px] w-full mt-2.5'
+              className='h-[160px] w-full mt-2.5 px-2.5'
               label='Description'
               mandatoryField='true'
               htmlFor='description'

@@ -34,8 +34,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
-    console.log(value, 'values')
-    // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
+
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -53,7 +52,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                 });
             });
         });
-        // console.log(result, 'result');
         return result;
 
 
@@ -99,29 +97,39 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
         fetchSections();
     }, [questionnaire_id, version_number]);
 
+    // const evaluateComplianceLogic = () => {
+    //     return complianceLogic.map(rule => {
+    //         try {
+    //             const result = eval(rule?.default_content);
+    //             // v1 result kkk
+    //             const conditionResult = eval(rule?.default_content);
+    //             return {
+    //                 label: rule?.label,
+    //                 result: result?.toString(),
+    //                 tookIfPath: conditionResult
+    //             };
+    //         } catch (error) {
+    //             console.log("Error while evaluating")
+    //         }
+    //     });
+    // };
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
-            try {
-                debugger
-                console.log(rule, 'rule')
-                // {
-                //     "label": "Status 1",
-                //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
-                // }
-                const result = eval(rule?.default_content);
-                console.log(result, 'result kkk');
-                // v1 result kkk
-                const conditionResult = eval(rule?.default_content);
-                console.log(conditionResult, 'conditional result kkkkk')
-                // v1 conditional result kkkkk
-                return {
-                    label: rule?.label,
-                    result: result?.toString(),
-                    tookIfPath: conditionResult
-                };
-            } catch (error) {
-                console.log("Error while evaluating")
-            }
+            // Get the condition part before the question mark
+            const conditionPart = rule.default_content.split('?')[0].trim();
+
+            // Evaluate the condition to determine which path was executed
+            const conditionResult = eval(rule);
+
+            // Get the full evaluation result
+            const result = eval(rule.default_content);
+
+            return {
+                label: rule.label,
+                result: result?.toString(),
+                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
+                tookIfPath: conditionResult
+            };
         });
     };
 
@@ -145,7 +153,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            console.log(value, 'valueeeee eee eeee eee')
             if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
@@ -279,7 +286,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     };
 
     useEffect(() => {
-        console.log(sections, 'sec')
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
@@ -322,10 +328,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-white rounded-[55px] relative px-4 pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
-                <div>
-                    {/* <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} /> */}
-                    <Image src={src} className={`${className} mx-auto`} />
-                </div>
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollBar w-full bg-slate-100 rounded-md'>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
@@ -372,7 +374,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list, 'currentPage');
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
@@ -380,7 +381,7 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error, 'l')
+                                                console.log(error,error)
                                             }
 
                                         } else {
