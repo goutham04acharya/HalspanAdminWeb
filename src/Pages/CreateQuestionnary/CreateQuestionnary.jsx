@@ -68,18 +68,18 @@ function CreateQuestionnary() {
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
-      public_name: createDetails?.public_name,
-      internal_name: createDetails?.internal_name,
-      description: createDetails?.description,
+      public_name: createDetails?.public_name.trim(),
+      internal_name: createDetails?.internal_name.trim(),
+      description: createDetails?.description.trim(),
       asset_type: selectedOption?.asset_type?.value,
       language: selectedOption?.language?.value,
       is_adhoc: createDetails?.is_adhoc,
     };
 
-    if (!createDetails.public_name) {
+    if (!createDetails.public_name.trim()) {
       errors.public_name = 'This field is mandatory';
     }
-    if (!createDetails.internal_name) {
+    if (!createDetails.internal_name.trim()) {
       errors.internal_name = 'This field is mandatory';
     }
     if (!selectedOption.asset_type) {
@@ -88,7 +88,7 @@ function CreateQuestionnary() {
     if (!selectedOption.language) {
       errors.language = 'This field is mandatory';
     }
-    if (!createDetails.description) {
+    if (!createDetails.description.trim()) {
       errors.description = 'This field is mandatory';
     }
 
