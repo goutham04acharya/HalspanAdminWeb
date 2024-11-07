@@ -93,13 +93,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
             remember_allowed: newToggleStates['Remember allowed'],
             field_validation: newToggleStates['Field validation'],
         };
-        console.log('i am here')
         dispatch(setNewComponent({
             id: 'options',
             value: payload,
             questionId: selectedQuestionId,
         }));
-        console.log('i am here also')
         dispatch(setShouldAutoSave(true));
     };
 
