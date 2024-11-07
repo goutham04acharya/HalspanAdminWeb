@@ -1,18 +1,22 @@
 import React, { useState } from 'react'
 import useObjects from '../../../customHooks/useObjects'
 
-function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handleSectionScroll, handlePageScroll }) {
+function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handleSectionScroll, handlePageScroll,
+    selectedSection,
+    setSelectedSection,
+    selectedPage,
+    setSelectedPage }) {
 
     // Create the initial dropdown state
     const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
+        // debugger
         acc[index] = false;  // Set all dropdowns to false initially
         return acc;
     }, {});
 
     // State for dropdowns
     const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
-    const [selectedSection, setSelectedSection] = useState(null);
-    const [selectedPage, setSelectedPage] = useState(null);
+
 
     const handleDropdown = (index) => {
         setDropdown(index, !dropdownOpen[index])

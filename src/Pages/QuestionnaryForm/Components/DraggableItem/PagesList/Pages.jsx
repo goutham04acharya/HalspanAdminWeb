@@ -15,12 +15,13 @@ function Pages({ pageIndex,
   sections,
   handleAutoSave,
   setSections,
+  scrollToPage
 }) {
-
+  
   const pageRefs = useRef({});
   const dispatch = useDispatch();
   const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-
+  
   const selectedAddQuestion = useSelector(
     (state) => state?.questionnaryForm?.selectedAddQuestion
   );
@@ -65,6 +66,7 @@ function Pages({ pageIndex,
     handleAutoSave(sectionId, updatedSections);
   };
   console.log(selectedAddQuestion.questionIndex, 'selectedAddQuestion')
+  console.log(pageData, 'field setting params')
 
   return (
     <div>

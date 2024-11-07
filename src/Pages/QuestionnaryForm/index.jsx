@@ -95,7 +95,8 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-
+    const [selectedSection, setSelectedSection] = useState(null);
+    const [selectedPage, setSelectedPage] = useState(null);
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -263,7 +264,7 @@ const QuestionnaryForm = () => {
     };
 
     const scrollToPage = (sectionIndex, pageId) => {
-
+        // debugger
         // Check if the section is closed, if so, expand it
         if (!expandedSections[sectionIndex]) {
             toggleSection(sectionIndex); // Assuming toggleSection will expand the section
@@ -550,8 +551,8 @@ const QuestionnaryForm = () => {
                     default_content: question?.default_content || '',
                     conditional_logic: question?.conditional_logic,
                     default_conditional_logic: question?.default_conditional_logic,
-                    attribute_data_lfp:question?.attribute_data_lfp,
-                    service_record_lfp:question?.service_record_lfp,
+                    attribute_data_lfp: question?.attribute_data_lfp,
+                    service_record_lfp: question?.service_record_lfp,
                 }))));
 
                 // Transform field settings data into the desired structure  
@@ -682,8 +683,8 @@ const QuestionnaryForm = () => {
                                 file_size: fieldSettingParams[question.question_id].fileSize,
                                 file_type: fieldSettingParams[question.question_id].fileType,
                             },
-                            attribute_data_lfp:fieldSettingParams[question.question_id].attribute_data_lfp,
-                            service_record_lfp:fieldSettingParams[question.question_id].service_record_lfp,
+                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
+                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1100,7 +1101,15 @@ const QuestionnaryForm = () => {
             ) : (
                 <div className='border-t border-[#DCE0EC] flex items-start h-customh5'>
                     <div className='w-[20%]'>
-                        <SideLayout formDefaultInfo={formDefaultInfo} sections={sections} setSections={setSections} handleSectionScroll={scrollToSection} handlePageScroll={scrollToPage} />
+                        <SideLayout formDefaultInfo={formDefaultInfo}
+                            selectedSection={selectedSection}
+                            setSelectedSection={setSelectedSection}
+                            selectedPage={selectedPage}
+                            setSelectedPage={setSelectedPage}
+                            sections={sections}
+                            setSections={setSections}
+                            handleSectionScroll={scrollToSection}
+                            handlePageScroll={scrollToPage} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -1208,6 +1217,11 @@ const QuestionnaryForm = () => {
                                                                     handleSaveSection={handleSaveSection}
                                                                     handleAutoSave={handleSaveSection}
                                                                     handleDeleteModal={handleDeleteModal}
+                                                                    selectedSection={selectedSection}
+                                                                    setSelectedSection={setSelectedSection}
+                                                                    selectedPage={selectedPage}
+                                                                    setSelectedPage={setSelectedPage}
+                                                                // currentSectionData={currentSectionData}
                                                                 />
                                                             </li>
                                                         )}
@@ -1288,6 +1302,7 @@ const QuestionnaryForm = () => {
                                         complianceState: complianceState,
                                         setCompliancestate: setCompliancestate,
                                         complianceSaveHandler: complianceSaveHandler,
+                                        scrollToPage: scrollToPage
                                     }
                                 )
                             ) : (
@@ -1402,7 +1417,7 @@ const QuestionnaryForm = () => {
                 setModalOpen={setPreviewModal}
                 Button1text={'Back'}
                 Button2text={'Next'}
-                src=''
+                // src=''   
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                 sections={sections}
                 setValidationErrors={setValidationErrors}
