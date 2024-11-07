@@ -14,7 +14,7 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
     
         delete params.start_key; // Reset the start_key when initiating a new search
     
-        const trimmedValue = value.trim();
+        const trimmedValue = value;
         // const specialCharRegex = /^[^a-zA-Z0-9]+$/;
     
         if (key === 'search') {
