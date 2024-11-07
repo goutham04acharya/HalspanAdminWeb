@@ -41,7 +41,6 @@ function DateTimeField({
                 }
             }));
         } else {
-            // debugger
             const value = e.target.value;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({

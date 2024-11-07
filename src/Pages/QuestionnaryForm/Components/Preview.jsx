@@ -102,7 +102,6 @@ function PreviewModal({ text, subText, Button1text, Button2text, src, className,
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
             try {
-                debugger
                 console.log(rule, 'rule')
                 // {
                 //     "label": "Status 1",

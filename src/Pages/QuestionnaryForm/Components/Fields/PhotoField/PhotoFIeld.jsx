@@ -50,7 +50,6 @@ function PhotoField({ label,
 
         // Check if the minimum required number of files has been uploaded
         if (updatedFileCount >= (question?.field_range?.min || 0)) {
-            // debugger
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: true

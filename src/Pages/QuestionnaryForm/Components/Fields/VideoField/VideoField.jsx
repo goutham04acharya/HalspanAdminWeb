@@ -81,7 +81,6 @@ function VideoField({ label,
     };
 
     const handleVideoRemove = (fileList, fileNameToRemove) => {
-        debugger
         console.log(fileNameToRemove, 'file name to remove');
 
         // setFileState((prev) => {
