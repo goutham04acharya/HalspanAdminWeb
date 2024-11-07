@@ -287,17 +287,19 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
                 return <ChoiceBoxField
-                    sections={sections[currentSection]}
-                    validationErrors={validationErrors}
-                    setValidationErrors={setValidationErrors}
-                    question={question}
-                    preview
-                    setConditionalValues={setConditionalValues}
-                    conditionalValues={setConditionalValues}
-                    setIsFormatError={setIsFormatError}
-                    question_id={question?.question_id}
-                    testId="preview"
-                    setValue={setValue}
+                sections={sections[currentSection]}
+                validationErrors={validationErrors}
+                setValidationErrors={setValidationErrors}
+                question={question}
+                preview
+                setConditionalValues={setConditionalValues}
+                conditionalValues={setConditionalValues}
+                setIsFormatError={setIsFormatError}
+                question_id={question?.question_id}
+                testId="preview"
+                setValue={setValue}
+                choiceValue={value[question?.question_id]}
+                fieldSettingParameters={question}
                 />
             case 'dateTimefield':
                 return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
