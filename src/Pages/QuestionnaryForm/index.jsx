@@ -71,7 +71,9 @@ const QuestionnaryForm = () => {
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
-    const [hasChangesInData, setHasChangesInData] = useState(false); // Track if any changes were made
+    const [compareSavedSections, setCompareSavedSections] = useState(sections);
+
+
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -101,10 +103,6 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    console.log(savedFieldSettingParams, 'savedFieldSettingParams')
-    console.log(fieldSettingParams, 'savedFieldSettingParams')
-
-    console.log(compareData(fieldSettingParams, savedFieldSettingParams), 'the compare')
 
     useEffect(() => {
         if (sections.length > 0) {
@@ -580,6 +578,7 @@ const QuestionnaryForm = () => {
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                     return;
                 }
 
@@ -590,9 +589,11 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
+                    setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                 }
             } else {
                 setToastError('Something went wrong fetching form details');
@@ -738,6 +739,8 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
+                        setCompareSavedSections(sections);
+
                         if (defaultString) {
                             dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                         } else {
@@ -1104,20 +1107,70 @@ const QuestionnaryForm = () => {
         }
     };
 
-    //this functionis for checcing is there any chnages in the questionary and if i ccik on cancel it should show a confirmation prompt
+    // Function to compare sections state with compareSavedSections to show the cancle modal or not
+    const compareSections = (sections, compareSavedSections) => {
+        if (sections.length !== compareSavedSections.length) {
+            return false; // Different number of sections
+        }
+
+        // Compare each section in detail (excluding questions)
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            const savedSection = compareSavedSections[i];
+
+            // Compare section names and ids
+            if (section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id) {
+                return false; // Section names or ids are different
+            }
+
+            // Compare pages within each section (excluding questions)
+            if (section.pages.length !== savedSection.pages.length) {
+                return false; // Different number of pages
+            }
+
+            // Compare each page's details (without comparing questions)
+            for (let j = 0; j < section.pages.length; j++) {
+                const page = section.pages[j];
+                const savedPage = savedSection.pages[j];
+
+                // Compare page names and page_ids
+                if (page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id) {
+                    return false; // Different page names or page_ids
+                }
+            }
+        }
+
+        return true; // Sections and pages match
+    };
+
+    // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
+    const hasUnsavedChanges = () => {
+        // If sections have changed, or compareData is false, we show the modal
+        return (
+            !compareSections(sections, compareSavedSections) ||
+            !compareData(fieldSettingParams, savedFieldSettingParams)
+        );
+    };
+    console.log(formDefaultInfo, 'formDefaultInfo')
+    // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
-        if (hasChangesInData) {
-            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are changes
+        if (hasUnsavedChanges()) {
+            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
         } else {
             navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
         }
     };
 
-    // Confirmation modal's "Confirm" button action
+    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
     const handleConfirmCancel = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
     };
+
+    console.log(sections, 'o')
+    console.log(compareSavedSections, 'pop')
 
     return (
         <>
@@ -1394,14 +1447,14 @@ const QuestionnaryForm = () => {
             )}
             {showCancelModal && (
                 <ConfirmationModal
-                    text='cancel Button'
-                    subText={`are you sure you want to go back question, you. This action cannot be undone.`}
+                    text='Leave Questionnaire'
+                    subText={`Changes that you made may not be saved.`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Confirm'
-                    Button2text='Cancel'
-                    src='delete-gray'
-                    testIDBtn1='confirm-delete'
-                    testIDBtn2='cancel-delete'
+                    Button1text='Leave'
+                    Button2text='Stay'
+                    src='x-circle'
+                    testIDBtn1='confirm-Leave'
+                    testIDBtn2='cancel-Leave'
                     isModalOpen={showCancelModal}
                     setModalOpen={setShowCancelModal}
                     handleButton1={handleConfirmCancel}
