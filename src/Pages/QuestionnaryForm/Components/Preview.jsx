@@ -39,10 +39,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
-    console.log(value, 'values')
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    // console.log(conditionalValues?.Section_1?.Page_1?.Question_1, 'conditionalValues section value')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -60,7 +58,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
             });
         });
-        // console.log(result, 'result');
         return result;
 
 
@@ -108,25 +105,21 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
+            // Get the condition part before the question mark
+            const conditionPart = rule.default_content.split('?')[0].trim();
 
-            // debugger
-            console.log(rule, 'rule')
-            // {
-            //     "label": "Status 1",
-            //     "default_content": "Section_1.Page_1.Question_2.getDay() ? \"v1\" : \"v2\" "
-            // }
-            const result = eval(rule?.default_content);
-            console.log(result, 'result kkk');
-            // v1 result kkk
-            const conditionResult = eval(rule?.default_content);
-            console.log(conditionResult, 'conditional result kkkkk')
-            // v1 conditional result kkkkk
+            // Evaluate the condition to determine which path was executed
+            const conditionResult = eval(rule);
+
+            // Get the full evaluation result
+            const result = eval(rule.default_content);
+
             return {
-                label: rule?.label,
+                label: rule.label,
                 result: result?.toString(),
+                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
                 tookIfPath: conditionResult
             };
-
         });
     };
 
@@ -150,7 +143,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            console.log(value, 'valueeeee eee eeee eee')
             if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
                 if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                     acc[question.question_id] = 'This is a mandatory field';
@@ -237,9 +229,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             setTotalPagesNavigated(totalPagesNavigated - 1);
         }
     };
-    console.log(fieldStatus, 'fieldStaus')
-
-    console.log(value, 'my value')
 
     const renderQuestion = (question) => {
         // debugger
@@ -329,7 +318,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     useEffect(() => {
-        console.log(sections, 'sec')
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
@@ -388,7 +376,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_videofield: '',
             preview_gpsfield: '',
         }));
-        console.log('first i am here')
         dispatch(resetFields())
     }
     return (
@@ -451,7 +438,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error, 'l')
+                                                console.log(error,error)
                                             }
 
                                         } else {

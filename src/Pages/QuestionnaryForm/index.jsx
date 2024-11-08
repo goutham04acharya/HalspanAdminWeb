@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -32,10 +32,12 @@ import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalL
 import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
+import { isEqual } from 'lodash'; // Import deep comparison library
+
 
 
 const QuestionnaryForm = () => {
-    const { questionnaire_id, version_number } = useParams();
+    const { public_name, questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
@@ -55,6 +57,8 @@ const QuestionnaryForm = () => {
     }]);
 
     const sectionRefs = useRef([]);
+    const initialSections = useRef(sections); // Store initial sections
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
@@ -67,6 +71,9 @@ const QuestionnaryForm = () => {
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
+    const [compareSavedSections, setCompareSavedSections] = useState(sections);
+
+
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -80,13 +87,14 @@ const QuestionnaryForm = () => {
     const pageToDelete = useSelector((state) => state?.questionnaryForm?.pageToDelete);
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
+    const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
+    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
@@ -95,7 +103,9 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
+    // const [selectedSection, setSelectedSection] = useState(0);
     const [selectedSection, setSelectedSection] = useState(null);
+
     const [selectedPage, setSelectedPage] = useState(null);
     useEffect(() => {
         if (sections.length > 0) {
@@ -573,6 +583,7 @@ const QuestionnaryForm = () => {
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                     return;
                 }
 
@@ -583,9 +594,11 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
+                    setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                 }
             } else {
                 setToastError('Something went wrong fetching form details');
@@ -731,6 +744,8 @@ const QuestionnaryForm = () => {
                     // setSaveClick(true)
                     if (!(response?.error)) {
                         setToastSuccess(response?.data?.message);
+                        setCompareSavedSections(sections);
+
                         if (defaultString) {
                             dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                         } else {
@@ -830,7 +845,7 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'type', value: 'single_line', questionId }));
             dispatch(setNewComponent({ id: 'format', value: "Alphanumeric", questionId }));
             dispatch(setNewComponent({ id: 'max', value: "2500", questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion]);
 
@@ -839,14 +854,14 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId }));
             dispatch(resetFixedChoice({ questionId }));
             dispatch(setNewComponent({ id: 'type', value: 'dropdown', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion, dispatch]);
 
     const handleDateTimeClick = useCallback(() => {
         addNewQuestion('dateTimefield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     })
 
@@ -854,13 +869,13 @@ const QuestionnaryForm = () => {
         addNewQuestion('numberfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'integer', questionId }));
             dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion]);
 
     const handleAssetLocationClick = useCallback(() => {
         addNewQuestion('assetLocationfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     })
 
@@ -868,7 +883,7 @@ const QuestionnaryForm = () => {
         addNewQuestion('floorPlanfield', (questionId) => {
             dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -878,7 +893,7 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -886,7 +901,7 @@ const QuestionnaryForm = () => {
     const handleVideoClick = useCallback(() => {
         addNewQuestion('videofield', (questionId) => {
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
             dispatch(setNewComponent({ id: 'fileSize', value: "10", questionId }));
         })
     });
@@ -894,27 +909,27 @@ const QuestionnaryForm = () => {
     const handleFileClick = useCallback(() => {
         addNewQuestion('filefield', (questionId) => {
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
             dispatch(setNewComponent({ id: 'fileSize', value: "10", questionId }));
         })
     });
 
     const handleSignatureClick = useCallback(() => {
         addNewQuestion('signaturefield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
 
     const handleGPSClick = useCallback(() => {
         addNewQuestion('gpsfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
 
     const handleDisplayClick = useCallback(() => {
         addNewQuestion('displayfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
     // function to handle the compliance logic click
@@ -933,7 +948,7 @@ const QuestionnaryForm = () => {
         addNewQuestion('tagScanfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'NFC', questionId }));
             dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -1110,6 +1125,68 @@ const QuestionnaryForm = () => {
             console.error("Error deleting compliance logic:", error);
         }
     };
+
+    // Function to compare sections state with compareSavedSections to show the cancle modal or not
+    const compareSections = (sections, compareSavedSections) => {
+        if (sections.length !== compareSavedSections.length) {
+            return false; // Different number of sections
+        }
+
+        // Compare each section in detail (excluding questions)
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            const savedSection = compareSavedSections[i];
+
+            // Compare section names and ids
+            if (section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id) {
+                return false; // Section names or ids are different
+            }
+
+            // Compare pages within each section (excluding questions)
+            if (section.pages.length !== savedSection.pages.length) {
+                return false; // Different number of pages
+            }
+
+            // Compare each page's details (without comparing questions)
+            for (let j = 0; j < section.pages.length; j++) {
+                const page = section.pages[j];
+                const savedPage = savedSection.pages[j];
+
+                // Compare page names and page_ids
+                if (page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id) {
+                    return false; // Different page names or page_ids
+                }
+            }
+        }
+
+        return true; // Sections and pages match
+    };
+
+    // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
+    const hasUnsavedChanges = () => {
+        // If sections have changed, or compareData is false, we show the modal
+        return (
+            !compareSections(sections, compareSavedSections) ||
+            !compareData(fieldSettingParams, savedFieldSettingParams)
+        );
+    };
+    // Cancel button click handler (related to showing the cancle modal)
+    const handleDataChanges = () => {
+        if (hasUnsavedChanges()) {
+            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
+        } else {
+            navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+        }
+    };
+
+    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
+    const handleConfirmCancel = () => {
+        dispatch(setShowCancelModal(false));
+        navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+    };
+
     return (
         <>
             {pageLoading ? (
@@ -1162,8 +1239,9 @@ const QuestionnaryForm = () => {
                                                                         ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
+                                                            // className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                            className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
 
-                                                                className="disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5"
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
@@ -1269,8 +1347,9 @@ const QuestionnaryForm = () => {
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${questionnaire_id}/${version_number}`)}>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
+                                onClick={() => handleDataChanges()}>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
@@ -1367,7 +1446,7 @@ const QuestionnaryForm = () => {
             {showPageDeleteModal && (
                 <ConfirmationModal
                     text='Delete Page'
-                    subText={`${selectedSectionData?.['questions'].length > 0 ?  `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                    subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
@@ -1395,6 +1474,22 @@ const QuestionnaryForm = () => {
                     setModalOpen={setShowquestionDeleteModal}
                     handleButton1={confirmDeleteQuestion}
                     handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
+                />
+            )}
+            {showCancelModal && (
+                <ConfirmationModal
+                    text='Leave Questionnaire'
+                    subText={`Changes that you made may not be saved.`}
+                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                    Button1text='Leave'
+                    Button2text='Stay'
+                    src='x-circle'
+                    testIDBtn1='confirm-Leave'
+                    testIDBtn2='cancel-Leave'
+                    isModalOpen={showCancelModal}
+                    setModalOpen={setShowCancelModal}
+                    handleButton1={handleConfirmCancel}
+                    handleButton2={() => dispatch(setShowCancelModal(false))}
                 />
             )}
             {showReplaceModal && (
