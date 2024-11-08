@@ -143,7 +143,7 @@ const Questions = ({
                         title='Delete'
                         className='pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]'
                         onClick={(e) => {
-                            e.stopPropagation();
+                            // e.stopPropagation();
                             handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
                             dispatch(setShowquestionDeleteModal(true));
                         }}

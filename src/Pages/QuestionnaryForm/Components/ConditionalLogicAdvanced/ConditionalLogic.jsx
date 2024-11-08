@@ -652,8 +652,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (complianceState) {
                 try {
                     const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-                    console.log("API response:", response?.data?.data?.compliance_logic);
-
                     // Extract default_content based on selected index
                     const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
 
@@ -766,7 +764,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = expression
             // Check for the "includes" method being used without a parameter
             let methods = [
-                "AddDays", "SubtractDays", "Date", "includes"
+                "AddDays", "SubtractDays", "includes"
             ]
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
@@ -775,7 +773,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             let payloadString = expression;
-            // console.log(payloadString, 'dhauhs')
             evalInputValue = addSectionPrefix(evalInputValue);
 
             // Extract variable names from the payloadString using a regex
@@ -804,7 +801,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (invalid) {
                     if (invalid) {
                         handleError(`Error in ${invalid.join(', ')}  (Please follow dd/mm/yyyy format)`);
-                        console.log('failed')
                         return
                     }
                 }
