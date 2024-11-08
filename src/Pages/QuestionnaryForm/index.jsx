@@ -103,7 +103,9 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    const [selectedSection, setSelectedSection] = useState(0);
+    // const [selectedSection, setSelectedSection] = useState(0);
+    const [selectedSection, setSelectedSection] = useState(null);
+
     const [selectedPage, setSelectedPage] = useState(null);
     useEffect(() => {
         if (sections.length > 0) {
@@ -843,7 +845,7 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'type', value: 'single_line', questionId }));
             dispatch(setNewComponent({ id: 'format', value: "Alphanumeric", questionId }));
             dispatch(setNewComponent({ id: 'max', value: "2500", questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion]);
 
@@ -852,14 +854,14 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId }));
             dispatch(resetFixedChoice({ questionId }));
             dispatch(setNewComponent({ id: 'type', value: 'dropdown', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion, dispatch]);
 
     const handleDateTimeClick = useCallback(() => {
         addNewQuestion('dateTimefield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'date', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     })
 
@@ -867,13 +869,13 @@ const QuestionnaryForm = () => {
         addNewQuestion('numberfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'integer', questionId }));
             dispatch(setNewComponent({ id: 'source', value: 'entryfield', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         });
     }, [addNewQuestion]);
 
     const handleAssetLocationClick = useCallback(() => {
         addNewQuestion('assetLocationfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     })
 
@@ -881,7 +883,7 @@ const QuestionnaryForm = () => {
         addNewQuestion('floorPlanfield', (questionId) => {
             dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -891,7 +893,7 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId }));
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -899,7 +901,7 @@ const QuestionnaryForm = () => {
     const handleVideoClick = useCallback(() => {
         addNewQuestion('videofield', (questionId) => {
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
             dispatch(setNewComponent({ id: 'fileSize', value: "10", questionId }));
         })
     });
@@ -907,27 +909,27 @@ const QuestionnaryForm = () => {
     const handleFileClick = useCallback(() => {
         addNewQuestion('filefield', (questionId) => {
             dispatch(setNewComponent({ id: 'max', value: '3', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
             dispatch(setNewComponent({ id: 'fileSize', value: "10", questionId }));
         })
     });
 
     const handleSignatureClick = useCallback(() => {
         addNewQuestion('signaturefield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
 
     const handleGPSClick = useCallback(() => {
         addNewQuestion('gpsfield', (questionId) => {
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
 
     const handleDisplayClick = useCallback(() => {
         addNewQuestion('displayfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'heading', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
     // function to handle the compliance logic click
@@ -946,7 +948,7 @@ const QuestionnaryForm = () => {
         addNewQuestion('tagScanfield', (questionId) => {
             dispatch(setNewComponent({ id: 'type', value: 'NFC', questionId }));
             dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId }));
-            dispatch(setNewComponent({ id: 'options', value: {'visible' :true}, questionId }));
+            dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
 
         });
     }, [addNewQuestion]);
@@ -1237,7 +1239,9 @@ const QuestionnaryForm = () => {
                                                                         ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
-                                                                className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                            // className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                            className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
+
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
@@ -1442,7 +1446,7 @@ const QuestionnaryForm = () => {
             {showPageDeleteModal && (
                 <ConfirmationModal
                     text='Delete Page'
-                    subText={`${selectedSectionData?.['questions'].length > 0 ?  `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                    subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                     Button1text='Delete'
                     Button2text='Cancel'
