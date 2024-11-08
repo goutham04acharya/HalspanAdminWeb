@@ -48,8 +48,6 @@ const TextBoxField = ({
     };
 
     const handleInputChange = (e) => {
-        debugger
-        console.log(question?.question_id, 'question id question')
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_textboxfield: {
@@ -78,10 +76,7 @@ const TextBoxField = ({
             'fieldId': question_id,
             isEditable: true
         }
-        console.log(obj,'my object')
-
         dispatch(setFieldEditable(obj));
-        console.log(newValue,'my new value')
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
@@ -117,10 +112,6 @@ const TextBoxField = ({
             }));
         }
     };
-    function handleFunction() {
-
-    }
-    console.log('recieved', values)
 
     return (
         <div className=''>

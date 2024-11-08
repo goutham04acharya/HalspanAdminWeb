@@ -10,7 +10,6 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
     const [fileTypeError, setFileTypeError] = useState(false);
     const [strokeColor, setStrokeColor] = useState('black');
     const [colorPicker, setColorPicker] = useState(false)
-    console.log(images, 'ffff images')
     const handleImageChange = (e) => {
         const files = e.target.files;
         const newImages = [...images];
@@ -70,12 +69,6 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
         canvasRef.current.resetCanvas();
     };
 
-    // const handleExportClick = () => {
-    //     canvasRef.current.exportImage('png').then((data) => {
-    //         console.log(data);
-    //     });
-    // };
-    console.log(strokeColor, 'sssss')
     return (
         <div>
             <label className="custom-file-label custom-file-input-wrapper w-fit h-auto mt-1 flex items-center bg-[#DFE0E2] border border-[#AEB3B7] p-0 rounded-md">

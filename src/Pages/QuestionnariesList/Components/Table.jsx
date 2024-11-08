@@ -36,7 +36,8 @@ function Table({ loading, QueList, lastElementRef }) {
     };
 
     const navigateToVersionList = (publicName,questionnaire_id) => {
-        navigate(`/questionnaries/version-list/${publicName}/${questionnaire_id}`);
+        const formattedName = publicName.replace(/ /g, "_");
+        navigate(`/questionnaries/version-list/${formattedName}/${questionnaire_id}`);
     };
 
     return (

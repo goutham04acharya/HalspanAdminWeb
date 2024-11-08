@@ -13,7 +13,6 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
             const newFiles = [...files];
-            console.log(newFiles, ' aeeaeaaee')
 
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];

@@ -36,8 +36,6 @@ const Sections = ({ sectionData,
 
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
 
-    console.log(pageData, 'pageData')
-    console.log(pageIndex, 'pageIndex')
     dispatch(setPageToDelete({ sectionIndex, pageIndex })); // Ensure you're setting both sectionIndex and pageIndex correctly
     dispatch(setSelectedSectionData(pageData));
     // dispatch(setModalOpen(true));

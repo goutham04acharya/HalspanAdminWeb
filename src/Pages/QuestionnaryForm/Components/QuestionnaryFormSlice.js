@@ -17,6 +17,7 @@ const initialState = {
     pageToDelete: { sectionIndex: null, pageIndex: null },
     questionToDelete: { sectionIndex: null, pageIndex: null, questionIndex: null },
     showquestionDeleteModal: '',
+    showCancelModal: false,
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
@@ -74,6 +75,9 @@ const questionnaryFormSlice = createSlice({
         setComplianceLogicId: (state, action) => {
             state.complianceLogicId = action.payload;
         },
+        setShowCancelModal: (state, action) => {
+            state.showCancelModal = action.payload;
+        }
     }
 });
 
@@ -94,6 +98,7 @@ export const {
     setShowPageDeleteModal,
     setModalOpen,
     setComplianceLogicId,
+    setShowCancelModal,
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

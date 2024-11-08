@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
-import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
+import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
@@ -10,6 +10,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const getOptions = (componentType) => {
+        // debugger
         switch (componentType) {
             case 'textboxfield':
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed', 'Field validation'];
@@ -20,25 +21,29 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 return ['Visible'];
             case 'videofield':
             case 'gpsfield':
+            case 'filefield':
                 return ['Visible', 'Optional', 'Remember allowed'];
             default:
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed'];
         }
     };
-
     const [toggleStates, setToggleStates] = useState({});
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
     const [isAttributeDropdownOpen, setIsAttributeDropdownOpen] = useState(false);
+    const [attributeValue, setAttributeValue] = useState('')
+    const [serviceValue, setServiceValue] = useState('')
 
     const handleServiceClick = (option) => {
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
-        setIsAttributeDropdownOpen(false);
+        setServiceRecordDropdownOpen(false);
+        setServiceValue(option);
     };
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
-        setServiceRecordDropdownOpen(false);
+        setIsAttributeDropdownOpen(false);
+        setAttributeValue(option)
     };
 
     const attributes = [
@@ -58,7 +63,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams[selectedQuestionId]?.options?.load_from_previous || false,
                 'Read only': fieldSettingParams[selectedQuestionId]?.options?.read_only || false,
-                'Visible': fieldSettingParams[selectedQuestionId]?.options?.visible || true,
+                'Visible': fieldSettingParams[selectedQuestionId]?.options?.visible || false,
                 'Optional': fieldSettingParams[selectedQuestionId]?.options?.optional || false,
                 'Remember allowed': fieldSettingParams[selectedQuestionId]?.options?.remember_allowed || false,
                 'Field validation': fieldSettingParams[selectedQuestionId]?.options?.field_validation || false,
@@ -93,7 +98,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             remember_allowed: newToggleStates['Remember allowed'],
             field_validation: newToggleStates['Field validation'],
         };
-
         dispatch(setNewComponent({
             id: 'options',
             value: payload,
@@ -104,8 +108,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
     const handleTabClick = (tab) => setActiveTab(tab);
     const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
-    const options = getOptions(componentType);
 
+    const options = getOptions(componentType);
     return (
         <div className='mt-7 w-[97%]'>
             <p className='font-semibold text-base text-[#2B333B]'>Options</p>
@@ -173,20 +177,23 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 </div>
             )}
 
-            {/* Render other toggles below the dropdown */}
-            {options
-                .filter(option => option !== 'Load from previously entered data')
-                .map(option => (
-                    <ToggleSwitch
-                        key={option}
-                        checked={toggleStates[option]}
-                        label={option}
-                        testId={option}
-                        onChange={formStatus === 'Draft' ?() => handleToggleClick(option):null}
-                    />
-                ))}
-        </div>
-    );
+        
+                
+        
+                {/* Render other toggles below the dropdown */}
+                {options
+                    .filter(option => option !== 'Load from previously entered data')
+                    .map(option => (
+                        <ToggleSwitch
+                            key={option}
+                            checked={toggleStates[option]}
+                            label={option}
+                            testId={option}
+                            onChange={formStatus === 'Draft' ?() => handleToggleClick(option):null}
+                        />
+                    ))}
+            </div>
+        );
 }
 
 export default OptionsComponent;

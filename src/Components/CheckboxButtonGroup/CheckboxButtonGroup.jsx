@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 const CustomCheckboxGroup = ({ values, onChange }) => {
     // Initialize with the first value selected by default
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(selectedValues, 'selected values fffffffffffffffff')
     const handleCheckboxChange = (value) => {
         setSelectedValues(prev => {
             if (prev.includes(value)) {

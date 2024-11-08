@@ -129,7 +129,6 @@ function ChoiceFieldSetting({
             .replaceAll('', 'if');
         // Return null as JSX expects a valid return inside {}
     }
-    console.log(defaultString,'hey here')
     return (
         <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
