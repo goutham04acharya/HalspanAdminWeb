@@ -71,7 +71,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
-    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -718,9 +718,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [selectedQuestionId, allSectionDetails]);
 
-
     const handleSave = async () => {
-
         const sectionId = selectedQuestionId.split('_')[0];
         setShowSectionList(false);
 
@@ -746,10 +744,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let evalInputValue = modifyString(inputValue);
 
-            if (isDefaultLogic) {
-                setDefaultString(evalInputValue);
-            }
-            if (complianceState) {
+            if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
             }
             evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
@@ -764,10 +759,35 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
+            console.log(evalInputValue, 'evalInputValue')
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "Date", "includes"
             ]
+            if (evalInputValue.includes('getMonth')) {
+                // Extract the value after `getMonth()` with any comparison operator using regex
+                const monthValueMatch = evalInputValue.match(/getMonth\(\)\s*(===|!==|>=|<=|>|<)\s*(\d+)/);
+
+                // Check if a valid match was found
+                if (monthValueMatch) {
+                    const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
+                    const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
+
+                    console.log(`Operator: ${operator}, Month Value: ${monthValue}`);
+
+                    // Validate if the month is between 1 and 12
+                    if (monthValue < 1 || monthValue > 12) {
+                        setError("Invalid month. Please enter a value between 1 and 12.");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getMonth() === value`.");
+                    return;
+                }
+            }
+
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
                 handleError('Please pass the parameter inside the function');
@@ -799,7 +819,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the expression (only for default checking)
-            if ((isDefaultLogic || complianceState) && selectedComponent == "dateTimefield") {
+            if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (expression.includes('AddDays()') || expression.includes('SubtractDays'))) {
                 let invalid = DateValidator(evalInputValue)
                 if (invalid) {
                     if (invalid) {
@@ -820,8 +840,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                         break;
                     case 'numberfield':
-                        // Attempt to parse result as a number
-                        // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
                         // Check if the type is 'integer'
@@ -970,7 +988,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
 
                     // Validate date value (either "Today" or a valid date format)
-                    if (value !== 'Today' && !validDateRegex.test(value)) {
+                    if (value !== 'Today' && (expression.includes('AddDays()') || expression.includes('SubtractDays')) && !validDateRegex.test(value)) {
                         errors.push(`Error in expression: "${value}" is not a valid date. Use 'dd/mm/yyyy' or 'Today'.`);
                     }
                 } else {
@@ -1039,7 +1057,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
-
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

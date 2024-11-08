@@ -23,8 +23,6 @@ function AdvancedEditor({
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-    const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 
     const dispatch = useDispatch()
 
