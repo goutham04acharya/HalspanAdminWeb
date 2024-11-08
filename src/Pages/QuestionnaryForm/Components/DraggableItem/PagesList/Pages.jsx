@@ -15,7 +15,8 @@ function Pages({ pageIndex,
   sections,
   handleAutoSave,
   setSections,
-  scrollToPage
+  scrollToPage,
+  formStatus
 }) {
   
   const pageRefs = useRef({});
@@ -65,9 +66,6 @@ function Pages({ pageIndex,
     // Call handleAutoSave with the correct sectionId and updated sections
     handleAutoSave(sectionId, updatedSections);
   };
-  console.log(selectedAddQuestion.questionIndex, 'selectedAddQuestion')
-  console.log(pageData, 'field setting params')
-
   return (
     <div>
       <div
@@ -87,6 +85,7 @@ function Pages({ pageIndex,
             ...questionData,
             sectionIndex,
             pageIndex,
+            formStatus: formStatus,
             index: questionIndex,
             selectedQuestionId: selectedQuestionId,
             handleDeletequestionModal: handleDeletequestionModal,
@@ -105,7 +104,7 @@ function Pages({ pageIndex,
           <button
             data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1
               }`}
-            onClick={() =>
+            onClick={formStatus === 'Draft' ?() =>
               handleAddRemoveQuestion(
                 "add",
                 sectionIndex,
@@ -113,7 +112,7 @@ function Pages({ pageIndex,
                 "",
                 pageData.page_id
               )
-            }
+            : null}
             className="flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base"
           >
             <span className="mr-[15px]">+</span>

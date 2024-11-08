@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
 
-function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
+function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
     const dispatch = useDispatch();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
@@ -116,7 +116,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                 checked={toggleStates['Load from previously entered data']}
                 label='Load from previously entered data'
                 testId='Load from previously entered data'
-                onChange={() => handleToggleClick('Load from previously entered data')}
+                onChange={formStatus === 'Draft' ?() => handleToggleClick('Load from previously entered data'):null}
             />
 
             {/* Conditionally render the dropdown below the toggle */}
@@ -126,14 +126,14 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                         <p
                             data-testid="attribute-data"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'attributeData' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
-                            onClick={() => handleTabClick('attributeData')}
+                            onClick={formStatus === 'Draft' ?() => handleTabClick('attributeData'):null}
                         >
                             Attribute Data
                         </p>
                         <p
                             data-testid="service-record"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'serviceRecord' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
-                            onClick={() => handleTabClick('serviceRecord')}
+                            onClick={formStatus === 'Draft' ?() => handleTabClick('serviceRecord'):null}
                         >
                             Service Record
                         </p>
@@ -147,9 +147,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                             testID='select-attribute'
                             labeltestID='attribute'
                             selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attribute_data_lfp)}
-                            handleOptionClick={handleAttributeClick}
-                            isDropdownOpen={isAttributeDropdownOpen}
-                            setDropdownOpen={setIsAttributeDropdownOpen}
+                            handleOptionClick={formStatus === 'Draft' ?handleAttributeClick: null}
+                            isDropdownOpen={formStatus === 'Draft' ?isAttributeDropdownOpen:false}
+                            setDropdownOpen={formStatus === 'Draft' ?setIsAttributeDropdownOpen:null}
                             options={attributes}
                         />
                     )}
@@ -164,9 +164,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                             testID='select-service-record'
                             labeltestID='service-record'
                             selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.service_record_lfp)}
-                            handleOptionClick={handleServiceClick}
-                            isDropdownOpen={isServiceRecordDropdownOpen}
-                            setDropdownOpen={setServiceRecordDropdownOpen}
+                            handleOptionClick={formStatus === 'Draft' ?handleServiceClick:null}
+                            isDropdownOpen={formStatus === 'Draft' ?isServiceRecordDropdownOpen: false}
+                            setDropdownOpen={formStatus === 'Draft' ?setServiceRecordDropdownOpen: null}
                             options={serviceRecordOptions}
                         />
                     )}
@@ -182,7 +182,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
                         checked={toggleStates[option]}
                         label={option}
                         testId={option}
-                        onChange={() => handleToggleClick(option)}
+                        onChange={formStatus === 'Draft' ?() => handleToggleClick(option):null}
                     />
                 ))}
         </div>

@@ -4,7 +4,7 @@ import { addNewFixedChoice, removeFixedChoice, setFixedChoiceValue } from '../..
 import {setShouldAutoSave}  from '../../../QuestionnaryFormSlice'
 
 const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
-    const { id, value, index, selectedQuestionId } = item;
+    const { id, value, index, selectedQuestionId, formStatus } = item;
     const dispatch = useDispatch();
     const [localValue, setLocalValue] = useState(value);
     const debounceTimerRef = useRef(null); // Ref to store the debounce timer
@@ -43,39 +43,40 @@ const FixedChoiceDraggable = ({ item, dragHandleProps }) => {
                 <div className='flex items-center justify-center w-full'>
                     <div
                         className="disable-select dragHandle"
-                        onMouseDown={(e) => {
+                        onMouseDown={formStatus === 'Draft' ?(e) => {
                             document.body.style.overflow = "hidden";
                             dragHandleProps.onMouseDown(e);
-                        }}
-                        onMouseUp={() => {
+                        }:null}
+                        onMouseUp={formStatus === 'Draft' ?() => {
                             document.body.style.overflow = "visible";
-                        }}
+                        }:null}
                     >
-                        <img className='cursor-grab' src={`/Images/drag.svg`} alt="Drag" />
+                        <img className={`${formStatus === 'Draft' ? 'cursor-grab' : 'cursor-not-allowed'}`} src={`/Images/drag.svg`} alt="Drag" />
                     </div>
                     <input
                         type="text"
                         className='w-full border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                         placeholder={`Choice ${index + 1}`}
-                        onChange={handleFixedChoiceChange}
+                        onChange={formStatus === 'Draft' ?handleFixedChoiceChange:null}
                         value={localValue}
                         id={id}
+                        disabled={formStatus !== 'Draft'}
                         data-testid={`choice-${index + 1}`}
                         maxLength={50}
                     />
                     {fixedChoiceArray.length > 1 && <img
                         src="/Images/trash-black.svg"
                         alt="delete"
-                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                        onClick={() => handleAddRemoveFixedChoice('remove', id)}
+                        className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} p-2 rounded-full hover:bg-[#FFFFFF]`}
+                        onClick={formStatus === 'Draft' ?() => handleAddRemoveFixedChoice('remove', id):null}
                         data-testid={`delete-choice-${index + 1}`}
                     />}
                     <img
                         src="/Images/add.svg"
                         alt="add"
                         data-testid={`add-choice-${index + 2}`}
-                        className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF]'
-                        onClick={() => handleAddRemoveFixedChoice('add', id)}
+                        className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} p-2 rounded-full hover:bg-[#FFFFFF]`}
+                        onClick={formStatus === 'Draft' ?() => handleAddRemoveFixedChoice('add', id):null}
                     />
                 </div>
             </div>

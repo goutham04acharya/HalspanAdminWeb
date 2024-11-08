@@ -26,7 +26,8 @@ const Sections = ({ sectionData,
   selectedSection,
   setSelectedSection,
   selectedPage,
-  setSelectedPage
+  setSelectedPage,
+  formStatus
 }) => {
 
   const sectionRefs = useRef([]);
@@ -151,23 +152,29 @@ const Sections = ({ sectionData,
                               />
                             </div>
                             <div className="flex items-center">
-                              <img
+                              {formStatus === 'Draft' ? <img
                                 className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
                                 title="Drag"
                                 src={`/Images/drag.svg`}
                                 alt="Drag"
                                 {...provided.dragHandleProps}
-                              />
+                              /> : <img
+                                className={`${formStatus === 'Draft' ? 'cursor-grab hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full `}
+                                title="Drag"
+                                src={`/Images/drag.svg`}
+                                alt="Drag"
+                              />}
                               <img src="/Images/trash-black.svg"
                                 title='Delete'
                                 alt="Delete"
                                 data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#EFF1F8] w-[47px]'
-                                onClick={() => {
-
-                                  handleDeletePageModal(sectionIndex, pageIndex, pageData),
-                                    dispatch(setShowPageDeleteModal(true));
-                                }}
+                                className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full  w-[47px]`}
+                                onClick={
+                                  formStatus === 'Draft' ?
+                                    () => {
+                                      handleDeletePageModal(sectionIndex, pageIndex, pageData),
+                                        dispatch(setShowPageDeleteModal(true));
+                                    } : null}
                               />
                             </div>
                           </div>
@@ -180,6 +187,7 @@ const Sections = ({ sectionData,
                             sections={sections}
                             handleAutoSave={handleAutoSave}
                             setSections={setSections}
+                            formStatus={formStatus}
                           />
                         </li>
                       )}
@@ -192,14 +200,14 @@ const Sections = ({ sectionData,
           </DragDropContext>
 
           <button
-            onClick={() =>
+            onClick={formStatus === 'Draft' ?() =>
               handleAddRemovePage(
                 "add",
                 sectionIndex,
                 "",
                 sectionData.section_id
               )
-            }
+            : null}
             data-testid={`add-page-sec-${sectionIndex}`}
             className="flex items-center justify-center w-full rounded-[10px] py-7 mt-4 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
           >

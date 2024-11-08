@@ -24,7 +24,8 @@ function InfinateDropdown({
     preview,
     assets,
     type, // 'multi_choice', 'single_choice', or other
-    handleMultiSelectChange // for multi-choice
+    handleMultiSelectChange, // for multi-choice
+    formStatus
 }) {
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
@@ -38,9 +39,11 @@ function InfinateDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
+                    disabled={formStatus !== 'Draft'}
                     value={preview ? selectedOption : (selectedOption ? selectedOption.label : '')}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
+                    
                 />
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[11px]`} onClick={() => handleRemoveLookup()} />

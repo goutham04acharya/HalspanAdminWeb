@@ -97,6 +97,8 @@ const QuestionnaryForm = () => {
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
     const [selectedSection, setSelectedSection] = useState(null);
     const [selectedPage, setSelectedPage] = useState(null);
+    const [formStatus, setFormStatus] = useState();
+
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -520,8 +522,13 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            console.log(formStatus, 'response?.data')
             if (!response?.error) {
+                
                 dispatch(setFormDefaultInfo(response?.data?.data));
+                setFormStatus(response?.data?.data?.status);
+
+                console.log(formStatus, 'response?.data')
                 const sectionsData = response?.data?.data?.sections || [];
                 // if (sectionsData.length === 1) {  
                 //     // If no sections are present, skip calling GetSectionOrder  
@@ -1157,7 +1164,8 @@ const QuestionnaryForm = () => {
                                                                             data-testId={`open-${sectionIndex}`}
                                                                             className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? "rotate-180 ml-2" : "" // Rotate 180deg when expanded
                                                                                 }`}
-                                                                            onClick={() => toggleSection(sectionIndex)} // Toggle section on click
+                                                                            onClick={() => toggleSection(sectionIndex)}
+
                                                                         />
                                                                         <EditableField
                                                                             name={sectionData?.section_name}
@@ -1169,36 +1177,42 @@ const QuestionnaryForm = () => {
                                                                             setSaveClick={setSaveClick}
                                                                             setSectionName={setSectionName}
                                                                             sectionName={sectionName}
+                                                                            formStatus={formStatus}
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                        <img
-                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                                        {formStatus === 'Draft' ? (
+                                                                            <img
+                                                                                className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                                                title="Drag"
+                                                                                src={`/Images/drag.svg`}
+                                                                                alt="Drag"
+                                                                                {...provided.dragHandleProps}
+                                                                            />
+                                                                        ) : <img
+                                                                            className="cursor-not-allowed p-2 rounded-full"
                                                                             title="Drag"
                                                                             src={`/Images/drag.svg`}
                                                                             alt="Drag"
-                                                                            {...provided.dragHandleProps}
-                                                                        />
+                                                                            
+                                                                        />}
+
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
                                                                             data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF] '
-                                                                            // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                                                                            onClick={() => {
-                                                                                handleDeleteModal(sectionIndex, sectionData)
-
-                                                                            }} // Open modal instead of directly deleting
+                                                                            className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                            onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                         />
                                                                         <img
                                                                             src="/Images/save.svg"
                                                                             alt="save"
                                                                             title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 cursor-pointer`}
-                                                                            onClick={() => {
+                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
+                                                                            onClick={formStatus === 'Draft' ? () => {
                                                                                 handleSaveSection(sectionData?.section_id);
-                                                                            }}
+                                                                            } : null}
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -1221,6 +1235,7 @@ const QuestionnaryForm = () => {
                                                                     setSelectedSection={setSelectedSection}
                                                                     selectedPage={selectedPage}
                                                                     setSelectedPage={setSelectedPage}
+                                                                    formStatus={formStatus}
                                                                 // currentSectionData={currentSectionData}
                                                                 />
                                                             </li>
@@ -1233,12 +1248,12 @@ const QuestionnaryForm = () => {
                                     </Droppable>
                                 </DragDropContext>
                                 <button
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         handleAddRemoveSection('add');
                                         handleSectionSaveOrder(sections);
-                                    }}
+                                    } : null}
                                     data-testid="add-section"
-                                    className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
+                                    className={`flex items-center ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} font-semibold text-[#2B333B] text-base mt-5`}>
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
@@ -1302,7 +1317,8 @@ const QuestionnaryForm = () => {
                                         complianceState: complianceState,
                                         setCompliancestate: setCompliancestate,
                                         complianceSaveHandler: complianceSaveHandler,
-                                        scrollToPage: scrollToPage
+                                        scrollToPage: scrollToPage,
+                                        formStatus: formStatus
                                     }
                                 )
                             ) : (

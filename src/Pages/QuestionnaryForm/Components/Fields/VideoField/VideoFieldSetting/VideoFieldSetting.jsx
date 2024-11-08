@@ -12,7 +12,8 @@ function VideoFieldSetting({ handleInputChange,
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
 
     return (
@@ -34,6 +35,7 @@ function VideoFieldSetting({ handleInputChange,
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <InputField

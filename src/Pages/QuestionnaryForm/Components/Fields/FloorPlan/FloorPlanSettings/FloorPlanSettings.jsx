@@ -13,8 +13,8 @@ function FloorPlanSettings({ handleInputChange,
     handleRadiobtn,
     fieldSettingParameters,
     selectedQuestionId,
-    setConditionalLogic
-
+    setConditionalLogic,
+    formStatus
 }) {
     const dispatch = useDispatch();
     return (
@@ -36,6 +36,7 @@ function FloorPlanSettings({ handleInputChange,
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Pin Drop</p>
@@ -46,12 +47,13 @@ function FloorPlanSettings({ handleInputChange,
                                     className='w-[17px] h-[17px]'
                                     name='pin_drop'
                                     id='pin_drop_yes'
+                                    disabled={formStatus !== 'Draft'}
                                     value='pin_drop'
                                     checked={fieldSettingParameters?.pin_drop === 'yes'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }}
+                                    } : null}
                                 />
                                 <label htmlFor='pin_drop_yes'
                                     data-testid='pindrop-yes'
@@ -65,12 +67,13 @@ function FloorPlanSettings({ handleInputChange,
                                     className='w-[17px] h-[17px]'
                                     name='pin_drop'
                                     id='pin_drop_no'
+                                    disabled={formStatus !== 'Draft'}
                                     value='pin_drop_no'
                                     checked={fieldSettingParameters?.pin_drop === 'no'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }}
+                                    } : null}
                                 />
                                 <label htmlFor='pin_drop_no'
                                     data-testid='pindrop-no'
@@ -88,12 +91,13 @@ function FloorPlanSettings({ handleInputChange,
                                 className='w-[17px] h-[17px]'
                                 name='draw_image'
                                 id='draw_image_yes'
+                                disabled={formStatus !== 'Draft'}
                                 value='draw_image_yes'
                                 checked={fieldSettingParameters?.draw_image === 'yes'}
-                                onClick={() => {
+                                onClick={formStatus === 'Draft' ? () => {
                                     dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                     dispatch(setShouldAutoSave(true));
-                                }} />
+                                } : null} />
                             <label htmlFor='draw_image_yes'
                                 data-testid='draw-yes'
                                 className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -106,12 +110,13 @@ function FloorPlanSettings({ handleInputChange,
                                 className='w-[17px] h-[17px]'
                                 name='draw_image'
                                 id='draw_image_no'
+                                disabled={formStatus !== 'Draft'}
                                 value='draw_image_no'
                                 checked={fieldSettingParameters?.draw_image === 'no'}
-                                onClick={() => {
+                                onClick={formStatus === 'Draft' ? () => {
                                     dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
                                     dispatch(setShouldAutoSave(true));
-                                }}
+                                } : null}
                             />
                             <label htmlFor='draw_image_no'
                                 data-testid='draw-no'
@@ -120,7 +125,7 @@ function FloorPlanSettings({ handleInputChange,
                             </label>
                         </div>
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -131,19 +136,20 @@ function FloorPlanSettings({ handleInputChange,
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
+                            formStatus={formStatus}
                             testId='Notes'
                             htmlFor='note'
-                            maxLength={500}
-                            handleChange={handleInputChange}
-                            handleBlur={handleBlur}
+                            maxLength={formStatus === 'Draft' ? 500 : 0}
+                            handleChange={formStatus === 'Draft' ? handleInputChange : null}
+                            handleBlur={formStatus === 'Draft' ? handleBlur : null}
                         />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             data-testid="add-conditional-logic"
                             type='button'
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                            className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                            onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
                         >
                             Add Conditional Logic
                         </button>

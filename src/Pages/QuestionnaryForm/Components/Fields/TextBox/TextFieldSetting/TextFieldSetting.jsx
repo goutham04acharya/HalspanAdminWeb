@@ -29,7 +29,8 @@ function TestFieldSetting({
   setConditionalLogic,
   setIsDefaultLogic,
   defaultString,
-  setDefaultString
+  setDefaultString,
+  formStatus
 }) {
 
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -190,6 +191,7 @@ function TestFieldSetting({
             handleInputChange={handleInputChange}
             formParameters={formParameters}
             handleBlur={handleBlur}
+            formStatus={formStatus}
           />
           <div className='flex flex-col justify-start mt-7 w-full relative'>
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
@@ -198,17 +200,18 @@ function TestFieldSetting({
                 data-testid="default-value-input"
                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content'
+                disabled={formStatus !== 'Draft'}
                 value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
-                onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))} />
+                onChange={formStatus === 'Draft' ?(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId })): null} />
               <img
                 src="/Images/setting.svg"
                 alt="setting"
                 data-testid="default-value"
-                className='absolute top-5 right-3 cursor-pointer'
-                onClick={() => {
+                className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} `}
+                onClick={formStatus === 'Draft' ?() => {
                   setIsDefaultLogic(true);
                   setConditionalLogic(false);
-                }} />
+                }:null} />
             </div>
           </div>
           <div className='mt-7'>
@@ -221,8 +224,9 @@ function TestFieldSetting({
                   name='type'
                   id='Singleline'
                   value='Singleline'
+                  disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.type === 'single_line'}
-                  onClick={() => handleRadiobtn('single_line')} />
+                  onClick={formStatus === 'Draft' ?() => handleRadiobtn('single_line'):null} />
                 <label htmlFor='Singleline'
                   data-testid='single_line'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -236,9 +240,10 @@ function TestFieldSetting({
                   className='w-[17px] h-[17px]'
                   name='type'
                   id='SingleChoice'
+                  disabled={formStatus !== 'Draft'}
                   value='SingleChoice'
                   checked={fieldSettingParameters?.type === 'multi_line'}
-                  onClick={() => handleRadiobtn('multi_line')} />
+                  onClick={formStatus === 'Draft' ?() => handleRadiobtn('multi_line'):null} />
                 <label
                   data-testid='multi_line'
                   htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -252,8 +257,9 @@ function TestFieldSetting({
                   name='type'
                   id='Lookup'
                   value='Lookup'
+                  disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.type === 'lookup'}
-                  onClick={() => handleRadiobtn('lookup')} />
+                  onClick={formStatus === 'Draft' ?() => handleRadiobtn('lookup'):null} />
                 <label htmlFor='Lookup' data-testid='lookup'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                   Lookup
@@ -266,21 +272,22 @@ function TestFieldSetting({
                       label=''
                       id='lookup'
                       placeholder='Select the lookup list'
-                      className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
+                      className={`w-full ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px]`}
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'
                       selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                      handleRemoveLookup={handleRemoveLookup}
-                      isDropdownOpen={isLookupOpen}
-                      setDropdownOpen={setIsLookupOpen}
+                      handleRemoveLookup={formStatus === 'Draft' ?handleRemoveLookup:null}
+                      isDropdownOpen={formStatus === 'Draft' ?isLookupOpen:false}
+                      setDropdownOpen={formStatus === 'Draft' ?setIsLookupOpen:null}
                       handleOptionClick={handleLookupOption}
+                      formStatus={formStatus}
                       top='20px'
                       close='true'
                       options={optionData}
                       lastElementRef={lastElementRef}
                     />
                   </div>
-                  <button onClick={() => navigate('/lookup-dataset', { state: { create: true } })} className='ml-4'>
+                  <button onClick={formStatus === 'Draft' ?() => navigate('/lookup-dataset', { state: { create: true } }):null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}
@@ -294,14 +301,15 @@ function TestFieldSetting({
               id='format'
               top='55px'
               placeholder='Select'
-              className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+              className={`w-full ${formStatus === 'Draft' ?'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px] mt-3`}
               testID='format-dropdown'
               labeltestID='format-list'
               selectedOption={options.find(option => option.value === fieldSettingParameters?.format)}
-              handleOptionClick={handleOptionClick}
-              isDropdownOpen={isDropdownOpen}
-              setDropdownOpen={setDropdownOpen}
+              handleOptionClick={formStatus === 'Draft' ?handleOptionClick : null}
+              isDropdownOpen={formStatus === 'Draft' ?isDropdownOpen: false}
+              setDropdownOpen={formStatus === 'Draft' ?setDropdownOpen : null}
               options={options}
+              formStatus={formStatus}
             />
           </div>
           {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true)
@@ -317,12 +325,13 @@ function TestFieldSetting({
                 className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder="Regex pattern (e.g. ^[a-zA-Z0-9]+$)"
                 value={fieldSettingParameters?.regular_expression}
-                handleBlur={(e) => validateRegex(e)}
-                handleChange={(e) => handleInputChange(e)}
+                handleBlur={formStatus === 'Draft' ?(e) => validateRegex(e):null}
+                handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null}
                 // onBlur={(e)=>}
                 testId="regex-input"
                 maxLength={50}
                 validationError={isValid ? 'Invalid Expression' : ''}
+                formStatus={formStatus}
               />
             </div>{validationErrors?.regular_expression && (
               <ErrorMessage error={validationErrors?.regular_expression} />
@@ -339,8 +348,8 @@ function TestFieldSetting({
               className='mt-[11px] border w-full border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
               placeholder="Enter a custom error message for invalid input"
               value={fieldSettingParameters?.format_error}
-              handleChange={(e) => handleInputChange(e)}
-
+              handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null}
+              formStatus={formStatus}
               testId="format-error-input"
               maxLength={50} />
           </div>}
@@ -355,11 +364,12 @@ function TestFieldSetting({
                 value={fieldSettingParameters?.min}
                 className='w-full'
                 labelStyle=''
+                formStatus={formStatus}
                 placeholder='Minimum'
                 testId='minChar'
                 htmlFor='min'
                 maxLength={10}
-                handleChange={(e) => handleInputChange(e)} />
+                handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null} />
               <p className='mx-3 font-normal text-base text-[#2B333B]'>to</p>
               <InputField
                 autoComplete='off'
@@ -368,19 +378,20 @@ function TestFieldSetting({
                 type='text'
                 value={fieldSettingParameters?.max}
                 className='w-full'
+                formStatus={formStatus}
                 labelStyle=''
                 placeholder='Maximum'
                 testId='maxChar'
                 htmlFor='max'
                 maxLength={10}
-                handleChange={(e) => handleInputChange(e)} />
+                handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null} />
             </div>
             {validationErrors?.minMax && (
               <ErrorMessage error={validationErrors.minMax} />
             )}
           </div>
           {/* OptionsComponent added here */}
-          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'
@@ -393,15 +404,16 @@ function TestFieldSetting({
               placeholder='Notes'
               testId='Notes'
               htmlFor='note'
-              maxLength={500}
-              handleChange={(e) => handleInputChange(e)} />
+              formStatus={formStatus}
+              maxLength={formStatus === 'Draft' ? 500 : 0}
+              handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null} />
           </div>
           <div className='mx-auto mt-7 flex flex-col items-center w-full'>
             <button
               type='button'
               data-testid="add-conditional-logic"
-              className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-              onClick={() => setConditionalLogic(true)}  // Use arrow function
+              className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
+              onClick={formStatus === 'Draft' ?() => setConditionalLogic(true):null}  // Use arrow function
             >
               Add Conditional Logic
             </button>
