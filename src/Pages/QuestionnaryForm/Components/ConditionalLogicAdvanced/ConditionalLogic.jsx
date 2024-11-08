@@ -786,6 +786,175 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
             }
 
+            if (evalInputValue.includes('getDay')) {
+                // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
+                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
+
+                // Check if a valid match was found
+                if (dayValueMatch) {
+                    const operator = dayValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
+                    const dayValue = dayValueMatch[2].toLowerCase(); // Capture and normalize day value to lowercase
+
+                    console.log(`Operator: ${operator}, Day Value: ${dayValue}`);
+
+                    // Validate day value against valid days (in lowercase)
+                    const validDays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+                    if (!validDays.includes(dayValue)) {
+                        setError("Invalid day. Please enter a valid day from Sunday to Saturday.");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getDay() === \"Day\"`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getFullYear')) {
+                // Extract the value after `getFullYear()` with any comparison operator using regex
+                const yearValueMatch = evalInputValue.match(/getFullYear\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{4,})/);
+
+                // Check if a valid match was found
+                if (yearValueMatch) {
+                    const operator = yearValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
+                    const yearValue = parseInt(yearValueMatch[2], 10); // Capture and parse the year value
+
+                    console.log(`Operator: ${operator}, Year Value: ${yearValue}`);
+
+                    // Validate if the year is a valid 4-digit number (between 1000 and 9999)
+                    if (isNaN(yearValue) || yearValue < 1000 || yearValue > 9999) {
+                        setError("Invalid year. Please enter a valid 4-digit year");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getFullYear() === <year>`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getTime')) {
+                // Match getTime() with a quoted `hh:mm:ss` format
+                const timeMatches = evalInputValue.match(/getTime\(\)\s*(===|!==|>=|<=|>|<)\s*"(\d{2}:\d{2}:\d{2})"/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, timeValue] = timeMatch.match(/getTime\(\)\s*(===|!==|>=|<=|>|<)\s*"(\d{2}:\d{2}:\d{2})"/);
+
+                        console.log(`Operator: ${operator}, Time Value: ${timeValue}`);
+
+                        // Validate `hh:mm:ss` format strictly for each time value
+                        const timePattern = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+                        if (!timePattern.test(timeValue)) {
+                            setError(`Invalid time: "${timeValue}". Please enter a valid time in 'hh:mm:ss' format`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getTime() === \"hh:mm:ss\"`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getSeconds')) {
+                // Match getSeconds() with either a quoted 2-digit seconds number or raw number
+                const timeMatches = evalInputValue.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/g);
+            
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, seconds] = timeMatch.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/);
+            
+                        console.log(`Operator: ${operator}, Seconds Value: ${seconds}`);
+            
+                        // Validate that seconds are exactly two digits and between 00 and 59
+                        if (!/^[0-5][0-9]$/.test(seconds)) {
+                            setError(`Invalid seconds: "${seconds}". Please enter a valid two-digit value between 00 and 59.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getSeconds() === \"ss\"` the seconds should to between 0 - 59 ");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getHours')) {
+                // Match getHours() with either a two-digit number and a comparison operator
+                const timeMatches = evalInputValue.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
+            
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, hours] = timeMatch.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
+            
+                        console.log(`Operator: ${operator}, Hours Value: ${hours}`);
+            
+                        // Ensure the hours value is a two-digit number between 00 and 23
+                        if (parseInt(hours) < 0 || parseInt(hours) > 23) {
+                            setError(`Invalid hours: "${hours}". The value must be a valid number between 00 and 23.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getHours() === hh` where hh is a two-digit number.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getMinutes')) {
+                // Match getMinutes() with a comparison operator and a two-digit number
+                const timeMatches = evalInputValue.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
+            
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, minutes] = timeMatch.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
+            
+                        console.log(`Operator: ${operator}, Minutes Value: ${minutes}`);
+            
+                        // Ensure the minutes value is a two-digit number between 00 and 59
+                        if (parseInt(minutes) < 0 || parseInt(minutes) > 59) {
+                            setError(`Invalid minutes: "${minutes}". The value must be a valid number between 00 and 59.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getMinutes() === mm` where mm is a two-digit number.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getMilliseconds')) {
+                // Match getMilliseconds() with a comparison operator and a three-digit number
+                const timeMatches = evalInputValue.match(/getMilliseconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{3,})/g);
+            
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, milliseconds] = timeMatch.match(/getMilliseconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{3,})/);
+            
+                        console.log(`Operator: ${operator}, Milliseconds Value: ${milliseconds}`);
+            
+                        // Ensure the milliseconds value is a number
+                        const millisecondsValue = parseInt(milliseconds);
+            
+                        // Validate that the milliseconds value is within the range 0 to 999
+                        if (millisecondsValue < 0 || millisecondsValue > 999) {
+                            setError(`Invalid milliseconds: "${milliseconds}". The value must be between 000 and 999.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getMilliseconds() === nnn` where nnn is a three-digit number.");
+                    return;
+                }
+            }
+            
+                        
+            
+            
+            
+            
+        
+
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
                 handleError('Please pass the parameter inside the function');
@@ -938,7 +1107,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
-        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
 
         // Define a regex to detect incomplete expressions (e.g., missing operators or values)
         const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
@@ -978,7 +1147,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 errors.push(`Error in expression: "${displayPart}" is incomplete (missing operator or value).`);
             }
             // Check if it's a date type
-            else if (selectedType === 'date') {
+            else if (selectedType === 'date' && (expression.includes('AddDays()') || expression.includes('SubtractDays'))) {
                 const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
                 if (dateMatch) {
                     const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
@@ -1053,6 +1222,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
+
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
