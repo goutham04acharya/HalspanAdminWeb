@@ -22,7 +22,10 @@ function InputWithDropDown({
     close,
     setSelectedUrlOption,
     selectedQuestionId,
-    formStatus
+    formStatus,
+    textFieldLookup,
+    assetType,
+    language
 }) {
     const dispatch = useDispatch();
 
@@ -47,7 +50,7 @@ function InputWithDropDown({
                     value={selectedOption ? selectedOption.label : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
-                    disabled={formStatus !== 'Draft'}
+                    disabled={formStatus !== 'Draft' && !language && !assetType}
                 />
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={()=> handleRemove()} />

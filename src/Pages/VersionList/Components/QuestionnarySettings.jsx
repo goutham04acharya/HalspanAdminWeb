@@ -108,7 +108,7 @@ function QuestionnarySettings({
                             id='public_name'
                             type='text'
                             mandatoryField='true'
-                            value={editedDetails?.public_name.trim()}
+                            value={editedDetails?.public_name?.trim()}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Enter Public name'
@@ -117,6 +117,7 @@ function QuestionnarySettings({
                             maxLength={100}
                             handleChange={(e) => handleChange(e, 'public_name')}
                             validationError={validationErrors?.public_name}
+                            questionnarySettings
                         />
                     </div>
                     <div className='w-full mt-6'>
@@ -135,6 +136,7 @@ function QuestionnarySettings({
                             maxLength={100}
                             handleChange={(e) => handleChange(e, 'internal_name')} // Ensure handleChange is passed
                             validationError={validationErrors?.internal_name}
+                            questionnarySettings
                         />
                     </div>
                     <div className='w-full mt-6'>

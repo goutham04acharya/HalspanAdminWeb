@@ -10,7 +10,8 @@ function GPSFieldSetting({
     handleBlur,
     fieldSettingParameters,
     selectedQuestionId,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
     return (
         <>
@@ -28,8 +29,9 @@ function GPSFieldSetting({
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -42,14 +44,16 @@ function GPSFieldSetting({
                             placeholder='Notes'
                             testId='Notes'
                             htmlFor='note'
+                            formStatus={formStatus}
                             maxLength={500}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

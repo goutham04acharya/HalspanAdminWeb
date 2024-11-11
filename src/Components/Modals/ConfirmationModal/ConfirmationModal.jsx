@@ -1,11 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Image from '../../Image/Image'
 import useOnClickOutside from '../../../CommonMethods/outSideClick.js'
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 
 
-function ConfirmationModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen }) {
+function ConfirmationModal({ text, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -14,12 +14,25 @@ function ConfirmationModal({ text, subText, Button1text, Button2text, src, class
         dispatch(setModalOpen(false));
     };
 
-    useOnClickOutside(modalRef, () => {
-        dispatch(setModalOpen(false));
-    });
+    // useOnClickOutside(modalRef, () => {
+    //     dispatch(setModalOpen(false));
+    // });
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (modalRef.current && !modalRef.current.contains(event.target)) {
+            handleClose();
+          }
+        };
+    
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, []);
 
     return (
-        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
+        <div className='bg-[#3931313b] w-full h-screen absolute left-0 top-0 flex flex-col items-center justify-center z-[999]'>
             <div ref={modalRef} className='w-[512px] h-auto mx-auto bg-white rounded-[14px] relative pt-10 px-6 pb-6 '>
                 <Image src="Error-close" className="absolute top-5 right-5 cursor-pointer" data-testid="close-btn" onClick={() => handleClose()} />
                 <Image src={src} className={`${className} mx-auto`} />
@@ -27,7 +40,7 @@ function ConfirmationModal({ text, subText, Button1text, Button2text, src, class
                 <p className='font-normal text-base text-[#2B333B] mt-2 text-center break-words'>{subText}</p>
                 <div className='mt-5 flex items-center justify-between'>
                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
-                        {Button1text}
+                   {!loading ? Button1text : <BeatLoader color="#fff" size={'10px'} /> }
                     </button> :
                     <>
                         <input

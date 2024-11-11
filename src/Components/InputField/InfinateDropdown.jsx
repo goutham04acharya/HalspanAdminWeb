@@ -22,10 +22,13 @@ function InfinateDropdown({
     lastElementRef,
     handleRemoveLookup,
     preview,
+    choiceBox,
     assets,
     type, // 'multi_choice', 'single_choice', or other
     handleMultiSelectChange, // for multi-choice
-    formStatus
+    formStatus,
+    textFieldLookup,
+    assetLocation
 }) {
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>
@@ -39,7 +42,7 @@ function InfinateDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
-                    disabled={formStatus !== 'Draft'}
+                    disabled={formStatus !== 'Draft' && !choiceBox && !preview && !textFieldLookup && !assetLocation}
                     value={preview ? selectedOption : (selectedOption ? selectedOption.label : '')}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly

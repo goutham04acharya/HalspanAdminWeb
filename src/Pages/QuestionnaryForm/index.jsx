@@ -33,7 +33,7 @@ import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSetting
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
 import { isEqual } from 'lodash'; // Import deep comparison library
-
+import useObjects from '../../customHooks/useObjects.js'
 
 
 const QuestionnaryForm = () => {
@@ -108,7 +108,15 @@ const QuestionnaryForm = () => {
 
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
+    // Create the initial dropdown state
+    const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
+        // debugger
+        acc[index] = false;  // Set all dropdowns to false initially
+        return acc;
+    }, {});
 
+    // State for dropdowns
+    const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -1181,7 +1189,7 @@ const QuestionnaryForm = () => {
     };
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
-        if (hasUnsavedChanges()) {
+        if (hasUnsavedChanges() && formStatus === 'Draft') {
             dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
         } else {
             navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
@@ -1209,7 +1217,9 @@ const QuestionnaryForm = () => {
                             sections={sections}
                             setSections={setSections}
                             handleSectionScroll={scrollToSection}
-                            handlePageScroll={scrollToPage} />
+                            handlePageScroll={scrollToPage}
+                            setDropdown={setDropdown}
+                            dropdownOpen={dropdownOpen} />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -1330,6 +1340,8 @@ const QuestionnaryForm = () => {
                                                                     selectedPage={selectedPage}
                                                                     setSelectedPage={setSelectedPage}
                                                                     formStatus={formStatus}
+                                                                    setDropdown={setDropdown}
+                                                                    dropdownOpen={dropdownOpen}
                                                                 // currentSectionData={currentSectionData}
                                                                 />
                                                             </li>
@@ -1373,7 +1385,7 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
+                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' disabled={formStatus !== 'Draft'} onClick={() => {
 
                                 handleSaveSection(latestSectionId);
                             }}>

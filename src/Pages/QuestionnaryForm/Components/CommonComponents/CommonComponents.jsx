@@ -36,7 +36,7 @@ function CommonComponents({
                     onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
                     data-testid="label-name-input"
                     disabled={formStatus !== 'Draft'}
-                    maxLength={formStatus === 'Draft' ? 100 : null}
+                    maxLength={formStatus === 'Draft' ? 2500 : null}
                     onFocus={formStatus === 'Draft' ? () => {
                         if (setFocusInput) {
                             setFocusInput('');
@@ -59,7 +59,7 @@ function CommonComponents({
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="help-text-input"
-                    maxLength={150}
+                    maxLength={2500}
                     disabled={formStatus !== 'Draft'}
                     onFocus={() => {
                         if (setFocusInput) {
@@ -90,7 +90,7 @@ function CommonComponents({
                         disabled={formStatus !== 'Draft'}
                         onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
                         data-testid="placeholder-input"
-                        maxLength={50}
+                        maxLength={2500}
                         onFocus={() => {
                             if (setFocusInput) {
                                 setFocusInput('');

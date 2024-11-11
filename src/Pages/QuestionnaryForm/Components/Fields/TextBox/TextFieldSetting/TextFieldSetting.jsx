@@ -259,7 +259,7 @@ function TestFieldSetting({
                   value='Lookup'
                   disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.type === 'lookup'}
-                  onClick={formStatus === 'Draft' ?() => handleRadiobtn('lookup'):null} />
+                  onClick={() => handleRadiobtn('lookup')} />
                 <label htmlFor='Lookup' data-testid='lookup'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                   Lookup
@@ -276,15 +276,16 @@ function TestFieldSetting({
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'
                       selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                      handleRemoveLookup={formStatus === 'Draft' ?handleRemoveLookup:null}
-                      isDropdownOpen={formStatus === 'Draft' ?isLookupOpen:false}
-                      setDropdownOpen={formStatus === 'Draft' ?setIsLookupOpen:null}
+                      handleRemoveLookup={handleRemoveLookup}
+                      isDropdownOpen={isLookupOpen}
+                      setDropdownOpen={setIsLookupOpen}
                       handleOptionClick={handleLookupOption}
                       formStatus={formStatus}
                       top='20px'
                       close='true'
                       options={optionData}
                       lastElementRef={lastElementRef}
+                      textFieldLookup
                     />
                   </div>
                   <button onClick={formStatus === 'Draft' ?() => navigate('/lookup-dataset', { state: { create: true } }):null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
@@ -310,6 +311,7 @@ function TestFieldSetting({
               setDropdownOpen={formStatus === 'Draft' ?setDropdownOpen : null}
               options={options}
               formStatus={formStatus}
+              textFieldLookup
             />
           </div>
           {(fieldSettingParameters?.format === "Custom Regular Expression" && fieldSettingParameters?.options?.field_validation === true)

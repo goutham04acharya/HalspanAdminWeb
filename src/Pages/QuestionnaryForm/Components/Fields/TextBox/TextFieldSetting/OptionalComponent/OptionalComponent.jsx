@@ -3,6 +3,7 @@ import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
+import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
@@ -151,10 +152,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             testID='select-attribute'
                             labeltestID='attribute'
                             selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attribute_data_lfp)}
-                            handleOptionClick={formStatus === 'Draft' ?handleAttributeClick: null}
-                            isDropdownOpen={formStatus === 'Draft' ?isAttributeDropdownOpen:false}
-                            setDropdownOpen={formStatus === 'Draft' ?setIsAttributeDropdownOpen:null}
+                            handleOptionClick={handleAttributeClick}
+                            isDropdownOpen={isAttributeDropdownOpen}
+                            setDropdownOpen={setIsAttributeDropdownOpen}
                             options={attributes}
+                            formStatus={formStatus}
                         />
                     )}
                     {activeTab === 'serviceRecord' && (
@@ -172,6 +174,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             isDropdownOpen={formStatus === 'Draft' ?isServiceRecordDropdownOpen: false}
                             setDropdownOpen={formStatus === 'Draft' ?setServiceRecordDropdownOpen: null}
                             options={serviceRecordOptions}
+                            formStatus={formStatus}
                         />
                     )}
                 </div>
