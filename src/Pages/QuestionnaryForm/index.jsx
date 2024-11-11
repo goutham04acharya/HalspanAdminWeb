@@ -1367,7 +1367,7 @@ const QuestionnaryForm = () => {
                             </div>
                             {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
-                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} />
+                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                 </div>
                             )}
                         </div>
