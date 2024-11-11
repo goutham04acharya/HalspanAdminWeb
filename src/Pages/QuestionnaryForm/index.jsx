@@ -37,7 +37,7 @@ import { isEqual } from 'lodash'; // Import deep comparison library
 
 
 const QuestionnaryForm = () => {
-    const { public_name, questionnaire_id, version_number } = useParams();
+    const {questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
@@ -132,6 +132,7 @@ const QuestionnaryForm = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
+
         // Restrict numeric input if the id is 'fileType'
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
@@ -653,14 +654,14 @@ const QuestionnaryForm = () => {
 
             let body = {
                 section_id: sectionToSave.section_id,
-                section_name: sectionToSave.section_name,
+                section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
                 pages: sectionToSave.pages.map(page => (
                     {
                         page_id: page.page_id,
-                        page_name: page.page_name,
+                        page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
                         questions: page.questions.map(question => ({
                             question_id: question.question_id,
-                            question_name: fieldSettingParams[question.question_id].label,
+                            question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
                             conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
                             default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
                             component_type: fieldSettingParams[question.question_id].componentType,

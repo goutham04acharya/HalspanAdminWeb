@@ -276,19 +276,19 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
                 return <ChoiceBoxField
-                sections={sections[currentSection]}
-                validationErrors={validationErrors}
-                setValidationErrors={setValidationErrors}
-                question={question}
-                preview
-                setConditionalValues={setConditionalValues}
-                conditionalValues={setConditionalValues}
-                setIsFormatError={setIsFormatError}
-                question_id={question?.question_id}
-                testId="preview"
-                setValue={setValue}
-                choiceValue={value[question?.question_id]}
-                fieldSettingParameters={question}
+                    sections={sections[currentSection]}
+                    validationErrors={validationErrors}
+                    setValidationErrors={setValidationErrors}
+                    question={question}
+                    preview
+                    setConditionalValues={setConditionalValues}
+                    conditionalValues={setConditionalValues}
+                    setIsFormatError={setIsFormatError}
+                    question_id={question?.question_id}
+                    testId="preview"
+                    setValue={setValue}
+                    choiceValue={value[question?.question_id]}
+                    fieldSettingParameters={question}
                 />
             case 'dateTimefield':
                 return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
@@ -378,6 +378,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }));
         dispatch(resetFields())
     }
+    function addDays(date) {
+        if (date) {
+            let result = date;
+            result.setDate(result.getDate() + 1);
+            console.log(result, 'pani')
+            // return result
+        }
+
+    }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -431,14 +440,20 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
+
                                     if (list?.conditional_logic !== '') {
+                                        // addDays(Section_1.Page_1.Question_1)
+                                        console.log(list?.conditional_logic)
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
+                                                let result = eval(list?.conditional_logic)
+                                                console.log(result,'result')
+                                                console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error,error)
+                                                console.log(error, error)
                                             }
 
                                         } else {

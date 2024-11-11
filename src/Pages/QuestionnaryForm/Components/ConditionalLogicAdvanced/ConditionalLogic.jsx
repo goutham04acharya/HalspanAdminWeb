@@ -747,20 +747,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setDefaultString(evalInputValue);
             }
             // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
-            // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
-            // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
             evalInputValue = evalInputValue.replaceAll(
-                /((?:\w+\.)*\w+)\.AddDays\((\d+)\)/g,
-                '(function(date) { const result = new Date(date); result.setDate(result.getDate() + $2); return result.toLocaleDateString("en-GB"); })($1)'
+                /(\w+\.\w+\.\w+)\.AddDays\((\d+)\)/g,
+                'new Date(new Date($1).setDate(new Date($1).getDate() + $2)).toLocaleDateString("en-GB")'
             );
-
+            console.log(evalInputValue,'nayana')
             // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
             evalInputValue = evalInputValue.replaceAll(
-                /((?:\w+\.)*\w+)\.SubtractDays\((\d+)\)/g,
-                '(function(date) { const result = new Date(date); result.setDate(result.getDate() - $2); return result.toLocaleDateString("en-GB"); })($1)'
+                /(\w+\.\w+\.\w+)\.SubtractDays\((\d+)\)/g,
+                'new Date(new Date($1).setDate(new Date($1).getDate() - $2)).toLocaleDateString("en-GB")'
             );
-
-
 
             evalInputValue = evalInputValue
                 .replaceAll('Today()', 'new Date()')
@@ -1119,11 +1115,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         console.log(expression, 'njnj')
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
+        console.log(parts, 'iiiiiiiiiiiiiii')
 
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
         const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+        // const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\) === "\d{2}\/\d{2}\/\d{4}"$/;
+        const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\)\s*(==|!=|===|!==|<|>|<=|>=)\s*"\d{2}\/\d{2}\/\d{4}"$/;
+
 
         // Define a regex to detect incomplete expressions (e.g., missing operators or values)
         const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
@@ -1136,13 +1136,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Check for incomplete expressions
             part = trimParentheses(part)
-            if (part.includes('includes(')) {
 
-            } else {
-                part = part.replace(/[()]/g, '')
-            }
             //trimming the conditions to avoid space issue
             part = part.trim();
+            console.log(part, 'single logic')
             const displayPart = part.replace(/sections\./g, '');
 
             // Check if the expression contains any method from the typeMethods list
@@ -1152,7 +1149,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (part.includes('includes(')) {
                 const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
                 if (!result) {
-                    error.push(`Error in the ${part}: missing vaalues inside the function`)
+                    error.push(`Error in the ${part}: missing values inside the function`)
                 }
             }
             // If it contains a method that doesn't require an operator, mark as correct
@@ -1177,7 +1174,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
             }
             // Check if the part matches the valid expression pattern
-            else if (!validExpressionRegex.test(part)) {
+            else if (!validExpressionRegex.test(part) && !addDaysValidator.test(part)) {
                 errors.push(`Error in expression: "${displayPart}" is incorrect.`);
             }
             // If the expression is correct, log that it's valid
