@@ -122,7 +122,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             };
         });
     };
-
+    console.log(conditionalValues, 'conditional values')
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
     const validateFormat = (value, format, regex) => {
