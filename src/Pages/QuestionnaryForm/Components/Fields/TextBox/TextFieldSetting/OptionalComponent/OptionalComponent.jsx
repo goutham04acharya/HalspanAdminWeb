@@ -106,7 +106,10 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters }) {
         dispatch(setShouldAutoSave(true));
     };
 
-    const handleTabClick = (tab) => setActiveTab(tab);
+    const handleTabClick = (tab) => {setActiveTab(tab)
+        setServiceRecordDropdownOpen(false);
+        setIsAttributeDropdownOpen(false);
+    };
     const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
 
     const options = getOptions(componentType);

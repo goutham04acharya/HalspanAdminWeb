@@ -51,13 +51,12 @@ function QuestionnarySettings({
         if (!editedDetails.description?.trim()) {
             errors.description = 'This field is mandatory';
         }
-        setValidationErrors(errors);
 
+        setValidationErrors(errors);
         // If there are any validation errors, stop here
         if (Object.keys(errors).length > 0 || Object.keys(payload).length === 0) {
             return; // Don't proceed if there are errors or if there are no changes in the payload
         }
-
         setIsThreedotLoader(true);
 
         try {
@@ -76,6 +75,22 @@ function QuestionnarySettings({
                     ...validationErrors,
                     public_name: 'This public name already exists',
                 });
+                setIsThreedotLoader(false);
+            } else if (response?.data?.status === 400) {
+                const fieldErrors = {};
+
+                // Check if public_name is too short and set the appropriate error
+                if (editedDetails?.public_name?.length < 2) {
+                    fieldErrors.public_name = 'Public name requires at least 2 characters';
+                }
+
+                // Check if internal_name is too short and set the appropriate error
+                if (editedDetails?.internal_name?.length < 2) {
+                    fieldErrors.internal_name = 'Internal name requires at least 2 characters';
+                }
+                // Set validation errors for the specific failing fields
+                setValidationErrors({ ...errors, ...fieldErrors });
+
                 setIsThreedotLoader(false);
             } else {
                 setToastError('Something went wrong!');
@@ -97,7 +112,7 @@ function QuestionnarySettings({
         dataLoading ?
             <QuestionnarySettingShimmer />
             :
-            
+
             <div className='mt-9'>
                 <p className='font-medium text-[22px] text-[#2B333B]'>Questionnaire settings</p>
                 <div className='mt-[22px] h-customh11 overflow-auto default-sidebar overflow-x-hidden'>
@@ -108,8 +123,8 @@ function QuestionnarySettings({
                             id='public_name'
                             type='text'
                             mandatoryField='true'
-                            value={editedDetails?.public_name.trim()}
-                            className='w-full mt-2.5'
+                            value={editedDetails?.public_name}
+                            className='w-full mt-2.5 pr-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Enter Public name'
                             testId='publicName'
@@ -127,7 +142,7 @@ function QuestionnarySettings({
                             type='text'
                             mandatoryField='true'
                             value={editedDetails?.internal_name || ''}
-                            className='w-full mt-2.5'
+                            className='w-full mt-2.5 pr-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Enter Internal name'
                             testId='internalName'
