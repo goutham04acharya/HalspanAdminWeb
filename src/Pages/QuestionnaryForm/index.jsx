@@ -1432,6 +1432,7 @@ const QuestionnaryForm = () => {
                                 <AddFields
                                     buttons={Fieldsneeded}
                                     handleClick={handleClick}
+                                    formStatus={formStatus}
                                 />
                             )}
 
