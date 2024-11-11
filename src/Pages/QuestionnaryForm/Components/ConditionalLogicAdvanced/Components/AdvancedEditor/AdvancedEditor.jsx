@@ -24,8 +24,6 @@ function AdvancedEditor({
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
-    const dispatch = useDispatch()
-
     // Handle user input change and filter suggestions
     const handleSearchChange = (event) => {
         const value = event.target.value;

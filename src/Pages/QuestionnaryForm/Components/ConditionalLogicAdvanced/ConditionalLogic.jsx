@@ -71,7 +71,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
-    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
+    const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
+    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
+    const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -251,8 +253,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'dateTimefield') {
+            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'datetime') {
+                setSuggestions(dateTimeMethods);
+                setShowMethodSuggestions(true);
+            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'date') {
                 setSuggestions(dateMethods);
+                setShowMethodSuggestions(true);
+            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'time') {
+                setSuggestions(timeMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
@@ -293,7 +301,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         setShowMethodSuggestions(true);
                         break;
                     case 'date':
-                        setSuggestions(dateMethods);
+                        setSuggestions(dateTimeMethods);
                         setShowMethodSuggestions(true);
                         break;
                     case 'number':
@@ -698,7 +706,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
                             conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+                            conditionalLogic = conditionalLogic.replaceAll(
+                                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                                '$1.AddDays($2)'
+                            );
+                            conditionalLogic = conditionalLogic.replaceAll(
+                                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                                '$1.SubtractDays($2)'
+                            );
 
+                            console.log(conditionalLogic, 'consitionalLogic')
                             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
                             setInputValue(conditionalLogic)
 
@@ -718,7 +735,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleSave = async () => {
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-        console.log(sectionId, 'section id')
         setShowSectionList(false);
 
         try {
@@ -751,7 +767,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 /(\w+\.\w+\.\w+)\.AddDays\((\d+)\)/g,
                 'new Date(new Date($1).setDate(new Date($1).getDate() + $2)).toLocaleDateString("en-GB")'
             );
-            console.log(evalInputValue,'nayana')
             // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
             evalInputValue = evalInputValue.replaceAll(
                 /(\w+\.\w+\.\w+)\.SubtractDays\((\d+)\)/g,
@@ -761,7 +776,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue
                 .replaceAll('Today()', 'new Date()')
                 .replaceAll('if', '');
-            console.log(evalInputValue, 'evalInputValue')
             let expression = evalInputValue.toString();
 
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
@@ -769,7 +783,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             evalInputValue = expression
-            console.log(evalInputValue, 'evalInputValue')
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "includes"
@@ -975,7 +988,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
-            console.log(evalInputValue, 'expression')
             // Extract variable names from the payloadString using a regex
             const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableNames = payloadString.match(variableRegex) || [];
@@ -1112,10 +1124,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
-        console.log(expression, 'njnj')
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
-        console.log(parts, 'iiiiiiiiiiiiiii')
 
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
@@ -1139,7 +1149,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             //trimming the conditions to avoid space issue
             part = part.trim();
-            console.log(part, 'single logic')
             const displayPart = part.replace(/sections\./g, '');
 
             // Check if the expression contains any method from the typeMethods list
