@@ -148,9 +148,9 @@ After(function (scenario) {
 Before("@create_questionnaire", async function () {
     try {
         global.questionary_payload= await create_questionnaire_payload();
-        console.log(global.questionary_payload, "Questionary Payload")
+        // console.log(global.questionary_payload, "Questionary Payload")
         let response = await createQuestionnaire(global.questionary_payload)
-        console.log(response.text, "Questionary Response")
+        // console.log(response.text, "Questionary Response")
     } catch (err) {
         console.log(err)
     }
@@ -159,9 +159,9 @@ Before("@create_questionnaire", async function () {
 Before("@create_lookup_dataset", async function () {
     try {
         global.lookup_dataset_payload = await lookup_dataset_payload();
-        console.log(global.lookup_dataset_payload, "lookup dataset payload")
+        // console.log(global.lookup_dataset_payload, "lookup dataset payload")
         let response = await createLookupDataset(global.lookup_dataset_payload)
-        console.log(response, "lookup dataset payload Response")
+        // console.log(response, "lookup dataset payload Response")
     } catch (err) {
         console.log(err)
     }
@@ -170,9 +170,9 @@ Before("@create_lookup_dataset", async function () {
 Before("@create_question", async function () {
     try {
         global.questionary_payload = await create_questionnaire_payload();
-        console.log(global.questionary_payload, "Questionary Payload");
+        // console.log(global.questionary_payload, "Questionary Payload");
         global.response = await Questionnaire(global.questionary_payload);
-        console.log(global.response, "Questionary Response");
+        // console.log(global.response, "Questionary Response");
     } catch (err) {
         console.log(err);
     }
