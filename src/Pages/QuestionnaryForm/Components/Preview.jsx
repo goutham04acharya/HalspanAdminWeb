@@ -125,7 +125,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             };
         });
     };
-
+    console.log(conditionalValues, 'conditional values')
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
     const validateFormat = (value, format, regex) => {
@@ -375,6 +375,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }));
         dispatch(resetFields())
     }
+    function addDays(date) {
+        if (date) {
+            let result = date;
+            result.setDate(result.getDate() + 1);
+            console.log(result, 'pani')
+            // return result
+        }
+
+    }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -428,9 +437,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
+
                                     if (list?.conditional_logic !== '') {
+                                        // addDays(Section_1.Page_1.Question_1)
+                                        console.log(list?.conditional_logic)
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
+                                                let result = eval(list?.conditional_logic)
+                                                console.log(result,'result')
+                                                console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }

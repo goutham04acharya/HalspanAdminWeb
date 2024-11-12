@@ -30,7 +30,7 @@ function CreateQuestionnary() {
   const [selectedOption, setSelectedOption] = useState({
     asset_type: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
-});
+  });
   const [validationErrors, setValidationErrors] = useState({});
   const [publickey, setpublickey] = useState()
 
@@ -99,7 +99,6 @@ function CreateQuestionnary() {
     try {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
-
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
