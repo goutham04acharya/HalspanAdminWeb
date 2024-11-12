@@ -177,7 +177,7 @@ const TextBoxField = ({
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
-                    disabled={formStatus !== 'Draft'}
+                    // disabled={formStatus !== 'Draft'}
                 />
                 :
                 <input
