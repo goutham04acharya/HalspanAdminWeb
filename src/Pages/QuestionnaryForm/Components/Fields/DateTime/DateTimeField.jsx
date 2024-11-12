@@ -23,12 +23,65 @@ function DateTimeField({
     sections
 }) {
     const splitDate = (dateStr) => {
+        if (!dateStr || typeof dateStr !== 'string') {
+            return new Date().toISOString().split('T')[0];
+        }
         const [day, month, year] = dateStr.split("/");
         return `${year}-${month}-${day}`;
     }
+
+    const splitTime = (timeStr) => {
+        if (!timeStr) {
+            return { hours: 0, minutes: 0, seconds: 0 };
+        }
+        const [hours, minutes, seconds] = timeStr.split(":");
+        return { 
+            hours: parseInt(hours, 10) || 0, 
+            minutes: parseInt(minutes, 10) || 0, 
+            seconds: parseInt(seconds || "0", 10) || 0 
+        };
+    };
+    const handleDateTime = (date, time) => {
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        
+        // Handle the date
+        const dateParts = new Date(splitDate(date));
+        
+        // Handle the time
+        const { hours, minutes, seconds } = splitTime(time);
+        const combinedDateTime = new Date(dateParts.getFullYear(), dateParts.getMonth(), dateParts.getDate(), hours, minutes, seconds, 0);
+
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: combinedDateTime
+                }
+            }
+        }));
+
+        // Only include time in the value if it exists
+        const dateTimeString = time ? `${date} ${time}` : date;
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: dateTimeString
+        }));
+
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_datetimefield: {
+                ...prevErrors.preview_datetimefield,
+                [question?.question_id]: ''
+            }
+        }));
+    };
     function handleFunction(e) {
+        console.log(e, 'dddddddddd') // 03:02:01
         if (type === 'time') {
             const value = e
+            console.log(e, 'seeeeeee')
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false
@@ -40,7 +93,21 @@ function DateTimeField({
                     [question?.question_id]: '' // Only clear the error message for the current question  
                 }
             }));
-        } else {
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+            const { hours, minutes, seconds } = splitTime(value);
+            const currentDateTime = new Date();
+            currentDateTime.setHours(hours, minutes, seconds, 0);
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name], // Preserve existing entries for this section
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                        [label]: currentDateTime // Thu Mar 01 2001 02:01:00 GMT+0530 (India Standard Time)
+                    }
+                }
+            }))
+        } else if (type === 'date'){
             const value = e.target.value;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
@@ -87,7 +154,7 @@ function DateTimeField({
                         type="date"
                         id={textId}
                         value={value}
-                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-md ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content || fieldSettingParameters?.placeholderContent}
                         onChange={(e) => handleFunction(e)}
                     />
@@ -114,13 +181,13 @@ function DateTimeField({
                                 type="date"
                                 id={textId}
                                 value={value}
-                                className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-lg mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                                className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                                 placeholder={question?.placeholder_content}
-                                onChange={(e) => handleFunction(e)}
+                                onChange={(e) => handleDateTime(e.target.value, value)}
                             />
                         </div>
                         <TimePicker
-                            onChange={handleFunction}
+                            onChange={(time) => handleDateTime(dateValue, time)}
                             format={question?.format}
                             setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
                                 ...prevErrors,

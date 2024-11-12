@@ -41,6 +41,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
+    console.log(conditionalValues, 'conditional values')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -104,16 +105,18 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
+        // debugger
         return complianceLogic.map(rule => {
+            // debugger
             // Get the condition part before the question mark
             const conditionPart = rule.default_content.split('?')[0].trim();
 
             // Evaluate the condition to determine which path was executed
             const conditionResult = eval(rule);
-
+            console.log(rule, 'condition result')
             // Get the full evaluation result
             const result = eval(rule.default_content);
-
+            
             return {
                 label: rule.label,
                 result: result?.toString(),
@@ -276,19 +279,19 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'choiceboxfield':
                 return <ChoiceBoxField
-                sections={sections[currentSection]}
-                validationErrors={validationErrors}
-                setValidationErrors={setValidationErrors}
-                question={question}
-                preview
-                setConditionalValues={setConditionalValues}
-                conditionalValues={setConditionalValues}
-                setIsFormatError={setIsFormatError}
-                question_id={question?.question_id}
-                testId="preview"
-                setValue={setValue}
-                choiceValue={value[question?.question_id]}
-                fieldSettingParameters={question}
+                    sections={sections[currentSection]}
+                    validationErrors={validationErrors}
+                    setValidationErrors={setValidationErrors}
+                    question={question}
+                    preview
+                    setConditionalValues={setConditionalValues}
+                    conditionalValues={setConditionalValues}
+                    setIsFormatError={setIsFormatError}
+                    question_id={question?.question_id}
+                    testId="preview"
+                    setValue={setValue}
+                    choiceValue={value[question?.question_id]}
+                    fieldSettingParameters={question}
                 />
             case 'dateTimefield':
                 return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
@@ -356,12 +359,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [conditionalValues])
-    const handleFieldEdit = (questionId) => {
-        dispatch(setFieldEditable({
-            fieldId: questionId,
-            isEditable: false
-        }));
-    };
 
     const handleClose = () => {
         setModalOpen(false)
@@ -438,9 +435,20 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error,error)
+                                                console.log(error, error)
+                                                return null;
                                             }
 
+                                        } else if (list?.conditional_logic.includes("getMonth(")) {
+                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
+                                            try {
+                                                if (!eval(replacedLogic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error, 'j')
+                                                return null;
+                                            }
                                         } else {
                                             try {
                                                 if (!eval(list?.conditional_logic)) {
@@ -448,6 +456,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 }
                                             } catch (error) {
                                                 console.log(error, 'j')
+                                                return null;
                                             }
                                         }
                                     }
