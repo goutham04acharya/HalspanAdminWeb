@@ -108,9 +108,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         // debugger
         return complianceLogic.map(rule => {
             // debugger
+            console.log(rule, 'rule')
             // Get the condition part before the question mark
             const conditionPart = rule.default_content.split('?')[0].trim();
-
+            console.log(conditionPart, 'ssss')
             // Evaluate the condition to determine which path was executed
             const conditionResult = eval(rule);
             console.log(rule, 'condition result')
@@ -121,7 +122,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 label: rule.label,
                 result: result?.toString(),
                 // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                tookIfPath: conditionResult
+                tookIfPath: result
             };
         });
     };
@@ -146,46 +147,88 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                } else if (question?.format_error && !validateFormat(value[question?.question_id], question?.format, question?.regular_expression)) {
-                    acc[question.question_id] = question?.format_error;
-                }
-            } else if (question?.component_type === 'choiceboxfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'numberfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'dateTimefield' && !question?.options?.optional) {
-                if (!value[question?.question_id] || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            }
-            else if (question?.component_type === 'photofield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
+            // First check if the question should be visible based on conditional logic
+            let isVisible = true;
+            if (question.conditional_logic !== '') {
+                try {
+                    if (question.conditional_logic.includes("new Date(")) {
+                        // Handle date-specific logic
+                        isVisible = eval(question.conditional_logic);
+                    } else if (question.conditional_logic.includes("getMonth(")) {
+                        // Handle month-specific logic with adjustment
+                        const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
+                        isVisible = eval(replacedLogic);
+                    } else {
+                        // Handle regular conditional logic
+                        isVisible = eval(question.conditional_logic);
+                    }
+                } catch (error) {
+                    console.error("Error evaluating conditional logic:", error);
+                    isVisible = false;
                 }
             }
-            else if (question?.component_type === 'filefield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            }
-            else if (question?.component_type === 'videofield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'gpsfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
+            // Only validate if the question is visible
+            if (isVisible) {
+                // Validate based on component type
+                switch (question.component_type) {
+                    case 'textboxfield':
+                        if (!question.options?.optional) {
+                            if (value[question.question_id] === '' || value[question.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
+                                acc[question.question_id] = question.format_error;
+                            }
+                        }
+                        break;
+    
+                    case 'choiceboxfield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }else{
+                                break;
+                            }
+                        }
+                    case 'numberfield':
+                        if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
+    
+                    case 'dateTimefield':
+                        if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
+    
+                    case 'photofield':
+                        if ( !question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'filefield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'videofield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'gpsfield':
+                        if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
                 }
             }
             return acc;
         }, {});
+    
         if (Object.keys(errors).length > 0) {
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -201,7 +244,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         } else {
             const isLastSection = currentSection === sections.length - 1;
             const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-
+    
             if (isLastSection && isLastPageInSection) {
                 setShowComplianceScreen(true);
                 setIsLastPage(true);
@@ -439,6 +482,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
 
                                     if (list?.conditional_logic !== '') {
+                                        // debugger
                                         // addDays(Section_1.Page_1.Question_1)
                                         console.log(list?.conditional_logic)
                                         if (list?.conditional_logic.includes("new Date(")) {
