@@ -1178,14 +1178,14 @@ const QuestionnaryForm = () => {
         if (hasUnsavedChanges()) {
             dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
         } else {
-            navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+            navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
     };
 
     // Confirmation modal "Confirm" button action (related to showing the cancle modal)
     const handleConfirmCancel = () => {
         dispatch(setShowCancelModal(false));
-        navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
+        navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
     return (
