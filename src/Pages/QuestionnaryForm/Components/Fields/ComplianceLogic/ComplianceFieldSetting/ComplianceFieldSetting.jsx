@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
-function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate }) {
+function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
 
     const handleInputChange = (id, field, value) => {
@@ -24,6 +24,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         <input
                             type="text"
                             data-testid="label-name-input"
+                            disabled={formStatus !== 'Draft'}
                             className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
@@ -35,10 +36,11 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                             <input type="text" id='Label'
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
                                 value={defaultContentConverter(complianceLogic[complianceLogicId]?.default_content)}
+                                disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 data-testid="default-value-input"
                                 placeholder='Populates the content' />
-                            <img src="/Images/setting.svg" alt="setting" onClick={() => setCompliancestate(true)} className='absolute top-5 right-3 cursor-pointer' data-testid='default-value' />
+                            <img src="/Images/setting.svg" alt="setting" disabled={formStatus !== 'Draft'} onClick={formStatus === 'Draft'?() => setCompliancestate(true) : null} className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`} data-testid='default-value' />
                         </div>
                     </div>
                 </div>

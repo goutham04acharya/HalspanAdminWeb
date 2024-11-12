@@ -33,7 +33,7 @@ import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSetting
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
 import { isEqual } from 'lodash'; // Import deep comparison library
-
+import useObjects from '../../customHooks/useObjects.js'
 
 
 const QuestionnaryForm = () => {
@@ -107,6 +107,16 @@ const QuestionnaryForm = () => {
     const [selectedSection, setSelectedSection] = useState(null);
 
     const [selectedPage, setSelectedPage] = useState(null);
+    const [formStatus, setFormStatus] = useState();
+    // Create the initial dropdown state
+    const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
+        // debugger
+        acc[index] = false;  // Set all dropdowns to false initially
+        return acc;
+    }, {});
+
+    // State for dropdowns
+    const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
     useEffect(() => {
         if (sections.length > 0) {
             const lastSection = sections[sections.length - 1]; // Get the latest section
@@ -532,8 +542,13 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            console.log(formStatus, 'response?.data')
             if (!response?.error) {
+                
                 dispatch(setFormDefaultInfo(response?.data?.data));
+                setFormStatus(response?.data?.data?.status);
+
+                console.log(formStatus, 'response?.data')
                 const sectionsData = response?.data?.data?.sections || [];
                 // if (sectionsData.length === 1) {  
                 //     // If no sections are present, skip calling GetSectionOrder  
@@ -1174,7 +1189,7 @@ const QuestionnaryForm = () => {
     };
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
-        if (hasUnsavedChanges()) {
+        if (hasUnsavedChanges() && formStatus === 'Draft') {
             dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
         } else {
             navigate(`/questionnaries/version-list/${formDefaultInfo?.public_name}/${questionnaire_id}`);
@@ -1202,7 +1217,10 @@ const QuestionnaryForm = () => {
                             sections={sections}
                             setSections={setSections}
                             handleSectionScroll={scrollToSection}
-                            handlePageScroll={scrollToPage} />
+                            handlePageScroll={scrollToPage}
+                            setDropdown={setDropdown}
+                            dropdownOpen={dropdownOpen}
+                             />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -1251,7 +1269,8 @@ const QuestionnaryForm = () => {
                                                                             data-testId={`open-${sectionIndex}`}
                                                                             className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? " ml-2" : "-rotate-90 mt-1 ml-2" // Rotate 180deg when expanded
                                                                                 }`}
-                                                                            onClick={() => toggleSection(sectionIndex)} // Toggle section on click
+                                                                            onClick={() => toggleSection(sectionIndex)}
+
                                                                         />
                                                                         <EditableField
                                                                             name={sectionData?.section_name}
@@ -1263,36 +1282,42 @@ const QuestionnaryForm = () => {
                                                                             setSaveClick={setSaveClick}
                                                                             setSectionName={setSectionName}
                                                                             sectionName={sectionName}
+                                                                            formStatus={formStatus}
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                        <img
-                                                                            className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                                        {formStatus === 'Draft' ? (
+                                                                            <img
+                                                                                className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                                                title="Drag"
+                                                                                src={`/Images/drag.svg`}
+                                                                                alt="Drag"
+                                                                                {...provided.dragHandleProps}
+                                                                            />
+                                                                        ) : <img
+                                                                            className="cursor-not-allowed p-2 rounded-full"
                                                                             title="Drag"
                                                                             src={`/Images/drag.svg`}
                                                                             alt="Drag"
-                                                                            {...provided.dragHandleProps}
-                                                                        />
+                                                                            
+                                                                        />}
+
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
                                                                             data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className='pl-2.5 cursor-pointer p-2 rounded-full hover:bg-[#FFFFFF] '
-                                                                            // onClick={() => handleAddRemoveSection('remove', sectionIndex)}
-                                                                            onClick={() => {
-                                                                                handleDeleteModal(sectionIndex, sectionData)
-
-                                                                            }} // Open modal instead of directly deleting
+                                                                            className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                            onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                         />
                                                                         <img
                                                                             src="/Images/save.svg"
                                                                             alt="save"
                                                                             title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 cursor-pointer`}
-                                                                            onClick={() => {
+                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
+                                                                            onClick={formStatus === 'Draft' ? () => {
                                                                                 handleSaveSection(sectionData?.section_id);
-                                                                            }}
+                                                                            } : null}
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -1315,6 +1340,9 @@ const QuestionnaryForm = () => {
                                                                     setSelectedSection={setSelectedSection}
                                                                     selectedPage={selectedPage}
                                                                     setSelectedPage={setSelectedPage}
+                                                                    formStatus={formStatus}
+                                                                    setDropdown={setDropdown}
+                                                                    dropdownOpen={dropdownOpen}
                                                                 // currentSectionData={currentSectionData}
                                                                 />
                                                             </li>
@@ -1327,12 +1355,12 @@ const QuestionnaryForm = () => {
                                     </Droppable>
                                 </DragDropContext>
                                 <button
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         handleAddRemoveSection('add');
                                         handleSectionSaveOrder(sections);
-                                    }}
+                                    } : null}
                                     data-testid="add-section"
-                                    className='flex items-center font-semibold text-[#2B333B] text-base mt-5'>
+                                    className={`flex items-center ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} font-semibold text-[#2B333B] text-base mt-5`}>
                                     <span className='mr-[15px]'>+</span>
                                     Add section
                                 </button>
@@ -1340,7 +1368,7 @@ const QuestionnaryForm = () => {
                             </div>
                             {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
-                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} />
+                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                 </div>
                             )}
                         </div>
@@ -1358,7 +1386,7 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' onClick={() => {
+                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' disabled={formStatus !== 'Draft'} onClick={() => {
 
                                 handleSaveSection(latestSectionId);
                             }}>
@@ -1397,13 +1425,15 @@ const QuestionnaryForm = () => {
                                         complianceState: complianceState,
                                         setCompliancestate: setCompliancestate,
                                         complianceSaveHandler: complianceSaveHandler,
-                                        scrollToPage: scrollToPage
+                                        scrollToPage: scrollToPage,
+                                        formStatus: formStatus
                                     }
                                 )
                             ) : (
                                 <AddFields
                                     buttons={Fieldsneeded}
                                     handleClick={handleClick}
+                                    formStatus={formStatus}
                                 />
                             )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import GlobalContext from '../Context/GlobalContext';
 
-const EditableField = ({ name, index, secondIndex, handleSave, section, testId }) => {
+const EditableField = ({ name, index, secondIndex, handleSave, section, testId, formStatus }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [inputValue, setInputValue] = useState(name);
     const inputRef = useRef(null);
@@ -16,7 +16,11 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId }
 
     const handleClick = () => {
         setInputValue(name);
-        setIsEditing(true);
+        if(formStatus === 'Draft'){
+            setIsEditing(true);
+        }else{
+            setIsEditing(false);
+        }
     };
 
     const handleBlur = () => {
@@ -67,7 +71,7 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId }
                     data-testid={testId}
                     onClick={handleClick}
                     title={name}
-                    className={`text-[#2B333B] p-[10px] font-medium text-[22px] cursor-pointer rounded mb-1 w-[85%] break-all break-words ml-1 ${section ? 'hover:bg-white' : 'hover:bg-[#EFF1F8]'}`}
+                    className={`text-[#2B333B] p-[10px] font-medium text-[22px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} rounded mb-1 w-[85%] break-all break-words ml-1 ${section ? 'hover:bg-white' : 'hover:bg-[#EFF1F8]'}`}
                 >
                     {name}
                 </p>
