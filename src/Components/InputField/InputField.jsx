@@ -26,7 +26,8 @@ const InputField = ({
     publicName,
     internalName,
     questionnarySettings,
-    lookupDataset
+    lookupDataset,
+    basicEditor
 }) => {
  
     return (
@@ -46,7 +47,7 @@ const InputField = ({
                     placeholder={prefixValue ? '' : placeholder}
                     data-testid={testId}
                     maxLength={maxLength}
-                    disabled={formStatus !== 'Draft' && !publicName && !internalName && !lookupDataset && !questionnarySettings}
+                    disabled={formStatus !== 'Draft' && !publicName && !internalName && !lookupDataset && !questionnarySettings && !basicEditor}
                     onInput={(e) => {
                         if (onInput) { 
                           e.target.value = e.target.value.replace(/[^0-9.]/g, ''); 
