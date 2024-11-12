@@ -136,6 +136,7 @@ const Sections = ({
                                 handleSave={handleSaveSectionName}
                                 testId={`page-${pageIndex}-name`}
                                 maxLength={1}
+                                formStatus={formStatus}
                               />
                             </div>
                             <div className="flex items-center">

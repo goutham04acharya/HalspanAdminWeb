@@ -1219,7 +1219,8 @@ const QuestionnaryForm = () => {
                             handleSectionScroll={scrollToSection}
                             handlePageScroll={scrollToPage}
                             setDropdown={setDropdown}
-                            dropdownOpen={dropdownOpen} />
+                            dropdownOpen={dropdownOpen}
+                             />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
