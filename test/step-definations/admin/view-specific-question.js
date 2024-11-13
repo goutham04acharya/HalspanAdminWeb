@@ -12,7 +12,9 @@ Given('I am on the questionnaire version listing screen', async function () {
     console.log('questionPublicName:', global.questionPublicName);
 
     if (questionnaireId && global.questionPublicName) {
-        await driver.get(`http://localhost:3000/questionnaries/version-list/${global.questionPublicName}/${questionnaireId}`); // Replace with actual URL
+        // await driver.get(`http://localhost:3000/questionnaries/version-list/${global.questionPublicName}/${questionnaireId}`); // Replace with actual URL
+        await driver.get(`http://localhost:3000/questionnaries/version-list/${questionnaireId}`);
+        console.log(`http://localhost:3000/questionnaries/version-list/${questionnaireId}`);
         await new Promise((resolve) => setTimeout(resolve, 500));
         const pageSource = await driver.getPageSource();
         check = pageSource.includes('Minerva Levy');
