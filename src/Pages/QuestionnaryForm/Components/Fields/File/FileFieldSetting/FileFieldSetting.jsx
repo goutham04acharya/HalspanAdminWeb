@@ -13,7 +13,8 @@ function FileFieldSetting({ handleInputChange,
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
     return (
         <>
@@ -34,6 +35,7 @@ function FileFieldSetting({ handleInputChange,
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <InputField
@@ -47,6 +49,7 @@ function FileFieldSetting({ handleInputChange,
                             labelStyle=''
                             placeholder='e.g. 5'
                             testId='file-size'
+                            formStatus={formStatus}
                             htmlFor='fileSize'
                             maxLength={10}
                             handleChange={(e) => handleInputChange(e)} />
@@ -60,6 +63,7 @@ function FileFieldSetting({ handleInputChange,
                             type='text'
                             value={fieldSettingParameters?.fileType}
                             className='w-full mt-2.5'
+                            formStatus={formStatus}
                             labelStyle=''
                             placeholder='File type by extension (e.g., pdf, doc, docx)'
                             testId='file-type'
@@ -77,6 +81,7 @@ function FileFieldSetting({ handleInputChange,
                                 value={fieldSettingParameters?.min}
                                 className='w-full'
                                 labelStyle=''
+                                formStatus={formStatus}
                                 placeholder='Minimum'
                                 testId='minChar'
                                 htmlFor='min'
@@ -91,6 +96,7 @@ function FileFieldSetting({ handleInputChange,
                                 value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
+                                formStatus={formStatus}
                                 placeholder='Maximum'
                                 testId='maxChar'
                                 htmlFor='max'
@@ -101,7 +107,7 @@ function FileFieldSetting({ handleInputChange,
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -114,6 +120,7 @@ function FileFieldSetting({ handleInputChange,
                             placeholder='Notes'
                             testId='Notes'
                             htmlFor='note'
+                            formStatus={formStatus}
                             maxLength={500}
                             handleChange={handleInputChange}
                             handleBlur={handleBlur}
@@ -122,8 +129,9 @@ function FileFieldSetting({ handleInputChange,
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

@@ -18,7 +18,8 @@ function NumberFieldSetting({
     selectedQuestionId,
     validationErrors,
     setConditionalLogic,
-    setIsDefaultLogic
+    setIsDefaultLogic,
+    formStatus
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
     const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function NumberFieldSetting({
                         handleInputChange={handleInputChange}
                         formParameters={formParameters}
                         handleBlur={handleBlur}
+                        formStatus={formStatus}
                     />
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
                         <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
@@ -60,6 +62,7 @@ function NumberFieldSetting({
                             <input type="text"
                                 id='Label'
                                 data-testid="default-value-input"
+                                disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
                                 onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
@@ -82,6 +85,7 @@ function NumberFieldSetting({
                                     type='radio'
                                     className='w-[17px] h-[17px]'
                                     name='type'
+                                    disabled={formStatus !== 'Draft'}
                                     id='integer'
                                     value='integer'
                                     checked={fieldSettingParameters?.type === 'integer'}
@@ -99,6 +103,7 @@ function NumberFieldSetting({
                                     type='radio'
                                     className='w-[17px] h-[17px]'
                                     name='type'
+                                    disabled={formStatus !== 'Draft'}
                                     id='float'
                                     value='float'
                                     checked={fieldSettingParameters?.type === 'float'}
@@ -114,6 +119,7 @@ function NumberFieldSetting({
                                     type='radio'
                                     className='w-[17px] h-[17px]'
                                     name='type'
+                                    disabled={formStatus !== 'Draft'}
                                     id='rating'
                                     value='rating'
                                     checked={fieldSettingParameters?.type === 'rating'}
@@ -136,7 +142,7 @@ function NumberFieldSetting({
                                     name='source'
                                     id='entryfield'
                                     value='entryfield'
-                                    disabled={fieldSettingParameters?.type === 'rating'}
+                                    disabled={fieldSettingParameters?.type === 'rating' || formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'entryfield'}
                                     onClick={() => {
                                         if (fieldSettingParameters?.type !== 'rating') {
@@ -158,6 +164,7 @@ function NumberFieldSetting({
                                     name='source'
                                     id='slider'
                                     value='slider'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'slider'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'slider', questionId: selectedQuestionId }));
@@ -176,7 +183,7 @@ function NumberFieldSetting({
                                     name='source'
                                     id='both'
                                     value='both'
-                                    disabled={fieldSettingParameters?.type === 'rating'}
+                                    disabled={fieldSettingParameters?.type === 'rating' || formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'both'}
                                     onClick={() => {
                                         if (fieldSettingParameters?.type !== 'rating') {
@@ -206,6 +213,7 @@ function NumberFieldSetting({
                                 labelStyle=''
                                 placeholder='Minimum'
                                 testId='minChar'
+                                formStatus={formStatus}
                                 htmlFor='min'
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
@@ -215,6 +223,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='max'
                                 type='text'
+                                formStatus={formStatus}
                                 value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
@@ -235,6 +244,7 @@ function NumberFieldSetting({
                                 label='Increment By'
                                 id='incrementby'
                                 type='text'
+                                formStatus={formStatus}
                                 value={fieldSettingParameters?.incrementby}
                                 className='w-full mt-2.5'
                                 labelStyle=''
@@ -251,16 +261,18 @@ function NumberFieldSetting({
                     <div className='mt-7'>
                         <div className='flex justify-between'>
                             <p
-                                data-testid="pre-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="pre-field-option" className={`font-semibold text-base ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
-                                onClick={() => handleTabClick('preField')}
+                                onClick={formStatus === 'Draft'?() => handleTabClick('preField'):null}
+                                disabled={formStatus !== 'Draft'}
                             >
                                 Pre-field Text
                             </p>
                             <p
-                                data-testid="post-field-option" className={`font-semibold text-base cursor-pointer ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
+                                data-testid="post-field-option" className={`font-semibold text-base ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
-                                onClick={() => handleTabClick('postField')}
+                                onClick={formStatus === 'Draft'?() => handleTabClick('postField'):null}
+                                disabled={formStatus !== 'Draft'}
                             >
                                 Post-field Text
                             </p>
@@ -278,6 +290,7 @@ function NumberFieldSetting({
                                     placeholder='Pre-field text'
                                     testId='field-text'
                                     htmlFor='preField'
+                                    formStatus={formStatus}
                                     maxLength={50}
                                     handleChange={(e) => handleInputChange(e)} // Ensure 'onChange' is used instead of 'handleChange'
                                 />
@@ -292,6 +305,7 @@ function NumberFieldSetting({
                                     type='postField'
                                     value={fieldSettingParameters?.postField}
                                     className='w-full'
+                                    formStatus={formStatus}
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Post-field text'
                                     testId='field-text'
@@ -309,6 +323,7 @@ function NumberFieldSetting({
                             label='Admin Field Notes'
                             id='note'
                             type='text'
+                            formStatus={formStatus}
                             value={fieldSettingParameters?.note}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
@@ -323,8 +338,9 @@ function NumberFieldSetting({
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

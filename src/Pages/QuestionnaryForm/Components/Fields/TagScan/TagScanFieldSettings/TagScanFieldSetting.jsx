@@ -14,7 +14,8 @@ function TagScanFieldSetting({
     selectedQuestionId,
     validationErrors,
     setConditionalLogic,
-    setIsDefaultLogic
+    setIsDefaultLogic,
+    formStatus
 }) {
 
     const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function TagScanFieldSetting({
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Type</p>
@@ -49,6 +51,7 @@ function TagScanFieldSetting({
                                     name='type'
                                     id='NFC'
                                     value='NFC'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.type === 'NFC'}
                                     onClick={() => {
                                         handleRadiobtn('NFC');
@@ -67,6 +70,7 @@ function TagScanFieldSetting({
                                     name='type'
                                     id='RFiD'
                                     value='RFiD'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.type === 'RFiD'}
                                     onClick={() => handleRadiobtn('RFiD')} />
                                 <label htmlFor='RFiD'
@@ -81,6 +85,7 @@ function TagScanFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='type'
                                     id='QR'
+                                    disabled={formStatus !== 'Draft'}
                                     value='QR'
                                     checked={fieldSettingParameters?.type === 'QR'}
                                     onClick={() => handleRadiobtn('QR')} />
@@ -97,6 +102,7 @@ function TagScanFieldSetting({
                                     name='type'
                                     id='Barcode'
                                     value='Barcode'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.type === 'Barcode'}
                                     onClick={() => handleRadiobtn('Barcode')} />
                                 <label htmlFor='Barcode'
@@ -117,6 +123,7 @@ function TagScanFieldSetting({
                                     name='source'
                                     id='uid'
                                     value='uid'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'uid'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'uid', questionId: selectedQuestionId }));
@@ -136,6 +143,7 @@ function TagScanFieldSetting({
                                     name='source'
                                     id='Payload'
                                     value='Payload'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'Payload'}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'source', value: 'Payload', questionId: selectedQuestionId }));
@@ -154,7 +162,7 @@ function TagScanFieldSetting({
                                     name='source'
                                     id='both'
                                     value='both'
-                                    disabled={fieldSettingParameters?.type === 'rating'}
+                                    disabled={fieldSettingParameters?.type === 'rating' || formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.source === 'both'}
                                     onClick={() => {
                                             dispatch(setNewComponent({ id: 'source', value: 'both', questionId: selectedQuestionId }));
@@ -169,7 +177,7 @@ function TagScanFieldSetting({
                             </div>
                         </div>
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -181,6 +189,7 @@ function TagScanFieldSetting({
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
+                            formStatus={formStatus}
                             htmlFor='note'
                             maxLength={500}
                             handleChange={handleInputChange}
@@ -190,8 +199,9 @@ function TagScanFieldSetting({
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

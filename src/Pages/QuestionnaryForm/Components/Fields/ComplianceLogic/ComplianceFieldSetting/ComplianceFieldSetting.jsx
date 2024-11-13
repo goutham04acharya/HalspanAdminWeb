@@ -4,7 +4,7 @@ import { defaultContentConverter } from '../../../../../../CommonMethods/default
 import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 
-function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate }) {
+function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     const dispatch = useDispatch();
 
@@ -26,6 +26,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                         <input
                             type="text"
                             data-testid="label-name-input"
+                            disabled={formStatus !== 'Draft'}
                             className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
@@ -39,14 +40,19 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                                 value={complianceLogic[complianceLogicId]?.default_content
                                     ? defaultContentConverter(complianceLogic[complianceLogicId].default_content)
                                     : ''}
+                                disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 data-testid="default-value-input"
                                 placeholder='Populates the content' />
-                            <img src="/Images/setting.svg" alt="setting"
-                             onClick={() => {
-                                setCompliancestate(true) 
-                                dispatch(setSelectedQuestionId(''))}}
-                             className='absolute top-5 right-3 cursor-pointer' data-testid='default-value' />
+                            <img src="/Images/setting.svg" 
+                            alt="setting" 
+                            disabled={formStatus!= 'Draft'}
+                            onClick={formStatus === 'Draft' ? () => {
+                                setCompliancestate(true)
+                                dispatch(setSelectedQuestionId(''))}
+                                : null}
+                            className={`absolute top-5 right-3 cursor-pointer ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                data-testid='default-value' />
                         </div>
                     </div>
                 </div>

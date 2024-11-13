@@ -1,24 +1,14 @@
 import React, { useState } from 'react'
-import useObjects from '../../../customHooks/useObjects'
+
 
 function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handleSectionScroll, handlePageScroll,
     selectedSection,
     setSelectedSection,
     selectedPage,
-    setSelectedPage }) {
-
-    // Create the initial dropdown state
-    const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
-        // debugger
-        acc[index] = false;  // Set all dropdowns to false initially
-        return acc;
-    }, {});
-
-    // State for dropdowns
-    const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
-
+    setSelectedPage, dropdownOpen, setDropdown }) {
 
     const handleDropdown = (index) => {
+        console.log(index, 'index')
         setDropdown(index, !dropdownOpen[index])
     }
 
@@ -42,7 +32,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                             }}
                             className={`${selectedSection === sectionIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-11 pr-3 cursor-pointer`}>
                             <img src="/Images/down-arrow.svg" alt="down-arrow"
-                                className={selectedSection === sectionIndex ? 'rotate-180' : ''}
+                                className={dropdownOpen[sectionIndex] ? 'rotate-180' : 'rotate-0'}
                             />
                             <p
                                 data-testid={`sidebar-section-${sectionIndex}`}

@@ -25,6 +25,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                     handleChange={handleChange}
                     className='w-full mt-2.5'
                     validationError={errors?.name}
+                    lookupDataset
                 />
                 <InputTextarea
                     className='h-[160px] w-full mt-2.5 px-2.5'

@@ -7,7 +7,8 @@ function AssetLocationFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
     return (
         <>
@@ -25,6 +26,7 @@ function AssetLocationFieldSetting({
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <InputField
@@ -36,6 +38,7 @@ function AssetLocationFieldSetting({
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
+                            formStatus={formStatus}
                             testId='Notes'
                             htmlFor='note'
                             maxLength={500}
@@ -44,8 +47,9 @@ function AssetLocationFieldSetting({
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

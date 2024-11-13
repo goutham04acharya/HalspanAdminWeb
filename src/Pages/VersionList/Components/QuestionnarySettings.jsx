@@ -132,6 +132,7 @@ function QuestionnarySettings({
                             maxLength={100}
                             handleChange={(e) => handleChange(e, 'public_name')}
                             validationError={validationErrors?.public_name}
+                            questionnarySettings
                         />
                     </div>
                     <div className='w-full mt-6'>
@@ -150,6 +151,7 @@ function QuestionnarySettings({
                             maxLength={100}
                             handleChange={(e) => handleChange(e, 'internal_name')} // Ensure handleChange is passed
                             validationError={validationErrors?.internal_name}
+                            questionnarySettings
                         />
                     </div>
                     <div className='w-full mt-6'>

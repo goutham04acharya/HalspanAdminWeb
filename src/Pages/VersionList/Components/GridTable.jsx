@@ -225,7 +225,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 Button2text='Cancel'
                 handleButton2={handleCancel}
                 handleButton1={handleConfirmPublish}
-                text="Confirm Publishing"
+                text="Confirm Publish Action"
                 subText="Publishing this version will retire the current published version, as only one active version is allowed."
                 button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                 src={`testing-error`}

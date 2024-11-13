@@ -16,7 +16,8 @@ function DisplayFieldSetting({
     selectedQuestionId,
     handleRadiobtn,
     setReplaceModal,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -164,9 +165,10 @@ function DisplayFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='type'
                                     id='heading'
+                                    disabled={formStatus !== 'Draft'}
                                     value='heading'
                                     checked={fieldSettingParameters?.type === 'heading'}
-                                    onClick={() => handleRadiobtn('heading')} />
+                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('heading') : null} />
                                 <label htmlFor='heading'
                                     data-testid='heading'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -181,10 +183,11 @@ function DisplayFieldSetting({
                                     value={fieldSettingParameters?.heading}
                                     className='w-full mt-2.5'
                                     placeholder='Enter heading'
+                                    formStatus={formStatus}
                                     testId='heading-input'
                                     htmlFor='heading'
-                                    maxLength={100}
-                                    handleChange={(e) => handleInputChange(e)} />
+                                    maxLength={formStatus === 'Draft' ? 100 : 0}
+                                    handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : 0} />
                             }
                             <div className="relative custom-radioBlue flex items-center mt-3">
                                 <input
@@ -192,9 +195,10 @@ function DisplayFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='type'
                                     id='text'
+                                    disabled={formStatus !== 'Draft'}
                                     value='text'
                                     checked={fieldSettingParameters?.type === 'text'}
-                                    onClick={() => handleRadiobtn('text')} />
+                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('text') : 0} />
                                 <label
                                     data-testid='text'
                                     htmlFor='text' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -211,8 +215,9 @@ function DisplayFieldSetting({
                                     placeholder='Enter text'
                                     testId='text-input'
                                     htmlFor='text'
-                                    maxLength={100}
-                                    handleChange={(e) => handleInputChange(e)} />
+                                    formStatus={formStatus}
+                                    maxLength={formStatus === 'Draft' ? 100 : 0}
+                                    handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
                             }
                             <div className="relative custom-radioBlue flex items-center mt-3">
                                 <input
@@ -221,11 +226,12 @@ function DisplayFieldSetting({
                                     name='type'
                                     id='image'
                                     value='image'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.type === 'image'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         handleRadiobtn('image'),
                                             handleImage()
-                                    }} />
+                                    } : null} />
                                 <label htmlFor='image' data-testid='image'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     Image
@@ -238,12 +244,13 @@ function DisplayFieldSetting({
                                             <input
                                                 type="file"
                                                 id="file-upload"
+                                                disabled={formStatus !== 'Draft'}
                                                 data-testId="add-image"
                                                 className='hidden'
-                                                onChange={handleFileChange}
+                                                onChange={formStatus === 'Draft' ? handleFileChange : null}
                                             />
                                             <label
-                                                onClick={handleFileUploadClick}
+                                                onClick={formStatus === 'Draft' ? handleFileUploadClick : null}
                                                 data-testid="upload-image" className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
                                             >
                                                 Add Image
@@ -266,12 +273,13 @@ function DisplayFieldSetting({
                                                         className='w-[17px] h-[17px]'
                                                         name='pin_drop'
                                                         id='pin_drop_yes'
+                                                        disabled={formStatus !== 'Draft'}
                                                         value='pin_drop_yes'
                                                         checked={fieldSettingParameters?.pin_drop === 'yes'}
-                                                        onClick={() => {
+                                                        onClick={formStatus === 'Draft' ? () => {
                                                             dispatch(setNewComponent({ id: 'pin_drop', value: 'yes', questionId: selectedQuestionId }));
                                                             dispatch(setShouldAutoSave(true));
-                                                        }} />
+                                                        } : null} />
                                                     <label htmlFor='pin_drop_yes'
                                                         data-testid='pindrop-yes'
                                                         className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -284,12 +292,13 @@ function DisplayFieldSetting({
                                                         className='w-[17px] h-[17px]'
                                                         name='pin_drop'
                                                         id='pin_drop_no'
+                                                        disabled={formStatus !== 'Draft'}
                                                         value='pin_drop_no'
                                                         checked={fieldSettingParameters?.pin_drop === 'no'}
-                                                        onClick={() => {
+                                                        onClick={formStatus === 'Draft' ? () => {
                                                             dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
                                                             dispatch(setShouldAutoSave(true));
-                                                        }} />
+                                                        } : null} />
                                                     <label htmlFor='pin_drop_no'
                                                         data-testid='pindrop-no'
                                                         className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -305,13 +314,14 @@ function DisplayFieldSetting({
                                                     type='radio'
                                                     className='w-[17px] h-[17px]'
                                                     name='draw_image'
+                                                    disabled={formStatus !== 'Draft'}
                                                     id='draw_image_yes'
                                                     value='draw_image_yes'
                                                     checked={fieldSettingParameters?.draw_image === 'yes'}
-                                                    onClick={() => {
+                                                    onClick={formStatus === 'Draft' ? () => {
                                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                                         dispatch(setShouldAutoSave(true));
-                                                    }} />
+                                                    } : null} />
                                                 <label htmlFor='draw_image_yes'
                                                     data-testid='draw-yes'
                                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -324,12 +334,13 @@ function DisplayFieldSetting({
                                                     className='w-[17px] h-[17px]'
                                                     name='draw_image'
                                                     id='draw_image_no'
+                                                    disabled={formStatus !== 'Draft'}
                                                     value='draw_image_no'
                                                     checked={fieldSettingParameters?.draw_image === 'no'}
-                                                    onClick={() => {
+                                                    onClick={formStatus === 'Draft' ? () => {
                                                         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
                                                         dispatch(setShouldAutoSave(true));
-                                                    }} />
+                                                    } : null} />
                                                 <label htmlFor='draw_image_no'
                                                     data-testid='draw-no'
                                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -346,9 +357,10 @@ function DisplayFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='type'
                                     id='url'
+                                    disabled={formStatus !== 'Draft'}
                                     value='url'
                                     checked={fieldSettingParameters?.type === 'url'}
-                                    onClick={() => handleRadiobtn('url')} />
+                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('url') : null} />
                                 <label htmlFor='url' data-testid='url'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     URL
@@ -363,11 +375,12 @@ function DisplayFieldSetting({
                                     testID={'url-dropdown'}
                                     labeltestID='url-list'
                                     selectedOption={options.find(option => option.value === fieldSettingParameters?.urlType)}
-                                    handleOptionClick={handleOptionClick}
-                                    isDropdownOpen={isDropdownOpen}
-                                    setDropdownOpen={setDropdownOpen}
+                                    handleOptionClick={formStatus === 'Draft' ? handleOptionClick : null}
+                                    isDropdownOpen={formStatus === 'Draft' ? isDropdownOpen : false}
+                                    setDropdownOpen={formStatus === 'Draft' ? setDropdownOpen : null}
                                     options={options}
                                     close={true}
+                                    formStatus={formStatus}
                                     setSelectedUrlOption={setSelectedUrlOption}
                                     selectedQuestionId={selectedQuestionId}
                                 />
@@ -389,14 +402,15 @@ function DisplayFieldSetting({
                                                     : 'Enter text'
                                     }
                                     testId='urlInput'
+                                    formStatus={formStatus}
                                     htmlFor='urlValue'
-                                    maxLength={100}
-                                    handleChange={(e) => handleInputChange(e)} // Ensure this updates correctly
+                                    maxLength={formStatus === 'Draft' ? 100 : 0}
+                                    handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} // Ensure this updates correctly
                                 />
                             )}
                         </div>
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -408,16 +422,17 @@ function DisplayFieldSetting({
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
+                            formStatus={formStatus}
                             htmlFor='note'
-                            maxLength={500}
-                            handleChange={(e) => handleInputChange(e)} />
+                            maxLength={formStatus === 'Draft' ? 500 : 0}
+                            handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : 0} />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-                            onClick={() => setConditionalLogic(true)}  // Use arrow function
+                            className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                            onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
                         >
                             Add Conditional Logic
                         </button>

@@ -203,6 +203,7 @@ function CreateQuestionnary() {
                   maxLength={100}
                   handleChange={handleChange}
                   validationError={validationErrors?.public_name}
+                  publicName
                 />
               </div>
               <div className='w-1/2'>
@@ -221,6 +222,7 @@ function CreateQuestionnary() {
                   maxLength={100}
                   handleChange={handleChange}
                   validationError={validationErrors?.internal_name}
+                  internalName
                 />
               </div>
             </div>
@@ -244,6 +246,7 @@ function CreateQuestionnary() {
                     handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
                     dropdownRef={assetDropdownRef}
                     validationError={validationErrors?.asset_type}
+                    assetType
                   />
                 </div>
                 {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
@@ -266,6 +269,7 @@ function CreateQuestionnary() {
                   handleOptionClick={(option) => handleOptionClick(option, 'language')}
                   dropdownRef={languageDropdownRef}
                   validationError={validationErrors?.language}
+                  language
                 />
                 {validationErrors?.language && <ErrorMessage error={validationErrors?.language} />}
               </div>

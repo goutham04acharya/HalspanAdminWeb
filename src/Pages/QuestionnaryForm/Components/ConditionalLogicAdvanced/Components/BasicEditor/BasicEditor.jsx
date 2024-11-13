@@ -359,6 +359,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     handleChange={handleInputChange}
                                                     onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
                                                     validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
+                                                    basicEditor
                                                 />
                                             </div>
 
