@@ -651,10 +651,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const fetchData = async () => {
             if (complianceState) {
                 try {
-                    const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+                    // const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
                     // Extract default_content based on selected index
-                    const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
-
+                    // const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
+                    const selectedLogic = complianceLogic[complianceLogicId];
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
@@ -675,41 +675,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Assuming `allSectionDetails` contains the fetched data and 
         // you have a way to map `selectedQuestionId` to the relevant question
         const findSelectedQuestion = () => {
-            allSectionDetails?.data?.sections?.forEach((section) => {
-                section.pages?.forEach((page) => {
-                    page.questions?.forEach((question) => {
-                        if (question.question_id === selectedQuestionId) {
-                            // Pre-fill the editor with the conditional logic of the selected question
+            // allSectionDetails?.data?.sections?.forEach((section) => {
+            //     section.pages?.forEach((page) => {
+            //         page.questions?.forEach((question) => {
+            //             if (question.question_id === selectedQuestionId) {
+            // Pre-fill the editor with the conditional logic of the selected question
 
-                            //adding this to check whether the advane editor or the default logic
-                            let conditionalLogic = ''
-                            if (isDefaultLogic) {
-                                conditionalLogic = question.default_conditional_logic || '';
-                            } else {
-                                conditionalLogic = question.conditional_logic || '';
-                            }
+            //adding this to check whether the advane editor or the default logic
+            let conditionalLogic = ''
+            if (isDefaultLogic) {
+                conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
+            }
+            else {
+                conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
+            }
 
 
-                            // Replace && with "and" and || with "or"
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
-                            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+            // Replace && with "and" and || with "or"
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
+            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
 
-                            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
-                            setInputValue(conditionalLogic)
+            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+            setInputValue(conditionalLogic)
 
-                            {
-                                !isDefaultLogic &&
-                                    setConditions(parseLogicExpression(question.conditional_logic));
-                            }
-                        }
-                    });
-                });
-            });
+            {
+                !isDefaultLogic &&
+                    setConditions(parseLogicExpression(question.conditional_logic));
+            }
+            //         }
+            //     });
+            // });
+            // });
         };
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value

@@ -38,7 +38,8 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
     );
 
     const changeHandler = (e) => {
-        const value = e.target.value;
+        let value = e.target.value;
+        value = value.replace(/^\s+/, '');
         let params = Object.fromEntries(searchParams)
         delete params.start_key;
         setSearchValue(value);
