@@ -246,15 +246,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'datetime') {
+            } else if (selectedFieldType === 'dateTimefield') {
                 setSuggestions(dateTimeMethods);
                 setShowMethodSuggestions(true);
-            // } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'date') {
-            //     setSuggestions(dateMethods);
-            //     setShowMethodSuggestions(true);
-            // } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'time') {
-            //     setSuggestions(timeMethods);
-            //     setShowMethodSuggestions(true);
             } else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions
@@ -965,13 +959,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-
-
-
-
-
-
-
 
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
