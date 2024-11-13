@@ -109,13 +109,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         return complianceLogic.map(rule => {
             // debugger
             console.log(rule, 'rule')
-            // Get the condition part before the question mark
             try {
+                // Get the condition part before the question mark
                 const conditionPart = rule.default_content.split('?')[0].trim();
-
+                console.log(conditionPart, 'ssss')
                 // Evaluate the condition to determine which path was executed
                 const conditionResult = eval(rule);
-
+                console.log(rule, 'condition result')
                 // Get the full evaluation result
                 const result = eval(rule.default_content);
 
@@ -123,7 +123,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     label: rule.label,
                     result: result?.toString(),
                     // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                    tookIfPath: conditionResult
+                    tookIfPath: result
                 };
             } catch {
                 console.log("Error while evaluating")
@@ -184,12 +184,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             }
                         }
                         break;
-    
+
                     case 'choiceboxfield':
                         if (!question?.options?.optional) {
                             if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
                                 acc[question.question_id] = 'This is a mandatory field';
-                            }else{
+                            } else {
                                 break;
                             }
                         }
@@ -198,15 +198,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             acc[question.question_id] = 'This is a mandatory field';
                         }
                         break;
-    
+
                     case 'dateTimefield':
                         if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
                             acc[question.question_id] = 'This is a mandatory field';
                         }
                         break;
-    
+
                     case 'photofield':
-                        if ( !question?.options?.optional) {
+                        if (!question?.options?.optional) {
                             if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
                                 acc[question.question_id] = 'This is a mandatory field';
                             }
@@ -232,7 +232,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             }
             return acc;
         }, {});
-    
+
         if (Object.keys(errors).length > 0) {
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -248,7 +248,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         } else {
             const isLastSection = currentSection === sections.length - 1;
             const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-    
+
             if (isLastSection && isLastPageInSection) {
                 setShowComplianceScreen(true);
                 setIsLastPage(true);
@@ -451,15 +451,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                     key={index}
                                     className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                 >
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex flex-col">
                                         <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
                                         <span
-                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result?.tookIfPath
-                                                ? 'bg-[#4CD95A] text-[#2B333B] border '
-                                                : 'bg-[#FA303B] text-white border '
-                                                }`}
+                                            className={` py-1.5 rounded-full flex text-sm font-medium`}
                                         >
-                                            <img src={result?.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
                                             {result?.result}
                                         </span>
                                     </div>
@@ -493,7 +489,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             try {
                                                 let result = eval(list?.conditional_logic)
                                                 console.log(result, 'result')
-                                                console.log(Section_1.Page_1.Question_1)
+                                                // console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
@@ -514,6 +510,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             }
                                         } else {
                                             try {
+                                                // debugger
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
