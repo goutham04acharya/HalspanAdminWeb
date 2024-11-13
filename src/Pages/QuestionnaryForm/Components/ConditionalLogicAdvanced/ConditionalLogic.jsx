@@ -15,9 +15,7 @@ import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
-import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
-import moment from 'moment/moment';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
 import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
@@ -72,8 +70,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
-    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
-    const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
+    // const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
+    // const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -237,16 +235,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
-        // setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
         setInputValue(value)
-        // if (isDefaultLogic) {
-        //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
-        // } else {
-        //     dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
-        // }
+
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -256,12 +249,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'datetime') {
                 setSuggestions(dateTimeMethods);
                 setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'date') {
-                setSuggestions(dateMethods);
-                setShowMethodSuggestions(true);
-            } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'time') {
-                setSuggestions(timeMethods);
-                setShowMethodSuggestions(true);
+            // } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'date') {
+            //     setSuggestions(dateMethods);
+            //     setShowMethodSuggestions(true);
+            // } else if (selectedFieldType === 'dateTimefield' && fieldSettingParams[selectedQuestionId].type === 'time') {
+            //     setSuggestions(timeMethods);
+            //     setShowMethodSuggestions(true);
             } else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions

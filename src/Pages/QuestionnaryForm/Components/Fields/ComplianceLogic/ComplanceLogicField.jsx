@@ -8,7 +8,6 @@ import { defaultContentConverter } from '../../../../../CommonMethods/defaultCon
 function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic }) {
   const dispatch = useDispatch()
   const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
-  console.log(complianceLogicId, 'kkkkkkkkkkkk')
 
   return (
     <div className='bg-white rounded-[10px] font-medium p-4 mt-8'>
