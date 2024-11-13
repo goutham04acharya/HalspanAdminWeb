@@ -106,7 +106,7 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
                 />
             </div>
             {isDropdownOpen && (
-                <div ref={dropdownRef} className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg">
+                <div ref={dropdownRef} className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-[99]">
                     <div className="grid grid-cols-3 divide-x divide-gray-200">
                         <div className="max-h-48 overflow-y-auto scrollBar">
                             {hours.map((h) => (
