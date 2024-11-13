@@ -285,6 +285,7 @@ const AssetLocationField = ({
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
                         placeholder='Site'
                         handleOptionClick={(siteId) => handleSiteChange(siteId)}
+                        assetLocation
                     />
                 </div>
             )}
@@ -319,6 +320,7 @@ const AssetLocationField = ({
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
                         placeholder='Building'
                         handleOptionClick={(locationId) => handleLocationChange(locationId)}
+                        assetLocation
                     />
                 </div>
             )}
@@ -353,6 +355,7 @@ const AssetLocationField = ({
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
                         placeholder='Floor'
                         handleOptionClick={(levelId) => handleLevelChange(levelId)}
+                        assetLocation
                     />
                 </div>
             )}

@@ -12,7 +12,8 @@ function VideoFieldSetting({ handleInputChange,
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
-    setConditionalLogic
+    setConditionalLogic,
+    formStatus
 }) {
 
     return (
@@ -34,6 +35,7 @@ function VideoFieldSetting({ handleInputChange,
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <InputField
@@ -44,6 +46,7 @@ function VideoFieldSetting({ handleInputChange,
                             type='text'
                             value={fieldSettingParameters?.fileSize}
                             className='w-full mt-2.5'
+                            formStatus={formStatus}
                             labelStyle=''
                             placeholder='e.g. 5'
                             testId='file-size'
@@ -61,6 +64,7 @@ function VideoFieldSetting({ handleInputChange,
                                 type='text'
                                 value={fieldSettingParameters?.min}
                                 className='w-full'
+                                formStatus={formStatus}
                                 labelStyle=''
                                 placeholder='Minimum'
                                 testId='minChar'
@@ -75,6 +79,7 @@ function VideoFieldSetting({ handleInputChange,
                                 type='text'
                                 value={fieldSettingParameters?.max}
                                 className='w-full'
+                                formStatus={formStatus}
                                 labelStyle=''
                                 placeholder='Maximum'
                                 testId='maxChar'
@@ -86,7 +91,7 @@ function VideoFieldSetting({ handleInputChange,
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -102,13 +107,15 @@ function VideoFieldSetting({ handleInputChange,
                             maxLength={500}
                             handleChange={handleInputChange}
                             handleBlur={handleBlur}
+                            formStatus={formStatus}
                         />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                         <button
                             type='button'
+                            disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
+                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

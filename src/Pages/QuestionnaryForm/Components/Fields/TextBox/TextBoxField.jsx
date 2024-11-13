@@ -7,6 +7,7 @@ import { setFieldEditable } from '../../defaultContentPreviewSlice';
 const TextBoxField = ({
     label,
     type,
+    formStatus,
     textId,
     HelpText,
     value,
@@ -176,6 +177,7 @@ const TextBoxField = ({
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
+                    // disabled={formStatus !== 'Draft'}
                 />
                 :
                 <input

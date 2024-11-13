@@ -25,9 +25,8 @@ const Questions = ({
     
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
-    const { index, selectedQuestionId } = item;
+    const { index, selectedQuestionId, formStatus } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-
     const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
         dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
@@ -100,7 +99,6 @@ const Questions = ({
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         dispatch(setSelectedComponent(componentType));
     };
-
     return (
         <div
             data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${index + 1}`}
@@ -113,23 +111,23 @@ const Questions = ({
                     {/* Drag Handle */}
                     <div
                         className="disable-select dragHandle"
-                        onMouseDown={(e) => {
+                        onMouseDown={formStatus === 'Draft' ? (e) => {
                             document.body.style.overflow = "hidden";
                             onMouseDown(e);
-                        }}
-                        onMouseUp={() => {
+                        }: null}
+                        onMouseUp={formStatus === 'Draft' ? () => {
                             document.body.style.overflow = "visible";
-                        }}
-                        onTouchStart={(e) => {
+                        }: null}
+                        onTouchStart={formStatus === 'Draft' ? (e) => {
                             document.body.style.overflow = "hidden";
                             onTouchStart(e);
-                        }}
-                        onTouchEnd={() => {
+                        }: null}
+                        onTouchEnd={formStatus === 'Draft' ? () => {
                             document.body.style.overflow = "visible";
-                        }}
+                        }: null}
                     >
                         <img
-                            className='cursor-grab p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full hover:bg-[#FFFFFF]'
+                            className={`${formStatus === 'Draft' ? 'cursor-grab hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full`}
                             title='Drag'
                             src={`/Images/drag.svg`}
                             alt="Drag"
@@ -141,12 +139,12 @@ const Questions = ({
                         src="/Images/trash-black.svg"
                         alt="delete"
                         title='Delete'
-                        className='pl-2.5 cursor-pointer absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]'
-                        onClick={(e) => {
-                            // e.stopPropagation();
+                        className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full `}
+                        onClick={formStatus === 'Draft' ?(e) => {
+                            e.stopPropagation();
                             handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
                             dispatch(setShowquestionDeleteModal(true));
-                        }}
+                        }:null}
                     />
                 </div>
             </div>
@@ -159,6 +157,7 @@ const Questions = ({
                         {
                             testId: `section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${index + 1}`,
                             fieldSettingParameters: fieldSettingParams[item.question_id], // Pass the settings for this question ID
+                            formStatus: formStatus
                         }
                     )}
                 </>

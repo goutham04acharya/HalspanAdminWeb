@@ -14,8 +14,10 @@ function CommonComponents({
     formParameters,
     handleBlur,
     setFocusInput,
-    assetLocation
+    assetLocation,
+    formStatus
 }) {
+    // console.log(formStatus, 'form status')
     return (
         <div>
             <div className='flex flex-col justify-start'>
@@ -28,17 +30,18 @@ function CommonComponents({
                     // id={labelID}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
-                    onChange={(e) => handleInputChange(e)}
+                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
                     value={formParameters?.label}
                     id='label'
-                    onBlur={(e) => handleBlur(e)}
+                    onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
                     data-testid="label-name-input"
-                    maxLength={100}
-                    onFocus={() => {
+                    disabled={formStatus !== 'Draft'}
+                    maxLength={formStatus === 'Draft' ? 2500 : null}
+                    onFocus={formStatus === 'Draft' ? () => {
                         if (setFocusInput) {
                             setFocusInput('');
                         }
-                    }}
+                    } : null}
                 />
             </div>
             <div className='flex flex-col justify-start mt-7'>
@@ -56,7 +59,8 @@ function CommonComponents({
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="help-text-input"
-                    maxLength={150}
+                    maxLength={2500}
+                    disabled={formStatus !== 'Draft'}
                     onFocus={() => {
                         if (setFocusInput) {
                             setFocusInput('');
@@ -70,29 +74,30 @@ function CommonComponents({
                 />
             </div>
             {!assetLocation &&
-            <div className='flex flex-col justify-start mt-7'>
-                <label
-                    htmlFor={placeholderContentId}
-                    className='font-semibold text-base text-[#2B333B]'>{placeholder}
-                </label>
-                <input
-                    type="text"
-                    // id={placeholderContentId}
-                    className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                    placeholder={placeholderContent}
-                    value={formParameters?.placeholderContent}
-                    onChange={(e) => handleInputChange(e)}
-                    id='placeholderContent'
-                    onBlur={(e) => handleBlur(e)}
-                    data-testid="placeholder-input"
-                    maxLength={50}
-                    onFocus={() => {
-                        if (setFocusInput) {
-                            setFocusInput('');
-                        }
-                    }}
-                />
-            </div>}
+                <div className='flex flex-col justify-start mt-7'>
+                    <label
+                        htmlFor={placeholderContentId}
+                        className='font-semibold text-base text-[#2B333B]'>{placeholder}
+                    </label>
+                    <input
+                        type="text"
+                        // id={placeholderContentId}
+                        className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                        placeholder={placeholderContent}
+                        value={formParameters?.placeholderContent}
+                        onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
+                        id='placeholderContent'
+                        disabled={formStatus !== 'Draft'}
+                        onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
+                        data-testid="placeholder-input"
+                        maxLength={2500}
+                        onFocus={() => {
+                            if (setFocusInput) {
+                                setFocusInput('');
+                            }
+                        }}
+                    />
+                </div>}
         </div>
     )
 }

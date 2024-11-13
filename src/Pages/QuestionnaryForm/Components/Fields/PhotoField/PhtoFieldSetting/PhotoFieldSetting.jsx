@@ -16,8 +16,8 @@ function PhotoFieldSetting({
     fieldSettingParameters,
     selectedQuestionId,
     validationErrors,
-    setConditionalLogic
-
+    setConditionalLogic,
+    formStatus
 }) {
     const dispatch = useDispatch();
     return (
@@ -39,6 +39,7 @@ function PhotoFieldSetting({
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         assetLocation={true}
+                        formStatus={formStatus}
                     />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Number of Photos</p>
@@ -52,10 +53,11 @@ function PhotoFieldSetting({
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Minimum'
+                                formStatus={formStatus}
                                 testId='minChar'
                                 htmlFor='min'
-                                maxLength={10}
-                                handleChange={(e) => handleInputChange(e)} />
+                                maxLength={formStatus === 'Draft' ? 10 : 0}
+                                handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
                             <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
                             <InputField
                                 autoComplete='off'
@@ -65,11 +67,12 @@ function PhotoFieldSetting({
                                 value={fieldSettingParameters?.max}
                                 className='w-full'
                                 labelStyle=''
+                                formStatus={formStatus}
                                 placeholder='Maximum'
                                 testId='maxChar'
                                 htmlFor='max'
-                                maxLength={10}
-                                handleChange={(e) => handleInputChange(e)} />
+                                maxLength={formStatus === 'Draft' ? 10 : 0}
+                                handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
                         </div>
                         {validationErrors?.minMax && (
                             <ErrorMessage error={validationErrors.minMax} />
@@ -84,12 +87,13 @@ function PhotoFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='draw_image'
                                     id='draw_image_yes'
+                                    disabled={formStatus !== 'Draft'}
                                     value='draw_image_yes'
                                     checked={fieldSettingParameters?.draw_image === 'yes'}
-                                    onClick={() => {
+                                    onClick={ formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }}
+                                    } : null}
                                 />
                                 <label htmlFor='draw_image_yes'
                                     data-testid='draw-yes'
@@ -103,12 +107,13 @@ function PhotoFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='draw_image'
                                     id='draw_image_no'
+                                    disabled={formStatus !== 'Draft'}
                                     value='draw_image_no'
                                     checked={fieldSettingParameters?.draw_image === 'no'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }}
+                                    }:null}
                                 />
                                 <label htmlFor='draw_image_no'
                                     data-testid='draw-no'
@@ -126,11 +131,12 @@ function PhotoFieldSetting({
                                     name='include_metadata'
                                     id='include_metadata_yes'
                                     value='include_metadata_yes'
+                                    disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.include_metadata === 'yes'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'yes', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }} />
+                                    }:null} />
                                 <label htmlFor='include_metadata_yes'
                                     data-testid='metadata-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -143,12 +149,13 @@ function PhotoFieldSetting({
                                     className='w-[17px] h-[17px]'
                                     name='include_metadata'
                                     id='include_metadata_no'
+                                    disabled={formStatus !== 'Draft'}
                                     value='include_metadata_no'
                                     checked={fieldSettingParameters?.include_metadata === 'no'}
-                                    onClick={() => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }}
+                                    }: null}
                                 />
                                 <label htmlFor='include_metadata_no'
                                     data-testid='metadata-no'
@@ -157,7 +164,7 @@ function PhotoFieldSetting({
                                 </label>
                             </div>
                         </div>
-                        <OptionsComponent selectedQuestionId={selectedQuestionId} />
+                        <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                         <div className='mt-7'>
                             <InputField
                                 autoComplete='off'
@@ -169,18 +176,19 @@ function PhotoFieldSetting({
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
                                 testId='Notes'
+                                formStatus={formStatus}
                                 htmlFor='note'
-                                maxLength={500}
-                                handleChange={handleInputChange}
-                                handleBlur={handleBlur}
+                                maxLength={formStatus === 'Draft' ? 500 : 0}
+                                handleChange={formStatus === 'Draft' ? handleInputChange : null}
+                                handleBlur={formStatus === 'Draft' ? handleBlur : null}
                             />
                         </div>
                         <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                             <button
                                 type='button'
                                 data-testId="add-conditional-logic"
-                                className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-                                onClick={() => setConditionalLogic(true)}  // Use arrow function
+                                className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
                             >
                                 Add Conditional Logic
                             </button>

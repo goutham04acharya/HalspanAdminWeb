@@ -29,7 +29,8 @@ function ChoiceFieldSetting({
     isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
-    setDefaultString
+    setDefaultString,
+    formStatus
 }) {
     const [isLookupOpen, setIsLookupOpen] = useState(false);
     const [optionData, setOptionData] = useState([]);
@@ -145,6 +146,7 @@ function ChoiceFieldSetting({
                     handleInputChange={handleInputChange}
                     formParameters={formParameters}
                     handleBlur={handleBlur}
+                    formStatus={formStatus}
                 />
                 <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
@@ -153,10 +155,11 @@ function ChoiceFieldSetting({
                             type="text"
                             id='Label'
                             data-testid="default-value-input"
+                            disabled={formStatus !== 'Draft'}
                             className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                             value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
-                            onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))
-                        } 
+                            onChange={formStatus === 'Draft' ?(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))
+                        : null} 
                             // Update defaultString when input changes
                             placeholder='Populates the content'
                         />
@@ -164,11 +167,11 @@ function ChoiceFieldSetting({
                             src="/Images/setting.svg"
                             alt="setting"
                             data-testid="default-value"
-                            className='absolute top-5 right-3 cursor-pointer'
-                            onClick={() => {
+                            className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                            onClick={formStatus === 'Draft' ?() => {
                                 setIsDefaultLogic(true);
                                 setConditionalLogic(false);
-                            }}
+                            }:null}
                         />
                     </div>
                 </div>
@@ -181,9 +184,10 @@ function ChoiceFieldSetting({
                                 className='w-[17px] h-[17px]'
                                 name='type'
                                 id='Singleline'
+                                disabled={formStatus !== 'Draft'}
                                 value='Singleline'
                                 checked={fieldSettingParameters?.type === 'dropdown'}
-                                onClick={() => handleRadiobtn('dropdown')} />
+                                onClick={formStatus === 'Draft' ?() => handleRadiobtn('dropdown'):null} />
                             <label data-testid='dropdown' htmlFor='Singleline' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Dropdown
                             </label>
@@ -194,9 +198,10 @@ function ChoiceFieldSetting({
                                 className='w-[17px] h-[17px]'
                                 name='type'
                                 id='SingleChoice'
+                                disabled={formStatus !== 'Draft'}
                                 value='SingleChoice'
                                 checked={fieldSettingParameters?.type === 'single_choice'}
-                                onClick={() => handleRadiobtn('single_choice')}
+                                onClick={formStatus === 'Draft' ?() => handleRadiobtn('single_choice'):null}
                             />
                             <label data-testid='single_choice' htmlFor='SingleChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Single Choice
@@ -208,9 +213,10 @@ function ChoiceFieldSetting({
                                 className='w-[17px] h-[17px]'
                                 name='type'
                                 id='MultiChoice'
+                                disabled={formStatus !== 'Draft'}
                                 value='MultiChoice'
                                 checked={fieldSettingParameters?.type === 'multi_choice'}
-                                onClick={() => handleRadiobtn('multi_choice')} />
+                                onClick={formStatus === 'Draft' ?() => handleRadiobtn('multi_choice'):null} />
                             <label data-testid='multi_choice' htmlFor='MultiChoice' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Multi Choice
                             </label>
@@ -223,13 +229,14 @@ function ChoiceFieldSetting({
                                 className='w-[17px] h-[17px]'
                                 name='source'
                                 id='FixedList'
+                                disabled={formStatus !== 'Draft'}
                                 value='FixedList'
                                 checked={fieldSettingParameters?.source === 'fixedList'}
-                                onClick={() => {
+                                onClick={formStatus === 'Draft' ?() => {
                                     dispatch(setNewComponent({ id: 'source', value: 'fixedList', questionId: selectedQuestionId }))
                                     dispatch(resetFixedChoice({ questionId: selectedQuestionId }))
                                     dispatch(setShouldAutoSave(true));
-                                }} />  {/* handleSource('fixedList') */}
+                                }:null} />  {/* handleSource('fixedList') */}
                             <label htmlFor='FixedList' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Fixed List
                             </label>
@@ -241,10 +248,11 @@ function ChoiceFieldSetting({
                                 list={fixedChoiceArray.map((data, choiceIndex) => ({
                                     ...data,
                                     index: choiceIndex,
+                                    formStatus: formStatus,
                                     selectedQuestionId: selectedQuestionId
                                 }))}
                                 onMoveEnd={handleMoveEnd}
-                                container={() => document.body}
+                                container={formStatus === 'Draft' ?() => document.body : null}
                             />}
                         <div className="relative custom-radioBlue flex items-center mt-3">
                             <input
@@ -253,13 +261,14 @@ function ChoiceFieldSetting({
                                 name='source'
                                 id='Lookup'
                                 value='Lookup'
+                                disabled={formStatus !== 'Draft'}
                                 checked={fieldSettingParameters?.source === 'lookup'}
-                                onClick={() => {
+                                onClick={formStatus === 'Draft' ?() => {
                                     dispatch(setNewComponent({
                                         id: 'source', value: 'lookup', questionId: selectedQuestionId
                                     }))
                                     dispatch(setShouldAutoSave(true));
-                                }} />  {/* handleSource('lookup') */}
+                                }:null} />  {/* handleSource('lookup') */}
                             <label htmlFor='Lookup' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                 Lookup
                             </label>
@@ -276,17 +285,18 @@ function ChoiceFieldSetting({
                                         testID='lookup-dropdown'
                                         labeltestID='lookup-list'
                                         selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                                        handleRemoveLookup={handleRemoveLookup}
-                                        isDropdownOpen={isLookupOpen}
-                                        setDropdownOpen={setIsLookupOpen}
-                                        handleOptionClick={handleLookupOption}
+                                        handleRemoveLookup={formStatus === 'Draft' ?handleRemoveLookup: null}
+                                        isDropdownOpen={formStatus === 'Draft' ?isLookupOpen:false}
+                                        setDropdownOpen={formStatus === 'Draft' ?setIsLookupOpen:null}
+                                        handleOptionClick={formStatus === 'Draft' ?handleLookupOption:null}
                                         top='20px'
                                         close='true'
                                         options={optionData}
                                         lastElementRef={lastElementRef}
+                                        formStatus={formStatus}
                                     />
                                 </div>
-                                <button onClick={() => navigate('/lookup-dataset', { state: { create: true } })} className='ml-4'>
+                                <button onClick={formStatus === 'Draft' ?() => navigate('/lookup-dataset', { state: { create: true } }):null} className={`${formStatus === 'Draft' ? 'cursor-pointer':'cursor-not-allowed'} ml-4`}>
                                     <img src="/Images/plus.svg" alt="plus" />
                                 </button>
                             </div>}
@@ -307,21 +317,22 @@ function ChoiceFieldSetting({
                                 placeholder='Notes'
                                 testId='Notes'
                                 htmlFor='note'
-                                maxLength={500}
-                                handleChange={(e) => handleInputChange(e)}
+                                maxLength={formStatus === 'Draft' ?500:0}
+                                handleChange={formStatus === 'Draft' ?(e) => handleInputChange(e):null}
                                 handleBlur={handleBlur}
+                                formStatus={formStatus}
                             />
                         </div>
                         <div className='mx-auto mt-7 flex flex-col items-center w-full'>
                             <button
                                 type='button'
                                 data-testId="add-conditional-logic"
-                                className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-                                onClick={() => {
+                                className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
+                                onClick={formStatus === 'Draft' ?() => {
                                     setConditionalLogic(true),
                                         setIsDefaultLogic(false)
                                 }
-                                }  // Use arrow function
+                                :null}  // Use arrow function
                             >
                                 Add Conditional Logic
                             </button>

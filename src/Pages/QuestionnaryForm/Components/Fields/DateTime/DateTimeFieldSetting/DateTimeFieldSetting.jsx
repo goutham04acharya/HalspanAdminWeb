@@ -15,8 +15,8 @@ function DateTimeFieldSetting({
   fieldSettingParameters,
   selectedQuestionId,
   setConditionalLogic,
-  setIsDefaultLogic
-
+  setIsDefaultLogic,
+  formStatus
 }) {
   const dispatch = useDispatch();
 
@@ -48,6 +48,7 @@ function DateTimeFieldSetting({
             handleInputChange={handleInputChange}
             formParameters={formParameters}
             handleBlur={handleBlur}
+            formStatus={formStatus}
           />
           <div className='flex flex-col justify-start mt-7 w-full relative'>
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
@@ -55,17 +56,18 @@ function DateTimeFieldSetting({
               <input
                 value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : '' }
                 type="text"
+                disabled={formStatus !== 'Draft'}
                 id='Label'
                 data-testid="default-value-input"
-                onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
+                onChange={formStatus === 'Draft' ? (e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId })): null}
                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content' />
               <img src="/Images/setting.svg" alt="setting"
                 data-testid="default-value"
-                className='absolute top-5 right-3 cursor-pointer' onClick={() => {
+                className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={formStatus === 'Draft' ? () => {
                   setIsDefaultLogic(true);
                   setConditionalLogic(false);
-                }} />
+                }:null} />
             </div>
           </div>
           <div className='mt-7'>
@@ -78,8 +80,9 @@ function DateTimeFieldSetting({
                   name='type'
                   id='date'
                   value='date'
+                  disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.type === 'date'}
-                  onClick={() => handleRadiobtn('date')} />
+                  onClick={formStatus === 'Draft' ? () => handleRadiobtn('date') : null} />
                 <label htmlFor='date'
                   data-testid='date'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -92,12 +95,13 @@ function DateTimeFieldSetting({
                   className='w-[17px] h-[17px]'
                   name='type'
                   id='time'
+                  disabled={formStatus !== 'Draft'}
                   value='time'
                   checked={fieldSettingParameters?.type === 'time'}
-                  onClick={() => {
+                  onClick={formStatus === 'Draft' ? () => {
                     handleRadiobtn('time');
                     handleTime();
-                  }} />
+                  } : null} />
                 <label htmlFor='time'
                   data-testid='time'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -111,8 +115,9 @@ function DateTimeFieldSetting({
                   name='type'
                   id='datetime'
                   value='datetime'
+                  disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.type === 'datetime'}
-                  onClick={() => handleRadiobtn('datetime')} />
+                  onClick={formStatus === 'Draft' ? () => handleRadiobtn('datetime') : null} />
                 <label htmlFor='datetime'
                   data-testid='date-time'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -131,10 +136,11 @@ function DateTimeFieldSetting({
                   name='format'
                   id='format12'
                   value='format12'
+                  disabled={formStatus !== 'Draft'}
                   checked={fieldSettingParameters?.format === '12'}
-                  onClick={() => {
+                  onClick={formStatus === 'Draft' ? () => {
                     handletimeradiobtn('12')
-                  }} />
+                  }:null} />
                 <label htmlFor='format12'
                   data-testid='format-12'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -147,9 +153,10 @@ function DateTimeFieldSetting({
                   className='w-[17px] h-[17px]'
                   name='format'
                   id='format24'
+                  disabled={formStatus !== 'Draft'}
                   value='format24'
                   checked={fieldSettingParameters?.format === '24'}
-                  onClick={() => handletimeradiobtn('24')} />
+                  onClick={formStatus === 'Draft' ? () => handletimeradiobtn('24') : null} />
                 <label htmlFor='format24'
                   data-testid='format-24'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -158,7 +165,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus}/>
           <div className='mt-7'>
             <InputField
               autoComplete='off'
@@ -171,15 +178,16 @@ function DateTimeFieldSetting({
               placeholder='Notes'
               testId='Notes'
               htmlFor='note'
-              maxLength={500}
-              handleChange={(e) => handleInputChange(e)} />
+              formStatus={formStatus}
+              maxLength={formStatus === 'Draft' ? 500 : 0}
+              handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
           </div>
           <div className='mx-auto mt-7 flex flex-col items-center w-full'>
             <button
               type='button'
               data-testid="add-conditional-logic"
-              className='w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]'
-              onClick={() => setConditionalLogic(true)}  // Use arrow function
+              className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+              onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
             >
               Add Conditional Logic
             </button>

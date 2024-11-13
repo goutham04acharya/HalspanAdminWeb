@@ -165,7 +165,7 @@ const ChoiceBoxField = ({
                         label=''
                         id='lookup'
                         placeholder={question?.placeholder_content}
-                        className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
+                        className='w-full truncate cursor-pointer placeholder:text-[#9FACB9] placeholder:w-[240px] h-[45px]'
                         testID='lookup-dropdown'
                         labeltestID='lookup-list'
                         isDropdownOpen={isDropdownOpen}
@@ -175,6 +175,7 @@ const ChoiceBoxField = ({
                         options={question?.source_value ? question?.source_value : null}
                         selectedOption={optionSelected}
                         preview
+                        choiceBox
                         type={question?.type}
                     />}
                 </div>
