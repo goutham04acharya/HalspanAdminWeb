@@ -41,6 +41,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
+    console.log(conditionalValues, 'conditional values')
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -104,22 +105,29 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
+        // debugger
         return complianceLogic.map(rule => {
-            // Get the condition part before the question mark
-            const conditionPart = rule.default_content.split('?')[0].trim();
+            // debugger
+            console.log(rule, 'rule')
+            try {
+                // Get the condition part before the question mark
+                const conditionPart = rule.default_content.split('?')[0].trim();
+                console.log(conditionPart, 'ssss')
+                // Evaluate the condition to determine which path was executed
+                const conditionResult = eval(rule);
+                console.log(rule, 'condition result')
+                // Get the full evaluation result
+                const result = eval(rule.default_content);
 
-            // Evaluate the condition to determine which path was executed
-            const conditionResult = eval(rule);
-
-            // Get the full evaluation result
-            const result = eval(rule.default_content);
-
-            return {
-                label: rule.label,
-                result: result?.toString(),
-                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                tookIfPath: conditionResult
-            };
+                return {
+                    label: rule.label,
+                    result: result?.toString(),
+                    // If condition is true, it took the "if" path (green), otherwise "else" path (red)
+                    tookIfPath: result
+                };
+            } catch {
+                console.log("Error while evaluating")
+            }
         });
     };
     console.log(conditionalValues, 'conditional values')
@@ -143,46 +151,88 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const handleNextClick = () => {
         const questions = sections[currentSection].pages[currentPage].questions;
         const errors = questions.reduce((acc, question) => {
-            if (question?.component_type === 'textboxfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                } else if (question?.format_error && !validateFormat(value[question?.question_id], question?.format, question?.regular_expression)) {
-                    acc[question.question_id] = question?.format_error;
-                }
-            } else if (question?.component_type === 'choiceboxfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'numberfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'dateTimefield' && !question?.options?.optional) {
-                if (!value[question?.question_id] || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            }
-            else if (question?.component_type === 'photofield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
+            // First check if the question should be visible based on conditional logic
+            let isVisible = true;
+            if (question.conditional_logic !== '') {
+                try {
+                    if (question.conditional_logic.includes("new Date(")) {
+                        // Handle date-specific logic
+                        isVisible = eval(question.conditional_logic);
+                    } else if (question.conditional_logic.includes("getMonth(")) {
+                        // Handle month-specific logic with adjustment
+                        const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
+                        isVisible = eval(replacedLogic);
+                    } else {
+                        // Handle regular conditional logic
+                        isVisible = eval(question.conditional_logic);
+                    }
+                } catch (error) {
+                    console.error("Error evaluating conditional logic:", error);
+                    isVisible = false;
                 }
             }
-            else if (question?.component_type === 'filefield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            }
-            else if (question?.component_type === 'videofield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
-                }
-            } else if (question?.component_type === 'gpsfield' && !question?.options?.optional) {
-                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                    acc[question.question_id] = 'This is a mandatory field';
+            // Only validate if the question is visible
+            if (isVisible) {
+                // Validate based on component type
+                switch (question.component_type) {
+                    case 'textboxfield':
+                        if (!question.options?.optional) {
+                            if (value[question.question_id] === '' || value[question.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
+                                acc[question.question_id] = question.format_error;
+                            }
+                        }
+                        break;
+
+                    case 'choiceboxfield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            } else {
+                                break;
+                            }
+                        }
+                    case 'numberfield':
+                        if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
+
+                    case 'dateTimefield':
+                        if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
+
+                    case 'photofield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'filefield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'videofield':
+                        if (!question?.options?.optional) {
+                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                        }
+                    case 'gpsfield':
+                        if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
+                            acc[question.question_id] = 'This is a mandatory field';
+                        }
+                        break;
                 }
             }
             return acc;
         }, {});
+
         if (Object.keys(errors).length > 0) {
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -356,12 +406,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [conditionalValues])
-    const handleFieldEdit = (questionId) => {
-        dispatch(setFieldEditable({
-            fieldId: questionId,
-            isEditable: false
-        }));
-    };
 
     const handleClose = () => {
         setModalOpen(false)
@@ -407,15 +451,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                     key={index}
                                     className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                 >
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex flex-col">
                                         <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
                                         <span
-                                            className={`px-4 py-1.5 rounded-full flex gap-3 text-sm font-medium ${result?.tookIfPath
-                                                ? 'bg-[#4CD95A] text-[#2B333B] border '
-                                                : 'bg-[#FA303B] text-white border '
-                                                }`}
+                                            className={` py-1.5 rounded-full flex text-sm font-medium`}
                                         >
-                                            <img src={result?.tookIfPath ? '/Images/compliant.svg' : '/Images/non-compliant.svg'} width={10} />
                                             {result?.result}
                                         </span>
                                     </div>
@@ -442,27 +482,41 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
 
                                     if (list?.conditional_logic !== '') {
+                                        // debugger
                                         // addDays(Section_1.Page_1.Question_1)
                                         console.log(list?.conditional_logic)
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
-                                                console.log(result,'result')
-                                                console.log(Section_1.Page_1.Question_1)
+                                                console.log(result, 'result')
+                                                // console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
                                                 console.log(error, error)
+                                                return null;
                                             }
 
+                                        } else if (list?.conditional_logic.includes("getMonth(")) {
+                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
+                                            try {
+                                                if (!eval(replacedLogic)) {
+                                                    return null;
+                                                }
+                                            } catch (error) {
+                                                console.log(error, 'j')
+                                                return null;
+                                            }
                                         } else {
                                             try {
+                                                // debugger
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
                                                 console.log(error, 'j')
+                                                return null;
                                             }
                                         }
                                     }
