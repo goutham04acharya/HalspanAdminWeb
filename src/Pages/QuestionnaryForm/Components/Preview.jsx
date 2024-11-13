@@ -106,20 +106,24 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const evaluateComplianceLogic = () => {
         return complianceLogic.map(rule => {
             // Get the condition part before the question mark
-            const conditionPart = rule.default_content.split('?')[0].trim();
+            try {
+                const conditionPart = rule.default_content.split('?')[0].trim();
 
-            // Evaluate the condition to determine which path was executed
-            const conditionResult = eval(rule);
+                // Evaluate the condition to determine which path was executed
+                const conditionResult = eval(rule);
 
-            // Get the full evaluation result
-            const result = eval(rule.default_content);
+                // Get the full evaluation result
+                const result = eval(rule.default_content);
 
-            return {
-                label: rule.label,
-                result: result?.toString(),
-                // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                tookIfPath: conditionResult
-            };
+                return {
+                    label: rule.label,
+                    result: result?.toString(),
+                    // If condition is true, it took the "if" path (green), otherwise "else" path (red)
+                    tookIfPath: conditionResult
+                };
+            } catch {
+                console.log("Error while evaluating")
+            }
         });
     };
     console.log(conditionalValues, 'conditional values')
@@ -447,7 +451,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
-                                                console.log(result,'result')
+                                                console.log(result, 'result')
                                                 console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
