@@ -112,7 +112,6 @@ const QuestionnaryForm = () => {
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
     const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
-        // debugger
         acc[index] = false;  // Set all dropdowns to false initially
         return acc;
     }, {});
@@ -286,7 +285,6 @@ const QuestionnaryForm = () => {
     };
 
     const scrollToPage = (sectionIndex, pageId) => {
-        // debugger
         // Check if the section is closed, if so, expand it
         if (!expandedSections[sectionIndex]) {
             toggleSection(sectionIndex); // Assuming toggleSection will expand the section
@@ -1229,13 +1227,11 @@ const QuestionnaryForm = () => {
                 console.log(sectionKey, pageKey, questionKey, 'roopesh')
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
-                    debugger
                     if (section.section_id.includes(sectionKey)) {
                         section.pages.forEach(page => {
                             if (page.page_id.includes(pageKey)) {
                                 page.questions.forEach((question, index) => {
                                     if (question.question_id.includes(questionKey)) {
-                                        debugger
                                         // Replace the question in sectionBody with updated values
                                         page.questions[index] = {
                                             question_id: question.question_id,
