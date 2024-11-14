@@ -48,15 +48,13 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           }
         } catch (error) {
           if (error.error === 'login_required' || error.error === 'consent_required') {
-            console.log("User needs to log in or consent.");
+            
 
           } else {
             // Handle other errors (e.g., token refresh failure)
             console.error("Error getting access token:", error);
           }
         }
-      } else {
-        console.log("User is not authenticated.");
       }
     };
 

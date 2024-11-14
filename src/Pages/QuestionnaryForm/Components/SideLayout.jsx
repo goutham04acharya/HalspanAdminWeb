@@ -17,7 +17,6 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
 }) {
 
     const handleDropdown = (index) => {
-        console.log(index, 'index')
         setDropdown(index, !dropdownOpen[index])
     }
 
