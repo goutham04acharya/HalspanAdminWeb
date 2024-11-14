@@ -1403,8 +1403,6 @@ const QuestionnaryForm = () => {
                                         formParameters: fieldSettingParams[selectedQuestionId],
                                         handleRadiobtn: handleRadiobtn,
                                         fieldSettingParameters: fieldSettingParams[selectedQuestionId],
-                                        // setFieldSettingParameters: setFieldSettingParameters,
-                                        // handleSaveSettings: handleSaveSettings,
                                         isThreedotLoader: isThreedotLoader,
                                         selectedQuestionId: selectedQuestionId,
                                         handleBlur: handleBlur,
