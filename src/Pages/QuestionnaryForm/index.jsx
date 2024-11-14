@@ -968,6 +968,17 @@ const QuestionnaryForm = () => {
             dispatch(setModalOpen(false)); // Close the modal  
         }
     }
+    // const confirmDeleteSection = () => {
+    //     if (sectionToDelete !== null) {
+    //         const updatedSections = sections.filter((section) => section.section_id !== selectedSectionData.section_id);
+    //         setSections(updatedSections); // Assuming setSections updates the state
+    //         // Update sections state
+    //         setSectionToDelete(null);  // Reset sectionToDelete
+    //         dispatch(setModalOpen(false));  // Close modal
+    //         // globalSaveHandler(updatedSections);
+    //         console.log(updatedSections, sections, '555555')
+    //     }
+    // };
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
