@@ -22,6 +22,7 @@ const LookupDataset = () => {
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
+   
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
         encodeURIComponent(searchParams.get('search')) : '');
@@ -55,6 +56,7 @@ const LookupDataset = () => {
 
     // Functions
     // List Functions
+    console.log(data,'data main')
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
         const params = Object.fromEntries(searchParams);
@@ -64,9 +66,12 @@ const LookupDataset = () => {
         if (searchValue !== '') {
             delete params.start_key
         }
+        console.log(objectToQueryString(params), 'params sdsdsd')
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+            console.log(response, 'response')
             const newItems = response?.data?.data?.items || [];
+            console.log(newItems, 'new items')
             setLookupList(prevItems => [...prevItems, ...newItems]);
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
@@ -76,13 +81,40 @@ const LookupDataset = () => {
         setLoading(false);
         setIsFetchingMore(false);
     }, [searchParams]);
-
+    
+    const handleRemoveChoice = (uuidToRemove) => {
+        setData(prevData => ({
+            ...prevData,
+            choices: prevData.choices.filter(choice => choice.uuid !== uuidToRemove)
+        }));
+    };
     // Create Functions
     const handleChange = (e, id, type) => {
-        setErrors(id, '')
+        setErrors(id, '');
         const value = e.target.value;
-        setData(id, value);
-    }
+        
+        if (type === 'value') {
+            // Update a specific choice's value in the array
+            setData(prevData => ({
+                ...prevData,
+                choices: prevData.choices.map(choice => {
+                    if (choice.uuid === id) {
+                        // Split the input by commas and clean up the values
+                        const values = value.split(',').map(v => v.trim()).filter(v => v);
+                        return {
+                            ...choice,
+                            value: values.join(', ') // Join back with comma and space for display
+                        };
+                    }
+                    return choice;
+                })
+            }));
+        } else {
+            // Handle regular field updates (like name)
+            setData(id, value);
+        }
+    };
+    
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
@@ -100,55 +132,68 @@ const LookupDataset = () => {
     }
 
     const handleSubmit = async (file) => {
+        debugger
         const isUpdate = isView?.open;
-
         setErrors(initialState);
+    
+        // Validate data
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
         }
-
-        const payload = {
-            name: file?.name || data?.name,
-            choices: file?.choices || data?.choices.split(',').map(choice => choice.trim())
-        };
-
-        if (!file) {
-            setIsCreateLoading(true);
-        }
-
-        const apiFunction = isUpdate ? PatchAPI : PostAPI;
-        const endpoint = isUpdate ? `lookup-data/${isView?.id}` : "lookup-data";
-
-        try {
-            const response = await apiFunction(endpoint, payload);
-            if (!response?.error) {
-                setLookupList([]);
-                fetchLookupList();
-                const successMessage = isUpdate
-                    ? `Updated lookup dataset ID ${isView?.id} successfully.`
-                    : 'Created new lookup dataset successfully.';
-                setToastSuccess(successMessage);
-                handleClose();
-            } else if (response?.data?.status === 409) {
-                const errorMessage = response?.data?.data?.message;
-                if (!file) {
-                    setErrors('name', errorMessage);
-                    setIsCreateLoading(false);
+    
+        let choicesArray;
+        if (file) {
+            // Handle file import case
+            choicesArray = file.choices.map(choice => ({ value: choice }));
+        } else if (isUpdate) {
+            // Handle update case
+            try {
+                if (Array.isArray(data.choices)) {
+                    choicesArray = [...data.choices];
                 } else {
-                    setToastError(errorMessage);
-                    handleClose();
-                    setIsImportLoading(false);
+                    // If choices are provided as a string, split and parse them
+                    choicesArray = data.choices.split(',').map(choice => {
+                        const trimmedChoice = choice.trim();
+                        try {
+                            const parsedChoice = JSON.parse(trimmedChoice);
+                            return {
+                                uuid: parsedChoice.uuid,
+                                value: parsedChoice.value
+                            };
+                        } catch {
+                            return { value: trimmedChoice };
+                        }
+                    });
                 }
-                return;
-            } else {
-                setToastError(response?.data?.data?.message);
-                handleClose();
+    
+                // Add additional values for each choice if available
+                choicesArray = choicesArray.flatMap((choice, index) => {
+                    const additionalValues = data[`additional-value-${index}`];
+                    let additionalChoices = [];
+    
+                    // Split additional values by commas if they exist
+                    if (additionalValues) {
+                        additionalChoices = additionalValues.split(',').map(val => ({ value: val.trim() }));
+                    }
+    
+                    // Return the original choice followed by the additional choices
+                    return [choice, ...additionalChoices];
+                });
+            } catch (error) {
+                console.error('Error parsing choices:', error);
+                choicesArray = data.choices.split(',').map(choice => ({ value: choice.trim() }));
             }
-        } catch (error) {
-            handleClose();
-            setToastError('Something went wrong.');
+        } else {
+            // Handle create case
+            choicesArray = data.choices.split(',').map(choice => ({ value: choice.trim() }));
         }
+    
+        // Process choicesArray further if needed...
+        console.log(choicesArray, 'Processed Choices Array');
     };
+    
+    
+    
 
     const handleImportConfirmationModal = () => {
         if (!data?.choices === '') {
@@ -199,16 +244,21 @@ const LookupDataset = () => {
 
     // View Functions
     const handleView = (id, name, choices) => {
+        console.log(choices,'choices sasdada')
+        // debugger
         setIsView({
             open: true,
             id: id
         });
+        
+        // Keep choices as an array of objects instead of converting to string
         setData({
             name,
-            choices: choices.join(',')
-        })
+            choices: choices // Keep as array of objects
+        });
+        console.log(data,'data datadtadtatdt')
         setIsCreateModalOpen(true);
-    }
+    };
 
     // Delete Functions
     const handleDelete = async () => {
@@ -315,6 +365,9 @@ const LookupDataset = () => {
                 isImportLoading={isImportLoading}
                 isView={isView?.open}
                 title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
+                createLookup={!isView?.open}
+                // handleAddChoice={handleAddChoice}
+                handleRemoveChoice={handleRemoveChoice}
             />
             <ConfirmModal
                 text='Delete Lookup Dataset'

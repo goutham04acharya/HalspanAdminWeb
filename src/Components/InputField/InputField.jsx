@@ -27,7 +27,8 @@ const InputField = ({
     internalName,
     questionnarySettings,
     lookupDataset,
-    basicEditor
+    basicEditor,
+    uuidLoopkup
 }) => {
  
     return (
