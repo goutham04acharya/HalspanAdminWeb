@@ -1366,13 +1366,13 @@ const QuestionnaryForm = () => {
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                        {/* <img src="/Images/trash-black.svg"
+                                                                        <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
                                                                             data-testid={`delete-btn-${sectionIndex}`}
                                                                             className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
                                                                             onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
-                                                                        /> */}
+                                                                        />
                                                                         {/* <img
                                                                             src="/Images/save.svg"
                                                                             alt="save"
