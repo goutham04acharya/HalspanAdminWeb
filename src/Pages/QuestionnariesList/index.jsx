@@ -36,7 +36,6 @@ function Questionnaries() {
   ];
 
   const handleSelect = (option) => {
-    console.log('Selected option:', option);
   };
 
   const handleCreateQue = (e) => {

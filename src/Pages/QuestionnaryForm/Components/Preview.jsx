@@ -332,7 +332,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
-                                    console.log(`Evaluation of "${default_conditional_logic}":`, result);
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result

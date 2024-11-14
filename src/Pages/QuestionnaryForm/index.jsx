@@ -34,6 +34,7 @@ import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLo
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
 import { isEqual } from 'lodash'; // Import deep comparison library
 import useObjects from '../../customHooks/useObjects.js'
+import Button from '../../Components/Button/button.jsx';
 
 
 const QuestionnaryForm = () => {
@@ -108,6 +109,7 @@ const QuestionnaryForm = () => {
 
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
+    const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
     const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
         // debugger
@@ -542,13 +544,10 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
-            console.log(formStatus, 'response?.data')
             if (!response?.error) {
 
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
-
-                console.log(formStatus, 'response?.data')
                 const sectionsData = response?.data?.data?.sections || [];
                 // if (sectionsData.length === 1) {  
                 //     // If no sections are present, skip calling GetSectionOrder  
@@ -649,6 +648,13 @@ const QuestionnaryForm = () => {
         if (compliance) {
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
+            setComplianceLogic((prev) =>
+                prev.map((item, index) =>
+                    index === complianceLogicId
+                        ? { ...item, default_content: payloadString }
+                        : item
+                )
+            );
             setIsThreedotLoader(false);
             setConditionalLogic(false);
             setIsDefaultLogic(false);
@@ -1022,12 +1028,7 @@ const QuestionnaryForm = () => {
                 index: index,
                 id: section.section_id
             })),
-        }
-
-        if (compliance) {
-            let compliance = [...complianceLogic]
-            compliance[complianceLogicId].default_content = payloadString;
-            body['compliance_logic'] = compliance;
+            'compliance_logic': complianceLogic,
         }
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
@@ -1072,7 +1073,7 @@ const QuestionnaryForm = () => {
         setExpandedSections({ 0: false })
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
-        handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
+        // handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
 
     const handleBlur = (e) => {
@@ -1200,6 +1201,7 @@ const QuestionnaryForm = () => {
 
 
     const globalSaveHandler = async () => {
+        setGlobalSaveLoading(true)
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
@@ -1221,8 +1223,6 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-
-                console.log(sectionKey, pageKey, questionKey, 'mam');
 
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
@@ -1317,10 +1317,12 @@ const QuestionnaryForm = () => {
 
             cleanSections();
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+            handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
-            console.log(sectionBody, 'its me', fieldSettingParams);
+            setGlobalSaveLoading(false)
         } catch (error) {
             console.log(error);
+            setGlobalSaveLoading(false)
         }
     };
 
@@ -1508,12 +1510,15 @@ const QuestionnaryForm = () => {
                                 <img src="/Images/preview.svg" className='pr-2.5' alt="preview" />
                                 Preview
                             </button>
-                            <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' disabled={formStatus !== 'Draft'} onClick={() => {
-
-                                globalSaveHandler();
-                            }}>
-                                Save
-                            </button>
+                            <Button
+                                testID="save"
+                                isThreedotLoading={globalSaveLoading}
+                                text='Save'
+                                className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
+                                disabled={formStatus !== 'Draft'} onClick={() => {
+                                    globalSaveHandler();
+                                }}
+                            />
                         </div>
                         <div>
                             {selectedComponent ? (

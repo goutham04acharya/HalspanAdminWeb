@@ -980,7 +980,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             // If the expression is correct, log that it's valid
             else {
-                console.log(`Expression is correct.`);
             }
         });
 
