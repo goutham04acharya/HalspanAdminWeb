@@ -128,7 +128,7 @@ const QuestionnaryForm = () => {
     // // to open and close the sections
     const toggleSection = (sectionIndex) => {
         setExpandedSections((prev) => ({
-            ...prev,
+            ...prev, 
             [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
         }));
     };
