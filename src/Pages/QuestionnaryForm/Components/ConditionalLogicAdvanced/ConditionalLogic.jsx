@@ -705,7 +705,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             {
                 !isDefaultLogic &&
-                    setConditions(parseLogicExpression(question.conditional_logic));
+                    setConditions(parseLogicExpression(conditionalLogic));
             }
             //         }
             //     });
