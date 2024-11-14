@@ -58,7 +58,8 @@ Then('I should see the help text for photo updated in the section {int} page {in
 
 When('I click the save button for the questionnaire version for section {int}', async function (save) {
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-${save - 1}"]`))).click();
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-${save - 1}"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
 });
 
 When('I enter the label name for floorplan for preview', async function () {

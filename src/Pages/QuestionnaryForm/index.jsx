@@ -1309,6 +1309,7 @@ const QuestionnaryForm = () => {
                         delete section.updated_at;
                         delete section.questionnaire_id;
                         delete section.version_number;
+                        delete section['ttl'];
                     });
                 } else {
                     console.error("sectionBody is not an array:", sectionBody);
