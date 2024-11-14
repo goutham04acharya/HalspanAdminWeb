@@ -1041,7 +1041,6 @@ const QuestionnaryForm = () => {
         // handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
 
-    console.log(fieldSettingParams, 'iiiiii')
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
         handleSaveSection(sectionId, false);
@@ -1172,7 +1171,6 @@ const QuestionnaryForm = () => {
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-            console.log(sections, 'uuuuu')
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
@@ -1189,8 +1187,6 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-                console.log(sectionBody, 'yyy')
-                console.log(sectionKey, pageKey, questionKey, 'roopesh')
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {

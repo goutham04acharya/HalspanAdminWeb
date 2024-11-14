@@ -703,7 +703,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 '$1.SubtractDays($2)'
                             );
 
-                            console.log(conditionalLogic, 'consitionalLogic')
                             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
                             setInputValue(conditionalLogic)
 
@@ -1105,7 +1104,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
-        console.log(expression,"exp")
         expression =  trimParentheses(expression)
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
