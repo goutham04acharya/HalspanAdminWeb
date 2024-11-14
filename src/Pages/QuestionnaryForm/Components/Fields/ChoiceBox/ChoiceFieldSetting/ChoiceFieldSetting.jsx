@@ -147,8 +147,9 @@ function ChoiceFieldSetting({
                     formParameters={formParameters}
                     handleBlur={handleBlur}
                     formStatus={formStatus}
+                    assetLocation
                 />
-                <div className='flex flex-col justify-start mt-7 w-full relative'>
+                {/* <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                     <div className='relative w-full'>
                         <input
@@ -174,7 +175,7 @@ function ChoiceFieldSetting({
                             }:null}
                         />
                     </div>
-                </div>
+                </div> */}
                 <div className='mt-7'>
                     <p className='font-semibold text-base text-[#2B333B]'>Type</p>
                     <div className='mt-2.5'>
