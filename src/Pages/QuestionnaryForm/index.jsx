@@ -545,7 +545,7 @@ const QuestionnaryForm = () => {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             console.log(formStatus, 'response?.data')
             if (!response?.error) {
-                
+
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
 
@@ -645,9 +645,11 @@ const QuestionnaryForm = () => {
     }
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
-        handleSectionSaveOrder(sections, compliance, payloadString)
+        // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
         if (compliance) {
+            let compliance = [...complianceLogic]
+            compliance[complianceLogicId].default_content = payloadString;
             setIsThreedotLoader(false);
             setConditionalLogic(false);
             setIsDefaultLogic(false);
@@ -756,35 +758,29 @@ const QuestionnaryForm = () => {
             try {
                 if (isSaving) {
                     // ... call the API ...  
-                    const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+                    // const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                     // setSaveClick(true)
-                    if (!(response?.error)) {
-                        setToastSuccess(response?.data?.message);
-                        setCompareSavedSections(sections);
+                    // if (!(response?.error)) {
+                    // setToastSuccess(response?.data?.message);
+                    // setCompareSavedSections(sections);
 
-                        if (defaultString) {
-                            dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                        } else {
-                            dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                        }
-                        dispatch(saveCurrentData());
-                        setIsThreedotLoader(false);
-                        setConditionalLogic(false);
-                        setIsDefaultLogic(false);
-                        setCompliancestate(false)
-                        // Update the saved status  
-                        const update = { ...dataIsSame };
-                        update[sections[sectionIndex].section_id] = true;
-
-                        dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
-                        setSaveClick(false)
-
+                    if (defaultString) {
+                        dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     } else {
-                        console.log(error)
-                        setToastError('Something went wrong.');
+                        dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
-                }
+                    dispatch(saveCurrentData());
+                    setIsThreedotLoader(false);
+                    setConditionalLogic(false);
+                    setIsDefaultLogic(false);
+                    setCompliancestate(false)
+                    // Update the saved status  
+                    const update = { ...dataIsSame };
+                    update[sections[sectionIndex].section_id] = true;
 
+                    dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+                    setSaveClick(false)
+                }
             } catch (error) {
                 console.log(error)
                 setToastError('Something went wrong');
@@ -1203,6 +1199,132 @@ const QuestionnaryForm = () => {
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
+
+    const globalSaveHandler = async () => {
+        try {
+            // Deep clone sections to avoid direct state mutation
+            let sectionBody = {
+                sections: JSON.parse(JSON.stringify(sections))
+            };
+
+            for (const key in fieldSettingParams) {
+                const keys = key.split("_");
+                let sectionKey = '';
+                let pageKey = '';
+                let questionKey = '';
+
+                if (keys.length > 3) {
+                    sectionKey = keys[1];
+                    pageKey = keys[2];
+                    questionKey = keys[3];
+                } else {
+                    sectionKey = keys[0];
+                    pageKey = keys[1];
+                    questionKey = keys[2];
+                }
+
+                console.log(sectionKey, pageKey, questionKey, 'mam');
+
+                // Traverse sectionBody to find matching keys and update values
+                sectionBody.sections.forEach(section => {
+                    if (section.section_id.includes(sectionKey)) {
+                        section.pages.forEach(page => {
+                            if (page.page_id.includes(pageKey)) {
+                                page.questions.forEach((question, index) => {
+                                    if (question.question_id.includes(questionKey)) {
+                                        // Replace the question in sectionBody with updated values
+                                        page.questions[index] = {
+                                            question_id: question.question_id,
+                                            question_name: fieldSettingParams[question.question_id].label,
+                                            conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                                            component_type: fieldSettingParams[question.question_id].componentType,
+                                            label: fieldSettingParams[question.question_id].label,
+                                            help_text: fieldSettingParams[question.question_id].helptext,
+                                            placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
+                                            default_content: fieldSettingParams[question.question_id].default_content || '',
+                                            type: fieldSettingParams[question.question_id].type,
+                                            format: fieldSettingParams[question.question_id].format,
+                                            regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+                                            format_error: fieldSettingParams[question?.question_id]?.format_error,
+                                            field_range: {
+                                                min: fieldSettingParams[question.question_id].min,
+                                                max: fieldSettingParams[question.question_id].max,
+                                            },
+                                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                                            source: fieldSettingParams[question.question_id].source,
+                                            source_value:
+                                                fieldSettingParams[question.question_id].source === 'fixedList' ?
+                                                    fieldSettingParams[question.question_id].fixedChoiceArray :
+                                                    fieldSettingParams[question.question_id].lookupOptionChoice
+                                            ,
+                                            lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                                            options: fieldSettingParams[question.question_id].options,
+                                            default_value: fieldSettingParams[question.question_id].defaultValue,
+                                            increment_by: fieldSettingParams[question.question_id].incrementby,
+                                            field_texts: {
+                                                pre_field_text: fieldSettingParams[question.question_id].preField,
+                                                post_field_text: fieldSettingParams[question.question_id].postField
+                                            },
+                                            asset_extras: {
+                                                draw_image: fieldSettingParams[question.question_id].draw_image,
+                                                pin_drop: fieldSettingParams[question.question_id].pin_drop,
+                                                include_metadata: fieldSettingParams[question.question_id].include_metadata,
+                                                file_size: fieldSettingParams[question.question_id].fileSize,
+                                                file_type: fieldSettingParams[question.question_id].fileType,
+                                            },
+                                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
+                                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                                            display_type: (() => {
+                                                switch (fieldSettingParams[question.question_id].type) {
+                                                    case 'heading':
+                                                        return { heading: fieldSettingParams[question.question_id].heading };
+                                                    case 'text':
+                                                        return { text: fieldSettingParams[question.question_id].text };
+                                                    case 'image':
+                                                        return { image: fieldSettingParams[question.question_id].image };
+                                                    case 'url':
+                                                        return {
+                                                            url: {
+                                                                type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
+                                                                value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
+                                                            }
+                                                        };
+                                                    default:
+                                                        return {}; // Return an empty object if componentType doesn't match any case  
+                                                }
+                                            })(),
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            function cleanSections() {
+                // Ensure sectionBody is an array before proceeding
+                if (Array.isArray(sectionBody['sections'])) {
+                    sectionBody['sections'].forEach(section => {
+                        delete section.created_at;
+                        delete section.updated_at;
+                        delete section.questionnaire_id;
+                        delete section.version_number;
+                    });
+                } else {
+                    console.error("sectionBody is not an array:", sectionBody);
+                }
+            }
+
+            cleanSections();
+            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+            setToastSuccess(response?.data?.message);
+            console.log(sectionBody, 'its me', fieldSettingParams);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <>
             {pageLoading ? (
@@ -1221,7 +1343,7 @@ const QuestionnaryForm = () => {
                             handlePageScroll={scrollToPage}
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
-                             />
+                        />
                     </div>
                     <div className='w-[50%] '>
                         <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
@@ -1258,8 +1380,8 @@ const QuestionnaryForm = () => {
                                                                         ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
                                                                         : "none", // Fallback in case transform is null/undefined
                                                                 }}
-                                                            // className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
-                                                            className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
+                                                                // className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                                className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
 
                                                             >
                                                                 <div className="flex justify-between w-full">
@@ -1300,7 +1422,7 @@ const QuestionnaryForm = () => {
                                                                             title="Drag"
                                                                             src={`/Images/drag.svg`}
                                                                             alt="Drag"
-                                                                            
+
                                                                         />}
 
                                                                         <img src="/Images/trash-black.svg"
@@ -1389,7 +1511,7 @@ const QuestionnaryForm = () => {
                             </button>
                             <button data-testid="save" className='w-1/3 py-[17px] px-[29px] font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]' disabled={formStatus !== 'Draft'} onClick={() => {
 
-                                handleSaveSection(latestSectionId);
+                                globalSaveHandler();
                             }}>
                                 Save
                             </button>
