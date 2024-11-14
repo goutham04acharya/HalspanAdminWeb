@@ -112,7 +112,6 @@ const QuestionnaryForm = () => {
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
     const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
-        // debugger
         acc[index] = false;  // Set all dropdowns to false initially
         return acc;
     }, {});
@@ -286,7 +285,6 @@ const QuestionnaryForm = () => {
     };
 
     const scrollToPage = (sectionIndex, pageId) => {
-        // debugger
         // Check if the section is closed, if so, expand it
         if (!expandedSections[sectionIndex]) {
             toggleSection(sectionIndex); // Assuming toggleSection will expand the section
@@ -1076,6 +1074,7 @@ const QuestionnaryForm = () => {
         // handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
 
+    console.log(fieldSettingParams, 'iiiiii')
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
         handleSaveSection(sectionId, false);
@@ -1207,7 +1206,7 @@ const QuestionnaryForm = () => {
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-
+            console.log(sections, 'uuuuu')
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
@@ -1215,15 +1214,17 @@ const QuestionnaryForm = () => {
                 let questionKey = '';
 
                 if (keys.length > 3) {
-                    sectionKey = keys[1];
+                    // replaciing as bdd records will have aditional key as bddtest# which will bot be there in the  normal user journey
+                    sectionKey = keys[1].replace('bddtest#', '');
                     pageKey = keys[2];
                     questionKey = keys[3];
                 } else {
-                    sectionKey = keys[0];
+                    sectionKey = keys[0].replace('bddtest#', '');
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-
+                console.log(sectionBody, 'yyy')
+                console.log(sectionKey, pageKey, questionKey, 'roopesh')
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1317,6 +1318,7 @@ const QuestionnaryForm = () => {
             }
 
             cleanSections();
+
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
