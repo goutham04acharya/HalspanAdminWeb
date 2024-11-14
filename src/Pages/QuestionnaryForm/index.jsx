@@ -1076,6 +1076,7 @@ const QuestionnaryForm = () => {
         // handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
 
+    console.log(fieldSettingParams, 'iiiiii')
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
         handleSaveSection(sectionId, false);
@@ -1207,7 +1208,7 @@ const QuestionnaryForm = () => {
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-
+            console.log(sections, 'uuuuu')
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
@@ -1215,22 +1216,26 @@ const QuestionnaryForm = () => {
                 let questionKey = '';
 
                 if (keys.length > 3) {
-                    sectionKey = keys[1];
+                    // replaciing as bdd records will have aditional key as bddtest# which will bot be there in the  normal user journey
+                    sectionKey = keys[1].replace('bddtest#', '');
                     pageKey = keys[2];
                     questionKey = keys[3];
                 } else {
-                    sectionKey = keys[0];
+                    sectionKey = keys[0].replace('bddtest#', '');
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-
+                console.log(sectionBody, 'yyy')
+                console.log(sectionKey, pageKey, questionKey, 'roopesh')
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
+                    debugger
                     if (section.section_id.includes(sectionKey)) {
                         section.pages.forEach(page => {
                             if (page.page_id.includes(pageKey)) {
                                 page.questions.forEach((question, index) => {
                                     if (question.question_id.includes(questionKey)) {
+                                        debugger
                                         // Replace the question in sectionBody with updated values
                                         page.questions[index] = {
                                             question_id: question.question_id,
@@ -1317,6 +1322,7 @@ const QuestionnaryForm = () => {
             }
 
             cleanSections();
+
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
