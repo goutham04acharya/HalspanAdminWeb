@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function Table({ loading, QueList, lastElementRef }) {
+function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionList }) {
     const navigate = useNavigate();
 
     const getStatusStyles = (status) => {
@@ -80,7 +80,7 @@ function Table({ loading, QueList, lastElementRef }) {
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_type}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6 truncate max-w-[200px] rounded-tr-[10px] rounded-br-[10px]'>{QueInfo?.description}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA]  flex justify-center'>
-                                        <img src="/Images/copy.svg" className='w-5 h-5 cursor-pointer' alt="" />
+                                        <img src="/Images/copy.svg" onClick={() => handleVersionList(QueInfo?.questionnaire_id)} className='w-5 h-5 cursor-pointer' alt="" />
                                     </td>
                                 </tr>
                                 <tr className='h-4 bg-white'>
