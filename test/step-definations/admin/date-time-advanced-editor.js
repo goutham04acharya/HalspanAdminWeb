@@ -49,8 +49,7 @@ When('I select the question from the suggestions for date\\/time field', async f
         'getMinutes()',
         'getSeconds()',
         'getMilliseconds()',
-        'getTime()',
-        'Date()'];
+        'getTime()'];
 
     bool = true;
     i = 0;
