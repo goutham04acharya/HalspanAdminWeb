@@ -48,6 +48,7 @@ module.exports = {
             'test/integration-testing/Flow1/42_default_value_number.feature',
             // 'test/integration-testing/Flow1/44_preview_response.feature',
             'test/integration-testing/Flow1/46_load_from_previous.feature',
+            'test/integration-testing/Flow1/47_cloning_questionnaire.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

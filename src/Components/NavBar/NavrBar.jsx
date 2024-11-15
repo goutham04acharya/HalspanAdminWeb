@@ -14,7 +14,8 @@ function NavrBar({setModalOpen}) {
             <div className='flex items-center gap-[50px]'>
                 <div 
                 onClick={()=> navigate('/questionnaries')}
-                className='flex items-center cursor-pointer h-[35px]'>
+                className='flex items-center cursor-pointer h-[35px]'
+                data-testid='questionnaries'>
                     <Image src="questionnaries" className="w-auto" />
                     <p className='font-semibold text-base text-[#2B333B] ml-4'>
                         Questionnaries
