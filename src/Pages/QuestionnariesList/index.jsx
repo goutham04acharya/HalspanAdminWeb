@@ -149,8 +149,14 @@ function Questionnaries() {
         "from_version_number": selectedVersion
       }
       const response = await PostAPI(`questionnaires/clone`, body);
-
+      console.log(response,'llllllllllll')
+      if(!response?.error){
+        setToastSuccess(response?.data?.message)
+      }else{
+        setToastError(response?.data?.data?.message)
+      }
       setCloneLoading(false)
+      setCloneModal(false)
     } catch (error) {
       console.log(error)
       setCloneLoading(false)
