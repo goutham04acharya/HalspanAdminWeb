@@ -6,21 +6,35 @@ import Button2 from '../Button2/ButtonLight';
 import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 
-const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice }) => {
-    console.log(data, 'data data')
-    const [activeInputs, setActiveInputs] = useState({});
-
+const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice, activeInputs, setActiveInputs }) => {
+    
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
             ...prev,
             [uuid]: true
         }));
     };
+    const handleClearAdditionalInput = (uuid, index) => {
+        setData(prevData => ({
+            ...prevData,
+            [`additional-value-${index}`]: '' // Only clear the specified additional input
+        }));
+
+        setActiveInputs(prev => ({
+            ...prev,
+            [uuid]: false
+        }));
+    };
+
+
 
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
-            <div className='customModal flex flex-col  w-[352px] relative'>
-                <Image testId="cancel" onClick={handleClose} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
+            <div className='customModal h-auto flex flex-col w-[352px] relative'>
+                <Image testId="cancel" onClick={() => {
+                    handleClose()
+                    // setActiveInputs('')
+                }} src='close' className='h-6 absolute -right-3 -top-3 cursor-pointer' />
                 <h1 className='font-[600] text-[22px] leading-[33px] mb-5'>{title}</h1>
                 <InputField
                     autoComplete='off'
@@ -32,22 +46,23 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                     testId='name'
                     htmlFor='name'
                     maxLength={40}
-                    handleChange={handleChange}
+                    handleChange={(e)=>handleChange(e, e.target.id, 'Name')}
                     className='w-full mt-2.5'
                     validationError={errors?.name}
                     lookupDataset
                 />
                 {createLookup && <InputTextarea
-                    className='h-[160px] w-full mt-2.5 px-2.5'
+                    className='h-[160px] w-full px-2.5 mt-2.5'
                     label='Choices (Comma separated)'
                     htmlFor='choices'
                     id='choices'
-                    labelStyle='font-semibold text-base text-[#2B333B]'
+                    mainStyle='mt-5'
+                    labelStyle='font-semibold text-base text-[#2B333B] pt-5'
                     value={data.choices}
                     placeholder='Enter choices'
                     testId='choices'
                     maxLength={1000}
-                    handleChange={handleChange}
+                    handleChange={(e)=>handleChange(e, e.target.id, 'choices')}
                     validationError={errors?.choices}
                 />}
 
@@ -105,7 +120,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
 
                             </div>
                             {activeInputs[choice.uuid] && (
-                                <div className="flex">
+                                <div className='flex gap-3'><div className="flex">
                                     <InputField
                                         autoComplete="off"
                                         id={`additional-value-${index}`}
@@ -115,7 +130,7 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                                         testId={`additional-value-${index}`}
                                         htmlFor={`additional-value-${index}`}
                                         maxLength={40}
-                                        handleChange={handleChange}
+                                        handleChange={(e)=>handleChange(e, e.target.id, `additional-value-${index}`)}
                                         className="w-full mt-2.5"
                                         onBlur={() => {
                                             // Remove the additional input field when it loses focus
@@ -125,7 +140,13 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                                                     [choice.uuid]: false
                                                 }));
                                             }, 200);
-                                        }}
+                                        }} />
+                                </div>
+                                    <img
+                                        src="/Images/close.svg"
+                                        alt="close"
+                                        onClick={() => handleClearAdditionalInput(choice.uuid, index)}
+                                        className="w-[22px] h-[22px] my-auto cursor-pointer mr-[14px]"
                                     />
                                 </div>
                             )}
@@ -143,7 +164,10 @@ const CreateModal = ({ isModalOpen, handleClose, data, errors, handleChange, han
                         text={`${isView ? 'Update' : 'Create'}`}
                         testId='create'
                         className='w-[156px] font-[600]'
-                        onClick={() => handleCreate('')}
+                        onClick={() => {
+                            handleCreate('')
+                            setActiveInputs('')
+                        }}
                         isThreedotLoading={isCreateLoading}
                     />
                     <>
