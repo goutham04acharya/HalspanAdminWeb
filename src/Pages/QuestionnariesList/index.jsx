@@ -12,6 +12,9 @@ import { handleCurrentPage, handlePagination } from '../../redux/paginationSlice
 import FilterDropdown from '../../Components/InputField/FilterDropdown.jsx';
 import useApi from '../../services/CustomHook/useApi.js';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString.js';
+import VersionEditModal from '../../Components/Modals/VersionEditModal.jsx';
+import GlobalContext from '../../Components/Context/GlobalContext.jsx';
+import { dataService } from '../../services/data.services.js';
 
 function Questionnaries() {
   const dispatch = useDispatch();
@@ -30,10 +33,15 @@ function Questionnaries() {
   const lastEvaluatedKeyRef = useRef(null);
 
   const [isFetchingMore, setIsFetchingMore] = useState(false);
-
-  const options = [
-    { value: 'Door', label: 'Door' },
-  ];
+  const [versionList, setVersionList] = useState([])
+  const [dropdownsOpen, setDropdownsOpen] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState()
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState('')
+  const [cloneLoading, setCloneLoading] = useState(false)
+  const [options,setOptions] = useState([])
+  // const options = [
+  //   { value: 'Door', label: 'Door' },
+  // ];
 
   const handleSelect = (option) => {
   };
@@ -46,7 +54,7 @@ function Questionnaries() {
   const handleFilter = (option) => {
     setSelectedOption(option);
     let params = Object.fromEntries(searchParams);
-    if (params.asset_type === option?.value) {
+    if (params.asset_type === option?.name) {
       setDropdownOpen(false);
       return;
     } else {
@@ -54,7 +62,7 @@ function Questionnaries() {
       setQueList([])
     }
     if (option) {
-      params['asset_type'] = option.value;
+      params['asset_type'] = option.name;
     } else {
       delete params.asset_type;
     }
@@ -111,10 +119,50 @@ function Questionnaries() {
   }, [loading, isFetchingMore]);
 
   useEffect(() => {
+    getAssetTypes()
     fetchQuestionnaryList();
   }, [fetchQuestionnaryList]);
 
 
+  const handleDropdownClick = () => {
+    setDropdownsOpen(!dropdownsOpen)
+    // setIsCreateModalOpen(false)
+  }
+  const handleOptionClick = (versionNumber) => {
+    setSelectedVersion(versionNumber); // Set the clicked version as the selected version
+    setDropdownsOpen(false); // Close the dropdown after selecting an option
+  };
+  const handleClone = async () => {
+    setCloneLoading(true)
+    try {
+      let body = {
+        "from_questionnaire_id": selectedQuestionnaireId,
+        "from_version_number": selectedVersion
+      }
+      const response = await PostAPI(`questionnaires/clone`, body);
+      console.log(response, 'llllllllllll')
+      if (!response?.error) {
+        setToastSuccess(response?.data?.message)
+      } else {
+        setToastError(response?.data?.data?.message)
+      }
+      setCloneLoading(false)
+      setCloneModal(false)
+    } catch (error) {
+      console.log(error)
+      setCloneLoading(false)
+    }
+  }
+  const getAssetTypes = async() => {
+    try {
+      let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`,null,true)
+      console.log(response?.data?.results,'pppppppppp')
+      setOptions(response?.data?.results)
+    } catch (error) {
+      
+    }
+  }
+  console.log(options, 'pop')
   return (
     <div className='bg-[#F4F6FA]'>
       <div className='py-[33px] px-[25px]'>

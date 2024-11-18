@@ -33,7 +33,7 @@ function FilterDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
-                    value={selectedOption ? selectedOption.label || selectedOption : ''}
+                    value={selectedOption ? selectedOption.name || selectedOption : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
@@ -47,11 +47,11 @@ function FilterDropdown({
             {isDropdownOpen && (
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-[100]">
                     {options.map(option => (
-                        <li key={option.value}
+                        <li key={option.id}
                             data-testid={labeltestID}
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => handleOptionClick(option)}>
-                            {option.label}
+                            {option.name}
                         </li>
                     ))}
                 </ul>

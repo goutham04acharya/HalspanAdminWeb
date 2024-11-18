@@ -12,5 +12,5 @@ async function PostAPIWithoutHeader (endpoint, body) {
     }
 }
 export const dataService = {
-    PostAPIWithoutHeader
+    PostAPIWithoutHeader,
 };
