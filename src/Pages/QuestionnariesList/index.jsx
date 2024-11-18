@@ -24,8 +24,7 @@ function Questionnaries() {
   const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
-    encodeURIComponent(searchParams.get('search')) : '');
+  const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ? encodeURIComponent(searchParams.get('search')) : '');
   const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
@@ -37,7 +36,6 @@ function Questionnaries() {
   ];
 
   const handleSelect = (option) => {
-    console.log('Selected option:', option);
   };
 
   const handleCreateQue = (e) => {

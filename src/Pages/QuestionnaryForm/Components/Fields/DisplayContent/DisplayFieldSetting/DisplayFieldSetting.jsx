@@ -90,7 +90,6 @@ function DisplayFieldSetting({
 
                 // Check if the upload was successful
                 if (uploadResponse.ok) {
-                    console.log('Image uploaded successfully!');
                 } else {
                     console.error('Failed to upload image:', uploadResponse.status, uploadResponse.statusText);
                     const errorText = await uploadResponse.text();

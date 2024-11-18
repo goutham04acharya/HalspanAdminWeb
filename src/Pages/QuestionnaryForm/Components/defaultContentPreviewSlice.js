@@ -10,12 +10,10 @@ const fieldSlice = createSlice({
     initialState,
     reducers: {
         setFieldEditable: (state, action) => {
-            console.log('first')
             const { fieldId, isEditable } = action.payload;
             state.fieldStatus[fieldId] = isEditable;
         },
         resetFields: (state, action) => {
-            console.log('i am here ye herereerer')
             state.fieldStatus = {}
         }
     }

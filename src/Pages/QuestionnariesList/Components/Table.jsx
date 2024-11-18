@@ -35,9 +35,8 @@ function Table({ loading, QueList, lastElementRef }) {
         }
     };
 
-    const navigateToVersionList = (publicName,questionnaire_id) => {
-        const formattedName = publicName.replace(/ /g, "_");
-        navigate(`/questionnaries/version-list/${formattedName}/${questionnaire_id}`);
+    const navigateToVersionList = (questionnaire_id) => {
+        navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
     return (
@@ -47,7 +46,7 @@ function Table({ loading, QueList, lastElementRef }) {
                     <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>ID</th>
                     <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>INTERNAL NAME</th>
                     <th className='min-w-[400px] text-start py-6 font-medium text-base text-[#2B333B]'>PUBLIC NAME</th>
-                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] pl-[18px]'>STATUS</th>
+                    <th className='min-w-[200px] text-center py-6 font-medium text-base text-[#2B333B] pl-[18px]'>STATUS</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>ASSET TYPE</th>
                     <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
                 </thead>
@@ -59,7 +58,7 @@ function Table({ loading, QueList, lastElementRef }) {
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-6 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{QueInfo?.questionnaire_id}</td>
                                     <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]'
-                                        onClick={() => navigateToVersionList(QueInfo?.public_name, QueInfo?.questionnaire_id)}
+                                        onClick={() => navigateToVersionList(QueInfo?.questionnaire_id)}
                                         title={QueInfo?.internal_name}><u>
                                             {QueInfo?.internal_name}</u>
                                     </td>

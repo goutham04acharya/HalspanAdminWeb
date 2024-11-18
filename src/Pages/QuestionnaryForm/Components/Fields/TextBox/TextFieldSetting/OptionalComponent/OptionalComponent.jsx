@@ -3,7 +3,6 @@ import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
-import InputWithDropDown from '../../../../../../../Components/InputField/InputWithDropDown';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
@@ -11,7 +10,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const getOptions = (componentType) => {
-        // debugger
         switch (componentType) {
             case 'textboxfield':
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed', 'Field validation'];
@@ -107,7 +105,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         dispatch(setShouldAutoSave(true));
     };
 
-    const handleTabClick = (tab) => setActiveTab(tab);
+    const handleTabClick = (tab) => {
+        setActiveTab(tab)
+        setServiceRecordDropdownOpen(false);
+        setIsAttributeDropdownOpen(false);
+    };
     const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
 
     const options = getOptions(componentType);
@@ -116,42 +118,44 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             <p className='font-semibold text-base text-[#2B333B]'>Options</p>
 
             {/* Separate 'Load from previously entered data' toggle */}
-            <ToggleSwitch
-                key='Load from previously entered data'
-                checked={toggleStates['Load from previously entered data']}
-                label='Load from previously entered data'
-                testId='Load from previously entered data'
-                onChange={formStatus === 'Draft' ?() => handleToggleClick('Load from previously entered data'):null}
-            />
+            {options.includes('Load from previously entered data') && (
+                <ToggleSwitch
+                    key='Load from previously entered data'
+                    checked={toggleStates['Load from previously entered data']}
+                    label='Load from previously entered data'
+                    testId='Load from previously entered data'
+                    onChange={formStatus === 'Draft' ? () => handleToggleClick('Load from previously entered data') : null}
+                />
+            )}
 
             {/* Conditionally render the dropdown below the toggle */}
-            {toggleStates['Load from previously entered data'] && (
+            {toggleStates['Load from previously entered data'] && options.includes('Load from previously entered data') && (
                 <div className="mt-4">
                     <div className="flex justify-between border-b border-gray-300 mb-2">
                         <p
                             data-testid="attribute-data"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'attributeData' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
-                            onClick={formStatus === 'Draft' ?() => handleTabClick('attributeData'):null}
+                            onClick={formStatus === 'Draft' ? () => handleTabClick('attributeData') : null}
                         >
                             Attribute Data
                         </p>
                         <p
                             data-testid="service-record"
                             className={`font-semibold text-base cursor-pointer ${activeTab === 'serviceRecord' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'}`}
-                            onClick={formStatus === 'Draft' ?() => handleTabClick('serviceRecord'):null}
+                            onClick={formStatus === 'Draft' ? () => handleTabClick('serviceRecord') : null}
                         >
                             Service Record
                         </p>
                     </div>
                     {activeTab === 'attributeData' && (
-                        <InputWithDropDown
+                        <InfinateDropdown
                             id='format'
                             top='25px'
                             placeholder='Select'
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-attribute'
                             labeltestID='attribute'
-                            selectedOption={attributes.find(option => attributes.value === fieldSettingParameters?.attribute_data_lfp)}
+                            selectedOption={attributeValue}
                             handleOptionClick={handleAttributeClick}
                             isDropdownOpen={isAttributeDropdownOpen}
                             setDropdownOpen={setIsAttributeDropdownOpen}
@@ -160,7 +164,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                         />
                     )}
                     {activeTab === 'serviceRecord' && (
-                        <InputWithDropDown
+                        <InfinateDropdown
                             label='Service Record List'
                             labelStyle='font-semibold text-[#2B333B] text-base'
                             id='serviceRecord'
@@ -169,34 +173,30 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-service-record'
                             labeltestID='service-record'
-                            selectedOption={serviceRecordOptions.find(option => serviceRecordOptions.value === fieldSettingParameters?.service_record_lfp)}
-                            handleOptionClick={formStatus === 'Draft' ?handleServiceClick:null}
-                            isDropdownOpen={formStatus === 'Draft' ?isServiceRecordDropdownOpen: false}
-                            setDropdownOpen={formStatus === 'Draft' ?setServiceRecordDropdownOpen: null}
+                            selectedOption={serviceValue}
+                            handleOptionClick={formStatus === 'Draft' ? handleServiceClick : null}
+                            isDropdownOpen={formStatus === 'Draft' ? isServiceRecordDropdownOpen : false}
+                            setDropdownOpen={formStatus === 'Draft' ? setServiceRecordDropdownOpen : null}
                             options={serviceRecordOptions}
                             formStatus={formStatus}
                         />
                     )}
                 </div>
             )}
-
-        
-                
-        
-                {/* Render other toggles below the dropdown */}
-                {options
-                    .filter(option => option !== 'Load from previously entered data')
-                    .map(option => (
-                        <ToggleSwitch
-                            key={option}
-                            checked={toggleStates[option]}
-                            label={option}
-                            testId={option}
-                            onChange={formStatus === 'Draft' ?() => handleToggleClick(option):null}
-                        />
-                    ))}
-            </div>
-        );
+            {/* Render other toggles below the dropdown */}
+            {options
+                .filter(option => option !== 'Load from previously entered data')
+                .map(option => (
+                    <ToggleSwitch
+                        key={option}
+                        checked={toggleStates[option]}
+                        label={option}
+                        testId={option}
+                        onChange={formStatus === 'Draft' ? () => handleToggleClick(option) : null}
+                    />
+                ))}
+        </div>
+    );
 }
 
 export default OptionsComponent;
