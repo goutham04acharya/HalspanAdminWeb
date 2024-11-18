@@ -13,8 +13,6 @@ import {
 const Sections = ({
   sectionData,
   sectionIndex,
-  expandedSections,
-  setExpandedSections,
   handleSaveSectionName,
   dataIsSame,
   handleAddRemovePage,
@@ -37,16 +35,16 @@ const Sections = ({
     dispatch(setSelectedSectionData(pageData));
   };
 
-  useEffect(() => {
-    const savedExpandedSections = localStorage.getItem("expandedSections");
-    if (savedExpandedSections) {
-      setExpandedSections(JSON.parse(savedExpandedSections));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedExpandedSections = localStorage.getItem("expandedSections");
+  //   if (savedExpandedSections) {
+  //     setExpandedSections(JSON.parse(savedExpandedSections));
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
-  }, [expandedSections]);
+  // useEffect(() => {
+  //   localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
+  // }, [expandedSections]);
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -97,9 +95,8 @@ const Sections = ({
       key={sectionData?.section_id}
       id={sectionData?.section_id}
       ref={(el) => (sectionRefs.current[sectionIndex] = el)}
-      className={`${expandedSections[sectionIndex] ? "" : "pb-0 mt-[10px] mb-0"}`}
+      className={"pb-0 mt-[10px] mb-0"}
     >
-      {expandedSections[sectionIndex] && (
         <>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable">
@@ -209,7 +206,6 @@ const Sections = ({
             <span>Add page</span>
           </button>
         </>
-      )}
     </div>
   );
 };

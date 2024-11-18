@@ -32,13 +32,12 @@ import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalL
 import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
-import { isEqual } from 'lodash'; // Import deep comparison library
 import useObjects from '../../customHooks/useObjects.js'
 import Button from '../../Components/Button/button.jsx';
 
 
 const QuestionnaryForm = () => {
-    const {questionnaire_id, version_number } = useParams();
+    const { questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
     const { getAPI } = useApi();
     const { PatchAPI } = useApi();
@@ -67,8 +66,6 @@ const QuestionnaryForm = () => {
     const [showReplaceModal, setReplaceModal] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [previewModal, setPreviewModal] = useState(false)
-    // const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default
-    const [expandedSections, setExpandedSections] = useState({ 0: true }); // Set first section open by default\
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
@@ -97,16 +94,13 @@ const QuestionnaryForm = () => {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
-    const [latestSectionId, setLatestSectionId] = useState(null);
     const [saveClick, setSaveClick] = useState(false)
     const [sectionName, setSectionName] = useState('')
     const [pageName, setPageName] = useState('')
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    // const [selectedSection, setSelectedSection] = useState(0);
-    const [selectedSection, setSelectedSection] = useState(null);
-
+    const [selectedSection, setSelectedSection] = useState(0);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
@@ -115,24 +109,8 @@ const QuestionnaryForm = () => {
         acc[index] = false;  // Set all dropdowns to false initially
         return acc;
     }, {});
-
-    // State for dropdowns
     const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
-    useEffect(() => {
-        if (sections.length > 0) {
-            const lastSection = sections[sections.length - 1]; // Get the latest section
-            setLatestSectionId(lastSection.section_id);
-            // handleSectionSaveOrder(sections)
-        }
-    }, [sections]); // This useEffect runs whenever `sections` changes
 
-    // // to open and close the sections
-    const toggleSection = (sectionIndex) => {
-        setExpandedSections((prev) => ({
-            ...prev, 
-            [sectionIndex]: !prev[sectionIndex], // Toggle the section's expanded state
-        }));
-    };
 
     const handleCancel = () => {
         dispatch(setModalOpen(false));
@@ -269,11 +247,6 @@ const QuestionnaryForm = () => {
     };
 
     const scrollToSection = (index, sectionId) => {
-        // Check if section is closed, if so, expand it
-        if (!expandedSections[index]) {
-            toggleSection(index); // Assuming toggleSection will expand the section
-        }
-
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
             const element = document.getElementById(sectionId);
@@ -286,11 +259,6 @@ const QuestionnaryForm = () => {
     };
 
     const scrollToPage = (sectionIndex, pageId) => {
-        // Check if the section is closed, if so, expand it
-        if (!expandedSections[sectionIndex]) {
-            toggleSection(sectionIndex); // Assuming toggleSection will expand the section
-        }
-
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
             const element = document.getElementById(pageId);
@@ -491,10 +459,6 @@ const QuestionnaryForm = () => {
                 setToastError("Limit reached: Maximum of 20 questions allowed.");
                 return; // Exit the function if the limit is reached
             }
-            // if (!isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, false);
-            // }
-            // setIsSectionSaved(prevState => ({ ...prevState, [sectionId]: false }));
         } else if (event === 'remove') {
             dispatch(setSelectedQuestionId(false));
             dispatch(setSelectedAddQuestion({}));
@@ -516,11 +480,6 @@ const QuestionnaryForm = () => {
                 }
                 return section;
             });
-            // if (!isSectionSaved[sectionId]) {
-            //     handleSaveSection(sectionId, currentSectionData, false); // Call auto-save function 
-            // }
-
-            // setIsSectionSaved(prevState => ({ ...prevState, [pageId.split('_')[0]]: false }));
         }
 
         // Reset the selected component
@@ -548,11 +507,7 @@ const QuestionnaryForm = () => {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
-                // if (sectionsData.length === 1) {  
-                //     // If no sections are present, skip calling GetSectionOrder  
-                //     setSections(sectionsData);  
-                //     return;  
-                //   } 
+
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -1019,6 +974,17 @@ const QuestionnaryForm = () => {
             dispatch(setModalOpen(false)); // Close the modal  
         }
     }
+    // const confirmDeleteSection = () => {
+    //     if (sectionToDelete !== null) {
+    //         const updatedSections = sections.filter((section) => section.section_id !== selectedSectionData.section_id);
+    //         setSections(updatedSections); // Assuming setSections updates the state
+    //         // Update sections state
+    //         setSectionToDelete(null);  // Reset sectionToDelete
+    //         dispatch(setModalOpen(false));  // Close modal
+    //         // globalSaveHandler(updatedSections);
+    //         console.log(updatedSections, sections, '555555')
+    //     }
+    // };
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
@@ -1069,13 +1035,12 @@ const QuestionnaryForm = () => {
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
 
-        setExpandedSections({ 0: false })
+        // setExpandedSections({ 0: false })
         setSections(reorderedItems);
         dispatch(setSavedSection(reorderedItems));
         // handleSectionSaveOrder(reorderedItems); // Call handleSectionSaveOrder with the updated sections  
     }
 
-    console.log(fieldSettingParams, 'iiiiii')
     const handleBlur = (e) => {
         const sectionId = selectedQuestionId.split('_')[0]
         handleSaveSection(sectionId, false);
@@ -1199,7 +1164,6 @@ const QuestionnaryForm = () => {
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
-
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
@@ -1207,7 +1171,6 @@ const QuestionnaryForm = () => {
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-            console.log(sections, 'uuuuu')
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
@@ -1224,8 +1187,6 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-                console.log(sectionBody, 'yyy')
-                console.log(sectionKey, pageKey, questionKey, 'roopesh')
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1348,6 +1309,12 @@ const QuestionnaryForm = () => {
                             handlePageScroll={scrollToPage}
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
+                            onDragEnd={onDragEnd}
+                            formStatus={formStatus}
+                            handleAddRemoveSection={handleAddRemoveSection}
+                            handleSectionSaveOrder={handleSectionSaveOrder}
+                            handleDeleteModal={handleDeleteModal}
+                            
                         />
                     </div>
                     <div className='w-[50%] '>
@@ -1356,6 +1323,7 @@ const QuestionnaryForm = () => {
                             <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                 {getStatusText(formDefaultInfo?.status)}
                             </button>
+                            {/* {formStatus !== 'Draft' &&<p className='font-normal pl-2 text-base text-[#2B333B]'>This form cannot be edited</p>} */}
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p
@@ -1367,7 +1335,9 @@ const QuestionnaryForm = () => {
                                 <DragDropContext onDragEnd={onDragEnd}>
                                     <Droppable droppableId="droppable">
                                         {(provided) => (
-                                            <ul {...provided.droppableProps} ref={provided.innerRef}>
+                                            <ul
+                                                {...provided.droppableProps} ref={provided.innerRef}
+                                            >
                                                 {sections.map((sectionData, sectionIndex) => (
                                                     <Draggable
                                                         key={sectionData.section_id}
@@ -1376,30 +1346,13 @@ const QuestionnaryForm = () => {
                                                     >
                                                         {(provided) => (
                                                             <li
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                style={{
-                                                                    ...provided.draggableProps.style,
-                                                                    // Ensure the transform exists and contains a Y-axis translation
-                                                                    transform: provided.draggableProps.style?.transform
-                                                                        ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
-                                                                        : "none", // Fallback in case transform is null/undefined
-                                                                }}
-                                                                // className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} border hover:border-[#2B333B] border-transparent mb-2.5`}
-                                                                className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
-
+                                                                className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
+                                                                    ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} 
+                                                                    border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                            // className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
-                                                                        <img
-                                                                            src="/Images/open-Filter.svg"
-                                                                            alt="down-arrow"
-                                                                            data-testId={`open-${sectionIndex}`}
-                                                                            className={`cursor-pointer pl-2 transform transition-transform duration-300 ${expandedSections[sectionIndex] ? " ml-2" : "-rotate-90 mt-1 ml-2" // Rotate 180deg when expanded
-                                                                                }`}
-                                                                            onClick={() => toggleSection(sectionIndex)}
-
-                                                                        />
                                                                         <EditableField
                                                                             name={sectionData?.section_name}
                                                                             index={sectionIndex}
@@ -1414,30 +1367,14 @@ const QuestionnaryForm = () => {
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                        {formStatus === 'Draft' ? (
-                                                                            <img
-                                                                                className="cursor-grab p-2 rounded-full hover:bg-[#FFFFFF]"
-                                                                                title="Drag"
-                                                                                src={`/Images/drag.svg`}
-                                                                                alt="Drag"
-                                                                                {...provided.dragHandleProps}
-                                                                            />
-                                                                        ) : <img
-                                                                            className="cursor-not-allowed p-2 rounded-full"
-                                                                            title="Drag"
-                                                                            src={`/Images/drag.svg`}
-                                                                            alt="Drag"
-
-                                                                        />}
-
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
                                                                             data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                            className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
                                                                             onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                         />
-                                                                        <img
+                                                                        {/* <img
                                                                             src="/Images/save.svg"
                                                                             alt="save"
                                                                             title="Save"
@@ -1446,7 +1383,7 @@ const QuestionnaryForm = () => {
                                                                             onClick={formStatus === 'Draft' ? () => {
                                                                                 handleSaveSection(sectionData?.section_id);
                                                                             } : null}
-                                                                        />
+                                                                        /> */}
                                                                     </div>
                                                                 </div>
                                                                 <Sections
@@ -1454,8 +1391,6 @@ const QuestionnaryForm = () => {
                                                                     sectionIndex={sectionIndex}
                                                                     selectedQuestionId={selectedQuestionId}
                                                                     handleAddRemoveQuestion={handleAddRemoveQuestion}
-                                                                    expandedSections={expandedSections}
-                                                                    setExpandedSections={setExpandedSections}
                                                                     handleSaveSectionName={handleSaveSectionName}
                                                                     dataIsSame={dataIsSame}
                                                                     setSections={setSections}
@@ -1471,7 +1406,6 @@ const QuestionnaryForm = () => {
                                                                     formStatus={formStatus}
                                                                     setDropdown={setDropdown}
                                                                     dropdownOpen={dropdownOpen}
-                                                                // currentSectionData={currentSectionData}
                                                                 />
                                                             </li>
                                                         )}
@@ -1482,17 +1416,7 @@ const QuestionnaryForm = () => {
                                         )}
                                     </Droppable>
                                 </DragDropContext>
-                                <button
-                                    onClick={formStatus === 'Draft' ? () => {
-                                        handleAddRemoveSection('add');
-                                        handleSectionSaveOrder(sections);
-                                    } : null}
-                                    data-testid="add-section"
-                                    className={`flex items-center ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} font-semibold text-[#2B333B] text-base mt-5`}>
-                                    <span className='mr-[15px]'>+</span>
-                                    Add section
-                                </button>
-
+                                {/* //add section buttion was there here */}
                             </div>
                             {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
@@ -1568,135 +1492,148 @@ const QuestionnaryForm = () => {
 
                         </div>
                     </div>
-                </div>
+                </div >
             )}
-            {isModalOpen && (
-                <ConfirmationModal
-                    text='Delete Section'
-                    subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
+            {
+                isModalOpen && (
+                    <ConfirmationModal
+                        text='Delete Section'
+                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Delete'
+                        Button2text='Cancel'
+                        src='delete-gray'
+                        testIDBtn1='confirm-delete'
+                        testIDBtn2='cancel-delete'
+                        isModalOpen={isModalOpen}
+                        setModalOpen={setModalOpen}
+                        handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
+                        handleButton2={handleCancel} // Handle cancel button
+                    />
+                )
+            }
+            {
+                isDeleteComplianceLogic && (
+                    <ConfirmationModal
+                        text='Delete Compliance Logic'
+                        subText={`You are about to delete the Compliance Logic section containing multiple Status. This action cannot be undone.`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Delete'
+                        Button2text='Cancel'
+                        src='delete-gray'
+                        testIDBtn1='confirm-delete'
+                        testIDBtn2='cancel-delete'
+                        isModalOpen={isDeleteComplianceLogic}
+                        setModalOpen={setIsDeleteComplianceLogic}
+                        handleButton1={handleDeleteComplianceLogic} // Call confirmDeleteSection on confirmation
+                        handleButton2={() => (setIsDeleteComplianceLogic(false))} // Handle cancel button
+                    />
+                )
+            }
+            {
+                showPageDeleteModal && (
+                    <ConfirmationModal
+                        text='Delete Page'
+                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Delete'
+                        Button2text='Cancel'
+                        src='delete-gray'
+                        testIDBtn1='confirm-delete-page'
+                        testIDBtn2='cancel-delete'
+                        isModalOpen={showPageDeleteModal}
+                        setModalOpen={setShowPageDeleteModal}
+                        handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
+                        handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
+                    />
+                )
+            }
+            {
+                showquestionDeleteModal && (
+                    <ConfirmationModal
+                        text='Delete Question'
+                        subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Delete'
+                        Button2text='Cancel'
+                        src='delete-gray'
+                        testIDBtn1='confirm-delete'
+                        testIDBtn2='cancel-delete'
+                        isModalOpen={showquestionDeleteModal}
+                        setModalOpen={setShowquestionDeleteModal}
+                        handleButton1={confirmDeleteQuestion}
+                        handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
+                    />
+                )
+            }
+            {
+                showCancelModal && (
+                    <ConfirmationModal
+                        text='Leave Questionnaire'
+                        subText={`Changes that you made may not be saved.`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Leave'
+                        Button2text='Stay'
+                        src='x-circle'
+                        testIDBtn1='confirm-Leave'
+                        testIDBtn2='cancel-Leave'
+                        isModalOpen={showCancelModal}
+                        setModalOpen={setShowCancelModal}
+                        handleButton1={handleConfirmCancel}
+                        handleButton2={() => dispatch(setShowCancelModal(false))}
+                    />
+                )
+            }
+            {
+                showReplaceModal && (
+                    <ConfirmationModal
+                        text='Replace Image'
+                        subText='This will replace the existing image. This action cannot be undone.'
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                        Button1text='Replace'
+                        Button2text='Cancel'
+                        src='replace'
+                        testIDBtn1='confirm-replace-image'
+                        testIDBtn2='cancel'
+                        isModalOpen={showReplaceModal}
+                        setModalOpen={setReplaceModal}
+                        handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation
+                        handleButton2={() => setReplaceModal(false)} // Handle cancel button
+                    />
+                )
+            }
+            {
+                (conditionalLogic || isDefaultLogic || complianceState) && (
+                    <ConditionalLogic
+                        setConditionalLogic={setConditionalLogic}
+                        conditionalLogic={conditionalLogic}
+                        handleSaveSection={handleSaveSection}
+                        isDefaultLogic={isDefaultLogic}
+                        setIsDefaultLogic={setIsDefaultLogic}
+                        setDefaultString={setDefaultString}
+                        defaultString={defaultString}
+                        complianceState={complianceState}
+                        setCompliancestate={setCompliancestate}
+                        complianceLogic={complianceLogic}
+                    />
+                )
+            }
+            {
+                previewModal === true && <PreviewModal
+                    isModalOpen={previewModal}
+                    setModalOpen={setPreviewModal}
+                    Button1text={'Back'}
+                    Button2text={'Next'}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Delete'
-                    Button2text='Cancel'
-                    src='delete-gray'
-                    testIDBtn1='confirm-delete'
-                    testIDBtn2='cancel-delete'
-                    isModalOpen={isModalOpen}
-                    setModalOpen={setModalOpen}
-                    handleButton1={confirmDeleteSection} // Call confirmDeleteSection on confirmation
-                    handleButton2={handleCancel} // Handle cancel button
+                    sections={sections}
+                    setValidationErrors={setValidationErrors}
+                    validationErrors={validationErrors}
+                    formDefaultInfo={formDefaultInfo}
+                    questionnaire_id={questionnaire_id}
+                    version_number={version_number}
+                    fieldSettingParameters={fieldSettingParams}
                 />
-            )}
-            {isDeleteComplianceLogic && (
-                <ConfirmationModal
-                    text='Delete Compliance Logic'
-                    subText={`You are about to delete the Compliance Logic section containing multiple Status. This action cannot be undone.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Delete'
-                    Button2text='Cancel'
-                    src='delete-gray'
-                    testIDBtn1='confirm-delete'
-                    testIDBtn2='cancel-delete'
-                    isModalOpen={isDeleteComplianceLogic}
-                    setModalOpen={setIsDeleteComplianceLogic}
-                    handleButton1={handleDeleteComplianceLogic} // Call confirmDeleteSection on confirmation
-                    handleButton2={() => (setIsDeleteComplianceLogic(false))} // Handle cancel button
-                />
-            )}
-            {showPageDeleteModal && (
-                <ConfirmationModal
-                    text='Delete Page'
-                    subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Delete'
-                    Button2text='Cancel'
-                    src='delete-gray'
-                    testIDBtn1='confirm-delete-page'
-                    testIDBtn2='cancel-delete'
-                    isModalOpen={showPageDeleteModal}
-                    setModalOpen={setShowPageDeleteModal}
-                    handleButton1={confirmDeletePage} // Call handleAddRemovePage and close modal on confirmation
-                    handleButton2={() => dispatch(setShowPageDeleteModal(false))} // Handle cancel button
-                />
-
-            )}
-            {showquestionDeleteModal && (
-                <ConfirmationModal
-                    text='Delete Question'
-                    subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Delete'
-                    Button2text='Cancel'
-                    src='delete-gray'
-                    testIDBtn1='confirm-delete'
-                    testIDBtn2='cancel-delete'
-                    isModalOpen={showquestionDeleteModal}
-                    setModalOpen={setShowquestionDeleteModal}
-                    handleButton1={confirmDeleteQuestion}
-                    handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
-                />
-            )}
-            {showCancelModal && (
-                <ConfirmationModal
-                    text='Leave Questionnaire'
-                    subText={`Changes that you made may not be saved.`}
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Leave'
-                    Button2text='Stay'
-                    src='x-circle'
-                    testIDBtn1='confirm-Leave'
-                    testIDBtn2='cancel-Leave'
-                    isModalOpen={showCancelModal}
-                    setModalOpen={setShowCancelModal}
-                    handleButton1={handleConfirmCancel}
-                    handleButton2={() => dispatch(setShowCancelModal(false))}
-                />
-            )}
-            {showReplaceModal && (
-                <ConfirmationModal
-                    text='Replace Image'
-                    subText='This will replace the existing image. This action cannot be undone.'
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Replace'
-                    Button2text='Cancel'
-                    src='replace'
-                    testIDBtn1='confirm-replace-image'
-                    testIDBtn2='cancel'
-                    isModalOpen={showReplaceModal}
-                    setModalOpen={setReplaceModal}
-                    handleButton1={handleConfirmReplace} // Replace the image and close modal on confirmation
-                    handleButton2={() => setReplaceModal(false)} // Handle cancel button
-                />
-            )}
-            {(conditionalLogic || isDefaultLogic || complianceState) && (
-                <ConditionalLogic
-                    setConditionalLogic={setConditionalLogic}
-                    conditionalLogic={conditionalLogic}
-                    handleSaveSection={handleSaveSection}
-                    isDefaultLogic={isDefaultLogic}
-                    setIsDefaultLogic={setIsDefaultLogic}
-                    setDefaultString={setDefaultString}
-                    defaultString={defaultString}
-                    complianceState={complianceState}
-                    setCompliancestate={setCompliancestate}
-                    complianceLogic={complianceLogic}
-                />
-
-            )}
-            {previewModal === true && <PreviewModal
-                isModalOpen={previewModal}
-                setModalOpen={setPreviewModal}
-                Button1text={'Back'}
-                Button2text={'Next'}
-                // src=''   
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                sections={sections}
-                setValidationErrors={setValidationErrors}
-                validationErrors={validationErrors}
-                formDefaultInfo={formDefaultInfo}
-                questionnaire_id={questionnaire_id}
-                version_number={version_number}
-                fieldSettingParameters={fieldSettingParams}
-            />}
+            }
         </>
     );
 }

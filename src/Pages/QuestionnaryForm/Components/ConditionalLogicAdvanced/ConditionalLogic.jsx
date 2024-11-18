@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
-import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
+import { setNewComponent, setNewLogic } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
@@ -50,6 +50,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
+    const [logic, setLogic] = useState('')
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
@@ -238,6 +239,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
+        console.log(value, 'asfadfaeae')
+        setLogic(value);
         setInputValue(value)
 
         const lastChar = value.slice(-1);
@@ -307,8 +310,30 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSuggestions([]);
             setShowMethodSuggestions(false); // Reset method suggestions
         }
+        const conditionalLogicReplaced = handleReplace(value);
+        // console.log(conditionalLogicReplaced, 'logic')
+        dispatch(setNewLogic({ id: 'conditional_logic', value: logic, questionId: selectedQuestionId }));
     };
 
+    const handleReplace = (conditionalLogic) => {
+         // Replace && with "and" and || with "or"
+         conditionalLogic = conditionalLogic.replace('and', '&&').replace('or', '||');
+         conditionalLogic = conditionalLogic.replace('AND', '&&').replace('OR', '||');
+         conditionalLogic = conditionalLogic.replace('And', '&&').replace('Or', '||');
+         conditionalLogic = conditionalLogic.replace('then', '?').replace('else', ':'); // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replace('if', ' '); // Replace the : with ' else ' // Replace the ? with ' then '
+        //  conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replace('()', 'length') // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replaceAll(
+             '$1.AddDays($2)',
+             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+         );
+         conditionalLogic = conditionalLogic.replaceAll(
+             '$1.SubtractDays($2)',
+             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+         );
+         return conditionalLogic;
+    }
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
@@ -341,6 +366,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             textarea.value = newText;
             setShowSectionList(false);
             setInputValue(newText)
+            setLogic(newText)
             // if (isDefaultLogic) {
             //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
             // } else {
@@ -683,29 +709,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
+                // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
 
 
-                            // Replace && with "and" and || with "or"
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
-                            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
-                            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
-                            conditionalLogic = conditionalLogic.replaceAll(
-                                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
-                                '$1.AddDays($2)'
-                            );
-                            conditionalLogic = conditionalLogic.replaceAll(
-                                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
-                                '$1.SubtractDays($2)'
-                            );
+            // Replace && with "and" and || with "or"
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
+            conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
+            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replaceAll(
+                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                '$1.AddDays($2)'
+            );
+            conditionalLogic = conditionalLogic.replaceAll(
+                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                '$1.SubtractDays($2)'
+            );
 
-                            console.log(conditionalLogic, 'consitionalLogic')
-                            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
-                            setInputValue(conditionalLogic)
+            // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
+            setInputValue(conditionalLogic)
 
             {
                 !isDefaultLogic &&
@@ -784,8 +810,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
                     const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
 
-                    console.log(`Operator: ${operator}, Month Value: ${monthValue}`);
-
                     // Validate if the month is between 1 and 12
                     if (monthValue < 1 || monthValue > 12) {
                         setError("Invalid month. Please enter a value between 1 and 12.");
@@ -801,14 +825,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
-                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
+                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Mon|Tue|Wednesday|Thursday|Friday|Saturday)"/i);
 
                 // Check if a valid match was found
                 if (dayValueMatch) {
                     const operator = dayValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
                     const dayValue = dayValueMatch[2].toLowerCase(); // Capture and normalize day value to lowercase
-
-                    console.log(`Operator: ${operator}, Day Value: ${dayValue}`);
 
                     // Validate day value against valid days (in lowercase)
                     const validDays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -832,8 +854,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const operator = yearValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
                     const yearValue = parseInt(yearValueMatch[2], 10); // Capture and parse the year value
 
-                    console.log(`Operator: ${operator}, Year Value: ${yearValue}`);
-
                     // Validate if the year is a valid 4-digit number (between 1000 and 9999)
                     if (isNaN(yearValue) || yearValue < 1000 || yearValue > 9999) {
                         setError("Invalid year. Please enter a valid 4-digit year");
@@ -853,8 +873,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (timeMatches) {
                     for (const timeMatch of timeMatches) {
                         const [, operator, timeValue] = timeMatch.match(/getTime\(\)\s*(===|!==|>=|<=|>|<)\s*"(\d{2}:\d{2}:\d{2})"/);
-
-                        console.log(`Operator: ${operator}, Time Value: ${timeValue}`);
 
                         // Validate `hh:mm:ss` format strictly for each time value
                         const timePattern = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
@@ -877,8 +895,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     for (const timeMatch of timeMatches) {
                         const [, operator, seconds] = timeMatch.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/);
 
-                        console.log(`Operator: ${operator}, Seconds Value: ${seconds}`);
-
                         // Validate that seconds are exactly two digits and between 00 and 59
                         if (!/^[0-5][0-9]$/.test(seconds)) {
                             setError(`Invalid seconds: "${seconds}". Please enter a valid two-digit value between 00 and 59.`);
@@ -898,8 +914,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (timeMatches) {
                     for (const timeMatch of timeMatches) {
                         const [, operator, hours] = timeMatch.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
-
-                        console.log(`Operator: ${operator}, Hours Value: ${hours}`);
 
                         // Ensure the hours value is a two-digit number between 00 and 23
                         if (parseInt(hours) < 0 || parseInt(hours) > 23) {
@@ -921,8 +935,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     for (const timeMatch of timeMatches) {
                         const [, operator, minutes] = timeMatch.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
 
-                        console.log(`Operator: ${operator}, Minutes Value: ${minutes}`);
-
                         // Ensure the minutes value is a two-digit number between 00 and 59
                         if (parseInt(minutes) < 0 || parseInt(minutes) > 59) {
                             setError(`Invalid minutes: "${minutes}". The value must be a valid number between 00 and 59.`);
@@ -942,8 +954,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (timeMatches) {
                     for (const timeMatch of timeMatches) {
                         const [, operator, milliseconds] = timeMatch.match(/getMilliseconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{3,})/);
-
-                        console.log(`Operator: ${operator}, Milliseconds Value: ${milliseconds}`);
 
                         // Ensure the milliseconds value is a number
                         const millisecondsValue = parseInt(milliseconds);
@@ -1105,11 +1115,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
-        console.log(expression,"exp")
-        expression =  trimParentheses(expression)
+        expression = trimParentheses(expression)
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
-
+        console.log(parts,expression,  'what is te expression here')
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
@@ -1225,8 +1234,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+        
     }
-
+    // useEffect(() => {
+    //     console.log(logic, 'logic')
+        
+    // }, [selectedQuestionId, logic])
+    
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

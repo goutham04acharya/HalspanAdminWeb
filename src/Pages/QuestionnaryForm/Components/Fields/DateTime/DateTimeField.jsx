@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TimePicker from '../../../../../Components/TimePicker/TimePicker';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
@@ -22,6 +22,9 @@ function DateTimeField({
     setConditionalValues,
     sections
 }) {
+    const [dateVal, setDateVal] = useState('');
+    const [timeValue, setTimeValue] = useState('');
+
     const splitDate = (dateStr) => {
         if (!dateStr || typeof dateStr !== 'string') {
             return new Date().toISOString().split('T')[0];
@@ -35,48 +38,66 @@ function DateTimeField({
             return { hours: 0, minutes: 0, seconds: 0 };
         }
         const [hours, minutes, seconds] = timeStr.split(":");
-        return { 
-            hours: parseInt(hours, 10) || 0, 
-            minutes: parseInt(minutes, 10) || 0, 
-            seconds: parseInt(seconds || "0", 10) || 0 
+        return {
+            hours: parseInt(hours, 10) || 0,
+            minutes: parseInt(minutes, 10) || 0,
+            seconds: parseInt(seconds || "0", 10) || 0,
+            milliseconds: new Date().getMilliseconds()
         };
     };
     const handleDateTime = (date, time) => {
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-        
-        // Handle the date
-        const dateParts = new Date(splitDate(date));
-        
-        // Handle the time
-        const { hours, minutes, seconds } = splitTime(time);
-        const combinedDateTime = new Date(dateParts.getFullYear(), dateParts.getMonth(), dateParts.getDate(), hours, minutes, seconds, 0);
+        // Update states when inputs change
+        if (date) setDateVal(date);
+        if (time) setTimeValue(time);
 
-        setConditionalValues((prevValues) => ({
-            ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: combinedDateTime
-                }
-            }
-        }));
+        // Combine date and time if both are available
+        if (date && time) {
+            const parsedDate = new Date(date); // Assuming date is in 'yyyy-mm-dd' format
+            const { hours, minutes, seconds, milliseconds } = splitTime(time);
 
-        // Only include time in the value if it exists
-        const dateTimeString = time ? `${date} ${time}` : date;
-        setValue((prev) => ({
-            ...prev,
-            [question?.question_id]: dateTimeString
-        }));
+            const combinedDateTime = new Date(
+                parsedDate.getFullYear(),
+                parsedDate.getMonth(),
+                parsedDate.getDate(),
+                hours,
+                minutes,
+                seconds,
+                milliseconds
+            );
 
-        setValidationErrors((prevErrors) => ({
-            ...prevErrors,
-            preview_datetimefield: {
-                ...prevErrors.preview_datetimefield,
-                [question?.question_id]: ''
-            }
-        }));
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+
+            // Update conditional values
+            setConditionalValues((prevValues) => ({
+                ...prevValues,
+                [section_name]: {
+                    ...prevValues[section_name],
+                    [page_name]: {
+                        ...prevValues[section_name]?.[page_name],
+                        [label]: combinedDateTime, // Ensure this holds the correct combined value
+                    },
+                },
+            }));
+
+            // Combine date and time into a string for setValue
+            const dateTimeString = `${date} ${time}`;
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: dateTimeString, // Ensure this stores the correct string value
+            }));
+
+            // Clear validation errors for the current field
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_datetimefield: {
+                    ...prevErrors.preview_datetimefield,
+                    [question?.question_id]: '', // Clear errors for this field
+                },
+            }));
+        }
     };
+
+
     function handleFunction(e) {
         console.log(e, 'dddddddddd') // 03:02:01
         if (type === 'time') {
@@ -107,7 +128,7 @@ function DateTimeField({
                     }
                 }
             }))
-        } else if (type === 'date'){
+        } else if (type === 'date') {
             const value = e.target.value;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
@@ -173,32 +194,31 @@ function DateTimeField({
                     />
                 )}
 
-                {preview && type === 'datetime' && (
-                    <div className='flex flex-wrap z-[-1] w-full'>
-                        <div className="flex w-full flex-wrap mb-2 flex-col">
-                            <input
-                                data-testid="input"
-                                type="date"
-                                id={textId}
-                                value={value}
-                                className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                                placeholder={question?.placeholder_content}
-                                onChange={(e) => handleDateTime(e.target.value, value)}
-                            />
-                        </div>
-                        <TimePicker
-                            onChange={(time) => handleDateTime(dateValue, time)}
-                            format={question?.format}
-                            setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_datetimefield: {
-                                    ...prevErrors.preview_datetimefield,
-                                    [question?.question_id]: errorMessage
-                                }
-                            }))}
+                {(preview && type === 'datetime') &&<div className='flex flex-wrap z-[-1] w-full'>
+                    <div className="flex w-full flex-wrap mb-2 flex-col">
+                        <input
+                            data-testid="input"
+                            type="date"
+                            id={textId}
+                            value={dateVal} // Use state to manage date value
+                            className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                            placeholder={question?.placeholder_content}
+                            onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
                         />
                     </div>
-                )}
+                    <TimePicker
+                        onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
+                        format={question?.format}
+                        setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
+                            ...prevErrors,
+                            preview_datetimefield: {
+                                ...prevErrors.preview_datetimefield,
+                                [question?.question_id]: errorMessage
+                            }
+                        }))}
+                    />
+                </div>}
+
                 {(question?.question_id && validationErrors?.preview_datetimefield && validationErrors?.preview_datetimefield[question?.question_id]) && (
                     <ErrorMessage error={validationErrors?.preview_datetimefield[question?.question_id]} />
                 )}

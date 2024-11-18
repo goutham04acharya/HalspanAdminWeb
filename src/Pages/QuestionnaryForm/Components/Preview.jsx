@@ -24,7 +24,7 @@ import {
 import { useSelector } from 'react-redux';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
-
+console.log(resetFields, 'resetFields')
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
