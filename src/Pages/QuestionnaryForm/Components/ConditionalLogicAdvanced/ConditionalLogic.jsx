@@ -1313,6 +1313,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 >
                                 </Button2>
                                 <Button
+                                testID={'save-conditional-logic'}
                                     text='Save'
                                     onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
