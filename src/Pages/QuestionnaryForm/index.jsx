@@ -1228,6 +1228,7 @@ const QuestionnaryForm = () => {
                             <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                 {getStatusText(formDefaultInfo?.status)}
                             </button>
+                            {/* {formStatus !== 'Draft' &&<p className='font-normal pl-2 text-base text-[#2B333B]'>This form cannot be edited</p>} */}
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p
