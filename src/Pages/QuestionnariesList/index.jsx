@@ -149,10 +149,10 @@ function Questionnaries() {
         "from_version_number": selectedVersion
       }
       const response = await PostAPI(`questionnaires/clone`, body);
-      console.log(response,'llllllllllll')
-      if(!response?.error){
+      console.log(response, 'llllllllllll')
+      if (!response?.error) {
         setToastSuccess(response?.data?.message)
-      }else{
+      } else {
         setToastError(response?.data?.data?.message)
       }
       setCloneLoading(false)
@@ -234,12 +234,14 @@ function Questionnaries() {
         </div>
       </div>
       {cloneModal && <VersionEditModal
-        text='Select version'
+        text='Select Version'
         subText={'Please select the version you want to duplicate.'}
         versionList={versionList}
         Button1text={'Duplicate'}
         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
         Button2text='Cancel'
+        testIDBtn1={'confirm-duplicate'}
+        testIDBtn2='cancel-btn-modal'
         handleDropdownClick={handleDropdownClick}
         setDropdownsOpen={setDropdownsOpen}
         dropdownsOpen={dropdownsOpen}

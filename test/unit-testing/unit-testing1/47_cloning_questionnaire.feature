@@ -25,11 +25,11 @@ Feature: Halspan - Admin - Cloning questionnaire
     Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
     When I click the modal cancel button
-    When I click the duplicate button
+    When I click the clone button
     Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
     When I click the modal close button
-    When I click the duplicate button
+    When I click the clone button
     Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
     When I click the confirm duplicate button
