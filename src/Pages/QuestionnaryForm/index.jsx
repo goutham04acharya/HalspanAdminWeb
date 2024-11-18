@@ -147,9 +147,9 @@ const QuestionnaryForm = () => {
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
-                .replace(/[0-9]/g, '')      // Remove numbers
+                // .replace(/[0-9]/g, '')      // Remove numbers
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+                .replace(/[^a-zA-Z,0-9]/g, ''); // Allow only alphabets and commas
         } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {

@@ -18,7 +18,7 @@ Given('I am on the questionnaire version listing screen', async function () {
         const pageSource = await driver.getPageSource();
         check = pageSource.includes('Minerva Levy');
     } else {
-        throw new Error('Questionnaire ID or version number is missing.');
+        throw new Error(`Questionnaire ID = ${questionnaireId} is missing.`);
     }
 
     // Find all versions by using the data-testid attribute

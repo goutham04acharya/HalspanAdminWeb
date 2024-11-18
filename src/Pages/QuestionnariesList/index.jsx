@@ -17,9 +17,10 @@ import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { dataService } from '../../services/data.services.js';
 
 function Questionnaries() {
+  const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const dispatch = useDispatch();
   const { logout } = useAuth0();
-  const { getAPI } = useApi();
+  const { getAPI, PostAPI } = useApi();
   const [isContentNotFound, setContentNotFound] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isFilterDropdown, setFilterDropdown] = useState(false);
@@ -31,7 +32,7 @@ function Questionnaries() {
   const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
-
+  const [cloneModal, setCloneModal] = useState(false)
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [versionList, setVersionList] = useState([])
   const [dropdownsOpen, setDropdownsOpen] = useState(false);
@@ -123,6 +124,17 @@ function Questionnaries() {
     fetchQuestionnaryList();
   }, [fetchQuestionnaryList]);
 
+  const handleVersionList = async (id) => {
+    try {
+      setSelectedVersion('')
+      const response = await getAPI(`questionnaires/versions/${id}`)
+      setVersionList(response?.data)
+      setSelectedQuestionnaireId(id)
+      setCloneModal(true)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleDropdownClick = () => {
     setDropdownsOpen(!dropdownsOpen)
@@ -140,7 +152,6 @@ function Questionnaries() {
         "from_version_number": selectedVersion
       }
       const response = await PostAPI(`questionnaires/clone`, body);
-      console.log(response, 'llllllllllll')
       if (!response?.error) {
         setToastSuccess(response?.data?.message)
       } else {
@@ -156,13 +167,11 @@ function Questionnaries() {
   const getAssetTypes = async() => {
     try {
       let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`,null,true)
-      console.log(response?.data?.results,'pppppppppp')
       setOptions(response?.data?.results)
     } catch (error) {
       
     }
   }
-  console.log(options, 'pop')
   return (
     <div className='bg-[#F4F6FA]'>
       <div className='py-[33px] px-[25px]'>
@@ -225,13 +234,36 @@ function Questionnaries() {
                   setQueList={setQueList}
                   QueList={QueList}
                   lastElementRef={lastElementRef}
+                  setCloneModal={setCloneModal}
+                  handleVersionList={handleVersionList}
                 />
               </div>
             )
           }
         </div>
       </div>
+      {cloneModal && <VersionEditModal
+        text='Select Version'
+        subText={'Please select the version you want to duplicate.'}
+        versionList={versionList}
+        Button1text={'Duplicate'}
+        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+        Button2text='Cancel'
+        testIDBtn1={'confirm-duplicate'}
+        testIDBtn2='cancel-btn-modal'
+        handleDropdownClick={handleDropdownClick}
+        setDropdownsOpen={setDropdownsOpen}
+        dropdownsOpen={dropdownsOpen}
+        clone
+        setCloneModal={setCloneModal}
+        selectedVersion={selectedVersion}
+        handleOptionClick={handleOptionClick}
+        handleButton1={handleClone}
+        handleButton2={() => setCloneModal(false)}
+        loading={cloneLoading}
+      />}
     </div>
+
   );
 }
 
