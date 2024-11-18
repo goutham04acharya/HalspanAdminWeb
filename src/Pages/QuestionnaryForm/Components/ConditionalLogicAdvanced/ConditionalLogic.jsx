@@ -798,7 +798,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
-                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Mon|Tue|Wednesday|Thursday|Friday|Saturday)"/i);
+                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
 
                 // Check if a valid match was found
                 if (dayValueMatch) {
@@ -1091,7 +1091,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         expression = trimParentheses(expression)
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
-        console.log(parts,expression,  'what is te expression here')
+        console.log(parts, expression, 'what is te expression here')
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
@@ -1194,6 +1194,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
+        if (complianceLogic) {
+            let compliance_logic;
+            compliance_logic = buildConditionExpression(conditions);
+            console.log(compliance_logic, 'compliance_logic')
+            dispatch(setNewComponent({ id: 'compliance_logic', value: compliance_logic, questionId: selectedQuestionId }));
+        }
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
@@ -1201,12 +1207,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         try {
             condition_logic = buildConditionExpression(conditions);
+            console.log(conditions, 'what you will get')
         } catch (error) {
         }
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+
     }
 
     return (
@@ -1214,7 +1222,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
                 <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
-                        {(tab === 'advance' || isDefaultLogic || complianceState) ? (
+                        {(tab === 'advance' || isDefaultLogic) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
                                     {!isDefaultLogic ?
@@ -1268,8 +1276,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 />
                             )
                         )}
-                        <div className={`${isDefaultLogic || complianceState ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic && !complianceState &&
+                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                            {!isDefaultLogic &&
                                 <div className='flex gap-5 items-end'>
                                     <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                     <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
@@ -1287,7 +1295,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == 'advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'advance' || isDefaultLogic ) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
