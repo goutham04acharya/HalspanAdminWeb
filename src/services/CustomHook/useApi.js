@@ -43,6 +43,7 @@ const useApi = () => {
     const getAPI = async (endpoint, customHeaders = {}) => {
         try {
             const tokenClaims = await getIdTokenClaims();
+            console.log(tokenClaims, 'tokenClaims')
             const accessToken = tokenClaims.__raw;
             const defaultHeaders = { Authorization: `Bearer ${accessToken}` };
             

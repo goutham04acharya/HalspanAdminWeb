@@ -23,7 +23,7 @@ import { defaultContentConverter } from '../../../../CommonMethods/defaultConten
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState,
-    setCompliancestate, complianceLogic }) {
+    setCompliancestate, complianceLogic, setComplianceLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -240,9 +240,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const value = event.target.value;
         setInputValue(value)
 
-        const lastChar = value.slice(-1);
+        const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
-        if (lastChar === '.') {
+        if (value[cursorPosition - 1] === '.') {
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -313,6 +313,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
         if (textarea) {
+            const cursorPosition = textarea.selectionStart; // Get the current cursor position
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
 
@@ -323,10 +324,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
             // Check if there's a space or if the input is empty
-            const lastChar = textBefore.slice(-1);
+            // const lastChar = textBefore.slice(-1);
+            const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
+
             let newText;
 
-            if ((lastChar === ' ' || lastChar === '.') || textBefore.length === 0) {
+            if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
             } else {
@@ -460,6 +463,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parsedConditions = conditionGroups.map(group => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
+                console.log(condition, 'pppppppppppppppp')
                 if (condition.includes('Math.abs')) {
                     // const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
                     // const matching = condition.match(regex);
@@ -653,6 +657,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
+                        setConditions(parseLogicExpression(transformedContent));
+                        console.log(conditions, 'kkkk')
                         setInputValue(transformedContent);
                     } else {
                         setInputValue('');
@@ -693,7 +699,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-            conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replace(/\.length\b/g, '()');
             conditionalLogic = conditionalLogic.replaceAll(
                 /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
                 '$1.AddDays($2)'
@@ -710,10 +716,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 !isDefaultLogic &&
                     setConditions(parseLogicExpression(conditionalLogic));
             }
-            //         }
-            //     });
-            // });
-            // });
+
         };
         if (selectedQuestionId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
@@ -1195,10 +1198,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleSaveBasicEditor = () => {
         if (complianceLogic) {
-            let compliance_logic;
-            compliance_logic = buildConditionExpression(conditions);
-            console.log(compliance_logic, 'compliance_logic')
-            dispatch(setNewComponent({ id: 'compliance_logic', value: compliance_logic, questionId: selectedQuestionId }));
+            let compliance_logic = buildConditionExpression(conditions);
+            console.log(compliance_logic, 'Generated compliance_logic');
+
+            setComplianceLogic((prev) => {
+                console.log(prev, 'Previous complianceLogic state');
+                return prev.map((item, index) =>
+                    index === complianceLogicId
+                        ? { ...item, default_content: compliance_logic }
+                        : item
+                );
+            });
+
+            setCompliancestate(false);
         }
         setSubmitSelected(true);
         if (validateConditions()) {
@@ -1216,6 +1228,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
 
     }
+    // Log the updated state using useEffect
+    useEffect(() => {
+        console.log(complianceLogic, 'Updated complianceLogic');
+    }, [complianceLogic]);
 
     return (
         <>
@@ -1225,11 +1241,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         {(tab === 'advance' || isDefaultLogic) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
-                                    {!isDefaultLogic ?
-                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>Shows when...</p>
-                                        :
+                                    {conditionalLogic ? (
+                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
+                                    ) : complianceState ? (
+                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>
+                                    ) : (
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
-                                    }
+                                    )}
+
                                     <AdvancedEditor
                                         handleListSectionDetails={handleListSectionDetails}
                                         showSectionList={showSectionList}
@@ -1295,7 +1314,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 </Button2>
                                 <Button
                                     text='Save'
-                                    onClick={(tab == 'advance' || isDefaultLogic ) ? handleSave : handleSaveBasicEditor}
+                                    onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
                                     data-testid='cancel'
                                     className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
