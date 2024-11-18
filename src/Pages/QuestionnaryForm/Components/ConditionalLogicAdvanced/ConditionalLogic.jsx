@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
-import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
+import { setNewComponent, setNewLogic } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
@@ -50,6 +50,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
+    const [logic, setLogic] = useState('')
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
@@ -238,6 +239,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
+        console.log(value, 'asfadfaeae')
+        setLogic(value);
         setInputValue(value)
 
         const lastChar = value.slice(-1);
@@ -307,8 +310,30 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSuggestions([]);
             setShowMethodSuggestions(false); // Reset method suggestions
         }
+        const conditionalLogicReplaced = handleReplace(value);
+        // console.log(conditionalLogicReplaced, 'logic')
+        dispatch(setNewLogic({ id: 'conditional_logic', value: logic, questionId: selectedQuestionId }));
     };
 
+    const handleReplace = (conditionalLogic) => {
+         // Replace && with "and" and || with "or"
+         conditionalLogic = conditionalLogic.replace('and', '&&').replace('or', '||');
+         conditionalLogic = conditionalLogic.replace('AND', '&&').replace('OR', '||');
+         conditionalLogic = conditionalLogic.replace('And', '&&').replace('Or', '||');
+         conditionalLogic = conditionalLogic.replace('then', '?').replace('else', ':'); // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replace('if', ' '); // Replace the : with ' else ' // Replace the ? with ' then '
+        //  conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replace('()', 'length') // Replace the : with ' else ' // Replace the ? with ' then '
+         conditionalLogic = conditionalLogic.replaceAll(
+             '$1.AddDays($2)',
+             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+         );
+         conditionalLogic = conditionalLogic.replaceAll(
+             '$1.SubtractDays($2)',
+             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+         );
+         return conditionalLogic;
+    }
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
@@ -341,6 +366,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             textarea.value = newText;
             setShowSectionList(false);
             setInputValue(newText)
+            setLogic(newText)
             // if (isDefaultLogic) {
             //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
             // } else {
@@ -683,6 +709,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
+                // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
 
 
@@ -1207,8 +1234,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+        
     }
-
+    // useEffect(() => {
+    //     console.log(logic, 'logic')
+        
+    // }, [selectedQuestionId, logic])
+    
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
