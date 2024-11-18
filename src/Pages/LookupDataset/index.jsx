@@ -256,11 +256,17 @@ const LookupDataset = () => {
 
     const handleImport = (event) => {
         console.log('handleImport is called')
-        if (data?.choices !== '' && !showlookupReplaceModal) {
+        // debugger
+        if (data?.choices !== '') {
             setShowLookupReplaceModal(true);
             setIsCreateModalOpen(false);
             setData(initialImportState)
             return;
+        }else{
+            setShowLookupReplaceModal(false);
+            setIsCreateModalOpen(true);
+            setData(initialState)
+            // return;
         }
         const file = event.target.files[0];
         console.log(file, 'fesfeieke')
@@ -459,7 +465,9 @@ const LookupDataset = () => {
                     testIDBtn2='cancel-delete'
                     isOpen={showlookupReplaceModal}
                     handleButton1={handleImport}
-                    handleButton2={() => setShowLookupReplaceModal(false)}
+                    handleButton2={() => {
+                        setShowLookupReplaceModal(false)
+                    }}
                     isOpenFileUpload={true}
                     isImportLoading={isImportLoading}
                     setModalOpen={setShowLookupReplaceModal}

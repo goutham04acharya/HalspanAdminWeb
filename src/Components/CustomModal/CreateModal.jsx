@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-responsive-modal';
 import InputField from '../InputField/InputField';
 import InputTextarea from '../InputField/InputTextarea';
@@ -7,7 +7,7 @@ import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 
 const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice, activeInputs, setActiveInputs }) => {
-    
+
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
             ...prev,
@@ -25,9 +25,15 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
             [uuid]: false
         }));
     };
+    useEffect(() => {
+        setData({
+            name: '',
+            choices: ''
+        })
+    }, [])
 
 
-
+    console.log(data, 'sdaasd')
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal h-auto flex flex-col w-[352px] relative'>
@@ -46,7 +52,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                     testId='name'
                     htmlFor='name'
                     maxLength={40}
-                    handleChange={(e)=>handleChange(e, e.target.id, 'Name')}
+                    handleChange={(e) => handleChange(e, e.target.id, 'Name')}
                     className='w-full mt-2.5'
                     validationError={errors?.name}
                     lookupDataset
@@ -62,7 +68,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                     placeholder='Enter choices'
                     testId='choices'
                     maxLength={1000}
-                    handleChange={(e)=>handleChange(e, e.target.id, 'choices')}
+                    handleChange={(e) => handleChange(e, e.target.id, 'choices')}
                     validationError={errors?.choices}
                 />}
 
@@ -130,7 +136,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                         testId={`additional-value-${index}`}
                                         htmlFor={`additional-value-${index}`}
                                         maxLength={40}
-                                        handleChange={(e)=>handleChange(e, e.target.id, `additional-value-${index}`)}
+                                        handleChange={(e) => handleChange(e, e.target.id, `additional-value-${index}`)}
                                         className="w-full mt-2.5"
                                         onBlur={() => {
                                             // Remove the additional input field when it loses focus
@@ -180,7 +186,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                             id="file-upload"
                             style={{ display: 'none' }} // Hide the actual input field
                         />
-                        {data?.choices === '' ? <label
+                        {(data?.choices === '' || data?.choices.length === 0) ? <label
                             htmlFor="file-upload"
                             className={`bg-[#fff] hover:bg-[#EFF1F8] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
                             leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center`}>
