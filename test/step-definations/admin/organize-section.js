@@ -187,7 +187,8 @@ Then('I should see the section {int} saved', async function (sectionNumber) {
 
 When('I click the save button for the questionnaire version', async function(){
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-0"]`))).click();
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
 });
 
 Then('I should see confirmation prompt for delete page', async function () {

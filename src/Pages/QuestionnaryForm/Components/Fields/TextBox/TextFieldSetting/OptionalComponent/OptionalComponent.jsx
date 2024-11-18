@@ -11,7 +11,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const getOptions = (componentType) => {
-        // debugger
         switch (componentType) {
             case 'textboxfield':
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed', 'Field validation'];

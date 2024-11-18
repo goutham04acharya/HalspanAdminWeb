@@ -8,7 +8,6 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     setSelectedPage, dropdownOpen, setDropdown }) {
 
     const handleDropdown = (index) => {
-        console.log(index, 'index')
         setDropdown(index, !dropdownOpen[index])
     }
 

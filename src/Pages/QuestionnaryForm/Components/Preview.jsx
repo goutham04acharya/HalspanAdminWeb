@@ -231,7 +231,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        // debugger
         // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
         const commonProps = {
             preview: true,
@@ -325,14 +324,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                     // Check if default_conditional_logic is not empty
                     if (!fieldStatus[question?.question_id]) {
-                        // debugger
-                        // debugger
                         if (default_conditional_logic) {
                             try {
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
-                                    console.log(`Evaluation of "${default_conditional_logic}":`, result);
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result

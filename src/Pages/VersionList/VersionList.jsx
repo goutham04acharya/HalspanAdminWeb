@@ -123,11 +123,9 @@ function VersionList() {
                 navigate(`/questionnaries/create-questionnary/questionnary-form/${questionnaire_id}/${selectedVersion}`);
                 // Additional logic like formDefaultDetails() or getFieldSetting() can be added here
             } else {
-                console.log('Selected version is not in "Draft" status');
                 setVersion(true); // Prevent navigation
             }
         } else {
-            console.log('No version found with the selected version number');
         }
         setLoading(false)
     };
