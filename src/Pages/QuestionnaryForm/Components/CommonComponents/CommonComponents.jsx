@@ -17,7 +17,6 @@ function CommonComponents({
     assetLocation,
     formStatus
 }) {
-    // console.log(formStatus, 'form status')
     return (
         <div>
             <div className='flex flex-col justify-start'>

@@ -28,7 +28,7 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     Given I am on the questionnaire management section
     When I click on add new section
     When I click on save button for section 2
-    Then I should read a message stating that "Section 2 saved successfully"
+    Then I should read a message stating that "2 sections saved successfully"
 
   @create_question
   Scenario: Admin deletes addeded pages from the section

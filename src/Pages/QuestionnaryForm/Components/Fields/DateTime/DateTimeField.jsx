@@ -26,6 +26,9 @@ function DateTimeField({
     const [timeValue, setTimeValue] = useState('');
 
     const splitDate = (dateStr) => {
+        if (!dateStr || typeof dateStr !== 'string') {
+            return new Date().toISOString().split('T')[0];
+        }
         const [day, month, year] = dateStr.split("/");
         return `${year}-${month}-${day}`;
     }
@@ -96,8 +99,10 @@ function DateTimeField({
 
 
     function handleFunction(e) {
+        console.log(e, 'dddddddddd') // 03:02:01
         if (type === 'time') {
             const value = e
+            console.log(e, 'seeeeeee')
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false
@@ -170,7 +175,7 @@ function DateTimeField({
                         type="date"
                         id={textId}
                         value={value}
-                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-md ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content || fieldSettingParameters?.placeholderContent}
                         onChange={(e) => handleFunction(e)}
                     />

@@ -30,6 +30,7 @@ const ChoiceBoxField = ({
     const [selectedValues, setSelectedValues] = useState([]);
 
     const handleRadioChange = (selectedValue) => {
+        console.log(selectedValue, 'selected value')
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -61,14 +62,15 @@ const ChoiceBoxField = ({
     };
 
     const handleCheckboxChange = (value) => {
+        console.log(value, 'value')
         setOptionSelected(value.value)
         setIsDropdownOpen(false)
         setSelectedValues(prev => {
             let newSelected;
-            if (prev.includes(value)) {
-                newSelected = prev.filter(item => item !== value);
+            if (prev.includes(value.value)) {
+                newSelected = prev.filter(item => item !== value.value);
             } else {
-                newSelected = [...prev, value];
+                newSelected = [...prev, value.value];
             }
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
@@ -77,7 +79,7 @@ const ChoiceBoxField = ({
                     ...prevValues[section_name], // Preserve existing entries for this section
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: newSelected.length > 1 ? newSelected : value // Add or update the label key with newValue
+                        [label]: value.value // Add or update the label key with newValue
                     }
                 }
             }))

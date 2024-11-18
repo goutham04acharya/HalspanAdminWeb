@@ -48,15 +48,13 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           }
         } catch (error) {
           if (error.error === 'login_required' || error.error === 'consent_required') {
-            console.log("User needs to log in or consent.");
+            
 
           } else {
             // Handle other errors (e.g., token refresh failure)
             console.error("Error getting access token:", error);
           }
         }
-      } else {
-        console.log("User is not authenticated.");
       }
     };
 
@@ -72,7 +70,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           <Route path="/questionnaries/create-questionnary" element={<CreateQuestionnary />} />
           <Route path="/lookup-dataset" element={<LookupDataset />} />
           <Route path="/questionnaries/create-questionnary/questionnary-form/:questionnaire_id/:version_number" element={<QuestionnaryForm />} />
-          <Route path="/questionnaries/version-list/:public_name/:questionnaire_id" element={<VersionList />} />
+          <Route path="/questionnaries/version-list/:questionnaire_id" element={<VersionList />} />
         </Route>
         {/* Add other routes here */}
       </Routes>

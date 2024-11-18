@@ -71,7 +71,6 @@ function FileField({
     };
 
     const handleFileRemove = (newFiles, fileNameToRemove) => {
-        // debugger
         // setFileState((prev) => {
         //     // Re-check if the minimum number of files is still met after removal
         //     if (newFiles.length >= (question?.field_range?.min || 0)) {
