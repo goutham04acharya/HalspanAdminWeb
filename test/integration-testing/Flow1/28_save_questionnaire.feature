@@ -15,4 +15,4 @@ Feature: Halspan - Admin - Save Questionnaire
     Then I should see field settings
     And I should see the display field added to the section 1 page 1 question 1
     When I click the save button
-    Then I should read a message stating that "Section 2 saved successfully"
+    Then I should read a message stating that "2 sections saved successfully"
