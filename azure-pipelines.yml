@@ -52,6 +52,7 @@ stages:
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
             aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/admin/licenses.json
           condition: ne(variables.CACHE_RESTORED, 'true')
+          displayName: 'Dependencies'
 
     - job: MegaLinter
       displayName: "Run MegaLinter"
@@ -449,7 +450,7 @@ stages:
       steps:
         - task: Cache@2
           inputs:
-            key: 'admnpmV3 | "$(Agent.OS)" | package.json'
+            key: 'admnpmV3 | "$(Agent.OS)" | package.json'  
             restoreKeys: |
               admnpmV3 | "$(Agent.OS)"
             path: "$(System.DefaultWorkingDirectory)/node_modules"
