@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 export const defaultContentConverter = (conditionalLogic) => {
-    console.log(conditionalLogic, 'logic before')
     if (conditionalLogic) {
         conditionalLogic = conditionalLogic?.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
         conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
@@ -10,7 +9,6 @@ export const defaultContentConverter = (conditionalLogic) => {
         conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
-        console.log(conditionalLogic, 'after ')
         return conditionalLogic;
     }else{
         return 

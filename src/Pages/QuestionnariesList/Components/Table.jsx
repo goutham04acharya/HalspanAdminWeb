@@ -57,9 +57,10 @@ function Table({ loading, QueList, lastElementRef }) {
                             <React.Fragment key={index}>
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-6 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{QueInfo?.questionnaire_id}</td>
-                                    <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 bg-[#F4F6FA]'
-                                        title={QueInfo?.internal_name}>
-                                        <u className='cursor-pointer' onClick={() => navigateToVersionList(QueInfo?.questionnaire_id)}>{QueInfo?.internal_name}</u>
+                                    <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]'
+                                        onClick={() => navigateToVersionList(QueInfo?.questionnaire_id)}
+                                        title={QueInfo?.internal_name}><u>
+                                            {QueInfo?.internal_name}</u>
                                     </td>
                                     <td className=' py-6 text-start truncate max-w-[100px] bg-[#F4F6FA] pr-6' title={QueInfo?.public_name}>{QueInfo?.public_name}</td>
                                     <td data-testid="status" className='py-2 px-[10px] bg-[#F4F6FA]'>

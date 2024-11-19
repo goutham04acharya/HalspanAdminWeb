@@ -316,7 +316,7 @@ function NumberFieldSetting({
                             </div>
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters}/>
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus}/>
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'

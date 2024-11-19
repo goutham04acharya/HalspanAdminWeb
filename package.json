@@ -57,6 +57,7 @@
     "react-signature-canvas": "^1.0.6",
     "react-sketch-canvas": "^6.2.0",
     "react-spinners": "^0.14.1",
+    "react-time-picker": "^7.0.0",
     "react-zoom-pan-pinch": "^3.6.1",
     "redux-persist": "^6.0.0",
     "regex-validator": "^0.0.1-alpha.0",

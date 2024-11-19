@@ -3,13 +3,14 @@ import { useSelector } from 'react-redux';
 import { setComplianceLogicId, setSelectedComponent } from '../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 import { defaultContentConverter } from '../../../../../CommonMethods/defaultContentConverter';
-import useApi from '../../../../../services/CustomHook/useApi';
-import { useParams } from 'react-router-dom';
+
 
 function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic, formStatus }) {
 
   // const {complianceLogicId} = useSelector(state => state.)
   const dispatch = useDispatch()
+  const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
+
   return (
     <div className='bg-white rounded-[10px] font-medium p-4 mt-8'>
       <div className='flex justify-between'>
@@ -29,7 +30,8 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
       </div>
 
       {complianceLogic.map((item, index) => (
-        <div data-testid="section-1-page-1-question-5" class="disable-select select-none w-full rounded-[10px] mb-4 p-4 hover:border border-[#2B333B] bg-[#EFF1F8]"
+        <div data-testid="section-1-page-1-question-5" 
+        className={`disable-select select-none w-full rounded-[10px] mb-4 p-4 hover:border border-[#2B333B] ${complianceLogicId === index ? 'bg-[#d1d3d9b7] border border-[#2B333B]' : 'bg-[#EFF1F8]'}`}
           onClick={formStatus === 'Draft' ? () => {
             dispatch(setComplianceLogicId(index))
             dispatch(setSelectedComponent('compliancelogic'))
