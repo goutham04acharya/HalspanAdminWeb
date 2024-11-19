@@ -43,7 +43,7 @@ function DisplayFieldSetting({
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        dispatch(setNewComponent({ id: 'urlValue', value: (option.value === 'mailto:' || option.value === 'tel:') ? `` : option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: (option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
 
         dispatch(setShouldAutoSave(true));
 

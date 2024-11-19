@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -57,6 +57,8 @@ const QuestionnaryForm = () => {
     }]);
 
     const sectionRefs = useRef([]);
+    const initialSections = useRef(sections); // Store initial sections
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
@@ -67,6 +69,9 @@ const QuestionnaryForm = () => {
     const [conditionalLogic, setConditionalLogic] = useState(false);
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
+    const [compareSavedSections, setCompareSavedSections] = useState(sections);
+
+
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -80,13 +85,14 @@ const QuestionnaryForm = () => {
     const pageToDelete = useSelector((state) => state?.questionnaryForm?.pageToDelete);
     const questionToDelete = useSelector((state) => state?.questionnaryForm?.questionToDelete);
     const showquestionDeleteModal = useSelector((state) => state?.questionnaryForm?.showquestionDeleteModal);
+    const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    // const savedData = useSelector(state => state.fieldSettingParams.savedData);  
+    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [saveClick, setSaveClick] = useState(false)
     const [sectionName, setSectionName] = useState('')
@@ -120,9 +126,9 @@ const QuestionnaryForm = () => {
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
-                // .replace(/[0-9]/g, '')      // Remove numbers
+                .replace(/[0-9]/g, '')      // Remove numbers
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-                .replace(/[^a-zA-Z,0-9]/g, ''); // Allow only alphabets and commas
+                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
         } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
@@ -541,10 +547,11 @@ const QuestionnaryForm = () => {
                 };
 
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
-                // dispatch(setSectionsData(sectionsData))
+
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                     return;
                 }
 
@@ -555,9 +562,11 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
+                    setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
                     setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
                 }
             } else {
                 setToastError('Something went wrong fetching form details');
@@ -625,71 +634,69 @@ const QuestionnaryForm = () => {
                 pages: sectionToSave.pages.map(page => (
                     {
                         page_id: page.page_id,
-                        page_name: page.page_name,
-                        questions: page.questions.map(question => (
-                            {
-                                question_id: question.question_id,
-                                question_name: fieldSettingParams[question.question_id].label,
-                                conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                                default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
-                                component_type: fieldSettingParams[question.question_id].componentType,
-                                label: fieldSettingParams[question.question_id].label,
-                                help_text: fieldSettingParams[question.question_id].helptext,
-                                placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                                default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
-                                type: fieldSettingParams[question.question_id].type,
-                                format: fieldSettingParams[question.question_id].format,
-                                regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
-                                format_error: fieldSettingParams[question?.question_id]?.format_error,
-                                field_range: {
-                                    min: fieldSettingParams[question.question_id].min,
-                                    max: fieldSettingParams[question.question_id].max,
-                                },
-                                admin_field_notes: fieldSettingParams[question.question_id].note,
-                                source: fieldSettingParams[question.question_id].source,
-                                source_value:
-                                    fieldSettingParams[question.question_id].source === 'fixedList' ?
-                                        fieldSettingParams[question.question_id].fixedChoiceArray :
-                                        fieldSettingParams[question.question_id].lookupOptionChoice
-                                ,
-                                lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                                options: fieldSettingParams[question.question_id].options,
-                                default_value: fieldSettingParams[question.question_id].defaultValue,
-                                increment_by: fieldSettingParams[question.question_id].incrementby,
-                                field_texts: {
-                                    pre_field_text: fieldSettingParams[question.question_id].preField,
-                                    post_field_text: fieldSettingParams[question.question_id].postField
-                                },
-                                asset_extras: {
-                                    draw_image: fieldSettingParams[question.question_id].draw_image,
-                                    pin_drop: fieldSettingParams[question.question_id].pin_drop,
-                                    include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                                    file_size: fieldSettingParams[question.question_id].fileSize,
-                                    file_type: fieldSettingParams[question.question_id].fileType,
-                                },
-                                attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
-                                service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
-                                display_type: (() => {
-                                    switch (fieldSettingParams[question.question_id].type) {
-                                        case 'heading':
-                                            return { heading: fieldSettingParams[question.question_id].heading };
-                                        case 'text':
-                                            return { text: fieldSettingParams[question.question_id].text };
-                                        case 'image':
-                                            return { image: fieldSettingParams[question.question_id].image };
-                                        case 'url':
-                                            return {
-                                                url: {
-                                                    type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
-                                                    value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
-                                                }
-                                            };
-                                        default:
-                                            return {}; // Return an empty object if componentType doesn't match any case  
-                                    }
-                                })(),
-                            }
-                        ))
+                        page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
+                        questions: page.questions.map(question => ({
+                            question_id: question.question_id,
+                            question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
+                            conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+                            default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                            component_type: fieldSettingParams[question.question_id].componentType,
+                            label: fieldSettingParams[question.question_id].label,
+                            help_text: fieldSettingParams[question.question_id].helptext,
+                            placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
+                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
+                            type: fieldSettingParams[question.question_id].type,
+                            format: fieldSettingParams[question.question_id].format,
+                            regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+                            format_error: fieldSettingParams[question?.question_id]?.format_error,
+                            field_range: {
+                                min: fieldSettingParams[question.question_id].min,
+                                max: fieldSettingParams[question.question_id].max,
+                            },
+                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                            source: fieldSettingParams[question.question_id].source,
+                            source_value:
+                                fieldSettingParams[question.question_id].source === 'fixedList' ?
+                                    fieldSettingParams[question.question_id].fixedChoiceArray :
+                                    fieldSettingParams[question.question_id].lookupOptionChoice
+                            ,
+                            lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                            options: fieldSettingParams[question.question_id].options,
+                            default_value: fieldSettingParams[question.question_id].defaultValue,
+                            increment_by: fieldSettingParams[question.question_id].incrementby,
+                            field_texts: {
+                                pre_field_text: fieldSettingParams[question.question_id].preField,
+                                post_field_text: fieldSettingParams[question.question_id].postField
+                            },
+                            asset_extras: {
+                                draw_image: fieldSettingParams[question.question_id].draw_image,
+                                pin_drop: fieldSettingParams[question.question_id].pin_drop,
+                                include_metadata: fieldSettingParams[question.question_id].include_metadata,
+                                file_size: fieldSettingParams[question.question_id].fileSize,
+                                file_type: fieldSettingParams[question.question_id].fileType,
+                            },
+                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
+                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                            display_type: (() => {
+                                switch (fieldSettingParams[question.question_id].type) {
+                                    case 'heading':
+                                        return { heading: fieldSettingParams[question.question_id].heading };
+                                    case 'text':
+                                        return { text: fieldSettingParams[question.question_id].text };
+                                    case 'image':
+                                        return { image: fieldSettingParams[question.question_id].image };
+                                    case 'url':
+                                        return {
+                                            url: {
+                                                type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
+                                                value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
+                                            }
+                                        };
+                                    default:
+                                        return {}; // Return an empty object if componentType doesn't match any case  
+                                }
+                            })(),
+                        }))
                     }))
             };
             // Recursive function to remove specified keys  
@@ -711,8 +718,10 @@ const QuestionnaryForm = () => {
                 if (isSaving) {
                     // ... call the API ...  
                     // const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                    // const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
                     // setSaveClick(true)
+                    // if (!(response?.error)) {
+                    // setToastSuccess(response?.data?.message);
+                    // setCompareSavedSections(sections);
 
                     if (defaultString) {
                         dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
@@ -1094,172 +1103,39 @@ const QuestionnaryForm = () => {
         }
     };
 
+    // Function to compare sections state with compareSavedSections to show the cancle modal or not
+    const compareSections = (sections, compareSavedSections) => {
+        if (sections.length !== compareSavedSections.length) {
+            return false; // Different number of sections
+        }
 
-    //this function is addd here to implement the global save feature
-    // const globalSaveHandler = () => {
-    //     try {
-    //         let sectionBody = {
-    //             sections: sections
-    //         }
-    //         for (const key in fieldSettingParams) {
-    //             debugger
-    //             const keys = key.split("_");
-    //             let sectionKey=''
-    //             let pageKey=''
-    //             let questionKey=''
-    //             if (keys.length > 3) {
-    //                 sectionKey = keys[1]
-    //                 pageKey = keys[2] 
-    //                 questionKey = keys[3]
-    //             }else{
-    //                 sectionKey = keys[0]
-    //                 pageKey = keys[1] 
-    //                 questionKey = keys[2]
-    //             }
-    //             console.log(sectionKey,pageKey,questionKey,'mam')
-    //             // Traverse obj2 to find matching keys and update values
-    //             sectionBody['sections'].forEach(section => {
-    //                 if (section.section_id.includes(sectionKey)) {
-    //                     section.pages.forEach(page => {
-    //                         if (page.page_id.includes(pageKey)) {
-    //                             page.questions.forEach((question, index) => {
-    //                                 if (question.question_id.includes(questionKey)) {
-    //                                     // Replace the question in obj2 with the values from obj1
-    //                                     page.questions[index] = { ...question, ...fieldSettingParams[key] };
-    //                                 }
-    //                             });
-    //                         }
-    //                     });
-    //                 }
-    //             });
-    //         }
-    //         console.log(sectionBody, 'its mee', fieldSettingParams)
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
-    const globalSaveHandler = async () => {
-        try {
-            // Deep clone sections to avoid direct state mutation
-            let sectionBody = {
-                sections: JSON.parse(JSON.stringify(sections))
-            };
+        // Compare each section in detail (excluding questions)
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            const savedSection = compareSavedSections[i];
 
-            for (const key in fieldSettingParams) {
-                const keys = key.split("_");
-                let sectionKey = '';
-                let pageKey = '';
-                let questionKey = '';
-
-                if (keys.length > 3) {
-                    sectionKey = keys[1];
-                    pageKey = keys[2];
-                    questionKey = keys[3];
-                } else {
-                    sectionKey = keys[0];
-                    pageKey = keys[1];
-                    questionKey = keys[2];
-                }
-
-                console.log(sectionKey, pageKey, questionKey, 'mam');
-
-                // Traverse sectionBody to find matching keys and update values
-                sectionBody.sections.forEach(section => {
-                    if (section.section_id.includes(sectionKey)) {
-                        section.pages.forEach(page => {
-                            if (page.page_id.includes(pageKey)) {
-                                page.questions.forEach((question, index) => {
-                                    if (question.question_id.includes(questionKey)) {
-                                        // Replace the question in sectionBody with updated values
-                                        page.questions[index] = {
-                                            question_id: question.question_id,
-                                            question_name: fieldSettingParams[question.question_id].label,
-                                            conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
-                                            component_type: fieldSettingParams[question.question_id].componentType,
-                                            label: fieldSettingParams[question.question_id].label,
-                                            help_text: fieldSettingParams[question.question_id].helptext,
-                                            placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                                            default_content: fieldSettingParams[question.question_id].default_content || '',
-                                            type: fieldSettingParams[question.question_id].type,
-                                            format: fieldSettingParams[question.question_id].format,
-                                            regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
-                                            format_error: fieldSettingParams[question?.question_id]?.format_error,
-                                            field_range: {
-                                                min: fieldSettingParams[question.question_id].min,
-                                                max: fieldSettingParams[question.question_id].max,
-                                            },
-                                            admin_field_notes: fieldSettingParams[question.question_id].note,
-                                            source: fieldSettingParams[question.question_id].source,
-                                            source_value:
-                                                fieldSettingParams[question.question_id].source === 'fixedList' ?
-                                                    fieldSettingParams[question.question_id].fixedChoiceArray :
-                                                    fieldSettingParams[question.question_id].lookupOptionChoice
-                                            ,
-                                            lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                                            options: fieldSettingParams[question.question_id].options,
-                                            default_value: fieldSettingParams[question.question_id].defaultValue,
-                                            increment_by: fieldSettingParams[question.question_id].incrementby,
-                                            field_texts: {
-                                                pre_field_text: fieldSettingParams[question.question_id].preField,
-                                                post_field_text: fieldSettingParams[question.question_id].postField
-                                            },
-                                            asset_extras: {
-                                                draw_image: fieldSettingParams[question.question_id].draw_image,
-                                                pin_drop: fieldSettingParams[question.question_id].pin_drop,
-                                                include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                                                file_size: fieldSettingParams[question.question_id].fileSize,
-                                                file_type: fieldSettingParams[question.question_id].fileType,
-                                            },
-                                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
-                                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
-                                            display_type: (() => {
-                                                switch (fieldSettingParams[question.question_id].type) {
-                                                    case 'heading':
-                                                        return { heading: fieldSettingParams[question.question_id].heading };
-                                                    case 'text':
-                                                        return { text: fieldSettingParams[question.question_id].text };
-                                                    case 'image':
-                                                        return { image: fieldSettingParams[question.question_id].image };
-                                                    case 'url':
-                                                        return {
-                                                            url: {
-                                                                type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
-                                                                value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
-                                                            }
-                                                        };
-                                                    default:
-                                                        return {}; // Return an empty object if componentType doesn't match any case  
-                                                }
-                                            })(),
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-            function cleanSections() {
-                // Ensure sectionBody is an array before proceeding
-                if (Array.isArray(sectionBody['sections'])) {
-                    sectionBody['sections'].forEach(section => {
-                        delete section.created_at;
-                        delete section.updated_at;
-                        delete section.questionnaire_id;
-                        delete section.version_number;
-                    });
-                } else {
-                    console.error("sectionBody is not an array:", sectionBody);
-                }
+            // Compare section names and ids
+            if (section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id) {
+                return false; // Section names or ids are different
             }
 
-            cleanSections();
-            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
-            setToastSuccess(response?.data?.message);
-            console.log(sectionBody, 'its me', fieldSettingParams);
-        } catch (error) {
-            console.log(error);
+            // Compare pages within each section (excluding questions)
+            if (section.pages.length !== savedSection.pages.length) {
+                return false; // Different number of pages
+            }
+
+            // Compare each page's details (without comparing questions)
+            for (let j = 0; j < section.pages.length; j++) {
+                const page = section.pages[j];
+                const savedPage = savedSection.pages[j];
+
+                // Compare page names and page_ids
+                if (page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id) {
+                    return false; // Different page names or page_ids
+                }
+            }
         }
 
         return true; // Sections and pages match
@@ -1486,6 +1362,7 @@ const QuestionnaryForm = () => {
                                                                             setSaveClick={setSaveClick}
                                                                             setSectionName={setSectionName}
                                                                             sectionName={sectionName}
+                                                                            formStatus={formStatus}
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
@@ -1501,8 +1378,8 @@ const QuestionnaryForm = () => {
                                                                             alt="save"
                                                                             title="Save"
                                                                             data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full hover:bg-[#FFFFFF] mr-6 cursor-pointer`}
-                                                                            onClick={() => {
+                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
+                                                                            onClick={formStatus === 'Draft' ? () => {
                                                                                 handleSaveSection(sectionData?.section_id);
                                                                             } : null}
                                                                         /> */}
@@ -1542,15 +1419,16 @@ const QuestionnaryForm = () => {
                             </div>
                             {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
-                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} />
+                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                 </div>
                             )}
                         </div>
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
-                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => navigate(`/questionnaries/version-list/${questionnaire_id}/${version_number}`)}>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="canc" />
+                            <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
+                                onClick={() => handleDataChanges()}>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
@@ -1599,13 +1477,15 @@ const QuestionnaryForm = () => {
                                         complianceState: complianceState,
                                         setCompliancestate: setCompliancestate,
                                         complianceSaveHandler: complianceSaveHandler,
-                                        scrollToPage: scrollToPage
+                                        scrollToPage: scrollToPage,
+                                        formStatus: formStatus
                                     }
                                 )
                             ) : (
                                 <AddFields
                                     buttons={Fieldsneeded}
                                     handleClick={handleClick}
+                                    formStatus={formStatus}
                                 />
                             )}
 
