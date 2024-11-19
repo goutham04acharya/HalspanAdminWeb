@@ -261,7 +261,7 @@ const QuestionnaryForm = () => {
     const scrollToPage = (sectionIndex, pageId) => {
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
-            const element = document.getElementById(pageId);
+            const element = document.getElementById(`${pageId}-scroll`);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             } else {
