@@ -670,11 +670,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Assuming `allSectionDetails` contains the fetched data and 
         // you have a way to map `selectedQuestionId` to the relevant question
         const findSelectedQuestion = () => {
-            // allSectionDetails?.data?.sections?.forEach((section) => {
-            //     section.pages?.forEach((page) => {
-            //         page.questions?.forEach((question) => {
-            //             if (question.question_id === selectedQuestionId) {
-            // Pre-fill the editor with the conditional logic of the selected question
 
             //adding this to check whether the advane editor or the default logic
             let conditionalLogic = ''
