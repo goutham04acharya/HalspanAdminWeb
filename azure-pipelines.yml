@@ -50,7 +50,7 @@ stages:
             node scripts/licences_complaince.js
             export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_MAIN}
             export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_MAIN}
-            aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/licenses.json
+            aws s3 cp licenses.json s3://$S3_BUCKET_NAME/licences/admin/licenses.json
           condition: ne(variables.CACHE_RESTORED, 'true')
 
     - job: MegaLinter
