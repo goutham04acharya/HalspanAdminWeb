@@ -21,7 +21,6 @@ const initialState = {
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
-    
 };
 
 

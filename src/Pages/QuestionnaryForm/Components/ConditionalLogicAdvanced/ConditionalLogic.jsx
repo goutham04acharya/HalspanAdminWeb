@@ -186,6 +186,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
         setShowSectionList(true)
+
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
         dispatch(setAllSectionDetails(response.data));
         handleQuestionnaryObject(response.data);
@@ -675,9 +676,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let conditionalLogic = ''
             if (isDefaultLogic) {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
-            }
-            else {
-                conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
+            } else {
+                conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';;
             }
 
 
@@ -719,27 +719,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         setShowSectionList(false);
 
-        try {
-            const addSectionPrefix = (input) => {
-                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
-            };
+    try {
+        const addSectionPrefix = (input) => {
+            return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+        };
 
-            const modifyString = (input) => {
-                if (selectedType === 'array') {
-                    const lastIndex = input.lastIndexOf('()');
-                    if (lastIndex !== -1) {
-                        return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
-                    }
+        const modifyString = (input) => {
+            if (selectedType === 'array') {
+                const lastIndex = input.lastIndexOf('()');
+                if (lastIndex !== -1) {
+                    return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
                 }
-                return input;
-            };
+            }
+            return input;
+        };
 
-            const handleError = (message) => {
-                setError(message);
-                setIsThreedotLoader(false);
-            };
+        const handleError = (message) => {
+            setError("message");
+            setIsThreedotLoader(false);
+        };
 
-            let evalInputValue = modifyString(inputValue);
+        let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
@@ -951,8 +951,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableNames = payloadString.match(variableRegex) || [];
 
-            // Validate if all variable names exist in secDetailsForSearching
-            const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+        // Validate if all variable names exist in secDetailsForSearching
+        const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
 
             if (invalidVariables.length > 0) {
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
@@ -990,72 +990,72 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'numberfield':
                         const parsedResult = Number(result);
 
-                        // Check if the type is 'integer'
-                        if (fieldSettingParams[selectedQuestionId].type === 'integer') {
-                            // Ensure result is an integer
-                            if (!Number.isInteger(parsedResult) || result.toString().includes('.')) {
-                                handleError('The evaluated result should only be an integer.');
-                                return;
-                            }
-                        }
-                        // Check if the type is 'float'
-                        else if (fieldSettingParams[selectedQuestionId].type === 'float') {
-                            // Ensure result is a valid float (allow dot and digits)
-                            if (!/^\d+(\.\d+)?$/.test(result)) {
-                                handleError('The evaluated result should be a valid float (number and dot).');
-                                return;
-                            }
-                        } else {
-                            setError('');  // No error, valid number
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            } else if (complianceState) {
-                switch (selectedComponent) {
-                    case 'numberfield':
-                    case 'choiceboxfield':
-                    case 'textboxfield':
-                    case 'dateTimefield':
-                    case 'assetLocationfield':
-                    case 'floorPlanfield':
-                    case 'photofield':
-                    case 'videofield':
-                    case 'filefield':
-                    case 'signaturefield':
-                    case 'gpsfield':
-                    case 'displayfield':
-                    case 'compliancelogic':
-                    case 'tagScanfield':
-                        if (typeof result !== 'string') {
-                            handleError('The evaluated result is not a string. The field type expects a string.');
+                    // Check if the type is 'integer'
+                    if (fieldSettingParams[selectedQuestionId].type === 'integer') {
+                        // Ensure result is an integer
+                        if (!Number.isInteger(parsedResult) || result.toString().includes('.')) {
+                            handleError('The evaluated result should only be an integer.');
                             return;
                         }
-                        break;
-                }
-            }
-
-            if (!isDefaultLogic && !complianceState) {
-                const validationResult = splitAndValidate(evalInputValue);
-
-                if (validationResult.some(msg => msg.includes('Error'))) {
-                    handleError(validationResult.join('\n'));
-                    return; // Stop execution if validation fails
-                }
-            }
-            if (complianceState) {
-                setConditionalLogic((prevLogic) => {
-                    const updatedLogic = Array.isArray(prevLogic) ? [...prevLogic] : [];; // Clone the existing state array
-
-                    // Check if the index exists in the array
-                    if (updatedLogic[complianceLogicId]) {
-                        // Update the `defaultContent` key of the object at the specified index
-                        updatedLogic[complianceLogicId].default_content = payloadString; // Replace "yourPayloadString" with your actual payload
-
-                        // Return the updated array to set the new state
-                        return updatedLogic;
                     }
+                    // Check if the type is 'float'
+                    else if (fieldSettingParams[selectedQuestionId].type === 'float') {
+                        // Ensure result is a valid float (allow dot and digits)
+                        if (!/^\d+(\.\d+)?$/.test(result)) {
+                            handleError('The evaluated result should be a valid float (number and dot).');
+                            return;
+                        }
+                    } else {
+                        setError('');  // No error, valid number
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } else if (complianceState) {
+            switch (selectedComponent) {
+                case 'numberfield':
+                case 'choiceboxfield':
+                case 'textboxfield':
+                case 'dateTimefield':
+                case 'assetLocationfield':
+                case 'floorPlanfield':
+                case 'photofield':
+                case 'videofield':
+                case 'filefield':
+                case 'signaturefield':
+                case 'gpsfield':
+                case 'displayfield':
+                case 'compliancelogic':
+                case 'tagScanfield':
+                    if (typeof result !== 'string') {
+                        handleError('The evaluated result is not a string. The field type expects a string.');
+                        return;
+                    }
+                    break;
+            }
+        }
+
+        if (!isDefaultLogic && !complianceState) {
+            const validationResult = splitAndValidate(evalInputValue);
+
+            if (validationResult.some(msg => msg.includes('Error'))) {
+                handleError(validationResult.join('\n'));
+                return; // Stop execution if validation fails
+            }
+        }
+        if (complianceState) {
+            setConditionalLogic((prevLogic) => {
+                const updatedLogic = Array.isArray(prevLogic) ? [...prevLogic] : [];; // Clone the existing state array
+
+                // Check if the index exists in the array
+                if (updatedLogic[complianceLogicId]) {
+                    // Update the `defaultContent` key of the object at the specified index
+                    updatedLogic[complianceLogicId].default_content = payloadString; // Replace "yourPayloadString" with your actual payload
+
+                    // Return the updated array to set the new state
+                    return updatedLogic;
+                }
 
                     return prevLogic; // If index doesn't exist, return the original state without changes
                 });
@@ -1065,22 +1065,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
-            } else if (typeof result === 'boolean') {
-                handleError('');  // Clear the error since the result is valid
-                setIsThreedotLoader(false);
-            } else if (isNaN(result)) {
-                handleError('Please pass the parameter inside the function');
-            } else {
-                handleError(result);
-            }
-        } catch (error) {
-            const handleError = (message) => {
-                setError(message);
-                setIsThreedotLoader(false);
-            };
-            handleError(`Error evaluating the expression: ${error.message}`);
+        } else if (typeof result === 'boolean') {
+            handleError('');  // Clear the error since the result is valid
+            setIsThreedotLoader(false);
+        } else if (isNaN(result)) {
+            handleError('Please pass the parameter inside the function');
+        } else {
+            handleError(result);
         }
-    };
+    } catch (error) {
+        const handleError = (message) => {
+            setError('The above Expression is incomplete or Invalid, Please check');
+            setIsThreedotLoader(false);
+        };
+        handleError(`Error evaluating the expression: ${error.message}`);
+    }
+};
 
     function splitAndValidate(expression) {
         expression = trimParentheses(expression)
@@ -1095,14 +1095,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\)\s*(==|!=|===|!==|<|>|<=|>=)\s*"\d{2}\/\d{2}\/\d{4}"$/;
 
 
-        // Define a regex to detect incomplete expressions (e.g., missing operators or values)
-        const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
+    // Define a regex to detect incomplete expressions (e.g., missing operators or values)
+    const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
 
-        // Regex for valid date format (dd/mm/yyyy)
-        const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    // Regex for valid date format (dd/mm/yyyy)
+    const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
-        parts.forEach((part, index) => {
-            part = part.replace(/^\s+|\s+$/g, '');
+    parts.forEach((part, index) => {
+        part = part.replace(/^\s+|\s+$/g, '');
 
             // Check for incomplete expressions
             part = trimParentheses(part)
@@ -1111,8 +1111,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             part = part.trim();
             const displayPart = part.replace(/sections\./g, '');
 
-            // Check if the expression contains any method from the typeMethods list
-            const containsTypeMethod = typeMethods.some(method => part.includes(method));
+        // Check if the expression contains any method from the typeMethods list
+        const containsTypeMethod = typeMethods.some(method => part.includes(method));
 
             //checking for the includes 
             if (part.includes('includes(')) {
@@ -1151,160 +1151,160 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         });
 
-        return errors.length > 0 ? errors : ["All expressions are valid."];
+    return errors.length > 0 ? errors : ["All expressions are valid."];
+}
+
+const showInputValue = (key) => {
+    //this is the array of cndition where the input value  tap will not be  shown
+    let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
+    // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
+    if (arr.includes(key)) {
+        return true;
     }
+    // if  its not there then return tru as the input box is required for  other condiitons 
+    return false;
+}
 
-    const showInputValue = (key) => {
-        //this is the array of cndition where the input value  tap will not be  shown
-        let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
-        // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
-        if (arr.includes(key)) {
-            return true;
-        }
-        // if  its not there then return tru as the input box is required for  other condiitons 
-        return false;
-    }
+const validateConditions = () => {
+    for (let i = 0; i < conditions.length; i++) {
+        for (let j = 0; j < conditions[i].conditions.length; j++) {
+            const condition = conditions[i].conditions[j];
+            if (showInputValue(condition.condition_logic)) {
 
-    const validateConditions = () => {
-        for (let i = 0; i < conditions.length; i++) {
-            for (let j = 0; j < conditions[i].conditions.length; j++) {
-                const condition = conditions[i].conditions[j];
-                if (showInputValue(condition.condition_logic)) {
-
-                    if (condition.question_name === '' || condition.condition_logic === '') {
-                        return true;
-                    }
-                } else {
-                    if (
-                        condition.question_name === '' ||
-                        condition.condition_logic === '' ||
-                        condition.value === ''
-                    ) {
-                        return true;  // Return true if any key is empty
-                    }
+                if (condition.question_name === '' || condition.condition_logic === '') {
+                    return true;
+                }
+            } else {
+                if (
+                    condition.question_name === '' ||
+                    condition.condition_logic === '' ||
+                    condition.value === ''
+                ) {
+                    return true;  // Return true if any key is empty
                 }
             }
         }
-        return false;  // Return false if all keys have values
-    };
-
-    const handleSaveBasicEditor = () => {
-        setSubmitSelected(true);
-        if (validateConditions()) {
-            return;
-        }
-        let condition_logic;
-        try {
-            condition_logic = buildConditionExpression(conditions);
-        } catch (error) {
-        }
-        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-
-        handleSaveSection(sectionId, true, condition_logic);
-        dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
     }
+    return false;  // Return false if all keys have values
+};
 
-    return (
-        <>
-            <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-                <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
-                    <div className='w-full'>
-                        {(tab === 'advance' || isDefaultLogic || complianceState) ? (
-                            <div className='flex h-customh14'>
-                                <div className='w-[60%]'>
-                                    {!isDefaultLogic ?
-                                        <p className='text-start text-lg text-[#2B333B] font-semibold'>Shows when...</p>
-                                        :
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
-                                    }
-                                    <AdvancedEditor
-                                        handleListSectionDetails={handleListSectionDetails}
-                                        showSectionList={showSectionList}
-                                        inputValue={inputValue}
-                                        error={error}
-                                        showMethodSuggestions={showMethodSuggestions}
-                                        suggestions={suggestions}
-                                        handleClickToInsert={handleClickToInsert}
-                                        textareaRef={textareaRef}
-                                        handleInputField={handleInputField}
-                                        secDetailsForSearching={secDetailsForSearching}
-                                        sections={sections}
-                                        setShowMethodSuggestions={setShowMethodSuggestions}
-                                        isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                        selectedFieldType={selectedFieldType}
-                                        setSelectedType={setSelectedType}
-                                        isDefaultLogic={isDefaultLogic}
-                                    />
-                                </div>
-                                <div className='w-[40%]'>
-                                    <StaticDetails
-                                        handleTabClick={handleTabClick}
-                                        activeTab={activeTab}
-                                        setActiveTab={setActiveTab}
-                                        isDefaultLogic={isDefaultLogic}
-                                        selectedFieldType={selectedFieldType}
-                                        isOperatorModal={isOperatorModal}
-                                        setIsOperatorModal={setIsOperatorModal}
-                                        setIsStringMethodModal={setIsStringMethodModal}
-                                    />
-                                </div>
-                            </div>) : (
-                            !isDefaultLogic && (
-                                <BasicEditor
-                                    secDetailsForSearching={filterQuestions()}
-                                    questions={allSectionDetails.data}
+const handleSaveBasicEditor = () => {
+    setSubmitSelected(true);
+    if (validateConditions()) {
+        return;
+    }
+    let condition_logic;
+    try {
+        condition_logic = buildConditionExpression(conditions);
+    } catch (error) {
+    }
+    const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+
+    handleSaveSection(sectionId, true, condition_logic);
+    dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+}
+
+return (
+    <>
+        <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
+            <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
+                <div className='w-full'>
+                    {(tab === 'advance' || isDefaultLogic || complianceState) ? (
+                        <div className='flex h-customh14'>
+                            <div className='w-[60%]'>
+                                {!isDefaultLogic ?
+                                    <p className='text-start text-lg text-[#2B333B] font-semibold'>Shows when...</p>
+                                    :
+                                    <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                }
+                                <AdvancedEditor
+                                    handleListSectionDetails={handleListSectionDetails}
+                                    showSectionList={showSectionList}
+                                    inputValue={inputValue}
+                                    error={error}
+                                    showMethodSuggestions={showMethodSuggestions}
+                                    suggestions={suggestions}
+                                    handleClickToInsert={handleClickToInsert}
+                                    textareaRef={textareaRef}
+                                    handleInputField={handleInputField}
+                                    secDetailsForSearching={secDetailsForSearching}
                                     sections={sections}
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                    conditions={conditions}
-                                    setConditions={setConditions}
-                                    submitSelected={submitSelected}
-                                    setSubmitSelected={setSubmitSelected}
+                                    selectedFieldType={selectedFieldType}
+                                    setSelectedType={setSelectedType}
+                                    isDefaultLogic={isDefaultLogic}
                                 />
-                            )
-                        )}
-                        <div className={`${isDefaultLogic || complianceState ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic && !complianceState &&
-                                <div className='flex gap-5 items-end'>
-                                    <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
-                                    <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                                </div>
-                            }
-                            <div>
-                                <Button2
-                                    text='Cancel'
-                                    type='button'
-                                    testId='cancel'
-                                    data-testid='button1'
-                                    className='w-[162px] h-[50px] text-black font-semibold text-base'
-                                    onClick={() => handleClose()}
-                                >
-                                </Button2>
-                                <Button
-                                    text='Save'
-                                    onClick={(tab == 'advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
-                                    type='button'
-                                    data-testid='cancel'
-                                    className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
-                                    isThreedotLoading={isThreedotLoader}
-                                >
-                                </Button>
                             </div>
+                            <div className='w-[40%]'>
+                                <StaticDetails
+                                    handleTabClick={handleTabClick}
+                                    activeTab={activeTab}
+                                    setActiveTab={setActiveTab}
+                                    isDefaultLogic={isDefaultLogic}
+                                    selectedFieldType={selectedFieldType}
+                                    isOperatorModal={isOperatorModal}
+                                    setIsOperatorModal={setIsOperatorModal}
+                                    setIsStringMethodModal={setIsStringMethodModal}
+                                />
+                            </div>
+                        </div>) : (
+                        !isDefaultLogic && (
+                            <BasicEditor
+                                secDetailsForSearching={filterQuestions()}
+                                questions={allSectionDetails.data}
+                                sections={sections}
+                                setShowMethodSuggestions={setShowMethodSuggestions}
+                                isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                conditions={conditions}
+                                setConditions={setConditions}
+                                submitSelected={submitSelected}
+                                setSubmitSelected={setSubmitSelected}
+                            />
+                        )
+                    )}
+                    <div className={`${isDefaultLogic || complianceState ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                        {!isDefaultLogic && !complianceState &&
+                            <div className='flex gap-5 items-end'>
+                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                            </div>
+                        }
+                        <div>
+                            <Button2
+                                text='Cancel'
+                                type='button'
+                                testId='cancel'
+                                data-testid='button1'
+                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                onClick={() => handleClose()}
+                            >
+                            </Button2>
+                            <Button
+                                text='Save'
+                                onClick={(tab == 'advance' || isDefaultLogic || complianceState) ? handleSave : handleSaveBasicEditor}
+                                type='button'
+                                data-testid='cancel'
+                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                isThreedotLoading={isThreedotLoader}
+                            >
+                            </Button>
                         </div>
                     </div>
                 </div>
-
             </div>
-            {(isOperatorModal || isStringMethodModal) &&
-                <OperatorsModal
-                    setIsOperatorModal={setIsOperatorModal}
-                    isOperatorModal={isOperatorModal}
-                    setIsStringMethodModal={setIsStringMethodModal}
-                    isStringMethodModal={isStringMethodModal}
-                />
-            }
-        </>
-    );
+
+        </div>
+        {(isOperatorModal || isStringMethodModal) &&
+            <OperatorsModal
+                setIsOperatorModal={setIsOperatorModal}
+                isOperatorModal={isOperatorModal}
+                setIsStringMethodModal={setIsStringMethodModal}
+                isStringMethodModal={isStringMethodModal}
+            />
+        }
+    </>
+);
 }
 
 export default ConditionalLogic;
