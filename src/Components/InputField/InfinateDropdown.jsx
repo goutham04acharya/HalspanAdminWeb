@@ -28,7 +28,8 @@ function InfinateDropdown({
     handleMultiSelectChange, // for multi-choice
     formStatus,
     textFieldLookup,
-    assetLocation
+    assetLocation,
+    failGrade
 }) {
     return (
         <div className='cursor-pointer w-full relative' ref={dropdownRef}>

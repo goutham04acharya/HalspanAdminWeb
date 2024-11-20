@@ -1,13 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
+// import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
+import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
+import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
 
 function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [failGradeValue, setFailGradeValue] = useState('')
     const dispatch = useDispatch();
-
+    console.log(complianceLogicId, 'adaedaaead')
+    const options = [
+        { value: 'NO_ACCESS', label: 'NO_ACCESS' },
+        { value: 'MISSING', label: 'MISSING' },
+        { value: 'RECOMMENDED_REPLACEMENT', label: 'RECOMMENDED_REPLACEMENT' },
+        { value: 'RECOMMENDED_REMEDIATION', label: 'RECOMMENDED_REMEDIATION' },
+        { value: 'FURTHER_INVESTIGATION', label: 'FURTHER_INVESTIGATION' },
+    ];
+    const handleOptionClick = (option) => {
+        setDropdownOpen(false);
+        handleInputChange(complianceLogicId, 'fail_grade', option.value)
+        setFailGradeValue(option)
+        // dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
+        // dispatch(setShouldAutoSave(true));
+    };
     const handleInputChange = (id, field, value) => {
         let arr = [...complianceLogic];
         arr[id][field] = value; // Dynamically update field
@@ -44,16 +63,54 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 data-testid="default-value-input"
                                 placeholder='Populates the content' />
-                            <img src="/Images/setting.svg" 
-                            alt="setting" 
-                            disabled={formStatus!= 'Draft'}
-                            onClick={formStatus === 'Draft' ? () => {
-                                setCompliancestate(true)
-                                dispatch(setSelectedQuestionId(''))}
-                                : null}
-                            className={`absolute top-5 right-3 cursor-pointer ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                            <img src="/Images/setting.svg"
+                                alt="setting"
+                                disabled={formStatus != 'Draft'}
+                                onClick={formStatus === 'Draft' ? () => {
+                                    setCompliancestate(true)
+                                    dispatch(setSelectedQuestionId(''))
+                                }
+                                    : null}
+                                className={`absolute top-5 right-3 cursor-pointer ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                                 data-testid='default-value' />
                         </div>
+                    </div>
+                    <div className='flex flex-col justify-start mt-7'>
+                        <label
+                            // htmlFor={labelID}
+                            className='font-semibold text-base text-[#2B333B]'>Pass Grade
+                        </label>
+                        <input
+                            type="text"
+                            data-testid="label-name-input"
+                            disabled={formStatus !== 'Draft'}
+                            className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                            onChange={(e) => handleInputChange(complianceLogicId, 'pass_grade', e.target.value)}
+                            value={complianceLogic[complianceLogicId]?.pass_grade}
+                        />
+                    </div>
+                    <div className='mt-7'>
+                        <InfinateDropdown
+                            label='Fail Grade'
+                            labelStyle='font-semibold text-base text-[#2B333B]'
+                            id='Fail Grade'
+                            top='25px'
+                            placeholder='Select'
+                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                            testID='select-attribute'
+                            labeltestID='attribute'
+                            selectedOption={
+                                options.find(option => 
+                                  complianceLogic?.some(failGrade => failGrade.fail_grade === option.value)
+                                )
+                              }
+                            handleOptionClick={handleOptionClick}
+                            isDropdownOpen={isDropdownOpen}
+                            setDropdownOpen={setDropdownOpen}
+                            options={options}
+                            formStatus={formStatus}
+                            failGrade
+                        />
                     </div>
                 </div>
             </div>

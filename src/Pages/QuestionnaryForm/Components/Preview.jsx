@@ -480,7 +480,7 @@ console.log(resetFields, 'resetFields')
                                     if (list?.conditional_logic !== '') {
                                         // debugger
                                         // addDays(Section_1.Page_1.Question_1)
-                                        console.log(list?.conditional_logic)
+                                        console.log(list?.conditional_logic, 'apaoaoe')
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
@@ -504,7 +504,35 @@ console.log(resetFields, 'resetFields')
                                                 console.log(error, 'j')
                                                 return null;
                                             }
-                                        } else {
+                                        } else if (list?.conditional_logic.includes("getDay()")) {
+                                            const daysMap = {
+                                                "Sunday": 0,
+                                                "Monday": 1,
+                                                "Tuesday": 2,
+                                                "Wednesday": 3,
+                                                "Thursday": 4,
+                                                "Friday": 5,
+                                                "Saturday": 6
+                                            };
+                                    
+                                            // Replace day names with corresponding numeric values
+                                            const replacedLogic = list.conditional_logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
+                                                return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
+                                            });
+                                            
+                                    
+                                            console.log(replacedLogic, 'Modified Logic');
+                                            try {
+                                                let result = eval(replacedLogic); // Evaluate the modified logic
+                                                console.log(result, 'Evaluation Result');
+                                                if (!result) {
+                                                    return null; // If the logic evaluates to false, return null
+                                                }
+                                            } catch (error) {
+                                                console.error(error, 'Error evaluating getDay logic');
+                                                return null;
+                                            }
+                                        }else {
                                             try {
                                                 // debugger
                                                 if (!eval(list?.conditional_logic)) {
