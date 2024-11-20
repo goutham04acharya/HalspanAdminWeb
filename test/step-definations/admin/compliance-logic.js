@@ -16,7 +16,7 @@ When('I enter the label name for compliance status', async function () {
 
 Then('I should see the compliance logic advanced editor for choice field', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Shows when..."]')));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="Compliance Logic"]')));
 });
 
 Then('I should see the compliance logic suggestions for questions for choice', async function () {
@@ -106,3 +106,9 @@ When('I click the add compliance button', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid="compliance"]'))).click();
 }); 
+
+When('I click the add default value button for compliance logic', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="default-value"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="advance-editor-tab"]`))).click();
+});
