@@ -24,7 +24,6 @@ import {
 import { useSelector } from 'react-redux';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
-console.log(resetFields, 'resetFields')
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
@@ -422,7 +421,6 @@ console.log(resetFields, 'resetFields')
         if (date) {
             let result = date;
             result.setDate(result.getDate() + 1);
-            console.log(result, 'pani')
             // return result
         }
 
@@ -480,12 +478,9 @@ console.log(resetFields, 'resetFields')
                                     if (list?.conditional_logic !== '') {
                                         // debugger
                                         // addDays(Section_1.Page_1.Question_1)
-                                        console.log(list?.conditional_logic, 'apaoaoe')
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
-                                                console.log(result, 'result')
-                                                // console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
@@ -504,7 +499,7 @@ console.log(resetFields, 'resetFields')
                                                 console.log(error, 'j')
                                                 return null;
                                             }
-                                        } else if (list?.conditional_logic.includes("getDay()")) {
+                                        }else if (list?.conditional_logic.includes("getDay()")) {
                                             const daysMap = {
                                                 "Sunday": 0,
                                                 "Monday": 1,
@@ -514,16 +509,16 @@ console.log(resetFields, 'resetFields')
                                                 "Friday": 5,
                                                 "Saturday": 6
                                             };
-                                    
                                             // Replace day names with corresponding numeric values
                                             const replacedLogic = list.conditional_logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
                                                 return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
                                             });
                                             
-                                    
-                                            console.log(replacedLogic, 'Modified Logic');
+                                            // Remove parentheses from around the entire string, if they exist
+                                            const logicWithoutBrackets = replacedLogic.replace(/^\((.*)\)$/, '$1');
+                                            console.log(logicWithoutBrackets, 'modified logic')
                                             try {
-                                                let result = eval(replacedLogic); // Evaluate the modified logic
+                                                let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                 console.log(result, 'Evaluation Result');
                                                 if (!result) {
                                                     return null; // If the logic evaluates to false, return null
@@ -532,7 +527,7 @@ console.log(resetFields, 'resetFields')
                                                 console.error(error, 'Error evaluating getDay logic');
                                                 return null;
                                             }
-                                        }else {
+                                        } else {
                                             try {
                                                 // debugger
                                                 if (!eval(list?.conditional_logic)) {

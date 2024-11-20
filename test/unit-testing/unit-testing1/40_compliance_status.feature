@@ -47,7 +47,7 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
     When I add a new question to the page 1 in section 1
     When I click the add compliance button 
     When I enter the label name for compliance status
-    When I click the add default value button
+    When I click the add default value button for compliance logic
     Then I should see the compliance logic advanced editor for choice field
     Then I should see the compliance logic suggestions for questions for choice
     When I enter the incorrect compliance logic for choice field
@@ -57,13 +57,13 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
     When I click the cancel button
     Then I should see field settings
     
-    When I click the add default value button
+    When I click the add default value button for compliance logic
     Then I should see the compliance logic advanced editor for choice field
     When I select the question from the compliance logic suggestions for choice field
     When I click the cancel button
     Then I should see field settings
 
-    When I click the add default value button
+    When I click the add default value button for compliance logic
     Then I should see the compliance logic advanced editor for choice field
     When I enter the correct compliance logic for choice field
     Then I click the save button for default value

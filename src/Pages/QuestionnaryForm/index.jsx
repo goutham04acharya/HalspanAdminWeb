@@ -248,22 +248,22 @@ const QuestionnaryForm = () => {
         // Add other mappings here...
     };
 
-    const scrollToSection = (index, sectionId) => {
-        // Add a slight delay to ensure DOM update before scrolling
-        setTimeout(() => {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                console.error(`Element with id ${sectionId} not found`);
-            }
-        }, 300); // Delay to allow the section to open and render the page
-    };
+    // const scrollToSection = (index, sectionId) => {
+    //     // Add a slight delay to ensure DOM update before scrolling
+    //     setTimeout(() => {
+    //         const element = document.getElementById(sectionId);
+    //         if (element) {
+    //             element.scrollIntoView({ behavior: 'smooth' });
+    //         } else {
+    //             console.error(`Element with id ${sectionId} not found`);
+    //         }
+    //     }, 300); // Delay to allow the section to open and render the page
+    // };
 
     const scrollToPage = (sectionIndex, pageId) => {
         // Add a slight delay to ensure DOM update before scrolling
         setTimeout(() => {
-            const element = document.getElementById(pageId);
+            const element = document.getElementById(`${pageId}-scroll`);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             } else {
@@ -1307,7 +1307,7 @@ const QuestionnaryForm = () => {
                             setSelectedPage={setSelectedPage}
                             sections={sections}
                             setSections={setSections}
-                            handleSectionScroll={scrollToSection}
+                            // handleSectionScroll={scrollToSection}
                             handlePageScroll={scrollToPage}
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
@@ -1316,7 +1316,7 @@ const QuestionnaryForm = () => {
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
                             handleDeleteModal={handleDeleteModal}
-                            
+
                         />
                     </div>
                     <div className='w-[50%] '>
@@ -1353,7 +1353,6 @@ const QuestionnaryForm = () => {
                                                                 className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
                                                                     ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} 
                                                                     border hover:border-[#2B333B] border-transparent mb-2.5`}
-                                                            // className={'disable-select select-none w-full rounded-[10px] p-[6px] my-4 border hover:border-[#2B333B] border-transparent mb-2.5'}
                                                             >
                                                                 <div className="flex justify-between w-full">
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
@@ -1619,6 +1618,7 @@ const QuestionnaryForm = () => {
                         complianceState={complianceState}
                         setCompliancestate={setCompliancestate}
                         complianceLogic={complianceLogic}
+                        setComplianceLogic={setComplianceLogic}
                     />
                 )
             }

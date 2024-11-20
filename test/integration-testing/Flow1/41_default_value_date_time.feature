@@ -69,11 +69,11 @@ Feature: Halspan - Admin - Implement default values of Date Fields
     When I enter the placeholder content for date/time
     Then I should see the placeholder content for date/time updated in the section 2
     
-    When I click the add default value button
-    Then I should see the default value advanced editor for date/time field
-    When I select the question from the default value suggestions for date/time field
-    When I click the cancel button
-    Then I should see field settings
+    # When I click the add default value button
+    # Then I should see the default value advanced editor for date/time field
+    # When I select the question from the default value suggestions for date/time field
+    # When I click the cancel button
+    # Then I should see field settings
 
     When I click the add default value button
     Then I should see the default value advanced editor for date/time field

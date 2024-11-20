@@ -22,7 +22,7 @@ When('I click on add new section', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await driver.wait(until.elementLocated(By.css('[data-testid="open-1"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="sidebar-section-1"]'))).click();
 });
 
 Then("I should see the new section added", async function () {

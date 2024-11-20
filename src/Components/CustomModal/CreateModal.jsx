@@ -25,15 +25,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
             [uuid]: false
         }));
     };
-    useEffect(() => {
-        setData({
-            name: '',
-            choices: ''
-        })
-    }, [])
-
-
-    console.log(data, 'sdaasd')
+    // console.log(data, 'sdaasd')
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className='customModal h-auto flex flex-col w-[352px] relative'>

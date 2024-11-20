@@ -70,7 +70,8 @@ Then('I should see sections created', async function () {
     while (true) {
         try {
             // eslint-disable-next-line max-len
-            const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)), 5000);
+            // const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-name"]`)), 5000);
+            const sectionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${sectionNumber}"]`)), 5000);
             await driver.wait(until.elementIsVisible(sectionElement));
             sectionNumber++;
         } catch (error) {

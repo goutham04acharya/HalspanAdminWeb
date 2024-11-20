@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
     savedData: {},
-    currentData: {}
+    currentData: {},
+    editorToggle: {}
 };
 
 // Helper function to process displayType
@@ -63,6 +64,18 @@ const fieldSettingParamsSlice = createSlice({
 
             state.currentData[questionId] = {
                 ...state.currentData[questionId],
+                [id]: value
+            };
+        },
+        setNewLogic: (state, action) => {
+            const { questionId, id, value } = action.payload;
+            if (!state.editorToggle[questionId]) {
+                state.editorToggle[questionId] = {};
+
+            }
+
+            state.editorToggle[questionId] = {
+                ...state.editorToggle[questionId],
                 [id]: value
             };
         },
@@ -192,6 +205,7 @@ export const compareData = (currentData, savedData) => {
 
 export const {
     setNewComponent,
+    setNewLogic,
     addNewFixedChoice,
     removeFixedChoice,
     resetFixedChoice,
