@@ -18,10 +18,10 @@ function Pages({ pageIndex,
   scrollToPage,
   formStatus
 }) {
-  
+
   const pageRefs = useRef({});
   const dispatch = useDispatch();
-  
+
   const selectedAddQuestion = useSelector(
     (state) => state?.questionnaryForm?.selectedAddQuestion
   );
@@ -103,7 +103,7 @@ function Pages({ pageIndex,
           <button
             data-testid={`add-question-btn-section-${sectionIndex + 1}-page-${pageIndex + 1
               }`}
-            onClick={formStatus === 'Draft' ?() =>
+            onClick={formStatus === 'Draft' ? () =>
               handleAddRemoveQuestion(
                 "add",
                 sectionIndex,
@@ -111,7 +111,7 @@ function Pages({ pageIndex,
                 "",
                 pageData.page_id
               )
-            : null}
+              : null}
             className="flex items-center justify-center w-full py-7 font-semibold text-[#2B333B] text-base"
           >
             <span className="mr-[15px]">+</span>

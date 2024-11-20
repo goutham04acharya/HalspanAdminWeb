@@ -32,7 +32,6 @@ import ConditionalLogic from './Components/ConditionalLogicAdvanced/ConditionalL
 import TagScanFieldSetting from './Components/Fields/TagScan/TagScanFieldSettings/TagScanFieldSetting.jsx';
 import ComplanceLogicField from './Components/Fields/ComplianceLogic/ComplanceLogicField.jsx';
 import ComplianceFieldSetting from './Components/Fields/ComplianceLogic/ComplianceFieldSetting/ComplianceFieldSetting.jsx';
-import useObjects from '../../customHooks/useObjects.js'
 import Button from '../../Components/Button/button.jsx';
 
 
@@ -57,8 +56,6 @@ const QuestionnaryForm = () => {
     }]);
 
     const sectionRefs = useRef([]);
-    const initialSections = useRef(sections); // Store initial sections
-
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)

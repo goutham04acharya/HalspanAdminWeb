@@ -21,15 +21,12 @@ function ChoiceFieldSetting({
     formParameters,
     handleRadiobtn,
     fieldSettingParameters,
-    // setFieldSettingParameters,
-    handleSaveSettings,
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
     isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
-    setDefaultString,
     formStatus
 }) {
     const [isLookupOpen, setIsLookupOpen] = useState(false);
