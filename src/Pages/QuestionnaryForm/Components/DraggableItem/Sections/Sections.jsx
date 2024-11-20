@@ -30,21 +30,11 @@ const Sections = ({
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
+  
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
     dispatch(setPageToDelete({ sectionIndex, pageIndex }));
     dispatch(setSelectedSectionData(pageData));
   };
-
-  // useEffect(() => {
-  //   const savedExpandedSections = localStorage.getItem("expandedSections");
-  //   if (savedExpandedSections) {
-  //     setExpandedSections(JSON.parse(savedExpandedSections));
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
-  // }, [expandedSections]);
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
