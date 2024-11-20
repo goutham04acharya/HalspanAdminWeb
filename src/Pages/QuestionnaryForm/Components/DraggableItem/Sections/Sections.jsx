@@ -122,6 +122,7 @@ const Sections = ({
                             handleSectionClick(sectionIndex);
                             setSelectedPage(pageIndex);
                           }}
+                          id={`${pageData?.page_id}-scroll`}
                           className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
                         >
                           <div className="flex justify-between">
