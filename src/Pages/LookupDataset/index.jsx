@@ -162,13 +162,16 @@ const LookupDataset = () => {
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
         }
-        setIsCreateLoading(true)
+        
         let choicesArray;
         if (file) {
+            setIsImportLoading(true)
             // Handle file import case
             choicesArray = file.choices.map(choice => ({ value: choice }));
+            
         } else if (isUpdate) {
             // debugger
+            setIsCreateLoading(true)
             try {
                 // Ensure data.choices is an array
                 choicesArray = Array.isArray(data.choices) ? [...data.choices] : [];
@@ -229,6 +232,7 @@ const LookupDataset = () => {
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;
                 if (!file) {
+                    // debugger
                     setErrors('name', errorMessage); // Set error for name if there's a conflict
                     setIsCreateLoading(false);
                 } else {
@@ -257,7 +261,7 @@ const LookupDataset = () => {
     const handleImport = (event) => {
         console.log('handleImport is called')
         // debugger
-        if (data?.choices !== '') {
+        if (data?.choices !== '' && isView.open) {
             setShowLookupReplaceModal(true);
             setIsCreateModalOpen(false);
             setData(initialImportState)
@@ -276,6 +280,7 @@ const LookupDataset = () => {
             return;
         }
         setIsImportLoading(true);
+        setIsCreateModalOpen(false);
         Papa.parse(file, {
             header: false,
             complete: (results) => {
@@ -296,7 +301,7 @@ const LookupDataset = () => {
                         name: fileName,
                         choices: flatData
                     }
-
+                    
                     handleSubmit(payload);
                 }
             },
