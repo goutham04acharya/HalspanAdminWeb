@@ -239,7 +239,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'asfadfaeae')
         setLogic(value);
         setInputValue(value)
 
@@ -311,28 +310,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
         const conditionalLogicReplaced = handleReplace(value);
-        // console.log(conditionalLogicReplaced, 'logic')
         dispatch(setNewLogic({ id: 'conditional_logic', value: logic, questionId: selectedQuestionId }));
     };
 
     const handleReplace = (conditionalLogic) => {
-         // Replace && with "and" and || with "or"
-         conditionalLogic = conditionalLogic.replace('and', '&&').replace('or', '||');
-         conditionalLogic = conditionalLogic.replace('AND', '&&').replace('OR', '||');
-         conditionalLogic = conditionalLogic.replace('And', '&&').replace('Or', '||');
-         conditionalLogic = conditionalLogic.replace('then', '?').replace('else', ':'); // Replace the : with ' else ' // Replace the ? with ' then '
-         conditionalLogic = conditionalLogic.replace('if', ' '); // Replace the : with ' else ' // Replace the ? with ' then '
+        // Replace && with "and" and || with "or"
+        conditionalLogic = conditionalLogic.replace('and', '&&').replace('or', '||');
+        conditionalLogic = conditionalLogic.replace('AND', '&&').replace('OR', '||');
+        conditionalLogic = conditionalLogic.replace('And', '&&').replace('Or', '||');
+        conditionalLogic = conditionalLogic.replace('then', '?').replace('else', ':'); // Replace the : with ' else ' // Replace the ? with ' then '
+        conditionalLogic = conditionalLogic.replace('if', ' '); // Replace the : with ' else ' // Replace the ? with ' then '
         //  conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-         conditionalLogic = conditionalLogic.replace('()', 'length') // Replace the : with ' else ' // Replace the ? with ' then '
-         conditionalLogic = conditionalLogic.replaceAll(
-             '$1.AddDays($2)',
-             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
-         );
-         conditionalLogic = conditionalLogic.replaceAll(
-             '$1.SubtractDays($2)',
-             /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
-         );
-         return conditionalLogic;
+        conditionalLogic = conditionalLogic.replace('()', 'length') // Replace the : with ' else ' // Replace the ? with ' then '
+        conditionalLogic = conditionalLogic.replaceAll(
+            '$1.AddDays($2)',
+            /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+        );
+        conditionalLogic = conditionalLogic.replaceAll(
+            '$1.SubtractDays($2)',
+            /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
+        );
+        return conditionalLogic;
     }
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
@@ -683,7 +681,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
                         setConditions(parseLogicExpression(transformedContent));
-                        console.log(conditions, 'kkkk')
                         setInputValue(transformedContent);
                     } else {
                         setInputValue('');
@@ -823,7 +820,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
                 const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
-                
+
                 // Check if a valid match was found
                 if (dayValueMatch) {
                     const operator = dayValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
@@ -842,7 +839,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-            
+
             if (evalInputValue.includes('getFullYear')) {
                 // Extract the value after `getFullYear()` with any comparison operator using regex
                 const yearValueMatch = evalInputValue.match(/getFullYear\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{4,})/);
@@ -1113,11 +1110,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
-        console.log(expression, 'expression')
         expression = trimParentheses(expression)
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
-        console.log(parts, expression, 'what is te expression here')
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
@@ -1225,10 +1220,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleSaveBasicEditor = () => {
         if (complianceLogic) {
             let compliance_logic = buildConditionExpression(conditions);
-            console.log(compliance_logic, 'Generated compliance_logic');
-
             setComplianceLogic((prev) => {
-                console.log(prev, 'Previous complianceLogic state');
                 return prev.map((item, index) =>
                     index === complianceLogicId
                         ? { ...item, default_content: compliance_logic }
@@ -1245,7 +1237,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         try {
             condition_logic = buildConditionExpression(conditions);
-            console.log(conditions, 'what you will get')
         } catch (error) {
         }
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
@@ -1335,7 +1326,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 >
                                 </Button2>
                                 <Button
-                                testID={'save-conditional-logic'}
+                                    testID={'save-conditional-logic'}
                                     text='Save'
                                     onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                     type='button'
