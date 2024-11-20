@@ -13,31 +13,38 @@ When('I select asset type as {string} from the filter dropdown', async function 
     switch (asset) {
     case 'Fire door':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option1"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option1"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option1"]'))).getText();
+        this.asset= 'Fire door';
         break;
     case 'Fire extinguisher':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).getText();
+        this.asset= 'Fire extinguisher';
         break;
     case 'Updated Elevator':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option3"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option3"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option3"]'))).getText();
+        this.asset= 'Updated Elevator';
         break;
     case 'test create nav':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option4"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option4"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option4"]'))).getText();
+        this.asset= 'test create nav';
         break;
     case 'create access':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option5"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option2"]'))).getText();
+        this.asset= 'create access';
         break;
     case 'Asset1':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option6"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option3"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option3"]'))).getText();
+        this.asset= 'Asset1';
         break;
     case 'Window':
         await driver.wait(until.elementLocated(By.css('[data-testid = "option7"]'))).click();
-        this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option4"]'))).getText();
+        // this.asset= await driver.wait(until.elementLocated(By.css('[data-testid = "option4"]'))).getText();
+        this.asset= 'Window';
         break;
     default:
         console.error(`Invalid asset type: ${asset}`);
