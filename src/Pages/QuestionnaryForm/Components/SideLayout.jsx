@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 
-function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handleSectionScroll, handlePageScroll,
+function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handlePageScroll,
     selectedSection,
     setSelectedSection,
     selectedPage,
@@ -58,12 +58,12 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                         setSelectedSection(sectionIndex);
                                                         setSelectedPage(null); // Reset selected page when a section is selected
                                                         handleDropdown(sectionIndex);
-                                                        handleSectionScroll(sectionIndex, sectionItem?.section_id);
+                                                        // handleSectionScroll(sectionIndex, sectionItem?.section_id);
                                                     }}
                                                     className={`${selectedSection === sectionIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
                                                     <div className='flex items-center'>
                                                         <img src="/Images/down-arrow.svg" alt="down-arrow"
-                                                            className={dropdownOpen[sectionIndex] ? 'rotate-90' : 'rotate-0'}
+                                                            className={dropdownOpen[sectionIndex] ? 'rotate-0' : 'rotate-270'}
                                                         />
                                                         <p
                                                             data-testid={`sidebar-section-${sectionIndex}`}

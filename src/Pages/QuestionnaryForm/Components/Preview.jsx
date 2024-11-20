@@ -24,7 +24,7 @@ import {
 import { useSelector } from 'react-redux';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
-console.log(resetFields, 'resetFields')
+    console.log(resetFields, 'resetFields')
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
@@ -502,6 +502,35 @@ console.log(resetFields, 'resetFields')
                                                 }
                                             } catch (error) {
                                                 console.log(error, 'j')
+                                                return null;
+                                            }
+                                        }else if (list?.conditional_logic.includes("getDay()")) {
+                                            const daysMap = {
+                                                "Sunday": 0,
+                                                "Monday": 1,
+                                                "Tuesday": 2,
+                                                "Wednesday": 3,
+                                                "Thursday": 4,
+                                                "Friday": 5,
+                                                "Saturday": 6
+                                            };
+
+                                            // Replace day names with corresponding numeric values
+                                            const replacedLogic = list.conditional_logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
+                                                return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
+                                            });
+                                            
+                                            // Remove parentheses from around the entire string, if they exist
+                                            const logicWithoutBrackets = replacedLogic.replace(/^\((.*)\)$/, '$1');
+                                            console.log(logicWithoutBrackets, 'modified logic')
+                                            try {
+                                                let result = eval(logicWithoutBrackets); // Evaluate the modified logic
+                                                console.log(result, 'Evaluation Result');
+                                                if (!result) {
+                                                    return null; // If the logic evaluates to false, return null
+                                                }
+                                            } catch (error) {
+                                                console.error(error, 'Error evaluating getDay logic');
                                                 return null;
                                             }
                                         } else {
