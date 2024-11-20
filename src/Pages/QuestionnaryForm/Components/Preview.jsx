@@ -24,7 +24,6 @@ import {
 import { useSelector } from 'react-redux';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
-    console.log(resetFields, 'resetFields')
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
@@ -422,7 +421,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         if (date) {
             let result = date;
             result.setDate(result.getDate() + 1);
-            console.log(result, 'pani')
             // return result
         }
 
@@ -480,12 +478,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                     if (list?.conditional_logic !== '') {
                                         // debugger
                                         // addDays(Section_1.Page_1.Question_1)
-                                        console.log(list?.conditional_logic)
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
-                                                console.log(result, 'result')
-                                                // console.log(Section_1.Page_1.Question_1)
                                                 if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }

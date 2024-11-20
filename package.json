@@ -1,7 +1,7 @@
 {
   "name": "halspan-web-application",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -31,6 +31,7 @@
     "axios": "^1.7.2",
     "babel-plugin-istanbul": "^5.1.0",
     "cucumber": "^6.0.7",
+    "cucumber-html-reporter": "^7.2.0",
     "dayjs": "^1.11.13",
     "detect-secrets": "^1.0.6",
     "dotenv": "^16.4.5",

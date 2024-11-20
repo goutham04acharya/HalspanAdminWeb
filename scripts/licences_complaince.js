@@ -1,16 +1,18 @@
-import { readFileSync, writeFileSync } from 'fs';
+/* eslint-disable guard-for-in */
+const fs = require('fs')
 
 // Read the package.json file
-const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 
 // Extract the license and description information
-const packageInfo = {};
+const packageInfo = {}
+// eslint-disable-next-line no-restricted-syntax
 for (const dependency in packageJson.dependencies) {
-    const depPackageJson = JSON.parse(readFileSync(`node_modules/${dependency}/package.json`, 'utf8'));
+    const depPackageJson = JSON.parse(fs.readFileSync(`node_modules/${dependency}/package.json`, 'utf8'))
     packageInfo[`${dependency}@${packageJson.dependencies[dependency]}`] = {
         license: depPackageJson.license,
-        description: depPackageJson.description
-    };
+        description: depPackageJson.description,
+    }
 }
 
-writeFileSync('licenses.json', JSON.stringify(packageInfo, null, 2));
+fs.writeFileSync('licenses.json', JSON.stringify(packageInfo, null, 2))
