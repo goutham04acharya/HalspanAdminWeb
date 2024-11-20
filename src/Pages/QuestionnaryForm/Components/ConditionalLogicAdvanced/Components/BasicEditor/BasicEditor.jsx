@@ -264,8 +264,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         });
     }
     return (
-        <div className='w-full '>
-            <p className='font-semibold text-2xl'>Conditional Fields</p>
+        <div className='w-full h-customh14'>
+            <p className='font-semibold text-[22px]'>Conditional Fields</p>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions.map((condition, index) => (
                     <div key={index} className='mb-6'>

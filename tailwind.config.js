@@ -22,7 +22,10 @@ export default {
             },
             colors: {
                 'customTextColor': '#2B333B'
-            }
+            },
+            rotate: {
+                '270': '270deg',
+            },
         },
     },
     plugins: [],

@@ -32,17 +32,16 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [isAttributeDropdownOpen, setIsAttributeDropdownOpen] = useState(false);
     const [attributeValue, setAttributeValue] = useState('')
     const [serviceValue, setServiceValue] = useState('')
-
     const handleServiceClick = (option) => {
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
         setServiceRecordDropdownOpen(false);
-        setServiceValue(option);
+        // setServiceValue(option);
     };
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
         setIsAttributeDropdownOpen(false);
-        setAttributeValue(option)
+        // setAttributeValue(option)
     };
 
     const attributes = [
@@ -155,7 +154,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-attribute'
                             labeltestID='attribute'
-                            selectedOption={attributeValue}
+                            selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
                             handleOptionClick={handleAttributeClick}
                             isDropdownOpen={isAttributeDropdownOpen}
                             setDropdownOpen={setIsAttributeDropdownOpen}
@@ -173,7 +172,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-service-record'
                             labeltestID='service-record'
-                            selectedOption={serviceValue}
+                            selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters.service_record_lfp)}
                             handleOptionClick={formStatus === 'Draft' ? handleServiceClick : null}
                             isDropdownOpen={formStatus === 'Draft' ? isServiceRecordDropdownOpen : false}
                             setDropdownOpen={formStatus === 'Draft' ? setServiceRecordDropdownOpen : null}
