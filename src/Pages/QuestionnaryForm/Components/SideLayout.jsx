@@ -13,18 +13,22 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     formStatus,
     handleAddRemoveSection,
     handleSectionSaveOrder,
-    handleDeleteModal,
     handleSectionScroll
 }) {
-    
-    const handleDropdown = (index) => {
-        setDropdown(index, !dropdownOpen[index])
+
+    const handleDropdown = (sectionId) => {
+        if(dropdownOpen === sectionId){
+            setDropdown('')
+            return;
+        }
+        setDropdown(sectionId)
     }
+
+    console.log(dropdownOpen, 'dropdownOpen')
     useEffect(() => {
         setSelectedSection(sections[0].section_id)
-
+        setDropdown(sections[0].section_id)
     }, [])
-
 
     return (
         <div className='py-4'>
@@ -63,13 +67,13 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                     onClick={() => {
                                                         setSelectedSection(sectionItem?.section_id);
                                                         setSelectedPage(null); // Reset selected page when a section is selected
-                                                        handleDropdown(sectionIndex);
+                                                        handleDropdown(sectionItem?.section_id);
                                                         handleSectionScroll(sectionIndex, sectionItem?.section_id);
                                                     }}
                                                     className={`${selectedSection === sectionItem?.section_id ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
                                                     <div className='flex items-center'>
                                                         <img src="/Images/down-arrow.svg" alt="down-arrow"
-                                                            className={dropdownOpen[sectionIndex] ? 'rotate-0' : 'rotate-270'}
+                                                            className={dropdownOpen ===  sectionItem?.section_id ? 'rotate-0' : 'rotate-270'}
                                                         />
                                                         <p
                                                             data-testid={`sidebar-section-${sectionIndex}`}
@@ -105,7 +109,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                     </div>
                                                 </div>
                                                 {sectionItem?.pages?.length > 0 && sectionItem?.pages.map((pageItem, pageIndex) => (
-                                                    dropdownOpen[sectionIndex] && (
+                                                    dropdownOpen === sectionItem?.section_id  && (
                                                         <div
                                                             key={pageItem?.page_id}
                                                             onClick={() => {

@@ -105,12 +105,7 @@ const QuestionnaryForm = () => {
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
-    const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
-        acc[index] = false;  // Set all dropdowns to false initially
-        return acc;
-    }, {});
-    const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
-
+    const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
 
     const handleCancel = () => {
         dispatch(setModalOpen(false));
