@@ -15,9 +15,7 @@ import { setNewComponent } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
-import { reverseFormat } from '../../../../CommonMethods/FormatDate';
 import dayjs from 'dayjs';
-import moment from 'moment/moment';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
 import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
@@ -71,7 +69,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
-    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()", "Date()"];
+    const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
+    // const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
+    // const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -235,16 +235,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
-        // setSelectedFieldType('')
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
         setInputValue(value)
-        // if (isDefaultLogic) {
-        //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: value, questionId: selectedQuestionId }))
-        // } else {
-        //     dispatch(setNewComponent({ id: 'conditional_logic', value: value, questionId: selectedQuestionId }))
-        // }
+
         const lastChar = value.slice(-1);
         // If the last character is a dot, check the field type and show method suggestions
         if (lastChar === '.') {
@@ -252,7 +247,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
-                setSuggestions(dateMethods);
+                setSuggestions(dateTimeMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
@@ -293,7 +288,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         setShowMethodSuggestions(true);
                         break;
                     case 'date':
-                        setSuggestions(dateMethods);
+                        setSuggestions(dateTimeMethods);
                         setShowMethodSuggestions(true);
                         break;
                     case 'number':
@@ -699,6 +694,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+            conditionalLogic = conditionalLogic.replaceAll(
+                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                '$1.AddDays($2)'
+            );
+            conditionalLogic = conditionalLogic.replaceAll(
+                /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
+                '$1.SubtractDays($2)'
+            );
 
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
@@ -717,10 +720,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [selectedQuestionId, allSectionDetails]);
 
-
     const handleSave = async () => {
-
-        const sectionId = selectedQuestionId.split('_')[0];
+        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         setShowSectionList(false);
 
         try {
@@ -745,17 +746,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let evalInputValue = modifyString(inputValue);
 
-            if (isDefaultLogic) {
+            if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
             }
-            if (complianceState) {
-                setDefaultString(evalInputValue);
-            }
-            evalInputValue = evalInputValue.replaceAll('AddDays(', 'setDate(')
-                .replaceAll('SubtractDays(', 'setDate(-')
-                .replace('Today()', 'new Date()')
-                .replace('if', '');
+            // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
+            evalInputValue = evalInputValue.replaceAll(
+                /(\w+\.\w+\.\w+)\.AddDays\((\d+)\)/g,
+                'new Date(new Date($1).setDate(new Date($1).getDate() + $2)).toLocaleDateString("en-GB")'
+            );
+            // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
+            evalInputValue = evalInputValue.replaceAll(
+                /(\w+\.\w+\.\w+)\.SubtractDays\((\d+)\)/g,
+                'new Date(new Date($1).setDate(new Date($1).getDate() - $2)).toLocaleDateString("en-GB")'
+            );
 
+            evalInputValue = evalInputValue
+                .replaceAll('Today()', 'new Date()')
+                .replaceAll('if', '');
             let expression = evalInputValue.toString();
 
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
@@ -767,6 +774,176 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
+            if (evalInputValue.includes('getMonth')) {
+                // Extract the value after `getMonth()` with any comparison operator using regex
+                const monthValueMatch = evalInputValue.match(/getMonth\(\)\s*(===|!==|>=|<=|>|<)\s*(\d+)/);
+
+                // Check if a valid match was found
+                if (monthValueMatch) {
+                    const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
+                    const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
+
+                    // Validate if the month is between 1 and 12
+                    if (monthValue < 1 || monthValue > 12) {
+                        setError("Invalid month. Please enter a value between 1 and 12.");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getMonth() === value`.");
+                    return;
+                }
+            }
+
+            if (evalInputValue.includes('getDay')) {
+                // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
+                const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Mon|Tue|Wednesday|Thursday|Friday|Saturday)"/i);
+
+                // Check if a valid match was found
+                if (dayValueMatch) {
+                    const operator = dayValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
+                    const dayValue = dayValueMatch[2].toLowerCase(); // Capture and normalize day value to lowercase
+
+                    // Validate day value against valid days (in lowercase)
+                    const validDays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+                    if (!validDays.includes(dayValue)) {
+                        setError("Invalid day. Please enter a valid day from Sunday to Saturday.");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getDay() === \"Day\"`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getFullYear')) {
+                // Extract the value after `getFullYear()` with any comparison operator using regex
+                const yearValueMatch = evalInputValue.match(/getFullYear\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{4,})/);
+
+                // Check if a valid match was found
+                if (yearValueMatch) {
+                    const operator = yearValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
+                    const yearValue = parseInt(yearValueMatch[2], 10); // Capture and parse the year value
+
+                    // Validate if the year is a valid 4-digit number (between 1000 and 9999)
+                    if (isNaN(yearValue) || yearValue < 1000 || yearValue > 9999) {
+                        setError("Invalid year. Please enter a valid 4-digit year");
+                        return;
+                    }
+
+                    // Continue with other logic if needed
+                } else {
+                    setError("Invalid format. Please use the format `getFullYear() === <year>`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getTime')) {
+                // Match getTime() with a quoted `hh:mm:ss` format
+                const timeMatches = evalInputValue.match(/getTime\(\)\s*(===|!==|>=|<=|>|<)\s*"(\d{2}:\d{2}:\d{2})"/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, timeValue] = timeMatch.match(/getTime\(\)\s*(===|!==|>=|<=|>|<)\s*"(\d{2}:\d{2}:\d{2})"/);
+
+                        // Validate `hh:mm:ss` format strictly for each time value
+                        const timePattern = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+                        if (!timePattern.test(timeValue)) {
+                            setError(`Invalid time: "${timeValue}". Please enter a valid time in 'hh:mm:ss' format`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getTime() === \"hh:mm:ss\"`.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getSeconds')) {
+                // Match getSeconds() with either a quoted 2-digit seconds number or raw number
+                const timeMatches = evalInputValue.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, seconds] = timeMatch.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/);
+
+                        // Validate that seconds are exactly two digits and between 00 and 59
+                        if (!/^[0-5][0-9]$/.test(seconds)) {
+                            setError(`Invalid seconds: "${seconds}". Please enter a valid two-digit value between 00 and 59.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getSeconds() === \"ss\"` the seconds should to between 0 - 59 ");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getHours')) {
+                // Match getHours() with either a two-digit number and a comparison operator
+                const timeMatches = evalInputValue.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, hours] = timeMatch.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
+
+                        // Ensure the hours value is a two-digit number between 00 and 23
+                        if (parseInt(hours) < 0 || parseInt(hours) > 23) {
+                            setError(`Invalid hours: "${hours}". The value must be a valid number between 00 and 23.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getHours() === hh` where hh is a two-digit number.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getMinutes')) {
+                // Match getMinutes() with a comparison operator and a two-digit number
+                const timeMatches = evalInputValue.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, minutes] = timeMatch.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
+
+                        // Ensure the minutes value is a two-digit number between 00 and 59
+                        if (parseInt(minutes) < 0 || parseInt(minutes) > 59) {
+                            setError(`Invalid minutes: "${minutes}". The value must be a valid number between 00 and 59.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getMinutes() === mm` where mm is a two-digit number.");
+                    return;
+                }
+            }
+            if (evalInputValue.includes('getMilliseconds')) {
+                // Match getMilliseconds() with a comparison operator and a three-digit number
+                const timeMatches = evalInputValue.match(/getMilliseconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{3,})/g);
+
+                if (timeMatches) {
+                    for (const timeMatch of timeMatches) {
+                        const [, operator, milliseconds] = timeMatch.match(/getMilliseconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{3,})/);
+
+                        // Ensure the milliseconds value is a number
+                        const millisecondsValue = parseInt(milliseconds);
+
+                        // Validate that the milliseconds value is within the range 0 to 999
+                        if (millisecondsValue < 0 || millisecondsValue > 999) {
+                            setError(`Invalid milliseconds: "${milliseconds}". The value must be between 000 and 999.`);
+                            return;
+                        }
+                    }
+                    // Continue with other logic if all times are valid
+                } else {
+                    setError("Invalid format. Please use the format `getMilliseconds() === nnn` where nnn is a three-digit number.");
+                    return;
+                }
+            }
+
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
                 handleError('Please pass the parameter inside the function');
@@ -775,7 +952,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
-
             // Extract variable names from the payloadString using a regex
             const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableNames = payloadString.match(variableRegex) || [];
@@ -797,7 +973,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Return null as JSX expects a valid return inside {}
             }
             //just checking for datetimefield before the evaluating the expression (only for default checking)
-            if ((isDefaultLogic || complianceState) && selectedComponent == "dateTimefield") {
+            if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (evalInputValue.includes('setDate'))) {
                 let invalid = DateValidator(evalInputValue)
                 if (invalid) {
                     if (invalid) {
@@ -817,8 +993,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                         break;
                     case 'numberfield':
-                        // Attempt to parse result as a number
-                        // Attempt to parse result as a number
                         const parsedResult = Number(result);
 
                         // Check if the type is 'integer'
@@ -891,8 +1065,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return prevLogic; // If index doesn't exist, return the original state without changes
                 });
             }
-            // Split and Validate Expression
-            // payloadString =evalInputValue;
+
             setIsThreedotLoader(true);
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
@@ -915,13 +1088,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     function splitAndValidate(expression) {
+        expression = trimParentheses(expression)
         const parts = expression.split(/\s*&&\s*|\s*\|\|\s*/);
         const errors = [];
-
+        console.log(parts,expression,  'what is te expression here')
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
 
-        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+        const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
+        // const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\) === "\d{2}\/\d{2}\/\d{4}"$/;
+        const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\)\s*(==|!=|===|!==|<|>|<=|>=)\s*"\d{2}\/\d{2}\/\d{4}"$/;
+
 
         // Define a regex to detect incomplete expressions (e.g., missing operators or values)
         const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
@@ -934,11 +1111,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // Check for incomplete expressions
             part = trimParentheses(part)
-            if (part.includes('includes(')) {
 
-            } else {
-                part = part.replace(/[()]/g, '')
-            }
             //trimming the conditions to avoid space issue
             part = part.trim();
             const displayPart = part.replace(/sections\./g, '');
@@ -950,7 +1123,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (part.includes('includes(')) {
                 const result = part.match(/includes\((["'])(.*?)\1\)/)[2]; // Extract the string inside the includes() parentheses
                 if (!result) {
-                    error.push(`Error in the ${part}: missing vaalues inside the function`)
+                    error.push(`Error in the ${part}: missing values inside the function`)
                 }
             }
             // If it contains a method that doesn't require an operator, mark as correct
@@ -961,13 +1134,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 errors.push(`Error in expression: "${displayPart}" is incomplete (missing operator or value).`);
             }
             // Check if it's a date type
-            else if (selectedType === 'date') {
+            else if (selectedType === 'date' && (expression.includes('setDate'))) {
                 const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
                 if (dateMatch) {
                     const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
 
                     // Validate date value (either "Today" or a valid date format)
-                    if (value !== 'Today' && !validDateRegex.test(value)) {
+                    if (value !== 'Today' && (expression.includes('setDate')) && !validDateRegex.test(value)) {
                         errors.push(`Error in expression: "${value}" is not a valid date. Use 'dd/mm/yyyy' or 'Today'.`);
                     }
                 } else {
@@ -975,7 +1148,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
             }
             // Check if the part matches the valid expression pattern
-            else if (!validExpressionRegex.test(part)) {
+            else if (!validExpressionRegex.test(part) && !addDaysValidator.test(part)) {
                 errors.push(`Error in expression: "${displayPart}" is incorrect.`);
             }
             // If the expression is correct, log that it's valid

@@ -101,7 +101,6 @@ function CreateQuestionnary() {
     try {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
-
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)

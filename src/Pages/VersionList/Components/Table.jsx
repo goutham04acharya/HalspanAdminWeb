@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Shimmer from '../../../Components/Shimmers/Shimmer';
 import useApi from '../../../services/CustomHook/useApi';
-import FilterDropdown from '../../../Components/InputField/FilterDropdown';
-import { useParams } from 'react-router-dom';
+
 
 function Table({
     setVersionList,

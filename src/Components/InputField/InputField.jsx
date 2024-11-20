@@ -27,9 +27,9 @@ const InputField = ({
     internalName,
     questionnarySettings,
     lookupDataset,
-    basicEditor
+    basicEditor,
+    uuidLoopkup
 }) => {
- 
     return (
         <div className='w-[100%]'>
             <label htmlFor={htmlFor} className={`font-semibold text-base text-[#2B333B] ${labelStyle}`}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}<span className='font-normal'>{optional}</span></label>

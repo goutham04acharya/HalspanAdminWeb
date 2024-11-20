@@ -22,16 +22,25 @@ const LookupDataset = () => {
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
+
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const initialState = {
         name: '',
+        choices: []
+    }
+    const initialImportState = {
+        name: '',
+        choices: ''
+    }
+    const initialErrorState = {
+        name: '',
         choices: ''
     }
     const [data, setData] = useObjects(initialState)
-    const [errors, setErrors] = useObjects(initialState)
+    const [errors, setErrors] = useObjects(initialErrorState)
     const [isCreateLoading, setIsCreateLoading] = useState(false);
     const [isImportLoading, setIsImportLoading] = useState(false);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -50,9 +59,8 @@ const LookupDataset = () => {
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [showlookupReplaceModal, setShowLookupReplaceModal] = useState(false);
-
-
-
+    const [activeInputs, setActiveInputs] = useState({});
+    console.log(data, 'datadtadt')
     // Functions
     // List Functions
     const fetchLookupList = useCallback(async () => {
@@ -77,17 +85,64 @@ const LookupDataset = () => {
         setIsFetchingMore(false);
     }, [searchParams]);
 
+    const handleRemoveChoice = (uuidToRemove) => {
+        setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
+    };
+
     // Create Functions
     const handleChange = (e, id, type) => {
-        setErrors(id, '')
+        setErrors(id, '');
         const value = e.target.value;
-        setData(id, value);
-    }
+        console.log(e, 'eaaef')
+        if (type === 'value') {
+            const updatedChoices = data.choices.map(choice =>
+                choice.uuid === id
+                    ? { ...choice, value: value }
+                    : choice
+            );
+            setData("choices", updatedChoices);
+        } else if (type === 'Name' || type === 'New Choice') {
+            // For other fields like name
+            setData(id, value);
+        } else {
+            // For other fields like name
+            setData(id, value);
+        }
+    };
+    // const handleChange = (e, id, type) => {
+    //     // debugger
+    //     setErrors(id, '');
+    //     const value = e.target.value;
+
+    //     if (type === 'value') {
+    //         // Update a specific choice's value in the array
+    //         setData(prevData => ({
+    //             ...prevData,
+    //             choices: prevData.choices.map(choice => {
+    //                 if (choice.uuid === id) {
+    //                     // Split the input by commas and clean up the values
+    //                     const values = value.split(',').map(v => v.trim()).filter(v => v);
+    //                     return {
+    //                         ...choice,
+    //                         value: values.join(', ') // Join back with comma and space for display
+    //                     };
+    //                 }
+    //                 return choice;
+    //             })
+    //         }));
+    //     } else {
+    //         // Handle regular field updates (like name)
+    //         setData(id, value);
+    //     }
+
+
+    // };
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
+        setActiveInputs('')
         setTimeout(() => {
-            setErrors(initialState);
+            setErrors(initialErrorState);
             setData(initialState);
             setIsCreateLoading(false);
             setIsImportLoading(false);
@@ -100,54 +155,97 @@ const LookupDataset = () => {
     }
 
     const handleSubmit = async (file) => {
+        // debugger
         const isUpdate = isView?.open;
+        setErrors(initialErrorState);
 
-        setErrors(initialState);
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
         }
+        setIsCreateLoading(true)
+        let choicesArray;
+        if (file) {
+            // Handle file import case
+            choicesArray = file.choices.map(choice => ({ value: choice }));
+        } else if (isUpdate) {
+            // debugger
+            try {
+                // Ensure data.choices is an array
+                choicesArray = Array.isArray(data.choices) ? [...data.choices] : [];
 
-        const payload = {
-            name: file?.name || data?.name,
-            choices: file?.choices || data?.choices.split(',').map(choice => choice.trim())
-        };
+                // Map choices with additional values, then flatten
+                choicesArray = choicesArray.map((choice, index) => {
+                    const additionalValues = data[`additional-value-${index}`];
+                    let additionalChoices = [];
 
-        if (!file) {
-            setIsCreateLoading(true);
+                    // Split additional values if they exist
+                    if (additionalValues) {
+                        additionalChoices = additionalValues.split(',').map(val => ({ value: val.trim() }));
+                    }
+
+                    // Return array of choice and additional choices
+                    return [choice, ...additionalChoices];
+                }).flat();
+            } catch (error) {
+                console.error('Error processing choices:', error);
+                choicesArray = [];
+            }
+        } else {
+            // Handle create case with comma-separated string
+            choicesArray = data.choices.split(',').map(choice => ({ value: choice.trim() }));
         }
-
+        let payload = {};
+        // Prepare data for API
+        if(file){
+            payload = {
+                name: file.name,
+                choices: choicesArray,
+                // Add any additional fields to the payload as needed
+            };
+        }else{
+            payload = {
+                name: data.name,
+                choices: choicesArray,
+                // Add any additional fields to the payload as needed
+            };
+        }
+        console.log(payload, 'dddddd')
+        // Determine which API function to call based on update/create scenario
         const apiFunction = isUpdate ? PatchAPI : PostAPI;
         const endpoint = isUpdate ? `lookup-data/${isView?.id}` : "lookup-data";
 
         try {
             const response = await apiFunction(endpoint, payload);
+
             if (!response?.error) {
-                setLookupList([]);
-                fetchLookupList();
+                setLookupList([]); // Clear lookup list
+                fetchLookupList(); // Refetch the lookup list after success
+
                 const successMessage = isUpdate
                     ? `Updated lookup dataset ID ${isView?.id} successfully.`
                     : 'Created new lookup dataset successfully.';
-                setToastSuccess(successMessage);
-                handleClose();
+                setToastSuccess(successMessage); // Display success toast
+                handleClose(); // Close the modal or dialog
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;
                 if (!file) {
-                    setErrors('name', errorMessage);
+                    setErrors('name', errorMessage); // Set error for name if there's a conflict
                     setIsCreateLoading(false);
                 } else {
-                    setToastError(errorMessage);
+                    setToastError(errorMessage); // Show error toast if file import fails
                     handleClose();
                     setIsImportLoading(false);
+                    setIsCreateLoading(false)
                 }
-                return;
             } else {
-                setToastError(response?.data?.data?.message);
+                setToastError(response?.data?.data?.message); // Show generic error toast
                 handleClose();
             }
         } catch (error) {
-            handleClose();
-            setToastError('Something went wrong.');
+            handleClose(); // Close modal in case of error
+            setToastError('Something went wrong.'); // Show error toast if API call fails
         }
+        
     };
 
     const handleImportConfirmationModal = () => {
@@ -157,13 +255,21 @@ const LookupDataset = () => {
     }
 
     const handleImport = (event) => {
-        if (data?.choices !== '' && !showlookupReplaceModal) {
+        console.log('handleImport is called')
+        // debugger
+        if (data?.choices !== '') {
             setShowLookupReplaceModal(true);
             setIsCreateModalOpen(false);
-            setData(initialState)
+            setData(initialImportState)
             return;
+        }else{
+            setShowLookupReplaceModal(false);
+            setIsCreateModalOpen(true);
+            setData(initialState)
+            // return;
         }
         const file = event.target.files[0];
+        console.log(file, 'fesfeieke')
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
             setToastError('Please upload a CSV file.');
@@ -174,6 +280,10 @@ const LookupDataset = () => {
             header: false,
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
+
+                // console.log(flatData);
+
+                console.log(flatData, 'flat data')
                 if (flatData.length > 500) {
                     handleClose();
                     setIsImportLoading(false);
@@ -181,6 +291,7 @@ const LookupDataset = () => {
                     setToastError('Only 500 data entries are accepted.');
                 } else {
                     const fileName = file.name.replace('.csv', '');
+                    console.log(fileName, 'ddddeee')
                     const payload = {
                         name: fileName,
                         choices: flatData
@@ -199,16 +310,19 @@ const LookupDataset = () => {
 
     // View Functions
     const handleView = (id, name, choices) => {
+        // debugger
         setIsView({
             open: true,
             id: id
         });
+
+        // Keep choices as an array of objects instead of converting to string
         setData({
             name,
-            choices: choices.join(',')
-        })
+            choices: choices // Keep as array of objects
+        });
         setIsCreateModalOpen(true);
-    }
+    };
 
     // Delete Functions
     const handleDelete = async () => {
@@ -315,6 +429,12 @@ const LookupDataset = () => {
                 isImportLoading={isImportLoading}
                 isView={isView?.open}
                 title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
+                createLookup={!isView?.open}
+                // handleAddChoice={handleAddChoice}
+                handleRemoveChoice={handleRemoveChoice}
+                setData={setData}
+                activeInputs={activeInputs}
+                setActiveInputs={setActiveInputs}
             />
             <ConfirmModal
                 text='Delete Lookup Dataset'
@@ -345,7 +465,9 @@ const LookupDataset = () => {
                     testIDBtn2='cancel-delete'
                     isOpen={showlookupReplaceModal}
                     handleButton1={handleImport}
-                    handleButton2={() => setShowLookupReplaceModal(false)}
+                    handleButton2={() => {
+                        setShowLookupReplaceModal(false)
+                    }}
                     isOpenFileUpload={true}
                     isImportLoading={isImportLoading}
                     setModalOpen={setShowLookupReplaceModal}

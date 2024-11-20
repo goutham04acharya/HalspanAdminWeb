@@ -16,9 +16,12 @@ function InputTextarea({
     disabled,
     labelStyle,
     mandatoryField,
+    mainStyle,
+    
 }) {
+    console.log(validationError, 'validationError')
     return (
-        <div>
+        <div className={mainStyle}>
             <label htmlFor={htmlFor} className={labelStyle}>{label ? label : null} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
             <textarea
                 htmlFor={htmlFor}
