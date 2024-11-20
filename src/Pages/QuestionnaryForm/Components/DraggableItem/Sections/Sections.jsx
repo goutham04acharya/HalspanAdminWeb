@@ -72,16 +72,16 @@ const Sections = ({
     const updatedDataIsSame = { ...dataIsSame };
     updatedDataIsSame[sectionId] = false;
     dispatch(setDataIsSame(updatedDataIsSame));
-
     handleAutoSave(sectionId, updatedSections);
   };
-  const handleSectionClick = (index) => {
-    setSelectedSection(index);
+  const handleSectionClick = (index, sectionId) => {
+    setSelectedSection(sectionId);
   
     const updatedDropdownOpen = sections.reduce((acc, _, i) => {
       acc[i] = i === index; // Only set the selected section to true
       return acc;
     }, {});
+    console.log(dropdownOpen, 'dropdown')
     setDropdown(updatedDropdownOpen);
   };
   
@@ -119,7 +119,7 @@ const Sections = ({
                               : "none",
                           }}
                           onClick={() => {
-                            handleSectionClick(sectionIndex);
+                            handleSectionClick(sectionIndex,sectionData?.section_id);
                             setSelectedPage(pageIndex);
                           }}
                           id={`${pageData?.page_id}-scroll`}
