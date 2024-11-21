@@ -104,6 +104,7 @@ When('I save all the data inside the version about to be duplicated', async func
 
         let k = 0;
 
+        await driver.wait(until.elementLocated(By.css(`[data-testid="sidebar-section-${i}"]`)), 3000).click();
         while (true) {
             try {
                 // eslint-disable-next-line max-len
