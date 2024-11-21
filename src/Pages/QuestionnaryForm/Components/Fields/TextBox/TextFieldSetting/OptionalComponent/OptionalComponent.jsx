@@ -3,12 +3,16 @@ import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
+import useApi from '../../../../../../../services/CustomHook/useApi';
+import objectToQueryString from '../../../../../../../CommonMethods/ObjectToQueryString';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
     const dispatch = useDispatch();
+    const { getAPI } = useApi();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-
+    const { assetType } = useSelector(state => state?.questionnaryForm)
+    // console.log(assetType, 'asset type') 
     const getOptions = (componentType) => {
         switch (componentType) {
             case 'textboxfield':
@@ -32,10 +36,18 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [isAttributeDropdownOpen, setIsAttributeDropdownOpen] = useState(false);
     const [attributeValue, setAttributeValue] = useState('')
     const [serviceValue, setServiceValue] = useState('')
+    const fetchQuestionnaireList = async () => {
+        console.log('fetchQuestionnaireList called');
+        console.log('assetType:', assetType);
+        const response = await getAPI(`questionnaires${objectToQueryString(assetType)}`);
+        console.log(response, 'response ssssssss')
+    };
     const handleServiceClick = (option) => {
+        // fetchQuestionnaireList()
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
         setServiceRecordDropdownOpen(false);
         // setServiceValue(option);
+        
     };
 
     const handleAttributeClick = (option) => {
@@ -55,8 +67,10 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         { value: 'Maintenance Log', label: 'Maintenance Log' },
         { value: 'Repair History', label: 'Repair History' },
     ];
-
     useEffect(() => {
+        console.log('useEffect triggered');
+        console.log('fieldSettingParams:', fieldSettingParams);
+        console.log('selectedQuestionId:', selectedQuestionId);
         if (fieldSettingParams[selectedQuestionId]) {
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams[selectedQuestionId]?.options?.load_from_previous || false,
@@ -67,6 +81,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 'Field validation': fieldSettingParams[selectedQuestionId]?.options?.field_validation || false,
             });
         }
+        fetchQuestionnaireList();
     }, [fieldSettingParams, selectedQuestionId]);
 
     const ToggleSwitch = ({ label, onChange, checked, testId }) => (
@@ -87,7 +102,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             [label]: !toggleStates[label],
         };
         setToggleStates(newToggleStates);
-
+        fetchQuestionnaireList();
         const payload = {
             load_from_previous: newToggleStates['Load from previously entered data'],
             read_only: newToggleStates['Read only'],

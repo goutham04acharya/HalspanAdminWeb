@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -67,7 +67,6 @@ const QuestionnaryForm = () => {
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
-
 
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
@@ -499,7 +498,8 @@ const QuestionnaryForm = () => {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
-
+                console.log(response?.data?.data?.asset_type, 'resdscsdcdsd')
+                dispatch(setAssetType(response?.data?.data?.asset_type))
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -578,6 +578,8 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
+                
+                // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
             } else {
