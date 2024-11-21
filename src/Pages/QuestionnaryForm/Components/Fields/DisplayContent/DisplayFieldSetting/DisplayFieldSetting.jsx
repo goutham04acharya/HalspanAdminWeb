@@ -43,7 +43,7 @@ function DisplayFieldSetting({
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
-        dispatch(setNewComponent({ id: 'urlValue', value: (option.value === 'mailto:' || option.value === 'tel:') ? `${option.value} ` : option.value, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'urlValue', value: (option.value === 'mailto:' || option.value === 'tel:') ? `${option.value}` : option.value, questionId: selectedQuestionId }));
 
         dispatch(setShouldAutoSave(true));
 
@@ -167,7 +167,8 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='heading'
                                     checked={fieldSettingParameters?.type === 'heading'}
-                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('heading') : null} />
+                                    onClick={formStatus === 'Draft' ? () => {handleRadiobtn('heading');
+                                     setSelectedFile(null)} : null} />
                                 <label htmlFor='heading'
                                     data-testid='heading'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -197,7 +198,7 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='text'
                                     checked={fieldSettingParameters?.type === 'text'}
-                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('text') : 0} />
+                                    onClick={formStatus === 'Draft' ? () => {handleRadiobtn('text'); setSelectedFile(null)} : 0} />
                                 <label
                                     data-testid='text'
                                     htmlFor='text' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -257,7 +258,7 @@ function DisplayFieldSetting({
                                             </label>
                                         </div>
                                         {(fieldSettingParameters?.image || selectedFile) && (
-                                            <label className='ml-3 break-words max-w-[50%]'>{selectedFile?.name || extractFileNameFromUrl(fieldSettingParameters.image)}</label>
+                                            <label className='ml-3 break-words max-w-[50%]'>{extractFileNameFromUrl(fieldSettingParameters.image)}</label>
                                         )}
                                     </div>
                                     {errorMessage &&

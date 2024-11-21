@@ -10,12 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import GlobalContext from '../../Components/Context/GlobalContext';
 import Toast from '../../Components/Toast/Toast';
 import useApi from '../../services/CustomHook/useApi';
+import AssetDropDown from '../../Components/InputField/AssetDropDown';
 
 function CreateQuestionnary() {
   const navigate = useNavigate();
-  const { PostAPI } = useApi();
+  const { PostAPI,getAPI } = useApi();
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isThreedotLoader, setIsThreedotLoader] = useState(false)
+  const [options, setOptions] = useState([])
 
   const [createDetails, setCreateDetails] = useState({
     public_name: '',
@@ -37,7 +39,7 @@ function CreateQuestionnary() {
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
 
-  const options = [{ value: 'Door', label: 'Door' }];
+  // const options = [{ value: 'Door', label: 'Door' }];
   const options1 = [{ value: 'UK- English', label: 'UK- English' }]
 
   const handleChange = (e, id) => {
@@ -70,7 +72,7 @@ function CreateQuestionnary() {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.value,
+      asset_type: selectedOption?.asset_type?.name,
       language: selectedOption?.language?.value,
       is_adhoc: createDetails?.is_adhoc,
     };
@@ -180,6 +182,18 @@ function CreateQuestionnary() {
     };
   }, [openDropdown]);
 
+  const getAssetTypes = async () => {
+    try {
+      let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)
+      setOptions(response?.data?.results)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    getAssetTypes()
+  }, [])
+
   return (
     <div className='bg-[#F4F6FA] p-7 h-customh2'>
       <div className='bg-white py-10 px-9 rounded-[10px] h-customh3'>
@@ -229,7 +243,7 @@ function CreateQuestionnary() {
             <div className='mt-8 flex items-start'>
               <div className='w-1/2 mr-[114px]'>
                 <div className='w-full'>
-                  <InputWithDropDown
+                  <AssetDropDown
                     label='Asset type'
                     mandatoryField='true'
                     labelStyle='font-semibold text-base text-[#2B333B]'

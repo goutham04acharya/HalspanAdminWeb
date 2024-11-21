@@ -110,16 +110,18 @@ const QuestionnaryForm = () => {
     }
 
     const handleInputChange = (e) => {
+        // debugger
+        console.log(e,'file type')
         const { id, value } = e.target;
         let updatedValue = value;
-
+        console.log(updatedValue, 'ddsssdd')
         // Restrict numeric input if the id is 'fileType'
         if (id === 'fileType') {
+            // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
-                .replace(/[0-9]/g, '')      // Remove numbers
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+                .replace(/[^a-zA-Z0-9,]/g, ''); // Allow only alphabets and commas
         } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
@@ -666,8 +668,8 @@ const QuestionnaryForm = () => {
                                 draw_image: fieldSettingParams[question.question_id].draw_image,
                                 pin_drop: fieldSettingParams[question.question_id].pin_drop,
                                 include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                                file_size: fieldSettingParams[question.question_id].fileSize,
-                                file_type: fieldSettingParams[question.question_id].fileType,
+                                file_size: fieldSettingParams[question.question_id].file_size,
+                                file_type: fieldSettingParams[question.question_id].file_type,
                             },
                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
@@ -1312,13 +1314,14 @@ const QuestionnaryForm = () => {
                         />
                     </div>
                     <div className='w-[50%] '>
-                        <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
-                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
-                            <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `}
-                                title={`${getStatusText(formDefaultInfo?.status)}`}>
-                                {getStatusText(formDefaultInfo?.status)}
-                            </button>
-                            {/* {formStatus !== 'Draft' &&<p className='font-normal pl-2 text-base text-[#2B333B]'>This form cannot be edited</p>} */}
+                    <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
+                            <div className='flex items-center'>
+                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                                <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
+                                    {getStatusText(formDefaultInfo?.status)}
+                                </button>
+                            </div>
+                            {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p

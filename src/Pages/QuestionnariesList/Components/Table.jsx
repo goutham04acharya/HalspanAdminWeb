@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function Table({ loading, QueList, lastElementRef }) {
+function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionList }) {
     const navigate = useNavigate();
 
     const getStatusStyles = (status) => {
@@ -49,6 +49,7 @@ function Table({ loading, QueList, lastElementRef }) {
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] pl-[18px]'>STATUS</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>ASSET TYPE</th>
                     <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
+                    <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center'>ACTION</th>
                 </thead>
                 {loading
                     ? <Shimmer column={6} row={10} firstIndex />
@@ -79,6 +80,9 @@ function Table({ loading, QueList, lastElementRef }) {
                                     {/* <td className={`py-6 text-start bg-[#F4F6FA]  px-6 ${getStatusStyles(QueInfo?.status)}`} title={`${getStatusText(QueInfo?.status)}`}>{getStatusText(QueInfo?.status) || '-'}</td> */}
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_type}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6 truncate max-w-[200px] rounded-tr-[10px] rounded-br-[10px]'>{QueInfo?.description}</td>
+                                    <td className=' py-6 text-start bg-[#F4F6FA]  flex justify-center'>
+                                        <img src="/Images/copy.svg" onClick={() => handleVersionList(QueInfo?.questionnaire_id)} className='w-5 h-5 cursor-pointer' data-testid={`clone-${index}`} alt="" />
+                                    </td>
                                 </tr>
                                 <tr className='h-4 bg-white'>
                                 </tr>

@@ -16,6 +16,7 @@ function FileFieldSetting({ handleInputChange,
     setConditionalLogic,
     formStatus
 }) {
+    console.log(formParameters, 'formParameters parameters')
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -54,14 +55,38 @@ function FileFieldSetting({ handleInputChange,
                             maxLength={10}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
-                    <div className='mt-7'>
+                    <div className='flex flex-col justify-start mt-7'>
+                        <label
+                            htmlFor='fileType'
+                            className='font-semibold text-base text-[#2B333B]'>File Type
+                        </label>
+                        <input
+                            type="text"
+                            // id={labelID}
+                            className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                            placeholder='File type by extension (e.g., pdf, doc, docx)'
+                            onChange={(e) => handleInputChange(e)}
+                            value={formParameters?.fileType}
+                            id='fileType'
+                            onBlur={(e) => handleBlur(e)}
+                            data-testid="file-type"
+                            disabled={formStatus !== 'Draft'}
+                            maxLength={2500}
+                            onFocus={() => {
+                                if (setFocusInput) {
+                                    setFocusInput('');
+                                }
+                            } }
+                        />
+                    </div>
+                    {/* <div className='mt-7'>
                         <InputField
                             autoComplete='off'
                             label='File Type'
                             optional='(Enter comma separated list, don’t include the.)'
                             id='fileType'
                             type='text'
-                            value={fieldSettingParameters?.fileType}
+                            value={fieldSettingParameters?.file_type}
                             className='w-full mt-2.5'
                             formStatus={formStatus}
                             labelStyle=''
@@ -69,7 +94,7 @@ function FileFieldSetting({ handleInputChange,
                             testId='file-type'
                             htmlFor='fileType'
                             handleChange={(e) => handleInputChange(e)} />
-                    </div>
+                    </div> */}
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Number of Files</p>
                         <div className='flex items-center mt-3'>
