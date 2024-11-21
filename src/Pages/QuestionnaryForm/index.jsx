@@ -100,17 +100,12 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    const [selectedSection, setSelectedSection] = useState(0);
+    const [selectedSection, setSelectedSection] = useState(sections[0].section_id);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
-    const initialDropdownState = sections.reduce((acc, sectionItem, index) => {
-        acc[index] = false;  // Set all dropdowns to false initially
-        return acc;
-    }, {});
-    const [dropdownOpen, setDropdown] = useObjects(initialDropdownState);
-
+    const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
 
     const handleCancel = () => {
         dispatch(setModalOpen(false));
@@ -119,16 +114,18 @@ const QuestionnaryForm = () => {
     }
 
     const handleInputChange = (e) => {
+        // debugger
+        console.log(e,'file type')
         const { id, value } = e.target;
         let updatedValue = value;
-
+        console.log(updatedValue, 'ddsssdd')
         // Restrict numeric input if the id is 'fileType'
         if (id === 'fileType') {
+            // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
-                .replace(/[0-9]/g, '')      // Remove numbers
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
-                .replace(/[^a-zA-Z,]/g, ''); // Allow only alphabets and commas
+                .replace(/[^a-zA-Z0-9,]/g, ''); // Allow only alphabets and commas
         } else if (id === 'fileSize' || id === 'min' || id === 'max' || (id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'integer')) {
             updatedValue = value.replace(/[^0-9]/g, ''); // Allow only numeric input
         } else if ((id === 'incrementby' && fieldSettingParams?.[selectedQuestionId]?.type === 'float')) {
@@ -246,17 +243,17 @@ const QuestionnaryForm = () => {
         // Add other mappings here...
     };
 
-    // const scrollToSection = (index, sectionId) => {
-    //     // Add a slight delay to ensure DOM update before scrolling
-    //     setTimeout(() => {
-    //         const element = document.getElementById(sectionId);
-    //         if (element) {
-    //             element.scrollIntoView({ behavior: 'smooth' });
-    //         } else {
-    //             console.error(`Element with id ${sectionId} not found`);
-    //         }
-    //     }, 300); // Delay to allow the section to open and render the page
-    // };
+    const scrollToSection = (index, sectionId) => {
+        // Add a slight delay to ensure DOM update before scrolling
+        setTimeout(() => {
+            const element = document.getElementById(`${sectionId}-scroll`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                console.error(`Element with id ${sectionId} not found`);
+            }
+        }, 300); // Delay to allow the section to open and render the page
+    };
 
     const scrollToPage = (sectionIndex, pageId) => {
         // Add a slight delay to ensure DOM update before scrolling
@@ -672,8 +669,8 @@ const QuestionnaryForm = () => {
                                 draw_image: fieldSettingParams[question.question_id].draw_image,
                                 pin_drop: fieldSettingParams[question.question_id].pin_drop,
                                 include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                                file_size: fieldSettingParams[question.question_id].fileSize,
-                                file_type: fieldSettingParams[question.question_id].fileType,
+                                file_size: fieldSettingParams[question.question_id].file_size,
+                                file_type: fieldSettingParams[question.question_id].file_type,
                             },
                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
@@ -1305,7 +1302,7 @@ const QuestionnaryForm = () => {
                             setSelectedPage={setSelectedPage}
                             sections={sections}
                             setSections={setSections}
-                            // handleSectionScroll={scrollToSection}
+                            handleSectionScroll={scrollToSection}
                             handlePageScroll={scrollToPage}
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
@@ -1318,13 +1315,14 @@ const QuestionnaryForm = () => {
                         />
                     </div>
                     <div className='w-[50%] '>
-                        <div className='flex items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
-                            <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
-                            <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} 
-                            title={`${getStatusText(formDefaultInfo?.status)}`}>
-                                {getStatusText(formDefaultInfo?.status)}
-                            </button>
-                            {/* {formStatus !== 'Draft' &&<p className='font-normal pl-2 text-base text-[#2B333B]'>This form cannot be edited</p>} */}
+                    <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
+                            <div className='flex items-center'>
+                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                                <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
+                                    {getStatusText(formDefaultInfo?.status)}
+                                </button>
+                            </div>
+                            {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
                         <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
                             <p
@@ -1348,10 +1346,12 @@ const QuestionnaryForm = () => {
                                                         {(provided) => (
                                                             <li
                                                                 className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
-                                                                    ${(selectedSection === sectionIndex || selectedSection === null) ? '' : 'hidden'} 
+                                                                    ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
                                                                     border hover:border-[#2B333B] border-transparent mb-2.5`}
                                                             >
-                                                                <div className="flex justify-between w-full">
+                                                                <div className="flex justify-between w-full"
+                                                                    id={`${sectionData.section_id}-scroll`}
+                                                                >
                                                                     <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
                                                                         <EditableField
                                                                             name={sectionData?.section_name}

@@ -136,9 +136,9 @@ Then('I should be able see url updated in question {int} page {int} section {int
     } else if (this.urlType === 'https') {
         assert.equal(urlText, 'https://' + this.url);
     } else if (this.urlType === 'tel')
-        assert.equal(urlText, 'tel: ' + this.url);
+        assert.equal(urlText, 'tel:' + this.url);
     else
-        assert.equal(urlText, 'mailto: ' + this.url);
+        assert.equal(urlText, 'mailto:' + this.url);
 });
 
 Then('I should see a confirmation prompt stating to replace image', async function () {

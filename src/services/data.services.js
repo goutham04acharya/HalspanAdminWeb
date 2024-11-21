@@ -1,4 +1,4 @@
- 
+
 import axios from 'axios';
 import { baseURL } from '../config';
 
@@ -12,5 +12,5 @@ async function PostAPIWithoutHeader (endpoint, body) {
     }
 }
 export const dataService = {
-    PostAPIWithoutHeader
+    PostAPIWithoutHeader,
 };

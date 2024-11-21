@@ -6,8 +6,8 @@ module.exports = {
             'test/integration-testing/Flow1/4_view_list_questionnaires.feature',
             'test/integration-testing/Flow1/3_create_questionnaries.feature',
             'test/integration-testing/Flow1/5_organize_sections_pages.feature',
-            // 'test/integration-testing/Flow1/6_lookup_dataset.feature',
-            // 'test/integration-testing/Flow1/7_delete_lookup_dataset.feature',
+            'test/integration-testing/Flow1/6_lookup_dataset.feature',
+            'test/integration-testing/Flow1/7_delete_lookup_dataset.feature',
             'test/integration-testing/Flow1/10_edit_questionnaire_section_page_name.feature',
             'test/integration-testing/Flow1/9_view_type_of_fields.feature',
             'test/integration-testing/Flow1/8_create_text_box_field.feature',
@@ -48,6 +48,8 @@ module.exports = {
             'test/integration-testing/Flow1/42_default_value_number.feature',
             // 'test/integration-testing/Flow1/44_preview_response.feature',
             'test/integration-testing/Flow1/46_load_from_previous.feature',
+            'test/integration-testing/Flow1/48_asset_type.feature',
+            'test/integration-testing/Flow1/47_cloning_questionnaire.feature',
             'test/integration-testing/Flow1/2_logout.feature'
         ]
     }

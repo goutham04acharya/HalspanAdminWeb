@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 
@@ -13,12 +13,22 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     formStatus,
     handleAddRemoveSection,
     handleSectionSaveOrder,
-    handleDeleteModal,
+    handleSectionScroll
 }) {
 
-    const handleDropdown = (index) => {
-        setDropdown(index, !dropdownOpen[index])
+    const handleDropdown = (sectionId) => {
+        if(dropdownOpen === sectionId){
+            setDropdown('')
+            return;
+        }
+        setDropdown(sectionId)
     }
+
+    console.log(dropdownOpen, 'dropdownOpen')
+    useEffect(() => {
+        setSelectedSection(sections[0].section_id)
+        setDropdown(sections[0].section_id)
+    }, [])
 
     return (
         <div className='py-4'>
@@ -55,15 +65,15 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                 key={sectionItem?.section_id}>
                                                 <div
                                                     onClick={() => {
-                                                        setSelectedSection(sectionIndex);
+                                                        setSelectedSection(sectionItem?.section_id);
                                                         setSelectedPage(null); // Reset selected page when a section is selected
-                                                        handleDropdown(sectionIndex);
-                                                        // handleSectionScroll(sectionIndex, sectionItem?.section_id);
+                                                        handleDropdown(sectionItem?.section_id);
+                                                        handleSectionScroll(sectionIndex, sectionItem?.section_id);
                                                     }}
-                                                    className={`${selectedSection === sectionIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
+                                                    className={`${selectedSection === sectionItem?.section_id ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
                                                     <div className='flex items-center'>
                                                         <img src="/Images/down-arrow.svg" alt="down-arrow"
-                                                            className={dropdownOpen[sectionIndex] ? 'rotate-0' : 'rotate-270'}
+                                                            className={dropdownOpen ===  sectionItem?.section_id ? 'rotate-0' : 'rotate-270'}
                                                         />
                                                         <p
                                                             data-testid={`sidebar-section-${sectionIndex}`}
@@ -99,15 +109,15 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                     </div>
                                                 </div>
                                                 {sectionItem?.pages?.length > 0 && sectionItem?.pages.map((pageItem, pageIndex) => (
-                                                    dropdownOpen[sectionIndex] && (
+                                                    dropdownOpen === sectionItem?.section_id  && (
                                                         <div
                                                             key={pageItem?.page_id}
                                                             onClick={() => {
-                                                                setSelectedSection(sectionIndex); // Keep track of the section
+                                                                setSelectedSection(sectionItem?.section_id); // Keep track of the section
                                                                 setSelectedPage(pageIndex); // Highlight the selected page
                                                                 handlePageScroll(sectionIndex, pageItem.page_id);
                                                             }}
-                                                            className={`${selectedSection === sectionIndex && selectedPage === pageIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-14 pr-2 cursor-pointer truncate`}>
+                                                            className={`${selectedSection === sectionItem?.section_id && selectedPage === pageIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-14 pr-2 cursor-pointer truncate`}>
                                                             <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>
                                                             <p
                                                                 data-testid={`sidebar-section-${sectionIndex}-page-${pageIndex}`}

@@ -30,21 +30,11 @@ const Sections = ({
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
+  
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
     dispatch(setPageToDelete({ sectionIndex, pageIndex }));
     dispatch(setSelectedSectionData(pageData));
   };
-
-  // useEffect(() => {
-  //   const savedExpandedSections = localStorage.getItem("expandedSections");
-  //   if (savedExpandedSections) {
-  //     setExpandedSections(JSON.parse(savedExpandedSections));
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem("expandedSections", JSON.stringify(expandedSections));
-  // }, [expandedSections]);
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -72,17 +62,7 @@ const Sections = ({
     const updatedDataIsSame = { ...dataIsSame };
     updatedDataIsSame[sectionId] = false;
     dispatch(setDataIsSame(updatedDataIsSame));
-
     handleAutoSave(sectionId, updatedSections);
-  };
-  const handleSectionClick = (index) => {
-    setSelectedSection(index);
-  
-    const updatedDropdownOpen = sections.reduce((acc, _, i) => {
-      acc[i] = i === index; // Only set the selected section to true
-      return acc;
-    }, {});
-    setDropdown(updatedDropdownOpen);
   };
   
   useEffect(() => {
@@ -119,7 +99,6 @@ const Sections = ({
                               : "none",
                           }}
                           onClick={() => {
-                            handleSectionClick(sectionIndex);
                             setSelectedPage(pageIndex);
                           }}
                           id={`${pageData?.page_id}-scroll`}

@@ -509,7 +509,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 "Friday": 5,
                                                 "Saturday": 6
                                             };
-
                                             // Replace day names with corresponding numeric values
                                             const replacedLogic = list.conditional_logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
                                                 return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;

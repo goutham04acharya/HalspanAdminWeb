@@ -17,7 +17,7 @@ const useApi = () => {
     including the raw access token needed for authentication when making API requests. By extracting
     this function, the `useApi` hook can easily access and call `getIdTokenClaims` to obtain the
     necessary access token for API requests. */
-    const { getIdTokenClaims } = useAuth0();
+    const { getIdTokenClaims ,getAccessTokenSilently} = useAuth0();
 
     /**
      * The function `getAPI` is an asynchronous function that fetches data from an API using an access
@@ -40,16 +40,15 @@ const useApi = () => {
     //     }
     // };
 
-    const getAPI = async (endpoint, customHeaders = {}) => {
+    const getAPI = async (endpoint, customHeaders = {},externalApi) => {
         try {
-            const tokenClaims = await getIdTokenClaims();
-            const accessToken = tokenClaims.__raw;
+            const tokenClaims = await getAccessTokenSilently();
+            const accessToken = tokenClaims;
             const defaultHeaders = { Authorization: `Bearer ${accessToken}` };
             
             // Merge default headers with custom headers
             const headers = { ...defaultHeaders, ...customHeaders };
-    
-            const { data } = await axios.get(`${baseURL}${endpoint}`, { headers });
+            const { data } = await axios.get(externalApi ? endpoint : `${baseURL}${endpoint}`, { headers });
             return { error: false, data };
         } catch (error) {
             return { error: true, data: error.response };

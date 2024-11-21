@@ -820,7 +820,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
                 const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
-
                 // Check if a valid match was found
                 if (dayValueMatch) {
                     const operator = dayValueMatch[1]; // Capture the operator (e.g., ===, !==, etc.)
