@@ -143,6 +143,8 @@ After(function (scenario) {
             }
         });
     }
+    console.log(`Scenario: ${scenario.pickle.name}`);
+    console.log('------------------------------------------------------------------------------');
 });
 
 Before("@create_questionnaire", async function () {
