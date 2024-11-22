@@ -51,6 +51,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isOperatorModal, setIsOperatorModal] = useState(false);
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
     const [logic, setLogic] = useState('')
+    const [complianceCondition, setComplianceCondition] = useState('')
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
@@ -681,8 +682,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
+                        console.log(transformedContent, 'jdjjdjdjdjjdjdjdjdjdj')
+                        console.log(parseLogicExpression(transformedContent), 'jashdasdhj')
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(transformedContent);
+                        console.log(inputValue, 'dkfskdfskdfkjsdjfk')
                     } else {
                         setInputValue('');
                     }
@@ -753,6 +757,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             };
 
             const modifyString = (input) => {
+
                 if (selectedType === 'array') {
                     const lastIndex = input.lastIndexOf('()');
                     if (lastIndex !== -1) {
@@ -766,7 +771,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setError(message);
                 setIsThreedotLoader(false);
             };
-
+            setComplianceCondition(inputValue)
+            console.log(complianceCondition, 'input value');
             let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic || complianceState) {

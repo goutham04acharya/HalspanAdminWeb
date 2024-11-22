@@ -106,17 +106,44 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const evaluateComplianceLogic = () => {
         let results = [];
 
-        // Initialize storage objects for each rule evaluation
-        let evaluationResult = {
-            STATUS: '',
-            REASON: '',
-            ACTIONS: [],
-            GRADE: ''
+        const preprocessLogic = (logic) => {
+            // Replace occurrences of getMonth() with getMonth() + 1
+            if (logic.includes("getMonth()")) {
+                logic = logic.replace(/getMonth\(\)/g, "getMonth() + 1");
+            }
+
+            // Replace occurrences of getDay() comparisons with string days
+            if (logic.includes("getDay()")) {
+                const daysMap = {
+                    "Sunday": 0,
+                    "Monday": 1,
+                    "Tuesday": 2,
+                    "Wednesday": 3,
+                    "Thursday": 4,
+                    "Friday": 5,
+                    "Saturday": 6
+                };
+
+                logic = logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
+                    return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
+                });
+            }
+
+            // Wrap new Date() for any necessary processing (can be extended if required)
+            if (logic.includes("new Date(")) {
+                try {
+                    eval(logic); // Test the validity of the new Date logic
+                } catch (error) {
+                    console.error("Error evaluating new Date logic:", error);
+                    throw error; // Re-throw the error for handling
+                }
+            }
+
+            return logic;
         };
 
         results = complianceLogic.map(rule => {
-            // Reset the evaluation result for each rule
-            evaluationResult = {
+            let evaluationResult = {
                 STATUS: '',
                 REASON: '',
                 ACTIONS: [],
@@ -124,23 +151,22 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             };
 
             try {
+                // Preprocess the rule's default_content
+                let processedContent = preprocessLogic(rule.default_content);
+
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
                 let ACTIONS = [];
                 let GRADE = '';
 
-                // Evaluate the condition
-                eval(rule.default_content);
+                // Evaluate the processed logic
+                eval(processedContent);
 
                 // Store the results
-                evaluationResult = {
-                    STATUS,
-                    REASON,
-                    ACTIONS,
-                    GRADE
-                };
-                console.log(evaluationResult, 'result eval')
+                evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
+                console.log(evaluationResult, 'result eval');
+
                 return {
                     label: rule.label,
                     ...evaluationResult,
@@ -161,6 +187,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         return results;
     };
+
 
     // Example usage:
     // const complianceLogic = [
@@ -502,8 +529,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
                                         <div className="flex flex-col">
-                                            <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3>
-                                            {result?.STATUS === 'Fail' && <><h3 className="font-semibold text-[#2B333B]">REASON: {result?.REASON}</h3><h3 className="font-semibold text-[#2B333B]">ACTION: {result?.ACTIONS}</h3></>}
+                                            {/* <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3> */}
+                                            {result?.STATUS === 'Fail' && <><h3 className="font-semibold text-[#2B333B]">REASON: {result?.REASON}</h3><h3 className="font-semibold text-[#2B333B]">ACTION: {result?.ACTIONS}</h3>
+                                            </>}
                                         </div>
 
                                     </div>
