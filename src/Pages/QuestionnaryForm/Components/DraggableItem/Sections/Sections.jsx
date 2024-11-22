@@ -30,7 +30,7 @@ const Sections = ({
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
-  
+
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
     dispatch(setPageToDelete({ sectionIndex, pageIndex }));
     dispatch(setSelectedSectionData(pageData));
@@ -141,51 +141,51 @@ const Sections = ({
                                 className={`pl-2.5 ${
                                   formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'
                                 } p-2 rounded-full w-[47px]`}
-                                onClick={
-                                  formStatus === 'Draft'
-                                    ? () => {
-                                        handleDeletePageModal(sectionIndex, pageIndex, pageData);
-                                        dispatch(setShowPageDeleteModal(true));
-                                      }
-                                    : null
-                                }
-                              />
-                            </div>
+                              onClick={
+                                formStatus === 'Draft'
+                                  ? () => {
+                                    handleDeletePageModal(sectionIndex, pageIndex, pageData);
+                                    dispatch(setShowPageDeleteModal(true));
+                                  }
+                                  : null
+                              }
+                            />
                           </div>
-                          <Pages
-                            pageIndex={pageIndex}
-                            pageData={pageData}
-                            handleSaveSectionName={handleSaveSectionName}
-                            sectionIndex={sectionIndex}
-                            handleAddRemoveQuestion={handleAddRemoveQuestion}
-                            sections={sections}
-                            handleAutoSave={handleAutoSave}
-                            setSections={setSections}
-                            formStatus={formStatus}
-                          />
-                        </li>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </DragDropContext>
+                        </div>
+                        <Pages
+                          pageIndex={pageIndex}
+                          pageData={pageData}
+                          handleSaveSectionName={handleSaveSectionName}
+                          sectionIndex={sectionIndex}
+                          handleAddRemoveQuestion={handleAddRemoveQuestion}
+                          sections={sections}
+                          handleAutoSave={handleAutoSave}
+                          setSections={setSections}
+                          formStatus={formStatus}
+                        />
+                      </li>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
 
-          <button
-            onClick={
-              formStatus === 'Draft'
-                ? () => handleAddRemovePage("add", sectionIndex, "", sectionData.section_id)
-                : null
-            }
-            data-testid={`add-page-sec-${sectionIndex}`}
-            className="flex items-center justify-center w-full rounded-[10px] py-7 mt-4 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
-          >
-            <span className="mr-[15px]">+</span>
-            <span>Add page</span>
-          </button>
-        </>
+        <button
+          onClick={
+            formStatus === 'Draft'
+              ? () => handleAddRemovePage("add", sectionIndex, "", sectionData.section_id)
+              : null
+          }
+          data-testid={`add-page-sec-${sectionIndex}`}
+          className="flex items-center justify-center w-full rounded-[10px] py-7 mt-4 bg-white font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]"
+        >
+          <span className="mr-[15px]">+</span>
+          <span>Add page</span>
+        </button>
+      </>
     </div>
   );
 };

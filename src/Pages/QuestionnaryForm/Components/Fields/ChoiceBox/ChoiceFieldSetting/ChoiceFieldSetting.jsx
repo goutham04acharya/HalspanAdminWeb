@@ -10,26 +10,21 @@ import objectToQueryString from '../../../../../../CommonMethods/ObjectToQuerySt
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewFixedChoice, removeFixedChoice, resetFixedChoice, setFixedChoiceValue, setNewComponent, updateFixedChoiceArray } from '../../fieldSettingParamsSlice';
 import DraggableList from 'react-draggable-list';
-import getOrdinal from '../../../../../../CommonMethods/getOrdinal';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
-import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 
 function ChoiceFieldSetting({
     handleInputChange,
     formParameters,
     handleRadiobtn,
     fieldSettingParameters,
-    // setFieldSettingParameters,
-    handleSaveSettings,
     selectedQuestionId,
     handleBlur,
     setConditionalLogic,
     isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
-    setDefaultString,
     formStatus
 }) {
     const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -147,8 +142,11 @@ function ChoiceFieldSetting({
                     formParameters={formParameters}
                     handleBlur={handleBlur}
                     formStatus={formStatus}
-                />
-                <div className='flex flex-col justify-start mt-7 w-full relative'>
+                    fieldSettingParameters={fieldSettingParameters}
+                    assetLocation={true}
+                    />
+
+                {/* <div className='flex flex-col justify-start mt-7 w-full relative'>
                     <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                     <div className='relative w-full'>
                         <input
@@ -174,7 +172,7 @@ function ChoiceFieldSetting({
                             }:null}
                         />
                     </div>
-                </div>
+                </div> */}
                 <div className='mt-7'>
                     <p className='font-semibold text-base text-[#2B333B]'>Type</p>
                     <div className='mt-2.5'>
