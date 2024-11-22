@@ -111,7 +111,7 @@ const QuestionnaryForm = () => {
 
     const handleInputChange = (e) => {
         // debugger
-        console.log(e,'file type')
+        console.log(e, 'file type')
         const { id, value } = e.target;
         let updatedValue = value;
         console.log(updatedValue, 'ddsssdd')
@@ -496,12 +496,11 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             if (!response?.error) {
-
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
-                console.log(response?.data?.data?.asset_type, 'resdscsdcdsd')
-                dispatch(setAssetType({asset_type: response?.data?.data?.asset_type}))
+                dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
+
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -527,8 +526,10 @@ const QuestionnaryForm = () => {
                     default_conditional_logic: question?.default_conditional_logic,
                     attribute_data_lfp: question?.attribute_data_lfp,
                     service_record_lfp: question?.service_record_lfp,
+                    questionnaire_name_lfp: question?.questionnaire_name_lfp,
+                    question_name_lfp:question?.question_name_lfp,
                 }))));
-
+                console.log(fieldSettingsData, 'field settings data')
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
                     message: "Field settings",
@@ -580,7 +581,7 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
-                
+
                 // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
@@ -591,6 +592,7 @@ const QuestionnaryForm = () => {
             setToastError('Something went wrong.');
         }
     }
+    console.log(fieldSettingParams?.questionnaire_name_lfp, 'hhhh')
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
@@ -673,6 +675,8 @@ const QuestionnaryForm = () => {
                             },
                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
+                            question_name_lfp:fieldSettingParams[question.question_id].question_name_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1314,7 +1318,7 @@ const QuestionnaryForm = () => {
                         />
                     </div>
                     <div className='w-[50%] '>
-                    <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
+                        <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
                             <div className='flex items-center'>
                                 <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
                                 <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
