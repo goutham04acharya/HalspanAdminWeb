@@ -95,6 +95,7 @@ function Questionnaries() {
       delete params.start_key
     }
     try {
+      console.log(params, 'params')
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
       const newItems = response?.data?.data?.items || [];
       setQueList(prevItems => [...prevItems, ...newItems]);

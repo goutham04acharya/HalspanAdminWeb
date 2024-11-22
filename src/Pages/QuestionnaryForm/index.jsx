@@ -501,7 +501,7 @@ const QuestionnaryForm = () => {
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
                 console.log(response?.data?.data?.asset_type, 'resdscsdcdsd')
-                dispatch(setAssetType(response?.data?.data?.asset_type))
+                dispatch(setAssetType({asset_type: response?.data?.data?.asset_type}))
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -1497,7 +1497,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
+                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1533,7 +1533,7 @@ const QuestionnaryForm = () => {
                 showPageDeleteModal && (
                     <ConfirmationModal
                         text='Delete Page'
-                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'

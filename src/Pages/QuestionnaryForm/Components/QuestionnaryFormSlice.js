@@ -21,7 +21,7 @@ const initialState = {
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
-    assetType: ''
+    assetType: {asset_type: ''}
     
 };
 
