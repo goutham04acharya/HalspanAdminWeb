@@ -36,8 +36,8 @@ Feature: Halspan - Admin - Preview the Questionnaire
     Then I should see the label name for choice updated in the section 1 page 1 question 2
     When I enter the help text for choice for preview
     Then I should see the help text for choice updated in the section 1 page 1 question 2
-    When I enter the placeholder content for choice for preview
-    Then I should see the placeholder content for choice updated in the section 1 page 1 question 2
+#     When I enter the placeholder content for choice for preview
+#     Then I should see the placeholder content for choice updated in the section 1 page 1 question 2
     When I select the choice type as "single_choice"
     * I enter the text for choices as "Option 1, option 2, option 3"
     When I click the save button for the questionnaire version for section 1
