@@ -12,7 +12,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [failGradeValue, setFailGradeValue] = useState('')
     const dispatch = useDispatch();
-    console.log(complianceLogicId, 'adaedaaead')
+    
     const options = [
         { value: 'NO_ACCESS', label: 'NO_ACCESS' },
         { value: 'MISSING', label: 'MISSING' },
@@ -28,6 +28,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
         // dispatch(setShouldAutoSave(true));
     };
     const handleInputChange = (id, field, value) => {
+        console.log(complianceLogic, 'adaedaaead')
         let arr = [...complianceLogic];
         arr[id][field] = value; // Dynamically update field
         setComplianceLogic(arr);
@@ -74,43 +75,6 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                                 className={`absolute top-5 right-3 cursor-pointer ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                                 data-testid='default-value' />
                         </div>
-                    </div>
-                    <div className='flex flex-col justify-start mt-7'>
-                        <label
-                            // htmlFor={labelID}
-                            className='font-semibold text-base text-[#2B333B]'>Pass Grade
-                        </label>
-                        <input
-                            type="text"
-                            data-testid="label-name-input"
-                            disabled={formStatus !== 'Draft'}
-                            className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                            onChange={(e) => handleInputChange(complianceLogicId, 'pass_grade', e.target.value)}
-                            value={complianceLogic[complianceLogicId]?.pass_grade}
-                        />
-                    </div>
-                    <div className='mt-7'>
-                        <InfinateDropdown
-                            label='Fail Grade'
-                            labelStyle='font-semibold text-base text-[#2B333B]'
-                            id='Fail Grade'
-                            top='25px'
-                            placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='select-attribute'
-                            labeltestID='attribute'
-                            selectedOption={
-                                options.find(option => 
-                                  complianceLogic?.some(failGrade => failGrade.fail_grade === option.value)
-                                )
-                              }
-                            handleOptionClick={handleOptionClick}
-                            isDropdownOpen={isDropdownOpen}
-                            setDropdownOpen={setDropdownOpen}
-                            options={options}
-                            formStatus={formStatus}
-                            failGrade
-                        />
                     </div>
                 </div>
             </div>

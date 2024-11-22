@@ -785,16 +785,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             evalInputValue = evalInputValue.replace(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
                 .replaceAll('Today()', 'new Date()')
-<<<<<<< Updated upstream
-                .replaceAll('if', '');
-            let expression = evalInputValue.toString();
-
-            // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
-            expression = expression.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
-            expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
-            expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
-            evalInputValue = expression
-=======
                 .replaceAll('if', '')
                 .replaceAll('{', '(')
                 .replaceAll('else', ':')
@@ -815,7 +805,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             console.log(expression, 'tttttttt')
 
->>>>>>> Stashed changes
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "includes"
@@ -1009,11 +998,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
                 return;
             }
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
             if (isDefaultLogic || complianceState) {
+                // debugger
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', ' ');
@@ -1022,10 +1008,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
-<<<<<<< Updated upstream
-=======
             // console.log(evalInputValue, 'ghhhhhhh')
->>>>>>> Stashed changes
             //just checking for datetimefield before the evaluating the expression (only for default checking)
             if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (evalInputValue.includes('setDate'))) {
                 let invalid = DateValidator(evalInputValue)
@@ -1041,6 +1024,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let REASON = ''
             let GRADE = ''
             const result = eval(evalInputValue);
+            console.log(result, 'dddsdseefsc')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
