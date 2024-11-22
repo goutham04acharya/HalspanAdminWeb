@@ -37,10 +37,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [attributeValue, setAttributeValue] = useState('')
     const [serviceValue, setServiceValue] = useState('')
     const fetchQuestionnaireList = async () => {
-        console.log('fetchQuestionnaireList called');
-        console.log('assetType:', assetType);
         const response = await getAPI(`questionnaires${objectToQueryString(assetType)}`);
-        console.log(response, 'response ssssssss')
     };
     const handleServiceClick = (option) => {
         // fetchQuestionnaireList()
@@ -68,9 +65,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         { value: 'Repair History', label: 'Repair History' },
     ];
     useEffect(() => {
-        console.log('useEffect triggered');
-        console.log('fieldSettingParams:', fieldSettingParams);
-        console.log('selectedQuestionId:', selectedQuestionId);
         if (fieldSettingParams[selectedQuestionId]) {
             setToggleStates({
                 'Load from previously entered data': fieldSettingParams[selectedQuestionId]?.options?.load_from_previous || false,

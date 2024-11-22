@@ -15,7 +15,8 @@ function CommonComponents({
     handleBlur,
     setFocusInput,
     assetLocation,
-    formStatus
+    formStatus,
+    fieldSettingParameters,
 }) {
     return (
         <div>
@@ -69,10 +70,9 @@ function CommonComponents({
                         // Get the position where the mouse was clicked
                         const clickPosition = e.currentTarget.selectionStart;
                     }}
-
                 />
             </div>
-            {!assetLocation &&
+            {(!assetLocation || fieldSettingParameters?.type === 'dropdown' ) &&
                 <div className='flex flex-col justify-start mt-7'>
                     <label
                         htmlFor={placeholderContentId}
