@@ -595,6 +595,7 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        sectionId = sectionId.replace('bddtest#','')
         if (compliance) {
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
