@@ -104,6 +104,10 @@ function DisplayFieldSetting({
         }
     };
 
+    const handleRadioButtonChanges = () => {
+        setDropdownOpen(false);
+        setSelectedFile(false);
+    }
 
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
@@ -167,8 +171,11 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='heading'
                                     checked={fieldSettingParameters?.type === 'heading'}
-                                    onClick={formStatus === 'Draft' ? () => {handleRadiobtn('heading');
-                                     setSelectedFile(null)} : null} />
+                                    onClick={formStatus === 'Draft' ? () => {
+                                        handleRadiobtn('heading');
+                                        setSelectedFile(null);
+                                        handleRadioButtonChanges();
+                                    } : null} />
                                 <label htmlFor='heading'
                                     data-testid='heading'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -198,7 +205,7 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='text'
                                     checked={fieldSettingParameters?.type === 'text'}
-                                    onClick={formStatus === 'Draft' ? () => {handleRadiobtn('text'); setSelectedFile(null)} : 0} />
+                                    onClick={formStatus === 'Draft' ? () => { handleRadiobtn('text'); setSelectedFile(null); handleRadioButtonChanges(); } : 0} />
                                 <label
                                     data-testid='text'
                                     htmlFor='text' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -385,7 +392,7 @@ function DisplayFieldSetting({
                                     selectedQuestionId={selectedQuestionId}
                                 />
                             }
-                            {fieldSettingParameters?.urlType && (
+                            {fieldSettingParameters?.type === 'url' && fieldSettingParameters?.urlType && (
                                 <InputField
                                     autoComplete='off'
                                     id='urlValue'
