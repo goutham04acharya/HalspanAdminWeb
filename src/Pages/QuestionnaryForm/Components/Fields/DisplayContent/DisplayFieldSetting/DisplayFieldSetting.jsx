@@ -104,9 +104,15 @@ function DisplayFieldSetting({
         }
     };
 
-    const handleRadioButtonChanges = () => {
-        setDropdownOpen(false);
-        setSelectedFile(false);
+    const handleRadioButtonChanges = (event) => {
+        if (event.target.id != 'image') {
+            setDropdownOpen(false);
+            setSelectedFile(false);
+        } else if (event.target.id != "url") {
+            dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
+            dispatch(setNewComponent({ id: 'urlValue', value: '', questionId: selectedQuestionId }));
+        }
+
     }
 
     const handleFileChange = (e) => {
@@ -153,6 +159,7 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         dispatch(setShouldAutoSave(true));
     }
+    console.log(fieldSettingParameters, 'urlll')
 
     return (
         <>
@@ -171,10 +178,10 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='heading'
                                     checked={fieldSettingParameters?.type === 'heading'}
-                                    onClick={formStatus === 'Draft' ? () => {
+                                    onClick={formStatus === 'Draft' ? (e) => {
                                         handleRadiobtn('heading');
                                         setSelectedFile(null);
-                                        handleRadioButtonChanges();
+                                        handleRadioButtonChanges(e);
                                     } : null} />
                                 <label htmlFor='heading'
                                     data-testid='heading'
@@ -205,7 +212,7 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='text'
                                     checked={fieldSettingParameters?.type === 'text'}
-                                    onClick={formStatus === 'Draft' ? () => { handleRadiobtn('text'); setSelectedFile(null); handleRadioButtonChanges(); } : 0} />
+                                    onClick={formStatus === 'Draft' ? (e) => { handleRadiobtn('text'); setSelectedFile(null); handleRadioButtonChanges(e); } : 0} />
                                 <label
                                     data-testid='text'
                                     htmlFor='text' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -235,9 +242,10 @@ function DisplayFieldSetting({
                                     value='image'
                                     disabled={formStatus !== 'Draft'}
                                     checked={fieldSettingParameters?.type === 'image'}
-                                    onClick={formStatus === 'Draft' ? () => {
+                                    onClick={formStatus === 'Draft' ? (e) => {
                                         handleRadiobtn('image'),
-                                            handleImage()
+                                            handleImage();
+                                        handleRadioButtonChanges(e);
                                     } : null} />
                                 <label htmlFor='image' data-testid='image'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -367,7 +375,10 @@ function DisplayFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='url'
                                     checked={fieldSettingParameters?.type === 'url'}
-                                    onClick={formStatus === 'Draft' ? () => handleRadiobtn('url') : null} />
+                                    onClick={formStatus === 'Draft' ? (e) => {
+                                        handleRadiobtn('url')
+                                        handleRadioButtonChanges(e);
+                                    } : null} />
                                 <label htmlFor='url' data-testid='url'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
                                     URL
