@@ -25,9 +25,12 @@ function InputWithDropDown({
     formStatus,
     textFieldLookup,
     assetType,
-    language
+    language,
+    services
 }) {
     const dispatch = useDispatch();
+
+    console.log(options, 'here are options')
 
     const handleRemove = () => {
         setSelectedUrlOption('');
@@ -45,12 +48,14 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => setDropdownOpen ? setDropdownOpen(isDropdownOpen ? null : id) : null} // Add condition here
+                    onClick={() => {
+                        console.log('ktttt')
+                        setDropdownOpen ? setDropdownOpen(isDropdownOpen ? null : id) : null}} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
-                    disabled={formStatus !== 'Draft' && !language && !assetType}
+                    disabled={formStatus !== 'Draft' && !language && !assetType && !services}
                 />
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={()=> handleRemove()} />

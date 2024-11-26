@@ -11,7 +11,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const dispatch = useDispatch();
     const { getAPI } = useApi();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const { assetType } = useSelector(state => state?.questionnaryForm)
+    const { assetType, setServiceRecord } = useSelector(state => state?.questionnaryForm)
     const [toggleStates, setToggleStates] = useState({});
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
@@ -24,7 +24,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [selectedQuestionnaryOption, setSelectedQuestionnaryOption] = useState(null);
     const [selectedQuesOption, setSelectedQuesOption] = useState(null);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
-
+    console.log(serviceValue?.label, 'servicevalue')
 
     const getOptions = (componentType) => {
         switch (componentType) {
@@ -50,16 +50,19 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     ];
 
     const serviceRecordOptions = [
-        { value: 'Fabrication', label: 'Fabrication' },
-        { value: 'Installation', label: 'Installation' },
-        { value: 'Inspection', label: 'Inspection' },
-        { value: 'Maintenance', label: 'Maintenance' },
-
+        { value: 'FABRICATION', label: 'FABRICATION' },
+        { value: 'INSTALLATION', label: 'INSTALLATION' },
+        { value: 'INSPECTION', label: 'INSPECTION' },
+        { value: 'MAINTENANCE', label: 'MAINTENANCE' }
     ];
 
     const fetchQuestionnaireList = async () => {
+        const query = {
+            ...assetType,
+            services_type: serviceValue?.label
+        }
         try {
-            const response = await getAPI(`questionnaires${objectToQueryString(assetType)}`);
+            const response = await getAPI(`questionnaires${objectToQueryString(query)}`);
             console.log(response?.data?.data?.items, 'response')
             setQuestionnairesList(response?.data?.data?.items);
         } catch {
@@ -99,16 +102,21 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
     const handleQuesClick = (option) => {
         setSelectedQuesOption(option);
-        console.log(selectedQuesOption, 'ghgjjjhjh')
         dispatch(setNewComponent({ id: 'question_name_lfp', value: option?.label, questionId: selectedQuestionId }));
         setIsQuesDropdownOpen(false)
     }
+    
+    useEffect(() => {
+        if (serviceValue) {
+            fetchQuestionnaireList();
+        }
+    }, [serviceValue]);
 
     const handleServiceClick = (option) => {
-        fetchQuestionnaireList();
+        // fetchQuestionnaireList();
+        setServiceValue(option);
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
         setServiceRecordDropdownOpen(false);
-        setServiceValue(option);
     };
 
     const handleAttributeClick = (option) => {
@@ -259,7 +267,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             formStatus={formStatus}
                         />
                     )}
-                    {serviceValue && (
+                    {(serviceValue && serviceValue !== undefined) && (
                         <InfinateDropdown
                             label='Questionnaire List'
                             mainDivStyle='mt-3'

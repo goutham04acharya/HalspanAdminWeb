@@ -110,11 +110,8 @@ const QuestionnaryForm = () => {
     }
 
     const handleInputChange = (e) => {
-        // debugger
-        console.log(e, 'file type')
         const { id, value } = e.target;
         let updatedValue = value;
-        console.log(updatedValue, 'ddsssdd')
         // Restrict numeric input if the id is 'fileType'
         if (id === 'fileType') {
             // debugger
@@ -527,9 +524,8 @@ const QuestionnaryForm = () => {
                     attribute_data_lfp: question?.attribute_data_lfp,
                     service_record_lfp: question?.service_record_lfp,
                     questionnaire_name_lfp: question?.questionnaire_name_lfp,
-                    question_name_lfp:question?.question_name_lfp,
+                    question_name_lfp: question?.question_name_lfp,
                 }))));
-                console.log(fieldSettingsData, 'field settings data')
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
                     message: "Field settings",
@@ -592,7 +588,6 @@ const QuestionnaryForm = () => {
             setToastError('Something went wrong.');
         }
     }
-    console.log(fieldSettingParams?.questionnaire_name_lfp, 'hhhh')
 
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
@@ -676,7 +671,7 @@ const QuestionnaryForm = () => {
                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
                             questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
-                            question_name_lfp:fieldSettingParams[question.question_id].question_name_lfp,
+                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -1237,6 +1232,8 @@ const QuestionnaryForm = () => {
                                             },
                                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
+                                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
                                             display_type: (() => {
                                                 switch (fieldSettingParams[question.question_id].type) {
                                                     case 'heading':
