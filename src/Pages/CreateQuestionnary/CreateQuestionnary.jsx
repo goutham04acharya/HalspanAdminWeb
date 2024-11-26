@@ -330,9 +330,9 @@ function CreateQuestionnary() {
           </div>
         </div>
         <div className='mt-10 flex items-start'>
-          <div className='w-1/3 mr-[114px]'>
+          <div className='w-1/3'>
             <InputWithDropDown
-              label='Service Records'
+              label='Service records'
               labelStyle='font-semibold text-base text-[#2B333B]'
               mandatoryField='true'
               id='services_type'
@@ -354,7 +354,7 @@ function CreateQuestionnary() {
             />
             {validationErrors?.services_type && <ErrorMessage error={validationErrors?.services_type} />}
           </div>
-          <div className='w-1/3'>
+          <div className='w-1/3 ml-[100px] px-5'>
             <p className='font-semibold text-[#2B333B] text-base'>Ad Hoc / Non TAG questionnaire</p>
             <div className='mt-2.5'>
               <div className="relative custom-radioBlue flex items-center" data-testid='yes'
@@ -384,6 +384,7 @@ function CreateQuestionnary() {
               </div>
             </div>
           </div>
+          <div className='w-1/3 mr-[114px]'></div>
         </div>
         <div className='mt-8'>
           <Button

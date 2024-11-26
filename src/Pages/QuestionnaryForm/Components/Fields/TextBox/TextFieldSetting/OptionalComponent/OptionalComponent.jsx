@@ -5,6 +5,7 @@ import { setShouldAutoSave } from '../../../../QuestionnaryFormSlice';
 import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
 import useApi from '../../../../../../../services/CustomHook/useApi';
 import objectToQueryString from '../../../../../../../CommonMethods/ObjectToQueryString';
+import ErrorMessage from '../../../../../../../Components/ErrorMessage/ErrorMessage';
 
 function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
 
@@ -23,8 +24,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [questionList, setQuestionList] = useState([]);
     const [selectedQuestionnaryOption, setSelectedQuestionnaryOption] = useState(null);
     const [selectedQuesOption, setSelectedQuesOption] = useState(null);
-    const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
-    console.log(serviceValue?.label, 'servicevalue')
+    const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
+
 
     const getOptions = (componentType) => {
         switch (componentType) {
@@ -63,18 +64,15 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         }
         try {
             const response = await getAPI(`questionnaires${objectToQueryString(query)}`);
-            console.log(response?.data?.data?.items, 'response')
             setQuestionnairesList(response?.data?.data?.items);
         } catch {
             console.error('Error fetching question list:', error);
 
         }
     };
-
-    const fetchQuestionList = async () => {
+    const fetchQuestionList = async (selectedQuestionnaireId) => {
         try {
-            const response = await getAPI(`questionnaires/list/${formDefaultInfo?.questionnaire_id}`);
-            console.log(response?.data?.data, 'question list');
+            const response = await getAPI(`questionnaires/list/${selectedQuestionnaireId}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
         } catch (error) {
             console.error('Error fetching question list:', error);
@@ -93,11 +91,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }));
 
     const handleQuestionnaryClick = (option) => {
-        fetchQuestionList();
+        fetchQuestionList(option?.value);
         setSelectedQuestionnaryOption(option);
         dispatch(setNewComponent({ id: 'questionnaire_name_lfp', value: option?.label, questionId: selectedQuestionId }));
-        // Close the dropdown
         setQuestionnariesDropdownOpen(false);
+        setSelectedQuestionnaireId(option?.value); // Store the selected questionnaire_id
     };
 
     const handleQuesClick = (option) => {
@@ -105,7 +103,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         dispatch(setNewComponent({ id: 'question_name_lfp', value: option?.label, questionId: selectedQuestionId }));
         setIsQuesDropdownOpen(false)
     }
-    
+
     useEffect(() => {
         if (serviceValue) {
             fetchQuestionnaireList();
@@ -113,7 +111,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }, [serviceValue]);
 
     const handleServiceClick = (option) => {
-        // fetchQuestionnaireList();
         setServiceValue(option);
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
         setServiceRecordDropdownOpen(false);
@@ -235,7 +232,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
                             handleOptionClick={handleAttributeClick}
                             isDropdownOpen={isAttributeDropdownOpen}
-                            // setDropdownOpen={setIsAttributeDropdownOpen}
                             setDropdownOpen={(isOpen) => {
                                 if (formStatus === 'Draft') {
                                     handleDropdownState(isOpen ? 'attributeData' : null);
@@ -255,7 +251,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
                             testID='select-service-record'
                             labeltestID='service-record'
-                            selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters.service_record_lfp)}
+                            selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters?.service_record_lfp)}
                             handleOptionClick={formStatus === 'Draft' ? handleServiceClick : null}
                             isDropdownOpen={formStatus === 'Draft' ? isServiceRecordDropdownOpen : false}
                             setDropdownOpen={(isOpen) => {
@@ -267,56 +263,68 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             formStatus={formStatus}
                         />
                     )}
-                    {(serviceValue && serviceValue !== undefined) && (
-                        <InfinateDropdown
-                            label='Questionnaire List'
-                            mainDivStyle='mt-3'
-                            labelStyle='font-semibold text-[#2B333B] text-base '
-                            id='serviceRecord'
-                            top='50px'
-                            placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='select-service-record'
-                            labeltestID='service-record'
-                            selectedOption={
-                                handleQuestionnarieList.find(option => option.label === fieldSettingParameters?.questionnaire_name_lfp)
-                            }
-                            handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
-                            isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
-                            setDropdownOpen={(isOpen) => {
-                                if (formStatus === 'Draft') {
-                                    handleDropdownState(isOpen ? 'questionnaire' : null);
+                    {activeTab !== 'attributeData' &&
+                        ((serviceValue && serviceValue !== undefined) ||
+                            (fieldSettingParameters?.question_name_lfp !== undefined &&
+                                fieldSettingParameters?.questionnaire_name_lfp)) && (
+                            questionnairesList.length === 0 ? (
+                                <ErrorMessage error={"No questionnaire list is available"} />
+                            ) : (<InfinateDropdown
+                                label='Questionnaire List'
+                                mainDivStyle='mt-3'
+                                labelStyle='font-semibold text-[#2B333B] text-base '
+                                id='serviceRecord'
+                                top='50px'
+                                placeholder='Select'
+                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                testID='select-service-record'
+                                labeltestID='service-record'
+                                selectedOption={
+                                    handleQuestionnarieList.find(option => option.label === fieldSettingParameters?.questionnaire_name_lfp)
                                 }
-                            }}
-                            options={handleQuestionnarieList}
-                            formStatus={formStatus}
-                        />
-                    )}
-                    {selectedQuestionnaryOption?.label && (
-                        <InfinateDropdown
-                            label='Field List'
-                            mainDivStyle='mt-3'
-                            labelStyle='font-semibold text-[#2B333B] text-base'
-                            id='serviceRecord'
-                            top='50px'
-                            placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='select-service-record'
-                            labeltestID='service-record'
-                            selectedOption={
-                                handleQuesList.find(option => option.label === fieldSettingParameters?.question_name_lfp)
-                            }
-                            handleOptionClick={formStatus === 'Draft' ? handleQuesClick : null}
-                            isDropdownOpen={formStatus === 'Draft' ? isQuesDropdownOpen : false}
-                            setDropdownOpen={(isOpen) => {
-                                if (formStatus === 'Draft') {
-                                    handleDropdownState(isOpen ? 'question' : null);
-                                }
-                            }}
-                            options={handleQuesList}
-                            formStatus={formStatus}
-                        />
-                    )}
+                                handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
+                                isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
+                                setDropdownOpen={(isOpen) => {
+                                    if (formStatus === 'Draft') {
+                                        handleDropdownState(isOpen ? 'questionnaire' : null);
+                                    }
+                                }}
+                                options={handleQuestionnarieList}
+                                formStatus={formStatus}
+                            />
+                            ))}
+                    {activeTab !== 'attributeData' &&
+                        (selectedQuestionnaryOption?.label ||
+                            (fieldSettingParameters?.question_name_lfp !== undefined &&
+                                fieldSettingParameters?.question_name_lfp)) && (
+                            (selectedQuestionnaryOption?.label && questionList?.length === 0) ? (
+                                <ErrorMessage error={"No questions available for the selected questionnaire"} />
+                            ) : (
+                                <InfinateDropdown
+                                    label='Field List'
+                                    mainDivStyle='mt-3'
+                                    labelStyle='font-semibold text-[#2B333B] text-base'
+                                    id='serviceRecord'
+                                    top='50px'
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                    testID='select-service-record'
+                                    labeltestID='service-record'
+                                    selectedOption={
+                                        handleQuesList.find(option => option.label === fieldSettingParameters?.question_name_lfp)
+                                    }
+                                    handleOptionClick={formStatus === 'Draft' ? handleQuesClick : null}
+                                    isDropdownOpen={formStatus === 'Draft' ? isQuesDropdownOpen : false}
+                                    setDropdownOpen={(isOpen) => {
+                                        if (formStatus === 'Draft') {
+                                            handleDropdownState(isOpen ? 'question' : null);
+                                        }
+                                    }}
+                                    options={handleQuesList}
+                                    formStatus={formStatus}
+                                />
+                            )
+                        )}
                 </div>
             )}
             {/* Render other toggles below the dropdown */}

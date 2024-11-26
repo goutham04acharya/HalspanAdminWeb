@@ -30,8 +30,6 @@ function InputWithDropDown({
 }) {
     const dispatch = useDispatch();
 
-    console.log(options, 'here are options')
-
     const handleRemove = () => {
         setSelectedUrlOption('');
         dispatch(setNewComponent({ id: 'urlType', value: '', questionId: selectedQuestionId }));
@@ -49,7 +47,6 @@ function InputWithDropDown({
                     id={id}
                     placeholder={placeholder}
                     onClick={() => {
-                        console.log('ktttt')
                         setDropdownOpen ? setDropdownOpen(isDropdownOpen ? null : id) : null}} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption.label : ''}

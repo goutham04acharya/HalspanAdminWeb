@@ -21,9 +21,7 @@ const initialState = {
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
-    assetType: {asset_type: ''},
-    serviceRecord: {service_record_lfp: ''}
-    
+    assetType: {asset_type: ''},    
 };
 
 
@@ -82,9 +80,6 @@ const questionnaryFormSlice = createSlice({
         },
         setAssetType: (state, action) => {
             state.assetType = action.payload
-        },
-        setServiceRecord: (state, action) => {
-            state.serviceRecord = action.payload
         }
     }
 });
@@ -107,8 +102,7 @@ export const {
     setModalOpen,
     setComplianceLogicId,
     setShowCancelModal,
-    setAssetType,
-    setServiceRecord,
+    setAssetType
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

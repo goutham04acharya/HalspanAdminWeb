@@ -40,16 +40,16 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
     };
 
     return (
-        <div className='overflow-auto scrollbar_gray h-customh4'>
+        <div className='overflow-auto scrollbar_gray h-customh4 relative'>
             <table className='w-full'>
                 <thead className='sticky top-0 bg-white z-[99]'>
                     <th className='min-w-[200px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>ID</th>
-                    <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>INTERNAL NAME</th>
-                    <th className='min-w-[400px] text-start py-6 font-medium text-base text-[#2B333B]'>PUBLIC NAME</th>
+                    <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>INTERNAL NAME</th>
+                    <th className='min-w-[250px] text-start py-6 font-medium text-base text-[#2B333B]'>PUBLIC NAME</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B] pl-[18px]'>STATUS</th>
                     <th className='min-w-[200px] text-start py-6 font-medium text-base text-[#2B333B]'>ASSET TYPE</th>
-                    <th className='min-w-[500px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
-                    <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center'>ACTION</th>
+                    <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
+                    <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center fixed right-[71px] bg-white'>ACTION</th>
                 </thead>
                 {loading
                     ? <Shimmer column={6} row={10} firstIndex />
@@ -80,7 +80,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                                     {/* <td className={`py-6 text-start bg-[#F4F6FA]  px-6 ${getStatusStyles(QueInfo?.status)}`} title={`${getStatusText(QueInfo?.status)}`}>{getStatusText(QueInfo?.status) || '-'}</td> */}
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_type}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6 truncate max-w-[200px] rounded-tr-[10px] rounded-br-[10px]'>{QueInfo?.description}</td>
-                                    <td className=' py-6 text-start bg-[#F4F6FA]  flex justify-center'>
+                                    <td className=' py-6 text-start bg-[#F4F6FA] min-w-[120px]  flex justify-center fixed right-[71px]'>
                                         <img src="/Images/copy.svg" onClick={() => handleVersionList(QueInfo?.questionnaire_id)} className='w-5 h-5 cursor-pointer' data-testid={`clone-${index}`} alt="" />
                                     </td>
                                 </tr>
