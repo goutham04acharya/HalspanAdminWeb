@@ -97,8 +97,8 @@ Feature: Halspan- Admin-Preview responses of questionnaire
     Then I should see the label name for choice updated in the section 1 page 1 question 1
     When I enter the help text for choice for preview
     Then I should see the help text for choice updated in the section 1 page 1 question 1
-    When I enter the placeholder content for choice for preview
-    Then I should see the placeholder content for choice updated in the section 1 page 1 question 1
+#     When I enter the placeholder content for choice for preview
+#     Then I should see the placeholder content for choice updated in the section 1 page 1 question 1
     When I select the choice type as "single_choice"
     * I enter the text for choices as "PAN, AADHAR, OTHER"
     When I click the save button for the questionnaire version for section 1

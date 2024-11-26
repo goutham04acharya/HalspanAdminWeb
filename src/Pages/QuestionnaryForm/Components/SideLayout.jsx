@@ -24,7 +24,6 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
         setDropdown(sectionId)
     }
 
-    console.log(dropdownOpen, 'dropdownOpen')
     useEffect(() => {
         setSelectedSection(sections[0].section_id)
         setDropdown(sections[0].section_id)
