@@ -354,7 +354,7 @@ function CreateQuestionnary() {
             />
             {validationErrors?.services_type && <ErrorMessage error={validationErrors?.services_type} />}
           </div>
-          <div className='w-1/3 ml-[100px] px-5'>
+          <div className='w-1/3 ml-[75px] px-11'>
             <p className='font-semibold text-[#2B333B] text-base'>Ad Hoc / Non TAG questionnaire</p>
             <div className='mt-2.5'>
               <div className="relative custom-radioBlue flex items-center" data-testid='yes'

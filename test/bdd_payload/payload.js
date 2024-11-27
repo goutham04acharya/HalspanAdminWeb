@@ -17,6 +17,7 @@ async function create_questionnaire_payload() {
         "description": "Pariatur Error quia fugiat officia hic sunt quibusdam culpa perferendis a ipsam mollitia minus in consequuntur eum autem dolor",
         "asset_type": "Door",
         "language": "UK- English",
+        "services_type":"FABRICATION",
         "is_adhoc": "No"
 
     };
