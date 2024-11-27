@@ -20,12 +20,12 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
             src="/Images/trash-black.svg"
             alt="delete"
             title='Delete'
-            className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} mr-4 z-[9] rounded-full hover:bg-[#FFFFFF] h-[26px]`}
+            className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} z-[9] rounded-full hover:bg-[#FFFFFF] h-[26px]`}
             onClick={formStatus === 'Draft' ?() => setIsDeleteComplianceLogic(true) : null}
           />
-          <img src="/Images/save.svg"
+          {/* <img src="/Images/save.svg"
             onClick={formStatus === 'Draft' ? () => complianceSaveHandler():null}
-            alt="save" title="Save" data-testid="save-btn-1" className={` h-[26px] rounded-full hover:bg-[#FFFFFF] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`} />
+            alt="save" title="Save" data-testid="save-btn-1" className={` h-[26px] rounded-full hover:bg-[#FFFFFF] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`} /> */}
         </div>
       </div>
 
@@ -56,9 +56,9 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
           <p data-testid="help-text" class="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"></p>
         </div>))
       }
-      <button onClick={() => addNewCompliance()} disabled={formStatus !== 'Draft'} data-testid="add-page-sec-0" class="bg-[#EFF1F8] flex items-center justify-center w-full rounded-[10px] py-7 mt-6 font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]">
+      {/* <button onClick={() => addNewCompliance()} disabled={formStatus !== 'Draft'} data-testid="add-page-sec-0" class="bg-[#EFF1F8] flex items-center justify-center w-full rounded-[10px] py-7 mt-6 font-semibold text-[#2B333B] text-base hover:border hover:border-[#2B333B]">
         <span class="mr-[15px]">+</span>
-        <span>Add Compliance</span></button>
+        <span>Add Compliance</span></button> */}
     </div>
   )
 }

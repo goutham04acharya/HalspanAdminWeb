@@ -84,13 +84,13 @@ When('I select the question from the compliance logic suggestions for choice fie
     }
 
     await driver.wait(until.elementLocated(By.css(`[data-testid="condition-3"]`)), 10000).click();
-    // eslint-disable-next-line max-len
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(') then "Yes" else "No"');
 });
 
 When('I enter the correct compliance logic for choice field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Sample_Choice_Label_Name === "India") then "Yes" else "No"`;
+    // eslint-disable-next-line max-len
+    const default_value = `if ( Section_1.Page_1.Sample_Choice_Label_Name === "No"  ) then ( STATUS = "Fail", REASON = "REPLACEMENT", ACTIONS += "Replace a new door" ) else ( STATUS = "Pass", GRADE = "1" )`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
     this.default_value = default_value;
 });

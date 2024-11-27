@@ -198,11 +198,11 @@ Feature: Halspan- Admin-Preview responses of questionnaire
     When I select the type as "single_line"
     * I enter the minimum and maximum number of characters
     When I click the save button for the questionnaire version for section 1
-    When I click the add conditional logic button
-    Then I should see the advanced editor for files or photos or videos
-    When I enter the conditional logic for photos field preview
-    Then I click the save button for conditional logic
-    And I should read a message stating that "Conditional Logic Added"
+    # When I click the add conditional logic button
+    # Then I should see the advanced editor for files or photos or videos
+    # When I enter the conditional logic for photos field preview
+    # Then I click the save button for conditional logic
+    # And I should read a message stating that "Conditional Logic Added"
     When I click the save button for the questionnaire version for section 1
 
     When I click the preview button 

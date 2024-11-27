@@ -17,7 +17,26 @@ body {
   border-radius: 10px !important;
   padding: 36px !important;
 }
-
+.react-responsive-modal-modal:has(.importModalLg) {
+  min-width: 80% !important;
+  border-radius: 10px !important;
+  padding: 36px !important;
+}
+.react-responsive-modal-modal:has(.importModalMd) {
+  min-width: 60% !important;
+  border-radius: 10px !important;
+  padding: 36px !important;
+}
+.react-responsive-modal-modal:has(.importModalSm) {
+  min-width: 40% !important;
+  border-radius: 10px !important;
+  padding: 36px !important;
+}
+.react-responsive-modal-modal:has(.importModalXsm) {
+  min-width: 20% !important;
+  border-radius: 10px !important;
+  padding: 36px !important;
+}
 .react-responsive-modal-modal:has(.confirmModal) {
   min-width: 512px !important;
   border-radius: 10px !important;
