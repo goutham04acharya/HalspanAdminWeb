@@ -186,6 +186,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         setQuestionnariesDropdownOpen(dropdownType === 'questionnaire');
         setIsQuesDropdownOpen(dropdownType === 'question')
     };
+    console.log(selectedQuestionnaryOption, 'selectedQuestionnaryOption')
 
     return (
         <div className='mt-7 w-[97%]'>
@@ -264,15 +265,12 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                         />
                     )}
                     {activeTab !== 'attributeData' &&
-                        ((serviceValue && serviceValue !== undefined) ||
-                            (fieldSettingParameters?.question_name_lfp !== undefined &&
-                                fieldSettingParameters?.questionnaire_name_lfp)) && (
-                            questionnairesList.length === 0 ? (
-                                <ErrorMessage error={"No questionnaire list is available"} />
-                            ) : (<InfinateDropdown
+                        ((serviceValue && serviceValue !== undefined) || (fieldSettingParameters?.question_name_lfp !== undefined && fieldSettingParameters?.questionnaire_name_lfp))
+                        ? (
+                            <InfinateDropdown
                                 label='Questionnaire List'
                                 mainDivStyle='mt-3'
-                                labelStyle='font-semibold text-[#2B333B] text-base '
+                                labelStyle='font-semibold text-[#2B333B] text-base'
                                 id='serviceRecord'
                                 top='50px'
                                 placeholder='Select'
@@ -280,7 +278,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                 testID='select-service-record'
                                 labeltestID='service-record'
                                 selectedOption={
-                                    handleQuestionnarieList.find(option => option.label === fieldSettingParameters?.questionnaire_name_lfp)
+                                    handleQuestionnarieList.find(
+                                        (option) => option.label === fieldSettingParameters?.questionnaire_name_lfp
+                                    )
                                 }
                                 handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
                                 isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
@@ -292,39 +292,38 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                 options={handleQuestionnarieList}
                                 formStatus={formStatus}
                             />
-                            ))}
+                        ) : (questionnairesList.length === 0 && activeTab !== 'attributeData' && serviceValue) ? (
+                            <ErrorMessage error={'No questionnaire list is available'} />
+                        ) : null}
                     {activeTab !== 'attributeData' &&
-                        (selectedQuestionnaryOption?.label ||
-                            (fieldSettingParameters?.question_name_lfp !== undefined &&
-                                fieldSettingParameters?.question_name_lfp)) && (
-                            (selectedQuestionnaryOption?.label && questionList?.length === 0) ? (
-                                <ErrorMessage error={"No questions available for the selected questionnaire"} />
-                            ) : (
-                                <InfinateDropdown
-                                    label='Field List'
-                                    mainDivStyle='mt-3'
-                                    labelStyle='font-semibold text-[#2B333B] text-base'
-                                    id='serviceRecord'
-                                    top='50px'
-                                    placeholder='Select'
-                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                    testID='select-service-record'
-                                    labeltestID='service-record'
-                                    selectedOption={
-                                        handleQuesList.find(option => option.label === fieldSettingParameters?.question_name_lfp)
+                        ((selectedQuestionnaryOption?.label !== null && questionList?.length !== 0) || (fieldSettingParameters?.question_name_lfp !== undefined && fieldSettingParameters?.question_name_lfp))
+                        ? (
+                            <InfinateDropdown
+                                label='Field List'
+                                mainDivStyle='mt-3'
+                                labelStyle='font-semibold text-[#2B333B] text-base'
+                                id='serviceRecord'
+                                top='50px'
+                                placeholder='Select'
+                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                testID='select-service-record'
+                                labeltestID='service-record'
+                                selectedOption={
+                                    handleQuesList.find(option => option.label === fieldSettingParameters?.question_name_lfp)
+                                }
+                                handleOptionClick={formStatus === 'Draft' ? handleQuesClick : null}
+                                isDropdownOpen={formStatus === 'Draft' ? isQuesDropdownOpen : false}
+                                setDropdownOpen={(isOpen) => {
+                                    if (formStatus === 'Draft') {
+                                        handleDropdownState(isOpen ? 'question' : null);
                                     }
-                                    handleOptionClick={formStatus === 'Draft' ? handleQuesClick : null}
-                                    isDropdownOpen={formStatus === 'Draft' ? isQuesDropdownOpen : false}
-                                    setDropdownOpen={(isOpen) => {
-                                        if (formStatus === 'Draft') {
-                                            handleDropdownState(isOpen ? 'question' : null);
-                                        }
-                                    }}
-                                    options={handleQuesList}
-                                    formStatus={formStatus}
-                                />
-                            )
-                        )}
+                                }}
+                                options={handleQuesList}
+                                formStatus={formStatus}
+                            />
+                        ) : (selectedQuestionnaryOption?.label && questionList?.length === 0 && activeTab !== 'attributeData') ? (
+                            <ErrorMessage error={"No questions available for the selected questionnaire"} />
+                        ) : null}
                 </div>
             )}
             {/* Render other toggles below the dropdown */}
