@@ -275,7 +275,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                 top='50px'
                                 placeholder='Select'
                                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                testID='select-service-record'
+                                testID='select-questionnaire-list'
                                 labeltestID='service-record'
                                 selectedOption={
                                     handleQuestionnarieList.find(
@@ -306,7 +306,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                 top='50px'
                                 placeholder='Select'
                                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                testID='select-service-record'
+                                testID='select-field-list'
                                 labeltestID='service-record'
                                 selectedOption={
                                     handleQuesList.find(option => option.label === fieldSettingParameters?.question_name_lfp)
