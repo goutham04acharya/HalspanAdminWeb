@@ -904,7 +904,7 @@ const QuestionnaryForm = () => {
     const handleComplianceLogicClick = () => {
         let arr = complianceLogic || [];
         arr.push({
-            label: `Status ${arr.length + 1}`,
+            label: `Status`,
             default_content: ''
         });
         setComplianceLogic(arr)

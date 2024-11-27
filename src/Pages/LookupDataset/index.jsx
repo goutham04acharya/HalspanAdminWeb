@@ -91,6 +91,7 @@ const LookupDataset = () => {
 
     // Create Functions
     const handleChange = (e, id, type) => {
+        // debugger
         setErrors(id, '');
         const value = e.target.value;
         console.log(e, 'eaaef')
@@ -259,9 +260,11 @@ const LookupDataset = () => {
     }
 
     const handleImport = (event) => {
-        console.log('handleImport is called')
+        debugger
+        console.log(event, 'handleImport is called')
+        console.log(data, 'fffff')
         // debugger
-        if (data?.choices !== '' && isView.open) {
+        if (data?.choices.length !== 0 || data?.name !== '') {
             setShowLookupReplaceModal(true);
             setIsCreateModalOpen(false);
             setData(initialImportState)
@@ -429,7 +432,7 @@ const LookupDataset = () => {
                 errors={errors}
                 handleChange={handleChange}
                 handleCreate={handleSubmit}
-                handleImport={handleImport}
+                handleImport={isView?.open ? handleClose : handleImport}
                 isCreateLoading={isCreateLoading}
                 isImportLoading={isImportLoading}
                 isView={isView?.open}
