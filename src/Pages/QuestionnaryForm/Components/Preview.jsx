@@ -524,17 +524,24 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         </div>
 
                                     </div>
-                                    <div
+                                    {result?.STATUS === 'Fail' && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col gap-4">
                                             {/* <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3> */}
-                                            {result?.STATUS === 'Fail' && <><h3 className="font-semibold text-[#2B333B]">REASON: {result?.REASON}</h3><h3 className="font-semibold text-[#2B333B]">ACTION: {result?.ACTIONS}</h3>
-                                            </>}
+                                            <div className=' flex items-center gap-2'>
+                                                <h3 className="font-semibold text-[#2B333B]">REASON: </h3>
+                                                <span className='text-sm'>{result?.REASON}</span>
+                                            </div>
+                                            <div className=' flex items-center gap-2'>
+                                                <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>
+                                                <span className='text-sm'>{result?.ACTIONS}</span>
+                                            </div>
+
                                         </div>
 
-                                    </div>
+                                    </div>}
                                 </>
                             ))}
                         </div>

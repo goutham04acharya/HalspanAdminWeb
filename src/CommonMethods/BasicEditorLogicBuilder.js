@@ -41,21 +41,22 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         return `Math.abs(${question_name} - ${actualFormat} ) == ${value * 24 * 60 * 60 * 1000}`
     default:
         // Fallback for other logic (you can add more cases here if needed)
-        return `${question_name} ${condition_logic} '${value}'`;
+        return '';
     }
 };
 
 // Main function to build the overall condition expression
 export const buildConditionExpression = (conditionsArray) => {
+    // debugger
     console.log(conditionsArray, 'nayanya')
-    return conditionsArray.map((conditionGroup) => {
+    return conditionsArray?.map((conditionGroup) => {
         const expressions = conditionGroup.conditions.map((cond) => {
             const { question_name, condition_logic, value, date } = cond;
-
+            console.log(condition_logic, 'condition_logic')
             // Use the buildLogicExpression function for each condition
             return `${buildLogicExpression(question_name, condition_logic, value, date)}`;
         });
-
+        
         // Join expressions with " && " and wrap the entire expression in parentheses
         return `${expressions.join(' && ')}`;
     }).join(' || ');  // Separate each group with " OR "

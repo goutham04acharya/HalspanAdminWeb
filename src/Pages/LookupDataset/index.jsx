@@ -27,6 +27,7 @@ const LookupDataset = () => {
     const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
+    const [replaceCancel, setReplaceCancel] = useState('false');
     const initialState = {
         name: '',
         choices: []
@@ -64,6 +65,7 @@ const LookupDataset = () => {
     // Functions
     // List Functions
     const fetchLookupList = useCallback(async () => {
+        console.log(isView?.open, 'isView?.open')
         setLoading(true);
         const params = Object.fromEntries(searchParams);
         if (lastEvaluatedKeyRef.current) {
@@ -91,7 +93,6 @@ const LookupDataset = () => {
 
     // Create Functions
     const handleChange = (e, id, type) => {
-        // debugger
         setErrors(id, '');
         const value = e.target.value;
         console.log(e, 'eaaef')
@@ -163,13 +164,13 @@ const LookupDataset = () => {
         if (!file && !isNotEmptyValidation(data, setErrors)) {
             return;
         }
-        
+
         let choicesArray;
         if (file) {
             setIsImportLoading(true)
             // Handle file import case
             choicesArray = file.choices.map(choice => ({ value: choice }));
-            
+
         } else if (isUpdate) {
             // debugger
             setIsCreateLoading(true)
@@ -200,13 +201,13 @@ const LookupDataset = () => {
         }
         let payload = {};
         // Prepare data for API
-        if(file){
+        if (file) {
             payload = {
                 name: file.name,
                 choices: choicesArray,
                 // Add any additional fields to the payload as needed
             };
-        }else{
+        } else {
             payload = {
                 name: data.name,
                 choices: choicesArray,
@@ -222,7 +223,13 @@ const LookupDataset = () => {
             const response = await apiFunction(endpoint, payload);
 
             if (!response?.error) {
+                // setIsView({
+                //     open: true,
+                //     id: isView?.id
+                // });
                 setLookupList([]); // Clear lookup list
+                console.log(isView?.open, 'isviewjdjdjj')
+                lastEvaluatedKeyRef.current = null
                 fetchLookupList(); // Refetch the lookup list after success
 
                 const successMessage = isUpdate
@@ -250,7 +257,7 @@ const LookupDataset = () => {
             handleClose(); // Close modal in case of error
             setToastError('Something went wrong.'); // Show error toast if API call fails
         }
-        
+
     };
 
     const handleImportConfirmationModal = () => {
@@ -260,21 +267,21 @@ const LookupDataset = () => {
     }
 
     const handleImport = (event) => {
-        debugger
-        console.log(event, 'handleImport is called')
-        console.log(data, 'fffff')
-        // debugger
-        if (data?.choices.length !== 0 || data?.name !== '') {
+        if (data?.choices.length !== 0 || data?.name !== '' || data?.choices !== '') {
             setShowLookupReplaceModal(true);
             setIsCreateModalOpen(false);
             setData(initialImportState)
-            return;
-        }else{
+            return; // 7348873888
+        } else {
             setShowLookupReplaceModal(false);
             setIsCreateModalOpen(true);
             setData(initialState)
             // return;
         }
+        // if(replaceCancel){
+        //     setShowLookupReplaceModal(false);
+        //     setIsCreateModalOpen(true);
+        // }
         const file = event.target.files[0];
         console.log(file, 'fesfeieke')
         if (!file || !file.name.endsWith('.csv')) {
@@ -282,14 +289,14 @@ const LookupDataset = () => {
             setToastError('Please upload a CSV file.');
             return;
         }
-        setIsImportLoading(true);
+        // setIsImportLoading(true);
         setIsCreateModalOpen(false);
         Papa.parse(file, {
             header: false,
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
 
-                // console.log(flatData);
+                console.log(flatData, 'flatData');
 
                 console.log(flatData, 'flat data')
                 if (flatData.length > 500) {
@@ -298,13 +305,14 @@ const LookupDataset = () => {
                     setShowLookupReplaceModal(false);
                     setToastError('Only 500 data entries are accepted.');
                 } else {
+                    // debugger
                     const fileName = file.name.replace('.csv', '');
                     console.log(fileName, 'ddddeee')
                     const payload = {
                         name: fileName,
                         choices: flatData
                     }
-                    
+
                     handleSubmit(payload);
                 }
             },
@@ -471,6 +479,7 @@ const LookupDataset = () => {
                     src='replace'
                     testIDBtn1='confirm-delete'
                     testIDBtn2='cancel-delete'
+                    setReplaceCancel={setReplaceCancel}
                     isOpen={showlookupReplaceModal}
                     handleButton1={handleImport}
                     handleButton2={() => {
