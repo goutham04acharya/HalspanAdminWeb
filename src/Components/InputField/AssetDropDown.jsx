@@ -61,14 +61,14 @@ function AssetDropDown({
             </div>
             {isDropdownOpen && (
                 <ul className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
-                    {options.map((option, index) => (
+                    {options?.map((option, index) => (
                         <li key={option.name}
                             data-testid={`${labeltestID}-${index}`}                            
                             className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
                             onClick={() => {handleOptionClick(option)
                                 setDropdownOpen(false)}    // Close dropdown after selection
                             }>
-                            {option.name}
+                            {option?.name}
                         </li>
                     ))}
                 </ul>

@@ -49,7 +49,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
     // console.log(data, 'sdaasd')
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
-            <div className={`h-auto flex flex-col relative ${getModalWidth()}`}>
+            <div className={`h-auto flex flex-col relative  ${getModalWidth()}`}>
                 <Image testId="cancel" onClick={() => {
                     handleClose()
                     // setActiveInputs('')

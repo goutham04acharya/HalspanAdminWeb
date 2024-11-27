@@ -792,11 +792,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replace(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
                 .replaceAll('Today()', 'new Date()')
                 .replaceAll('if', '')
-                .replaceAll('{', '(')
-                .replaceAll('else', ':')
-                .replaceAll('then', '?')
                 .replaceAll('if', ' ')
-                .replaceAll('}', ')')
+
+            if (complianceState) {
+                
+                evalInputValue = evalInputValue.replaceAll('{', '(')
+                    .replaceAll('else', ':')
+                    .replaceAll('then', '?')
+                    .replaceAll('}', ')')
+            }
 
 
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
@@ -1028,7 +1032,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let STATUS = ''
             let ACTIONS = []
             let REASON = ''
-            let GRADE = ''
+            let GRADE;
+            console.log(evalInputValue.includes('GRADE'), 'DDDDDDDDDDD')
             const result = eval(evalInputValue);
             console.log(result, 'dddsdseefsc')
             if (isDefaultLogic) {
@@ -1271,6 +1276,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
 
     }
+    // useEffect(() => {
+    //     let compliance_logic = defaultContentConverter(buildConditionExpression(conditions));
+    //     setInputValue(compliance_logic)
+    // }, [conditions])
 
     return (
         <>
