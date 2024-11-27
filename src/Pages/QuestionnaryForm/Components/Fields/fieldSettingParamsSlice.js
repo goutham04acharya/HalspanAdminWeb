@@ -167,7 +167,9 @@ const fieldSettingParamsSlice = createSlice({
                     conditional_logic: item?.conditional_logic,
                     default_conditional_logic: item?.default_conditional_logic,
                     service_record_lfp: item?.service_record_lfp,
-                    attribute_data_lfp:item?.attribute_data_lfp,
+                    attribute_data_lfp: item?.attribute_data_lfp,
+                    questionnaire_name_lfp: item?.questionnaire_name_lfp,
+                    question_name_lfp:item?.question_name_lfp,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };

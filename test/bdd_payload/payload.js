@@ -15,8 +15,9 @@ async function create_questionnaire_payload() {
         "public_name": publicName,
         "internal_name": "Minerva Levy",
         "description": "Pariatur Error quia fugiat officia hic sunt quibusdam culpa perferendis a ipsam mollitia minus in consequuntur eum autem dolor",
-        "asset_type": "Door",
+        "asset_type": "Fire door",
         "language": "UK- English",
+        "services_type":"FABRICATION",
         "is_adhoc": "No"
 
     };

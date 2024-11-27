@@ -14,7 +14,7 @@ import AssetDropDown from '../../Components/InputField/AssetDropDown';
 
 function CreateQuestionnary() {
   const navigate = useNavigate();
-  const { PostAPI,getAPI } = useApi();
+  const { PostAPI, getAPI } = useApi();
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [isThreedotLoader, setIsThreedotLoader] = useState(false)
   const [options, setOptions] = useState([])
@@ -24,23 +24,33 @@ function CreateQuestionnary() {
     internal_name: '',
     description: '',
     asset_type: '',
+    services_type: '',
     language: 'UK- English',  // Default language set here
     is_adhoc: 'No',
   });
 
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  console.log(openDropdown, 'open')
   const [selectedOption, setSelectedOption] = useState({
     asset_type: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
+    services_type: null,
   });
   const [validationErrors, setValidationErrors] = useState({});
-  const [publickey, setpublickey] = useState()
-
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
+  const serviceDropdownRef = useRef(null);
 
-  // const options = [{ value: 'Door', label: 'Door' }];
+
   const options1 = [{ value: 'UK- English', label: 'UK- English' }]
+  const services_type_list = [
+    { value: 'FABRICATION', label: 'FABRICATION' },
+    { value: 'INSTALLATION', label: 'INSTALLATION' },
+    { value: 'INSPECTION', label: 'INSPECTION' },
+    { value: 'MAINTENANCE', label: 'MAINTENANCE' }
+  ];
+  
 
   const handleChange = (e, id) => {
     const { value } = e.target;
@@ -74,6 +84,7 @@ function CreateQuestionnary() {
       description: createDetails?.description.trim(),
       asset_type: selectedOption?.asset_type?.name,
       language: selectedOption?.language?.value,
+      services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
     };
 
@@ -88,6 +99,9 @@ function CreateQuestionnary() {
     }
     if (!selectedOption.language) {
       errors.language = 'This field is mandatory';
+    }
+    if (!selectedOption.services_type) {
+      errors.services_type = 'This field is mandatory';
     }
     if (!createDetails.description.trim()) {
       errors.description = 'This field is mandatory';
@@ -142,6 +156,7 @@ function CreateQuestionnary() {
       ...prevOptions,
       [id]: option,
     }));
+    console.log(option, 'optionsss')
 
     // Clear the validation error for the current dropdown field
     setValidationErrors((prevErrors) => ({
@@ -175,7 +190,15 @@ function CreateQuestionnary() {
       ) {
         setOpenDropdown(null);
       }
+      if (
+        openDropdown === 'services_type' &&
+        serviceDropdownRef.current &&
+        !serviceDropdownRef.current.contains(event.target)
+      ) {
+        setOpenDropdown(null);
+      }
     };
+    console.log(openDropdown, 'opendropdwon')
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -306,35 +329,62 @@ function CreateQuestionnary() {
             />
           </div>
         </div>
-        <div className='mt-10'>
-          <p className='font-semibold text-[#2B333B] text-base'>Ad Hoc / Non TAG questionnaire</p>
-          <div className='mt-2.5'>
-            <div className="relative custom-radioBlue flex items-center" data-testid='yes'
-            >
-              <input type='radio'
-                className='w-[17px] h-[17px]'
-                name='is_adhoc'
-                id='yes'
-                value='Yes'
-                checked={createDetails.is_adhoc === 'Yes'}
-                onChange={handleadhocChange} />
-              <label htmlFor='yes' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                Yes
-              </label>
-            </div>
-            <div className="relative custom-radioBlue flex items-center mt-[12px]" data-testid='no'
-            >
-              <input type='radio'
-                className='w-[17px] h-[17px]'
-                name='is_adhoc'
-                id='no'
-                value='No' checked={createDetails.is_adhoc === 'No'}
-                onChange={handleadhocChange} />
-              <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
-                No
-              </label>
+        <div className='mt-10 flex items-start'>
+          <div className='w-1/3'>
+            <InputWithDropDown
+              label='Service records'
+              labelStyle='font-semibold text-base text-[#2B333B]'
+              mandatoryField='true'
+              id='services_type'
+              placeholder='Select'
+              className='w-full cursor-pointer mt-2.5 placeholder:text-[#9FACB9] h-[45px]'
+              top='53px'
+              testID='services_type-drop-btn'
+              labeltestID='services_type'
+              options={services_type_list}
+              isDropdownOpen={openDropdown === 'services_type'}
+              setDropdownOpen={() => {
+                console.log(openDropdown, 'hhh')
+                setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')}}
+              selectedOption={selectedOption?.services_type}
+              handleOptionClick={(option) => handleOptionClick(option, 'services_type')}
+              dropdownRef={serviceDropdownRef}
+              validationError={validationErrors?.services_type}
+              services
+            />
+            {validationErrors?.services_type && <ErrorMessage error={validationErrors?.services_type} />}
+          </div>
+          <div className='w-1/3 ml-[75px] px-11'>
+            <p className='font-semibold text-[#2B333B] text-base'>Ad Hoc / Non TAG questionnaire</p>
+            <div className='mt-2.5'>
+              <div className="relative custom-radioBlue flex items-center" data-testid='yes'
+              >
+                <input type='radio'
+                  className='w-[17px] h-[17px]'
+                  name='is_adhoc'
+                  id='yes'
+                  value='Yes'
+                  checked={createDetails.is_adhoc === 'Yes'}
+                  onChange={handleadhocChange} />
+                <label htmlFor='yes' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                  Yes
+                </label>
+              </div>
+              <div className="relative custom-radioBlue flex items-center mt-[12px]" data-testid='no'
+              >
+                <input type='radio'
+                  className='w-[17px] h-[17px]'
+                  name='is_adhoc'
+                  id='no'
+                  value='No' checked={createDetails.is_adhoc === 'No'}
+                  onChange={handleadhocChange} />
+                <label htmlFor='no' className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
+                  No
+                </label>
+              </div>
             </div>
           </div>
+          <div className='w-1/3 mr-[114px]'></div>
         </div>
         <div className='mt-8'>
           <Button

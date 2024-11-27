@@ -39,7 +39,7 @@ function Questionnaries() {
   const [selectedVersion, setSelectedVersion] = useState()
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState('')
   const [cloneLoading, setCloneLoading] = useState(false)
-  const [options,setOptions] = useState([])
+  const [options, setOptions] = useState([])
   // const options = [
   //   { value: 'Door', label: 'Door' },
   // ];
@@ -164,12 +164,13 @@ function Questionnaries() {
       setCloneLoading(false)
     }
   }
-  const getAssetTypes = async() => {
+  const getAssetTypes = async () => {
     try {
-      let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`,null,true)
+      let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)
       setOptions(response?.data?.results)
+      console.log(options, 'options')
     } catch (error) {
-      
+
     }
   }
   return (
@@ -183,6 +184,7 @@ function Questionnaries() {
               onClick={handleCreateQue}
               className='w-[315px] h-[50px] font-semibold'
               text='Create New Questionnaire'
+              options={options}
             />
           </div>
           <div className='flex items-center justify-between w-full'>

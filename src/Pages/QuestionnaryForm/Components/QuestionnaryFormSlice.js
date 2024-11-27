@@ -21,8 +21,7 @@ const initialState = {
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
-    assetType: ''
-    
+    assetType: {asset_type: ''},    
 };
 
 
@@ -103,7 +102,7 @@ export const {
     setModalOpen,
     setComplianceLogicId,
     setShowCancelModal,
-    setAssetType,
+    setAssetType
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

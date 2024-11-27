@@ -21,6 +21,7 @@ Feature: Halspan - Admin -Asset type
     * I select the <asset> from the asset type dropdown
     * I select <type> from the questionnaire type options
     * I select british english from the language dropdown
+    * I select "FABRICATION" from service record list
     * I click the create questionnaire button
     Then I should read a message stating that "Questionnaire created successfully"
 

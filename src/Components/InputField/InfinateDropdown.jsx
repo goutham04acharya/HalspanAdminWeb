@@ -29,10 +29,11 @@ function InfinateDropdown({
     formStatus,
     textFieldLookup,
     assetLocation,
-    failGrade
+    failGrade,
+    mainDivStyle
 }) {
     return (
-        <div className='cursor-pointer w-full relative' ref={dropdownRef}>
+        <div className={`cursor-pointer w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>
                 {label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}
             </label>
