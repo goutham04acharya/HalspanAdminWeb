@@ -13,7 +13,7 @@ When('I enter the conditional logic for textbox field', async function () {
 });
 
 When('I enter the text as {string} in textbox for section {int} page {int} question {int}', async function (text, sectionNumber, pageNumber, quesionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="input"]`)), 5000);
     await driver.wait(until.elementIsVisible(text_area), 2000);
     await text_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
