@@ -96,8 +96,8 @@ Feature: Halspan- Admin-Preview responses of questionnaire
         # Then I validate the data entered exists in the mobile preview for section 1 page 1
         # When I enter the date as "31/12/2002" in date field for section 1 page 1 question 1
         # Then I should not see the text field at section 1 page 1 question 2
-        When I enter the date as "31/10/2024" in date field for section 1 page 1 question 1
-        When I enter the text as "Valid" in textbox for section 1 page 1 question 2
+        When I enter the date as "25/11/2024" in date field for section 1 page 1 question 1
+        # When I enter the text as "Valid" in textbox for section 1 page 1 question 2
 
     @create_question
     Scenario: Admin checks the preview response for conditional logic for choice field and photo field

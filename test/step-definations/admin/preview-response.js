@@ -44,7 +44,7 @@ Then('I should not see the choice field at section {int} page {int} question {in
 //------------------------------------------ This is not correct needs to be improved ------------------------------------------------
 When('I enter the conditional logic for date\\/time field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.AddDays(5) === "05/11/2024"');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.AddDays(5) === "30/11/2024"');
 });
 
 When('I enter the date as {string} in date field for section {int} page {int} question {int}', async function (date, sectionNumber, pageNumber, quesionNumber) {

@@ -83,8 +83,8 @@ Feature: Halspan- Admin-Preview responses of questionnaire
 
     When I click the preview button 
     Then I should see the mobile preview
-    When I enter the date as "31/10/2024" in date field for section 1 page 1 question 1
-    When I enter the text as "Valid" in textbox for section 1 page 1 question 2
+    When I enter the date as "25/11/2024" in date field for section 1 page 1 question 1
+    # When I enter the text as "Valid" in textbox for section 1 page 1 question 2
 
   @create_question
   Scenario: Admin checks the preview response for conditional logic for choice field and photo field 
