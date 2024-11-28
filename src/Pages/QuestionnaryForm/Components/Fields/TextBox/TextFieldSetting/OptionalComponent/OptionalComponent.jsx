@@ -1,24 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { setNewComponent } from '../../../fieldSettingParamsSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { setShouldAutoSave, setSelectedServiceValue, setSelectedQuesOption, setSelectedQuestionnaryOption } from '../../../../QuestionnaryFormSlice';
+import { setShouldAutoSave, setSelectedQuestionnaryOption } from '../../../../QuestionnaryFormSlice';
 import InfinateDropdown from '../../../../../../../Components/InputField/InfinateDropdown';
 import useApi from '../../../../../../../services/CustomHook/useApi';
 import objectToQueryString from '../../../../../../../CommonMethods/ObjectToQueryString';
 import ErrorMessage from '../../../../../../../Components/ErrorMessage/ErrorMessage';
+import { BeatLoader } from 'react-spinners';
 
-function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus }) {
+function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus, smallLoader}) {
 
     const dispatch = useDispatch();
     const { getAPI } = useApi();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const assetType = useSelector(state => state?.questionnaryForm.assetType)
     const selectedServiceValue = useSelector(state => state?.questionnaryForm.selectedServiceValue)
-    const selectedQuesOption = useSelector(state => state?.questionnaryForm.selectedQuesOption)
-    const selectedQuestionnaryOption = useSelector(state => state?.questionnaryForm.selectedQuestionnaryOption)
 
-
-    console.log(fieldSettingParameters, 'fieldSettingParameters')
     const [toggleStates, setToggleStates] = useState({});
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
@@ -29,18 +26,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [questionList, setQuestionList] = useState([]);
     const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
     const [showError, setShowError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        console.log('rendering')
-    },[selectedQuestionId])
-
-    // console.log(fieldSettingParameters?.componentType)
-    // console.log(selectedServiceValue, 'selectedServiceValue')
-    // console.log(selectedQuesOption, 'selectedQuesOption')
-    // console.log(selectedQuestionnaryOption?.label, 'selectedQuestionnaryOption')
-    // console.log(questionList, 'length of question')
-    // console.log(questionnairesList, 'questionnairesList')
-    // console.log(selectedServiceValue, 'nayanx')
     const getOptions = (componentType) => {
         switch (componentType) {
             case 'textboxfield':
@@ -86,20 +73,21 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     };
 
     const fetchQuestionList = async (selectedQuestionnaireId) => {
+        setIsLoading(true);
         try {
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
+            setIsLoading(false); // Start loading
         } catch (error) {
             console.error('Error fetching question list:', error);
         }
     }
 
     useEffect(() => {
-        if(fieldSettingParameters.service_record_lfp){
+        if (fieldSettingParameters.service_record_lfp) {
             fetchQuestionnaireList(fieldSettingParameters.service_record_lfp)
         }
-        if(fieldSettingParameters.questionnaire_name_lfp){
-            console.log(fieldSettingParameters.questionnaire_name_lfp, 'fieldSettingParameters.questionnaire_name_lfp')
+        if (fieldSettingParameters.questionnaire_name_lfp) {
             fetchQuestionList(fieldSettingParameters.questionnaire_name_lfp)
         }
     }, [selectedQuestionId])
@@ -110,47 +98,36 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         value: item.questionnaire_id,
     }));
 
-    // const handleQuesList = questionList.map((item) => ({
-    //     label: `${item.section_name}.${item.page_name}.${item.question_name}`, // Concatenate names
-    //     value: item.question_id, // Use question_id as the unique value
-    // }));
     const handleQuesList = (questionList, componentType) => {
         if (!questionList || !componentType) {
             console.log("No questionList or componentType provided.");
             return [];
         }
-    
         const filteredList = questionList.filter((item) => item.component_type === componentType);
-    
         console.log("Filtered List:", filteredList); // Logs only the filtered list for debugging
-    
         return filteredList.map((item) => ({
             label: `${item.section_name}.${item.page_name}.${item.question_name}`,
             value: item.question_id,
         }));
     };
-    
-    
-    
+
+
+
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
         setIsAttributeDropdownOpen(false);
     };
-    
+
     const handleServiceClick = (option) => {
-        // dispatch(setSelectedServiceValue(option));
         fetchQuestionnaireList(option.label)
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.label, questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'questionnaire_name_lfp', value: null, questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'question_name_lfp', value: null, questionId: selectedQuestionId }));
-        // dispatch(setSelectedQuestionnaryOption(null))
-        // dispatch(setSelectedQuesOption(null))
         setServiceRecordDropdownOpen(false);
     };
 
     const handleQuestionnaryClick = (option) => {
         fetchQuestionList(option?.value);
-        // dispatch(setSelectedQuestionnaryOption(option));
         dispatch(setNewComponent({ id: 'questionnaire_name_lfp', value: option?.value, questionId: selectedQuestionId }));
         setQuestionnariesDropdownOpen(false);
         setSelectedQuestionnaireId(option?.value); // Store the selected questionnaire_id
@@ -158,7 +135,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
 
     const handleQuesClick = (option) => {
-        // dispatch(setSelectedQuesOption(option));
         dispatch(setNewComponent({ id: 'question_name_lfp', value: option?.label, questionId: selectedQuestionId }));
         setIsQuesDropdownOpen(false)
     }
@@ -174,7 +150,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 'Field validation': fieldSettingParams[selectedQuestionId]?.options?.field_validation || false,
             });
         }
-        // fetchQuestionnaireList();
     }, [fieldSettingParams, selectedQuestionId]);
 
     const ToggleSwitch = ({ label, onChange, checked, testId }) => (
@@ -218,7 +193,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         setServiceRecordDropdownOpen(false);
     };
     const componentType = fieldSettingParams?.[selectedQuestionId]?.componentType;
-
     const options = getOptions(componentType);
 
     // Ensure only one dropdown is open at a time
@@ -228,7 +202,8 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         setQuestionnariesDropdownOpen(dropdownType === 'questionnaire');
         setIsQuesDropdownOpen(dropdownType === 'question')
     };
-// show the error message after 2seconds
+
+    // show the error message after 2seconds
     useEffect(() => {
         if (questionnairesList.length === 0 && activeTab !== 'attributeData' && selectedServiceValue !== '') {
             const timer = setTimeout(() => setShowError(true), 2000); // 2-second delay
@@ -238,8 +213,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         }
     }, [questionnairesList, activeTab, selectedServiceValue])
 
-    console.log(fieldSettingParameters)
-    console.log(selectedQuestionnaryOption && handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0 && activeTab !== 'attributeData', 'jjjj')
     return (
         <div className='mt-7 w-[97%]'>
             <p className='font-semibold text-base text-[#2B333B]'>Options</p>
@@ -343,11 +316,13 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             />
                             ) : (
                                 showError && <ErrorMessage error={"No questionnaire is available"} />
-                                )
-                            )}
+                            )
+                    )}
                     {activeTab !== 'attributeData' && (
                         (fieldSettingParameters.questionnaire_name_lfp && handleQuesList(questionList, fieldSettingParameters?.componentType)?.length !== 0) ?
-                            (
+                            isLoading ? (
+                                <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
+                            ) : (
                                 <InfinateDropdown
                                     label='Field List'
                                     mainDivStyle='mt-3'
@@ -357,7 +332,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                     top='50px'
                                     placeholder='Select'
                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                                    testID='select-service-record'
+                                    testID='select-field-list'
                                     labeltestID='service-record'
                                     selectedOption={handleQuesList(questionList, fieldSettingParameters?.componentType).find(option => option.label === fieldSettingParameters.question_name_lfp)}
                                     handleOptionClick={formStatus === 'Draft' ? handleQuesClick : null}
@@ -370,10 +345,10 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                     options={handleQuesList(questionList, fieldSettingParameters?.componentType)} // Filtered list
                                     formStatus={formStatus}
                                 />
-                            ) : (handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0 && activeTab !== 'attributeData') ? (
-                                <ErrorMessage error={'No questions available for the selected questionnaire'}/>
+                            ) : (fieldSettingParameters?.questionnaire_name_lfp &&(handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0) && activeTab !== 'attributeData') ? (
+                                <ErrorMessage error={'No questions available for the selected questionnaire'} />
                             ) : null
-                        )}
+                    )}
                 </div>
             )}
             {/* Render other toggles below the dropdown */}

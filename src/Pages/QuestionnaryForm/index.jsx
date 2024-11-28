@@ -1159,7 +1159,6 @@ const QuestionnaryForm = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
-
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {

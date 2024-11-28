@@ -118,7 +118,6 @@ export const {
     setSelectedServiceValue,
     setSelectedQuesOption,
     setSelectedQuestionnaryOption,
-    selectedQuestionnaryOption,
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;
