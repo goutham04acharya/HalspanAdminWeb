@@ -84,7 +84,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                     handleChange={(e) => handleChange(e, e.target.id, 'choices')}
                     validationError={errors?.choices}
                 />}
-                {(!createLookup && (choicesLength >= 11)) && <div className='flex gap-[245px] mt-5 mb-1.5'>
+                {(!createLookup && (choicesLength >= 11)) && <div className='flex gap-[295px] mt-5 mb-1.5'>
                     <div className='flex items-center gap-[135px]'>
                         <h1 className='font-[600] text-[#2B333B]'>Id</h1>
                         <h1 className='font-[600] text-[#2B333B]'>Value</h1>
@@ -98,7 +98,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                         <h1 className='font-[600] text-[#2B333B]'>Value</h1>
                     </div>
                 </div>}
-                {(!createLookup && (choicesLength > 6 && choicesLength < 11)) && <div className='flex gap-[175px] mt-5 mb-1.5'>
+                {(!createLookup && (choicesLength > 6 && choicesLength < 11)) && <div className='flex gap-[210px] mt-5 mb-1.5'>
                     <div className='flex items-center gap-[90px]'>
                         <h1 className='font-[600] text-[#2B333B]'>Id</h1>
                         <h1 className='font-[600] text-[#2B333B]'>Value</h1>

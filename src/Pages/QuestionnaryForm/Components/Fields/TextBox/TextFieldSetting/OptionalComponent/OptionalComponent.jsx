@@ -26,7 +26,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [selectedQuesOption, setSelectedQuesOption] = useState(null);
     const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
 
-
+    console.log(fieldSettingParameters, 'fsdfsf')
     const getOptions = (componentType) => {
         switch (componentType) {
             case 'textboxfield':
@@ -111,8 +111,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }, [serviceValue]);
 
     const handleServiceClick = (option) => {
-        setServiceValue(option);
+        
         dispatch(setNewComponent({ id: 'service_record_lfp', value: option.value, questionId: selectedQuestionId }));
+        setServiceValue(option)
         setServiceRecordDropdownOpen(false);
     };
 
@@ -253,7 +254,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             testID='select-service-record'
                             labeltestID='service-record'
                             selectedOption={serviceRecordOptions.find(option => option.value === fieldSettingParameters?.service_record_lfp)}
-                            handleOptionClick={formStatus === 'Draft' ? handleServiceClick : null}
+                            handleOptionClick={formStatus === 'Draft' ? handleServiceClick : null} 
                             isDropdownOpen={formStatus === 'Draft' ? isServiceRecordDropdownOpen : false}
                             setDropdownOpen={(isOpen) => {
                                 if (formStatus === 'Draft') {
