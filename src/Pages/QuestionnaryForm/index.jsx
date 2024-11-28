@@ -779,7 +779,8 @@ const QuestionnaryForm = () => {
         if (!selectedAddQuestion?.pageId) return;
 
         // Generate a unique question ID
-        const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
+        let questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
+        questionId = questionId.replace(/-/g, '_').toLowerCase();
 
         // Set the selected component and question ID
         dispatch(setSelectedComponent(componentType));
@@ -1232,8 +1233,8 @@ const QuestionnaryForm = () => {
                                             },
                                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
-                                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
-                                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
+                                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp || '',
+                                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp || '',
                                             display_type: (() => {
                                                 switch (fieldSettingParams[question.question_id].type) {
                                                     case 'heading':
