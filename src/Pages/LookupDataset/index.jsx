@@ -267,17 +267,18 @@ const LookupDataset = () => {
     }
 
     const handleImport = (event) => {
-        if (data?.choices.length !== 0 || data?.name !== '' || data?.choices !== '') {
-            setShowLookupReplaceModal(true);
-            setIsCreateModalOpen(false);
-            setData(initialImportState)
-            return; // 7348873888
-        } else {
-            setShowLookupReplaceModal(false);
-            setIsCreateModalOpen(true);
-            setData(initialState)
-            // return;
-        }
+        debugger
+        // if (data?.choices.length !== 0 || data?.name !== '' || data?.choices !== '') {
+        //     setShowLookupReplaceModal(true);
+        //     setIsCreateModalOpen(false);
+        //     setData(initialImportState)
+        //     return; // 7348873888
+        // } else {
+        // setShowLookupReplaceModal(false);
+        // setIsCreateModalOpen(true);
+        setData(initialState)
+        // return;
+        // }
         // if(replaceCancel){
         //     setShowLookupReplaceModal(false);
         //     setIsCreateModalOpen(true);
@@ -469,7 +470,7 @@ const LookupDataset = () => {
                 handleClose={() => setDeleteModal('open', false)}
                 isLoading={isDeleteLoading}
             />
-            {showlookupReplaceModal && (
+            {/* {showlookupReplaceModal && (
                 <ConfirmationModal
                     text='Replace Lookup Dataset'
                     subText='You are about to import new data into the lookup dataset. This action will replace the existing choices with the new ones.'
@@ -490,7 +491,7 @@ const LookupDataset = () => {
                     setModalOpen={setShowLookupReplaceModal}
                     showLabel
                 />
-            )}
+            )} */}
         </>
     )
 }
