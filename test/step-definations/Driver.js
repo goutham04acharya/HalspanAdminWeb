@@ -37,6 +37,7 @@ BeforeAll(async function () {
     await new Promise(resolve => setTimeout(resolve, 3000));
     global.current_process_name = faker.string.alpha({ count: 10, casing: 'upper' });
     global.is_user_logged_in = false;
+    global.index = 1;
     console.log('Current process name:', global.current_process_name);
     try {
         const currentUrl = await driver.getCurrentUrl();
@@ -97,7 +98,6 @@ AfterAll(async function () {
             }
         });
     }
-
     await driver.quit();
 });
 
@@ -146,8 +146,9 @@ After(function (scenario) {
         });
     }
     else if (scenario.result.status === 'PASSED') {
-        console.log('\x1b[33m%s\x1b[0m',`Scenario: ${scenario.pickle.name}`);
+        console.log('\x1b[33m%s\x1b[0m',`${global.index}. Scenario: ${scenario.pickle.name}`);
         console.log('\x1b[32m%s\x1b[0m', '✅ Scenario Passed Successfully');
+        global.index = global.index + 1;
     }
     console.log('------------------------------------------------------------------------------');
 });
