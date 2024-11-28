@@ -328,7 +328,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                 mandatoryField
                                 placeholder='Select'
                                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
-                                testID='select-service-record'
+                                testID='select-questionnaire-list'
                                 labeltestID='service-record'
                                 selectedOption={handleQuestionnarieList.find(option => option.value === fieldSettingParameters.questionnaire_name_lfp)}
                                 handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
