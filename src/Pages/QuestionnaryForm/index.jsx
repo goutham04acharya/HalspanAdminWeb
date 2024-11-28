@@ -592,8 +592,10 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        sectionId = sectionId?.replace('bddtest#','')
         if (compliance) {
             let compliance = [...complianceLogic]
+            // console.log(compliance,'gggggggggggggggggg')
             compliance[complianceLogicId].default_content = payloadString;
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
@@ -903,7 +905,7 @@ const QuestionnaryForm = () => {
     const handleComplianceLogicClick = () => {
         let arr = complianceLogic || [];
         arr.push({
-            label: `Status ${arr.length + 1}`,
+            label: `Status`,
             default_content: ''
         });
         setComplianceLogic(arr)

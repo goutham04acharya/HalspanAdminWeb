@@ -104,31 +104,98 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
-        // debugger
-        return complianceLogic.map(rule => {
-            // debugger
-            console.log(rule, 'rule')
+        let results = [];
+
+        const preprocessLogic = (logic) => {
+            // Replace occurrences of getMonth() with getMonth() + 1
+            if (logic.includes("getMonth()")) {
+                logic = logic.replace(/getMonth\(\)/g, "getMonth() + 1");
+            }
+
+            // Replace occurrences of getDay() comparisons with string days
+            if (logic.includes("getDay()")) {
+                const daysMap = {
+                    "Sunday": 0,
+                    "Monday": 1,
+                    "Tuesday": 2,
+                    "Wednesday": 3,
+                    "Thursday": 4,
+                    "Friday": 5,
+                    "Saturday": 6
+                };
+
+                logic = logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
+                    return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
+                });
+            }
+
+            // Wrap new Date() for any necessary processing (can be extended if required)
+            if (logic.includes("new Date(")) {
+                try {
+                    eval(logic); // Test the validity of the new Date logic
+                } catch (error) {
+                    console.error("Error evaluating new Date logic:", error);
+                    throw error; // Re-throw the error for handling
+                }
+            }
+
+            return logic;
+        };
+
+        results = complianceLogic.map(rule => {
+            let evaluationResult = {
+                STATUS: '',
+                REASON: '',
+                ACTIONS: [],
+                GRADE: ''
+            };
+
             try {
-                // Get the condition part before the question mark
-                const conditionPart = rule.default_content.split('?')[0].trim();
-                console.log(conditionPart, 'ssss')
-                // Evaluate the condition to determine which path was executed
-                const conditionResult = eval(rule);
-                console.log(rule, 'condition result')
-                // Get the full evaluation result
-                const result = eval(rule.default_content);
+                // Preprocess the rule's default_content
+                let processedContent = preprocessLogic(rule.default_content);
+
+                // Define variables that will be set in eval
+                let STATUS = '';
+                let REASON = '';
+                let ACTIONS = [];
+                let GRADE = '';
+
+                // Evaluate the processed logic
+                eval(processedContent);
+
+                // Store the results
+                evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
+                console.log(evaluationResult, 'result eval');
 
                 return {
                     label: rule.label,
-                    result: result?.toString(),
-                    // If condition is true, it took the "if" path (green), otherwise "else" path (red)
-                    tookIfPath: result
+                    ...evaluationResult,
+                    conditionMet: STATUS === 'Pass'
                 };
-            } catch {
-                console.log("Error while evaluating")
+            } catch (error) {
+                console.error("Error while evaluating:", error);
+                return {
+                    label: rule.label,
+                    STATUS: 'Error',
+                    REASON: error.message,
+                    ACTIONS: [],
+                    GRADE: '',
+                    conditionMet: false
+                };
             }
         });
+
+        return results;
     };
+
+
+    // Example usage:
+    // const complianceLogic = [
+    //     {
+    //         label: "Status 1",
+    //         default_content: "Section_1.Page_1.Question_1 === 'No' ? (STATUS = 'Fail', REASON = 'REPLACEMENT', ACTIONS.push('Replace a new door')) : (STATUS = 'Pass', GRADE = '1')"
+    //     }
+    // ];
     console.log(conditionalValues, 'conditional values')
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
@@ -441,20 +508,41 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
-                                <div
-                                    key={index}
-                                    className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
-                                >
-                                    <div className="flex flex-col">
-                                        <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
-                                        <span
-                                            className={` py-1.5 rounded-full flex text-sm font-medium`}
-                                        >
-                                            {result?.result}
-                                        </span>
-                                    </div>
+                                <>
+                                    <div
+                                        key={index}
+                                        className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
+                                            <span
+                                                className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'Pass' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
+                                            >
+                                                <img src={`${result?.STATUS === 'Pass' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                {result?.STATUS === 'Pass' ? 'Compliant' : 'Non-Compliant'}
+                                            </span>
+                                        </div>
 
-                                </div>
+                                    </div>
+                                    {result?.STATUS === 'Fail' && <div
+                                        key={index}
+                                        className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
+                                    >
+                                        <div className="flex flex-col gap-4">
+                                            {/* <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3> */}
+                                            <div className=' flex items-center gap-2'>
+                                                <h3 className="font-semibold text-[#2B333B]">REASON: </h3>
+                                                <span className='text-sm'>{result?.REASON}</span>
+                                            </div>
+                                            <div className=' flex items-center gap-2'>
+                                                <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>
+                                                <span className='text-sm'>{result?.ACTIONS}</span>
+                                            </div>
+
+                                        </div>
+
+                                    </div>}
+                                </>
                             ))}
                         </div>
                     ) : (
@@ -499,7 +587,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 console.log(error, 'j')
                                                 return null;
                                             }
-                                        }else if (list?.conditional_logic.includes("getDay()")) {
+                                        } else if (list?.conditional_logic.includes("getDay()")) {
                                             const daysMap = {
                                                 "Sunday": 0,
                                                 "Monday": 1,
@@ -513,7 +601,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             const replacedLogic = list.conditional_logic.replace(/getDay\(\)\s*(===|!==)\s*"(.*?)"/g, (match, operator, day) => {
                                                 return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
                                             });
-                                            
+
                                             // Remove parentheses from around the entire string, if they exist
                                             const logicWithoutBrackets = replacedLogic.replace(/^\((.*)\)$/, '$1');
                                             console.log(logicWithoutBrackets, 'modified logic')

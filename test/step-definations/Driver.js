@@ -127,7 +127,8 @@ After(function (scenario) {
         fs.mkdirSync(failed_scenarios);
     }
     if (scenario.result.status === 'FAILED') {
-        console.log('❌ Scenario Failed');
+        console.log(`Scenario: ${scenario.pickle.name}`);
+        console.log('\x1b[31m%s\x1b[0m', '❌ Scenario Failed');
         var world = this;
         return driver.takeScreenshot().then(function(screenShot, error) {
             if (!error) {
@@ -145,9 +146,9 @@ After(function (scenario) {
         });
     }
     else if (scenario.result.status === 'PASSED') {
-        console.log('✅ Scenario Passed Successfully');
+        console.log(`Scenario: ${scenario.pickle.name}`);
+        console.log('\x1b[32m%s\x1b[0m', '✅ Scenario Passed Successfully');
     }
-    console.log(`Scenario: ${scenario.pickle.name}`);
     console.log('------------------------------------------------------------------------------');
 });
 
