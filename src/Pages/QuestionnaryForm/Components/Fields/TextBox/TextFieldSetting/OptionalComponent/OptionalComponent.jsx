@@ -84,11 +84,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }
 
     useEffect(() => {
-        if (fieldSettingParameters.service_record_lfp) {
-            fetchQuestionnaireList(fieldSettingParameters.service_record_lfp)
+        if (fieldSettingParameters?.service_record_lfp) {
+            fetchQuestionnaireList(fieldSettingParameters?.service_record_lfp)
         }
-        if (fieldSettingParameters.questionnaire_name_lfp) {
-            fetchQuestionList(fieldSettingParameters.questionnaire_name_lfp)
+        if (fieldSettingParameters?.questionnaire_name_lfp) {
+            fetchQuestionList(fieldSettingParameters?.questionnaire_name_lfp)
         }
     }, [selectedQuestionId])
 
