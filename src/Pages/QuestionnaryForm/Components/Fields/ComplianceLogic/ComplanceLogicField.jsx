@@ -39,15 +39,15 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
         >
           <div className='flex justify-between items-start'>
             <label data-testid="label-name" maxlength="100" class="font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] h-auto">{item?.label}</label>
-            <img
+            {/* <img
               src="/Images/trash-black.svg"
               alt="delete"
               title='Delete'
               className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} mb-2 z-[9] rounded-full hover:bg-[#FFFFFF]`}
               onClick={formStatus === 'Draft' ?() => {
                 addNewCompliance(true, index);
-              }:null}
-            />
+              }:null} */}
+            {/* /> */}
           </div>
           <input data-testid="input" disabled={formStatus !== 'Draft'}
             class="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined"

@@ -782,7 +782,7 @@ const QuestionnaryForm = () => {
 
         // Generate a unique question ID
         let questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
-        questionId = questionId.replace(/-/g, '_').toLowerCase();
+        // questionId = questionId.replace(/-/g, '_').toLowerCase();
 
         // Set the selected component and question ID
         dispatch(setSelectedComponent(componentType));
