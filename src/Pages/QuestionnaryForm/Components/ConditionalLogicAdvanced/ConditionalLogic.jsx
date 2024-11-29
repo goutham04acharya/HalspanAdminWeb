@@ -342,11 +342,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
 
-
             // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-
 
             // Check if there's a space or if the input is empty
             // const lastChar = textBefore.slice(-1);
@@ -809,12 +807,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             evalInputValue = evalInputValue.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
             let expression = evalInputValue.toString();
 
-            // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
-            // expression = expression.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
-            // expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
-            // expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
-            console.log(expression, 'tttttttt')
-
             // Check for the "includes" method being used without a parameter
             let methods = [
                 "AddDays", "SubtractDays", "includes"
@@ -1033,9 +1025,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let ACTIONS = []
             let REASON = ''
             let GRADE;
-            console.log(evalInputValue.includes('GRADE'), 'DDDDDDDDDDD')
             const result = eval(evalInputValue);
-            console.log(result, 'dddsdseefsc')
+
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':

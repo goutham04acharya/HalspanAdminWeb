@@ -1369,6 +1369,13 @@ const QuestionnaryForm = () => {
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
+                                                                    <img src="/Images/setting.svg"
+                                                                            alt="setting"
+                                                                            title='Add Conditional-logic'
+                                                                            data-testid={`add-conditional-btn-${sectionIndex}`}
+                                                                            className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                            onClick={formStatus === 'Draft' ?() => setConditionalLogic(true):null}  // Use arrow function
+                                                                            />
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
