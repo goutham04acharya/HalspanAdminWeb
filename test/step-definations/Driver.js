@@ -140,6 +140,7 @@ After(function (scenario) {
                         console.error('Error writing coverage data:', err);
                     } else {
                         console.log('Coverage data has been written to:', failed_scenarios);
+                        console.log('------------------------------------------------------------------------------');
                     }
                 });
             }
