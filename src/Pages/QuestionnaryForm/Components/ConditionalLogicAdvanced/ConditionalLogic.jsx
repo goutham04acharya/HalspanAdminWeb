@@ -23,8 +23,8 @@ import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/Compl
 
 
 
-function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState,
-    setCompliancestate, complianceLogic, setComplianceLogic }) {
+function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
@@ -121,6 +121,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleClose = () => {
         setConditionalLogic(false);
+        setSectionConditionLogicId('');
+        setPageConditionLogicId('');
         setIsDefaultLogic(false);
         setCompliancestate(false);
     };
@@ -312,29 +314,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSuggestions([]);
             setShowMethodSuggestions(false); // Reset method suggestions
         }
-        const conditionalLogicReplaced = handleReplace(value);
-        dispatch(setNewLogic({ id: 'conditional_logic', value: logic, questionId: selectedQuestionId }));
     };
 
-    const handleReplace = (conditionalLogic) => {
-        // Replace && with "and" and || with "or"
-        conditionalLogic = conditionalLogic.replace('and', '&&').replace('or', '||');
-        conditionalLogic = conditionalLogic.replace('AND', '&&').replace('OR', '||');
-        conditionalLogic = conditionalLogic.replace('And', '&&').replace('Or', '||');
-        conditionalLogic = conditionalLogic.replace('then', '?').replace('else', ':'); // Replace the : with ' else ' // Replace the ? with ' then '
-        conditionalLogic = conditionalLogic.replace('if', ' '); // Replace the : with ' else ' // Replace the ? with ' then '
-        //  conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-        conditionalLogic = conditionalLogic.replace('()', 'length') // Replace the : with ' else ' // Replace the ? with ' then '
-        conditionalLogic = conditionalLogic.replaceAll(
-            '$1.AddDays($2)',
-            /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
-        );
-        conditionalLogic = conditionalLogic.replaceAll(
-            '$1.SubtractDays($2)',
-            /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g
-        );
-        return conditionalLogic;
-    }
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
@@ -681,11 +662,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
-                        console.log(transformedContent, 'jdjjdjdjdjjdjdjdjdjdj')
-                        console.log(parseLogicExpression(transformedContent), 'jashdasdhj')
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(transformedContent);
-                        console.log(inputValue, 'dkfskdfskdfkjsdjfk')
                     } else {
                         setInputValue('');
                     }
@@ -707,8 +685,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let conditionalLogic = ''
             if (isDefaultLogic) {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
-            }
-            else {
+            } else if (sectionConditionLogicId) {
+                const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
+                // Get the section_condition_logic if it exists
+                const sectionConditionLogic = section?.section_conditional_logic || '';
+                conditionalLogic = sectionConditionLogic
+            } else if (pageConditionLogicId) {
+                const page = sectionsData.find(page => page.page_id === pageConditionLogicId);
+                const pageConditionLogic = page?.page_conditional_logic || '';
+                conditionalLogic = pageConditionLogic;
+            } else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
@@ -740,17 +726,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
         };
-        if (selectedQuestionId) {
+        if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
     }, [selectedQuestionId, allSectionDetails]);
 
     const handleSave = async () => {
-        debugger
-        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-        console.log(selectedQuestionId, 'sectionID')
-        setShowSectionList(false);
+        let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+        if (!sectionId && sectionConditionLogicId) {
+            sectionId = sectionConditionLogicId
+        }
+        if (!sectionId && pageConditionLogicId) {
+            sectionId = pageConditionLogicId.split('_')[0]
+        }
 
+        setShowSectionList(false);
 
         try {
             const addSectionPrefix = (input) => {
@@ -773,7 +763,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            console.log(complianceCondition, 'input value');
             let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic || complianceState) {
@@ -835,7 +824,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
                 const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
@@ -857,7 +845,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-
             if (evalInputValue.includes('getFullYear')) {
                 // Extract the value after `getFullYear()` with any comparison operator using regex
                 const yearValueMatch = evalInputValue.match(/getFullYear\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{4,})/);
@@ -1011,9 +998,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 evalInputValue = evalInputValue.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', ' ');
-                // Return null as JSX expects a valid return inside {}
             }
-            // console.log(evalInputValue, 'ghhhhhhh')
             //just checking for datetimefield before the evaluating the expression (only for default checking)
             if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (evalInputValue.includes('setDate'))) {
                 let invalid = DateValidator(evalInputValue)
@@ -1098,7 +1083,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             if (complianceState) {
                 setConditionalLogic((prevLogic) => {
-                    const updatedLogic = Array.isArray(prevLogic) ? [...prevLogic] : [];; // Clone the existing state array
+                    const updatedLogic = Array.isArray(prevLogic) ? [...prevLogic] : []; // Clone the existing state array
 
                     // Check if the index exists in the array
                     if (updatedLogic[complianceLogicId]) {
@@ -1112,7 +1097,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return prevLogic; // If index doesn't exist, return the original state without changes
                 });
             }
-
             setIsThreedotLoader(true);
             if (!error) {
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
@@ -1278,12 +1262,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-                <div ref={modalRef} className='w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
+                <div ref={modalRef} className='!w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
                     <div className='w-full'>
                         {(tab === 'advance' || isDefaultLogic) ? (
                             <div className='flex h-customh14'>
                                 <div className='w-[60%]'>
-                                    {conditionalLogic ? (
+                                    {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
                                     ) : complianceState ? (
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>

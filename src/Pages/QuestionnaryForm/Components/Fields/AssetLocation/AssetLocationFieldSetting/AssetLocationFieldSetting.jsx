@@ -49,7 +49,7 @@ function AssetLocationFieldSetting({
                             type='button'
                             disabled={formStatus !== 'Draft'}
                             data-testid="add-conditional-logic"
-                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
+                            className={` mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
                             onClick={() => setConditionalLogic(true)}  // Use arrow function
                         >
                             Add Conditional Logic

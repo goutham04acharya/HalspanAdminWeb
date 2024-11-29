@@ -47,9 +47,11 @@ const QuestionnaryForm = () => {
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: section1Id,
+        section_conditional_logic: 'section_conditional_logic',
         pages: [{
             page_id: page1Id,
             page_name: 'Page 1',
+            page_conditional_logic: 'page_conditional_logic',
             questions: []
         }],
 
@@ -100,6 +102,8 @@ const QuestionnaryForm = () => {
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
+    const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
+    const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     // Create the initial dropdown state
     const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
 
@@ -311,9 +315,11 @@ const QuestionnaryForm = () => {
             const newSection = {
                 section_name: `Section ${sections && sections.length + 1}`,
                 section_id: sectionId,
+                section_conditional_logic: '',
                 pages: [{
                     page_id: pageId,
                     page_name: 'Page 1',
+                    page_conditional_logic: '',
                     questions: []
                 }],
             };
@@ -592,10 +598,9 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
-        sectionId = sectionId?.replace('bddtest#','')
+        sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
-            // console.log(compliance,'gggggggggggggggggg')
             compliance[complianceLogicId].default_content = payloadString;
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
@@ -606,6 +611,8 @@ const QuestionnaryForm = () => {
             );
             setIsThreedotLoader(false);
             setConditionalLogic(false);
+            setSectionConditionLogicId('');
+            setPageConditionLogicId('')
             setIsDefaultLogic(false);
             setCompliancestate(false);
             setSaveClick(false);
@@ -618,6 +625,8 @@ const QuestionnaryForm = () => {
             if (isDataSame && !payloadString) {
                 setIsThreedotLoader(false);
                 setConditionalLogic(false)
+                setSectionConditionLogicId('');
+                setPageConditionLogicId('')
                 // If data is the same, return early and don't call the API  
                 return;
             }
@@ -626,10 +635,12 @@ const QuestionnaryForm = () => {
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
+                section_conditional_logic: sectionToSave?.section_conditional_logic,
                 pages: sectionToSave.pages.map(page => (
                     {
                         page_id: page.page_id,
                         page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
+                        page_conditional_logic: page?.page_conditional_logic,
                         questions: page.questions.map(question => ({
                             question_id: question.question_id,
                             question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
@@ -722,24 +733,83 @@ const QuestionnaryForm = () => {
 
                     if (defaultString) {
                         dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                    } else {
-                        dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                    }
-                    dispatch(saveCurrentData());
-                    setIsThreedotLoader(false);
-                    setConditionalLogic(false);
-                    setIsDefaultLogic(false);
-                    setCompliancestate(false)
-                    // Update the saved status  
-                    const update = { ...dataIsSame };
-                    update[sections[sectionIndex].section_id] = true;
+                    } else if (sectionConditionLogicId) {
+                        const sectionIndex = sections.findIndex(section => section.section_id === sectionConditionLogicId);
+                        // Get the section_condition_logic if it exists
+                        if (sectionIndex !== -1) {
+                            // Create a shallow copy of the specific section
+                            const updatedSection = {
+                                ...sections[sectionIndex],
+                                section_conditional_logic: payloadString, // Add or update the property
+                            };
 
-                    dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
-                    setSaveClick(false)
+                            // Create a new array with the updated section
+                            const updatedSections = [
+                                ...sections.slice(0, sectionIndex),  // Keep sections before the updated section
+                                updatedSection,                     // Add the updated section
+                                ...sections.slice(sectionIndex + 1) // Keep sections after the updated section
+                            ];
+
+                            // Update state
+                            setSections(updatedSections);
+                        } else {
+                            console.error('Section not found for the given sectionConditionLogicId');
+                        }
+                    } else if (pageConditionLogicId) {
+                        // Iterate through sections to find the page with the given pageConditionLogicId
+                        let pageFound = false;
+                        const updatedSections = sections.map(section => {
+                            const pageIndex = section.pages.findIndex(page => page.page_id === pageConditionLogicId);
+                            if (pageIndex !== -1) {
+                                pageFound = true;
+                                // Create a shallow copy of the specific page
+                                const updatedPage = {
+                                    ...section.pages[pageIndex],
+                                    page_conditional_logic: payloadString, // Add or update the property
+                                };
+
+                                // Update the pages array
+                                const updatedPages = [
+                                    ...section.pages.slice(0, pageIndex),
+                                    updatedPage,
+                                    ...section.pages.slice(pageIndex + 1),
+                                ];
+
+                                // Return the updated section with updated pages
+                                return {
+                                    ...section,
+                                    pages: updatedPages,
+                                };
+                            }
+                            return section; // Return the original section if no changes
+                        });
+
+                        if (pageFound) {
+                            setSections(updatedSections);
+                        } else {
+                            console.error('Page not found for the given pageConditionLogicId');
+                        }
+                    }
+                } else {
+                    dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                 }
-            } catch (error) {
-                console.log(error)
-                setToastError('Something went wrong');
+                dispatch(saveCurrentData());
+                setIsThreedotLoader(false);
+                setConditionalLogic(false);
+                setSectionConditionLogicId('');
+                setPageConditionLogicId('')
+                setIsDefaultLogic(false);
+                setCompliancestate(false)
+                // Update the saved status  
+                const update = { ...dataIsSame };
+                update[sections[sectionIndex].section_id] = true;
+
+                dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+                setSaveClick(false)
+            }
+            catch (error) {
+                console.error('ther erro is', error)
+                setToastError('Something went wrong!!');
             }
         }
 
@@ -980,7 +1050,6 @@ const QuestionnaryForm = () => {
     //         setSectionToDelete(null);  // Reset sectionToDelete
     //         dispatch(setModalOpen(false));  // Close modal
     //         // globalSaveHandler(updatedSections);
-    //         console.log(updatedSections, sections, '555555')
     //     }
     // };
 
@@ -998,9 +1067,11 @@ const QuestionnaryForm = () => {
             if (!(response?.data?.error)) {
                 // Success
             } else {
+                console.error('error')
                 setToastError('Something went wrong');
             }
         } catch (error) {
+            console.error(error)
             setToastError('Something went wrong');
         }
     }
@@ -1079,9 +1150,11 @@ const QuestionnaryForm = () => {
             if (!(response?.data?.error)) {
                 setToastSuccess('Compliance Logic Saved Successfully')
             } else {
+                console.error('error here')
                 setToastError('Something went wrong');
             }
         } catch (error) {
+            console.error(error)
             setToastError('Something went wrong');
         }
     }
@@ -1369,13 +1442,13 @@ const QuestionnaryForm = () => {
                                                                         />
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                    <img src="/Images/setting.svg"
+                                                                        <img src="/Images/setting.svg"
                                                                             alt="setting"
                                                                             title='Add Conditional-logic'
                                                                             data-testid={`add-conditional-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                            onClick={formStatus === 'Draft' ?() => setConditionalLogic(true):null}  // Use arrow function
-                                                                            />
+                                                                            className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                            onClick={formStatus === 'Draft' ? () => setSectionConditionLogicId(sectionData.section_id) : null}  // Use arrow function
+                                                                        />
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"
                                                                             title='Delete'
@@ -1415,6 +1488,8 @@ const QuestionnaryForm = () => {
                                                                     formStatus={formStatus}
                                                                     setDropdown={setDropdown}
                                                                     dropdownOpen={dropdownOpen}
+                                                                    setPageConditionLogicId={setPageConditionLogicId}
+                                                                    pageConditionLogicId={setPageConditionLogicId}
                                                                 />
                                                             </li>
                                                         )}
@@ -1612,7 +1687,7 @@ const QuestionnaryForm = () => {
                 )
             }
             {
-                (conditionalLogic || isDefaultLogic || complianceState) && (
+                (conditionalLogic || isDefaultLogic || complianceState || sectionConditionLogicId || pageConditionLogicId) && (
                     <ConditionalLogic
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
@@ -1625,6 +1700,11 @@ const QuestionnaryForm = () => {
                         setCompliancestate={setCompliancestate}
                         complianceLogic={complianceLogic}
                         setComplianceLogic={setComplianceLogic}
+                        setSectionConditionLogicId={setSectionConditionLogicId}
+                        pageConditionLogicId={pageConditionLogicId}
+                        setPageConditionLogicId={setPageConditionLogicId}
+                        sectionConditionLogicId={sectionConditionLogicId}
+                        sectionsData={sections}
                     />
                 )
             }
