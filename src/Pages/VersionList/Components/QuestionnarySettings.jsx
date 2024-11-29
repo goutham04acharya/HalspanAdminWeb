@@ -107,7 +107,7 @@ function QuestionnarySettings({
         const hasChanges = Object.keys(Payload()).length > 0;
         setIsSaveDisabled(!hasChanges); // Disable the button if no changes, enable if there are changes
     }, [editedDetails, queSettingDetails]);
-
+    console.log(queSettingDetails, 'queSettingDetails?.data')
     return (
         dataLoading ?
             <QuestionnarySettingShimmer />
@@ -201,6 +201,15 @@ function QuestionnarySettings({
                             data-testId='language'
                             className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
                             <p>{queSettingDetails?.data?.language}</p>
+                            <img src="/Images/open-Filter.svg" alt="" />
+                        </button>
+                    </div>
+                    <div className='w-full mt-6'>
+                        <p className='font-semibold text-base text-[#6F7579] mb-2.5'>Service record</p>
+                        <button
+                            data-testId='service_type'
+                            className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
+                            <p>{queSettingDetails?.data?.services_type}</p>
                             <img src="/Images/open-Filter.svg" alt="" />
                         </button>
                     </div>

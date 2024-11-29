@@ -110,11 +110,8 @@ const QuestionnaryForm = () => {
     }
 
     const handleInputChange = (e) => {
-        // debugger
-        console.log(e,'file type')
         const { id, value } = e.target;
         let updatedValue = value;
-        console.log(updatedValue, 'ddsssdd')
         // Restrict numeric input if the id is 'fileType'
         if (id === 'fileType') {
             // debugger
@@ -496,12 +493,11 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             if (!response?.error) {
-
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
-                console.log(response?.data?.data?.asset_type, 'resdscsdcdsd')
-                dispatch(setAssetType(response?.data?.data?.asset_type))
+                dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
+
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -527,8 +523,9 @@ const QuestionnaryForm = () => {
                     default_conditional_logic: question?.default_conditional_logic,
                     attribute_data_lfp: question?.attribute_data_lfp,
                     service_record_lfp: question?.service_record_lfp,
+                    questionnaire_name_lfp: question?.questionnaire_name_lfp,
+                    question_name_lfp: question?.question_name_lfp,
                 }))));
-
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
                     message: "Field settings",
@@ -580,7 +577,7 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
-                
+
                 // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
@@ -675,6 +672,8 @@ const QuestionnaryForm = () => {
                             },
                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
+                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
                             display_type: (() => {
                                 switch (fieldSettingParams[question.question_id].type) {
                                     case 'heading':
@@ -782,7 +781,8 @@ const QuestionnaryForm = () => {
         if (!selectedAddQuestion?.pageId) return;
 
         // Generate a unique question ID
-        const questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
+        let questionId = `${selectedAddQuestion.pageId}_QUES-${uuidv4()}`;
+        // questionId = questionId.replace(/-/g, '_').toLowerCase();
 
         // Set the selected component and question ID
         dispatch(setSelectedComponent(componentType));
@@ -1161,7 +1161,6 @@ const QuestionnaryForm = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
-
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
@@ -1235,6 +1234,8 @@ const QuestionnaryForm = () => {
                                             },
                                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+                                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp || '',
+                                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp || '',
                                             display_type: (() => {
                                                 switch (fieldSettingParams[question.question_id].type) {
                                                     case 'heading':
@@ -1316,7 +1317,7 @@ const QuestionnaryForm = () => {
                         />
                     </div>
                     <div className='w-[50%] '>
-                    <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
+                        <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
                             <div className='flex items-center'>
                                 <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
                                 <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
@@ -1499,7 +1500,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section containing multiple pages. This action cannot be undone.`}
+                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1535,7 +1536,7 @@ const QuestionnaryForm = () => {
                 showPageDeleteModal && (
                     <ConfirmationModal
                         text='Delete Page'
-                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page containing multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'

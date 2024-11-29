@@ -91,3 +91,29 @@ When('I select british english from the language dropdown', async function () {
     await driver.wait(until.elementLocated(By.css('[data-testid = "language-drop-btn"]'))).click();
     await driver.wait(until.elementLocated(By.css('[data-testid = "language-0"]'))).click();
 });
+
+When('I select {string} from service record list', async function (service_record) {
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid = "services_type-drop-btn"]'))).click();
+    switch (service_record) {
+    case "FABRICATION":
+        await driver.wait(until.elementLocated(By.css('[data-testid="services_type-0"]'))).click();
+        break;
+
+    case "INSTALLATION":
+        await driver.wait(until.elementLocated(By.css('[data-testid="services_type-1"]'))).click();
+        break;
+
+    case "INSPECTION":
+        await driver.wait(until.elementLocated(By.css('[data-testid="services_type-2"]'))).click();
+        break;
+
+    case "MAINTENANCE":
+        await driver.wait(until.elementLocated(By.css('[data-testid="services_type-3"]'))).click();
+        break;
+
+    default:
+        throw new Error(`Unsupported service record: ${service_record}`);
+    }
+
+});

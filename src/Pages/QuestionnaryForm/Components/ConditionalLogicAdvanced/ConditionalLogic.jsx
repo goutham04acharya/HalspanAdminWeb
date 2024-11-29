@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
 import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
+import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/ComplianceBasicEditor';
 
 
 
@@ -747,7 +748,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId, allSectionDetails]);
 
     const handleSave = async () => {
+        debugger
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+        console.log(selectedQuestionId, 'sectionID')
         setShowSectionList(false);
 
 
@@ -795,7 +798,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 .replaceAll('if', ' ')
 
             if (complianceState) {
-                
+
                 evalInputValue = evalInputValue.replaceAll('{', '(')
                     .replaceAll('else', ':')
                     .replaceAll('then', '?')
@@ -1328,8 +1331,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         setIsStringMethodModal={setIsStringMethodModal}
                                     />
                                 </div>
-                            </div>) : (
-                            !isDefaultLogic && (
+                            </div>) : (!isDefaultLogic && !complianceState) ? (
                                 <BasicEditor
                                     secDetailsForSearching={filterQuestions()}
                                     questions={allSectionDetails.data}
@@ -1341,8 +1343,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     submitSelected={submitSelected}
                                     setSubmitSelected={setSubmitSelected}
                                 />
-                            )
-                        )}
+                            ) : (complianceState) &&
+                        <ComplianceBasicEditor
+                            secDetailsForSearching={filterQuestions()}
+                            questions={allSectionDetails.data}
+                            sections={sections}
+                            setShowMethodSuggestions={setShowMethodSuggestions}
+                            isThreedotLoaderBlack={isThreedotLoaderBlack}
+                            conditions={conditions}
+                            setConditions={setConditions}
+                            submitSelected={submitSelected}
+                            setSubmitSelected={setSubmitSelected}
+                        />
+                        }
                         <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                             {!isDefaultLogic &&
                                 <div className='flex gap-5 items-end'>

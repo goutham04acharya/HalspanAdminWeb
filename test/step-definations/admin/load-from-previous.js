@@ -49,7 +49,7 @@ When('I click the service record', async function () {
 
 When('I select the service record list', async function () {
     try {
-        for (let i = 0; i < 3; i++) {
+        for (let i = 3; i >= 0; i--) {
             console.log(`Starting interaction for service record ${i}`);
 
             // Wait for the service record dropdown to be located and visible
@@ -72,4 +72,18 @@ When('I select the service record list', async function () {
         console.error(`Error occurred while selecting the service record list: ${error.message}`);
         console.error(`Stack trace: ${error.stack}`);
     }
+});
+
+When('I select the questionnaire list', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="select-questionnaire-list"]`))).click();
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).click();
+});
+
+When('I select the field list', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="select-field-list"]`))).click();
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).click();
 });

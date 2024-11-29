@@ -21,8 +21,10 @@ const initialState = {
     showPageDeleteModal: '',
     isModalOpen: '',
     complianceLogicId:0,
-    assetType: ''
-    
+    assetType: {asset_type: ''},  
+    selectedServiceValue: '' ,
+    selectedQuesOption: null,
+    selectedQuestionnaryOption: null
 };
 
 
@@ -81,6 +83,15 @@ const questionnaryFormSlice = createSlice({
         },
         setAssetType: (state, action) => {
             state.assetType = action.payload
+        },
+        setSelectedServiceValue: (state, action) => {
+            state.selectedServiceValue = action.payload
+        },
+        setSelectedQuesOption: (state, action) => {
+            state.selectedQuesOption = action.payload
+        },
+        setSelectedQuestionnaryOption: (state, action) => {
+            state.selectedQuestionnaryOption = action.payload
         }
     }
 });
@@ -104,6 +115,9 @@ export const {
     setComplianceLogicId,
     setShowCancelModal,
     setAssetType,
+    setSelectedServiceValue,
+    setSelectedQuesOption,
+    setSelectedQuestionnaryOption,
 } = questionnaryFormSlice.actions;
 
 export default questionnaryFormSlice.reducer;

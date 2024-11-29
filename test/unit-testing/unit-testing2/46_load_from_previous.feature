@@ -38,6 +38,8 @@ Feature: Halspan - Admin - Load from Previous Data for all the Fields
     When I select the attribute type
     When I click the service record
     When I select the service record list 
+    When I select the questionnaire list
+    When I select the field list
     When I click the save button for the questionnaire version for section 1
 
 

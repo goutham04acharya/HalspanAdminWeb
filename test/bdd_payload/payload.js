@@ -2,7 +2,7 @@
 const { faker } = require('@faker-js/faker');
 
 async function create_questionnaire_payload() {
-    let publicName = `bddtest${faker.string.alphanumeric(8)}`; // Use random.alphaNumeric
+    let publicName = `bddtest${faker.string.alphanumeric(20)}`; // Use random.alphaNumeric
     global.questionPublicName = publicName;
     return {
         // "public_name" : publicName,
@@ -17,6 +17,7 @@ async function create_questionnaire_payload() {
         "description": "Pariatur Error quia fugiat officia hic sunt quibusdam culpa perferendis a ipsam mollitia minus in consequuntur eum autem dolor",
         "asset_type": "Fire door",
         "language": "UK- English",
+        "services_type":"FABRICATION",
         "is_adhoc": "No"
 
     };
