@@ -680,7 +680,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Assuming `allSectionDetails` contains the fetched data and 
         // you have a way to map `selectedQuestionId` to the relevant question
         const findSelectedQuestion = () => {
-
             //adding this to check whether the advane editor or the default logic
             let conditionalLogic = ''
             if (isDefaultLogic) {
@@ -691,7 +690,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const sectionConditionLogic = section?.section_conditional_logic || '';
                 conditionalLogic = sectionConditionLogic
             } else if (pageConditionLogicId) {
-                const page = sectionsData.find(page => page.page_id === pageConditionLogicId);
+                const sectionId = pageConditionLogicId.split('_')[0]
+                const section = sectionsData.find(section => section.section_id === sectionId);
+                const page = section.pages.find(page => page.page_id === pageConditionLogicId);
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
             } else {
