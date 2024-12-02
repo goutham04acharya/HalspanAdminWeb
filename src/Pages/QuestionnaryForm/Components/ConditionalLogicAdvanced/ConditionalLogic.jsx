@@ -1255,22 +1255,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         if (sectionConditionLogicId) {
             condition_logic = buildConditionExpression(conditions);
-            console.log(condition_logic, 'condition_logic section')
-            const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
-            condition_logic = section?.section_conditional_logic || '';
 
         }
         if (pageConditionLogicId) {
             console.log(pageConditionLogicId, 'pageCOnditiopn')
             condition_logic = buildConditionExpression(conditions);
-            console.log(condition_logic, 'condition_logic page')
-            const sectionId = pageConditionLogicId.split('_')[0]
-            const section = sectionsData.find(section => section?.section_id === sectionId);
-            console.log(sectionsData, 'section')
-            const page = section?.pages.find(page => page.page_id === pageConditionLogicId);
-            condition_logic = page?.page_conditional_logic || '';
-            console.log( page?.page_conditional_logic, 'ghghg')
-
+           
         }
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 

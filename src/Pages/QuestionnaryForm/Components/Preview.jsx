@@ -188,15 +188,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         return results;
     };
 
-
-    // Example usage:
-    // const complianceLogic = [
-    //     {
-    //         label: "Status 1",
-    //         default_content: "Section_1.Page_1.Question_1 === 'No' ? (STATUS = 'Fail', REASON = 'REPLACEMENT', ACTIONS.push('Replace a new door')) : (STATUS = 'Pass', GRADE = '1')"
-    //     }
-    // ];
-    console.log(conditionalValues, 'conditional values')
     const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
 
     const validateFormat = (value, format, regex) => {

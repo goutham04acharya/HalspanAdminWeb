@@ -598,8 +598,11 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        console.log('i came')
+        console.log(pageConditionLogicId, 'pageConditionLogicIds')
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
+            console.log('what')
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
             setComplianceLogic((prev) =>
@@ -756,10 +759,13 @@ const QuestionnaryForm = () => {
                             console.error('Section not found for the given sectionConditionLogicId');
                         }
                     } else if (pageConditionLogicId) {
+                        console.log('am here')
                         // Iterate through sections to find the page with the given pageConditionLogicId
                         let pageFound = false;
                         const updatedSections = sections.map(section => {
-                            const pageIndex = section.pages.findIndex(page => page.page_id === pageConditionLogicId);
+                            const pageIndex = section?.pages.findIndex(page => page.page_id === pageConditionLogicId);
+                            console.log(payloadString, pageIndex, 'mudfefee')
+
                             if (pageIndex !== -1) {
                                 pageFound = true;
                                 // Create a shallow copy of the specific page
