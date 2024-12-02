@@ -1007,6 +1007,7 @@ const QuestionnaryForm = () => {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
+            console.log(response, 'responseresponseresponse')
             if (!response?.error) {
 
                 // Extract section IDs in the order provided

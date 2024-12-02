@@ -53,8 +53,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
     const [logic, setLogic] = useState('')
     const [complianceCondition, setComplianceCondition] = useState('')
-
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
+    // console.log(defaultContentConverter(buildConditionExpression(conditionalLogicData)), 'fffffffffffff')
+    console.log(conditionalLogicData, 'conditionalLogicData')
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -1250,6 +1252,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
+        console.log(complianceLogic, 'dsaddddddddddddddddddddddd')
         if (complianceLogic) {
             let compliance_logic = buildConditionExpression(conditions);
             setComplianceLogic((prev) => {
@@ -1274,13 +1277,24 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
+        console.log(condition_logic, 'condition')
+        console.log(selectedQuestionId, 'question id')
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
 
     }
-    // useEffect(() => {
-    //     let compliance_logic = defaultContentConverter(buildConditionExpression(conditions));
-    //     setInputValue(compliance_logic)
-    // }, [conditions])
+    useEffect(() => {
+        // let compliance_logic = conditionalLogicData[selectedQuestionId]?.conditional_logic?.map((conditionGroup) => {
+        //     const expressions = conditionGroup.conditions.map((cond) => {
+        //         const { question_name, condition_logic, value, date } = cond;
+        //         console.log(condition_logic, 'condition_logic')
+        //         // Use the buildLogicExpression function for each condition
+        //         return 
+        //     });
+        // })
+        let compliance_logic = conditionalLogicData[selectedQuestionId]?.conditional_logic;
+        console.log(compliance_logic, 'lllllll')
+        setInputValue(compliance_logic)
+    }, [conditionalLogicData, selectedQuestionId])
 
     return (
         <>
@@ -1340,6 +1354,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setConditions={setConditions}
                                     submitSelected={submitSelected}
                                     setSubmitSelected={setSubmitSelected}
+                                    selectedQuestionId={selectedQuestionId}
+                                    conditionalLogicData={conditionalLogicData}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor
