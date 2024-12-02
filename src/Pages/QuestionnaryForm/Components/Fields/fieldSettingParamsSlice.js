@@ -170,6 +170,7 @@ const fieldSettingParamsSlice = createSlice({
                     attribute_data_lfp: item?.attribute_data_lfp,
                     questionnaire_name_lfp: item?.questionnaire_name_lfp,
                     question_name_lfp:item?.question_name_lfp,
+                    question_id_lfp:item?.question_id_lfp,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };

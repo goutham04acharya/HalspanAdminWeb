@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 export const defaultContentConverter = (conditionalLogic) => {
-    console.log(conditionalLogic, 'asdasdasdads')
     if (conditionalLogic !== "") {
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
         conditionalLogic = conditionalLogic.replaceAll(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
