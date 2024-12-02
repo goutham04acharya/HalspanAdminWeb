@@ -453,7 +453,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                 placeholder='Select'
                                                 className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                                 testID={`condition-${index}`}
-                                                labeltestID={`condition-dropdown-${index}-${i}`}
+                                                labeltestID={`condition-dropdown-${index}`}
                                                 selectedOption={conditions[index]?.conditions[i]?.condition_logic}
                                                 handleOptionClick={handleSelectDropdown}
                                                 mainIndex={index}
