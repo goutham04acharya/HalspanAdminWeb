@@ -77,6 +77,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         try {
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
+            console.log(questionList, 'qyestion')
             setIsLoading(false); // Start loading
         } catch (error) {
             console.error('Error fetching question list:', error);
@@ -111,8 +112,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         }));
     };
 
-
-
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
         setIsAttributeDropdownOpen(false);
@@ -136,6 +135,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
     const handleQuesClick = (option) => {
         dispatch(setNewComponent({ id: 'question_name_lfp', value: option?.label, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'question_id_lfp', value: option?.value, questionId: selectedQuestionId }));
         setIsQuesDropdownOpen(false)
     }
 
