@@ -106,12 +106,10 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         const filteredList = questionList.filter((item) => item.component_type === componentType);
         console.log("Filtered List:", filteredList); // Logs only the filtered list for debugging
         return filteredList.map((item) => ({
-            label: `${item.section_name}.${item.page_name}.${item.question_name}`,
+            label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentType})`,
             value: item.question_id,
         }));
     };
-
-
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
@@ -136,6 +134,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
     const handleQuesClick = (option) => {
         dispatch(setNewComponent({ id: 'question_name_lfp', value: option?.label, questionId: selectedQuestionId }));
+        dispatch(setNewComponent({ id: 'question_id_lfp', value: option?.value, questionId: selectedQuestionId }));
         setIsQuesDropdownOpen(false)
     }
 

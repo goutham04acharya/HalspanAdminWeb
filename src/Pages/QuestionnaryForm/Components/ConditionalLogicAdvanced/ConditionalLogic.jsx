@@ -685,11 +685,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
-                        console.log(transformedContent, 'jdjjdjdjdjjdjdjdjdjdj')
-                        console.log(parseLogicExpression(transformedContent), 'jashdasdhj')
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(transformedContent);
-                        console.log(inputValue, 'dkfskdfskdfkjsdjfk')
                     } else {
                         setInputValue('');
                     }
@@ -751,12 +748,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId, allSectionDetails]);
 
     const handleSave = async () => {
-        debugger
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-        console.log(selectedQuestionId, 'sectionID')
         setShowSectionList(false);
-
-
         try {
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
@@ -778,7 +771,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            console.log(complianceCondition, 'input value');
             let evalInputValue = modifyString(inputValue);
 
             if (isDefaultLogic || complianceState) {
@@ -819,7 +811,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // expression = expression.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
             // expression = expression.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
             // expression = expression.replaceAll(/\s+AND\s+/g, " && ").replaceAll(/\s+OR\s+/g, " || ");
-            console.log(expression, 'tttttttt')
 
             // Check for the "includes" method being used without a parameter
             let methods = [
@@ -1024,7 +1015,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('if', ' ');
                 // Return null as JSX expects a valid return inside {}
             }
-            // console.log(evalInputValue, 'ghhhhhhh')
             //just checking for datetimefield before the evaluating the expression (only for default checking)
             if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (evalInputValue.includes('setDate'))) {
                 let invalid = DateValidator(evalInputValue)
@@ -1039,9 +1029,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let ACTIONS = []
             let REASON = ''
             let GRADE;
-            console.log(evalInputValue.includes('GRADE'), 'DDDDDDDDDDD')
             const result = eval(evalInputValue);
-            console.log(result, 'dddsdseefsc')
             if (isDefaultLogic) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':

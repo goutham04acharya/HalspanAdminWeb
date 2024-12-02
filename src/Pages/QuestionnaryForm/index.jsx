@@ -595,7 +595,6 @@ const QuestionnaryForm = () => {
         sectionId = sectionId?.replace('bddtest#','')
         if (compliance) {
             let compliance = [...complianceLogic]
-            // console.log(compliance,'gggggggggggggggggg')
             compliance[complianceLogicId].default_content = payloadString;
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
@@ -1237,6 +1236,7 @@ const QuestionnaryForm = () => {
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
                                             questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp || '',
                                             question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp || '',
+                                            question_id_lfp: fieldSettingParams[question.question_id].question_id_lfp || '',
                                             display_type: (() => {
                                                 switch (fieldSettingParams[question.question_id].type) {
                                                     case 'heading':
