@@ -176,7 +176,7 @@ function VersionList() {
             <div className='p-7 bg-[#F4F6FA]'>
                 <div className='px-[34px] py-[38px] w-full flex items-start bg-[#FFFFFF] h-customh6'>
                     <div className='w-[75%]'>
-                        <p className='mt-2 text-[28px] font-medium text-[#2B333B]'>{queSettingDetails?.data?.internal_name}</p>
+                        <p className='mt-2 text-[28px] font-medium text-[#2B333B] break-words'>{queSettingDetails?.data?.internal_name}</p>
                         <p className='mt-8 text-[22px] font-medium text-[#2B333B] '>Choose a Version</p>
                         <div className='mt-10'>
                             <GridTable
