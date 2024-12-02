@@ -77,7 +77,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         try {
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
-            console.log(questionList, 'qyestion')
             setIsLoading(false); // Start loading
         } catch (error) {
             console.error('Error fetching question list:', error);

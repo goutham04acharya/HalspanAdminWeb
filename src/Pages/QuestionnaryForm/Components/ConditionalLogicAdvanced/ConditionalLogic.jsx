@@ -692,7 +692,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (pageConditionLogicId) {
                 const sectionId = pageConditionLogicId.split('_')[0]
                 const section = sectionsData.find(section => section.section_id === sectionId);
-                const page = section.pages.find(page => page.page_id === pageConditionLogicId);
+                const page = section?.pages.find(page => page.page_id === pageConditionLogicId);
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
             } else {
@@ -1228,7 +1228,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const handleSaveBasicEditor = () => {
-        if (complianceLogic) {
+
+        if (complianceState) {
             let compliance_logic = buildConditionExpression(conditions);
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
@@ -1245,20 +1246,41 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         let condition_logic;
-        try {
+        if (conditionalLogic) {
+            try {
+                condition_logic = buildConditionExpression(conditions);
+                console.log(condition_logic, 'am i getting this')
+            } catch (error) {
+            }
+        }
+        if (sectionConditionLogicId) {
             condition_logic = buildConditionExpression(conditions);
-        } catch (error) {
+            console.log(condition_logic, 'condition_logic section')
+            const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
+            condition_logic = section?.section_conditional_logic || '';
+
+        }
+        if (pageConditionLogicId) {
+            console.log(pageConditionLogicId, 'pageCOnditiopn')
+            condition_logic = buildConditionExpression(conditions);
+            console.log(condition_logic, 'condition_logic page')
+            const sectionId = pageConditionLogicId.split('_')[0]
+            const section = sectionsData.find(section => section?.section_id === sectionId);
+            console.log(sectionsData, 'section')
+            const page = section?.pages.find(page => page.page_id === pageConditionLogicId);
+            condition_logic = page?.page_conditional_logic || '';
+            console.log( page?.page_conditional_logic, 'ghghg')
+
         }
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+        setConditionalLogic(false);
+        setSectionConditionLogicId(false);
+        setPageConditionLogicId(false);
 
     }
-    // useEffect(() => {
-    //     let compliance_logic = defaultContentConverter(buildConditionExpression(conditions));
-    //     setInputValue(compliance_logic)
-    // }, [conditions])
 
     return (
         <>
