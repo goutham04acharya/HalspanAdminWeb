@@ -1236,6 +1236,7 @@ const QuestionnaryForm = () => {
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
                                             questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp || '',
                                             question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp || '',
+                                            question_id_lfp: fieldSettingParams[question.question_id].question_id_lfp || '',
                                             display_type: (() => {
                                                 switch (fieldSettingParams[question.question_id].type) {
                                                     case 'heading':
