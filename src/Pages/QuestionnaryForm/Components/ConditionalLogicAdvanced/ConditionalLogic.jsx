@@ -1,5 +1,5 @@
 
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { setModalOpen, setSelectedComponent } from '../QuestionnaryFormSlice';
 import useOnClickOutside from '../../../../CommonMethods/outSideClick';
@@ -737,11 +737,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
+            console.log(parseLogicExpression(conditionalLogic), 'ggggggggggggggggggggggggggggggggggggggggggg')
 
-            {
-                !isDefaultLogic &&
-                    setConditions(parseLogicExpression(conditionalLogic));
-            }
+            // {
+            //     !isDefaultLogic &&
+            //         setConditions(parseLogicExpression(conditionalLogic));
+            // }
 
         };
         if (selectedQuestionId) {
@@ -1272,31 +1273,79 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         let condition_logic;
+        console.log(conditions, 'condtions')
         try {
             condition_logic = buildConditionExpression(conditions);
         } catch (error) {
         }
+        console.log(parseBasicEditorLogicExpression(condition_logic), 'condition_logic')
+
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
 
         handleSaveSection(sectionId, true, condition_logic);
-        console.log(condition_logic, 'condition')
+        // console.log(condition_logic, 'condition')
         console.log(selectedQuestionId, 'question id')
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
 
     }
-    useEffect(() => {
-        // let compliance_logic = conditionalLogicData[selectedQuestionId]?.conditional_logic?.map((conditionGroup) => {
-        //     const expressions = conditionGroup.conditions.map((cond) => {
-        //         const { question_name, condition_logic, value, date } = cond;
-        //         console.log(condition_logic, 'condition_logic')
-        //         // Use the buildLogicExpression function for each condition
-        //         return 
-        //     });
-        // })
-        let compliance_logic = conditionalLogicData[selectedQuestionId]?.conditional_logic;
+    /* eslint-disable complexity */
+    const parseBasicEditorLogicExpression = (logic) => {
+        // Helper function to identify condition type
+        if(!logic){
+            return;
+        }
+        const getConditionLogic = (expression) => {
+            if (expression.includes("===")) return "equals";
+            if (expression.includes("!==")) return "not equal to";
+            if (expression.includes(".includes")) return expression.startsWith("!") ? "does not include" : "includes";
+            if (expression.includes(".length === 0")) return "has no files";
+            if (expression.includes(".length >= 1")) return "has atleast one file";
+            if (expression.includes(".length ===")) return "number of file is";
+            if (expression.includes(" < ")) return "smaller";
+            if (expression.includes(" > ")) return "larger";
+            if (expression.includes(" <= ")) return "smaller or equal";
+            if (expression.includes(" >= ")) return "larger or equal";
+            return null; // Add more cases as needed
+        };
+
+        // Split the logic into OR groups
+        const groups = logic.split(" || ").map(group => group.trim());
+
+        return groups.map(group => {
+            // Split each group into AND conditions
+            const conditions = group.replace(/[()]/g, "").split(" && ").map(cond => cond.trim());
+
+            return {
+                conditions: conditions.map((cond) => {
+                    const questionMatch = cond.match(/^[^ ]+/); // Match the question name
+                    const valueMatch = cond.match(/"([^"]*)"/); // Match the value in quotes
+                    const conditionLogic = getConditionLogic(cond); // Determine the condition logic
+
+                    // Identify condition type based on the question name (example logic)
+                    const conditionType = questionMatch?.[0]?.includes("Photo_label_name")
+                        ? "photofield"
+                        : "textboxfield";
+
+                    return {
+                        question_name: questionMatch?.[0] || "",
+                        condition_logic: conditionLogic,
+                        value: valueMatch?.[1] || "",
+                        dropdown: false,
+                        condition_dropdown: false,
+                        condition_type: conditionType,
+                    };
+                }),
+            };
+        });
+    };
+
+
+    useLayoutEffect(() => {
+        let compliance_logic = parseBasicEditorLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
         console.log(compliance_logic, 'lllllll')
+        setConditions(compliance_logic)
         setInputValue(compliance_logic)
-    }, [conditionalLogicData, selectedQuestionId])
+    }, [selectedQuestionId])
 
     return (
         <>

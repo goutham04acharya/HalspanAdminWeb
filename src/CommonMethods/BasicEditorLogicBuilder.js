@@ -52,7 +52,7 @@ export const buildConditionExpression = (conditionsArray) => {
     return conditionsArray?.map((conditionGroup) => {
         const expressions = conditionGroup.conditions.map((cond) => {
             const { question_name, condition_logic, value, date } = cond;
-            console.log(condition_logic, 'condition_logic')
+            // console.log(condition_logic, 'condition_logic')
             // Use the buildLogicExpression function for each condition
             return `${buildLogicExpression(question_name, condition_logic, value, date)}`;
         });

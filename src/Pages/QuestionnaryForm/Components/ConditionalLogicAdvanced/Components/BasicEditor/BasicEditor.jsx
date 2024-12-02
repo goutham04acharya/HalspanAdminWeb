@@ -7,12 +7,15 @@ import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 import { useDispatch } from 'react-redux';
 import { setNewLogic } from '../../../Fields/fieldSettingParamsSlice';
+import { useSelector } from 'react-redux';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData }) {
     const [dropdown, setDropdown] = useState(false)
     const dispatch = useDispatch();
+    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    console.log(conditions, 'conditions cbcbcbbc')
+    console.log(basicEditorLogic[selectedQuestionId].conditional_logic, 'conditions cbcbcbbc')
+    console.log(conditions, 'ddddddd')
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -145,40 +148,29 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
         setConditions(prevConditions => {
             // Create a deep copy of the conditions array
-            const updatedConditions = prevConditions.map((condition, index) => {
-                if (index === mainIndex) {
-                    // Clone the specific conditions array and update the target condition
-                    return {
-                        ...condition,
-                        conditions: condition.conditions.map((subCondition, idx) => {
-                            if (idx === subIndex) {
-                                return {
-                                    ...subCondition,
-                                    value: e.target.value // Update the value immutably
-                                };
-                            }
-                            return subCondition; // Keep other subconditions unchanged
-                        })
-                    };
-                }
-                return condition; // Keep other conditions unchanged
-            });
+            // Create a new array from the current conditions
+            const updatedConditions = [...prevConditions];
+            // Access the specific condition using mainIndex and subIndex
+            const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
 
-            return updatedConditions; // Return the fully updated conditions array
+           // Update the condition_logic key with the value sent to the function
+           conditionToUpdate.value = e.target.value;
+           return updatedConditions;
         });
-
+        console.log(conditions, 'fffff')
+        
         // Ensure `conditions` is the latest state before dispatching
-        setConditions(prevConditions => {
-            const latestConditions = [...prevConditions]; // Clone before dispatching
-            dispatch(
-                setNewLogic({
-                    id: 'conditional_logic',
-                    value: latestConditions,
-                    questionId: selectedQuestionId
-                })
-            );
-            return latestConditions; // Return to maintain the state chain
-        });
+        // setConditions(prevConditions => {
+        //     const latestConditions = [...prevConditions]; // Clone before dispatching
+        //     dispatch(
+        //         setNewLogic({
+        //             id: 'conditional_logic',
+        //             value: latestConditions,
+        //             questionId: selectedQuestionId
+        //         })
+        //     );
+        //     return latestConditions; // Return to maintain the state chain
+        // });
     };
 
     //function to set the value from the selection dropdown for selecting the question
@@ -298,11 +290,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
-                {conditionalLogicData[selectedQuestionId]?.conditional_logic?.map((condition, index) => (
+                {conditions?.map((condition, index) => (
 
                     <div key={index} className='mb-6'>
                         {console.log(condition, 'conditionconditionconditioncondition')}
-                        {condition.length > 1 ? condition['conditions']?.map((sub_cond, i) => (
+                        {condition['conditions']?.map((sub_cond, i) => (
                             <div className='flex gap-4 items-start justify-between mb-6'>
                                 <div className='w-[97%] flex items-end gap-6 bg-[#EFF1F8] p-2.5'>
                                     <div className='w-[97%] -mx-2 flex'>
@@ -415,118 +407,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                 </div>
 
                             </div>
-                        )) : <div className='flex gap-4 items-start justify-between mb-6'>
-                            <div className='w-[97%] flex items-end gap-6 bg-[#EFF1F8] p-2.5'>
-                                <div className='w-[97%] -mx-2 flex'>
-                                    <div className='w-1/3 px-2 '>
-                                        <div className=''>
-                                            <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
-                                            <InputWithDropDown
-                                                label=''
-                                                labelStyle='font-semibold text-[#2B333B] text-base'
-                                                id='dropdown'
-                                                top='30px'
-                                                placeholder='Select'
-                                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                testID={`select-${index}`}
-                                                labeltestID={`select-dropdown-${index}`}
-                                                selectedOption={condition?.question_name}
-                                                handleOptionClick={handleSelectDropdown}
-                                                isDropdownOpen={conditions[index]['conditions'][i]['dropdown']}
-                                                mainIndex={index}
-                                                subIndex={i}
-                                                setDropdownOpen={updateDropdown}
-                                                options={secDetailsForSearching}
-                                                validationError={submitSelected && condition?.question_name === ''}
-                                            />
-                                            {submitSelected && condition?.question_name === '' && <ErrorMessage error={'This field is mandatory'} />}
-                                        </div>
-                                    </div>
-                                    <div className='w-1/3 px-2 '>
-                                        <div className=''>
-                                            <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
-                                            <InputWithDropDown
-                                                // label='Format'
-                                                labelStyle='font-semibold text-[#2B333B] text-base'
-                                                id='condition_dropdown'
-                                                top='30px'
-                                                placeholder='Select'
-                                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                testID={`condition-${index}`}
-                                                labeltestID={`condition-dropdown-${index}`}
-                                                selectedOption={conditions[index]?.conditions[i]?.condition_logic}
-                                                handleOptionClick={handleSelectDropdown}
-                                                mainIndex={index}
-                                                subIndex={i}
-                                                isDropdownOpen={conditions[index]['conditions'][i]['condition_dropdown']}
-                                                setDropdownOpen={updateDropdown}
-                                                options={getConditions(conditions[index].conditions[i].condition_type)}
-                                                validationError={submitSelected && conditions[index]?.conditions[i]?.condition_logic === ''}
-                                            />
-                                            {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
-                                        </div>
-                                    </div>
-                                    {conditions[index]?.conditions[i]?.condition_logic === 'date is “X” date of set date' && <div className='w-1/3 px-2 '>
-                                        <p className='text-sm text-[#2B333B] mb-[11px]'>Set Date</p>
-                                        <DatePicker
-                                            autoComplete='off'
-                                            label=''
-                                            id='value'
-                                            type='text'
-                                            value={conditions[index].conditions[i]?.date || null}
-                                            className='w-full'
-                                            labelStyle=''
-                                            testId={`set-date-${index}-${i}`}
-                                            htmlFor=''
-                                            mainIndex={index}
-                                            subIndex={i}
-                                            handleChange={handleDatePicker}
-                                            validationError={submitSelected && conditions[index]?.conditions[i]?.date === '' && 'This field  is mandatory'}
-                                        />
-                                    </div>}
-                                    {showInputValue(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
-                                        <div className=''>
-                                            <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
-                                            <InputField
-                                                autoComplete='off'
-                                                label=''
-                                                id='value'
-                                                type='text'
-                                                value={conditions[index].conditions[i].value}
-                                                className='w-full'
-                                                labelStyle=''
-                                                placeholder=''
-                                                testId={`value-input-${index}-${i}`}
-                                                htmlFor=''
-                                                maxLength={32}
-                                                mainIndex={index}
-                                                subIndex={i}
-                                                handleChange={handleInputChange}
-                                                onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
-                                                validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
-                                                basicEditor
-                                            />
-                                        </div>
-
-                                    </div>}
-
-                                </div>
-
-                                {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
-                                    <Image src="add" className="cursor-pointer" data-testid="add" />
-                                    <p className='text-sm text-[#2B333B] -mt-2 font-semibold cursor-pointer'>AND</p>
-                                </div> : <div className='w-[3%] flex flex-col items-center'>
-                                    
-                                    <p className='text-sm text-[#2B333B] -mt-2 font-semibold'>AND</p>
-                                </div>}
-                            </div>
-                            <div className='w-[3%] flex justify-end'>
-                                <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit' onClick={() => handleAdd("delete", index, i)}>
-                                    <Image src="trash-black" className="" data-testid="delete" />
-                                </div>
-                            </div>
-
-                        </div>}
+                        ))}
                         {conditions.length - 1 === index ? <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => handleAdd('OR')}>
                             <Image src="add" className="mx-auto w-8 h-8" data-testid="add" />
                             <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
