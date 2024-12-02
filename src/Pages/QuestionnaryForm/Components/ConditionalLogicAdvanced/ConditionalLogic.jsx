@@ -691,8 +691,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 conditionalLogic = sectionConditionLogic
             } else if (pageConditionLogicId) {
                 const sectionId = pageConditionLogicId.split('_')[0]
-                const section = sectionsData.find(section => section.section_id === sectionId);
-                const page = section?.pages.find(page => page.page_id === pageConditionLogicId);
+                const section = sectionsData.find(section => section.section_id.includes(sectionId));
+                const page = section?.pages.find(page => page.page_id.includes(pageConditionLogicId));
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
             } else {
@@ -1226,7 +1226,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return false;  // Return false if all keys have values
     };
-
     const handleSaveBasicEditor = () => {
 
         if (complianceState) {
@@ -1249,7 +1248,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditionalLogic) {
             try {
                 condition_logic = buildConditionExpression(conditions);
-                console.log(condition_logic, 'am i getting this')
             } catch (error) {
             }
         }
@@ -1258,11 +1256,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         }
         if (pageConditionLogicId) {
-            console.log(pageConditionLogicId, 'pageCOnditiopn')
             condition_logic = buildConditionExpression(conditions);
-           
+
         }
-        const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+        let sectionId
+        if (selectedQuestionId) {
+            sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+        } else if (sectionConditionLogicId) {
+            sectionId = sectionConditionLogicId
+        } else if (pageConditionLogicId) {
+            sectionId = pageConditionLogicId.split('_')[0]
+        }
 
         handleSaveSection(sectionId, true, condition_logic);
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
