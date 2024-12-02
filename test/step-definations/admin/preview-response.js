@@ -13,7 +13,7 @@ When('I enter the conditional logic for textbox field', async function () {
 });
 
 When('I enter the text as {string} in textbox for section {int} page {int} question {int}', async function (text, sectionNumber, pageNumber, quesionNumber) {
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     const text_area = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="input"]`)), 5000);
     await driver.wait(until.elementIsVisible(text_area), 2000);
     await text_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
@@ -44,7 +44,7 @@ Then('I should not see the choice field at section {int} page {int} question {in
 //------------------------------------------ This is not correct needs to be improved ------------------------------------------------
 When('I enter the conditional logic for date\\/time field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.AddDays(5) === "05/11/2024"');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.AddDays(5) === "30/11/2024"');
 });
 
 When('I enter the date as {string} in date field for section {int} page {int} question {int}', async function (date, sectionNumber, pageNumber, quesionNumber) {

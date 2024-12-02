@@ -2,7 +2,7 @@
 const { faker } = require('@faker-js/faker');
 
 async function create_questionnaire_payload() {
-    let publicName = `bddtest${faker.string.alphanumeric(8)}`; // Use random.alphaNumeric
+    let publicName = `bddtest${faker.string.alphanumeric(20)}`; // Use random.alphaNumeric
     global.questionPublicName = publicName;
     return {
         // "public_name" : publicName,

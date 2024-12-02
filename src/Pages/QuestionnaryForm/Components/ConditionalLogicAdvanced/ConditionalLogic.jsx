@@ -750,7 +750,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId, allSectionDetails]);
 
     const handleSave = async () => {
+        debugger
         const sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
+        console.log(selectedQuestionId, 'sectionID')
         setShowSectionList(false);
 
 
