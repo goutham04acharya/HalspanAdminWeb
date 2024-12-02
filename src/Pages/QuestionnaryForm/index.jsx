@@ -595,7 +595,6 @@ const QuestionnaryForm = () => {
         sectionId = sectionId?.replace('bddtest#','')
         if (compliance) {
             let compliance = [...complianceLogic]
-            // console.log(compliance,'gggggggggggggggggg')
             compliance[complianceLogicId].default_content = payloadString;
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>

@@ -77,7 +77,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         try {
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
-            console.log(questionList, 'qyestion')
             setIsLoading(false); // Start loading
         } catch (error) {
             console.error('Error fetching question list:', error);
@@ -107,7 +106,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         const filteredList = questionList.filter((item) => item.component_type === componentType);
         console.log("Filtered List:", filteredList); // Logs only the filtered list for debugging
         return filteredList.map((item) => ({
-            label: `${item.section_name}.${item.page_name}.${item.question_name}`,
+            label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentType})`,
             value: item.question_id,
         }));
     };
