@@ -40,7 +40,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    console.log(conditionalValues, 'conditional values')
+    console.log(sections, 'nahanahha')
+
     const handleConditionalLogic = async (data) => {
         let result = {};
 
@@ -62,10 +63,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
 
     }
+
     const updateConditionalValues = async (data) => {
         const result = await handleConditionalLogic(data);
         setConditionalValues(result);
     };
+
     useEffect(() => {
         const fetchSections = async () => {
             setLoading(true);
@@ -188,7 +191,57 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         return results;
     };
 
-    const allPages = sections.flatMap((section) => section.pages.map((page) => ({ page_name: page.page_name, page_id: page.page_id })));
+    // Initial State: Exclude sections with non-empty `section_conditional_logic`
+    const initialAllPages = sections
+        .filter((section) => !section.section_conditional_logic || section.section_conditional_logic.trim() === '')
+        .filter((section) => {
+            if (section.section_conditional_logic) {
+                try {
+                    // Evaluate the section's conditional logic
+                    return eval(section.section_conditional_logic);
+                } catch (err) {
+                    console.error('Error evaluating section conditional logic:', err);
+                    return false; // Exclude the section if evaluation fails
+                }
+            }
+            return true; // Include sections without conditional logic
+        })
+        .flatMap((section) =>
+            section.pages.map((page) => ({
+                page_name: page.page_name,
+                page_id: page.page_id,
+            }))
+        );
+
+    // Dynamically evaluate `section_conditional_logic` and update pages
+    const getEvaluatedAllPages = () => {
+        return sections
+            .filter((section) => {
+                if (section.section_conditional_logic) {
+                    try {
+                        // Evaluate the section's conditional logic
+                        return eval(section.section_conditional_logic);
+                    } catch (err) {
+                        console.error('Error evaluating section conditional logic:', err);
+                        return false; // Exclude the section if evaluation fails
+                    }
+                }
+                return true; // Include sections without conditional logic
+            })
+            .flatMap((section) =>
+                section.pages.map((page) => ({
+                    page_name: page.page_name,
+                    page_id: page.page_id,
+                }))
+            );
+    };
+
+    // Usage
+    // console.log('Initial Pages:', initialAllPages);
+
+    // Simulate user interaction or dynamic evaluation
+    const allPages = getEvaluatedAllPages();
+    console.log('Evaluated Pages:', allPages);
 
     const validateFormat = (value, format, regex) => {
         switch (format) {
@@ -205,120 +258,274 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
+
+
+
+    // const handleNextClick = () => {
+    // const questions = sections[currentSection].pages[currentPage].questions;
+    //     const errors = questions.reduce((acc, question) => {
+    //         // First check if the question should be visible based on conditional logic
+    //         let isVisible = true;
+    // if (question.conditional_logic !== '') {
+    //     try {
+    //         if (question.conditional_logic.includes("new Date(")) {
+    //             // Handle date-specific logic
+    //             isVisible = eval(question.conditional_logic);
+    //         } else if (question.conditional_logic.includes("getMonth(")) {
+    //             // Handle month-specific logic with adjustment
+    //             const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
+    //             isVisible = eval(replacedLogic);
+    //         } else {
+    //             // Handle regular conditional logic
+    //             isVisible = eval(question.conditional_logic);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error evaluating conditional logic:", error);
+    //         isVisible = false;
+    //     }
+    // }
+    //         // Only validate if the question is visible
+    //         if (isVisible) {
+    //             // Validate based on component type
+    //             switch (question.component_type) {
+    //                 case 'textboxfield':
+    //                     if (!question.options?.optional) {
+    //                         if (value[question.question_id] === '' || value[question.question_id] === undefined) {
+    //                             acc[question.question_id] = 'This is a mandatory field';
+    //                         } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
+    //                             acc[question.question_id] = question.format_error;
+    //                         }
+    //                     }
+    //                     break;
+
+    //                 case 'choiceboxfield':
+    //                     if (!question?.options?.optional) {
+    //                         if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+    //                             acc[question.question_id] = 'This is a mandatory field';
+    //                         } else {
+    //                             break;
+    //                         }
+    //                     }
+    //                 case 'numberfield':
+    //                     if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
+    //                         acc[question.question_id] = 'This is a mandatory field';
+    //                     }
+    //                     break;
+
+    //                 case 'dateTimefield':
+    //                     if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
+    //                         acc[question.question_id] = 'This is a mandatory field';
+    //                     }
+    //                     break;
+
+    //                 case 'photofield':
+    //                     if (!question?.options?.optional) {
+    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+    //                             acc[question.question_id] = 'This is a mandatory field';
+    //                         }
+    //                     }
+    //                 case 'filefield':
+    //                     if (!question?.options?.optional) {
+    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+    //                             acc[question.question_id] = 'This is a mandatory field';
+    //                         }
+    //                     }
+    //                 case 'videofield':
+    //                     if (!question?.options?.optional) {
+    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+    //                             acc[question.question_id] = 'This is a mandatory field';
+    //                         }
+    //                     }
+    //                 case 'gpsfield':
+    //                     if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
+    //                         acc[question.question_id] = 'This is a mandatory field';
+    //                     }
+    //                     break;
+    //             }
+    //         }
+    //         return acc;
+    //     }, {});
+
+    // if (Object.keys(errors).length > 0) {
+    //     setValidationErrors((prevErrors) => ({
+    //         ...prevErrors,
+    //         preview_textboxfield: errors,
+    //         preview_choiceboxfield: errors,
+    //         preview_numberfield: errors,
+    //         preview_datetimefield: errors,
+    //         preview_photofield: errors,
+    //         preview_filefield: errors,
+    //         preview_videofield: errors,
+    //         preview_gpsfield: errors,
+    //     }));
+    // } else {
+    //     const isLastSection = currentSection === sections.length - 1;
+    //     const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
+
+    //     if (isLastSection && isLastPageInSection) {
+    //         setShowComplianceScreen(true);
+    //         setIsLastPage(true);
+    //     } else if (currentPage < sections[currentSection].pages.length - 1) {
+    //         setCurrentPage(currentPage + 1);
+    //         setTotalPagesNavigated(totalPagesNavigated + 1);
+    //     } else {
+    //         setCurrentSection(currentSection + 1);
+    //         setCurrentPage(0);
+    //         setTotalPagesNavigated(totalPagesNavigated + 1);
+    //     }
+    // }
+    // };
+
     const handleNextClick = () => {
-        const questions = sections[currentSection].pages[currentPage].questions;
-        const errors = questions.reduce((acc, question) => {
-            // First check if the question should be visible based on conditional logic
-            let isVisible = true;
-            if (question.conditional_logic !== '') {
-                try {
-                    if (question.conditional_logic.includes("new Date(")) {
-                        // Handle date-specific logic
-                        isVisible = eval(question.conditional_logic);
-                    } else if (question.conditional_logic.includes("getMonth(")) {
-                        // Handle month-specific logic with adjustment
-                        const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
-                        isVisible = eval(replacedLogic);
-                    } else {
-                        // Handle regular conditional logic
-                        isVisible = eval(question.conditional_logic);
-                    }
-                } catch (error) {
-                    console.error("Error evaluating conditional logic:", error);
-                    isVisible = false;
+        // d-ebugger
+        const currentSectionData = sections[currentSection + 1];
+        let isSectionVisible = false;
+
+        // Evaluate the section_conditional_logic if it exists
+        if (currentSectionData?.section_conditional_logic) {
+            try {
+                if (currentSectionData.section_conditional_logic.includes("new Date(")) {
+                    // Handle date-specific logic
+                    isSectionVisible = eval(currentSectionData.section_conditional_logic);
+                } else if (currentSectionData.section_conditional_logic.includes("getMonth(")) {
+                    // Handle month-specific logic with adjustment
+                    const replacedLogic = currentSectionData.section_conditional_logic.replace("getMonth()", "getMonth() + 1");
+                    isSectionVisible = eval(replacedLogic);
+                } else {
+                    // Handle regular conditional logic
+                    isSectionVisible = eval(currentSectionData.section_conditional_logic);
                 }
-            }
-            // Only validate if the question is visible
-            if (isVisible) {
-                // Validate based on component type
-                switch (question.component_type) {
-                    case 'textboxfield':
-                        if (!question.options?.optional) {
-                            if (value[question.question_id] === '' || value[question.question_id] === undefined) {
-                                acc[question.question_id] = 'This is a mandatory field';
-                            } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
-                                acc[question.question_id] = question.format_error;
-                            }
-                        }
-                        break;
-
-                    case 'choiceboxfield':
-                        if (!question?.options?.optional) {
-                            if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                                acc[question.question_id] = 'This is a mandatory field';
-                            } else {
-                                break;
-                            }
-                        }
-                    case 'numberfield':
-                        if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-                            acc[question.question_id] = 'This is a mandatory field';
-                        }
-                        break;
-
-                    case 'dateTimefield':
-                        if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-                            acc[question.question_id] = 'This is a mandatory field';
-                        }
-                        break;
-
-                    case 'photofield':
-                        if (!question?.options?.optional) {
-                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                acc[question.question_id] = 'This is a mandatory field';
-                            }
-                        }
-                    case 'filefield':
-                        if (!question?.options?.optional) {
-                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                acc[question.question_id] = 'This is a mandatory field';
-                            }
-                        }
-                    case 'videofield':
-                        if (!question?.options?.optional) {
-                            if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                acc[question.question_id] = 'This is a mandatory field';
-                            }
-                        }
-                    case 'gpsfield':
-                        if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
-                            acc[question.question_id] = 'This is a mandatory field';
-                        }
-                        break;
-                }
-            }
-            return acc;
-        }, {});
-
-        if (Object.keys(errors).length > 0) {
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: errors,
-                preview_choiceboxfield: errors,
-                preview_numberfield: errors,
-                preview_datetimefield: errors,
-                preview_photofield: errors,
-                preview_filefield: errors,
-                preview_videofield: errors,
-                preview_gpsfield: errors,
-            }));
-        } else {
-            const isLastSection = currentSection === sections.length - 1;
-            const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-
-            if (isLastSection && isLastPageInSection) {
-                setShowComplianceScreen(true);
-                setIsLastPage(true);
-            } else if (currentPage < sections[currentSection].pages.length - 1) {
-                setCurrentPage(currentPage + 1);
-                setTotalPagesNavigated(totalPagesNavigated + 1);
-            } else {
-                setCurrentSection(currentSection + 1);
-                setCurrentPage(0);
-                setTotalPagesNavigated(totalPagesNavigated + 1);
+            } catch (error) {
+                console.error("Error evaluating section conditional logic:", error);
+                isSectionVisible = false;
             }
         }
+
+        // Proceed only if the section is visible
+        if (isSectionVisible) {
+            const questions = sections[currentSection].pages[currentPage].questions;
+            const errors = questions.reduce((acc, question) => {
+                let isVisible = true;
+                
+                // Evaluate question conditional logic
+                if (question.conditional_logic !== '') {
+                    try {
+                        if (question.conditional_logic.includes("new Date(")) {
+                            // Handle date-specific logic
+                            isVisible = eval(question.conditional_logic);
+                        } else if (question.conditional_logic.includes("getMonth(")) {
+                            // Handle month-specific logic with adjustment
+                            const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
+                            isVisible = eval(replacedLogic);
+                        } else {
+                            // Handle regular conditional logic
+                            isVisible = eval(question.conditional_logic);
+                        }
+                    } catch (error) {
+                        console.error("Error evaluating conditional logic:", error);
+                        isVisible = false;
+                    }
+                }
+
+                // Validate questions if visible
+                if (isVisible) {
+                    switch (question.component_type) {
+                        case 'textboxfield':
+                            if (!question.options?.optional) {
+                                if (value[question.question_id] === '' || value[question.question_id] === undefined) {
+                                    acc[question.question_id] = 'This is a mandatory field';
+                                } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
+                                    acc[question.question_id] = question.format_error;
+                                }
+                            }
+                            break;
+
+                        case 'choiceboxfield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                                    acc[question.question_id] = 'This is a mandatory field';
+                                } else {
+                                    break;
+                                }
+                            }
+                        case 'numberfield':
+                            if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                            break;
+
+                        case 'dateTimefield':
+                            if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                            break;
+
+                        case 'photofield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                        case 'filefield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                        case 'videofield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                        case 'gpsfield':
+                            if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
+                                acc[question.question_id] = 'This is a mandatory field';
+                            }
+                            break;
+                    }
+                }
+
+                return acc;
+            }, {});
+
+            // Handle errors or navigate to the next step
+            if (Object.keys(errors).length > 0) {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_textboxfield: errors,
+                    preview_choiceboxfield: errors,
+                    preview_numberfield: errors,
+                    preview_datetimefield: errors,
+                    preview_photofield: errors,
+                    preview_filefield: errors,
+                    preview_videofield: errors,
+                    preview_gpsfield: errors,
+                }));
+            } else {
+                const isLastSection = currentSection === sections.length - 1;
+                const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
+
+                if (isLastSection && isLastPageInSection) {
+                    setShowComplianceScreen(true);
+                    setIsLastPage(true);
+                } else if (currentPage < sections[currentSection].pages.length - 1) {
+                    setCurrentPage(currentPage + 1);
+                    setTotalPagesNavigated(totalPagesNavigated + 1);
+                } else {
+                    setCurrentSection(currentSection + 1);
+                    setCurrentPage(0);
+                    setTotalPagesNavigated(totalPagesNavigated + 1);
+                }
+            }
+        } else {
+            console.log(`Section ${currentSectionData.section_name} is hidden due to conditional logic.`);
+        }
     };
+
+
+
+
 
     const handleBackClick = () => {
         if (showComplianceScreen) {
@@ -338,22 +545,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        // if ((question.conditional_logic !== "" && eval(question?.conditional_logic))) return null;
         const commonProps = {
             preview: true,
             setValidationErrors,
             validationErrors,
-            // onStartEdit: () => handleFieldEdit(question.question_id),
-            // value: fieldValue,
             sections: sections[currentSection],
             setConditionalValues,
             conditionalValues,
-            // isEditable
         };
 
-        // if (!question) {
-        //     return <p>No question data available.</p>;
-        // }
         switch (question?.component_type) {
             case 'textboxfield':
                 return <TextBoxField
@@ -418,10 +618,44 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
+
+    // const isLastSectionAndPage = () => {
+    //     const nextSectionData = sections[currentSection + 1];
+    //     let isSectionEval = false;
+    //     if(nextSectionData?.section_conditional_logic){
+    //         isSectionEval = eval(nextSectionData?.section_conditional_logic)
+    //     }
+    //     console.log(isSectionEval, 'dddddddddddddd')
+    //     if(isSectionEval){
+    //         return false;
+    //     }else{
+    //         return currentSection === sections.length - 1 &&
+    //         currentPage === sections[currentSection]?.pages.length - 1;
+    //     }
+
+    // };
     const isLastSectionAndPage = () => {
+        const nextSectionData = sections[currentSection + 1]; // Get the next section
+        let isSectionEval = false;
+
+        // Evaluate the next section's conditional logic if it exists
+        if (nextSectionData?.section_conditional_logic) {
+            try {
+                isSectionEval = eval(nextSectionData.section_conditional_logic);
+            } catch (err) {
+                console.error('Error evaluating section conditional logic:', err);
+            }
+        }
+        console.log(isSectionEval, 'Evaluated section logic'); // Debugging
+        // If the next section logic evaluates to false, show "Submit" button
+        if (!isSectionEval) {
+            return true;
+        }
+        // Check if we are on the last section and last page
         return currentSection === sections.length - 1 &&
             currentPage === sections[currentSection]?.pages.length - 1;
     };
+
 
     useEffect(() => {
         sections.forEach(section => {

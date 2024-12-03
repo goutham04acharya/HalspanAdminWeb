@@ -682,9 +682,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const findSelectedQuestion = () => {
             //adding this to check whether the advane editor or the default logic
             let conditionalLogic = ''
-            if (isDefaultLogic) {
-                conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
-            } else if (sectionConditionLogicId) {
+            if (sectionConditionLogicId) {
                 const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
                 // Get the section_condition_logic if it exists
                 const sectionConditionLogic = section?.section_conditional_logic || '';
@@ -695,11 +693,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const page = section?.pages.find(page => page.page_id.includes(pageConditionLogicId));
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
+            } else if (isDefaultLogic) {
+                conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
             } else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
-
 
             // Replace && with "and" and || with "or"
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
@@ -734,10 +733,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const handleSave = async () => {
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-        if (!sectionId && sectionConditionLogicId) {
+        if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
         }
-        if (!sectionId && pageConditionLogicId) {
+        if (pageConditionLogicId) {
             sectionId = pageConditionLogicId.split('_')[0]
         }
 
@@ -1260,12 +1259,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         }
         let sectionId
-        if (selectedQuestionId) {
-            sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
-        } else if (sectionConditionLogicId) {
+        if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
         } else if (pageConditionLogicId) {
             sectionId = pageConditionLogicId.split('_')[0]
+        } else if (selectedQuestionId) {
+            sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
 
         handleSaveSection(sectionId, true, condition_logic);

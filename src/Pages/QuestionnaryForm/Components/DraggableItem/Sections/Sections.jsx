@@ -125,7 +125,7 @@ const Sections = ({
                               title="page-condition-logic"
                               alt="page-condition-logic"
                               data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                              className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[47px]`}
+                              className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[80px]`}
                               onClick={
                                 formStatus === 'Draft'
                                   ? () => setPageConditionLogicId(pageData?.page_id)
