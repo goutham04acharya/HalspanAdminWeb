@@ -7,7 +7,9 @@ import {
   setShowPageDeleteModal,
   setSelectedSectionData,
   setPageToDelete,
-  setDataIsSame
+  setDataIsSame,
+  setSelectedQuestionId,
+  setSelectedComponent
 } from "../../QuestionnaryFormSlice";
 
 const Sections = ({
@@ -128,7 +130,9 @@ const Sections = ({
                               className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[80px]`}
                               onClick={
                                 formStatus === 'Draft'
-                                  ? () => setPageConditionLogicId(pageData?.page_id)
+                                  ? () => {setPageConditionLogicId(pageData?.page_id)
+                                    dispatch(setSelectedQuestionId(''))
+                                    dispatch(setSelectedComponent(null));}
                                   : null
                               }
                             />

@@ -14,8 +14,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const dispatch = useDispatch();
     const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    console.log(basicEditorLogic[selectedQuestionId].conditional_logic, 'conditions cbcbcbbc')
-    console.log(conditions, 'ddddddd')
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -176,7 +174,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
+        console.log(key, 'key')
         if (type === 'condition_dropdown') {
+            console.log('condition_dropdown')
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
                 const updatedConditions = [...prevConditions];

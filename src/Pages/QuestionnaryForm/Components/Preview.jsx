@@ -40,6 +40,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
+    console.log(value, 'conditiona values')
     console.log(sections, 'nahanahha')
 
     const handleConditionalLogic = async (data) => {
@@ -377,56 +378,79 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     // };
 
     const handleNextClick = () => {
-        // d-ebugger
+        console.log('oooo');
         const currentSectionData = sections[currentSection + 1];
-        let isSectionVisible = false;
-
-        // Evaluate the section_conditional_logic if it exists
-        if (currentSectionData?.section_conditional_logic) {
+        let isSectionVisible = true; // Default to true unless logic makes it false
+    
+        console.log(currentSectionData, 'currentSectionData');
+        console.log(currentPage, 'currentPage');
+        
+        const pageConditionalLogic = currentSectionData.pages[currentPage]?.page_conditional_logic;
+        const sectionConditionalLogic = currentSectionData?.section_conditional_logic;
+        console.log(pageConditionalLogic, 'pageConditionalLogic');
+        console.log(sectionConditionalLogic, 'sectionConditionalLogic');
+    
+        // Helper function to evaluate logic
+        const evaluateLogic = (logic) => {
             try {
-                if (currentSectionData.section_conditional_logic.includes("new Date(")) {
+                if (logic.includes("new Date(")) {
                     // Handle date-specific logic
-                    isSectionVisible = eval(currentSectionData.section_conditional_logic);
-                } else if (currentSectionData.section_conditional_logic.includes("getMonth(")) {
+                    return eval(logic);
+                } else if (logic.includes("getMonth(")) {
                     // Handle month-specific logic with adjustment
-                    const replacedLogic = currentSectionData.section_conditional_logic.replace("getMonth()", "getMonth() + 1");
-                    isSectionVisible = eval(replacedLogic);
+                    const replacedLogic = logic.replace("getMonth()", "getMonth() + 1");
+                    return eval(replacedLogic);
+                } else if (logic.includes("getDay()")) {
+                    // Handle day-specific logic
+                    const daysMap = {
+                        Sunday: 0,
+                        Monday: 1,
+                        Tuesday: 2,
+                        Wednesday: 3,
+                        Thursday: 4,
+                        Friday: 5,
+                        Saturday: 6,
+                    };
+                    const replacedLogic = logic.replace(
+                        /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
+                        (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+                    );
+                    return eval(replacedLogic);
                 } else {
                     // Handle regular conditional logic
-                    isSectionVisible = eval(currentSectionData.section_conditional_logic);
+                    return eval(logic);
                 }
             } catch (error) {
-                console.error("Error evaluating section conditional logic:", error);
-                isSectionVisible = false;
+                console.error("Error evaluating conditional logic:", error);
+                return false;
             }
+        };
+    
+        // Evaluate sectionConditionalLogic first
+        if (sectionConditionalLogic) {
+            console.log('Evaluating sectionConditionalLogic...');
+            isSectionVisible = evaluateLogic(sectionConditionalLogic);
         }
-
-        // Proceed only if the section is visible
+    
+        // If section is visible, evaluate pageConditionalLogic
+        if (isSectionVisible && pageConditionalLogic) {
+            console.log('Evaluating pageConditionalLogic...');
+            isSectionVisible = evaluateLogic(pageConditionalLogic);
+        }
+    
+        // Proceed based on the combined visibility
         if (isSectionVisible) {
+            console.log('Section is visible, proceeding...');
             const questions = sections[currentSection].pages[currentPage].questions;
             const errors = questions.reduce((acc, question) => {
                 let isVisible = true;
-                
+    
                 // Evaluate question conditional logic
                 if (question.conditional_logic !== '') {
-                    try {
-                        if (question.conditional_logic.includes("new Date(")) {
-                            // Handle date-specific logic
-                            isVisible = eval(question.conditional_logic);
-                        } else if (question.conditional_logic.includes("getMonth(")) {
-                            // Handle month-specific logic with adjustment
-                            const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
-                            isVisible = eval(replacedLogic);
-                        } else {
-                            // Handle regular conditional logic
-                            isVisible = eval(question.conditional_logic);
-                        }
-                    } catch (error) {
-                        console.error("Error evaluating conditional logic:", error);
-                        isVisible = false;
-                    }
+                    console.log('Evaluating question conditional logic...');
+                    isVisible = evaluateLogic(question.conditional_logic);
                 }
-
+    
                 // Validate questions if visible
                 if (isVisible) {
                     switch (question.component_type) {
@@ -439,73 +463,52 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 }
                             }
                             break;
-
+    
                         case 'choiceboxfield':
-                            if (!question?.options?.optional) {
-                                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-                                    acc[question.question_id] = 'This is a mandatory field';
-                                } else {
-                                    break;
-                                }
+                            if (!question?.options?.optional && (value[question?.question_id] === '' || value[question?.question_id] === undefined)) {
+                                acc[question.question_id] = 'This is a mandatory field';
                             }
+                            break;
+    
                         case 'numberfield':
                             if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
                                 acc[question.question_id] = 'This is a mandatory field';
                             }
                             break;
-
+    
                         case 'dateTimefield':
                             if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
                                 acc[question.question_id] = 'This is a mandatory field';
                             }
                             break;
-
+    
                         case 'photofield':
-                            if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                    acc[question.question_id] = 'This is a mandatory field';
-                                }
-                            }
                         case 'filefield':
-                            if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                    acc[question.question_id] = 'This is a mandatory field';
-                                }
-                            }
                         case 'videofield':
-                            if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-                                    acc[question.question_id] = 'This is a mandatory field';
-                                }
-                            }
                         case 'gpsfield':
-                            if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
+                            if (!question?.options?.optional && (value[question?.question_id] === false || value[question?.question_id] === undefined)) {
                                 acc[question.question_id] = 'This is a mandatory field';
                             }
                             break;
+    
+                        default:
+                            console.warn(`Unknown component type: ${question.component_type}`);
                     }
                 }
-
+    
                 return acc;
             }, {});
-
+    
             // Handle errors or navigate to the next step
             if (Object.keys(errors).length > 0) {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
-                    preview_textboxfield: errors,
-                    preview_choiceboxfield: errors,
-                    preview_numberfield: errors,
-                    preview_datetimefield: errors,
-                    preview_photofield: errors,
-                    preview_filefield: errors,
-                    preview_videofield: errors,
-                    preview_gpsfield: errors,
+                    ...errors,
                 }));
             } else {
                 const isLastSection = currentSection === sections.length - 1;
                 const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-
+    
                 if (isLastSection && isLastPageInSection) {
                     setShowComplianceScreen(true);
                     setIsLastPage(true);
@@ -522,7 +525,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             console.log(`Section ${currentSectionData.section_name} is hidden due to conditional logic.`);
         }
     };
-
+    
 
 
 
@@ -635,25 +638,33 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // };
     const isLastSectionAndPage = () => {
-        const nextSectionData = sections[currentSection + 1]; // Get the next section
-        let isSectionEval = false;
+        const isLastSectionAndPage = () => {
+            // Check if we are on the last section and last page
+            const isLastPageInSection =
+                currentPage === sections[currentSection]?.pages.length - 1;
+            const isLastSection = currentSection === sections.length - 1;
 
-        // Evaluate the next section's conditional logic if it exists
-        if (nextSectionData?.section_conditional_logic) {
-            try {
-                isSectionEval = eval(nextSectionData.section_conditional_logic);
-            } catch (err) {
-                console.error('Error evaluating section conditional logic:', err);
+            // If already on the last section and page, return true to show "Submit"
+            if (isLastSection && isLastPageInSection) {
+                return true;
             }
-        }
-        console.log(isSectionEval, 'Evaluated section logic'); // Debugging
-        // If the next section logic evaluates to false, show "Submit" button
-        if (!isSectionEval) {
-            return true;
-        }
-        // Check if we are on the last section and last page
-        return currentSection === sections.length - 1 &&
-            currentPage === sections[currentSection]?.pages.length - 1;
+
+            // Otherwise, evaluate the next section's conditional logic
+            const nextSectionData = sections[currentSection + 1];
+            if (nextSectionData?.section_conditional_logic) {
+                try {
+                    const isSectionEval = eval(nextSectionData.section_conditional_logic);
+                    console.log(isSectionEval, "Evaluated section logic");
+                    return isSectionEval; // Show "Submit" if the next section logic is false
+                } catch (err) {
+                    console.error("Error evaluating section conditional logic:", err);
+                    return false; // Fallback to "Next" if evaluation fails
+                }
+            }
+
+            // Default: Proceed to "Next" if no conditional logic exists
+            return false;
+        };
     };
 
 

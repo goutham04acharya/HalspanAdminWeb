@@ -1197,7 +1197,7 @@ const QuestionnaryForm = () => {
             const savedSection = compareSavedSections[i];
 
             // Compare section names and ids
-            if (section.section_name !== savedSection.section_name ||
+            if (section.section_name !== savedSection.section_name || 
                 section.section_id !== savedSection.section_id) {
                 return false; // Section names or ids are different
             }
@@ -1459,7 +1459,11 @@ const QuestionnaryForm = () => {
                                                                             title='Add Conditional-logic'
                                                                             data-testid={`add-conditional-btn-${sectionIndex}`}
                                                                             className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                            onClick={formStatus === 'Draft' ? () => setSectionConditionLogicId(sectionData.section_id) : null}  // Use arrow function
+                                                                            onClick={formStatus === 'Draft' ? () =>{ 
+                                                                                setSectionConditionLogicId(sectionData.section_id)
+                                                                                dispatch(setSelectedQuestionId(''))
+                                                                                dispatch(setSelectedComponent(null))}
+                                                                             : null}  // Use arrow function
                                                                         />
                                                                         <img src="/Images/trash-black.svg"
                                                                             alt="delete"

@@ -72,6 +72,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     },
     ])
 
+    console.log('conditions', conditions)
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -723,9 +724,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(conditionalLogic)
             console.log(parseLogicExpression(conditionalLogic), 'ggggggggggggggggggggggggggggggggggggggggggg')
 
+            // parseLogicExpression(conditionalLogic)
             // {
             //     !isDefaultLogic &&
             //         setConditions(parseLogicExpression(conditionalLogic));
+            // }
+            // if(sectionConditionLogicId || pageConditionLogicId){
+            //     setConditions(parseLogicExpression(conditionalLogic));
             // }
 
         };
@@ -822,7 +827,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
 
                     // Continue with other logic if needed
-                } else {
+                } else {setConditions
                     setError("Invalid format. Please use the format `getMonth() === value`.");
                     return;
                 }
@@ -1230,6 +1235,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
     const handleSaveBasicEditor = () => {
 
+        console.log(complianceState, 'complianceState')
         if (complianceState) {
             let compliance_logic = buildConditionExpression(conditions);
             setComplianceLogic((prev) => {
@@ -1247,19 +1253,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         let condition_logic;
-        if (conditionalLogic) {
-            try {
-                condition_logic = buildConditionExpression(conditions);
-            } catch (error) {
-            }
-        }
-        if (sectionConditionLogicId) {
+        try {
+            console.log(conditions, 'conditions')
             condition_logic = buildConditionExpression(conditions);
-
-        }
-        if (pageConditionLogicId) {
-            condition_logic = buildConditionExpression(conditions);
-
+            console.log(condition_logic, '333 conditionlogic')
+        } catch (error) {
         }
         let sectionId
         if (sectionConditionLogicId) {
@@ -1282,8 +1280,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     /* eslint-disable complexity */
     const parseBasicEditorLogicExpression = (logic) => {
         // Helper function to identify condition type
-        if(!logic){
-            return;
+        if (!logic) {
+            return [{
+                'conditions': [
+                    {
+                        'question_name': '',
+                        'condition_logic': '',
+                        'value': '',
+                        'dropdown': false,
+                        'condition_dropdown': false,
+                        'condition_type': 'textboxfield'
+                    },
+                ]
+            },
+            ];
         }
         const getConditionLogic = (expression) => {
             if (expression.includes("===")) return "equals";
@@ -1317,6 +1327,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         ? "photofield"
                         : "textboxfield";
 
+                        console.log(questionMatch, 'questionMatch')
                     return {
                         question_name: questionMatch?.[0] || "",
                         condition_logic: conditionLogic,
@@ -1331,11 +1342,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
 
-    useLayoutEffect(() => {
-        let compliance_logic = parseBasicEditorLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
-        console.log(compliance_logic, 'lllllll')
+    useEffect(() => {
+        let compliance_logic;
+        if (sectionConditionLogicId) {
+            // Find the section with the matching section ID
+            const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
+
+            if (section) {
+                // Extract and parse the section's conditional logic
+                compliance_logic = parseLogicExpression(section.section_conditional_logic);
+            } else {
+                console.error('Section not found for the given sectionConditionLogicId');
+            }
+        } else if (pageConditionLogicId) {
+            let pageFound = false;
+
+            // Iterate through sections to find the page with the matching page ID
+            sectionsData.forEach(section => {
+                const page = section.pages?.find(page => page.page_id === pageConditionLogicId);
+
+                if (page) {
+                    pageFound = true;
+                    // Extract and parse the page's conditional logic
+                    compliance_logic = parseLogicExpression(page.page_conditional_logic);
+                }
+            });
+
+            if (!pageFound) {
+                console.error('Page not found for the given pageConditionLogicId');
+            }
+        } else {
+            // Default: Extract and parse the conditional logic from the selected question
+            compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+        }
+
+        console.log(compliance_logic, 'compliance_logic')
         setConditions(compliance_logic)
-        setInputValue(compliance_logic)
     }, [selectedQuestionId])
 
     return (
