@@ -69,16 +69,20 @@ const fieldSettingParamsSlice = createSlice({
         },
         setNewLogic: (state, action) => {
             const { questionId, id, value } = action.payload;
+        
             if (!state.editorToggle[questionId]) {
                 state.editorToggle[questionId] = {};
-
             }
-
+        
+            const newValue = Array.isArray(value)
+                ? value.map((item) => ({ ...item }))
+                : { ...value };
+        
             state.editorToggle[questionId] = {
                 ...state.editorToggle[questionId],
-                [id]: value
+                [id]: newValue
             };
-        },
+        },     
         addNewFixedChoice: (state, action) => {
             const { questionId } = action.payload;
 
