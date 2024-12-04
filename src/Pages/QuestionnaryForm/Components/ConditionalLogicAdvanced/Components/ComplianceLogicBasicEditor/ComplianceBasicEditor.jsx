@@ -652,8 +652,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         return `${ifStatements} ${elseIfStatements} ${elseStatement}`;
     };
 
-    console.log(conditions, 'structureUserInputstructureUserInput')
-
     return (
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>

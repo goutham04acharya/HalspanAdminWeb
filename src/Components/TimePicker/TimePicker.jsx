@@ -17,7 +17,6 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
 
     const handleTimeChange = (e) => {
         const selectedTime = e.target.value;
-        console.log(selectedTime, 'selected time')
         const [hour, minute, second] = selectedTime.split(':');
         setHour(hour);
         setMinute(minute);
@@ -47,7 +46,6 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
         if (hour && minute && second) {
             const newTime = `${hour}:${minute}:${second}`;
             setTime(newTime);
-            console.log(newTime, 'new time')
             onChange(newTime);
         }
     };

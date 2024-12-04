@@ -598,7 +598,6 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
-        console.log('i here 11111')
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
@@ -732,12 +731,9 @@ const QuestionnaryForm = () => {
                     // setToastSuccess(response?.data?.message);
                     // setCompareSavedSections(sections);
 
-                    console.log('here i am in try')
                     if (defaultString) {
-                        console.log('here i am in try 1111')
                         dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     } else if (sectionConditionLogicId) {
-                        console.log('here i am in try 2222')
                         const sectionIndex = sections.findIndex(section => section.section_id === sectionConditionLogicId);
                         // Get the section_condition_logic if it exists
                         if (sectionIndex !== -1) {
@@ -760,7 +756,6 @@ const QuestionnaryForm = () => {
                             console.error('Section not found for the given sectionConditionLogicId');
                         }
                     } else if (pageConditionLogicId) {
-                        console.log('here i am in try 3333')
                         // Iterate through sections to find the page with the given pageConditionLogicId
                         let pageFound = false;
                         const updatedSections = sections.map(section => {
@@ -799,7 +794,6 @@ const QuestionnaryForm = () => {
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
                 } else {
-                    console.log('not isSaving', isSaving)
                     // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                 }
                 dispatch(saveCurrentData());
@@ -817,8 +811,6 @@ const QuestionnaryForm = () => {
                 setSaveClick(false)
             }
             catch (error) {
-                console.error('ther erro is', error)
-                console.log('ther errr', error)
                 setToastError('Something went wrong!!');
             }
         }
@@ -1089,7 +1081,6 @@ const QuestionnaryForm = () => {
     const GetSectionOrder = async () => {
         try {
             const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-            console.log(response, 'responseresponseresponse')
             if (!response?.error) {
 
                 // Extract section IDs in the order provided

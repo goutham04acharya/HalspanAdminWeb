@@ -40,8 +40,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    console.log(value, 'conditiona values')
-    console.log(sections, 'nahanahha')
     const [isvalidExpression, setIsValidExpression] = useState(false);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -243,12 +241,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             );
     };
 
-    // Usage
-    // console.log('Initial Pages:', initialAllPages);
-
     // Simulate user interaction or dynamic evaluation
     const allPages = getEvaluatedAllPages();
-    console.log('Evaluated Pages:', allPages);
 
     const validateFormat = (value, format, regex) => {
         switch (format) {
@@ -339,7 +333,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
             // Check if we've exhausted all sections
             if (nextSection > sections.length) {
-                console.log('i am here')
                 // No more sections available
                 isLastSection = true;
                 nextSection = currentSection;
@@ -390,7 +383,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         }
 
                         // No more valid sections found
-                        console.log('i came am here')
                         return {
                             nextSection: currentSection,
                             nextPage: currentPage,
@@ -411,13 +403,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
 
         // Final check to determine if this is the last section and page
-        console.log(nextSection, 'nextSection')
-        console.log(sections.length, 'sections.length')
-        console.log(sections[nextSection]?.pages.length, 'sections[nextSection]?.pages.length')
-        console.log(nextPage, 'nextPage')
         // if (nextSection === sections.length - 1 && 
         //     nextPage === sections[nextSection]?.pages.length - 1) {
-        //         console.log('i am here 111')
         //     isLastSection = true;
         // }
         if (!sections[nextSection]) {
@@ -439,8 +426,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [sections, currentSection, currentPage, value]);
 
 
-    console.log(precomputedNavigation, 'precomputedNavigation')
-
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
         setValidationErrors({});
@@ -450,8 +435,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             const errors = sections[currentSection]?.pages[currentPage]?.questions.reduce((acc, question) => {
                 const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible
                 if (isVisible) {
-                    console.log('i am here yyyy');
-
                     // Initialize the field error accumulator for each component type
                     if (!acc[`preview_${question.component_type}`]) {
                         acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type
@@ -549,7 +532,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     ...prevErrors,
                     ...filteredErrors,  // Merge the filtered errors into the existing validation errors
                 }));
-                console.log("Mandatory fields are missing:", filteredErrors);
                 return; // Don't proceed to next page or section if there are errors
             }
         }
@@ -571,7 +553,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             setCurrentPage(nextPage);
         }
 
-        console.log(nextPage, 'nextPage')
         setTotalPagesNavigated(totalPagesNavigated + nextSection);
     };
 
@@ -700,14 +681,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             isFirstPageInSection
         } = computeBackNavigation();
 
-        // If no valid previous navigation found, do nothing
-        if (previousSection < 0 || previousPage < 0) {
-            console.log("No previous navigable page found");
-            return;
-        }
-
-        console.log(previousSection, 'previousSection')
-        console.log(previousPage, 'previousPage')
         // Decrement total pages navigated
         setTotalPagesNavigated(totalPagesNavigated - currentSection);
 
@@ -724,7 +697,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         setValidationErrors({});
     };
 
-    console.log(totalPagesNavigated, 'previousPage');
     const renderQuestion = (question) => {
         const commonProps = {
             preview: true,
@@ -814,7 +786,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         if (nextSectionData?.section_conditional_logic) {
             try {
                 const isSectionEval = eval(nextSectionData.section_conditional_logic);
-                console.log(isSectionEval, "Evaluated section logic");
                 return !isSectionEval; // If the next section logic is invalid, it becomes a "Submit" button
             } catch (err) {
                 console.error("Error evaluating section conditional logic:", err);
@@ -984,7 +955,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error, 'j')
                                                 return null;
                                             }
                                         } else if (list?.conditional_logic.includes("getDay()")) {
@@ -1004,10 +974,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                             // Remove parentheses from around the entire string, if they exist
                                             const logicWithoutBrackets = replacedLogic.replace(/^\((.*)\)$/, '$1');
-                                            console.log(logicWithoutBrackets, 'modified logic')
                                             try {
                                                 let result = eval(logicWithoutBrackets); // Evaluate the modified logic
-                                                console.log(result, 'Evaluation Result');
                                                 if (!result) {
                                                     return null; // If the logic evaluates to false, return null
                                                 }
@@ -1022,7 +990,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error, 'j')
                                                 return null;
                                             }
                                         }

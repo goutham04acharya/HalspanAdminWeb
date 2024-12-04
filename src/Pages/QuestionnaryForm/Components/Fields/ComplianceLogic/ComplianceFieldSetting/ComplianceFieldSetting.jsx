@@ -28,7 +28,6 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
         // dispatch(setShouldAutoSave(true));
     };
     const handleInputChange = (id, field, value) => {
-        console.log(complianceLogic, 'adaedaaead')
         let arr = [...complianceLogic];
         arr[id][field] = value; // Dynamically update field
         setComplianceLogic(arr);
