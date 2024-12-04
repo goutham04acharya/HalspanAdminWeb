@@ -31,7 +31,6 @@ function CreateQuestionnary() {
 
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  console.log(openDropdown, 'open')
   const [selectedOption, setSelectedOption] = useState({
     asset_type: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
@@ -156,7 +155,6 @@ function CreateQuestionnary() {
       ...prevOptions,
       [id]: option,
     }));
-    console.log(option, 'optionsss')
 
     // Clear the validation error for the current dropdown field
     setValidationErrors((prevErrors) => ({
@@ -198,7 +196,6 @@ function CreateQuestionnary() {
         setOpenDropdown(null);
       }
     };
-    console.log(openDropdown, 'opendropdwon')
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -344,7 +341,6 @@ function CreateQuestionnary() {
               options={services_type_list}
               isDropdownOpen={openDropdown === 'services_type'}
               setDropdownOpen={() => {
-                console.log(openDropdown, 'hhh')
                 setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')}}
               selectedOption={selectedOption?.services_type}
               handleOptionClick={(option) => handleOptionClick(option, 'services_type')}

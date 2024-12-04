@@ -55,8 +55,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [complianceCondition, setComplianceCondition] = useState('')
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
-    // console.log(defaultContentConverter(buildConditionExpression(conditionalLogicData)), 'fffffffffffff')
-    console.log(conditionalLogicData, 'conditionalLogicData')
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -71,8 +69,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         ]
     },
     ])
-
-    console.log('conditions', conditions)
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -722,8 +718,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
-            console.log(parseLogicExpression(conditionalLogic), 'ggggggggggggggggggggggggggggggggggggggggggg')
-
             // parseLogicExpression(conditionalLogic)
             // {
             //     !isDefaultLogic &&
@@ -1235,7 +1229,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
     const handleSaveBasicEditor = () => {
 
-        console.log(complianceState, 'complianceState')
         if (complianceState) {
             let compliance_logic = buildConditionExpression(conditions);
             setComplianceLogic((prev) => {
@@ -1254,9 +1247,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         let condition_logic;
         try {
-            console.log(conditions, 'conditions')
             condition_logic = buildConditionExpression(conditions);
-            console.log(condition_logic, '333 conditionlogic')
         } catch (error) {
         }
         let sectionId
@@ -1269,8 +1260,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         handleSaveSection(sectionId, true, condition_logic);
-        // console.log(condition_logic, 'condition')
-        console.log(selectedQuestionId, 'question id')
         dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         setConditionalLogic(false);
         setSectionConditionLogicId(false);
@@ -1326,8 +1315,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const conditionType = questionMatch?.[0]?.includes("Photo_label_name")
                         ? "photofield"
                         : "textboxfield";
-
-                        console.log(questionMatch, 'questionMatch')
                     return {
                         question_name: questionMatch?.[0] || "",
                         condition_logic: conditionLogic,
@@ -1376,7 +1363,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
         }
 
-        console.log(compliance_logic, 'compliance_logic')
         setConditions(compliance_logic)
     }, [selectedQuestionId])
 

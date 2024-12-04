@@ -168,7 +168,6 @@ function Questionnaries() {
     try {
       let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)
       setOptions(response?.data?.results)
-      console.log(options, 'options')
     } catch (error) {
 
     }
