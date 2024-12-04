@@ -24,8 +24,10 @@ function InputWithDropDown({
     selectedQuestionId,
     mainIndex,
     subIndex,
+    compliance,
     ifcompliance,
     complinace //added this to only use in the complinace basic editor for the dropdown selector
+
 }) {
     const dispatch = useDispatch();
 
@@ -54,6 +56,7 @@ function InputWithDropDown({
                 />
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={() => handleRemove()} />
+                    : (ifcompliance || compliance) ? <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute top-[43px] right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`} />
                     :
                     <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />
