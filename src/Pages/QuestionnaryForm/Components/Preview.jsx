@@ -315,7 +315,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
         return true; // Default to true if no conditional logic exists
     };
-    
+
     const computeNextNavigation = () => {
         let nextPage = currentPage + 1;
         let nextSection = currentSection;
@@ -327,7 +327,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             nextPage++;
         }
 
-        // If no visible pages, move to the next visible section
+        // If no visible pages in current section, move to the next section
         if (nextPage >= sections[currentSection]?.pages.length) {
             nextPage = 0; // Reset page index
             nextSection++; // Move to the next section
@@ -337,11 +337,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 nextSection++;
             }
 
-            if (nextSection >= sections.length) {
-                // No more visible sections, mark as last
+            // Check if we've exhausted all sections
+            if (nextSection > sections.length) {
+                console.log('i am here')
+                // No more sections available
                 isLastSection = true;
+                nextSection = currentSection;
+                nextPage = currentPage;
             } else {
-                // Find the first visible page in the next visible section
+                // Find first visible page in the next visible section
                 while (
                     nextPage < sections[nextSection]?.pages.length &&
                     !isPageVisible(nextSection, nextPage)
@@ -349,14 +353,75 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     nextPage++;
                 }
 
-                // if (nextPage >= sections[nextSection]?.pages.length) {
-                //     // No visible pages in the next section
-                //     isLastSection = true;
-                // }
+                // If no visible pages in the next section
+                if (nextPage >= sections[nextSection]?.pages.length) {
+                    // Continue searching for the next valid section and page
+                    const findNextValidNavigation = () => {
+                        let searchSection = nextSection + 1;
+
+                        // Continue searching through remaining sections
+                        while (searchSection < sections.length) {
+                            // Skip invisible sections
+                            if (!isSectionVisible(searchSection)) {
+                                searchSection++;
+                                continue;
+                            }
+
+                            // Find first visible page in this section
+                            let searchPage = 0;
+                            while (
+                                searchPage < sections[searchSection]?.pages.length &&
+                                !isPageVisible(searchSection, searchPage)
+                            ) {
+                                searchPage++;
+                            }
+
+                            // If found a valid page, return it
+                            if (searchPage < sections[searchSection]?.pages.length) {
+                                return {
+                                    nextSection: searchSection,
+                                    nextPage: searchPage,
+                                    isLastSection: false
+                                };
+                            }
+
+                            // Move to next section
+                            searchSection++;
+                        }
+
+                        // No more valid sections found
+                        console.log('i came am here')
+                        return {
+                            nextSection: currentSection,
+                            nextPage: currentPage,
+                            isLastSection: true
+                        };
+                    };
+
+                    // Update navigation with found valid section/page
+                    const validNavigation = findNextValidNavigation();
+                    nextSection = validNavigation.nextSection;
+                    nextPage = validNavigation.nextPage;
+                    isLastSection = validNavigation.isLastSection;
+                }
             }
         } else {
             // Still within the current section
             isLastPageInSection = nextPage === sections[currentSection]?.pages.length - 1;
+        }
+
+        // Final check to determine if this is the last section and page
+        console.log(nextSection, 'nextSection')
+        console.log(sections.length, 'sections.length')
+        console.log(sections[nextSection]?.pages.length, 'sections[nextSection]?.pages.length')
+        console.log(nextPage, 'nextPage')
+        // if (nextSection === sections.length - 1 && 
+        //     nextPage === sections[nextSection]?.pages.length - 1) {
+        //         console.log('i am here 111')
+        //     isLastSection = true;
+        // }
+        if (!sections[nextSection]) {
+            isLastSection = true;
         }
 
         // Update state with precomputed navigation
@@ -369,9 +434,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
     // useEffect to evaluate conditional logic dynamically
     useEffect(() => {
-
+        // Call the computeNextNavigation only if the page is validated
         computeNextNavigation();
     }, [sections, currentSection, currentPage, value]);
+
 
     console.log(precomputedNavigation, 'precomputedNavigation')
 
@@ -505,7 +571,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             setCurrentPage(nextPage);
         }
 
-        setTotalPagesNavigated(totalPagesNavigated + 1);
+        console.log(nextPage, 'nextPage')
+        setTotalPagesNavigated(totalPagesNavigated + nextSection);
     };
 
     const handleBackClick = () => {
@@ -515,7 +582,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             setIsLastPage(false);
             return;
         }
-    
+
         const evaluateLogic = (logic) => {
             try {
                 if (logic.includes("new Date(")) {
@@ -546,45 +613,45 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return false;
             }
         };
-    
+
         const isPageVisible = (sectionIndex, pageIndex) => {
             const pageData = sections[sectionIndex]?.pages[pageIndex];
             const pageConditionalLogic = pageData?.page_conditional_logic;
-    
+
             if (pageConditionalLogic) {
                 return evaluateLogic(pageConditionalLogic);
             }
             return true; // Default to true if no conditional logic exists
         };
-    
+
         const isSectionVisible = (sectionIndex) => {
             const sectionData = sections[sectionIndex];
             const sectionConditionalLogic = sectionData?.section_conditional_logic;
-    
+
             if (sectionConditionalLogic) {
                 return evaluateLogic(sectionConditionalLogic);
             }
             return true; // Default to true if no conditional logic exists
         };
-    
+
         const computeBackNavigation = () => {
             let previousPage = currentPage - 1;
             let previousSection = currentSection;
-    
+
             // First, try to find a visible page in the current section
             while (previousPage >= 0 && !isPageVisible(currentSection, previousPage)) {
                 previousPage--;
             }
-    
+
             // If no visible pages in current section, move to previous section
             if (previousPage < 0) {
                 previousSection--;
-    
+
                 // Skip invisible sections
                 while (previousSection >= 0 && !isSectionVisible(previousSection)) {
                     previousSection--;
                 }
-    
+
                 // If a valid previous section is found
                 if (previousSection >= 0) {
                     // Find the last visible page in the previous section
@@ -592,7 +659,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     while (previousPage >= 0 && !isPageVisible(previousSection, previousPage)) {
                         previousPage--;
                     }
-    
+
                     // If no visible pages found in the previous section
                     if (previousPage < 0) {
                         // Continue searching backwards through sections
@@ -603,7 +670,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 while (previousPage >= 0 && !isPageVisible(previousSection, previousPage)) {
                                     previousPage--;
                                 }
-                                
+
                                 if (previousPage >= 0) {
                                     break;
                                 }
@@ -612,11 +679,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     }
                 }
             }
-    
+
             // Determine if this is the first section and page
             const isFirstSection = previousSection === 0;
             const isFirstPageInSection = previousPage === 0;
-    
+
             return {
                 previousSection: previousSection >= 0 ? previousSection : 0,
                 previousPage: previousPage >= 0 ? previousPage : 0,
@@ -624,24 +691,26 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 isFirstPageInSection
             };
         };
-    
+
         // Compute back navigation
-        const { 
-            previousSection, 
-            previousPage, 
-            isFirstSection, 
-            isFirstPageInSection 
+        const {
+            previousSection,
+            previousPage,
+            isFirstSection,
+            isFirstPageInSection
         } = computeBackNavigation();
-    
+
         // If no valid previous navigation found, do nothing
         if (previousSection < 0 || previousPage < 0) {
             console.log("No previous navigable page found");
             return;
         }
-    
+
+        console.log(previousSection, 'previousSection')
+        console.log(previousPage, 'previousPage')
         // Decrement total pages navigated
-        setTotalPagesNavigated(totalPagesNavigated - 1);
-    
+        setTotalPagesNavigated(totalPagesNavigated - currentSection);
+
         // Update current section and page
         if (previousSection !== currentSection) {
             setCurrentSection(previousSection);
@@ -649,12 +718,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         } else {
             setCurrentPage(previousPage);
         }
-    
+
         // Reset any section or page-specific states if needed
         // For example, clearing validation errors for the previous page
         setValidationErrors({});
     };
 
+    console.log(totalPagesNavigated, 'previousPage');
     const renderQuestion = (question) => {
         const commonProps = {
             preview: true,
@@ -754,6 +824,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         return false; // Default: "Next"
     };
+
 
 
     useEffect(() => {
@@ -877,7 +948,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                                 <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
-                                    <p>Step {totalPagesNavigated + 1} of {sections.reduce((total, section) => total + section.pages.length, 0)}</p>
+                                    <p>Step {precomputedNavigation.nextPage + precomputedNavigation.nextSection - 1} of {sections.reduce((total, section) => total + section.pages.length, 0)}</p>
                                     <span className="text-sm text-gray-600">
                                         {allPages.length > 0
                                             ? ((totalPagesNavigated / allPages.length) * 100).toFixed(0)
