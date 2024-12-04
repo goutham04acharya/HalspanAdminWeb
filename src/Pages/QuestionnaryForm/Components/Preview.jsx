@@ -52,7 +52,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     const handleConditionalLogic = async (data) => {
         let result = {};
-
         data.forEach((section, sectionIndex) => {
             const sectionKey = section.section_name.replace(/\s+/g, '_')// Convert section name to key format
             result[sectionKey] = {}; // Initialize the section key
@@ -266,118 +265,37 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
-    // useEffect to evaluate conditional logic dynamically
-    useEffect(() => {
-        const evaluateLogic = (logic) => {
-            try {
-                if (logic.includes("new Date(")) {
-                    return eval(logic);
-                } else if (logic.includes("getMonth(")) {
-                    const replacedLogic = logic.replace("getMonth()", "getMonth() + 1");
-                    return eval(replacedLogic);
-                } else if (logic.includes("getDay()")) {
-                    const daysMap = {
-                        Sunday: 0,
-                        Monday: 1,
-                        Tuesday: 2,
-                        Wednesday: 3,
-                        Thursday: 4,
-                        Friday: 5,
-                        Saturday: 6,
-                    };
-                    const replacedLogic = logic.replace(
-                        /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
-                        (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
-                    );
-                    return eval(replacedLogic);
-                } else {
-                    return eval(logic);
-                }
-            } catch (error) {
-                console.error("Error evaluating conditional logic:", error);
-                return false;
-            }
-        };
-
-        const isPageVisible = (sectionIndex, pageIndex) => {
-            const pageData = sections[sectionIndex]?.pages[pageIndex];
-            const pageConditionalLogic = pageData?.page_conditional_logic;
-
-            if (pageConditionalLogic) {
-                return evaluateLogic(pageConditionalLogic);
-            }
-            return true; // Default to true if no conditional logic exists
-        };
-
-        const isSectionVisible = (sectionIndex) => {
-            const sectionData = sections[sectionIndex];
-            const sectionConditionalLogic = sectionData?.section_conditional_logic;
-
-            if (sectionConditionalLogic) {
-                return evaluateLogic(sectionConditionalLogic);
-            }
-            return true; // Default to true if no conditional logic exists
-        };
-
-        const computeNextNavigation = () => {
-            let nextPage = currentPage + 1;
-            let nextSection = currentSection;
-            let isLastPageInSection = false;
-            let isLastSection = false;
-
-            // Find the next visible page in the current section
-            while (nextPage < sections[currentSection]?.pages.length && !isPageVisible(currentSection, nextPage)) {
-                nextPage++;
-            }
-
-            // If no visible pages, move to the next visible section
-            if (nextPage >= sections[currentSection]?.pages.length) {
-                nextPage = 0; // Reset page index
-                nextSection++; // Move to the next section
-
-                // Skip over any invisible sections
-                while (nextSection < sections.length && !isSectionVisible(nextSection)) {
-                    nextSection++;
-                }
-
-                if (nextSection >= sections.length) {
-                    // No more visible sections, mark as last
-                    isLastSection = true;
-                } else {
-                    // Find the first visible page in the next visible section
-                    while (
-                        nextPage < sections[nextSection]?.pages.length &&
-                        !isPageVisible(nextSection, nextPage)
-                    ) {
-                        nextPage++;
-                    }
-
-                    // if (nextPage >= sections[nextSection]?.pages.length) {
-                    //     // No visible pages in the next section
-                    //     isLastSection = true;
-                    // }
-                }
+    const evaluateLogic = (logic) => {
+        try {
+            if (logic.includes("new Date(")) {
+                return eval(logic);
+            } else if (logic.includes("getMonth(")) {
+                const replacedLogic = logic.replace("getMonth()", "getMonth() + 1");
+                return eval(replacedLogic);
+            } else if (logic.includes("getDay()")) {
+                const daysMap = {
+                    Sunday: 0,
+                    Monday: 1,
+                    Tuesday: 2,
+                    Wednesday: 3,
+                    Thursday: 4,
+                    Friday: 5,
+                    Saturday: 6,
+                };
+                const replacedLogic = logic.replace(
+                    /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
+                    (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+                );
+                return eval(replacedLogic);
             } else {
-                // Still within the current section
-                isLastPageInSection = nextPage === sections[currentSection]?.pages.length - 1;
+                return eval(logic);
             }
+        } catch (error) {
+            console.error("Error evaluating conditional logic:", error);
+            return false;
+        }
+    };
 
-            // Update state with precomputed navigation
-            setPrecomputedNavigation({
-                nextPage,
-                nextSection,
-                isLastPageInSection,
-                isLastSection,
-            });
-        };
-
-
-        computeNextNavigation();
-    }, [sections, currentSection, currentPage, value]);
-
-    console.log(precomputedNavigation, 'precomputedNavigation')
-
-    // Define isPageVisible outside of useEffect
     const isPageVisible = (sectionIndex, pageIndex) => {
         const pageData = sections[sectionIndex]?.pages[pageIndex];
         const pageConditionalLogic = pageData?.page_conditional_logic;
@@ -388,6 +306,74 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         return true; // Default to true if no conditional logic exists
     };
 
+    const isSectionVisible = (sectionIndex) => {
+        const sectionData = sections[sectionIndex];
+        const sectionConditionalLogic = sectionData?.section_conditional_logic;
+
+        if (sectionConditionalLogic) {
+            return evaluateLogic(sectionConditionalLogic);
+        }
+        return true; // Default to true if no conditional logic exists
+    };
+    
+    const computeNextNavigation = () => {
+        let nextPage = currentPage + 1;
+        let nextSection = currentSection;
+        let isLastPageInSection = false;
+        let isLastSection = false;
+
+        // Find the next visible page in the current section
+        while (nextPage < sections[currentSection]?.pages.length && !isPageVisible(currentSection, nextPage)) {
+            nextPage++;
+        }
+
+        // If no visible pages, move to the next visible section
+        if (nextPage >= sections[currentSection]?.pages.length) {
+            nextPage = 0; // Reset page index
+            nextSection++; // Move to the next section
+
+            // Skip over any invisible sections
+            while (nextSection < sections.length && !isSectionVisible(nextSection)) {
+                nextSection++;
+            }
+
+            if (nextSection >= sections.length) {
+                // No more visible sections, mark as last
+                isLastSection = true;
+            } else {
+                // Find the first visible page in the next visible section
+                while (
+                    nextPage < sections[nextSection]?.pages.length &&
+                    !isPageVisible(nextSection, nextPage)
+                ) {
+                    nextPage++;
+                }
+
+                // if (nextPage >= sections[nextSection]?.pages.length) {
+                //     // No visible pages in the next section
+                //     isLastSection = true;
+                // }
+            }
+        } else {
+            // Still within the current section
+            isLastPageInSection = nextPage === sections[currentSection]?.pages.length - 1;
+        }
+
+        // Update state with precomputed navigation
+        setPrecomputedNavigation({
+            nextPage,
+            nextSection,
+            isLastPageInSection,
+            isLastSection,
+        });
+    };
+    // useEffect to evaluate conditional logic dynamically
+    useEffect(() => {
+
+        computeNextNavigation();
+    }, [sections, currentSection, currentPage, value]);
+
+    console.log(precomputedNavigation, 'precomputedNavigation')
 
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
@@ -522,88 +508,152 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         setTotalPagesNavigated(totalPagesNavigated + 1);
     };
 
-
-
     const handleBackClick = () => {
+        // If on compliance screen, return to last page
         if (showComplianceScreen) {
             setShowComplianceScreen(false);
             setIsLastPage(false);
             return;
         }
-
-        // Helper function to evaluate page visibility
+    
+        const evaluateLogic = (logic) => {
+            try {
+                if (logic.includes("new Date(")) {
+                    return eval(logic);
+                } else if (logic.includes("getMonth(")) {
+                    const replacedLogic = logic.replace("getMonth()", "getMonth() + 1");
+                    return eval(replacedLogic);
+                } else if (logic.includes("getDay()")) {
+                    const daysMap = {
+                        Sunday: 0,
+                        Monday: 1,
+                        Tuesday: 2,
+                        Wednesday: 3,
+                        Thursday: 4,
+                        Friday: 5,
+                        Saturday: 6,
+                    };
+                    const replacedLogic = logic.replace(
+                        /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
+                        (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+                    );
+                    return eval(replacedLogic);
+                } else {
+                    return eval(logic);
+                }
+            } catch (error) {
+                console.error("Error evaluating conditional logic:", error);
+                return false;
+            }
+        };
+    
         const isPageVisible = (sectionIndex, pageIndex) => {
             const pageData = sections[sectionIndex]?.pages[pageIndex];
             const pageConditionalLogic = pageData?.page_conditional_logic;
-
+    
             if (pageConditionalLogic) {
-                try {
-                    return eval(pageConditionalLogic);
-                } catch (error) {
-                    console.error("Error evaluating page conditional logic:", error);
-                    return false;
-                }
+                return evaluateLogic(pageConditionalLogic);
             }
             return true; // Default to true if no conditional logic exists
         };
-
-        // Helper function to evaluate section visibility
+    
         const isSectionVisible = (sectionIndex) => {
             const sectionData = sections[sectionIndex];
             const sectionConditionalLogic = sectionData?.section_conditional_logic;
-
+    
             if (sectionConditionalLogic) {
-                try {
-                    return eval(sectionConditionalLogic);
-                } catch (error) {
-                    console.error("Error evaluating section conditional logic:", error);
-                    return false;
-                }
+                return evaluateLogic(sectionConditionalLogic);
             }
             return true; // Default to true if no conditional logic exists
         };
-
-        if (currentPage > 0) {
+    
+        const computeBackNavigation = () => {
             let previousPage = currentPage - 1;
-
+            let previousSection = currentSection;
+    
+            // First, try to find a visible page in the current section
             while (previousPage >= 0 && !isPageVisible(currentSection, previousPage)) {
-                console.log(`Page ${previousPage} in Section ${currentSection} is not visible. Skipping...`);
                 previousPage--;
             }
-
-            if (previousPage >= 0) {
-                setCurrentPage(previousPage);
-                setTotalPagesNavigated(totalPagesNavigated - 1);
-            } else {
-                console.log("No more visible pages in the current section.");
-            }
-        } else if (currentSection > 0) {
-            let previousSection = currentSection - 1;
-            while (previousSection >= 0 && !isSectionVisible(previousSection)) {
-                console.log(`Section ${previousSection} is not visible. Skipping...`);
+    
+            // If no visible pages in current section, move to previous section
+            if (previousPage < 0) {
                 previousSection--;
-            }
-
-            if (previousSection >= 0) {
-                let lastVisiblePage = sections[previousSection]?.pages.length - 1;
-
-                while (lastVisiblePage >= 0 && !isPageVisible(previousSection, lastVisiblePage)) {
-                    lastVisiblePage--;
+    
+                // Skip invisible sections
+                while (previousSection >= 0 && !isSectionVisible(previousSection)) {
+                    previousSection--;
                 }
-
-                if (lastVisiblePage >= 0) {
-                    setCurrentSection(previousSection);
-                    setCurrentPage(lastVisiblePage);
-                    setTotalPagesNavigated(totalPagesNavigated - 1);
-                } else {
-                    console.log("No visible pages in the previous section.");
+    
+                // If a valid previous section is found
+                if (previousSection >= 0) {
+                    // Find the last visible page in the previous section
+                    previousPage = sections[previousSection]?.pages.length - 1;
+                    while (previousPage >= 0 && !isPageVisible(previousSection, previousPage)) {
+                        previousPage--;
+                    }
+    
+                    // If no visible pages found in the previous section
+                    if (previousPage < 0) {
+                        // Continue searching backwards through sections
+                        while (previousSection >= 0) {
+                            previousSection--;
+                            if (previousSection >= 0 && isSectionVisible(previousSection)) {
+                                previousPage = sections[previousSection]?.pages.length - 1;
+                                while (previousPage >= 0 && !isPageVisible(previousSection, previousPage)) {
+                                    previousPage--;
+                                }
+                                
+                                if (previousPage >= 0) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-            } else {
-                console.log("No more visible sections to navigate back to.");
             }
+    
+            // Determine if this is the first section and page
+            const isFirstSection = previousSection === 0;
+            const isFirstPageInSection = previousPage === 0;
+    
+            return {
+                previousSection: previousSection >= 0 ? previousSection : 0,
+                previousPage: previousPage >= 0 ? previousPage : 0,
+                isFirstSection,
+                isFirstPageInSection
+            };
+        };
+    
+        // Compute back navigation
+        const { 
+            previousSection, 
+            previousPage, 
+            isFirstSection, 
+            isFirstPageInSection 
+        } = computeBackNavigation();
+    
+        // If no valid previous navigation found, do nothing
+        if (previousSection < 0 || previousPage < 0) {
+            console.log("No previous navigable page found");
+            return;
         }
+    
+        // Decrement total pages navigated
+        setTotalPagesNavigated(totalPagesNavigated - 1);
+    
+        // Update current section and page
+        if (previousSection !== currentSection) {
+            setCurrentSection(previousSection);
+            setCurrentPage(previousPage);
+        } else {
+            setCurrentPage(previousPage);
+        }
+    
+        // Reset any section or page-specific states if needed
+        // For example, clearing validation errors for the previous page
+        setValidationErrors({});
     };
-
 
     const renderQuestion = (question) => {
         const commonProps = {
