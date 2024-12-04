@@ -92,7 +92,7 @@ const ChoiceBoxField = ({
             } else {
                 setValue((prev) => ({
                     ...prev,
-                    [question?.question_id]: newSelected,
+                    [question?.question_id]: value.value ,
                 }));
             }
 
@@ -105,7 +105,7 @@ const ChoiceBoxField = ({
                 },
             }));
 
-            return newSelected;
+            return value.value ;
         });
     };
 

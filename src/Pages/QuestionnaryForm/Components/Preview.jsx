@@ -42,6 +42,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     console.log(value, 'conditiona values')
     console.log(sections, 'nahanahha')
+    const [isvalidExpression, setIsValidExpression] = useState(false);
+    const [precomputedNavigation, setPrecomputedNavigation] = useState({
+        nextPage: 0,
+        nextSection: 0,
+        isLastPageInSection: false,
+        isLastSection: false,
+    });
 
     const handleConditionalLogic = async (data) => {
         let result = {};
@@ -259,149 +266,16 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
-
-
-
-    // const handleNextClick = () => {
-    // const questions = sections[currentSection].pages[currentPage].questions;
-    //     const errors = questions.reduce((acc, question) => {
-    //         // First check if the question should be visible based on conditional logic
-    //         let isVisible = true;
-    // if (question.conditional_logic !== '') {
-    //     try {
-    //         if (question.conditional_logic.includes("new Date(")) {
-    //             // Handle date-specific logic
-    //             isVisible = eval(question.conditional_logic);
-    //         } else if (question.conditional_logic.includes("getMonth(")) {
-    //             // Handle month-specific logic with adjustment
-    //             const replacedLogic = question.conditional_logic.replace("getMonth()", "getMonth() + 1");
-    //             isVisible = eval(replacedLogic);
-    //         } else {
-    //             // Handle regular conditional logic
-    //             isVisible = eval(question.conditional_logic);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error evaluating conditional logic:", error);
-    //         isVisible = false;
-    //     }
-    // }
-    //         // Only validate if the question is visible
-    //         if (isVisible) {
-    //             // Validate based on component type
-    //             switch (question.component_type) {
-    //                 case 'textboxfield':
-    //                     if (!question.options?.optional) {
-    //                         if (value[question.question_id] === '' || value[question.question_id] === undefined) {
-    //                             acc[question.question_id] = 'This is a mandatory field';
-    //                         } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
-    //                             acc[question.question_id] = question.format_error;
-    //                         }
-    //                     }
-    //                     break;
-
-    //                 case 'choiceboxfield':
-    //                     if (!question?.options?.optional) {
-    //                         if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
-    //                             acc[question.question_id] = 'This is a mandatory field';
-    //                         } else {
-    //                             break;
-    //                         }
-    //                     }
-    //                 case 'numberfield':
-    //                     if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-    //                         acc[question.question_id] = 'This is a mandatory field';
-    //                     }
-    //                     break;
-
-    //                 case 'dateTimefield':
-    //                     if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-    //                         acc[question.question_id] = 'This is a mandatory field';
-    //                     }
-    //                     break;
-
-    //                 case 'photofield':
-    //                     if (!question?.options?.optional) {
-    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-    //                             acc[question.question_id] = 'This is a mandatory field';
-    //                         }
-    //                     }
-    //                 case 'filefield':
-    //                     if (!question?.options?.optional) {
-    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-    //                             acc[question.question_id] = 'This is a mandatory field';
-    //                         }
-    //                     }
-    //                 case 'videofield':
-    //                     if (!question?.options?.optional) {
-    //                         if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
-    //                             acc[question.question_id] = 'This is a mandatory field';
-    //                         }
-    //                     }
-    //                 case 'gpsfield':
-    //                     if (!question.options?.optional && (value[question.question_id] === false || value[question.question_id] === undefined)) {
-    //                         acc[question.question_id] = 'This is a mandatory field';
-    //                     }
-    //                     break;
-    //             }
-    //         }
-    //         return acc;
-    //     }, {});
-
-    // if (Object.keys(errors).length > 0) {
-    //     setValidationErrors((prevErrors) => ({
-    //         ...prevErrors,
-    //         preview_textboxfield: errors,
-    //         preview_choiceboxfield: errors,
-    //         preview_numberfield: errors,
-    //         preview_datetimefield: errors,
-    //         preview_photofield: errors,
-    //         preview_filefield: errors,
-    //         preview_videofield: errors,
-    //         preview_gpsfield: errors,
-    //     }));
-    // } else {
-    //     const isLastSection = currentSection === sections.length - 1;
-    //     const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-
-    //     if (isLastSection && isLastPageInSection) {
-    //         setShowComplianceScreen(true);
-    //         setIsLastPage(true);
-    //     } else if (currentPage < sections[currentSection].pages.length - 1) {
-    //         setCurrentPage(currentPage + 1);
-    //         setTotalPagesNavigated(totalPagesNavigated + 1);
-    //     } else {
-    //         setCurrentSection(currentSection + 1);
-    //         setCurrentPage(0);
-    //         setTotalPagesNavigated(totalPagesNavigated + 1);
-    //     }
-    // }
-    // };
-
-    const handleNextClick = () => {
-        console.log('oooo');
-        const currentSectionData = sections[currentSection + 1];
-        let isSectionVisible = true; // Default to true unless logic makes it false
-    
-        console.log(currentSectionData, 'currentSectionData');
-        console.log(currentPage, 'currentPage');
-        
-        const pageConditionalLogic = currentSectionData.pages[currentPage]?.page_conditional_logic;
-        const sectionConditionalLogic = currentSectionData?.section_conditional_logic;
-        console.log(pageConditionalLogic, 'pageConditionalLogic');
-        console.log(sectionConditionalLogic, 'sectionConditionalLogic');
-    
-        // Helper function to evaluate logic
+    // useEffect to evaluate conditional logic dynamically
+    useEffect(() => {
         const evaluateLogic = (logic) => {
             try {
                 if (logic.includes("new Date(")) {
-                    // Handle date-specific logic
                     return eval(logic);
                 } else if (logic.includes("getMonth(")) {
-                    // Handle month-specific logic with adjustment
                     const replacedLogic = logic.replace("getMonth()", "getMonth() + 1");
                     return eval(replacedLogic);
                 } else if (logic.includes("getDay()")) {
-                    // Handle day-specific logic
                     const daysMap = {
                         Sunday: 0,
                         Monday: 1,
@@ -417,7 +291,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     );
                     return eval(replacedLogic);
                 } else {
-                    // Handle regular conditional logic
                     return eval(logic);
                 }
             } catch (error) {
@@ -425,108 +298,229 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return false;
             }
         };
-    
-        // Evaluate sectionConditionalLogic first
-        if (sectionConditionalLogic) {
-            console.log('Evaluating sectionConditionalLogic...');
-            isSectionVisible = evaluateLogic(sectionConditionalLogic);
-        }
-    
-        // If section is visible, evaluate pageConditionalLogic
-        if (isSectionVisible && pageConditionalLogic) {
-            console.log('Evaluating pageConditionalLogic...');
-            isSectionVisible = evaluateLogic(pageConditionalLogic);
-        }
-    
-        // Proceed based on the combined visibility
-        if (isSectionVisible) {
-            console.log('Section is visible, proceeding...');
-            const questions = sections[currentSection].pages[currentPage].questions;
-            const errors = questions.reduce((acc, question) => {
-                let isVisible = true;
-    
-                // Evaluate question conditional logic
-                if (question.conditional_logic !== '') {
-                    console.log('Evaluating question conditional logic...');
-                    isVisible = evaluateLogic(question.conditional_logic);
+
+        const isPageVisible = (sectionIndex, pageIndex) => {
+            const pageData = sections[sectionIndex]?.pages[pageIndex];
+            const pageConditionalLogic = pageData?.page_conditional_logic;
+
+            if (pageConditionalLogic) {
+                return evaluateLogic(pageConditionalLogic);
+            }
+            return true; // Default to true if no conditional logic exists
+        };
+
+        const isSectionVisible = (sectionIndex) => {
+            const sectionData = sections[sectionIndex];
+            const sectionConditionalLogic = sectionData?.section_conditional_logic;
+
+            if (sectionConditionalLogic) {
+                return evaluateLogic(sectionConditionalLogic);
+            }
+            return true; // Default to true if no conditional logic exists
+        };
+
+        const computeNextNavigation = () => {
+            let nextPage = currentPage + 1;
+            let nextSection = currentSection;
+            let isLastPageInSection = false;
+            let isLastSection = false;
+
+            // Find the next visible page in the current section
+            while (nextPage < sections[currentSection]?.pages.length && !isPageVisible(currentSection, nextPage)) {
+                nextPage++;
+            }
+
+            // If no visible pages, move to the next visible section
+            if (nextPage >= sections[currentSection]?.pages.length) {
+                nextPage = 0; // Reset page index
+                nextSection++; // Move to the next section
+
+                // Skip over any invisible sections
+                while (nextSection < sections.length && !isSectionVisible(nextSection)) {
+                    nextSection++;
                 }
-    
-                // Validate questions if visible
+
+                if (nextSection >= sections.length) {
+                    // No more visible sections, mark as last
+                    isLastSection = true;
+                } else {
+                    // Find the first visible page in the next visible section
+                    while (
+                        nextPage < sections[nextSection]?.pages.length &&
+                        !isPageVisible(nextSection, nextPage)
+                    ) {
+                        nextPage++;
+                    }
+
+                    // if (nextPage >= sections[nextSection]?.pages.length) {
+                    //     // No visible pages in the next section
+                    //     isLastSection = true;
+                    // }
+                }
+            } else {
+                // Still within the current section
+                isLastPageInSection = nextPage === sections[currentSection]?.pages.length - 1;
+            }
+
+            // Update state with precomputed navigation
+            setPrecomputedNavigation({
+                nextPage,
+                nextSection,
+                isLastPageInSection,
+                isLastSection,
+            });
+        };
+
+
+        computeNextNavigation();
+    }, [sections, currentSection, currentPage, value]);
+
+    console.log(precomputedNavigation, 'precomputedNavigation')
+
+    // Define isPageVisible outside of useEffect
+    const isPageVisible = (sectionIndex, pageIndex) => {
+        const pageData = sections[sectionIndex]?.pages[pageIndex];
+        const pageConditionalLogic = pageData?.page_conditional_logic;
+
+        if (pageConditionalLogic) {
+            return evaluateLogic(pageConditionalLogic);
+        }
+        return true; // Default to true if no conditional logic exists
+    };
+
+
+    const handleNextClick = () => {
+        // Reset previous validation errors before proceeding
+        setValidationErrors({});
+
+        // Function to validate mandatory fields
+        const validateMandatoryFields = () => {
+            const errors = sections[currentSection]?.pages[currentPage]?.questions.reduce((acc, question) => {
+                const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible
                 if (isVisible) {
+                    console.log('i am here yyyy');
+
+                    // Initialize the field error accumulator for each component type
+                    if (!acc[`preview_${question.component_type}`]) {
+                        acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type
+                    }
+
+                    // Validate based on component type
                     switch (question.component_type) {
                         case 'textboxfield':
                             if (!question.options?.optional) {
                                 if (value[question.question_id] === '' || value[question.question_id] === undefined) {
-                                    acc[question.question_id] = 'This is a mandatory field';
+                                    acc.preview_textboxfield[question.question_id] = 'This is a mandatory field';
                                 } else if (question.format_error && !validateFormat(value[question.question_id], question.format, question.regular_expression)) {
-                                    acc[question.question_id] = question.format_error;
+                                    acc.preview_textboxfield[question.question_id] = question.format_error;
                                 }
                             }
                             break;
-    
+
                         case 'choiceboxfield':
-                            if (!question?.options?.optional && (value[question?.question_id] === '' || value[question?.question_id] === undefined)) {
-                                acc[question.question_id] = 'This is a mandatory field';
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === '' || value[question?.question_id] === undefined) {
+                                    acc.preview_choiceboxfield[question.question_id] = 'This is a mandatory field';
+                                }
                             }
                             break;
-    
+
                         case 'numberfield':
                             if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-                                acc[question.question_id] = 'This is a mandatory field';
+                                acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
                             }
                             break;
-    
+
                         case 'dateTimefield':
                             if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-                                acc[question.question_id] = 'This is a mandatory field';
+                                acc.preview_datetimefield[question.question_id] = 'This is a mandatory field';
                             }
                             break;
-    
+
                         case 'photofield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc.preview_photofield[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                            break;
+
                         case 'filefield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc.preview_filefield[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                            break;
+
                         case 'videofield':
+                            if (!question?.options?.optional) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                    acc.preview_videofield[question.question_id] = 'This is a mandatory field';
+                                }
+                            }
+                            break;
+
                         case 'gpsfield':
                             if (!question?.options?.optional && (value[question?.question_id] === false || value[question?.question_id] === undefined)) {
-                                acc[question.question_id] = 'This is a mandatory field';
+                                acc.preview_gpsfield[question.question_id] = 'This is a mandatory field';
                             }
                             break;
-    
+
                         default:
-                            console.warn(`Unknown component type: ${question.component_type}`);
+                            break;
                     }
                 }
-    
                 return acc;
             }, {});
-    
-            // Handle errors or navigate to the next step
-            if (Object.keys(errors).length > 0) {
+
+            return errors;
+        };
+
+        // Get the errors after validating
+        const errors = validateMandatoryFields();
+
+        // If there are validation errors, update the state and return early
+        if (Object.keys(errors).length > 0) {
+            const filteredErrors = {};
+
+            // Loop through errors and keep only those with actual error messages (non-empty objects)
+            Object.keys(errors).forEach((key) => {
+                if (Object.keys(errors[key]).length > 0) {
+                    filteredErrors[key] = errors[key];
+                }
+            });
+
+            // If there are any filtered errors (i.e., non-empty error objects), set validation errors
+            if (Object.keys(filteredErrors).length > 0) {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
-                    ...errors,
+                    ...filteredErrors,  // Merge the filtered errors into the existing validation errors
                 }));
-            } else {
-                const isLastSection = currentSection === sections.length - 1;
-                const isLastPageInSection = currentPage === sections[currentSection].pages.length - 1;
-    
-                if (isLastSection && isLastPageInSection) {
-                    setShowComplianceScreen(true);
-                    setIsLastPage(true);
-                } else if (currentPage < sections[currentSection].pages.length - 1) {
-                    setCurrentPage(currentPage + 1);
-                    setTotalPagesNavigated(totalPagesNavigated + 1);
-                } else {
-                    setCurrentSection(currentSection + 1);
-                    setCurrentPage(0);
-                    setTotalPagesNavigated(totalPagesNavigated + 1);
-                }
+                console.log("Mandatory fields are missing:", filteredErrors);
+                return; // Don't proceed to next page or section if there are errors
             }
-        } else {
-            console.log(`Section ${currentSectionData.section_name} is hidden due to conditional logic.`);
         }
-    };
-    
 
+
+        // Get precomputed navigation details for next page/section
+        const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
+
+        if (isLastSection) {
+            setShowComplianceScreen(true);  // Show compliance screen if it's the last section
+            return;
+        }
+
+        // Move to the next section or page
+        if (nextSection !== currentSection) {
+            setCurrentSection(nextSection);
+            setCurrentPage(nextPage);
+        } else {
+            setCurrentPage(nextPage);
+        }
+
+        setTotalPagesNavigated(totalPagesNavigated + 1);
+    };
 
 
 
@@ -537,15 +531,79 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             return;
         }
 
+        // Helper function to evaluate page visibility
+        const isPageVisible = (sectionIndex, pageIndex) => {
+            const pageData = sections[sectionIndex]?.pages[pageIndex];
+            const pageConditionalLogic = pageData?.page_conditional_logic;
+
+            if (pageConditionalLogic) {
+                try {
+                    return eval(pageConditionalLogic);
+                } catch (error) {
+                    console.error("Error evaluating page conditional logic:", error);
+                    return false;
+                }
+            }
+            return true; // Default to true if no conditional logic exists
+        };
+
+        // Helper function to evaluate section visibility
+        const isSectionVisible = (sectionIndex) => {
+            const sectionData = sections[sectionIndex];
+            const sectionConditionalLogic = sectionData?.section_conditional_logic;
+
+            if (sectionConditionalLogic) {
+                try {
+                    return eval(sectionConditionalLogic);
+                } catch (error) {
+                    console.error("Error evaluating section conditional logic:", error);
+                    return false;
+                }
+            }
+            return true; // Default to true if no conditional logic exists
+        };
+
         if (currentPage > 0) {
-            setCurrentPage(currentPage - 1);
-            setTotalPagesNavigated(totalPagesNavigated - 1);
+            let previousPage = currentPage - 1;
+
+            while (previousPage >= 0 && !isPageVisible(currentSection, previousPage)) {
+                console.log(`Page ${previousPage} in Section ${currentSection} is not visible. Skipping...`);
+                previousPage--;
+            }
+
+            if (previousPage >= 0) {
+                setCurrentPage(previousPage);
+                setTotalPagesNavigated(totalPagesNavigated - 1);
+            } else {
+                console.log("No more visible pages in the current section.");
+            }
         } else if (currentSection > 0) {
-            setCurrentSection(currentSection - 1);
-            setCurrentPage(sections[currentSection - 1].pages.length - 1);
-            setTotalPagesNavigated(totalPagesNavigated - 1);
+            let previousSection = currentSection - 1;
+            while (previousSection >= 0 && !isSectionVisible(previousSection)) {
+                console.log(`Section ${previousSection} is not visible. Skipping...`);
+                previousSection--;
+            }
+
+            if (previousSection >= 0) {
+                let lastVisiblePage = sections[previousSection]?.pages.length - 1;
+
+                while (lastVisiblePage >= 0 && !isPageVisible(previousSection, lastVisiblePage)) {
+                    lastVisiblePage--;
+                }
+
+                if (lastVisiblePage >= 0) {
+                    setCurrentSection(previousSection);
+                    setCurrentPage(lastVisiblePage);
+                    setTotalPagesNavigated(totalPagesNavigated - 1);
+                } else {
+                    console.log("No visible pages in the previous section.");
+                }
+            } else {
+                console.log("No more visible sections to navigate back to.");
+            }
         }
     };
+
 
     const renderQuestion = (question) => {
         const commonProps = {
@@ -622,49 +680,29 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         window[key] = value;
     });
 
-    // const isLastSectionAndPage = () => {
-    //     const nextSectionData = sections[currentSection + 1];
-    //     let isSectionEval = false;
-    //     if(nextSectionData?.section_conditional_logic){
-    //         isSectionEval = eval(nextSectionData?.section_conditional_logic)
-    //     }
-    //     console.log(isSectionEval, 'dddddddddddddd')
-    //     if(isSectionEval){
-    //         return false;
-    //     }else{
-    //         return currentSection === sections.length - 1 &&
-    //         currentPage === sections[currentSection]?.pages.length - 1;
-    //     }
-
-    // };
     const isLastSectionAndPage = () => {
-        const isLastSectionAndPage = () => {
-            // Check if we are on the last section and last page
-            const isLastPageInSection =
-                currentPage === sections[currentSection]?.pages.length - 1;
-            const isLastSection = currentSection === sections.length - 1;
+        // Check if we are on the last section and last page
+        const isLastPageInSection = currentPage === sections[currentSection]?.pages.length - 1;
+        const isLastSection = currentSection === sections.length - 1;
 
-            // If already on the last section and page, return true to show "Submit"
-            if (isLastSection && isLastPageInSection) {
-                return true;
+        if (isLastSection && isLastPageInSection) {
+            return true; // If on the last section and page, it's a "Submit" button
+        }
+
+        // Otherwise, evaluate the next section's conditional logic
+        const nextSectionData = sections[currentSection + 1];
+        if (nextSectionData?.section_conditional_logic) {
+            try {
+                const isSectionEval = eval(nextSectionData.section_conditional_logic);
+                console.log(isSectionEval, "Evaluated section logic");
+                return !isSectionEval; // If the next section logic is invalid, it becomes a "Submit" button
+            } catch (err) {
+                console.error("Error evaluating section conditional logic:", err);
+                return true; // On error, assume "Submit"
             }
+        }
 
-            // Otherwise, evaluate the next section's conditional logic
-            const nextSectionData = sections[currentSection + 1];
-            if (nextSectionData?.section_conditional_logic) {
-                try {
-                    const isSectionEval = eval(nextSectionData.section_conditional_logic);
-                    console.log(isSectionEval, "Evaluated section logic");
-                    return isSectionEval; // Show "Submit" if the next section logic is false
-                } catch (err) {
-                    console.error("Error evaluating section conditional logic:", err);
-                    return false; // Fallback to "Next" if evaluation fails
-                }
-            }
-
-            // Default: Proceed to "Next" if no conditional logic exists
-            return false;
-        };
+        return false; // Default: "Next"
     };
 
 
@@ -789,8 +827,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                                 <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
-                                    <p>Step {totalPagesNavigated + 1} of {allPages.length}</p>
-                                    <span className="text-sm text-gray-600">{((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%</span>
+                                    <p>Step {totalPagesNavigated + 1} of {sections.reduce((total, section) => total + section.pages.length, 0)}</p>
+                                    <span className="text-sm text-gray-600">
+                                        {allPages.length > 0
+                                            ? ((totalPagesNavigated / allPages.length) * 100).toFixed(0)
+                                            : 0
+                                        }%
+                                    </span>
                                 </div>
                             </div>
 
@@ -910,7 +953,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`}
                             onClick={handleNextClick}
                         >
-                            {isLastSectionAndPage() ? 'Submit' : 'Next'}
+                            {precomputedNavigation.isLastSection ? "Submit" : "Next"}
                         </button>
                     )}
                 </div>
