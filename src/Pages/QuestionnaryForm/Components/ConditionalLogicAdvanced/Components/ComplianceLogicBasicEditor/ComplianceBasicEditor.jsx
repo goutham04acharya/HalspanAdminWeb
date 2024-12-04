@@ -13,7 +13,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     const dispatch = useDispatch();
     const [dropdown, setDropdown] = useState(false)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [isDropdownOpen, setDropdownOpen] = useState({});
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -37,36 +37,36 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     //     { value: 'Other', label: 'OTHER' },
     // ];
 
-    const options = [ 'NO ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER']
-    const handleOptionClick = (option, mainIndex) => {
-        setDropdownOpen(false);
-        if (mainIndex === 'if') {
-            setConditions()
-        } else if (mainIndex === 'else_if') {
-            // Adding a new 'else if'
-            dispatch(setConditionReason({
-                id: 'condition_1',
-                conditionType: 'else_if',
-                reason: 'Replacement_Recommended_true'
-            }));
-        } else if (mainIndex === 'else') {
-            // Setting REASON for 'else'
-            dispatch(setConditionReason({
-                id: 'condition_1',
-                conditionType: 'else',
-                reason: 'Default_Reason'
-            }));
-        }
-        // // Updating an existing 'else if' (e.g., at index 0)
-        // dispatch(setConditionReason({
-        //     id: 'condition_1',
-        //     conditionType: 'else_if',
-        //     reason: 'Updated_ElseIf_Reason',
-        //     elseIfIndex: 0
-        // }));
+    const options = ['NO ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER']
+    // const handleOptionClick = (option, mainIndex) => {
+    //     setDropdownOpen(false);
+    //     if (mainIndex === 'if') {
+    //         setConditions()
+    //     } else if (mainIndex === 'else_if') {
+    //         // Adding a new 'else if'
+    //         dispatch(setConditionReason({
+    //             id: 'condition_1',
+    //             conditionType: 'else_if',
+    //             reason: 'Replacement_Recommended_true'
+    //         }));
+    //     } else if (mainIndex === 'else') {
+    //         // Setting REASON for 'else'
+    //         dispatch(setConditionReason({
+    //             id: 'condition_1',
+    //             conditionType: 'else',
+    //             reason: 'Default_Reason'
+    //         }));
+    //     }
+    //     // // Updating an existing 'else if' (e.g., at index 0)
+    //     // dispatch(setConditionReason({
+    //     //     id: 'condition_1',
+    //     //     conditionType: 'else_if',
+    //     //     reason: 'Updated_ElseIf_Reason',
+    //     //     elseIfIndex: 0
+    //     // }));
 
 
-    };
+    // };
     const updateDropdown = (dropdown, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
         if (isElseIf) {
@@ -854,7 +854,124 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     // // const conditions = [...]; // Your conditions array  
     // console.log(generateTernaryOperation(conditions));
 
+    //this below code will set the dropdown value to the conditions state
+    const reasonDropdownHandler = (option, index, subIndex, id, type) => {
+        if (type == 'elseIfIndex') {
+            dropdownHandler('elseIfBlock', subIndex)
+            setConditions((prevState) => {
+                // Create a deep copy of the state
+                const updatedState = [...prevState];
 
+                // Ensure the mainIndex is valid
+                if (index >= 0 && index < updatedState.length) {
+                    const elseIfBlocks = updatedState[index]?.elseIfBlocks;
+
+                    // Ensure the subIndex is valid within elseIfBlocks
+                    if (elseIfBlocks && subIndex >= 0 && subIndex < elseIfBlocks.length) {
+                        const thenActions = elseIfBlocks[subIndex]?.thenActions;
+
+                        // Ensure there are conditions to update
+                        if (thenActions && thenActions.length > 0) {
+                            // Update the value of the first condition (or modify logic as needed)
+                            console.log(thenActions, 'popop')
+                            thenActions[0] = {
+                                ...thenActions[0],
+                                [id]: option,
+                            };
+                        } else {
+                            console.error("No conditions found at specified subIndex.");
+                        }
+                    } else {
+                        console.error("Invalid subIndex.");
+                    }
+                } else {
+                    console.error("Invalid mainIndex.");
+                }
+
+                return updatedState;
+            });
+        } else if (type === 'else') {
+            dropdownHandler('else', index)
+            setConditions((prevState) => {
+                const updatedState = [...prevState];
+
+                // Ensure the mainIndex is valid
+                if (index >= 0 && index < updatedState.length) {
+                    const currentItem = updatedState[index];
+
+                    // If elseBlock doesn't exist, create it, else update the 'value' key
+                    if (currentItem?.elseBlock) {
+                        // Update the value key inside the existing elseBlock
+                        updatedState[index] = {
+                            ...currentItem,
+                            elseBlock: {
+                                ...currentItem.elseBlock,
+                            [id]: option,  // Update the value key with the new option
+                            },
+                        };
+                    } else {
+                        // If elseBlock doesn't exist, create it with the value key set to the option
+                        updatedState[index] = {
+                            ...currentItem,
+                            elseBlock: {
+                                [id]: option,  // Initialize value with the option
+                            },
+                        };
+                    }
+                } else {
+                    console.error("Invalid mainIndex.");
+                }
+
+                return updatedState;
+            });
+        }
+        else {
+            dropdownHandler('if', index)
+            setConditions((prevState) => {
+                // Create a deep copy of the state
+                const updatedState = [...prevState];
+
+                // Ensure the index is valid before updating
+                if (index >= 0 && index < updatedState.length) {
+                    updatedState[index] = {
+                        ...updatedState[index],
+                        thenAction: {
+                            ...updatedState[index].thenAction,
+                            [id]: option,
+                        },
+                    };
+                } else {
+                    console.error("Invalid index");
+                }
+
+                return updatedState;
+            });
+        }
+
+    };
+
+    //function to handle opening and closing of the dropdown in complinace basic editor
+    console.log(isDropdownOpen, 'ikiki')
+    const dropdownHandler = (type, index) => {
+        setDropdownOpen((prevState) => {
+            // Generate the key based on type and index
+            const newKey = `${type}-${index}`;
+
+            // Start with all keys set to false
+            const updatedState = Object.keys(prevState).reduce((acc, key) => {
+                // If the key matches, toggle it; otherwise, set to false
+                acc[key] = key === newKey ? !prevState[newKey] : false;
+                return acc;
+            }, {});
+
+            // Add the new key if it doesn't exist and toggle it to true
+            if (!(newKey in updatedState)) {
+                updatedState[newKey] = true;
+            }
+
+            return updatedState;
+        });
+    };
 
 
 
@@ -1024,19 +1141,20 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                         <InputWithDropDown
                                             label='Reason'
                                             labelStyle='font-semibold text-[#2B333B] text-base'
-                                            id='condition_dropdown'
+                                            id='value'
                                             top='30px'
                                             placeholder='Select'
                                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                             testID={`reason-dropdown`}
                                             labeltestID={`reason-dropdown-label`}
-                                            // selectedOption={options.find(option => option.label === fieldSettingParamsReason?.reason)}
-                                            handleOptionClick={handleOptionClick}
+                                            selectedOption={condition?.thenAction?.value}
+                                            handleOptionClick={reasonDropdownHandler}
                                             mainIndex={index}
                                             // subIndex={i}
-                                            isDropdownOpen={isDropdownOpen}
-                                            setDropdownOpen={setDropdownOpen}
+                                            isDropdownOpen={isDropdownOpen?.[`if-${index}`]}
+                                            setDropdownOpen={() => dropdownHandler('if', index)}
                                             options={options}
+                                            ifcompliance
                                         // validationError={submitSelected && condition[index]?.condition_logic === ''}
                                         />
                                         <InputField
@@ -1220,20 +1338,44 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     handleChange={(e) => handleThenActionChange(index, 'status', e.target.value, false, true, elseIfIndex)}
                                                     basicEditor
                                                 />
-                                                <InputField
+                                                {/* <InputField
                                                     label="Reason"
                                                     className="w-full"
                                                     placeholder="Enter reason"
                                                     value={condition.elseIfBlocks[elseIfIndex].thenActions[0].value || ''}
                                                     handleChange={(e) => handleThenActionChange(index, 'value', e.target.value, false, true, elseIfIndex)}
                                                     basicEditor
+                                                    />
+                                                    */}
+                                                <InputWithDropDown
+                                                    label='Reason'
+                                                    labelStyle='font-semibold text-[#2B333B] text-base'
+                                                    id='value'
+                                                    top='30px'
+                                                    placeholder='Select'
+                                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+                                                    testID={`reason-dropdown`}
+                                                    labeltestID={`reason-dropdown-label`}
+                                                    selectedOption={condition?.elseIfBlocks?.[elseIfIndex]?.thenActions?.[0].value}
+                                                    handleOptionClick={(e) => {
+                                                        console.log(e)
+                                                        reasonDropdownHandler(e, index, elseIfIndex, 'value', 'elseIfIndex')
+                                                    }}
+                                                    mainIndex={index}
+                                                    // subIndex={i}
+                                                    isDropdownOpen={isDropdownOpen?.[`elseIfBlock-${elseIfIndex}`]}
+                                                    setDropdownOpen={() => dropdownHandler('elseIfBlock', elseIfIndex)}
+                                                    options={options}
+                                                    compliance
+                                                // validationError={submitSelected && condition[index]?.condition_logic === ''}
                                                 />
+
                                                 <InputField
                                                     label="Action"
                                                     className="w-full"
                                                     placeholder="Enter action"
                                                     value={condition.elseIfBlocks[elseIfIndex].thenActions[0].action || ''}
-                                                    handleChange={(e) => handleThenActionChange(index, 'action', e.target.value, false, true, elseIfIndex)}
+                                                    handleChange={(e) => handleThenActionChange(index, 'action', e.target.value, false, true, 'else')}
                                                     basicEditor
                                                 />
                                                 <InputField
@@ -1278,13 +1420,35 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             handleChange={(e) => handleThenActionChange(index, 'status', e.target.value, true)}
                                             basicEditor
                                         />
-                                        <InputField
+                                        {/* <InputField
                                             label="Reason"
                                             className="w-full"
                                             placeholder="Enter reason"
                                             value={condition.elseBlock?.value || ''}
                                             handleChange={(e) => handleThenActionChange(index, 'value', e.target.value, true)}
                                             basicEditor
+                                        /> */}
+                                        <InputWithDropDown
+                                            label='Reason'
+                                            labelStyle='font-semibold text-[#2B333B] text-base'
+                                            id='value'
+                                            top='30px'
+                                            placeholder='Select'
+                                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+                                            testID={`reason-dropdown`}
+                                            labeltestID={`reason-dropdown-label`}
+                                            selectedOption={condition?.elseBlock?.value}
+                                            handleOptionClick={(e) => {
+                                                console.log(e)
+                                                reasonDropdownHandler(e, index, null, 'value', 'else')
+                                            }}
+                                            mainIndex={index}
+                                            // subIndex={i}
+                                            isDropdownOpen={isDropdownOpen?.[`else-${index}`]}
+                                            setDropdownOpen={() => dropdownHandler('else', index)}
+                                            options={options}
+                                            compliance
+                                        // validationError={submitSelected && condition[index]?.condition_logic === ''}
                                         />
                                         <InputField
                                             label="Action"
