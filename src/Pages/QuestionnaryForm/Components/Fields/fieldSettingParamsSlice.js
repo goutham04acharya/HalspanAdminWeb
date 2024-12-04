@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 const initialState = {
     savedData: {},
     currentData: {},
-    editorToggle: {}
+    editorToggle: {},
+    conditions: [],
 };
 
 // Helper function to process displayType
@@ -66,6 +67,39 @@ const fieldSettingParamsSlice = createSlice({
                 ...state.currentData[questionId],
                 [id]: value
             };
+        },
+        setConditionReason: (state, action) => {
+            const { id, conditionType, reason, elseIfIndex = null } = action.payload;
+
+            const existingCondition = state.conditions.find(cond => cond.id === id);
+
+            if (existingCondition) {
+                if (conditionType === 'if') {
+                    existingCondition.if = reason;
+                } else if (conditionType === 'else_if') {
+                    if (elseIfIndex !== null) {
+                        // Update existing else if
+                        existingCondition.elseIf[elseIfIndex] = reason;
+                    } else {
+                        // Add new else if
+                        existingCondition.elseIf.push(reason);
+                    }
+                } else if (conditionType === 'else') {
+                    existingCondition.else = reason;
+                }
+            } else {
+                // Add a new condition with REASON
+                const newCondition = {
+                    id,
+                    if: conditionType === 'if' ? reason : null,
+                    elseIf: conditionType === 'else_if' ? [reason] : [],
+                    else: conditionType === 'else' ? reason : null,
+                };
+                state.conditions.push(newCondition);
+            }
+        },
+        clearConditions: (state) => {
+            state.conditions = [];
         },
         setNewLogic: (state, action) => {
             const { questionId, id, value } = action.payload;
@@ -219,7 +253,9 @@ export const {
     setFixedChoiceValue,
     updateFixedChoiceArray,
     saveCurrentData,
-    setInitialData
+    setInitialData,
+    setConditionReason,
+    clearConditions
 } = fieldSettingParamsSlice.actions;
 
 export default fieldSettingParamsSlice.reducer;

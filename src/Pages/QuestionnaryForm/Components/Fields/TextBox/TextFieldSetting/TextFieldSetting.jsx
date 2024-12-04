@@ -62,7 +62,6 @@ function TestFieldSetting({
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
-    // dispatch(setShouldAutoSave(true));
   };
   const validateRegex = (e) => {
     const value = e.target.value;

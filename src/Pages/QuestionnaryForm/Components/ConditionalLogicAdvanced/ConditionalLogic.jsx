@@ -1279,8 +1279,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     /* eslint-disable complexity */
     const parseBasicEditorLogicExpression = (logic) => {
         // Helper function to identify condition type
-        if(!logic){
-            return;
+        if (logic === '') {
+            return [{
+                'conditions': [
+                    {
+                        'question_name': '',
+                        'condition_logic': '',
+                        'value': '',
+                        'dropdown': false,
+                        'condition_dropdown': false,
+                        'condition_type': 'textboxfield'
+                    },
+                ]
+            },
+            ]
         }
         const getConditionLogic = (expression) => {
             if (expression.includes("===")) return "equals";
@@ -1329,10 +1341,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
 
     useLayoutEffect(() => {
-        let compliance_logic = parseBasicEditorLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
-        console.log(compliance_logic, 'lllllll')
-        setConditions(compliance_logic)
-        setInputValue(compliance_logic)
+        if (!complianceState) {
+            let compliance_logic = parseBasicEditorLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+            console.log(compliance_logic, 'lllllll')
+            setConditions(compliance_logic)
+            setInputValue(compliance_logic)
+        }
     }, [selectedQuestionId])
 
     return (

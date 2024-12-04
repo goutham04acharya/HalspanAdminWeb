@@ -5,17 +5,22 @@ import InputWithDropDown from '../../../../../../Components/InputField/Dropdown'
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
+import { useDispatch } from 'react-redux';
+import { setConditionReason, setNewComponent } from '../../../Fields/fieldSettingParamsSlice';
+import { useSelector } from 'react-redux';
 
 function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected }) {
+    const dispatch = useDispatch();
     const [dropdown, setDropdown] = useState(false)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-    const [orClick, setOrClick] = useState(false);
-    const [andClick, setAndClick] = useState(false);
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
         elseStatement: {}
     });
+    const fieldSettingParamsReason = useSelector(state => state.fieldSettingParams.conditions);
+
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -23,6 +28,47 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
 
+    const options = [
+        { value: 'No access to asset', label: 'NO ACCESS' },
+        { value: 'Missing asset', label: 'MISSING' },
+        { value: 'Recommend relacement', label: 'RECOMMEND_REPLACEMENT' },
+        { value: 'Recommend remediation', label: 'RECOMMEND_REMEDIATION' },
+        { value: 'Further investigation required', label: 'FURTHER_INVESTIGATION' },
+        { value: 'Other', label: 'OTHER' },
+    ];
+    const handleOptionClick = (option, type) => {
+        setDropdownOpen(false);
+        if (type === 'if') {
+            dispatch(setConditionReason({
+                id: 'condition_1',
+                conditionType: 'if',
+                reason: option.label
+            }));
+        } else if (type === 'else_if') {
+            // Adding a new 'else if'
+            dispatch(setConditionReason({
+                id: 'condition_1',
+                conditionType: 'else_if',
+                reason: 'Replacement_Recommended_true'
+            }));
+        } else if (type === 'else') {
+            // Setting REASON for 'else'
+            dispatch(setConditionReason({
+                id: 'condition_1',
+                conditionType: 'else',
+                reason: 'Default_Reason'
+            }));
+        }
+        // // Updating an existing 'else if' (e.g., at index 0)
+        // dispatch(setConditionReason({
+        //     id: 'condition_1',
+        //     conditionType: 'else_if',
+        //     reason: 'Updated_ElseIf_Reason',
+        //     elseIfIndex: 0
+        // }));
+
+
+    };
     const updateDropdown = (dropdown, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
         if (isElseIf) {
@@ -310,90 +356,90 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         }
     };
 
-    const handleThenActionChange = (index, field, value, isElseBlock = false, isElseIf = false, elseIfIndex = null) => {  
-        setConditions(prevConditions =>  
-           prevConditions.map((condition, i) => {  
-             if (i === index) {  
-                if (isElseIf) {  
-                   // Update the userInput state  
-                   setUserInput(prevInput => {  
-                     const updatedInput = { ...prevInput };  
-                     if (!updatedInput.elseIfStatements[index]) {  
-                        updatedInput.elseIfStatements[index] = [];  
-                     }  
-                     if (!updatedInput.elseIfStatements[index][elseIfIndex]) {  
-                        updatedInput.elseIfStatements[index][elseIfIndex] = {};  
-                     }  
-                     if (!updatedInput.elseIfStatements[index][elseIfIndex].thenAction) {  
-                        updatedInput.elseIfStatements[index][elseIfIndex].thenAction = {};  
-                     }  
-                     updatedInput.elseIfStatements[index][elseIfIndex].thenAction[field] = value;  
-                     return updatedInput;  
-                   });  
-       
-                   return {  
-                     ...condition,  
-                     elseIfBlocks: condition.elseIfBlocks.map((elseIfBlock, j) => {  
-                        if (j === elseIfIndex) {  
-                           return {  
-                             ...elseIfBlock,  
-                             thenActions: elseIfBlock.thenActions.map((thenAction, k) => {  
-                                return {  
-                                   ...thenAction,  
-                                   [field]: value  
-                                };  
-                             })  
-                           };  
-                        }  
-                        return elseIfBlock;  
-                     })  
-                   };  
-                } else if (isElseBlock) {  
-                   // Update the userInput state  
-                   setUserInput(prevInput => {  
-                     const updatedInput = { ...prevInput };  
-                     if (!updatedInput.elseStatement) {  
-                        updatedInput.elseStatement = {};  
-                     }  
-                     updatedInput.elseStatement[field] = value;  
-                     return updatedInput;  
-                   });  
-       
-                   return {  
-                     ...condition,  
-                     elseBlock: {  
-                        ...condition.elseBlock,  
-                        [field]: value  
-                     }  
-                   };  
-                } else {  
-                   // Update the userInput state  
-                   setUserInput(prevInput => {  
-                     const updatedInput = { ...prevInput };  
-                     if (!updatedInput.ifStatements[index]) {  
-                        updatedInput.ifStatements[index] = {};  
-                     }  
-                     if (!updatedInput.ifStatements[index].thenAction) {  
-                        updatedInput.ifStatements[index].thenAction = {};  
-                     }  
-                     updatedInput.ifStatements[index].thenAction[field] = value;  
-                     return updatedInput;  
-                   });  
-       
-                   return {  
-                     ...condition,  
-                     thenAction: {  
-                        ...condition.thenAction,  
-                        [field]: value  
-                     }  
-                   };  
-                }  
-             }  
-             return condition;  
-           })  
-        );  
-     };
-     
+    const handleThenActionChange = (index, field, value, isElseBlock = false, isElseIf = false, elseIfIndex = null) => {
+        setConditions(prevConditions =>
+            prevConditions.map((condition, i) => {
+                if (i === index) {
+                    if (isElseIf) {
+                        // Update the userInput state  
+                        setUserInput(prevInput => {
+                            const updatedInput = { ...prevInput };
+                            if (!updatedInput.elseIfStatements[index]) {
+                                updatedInput.elseIfStatements[index] = [];
+                            }
+                            if (!updatedInput.elseIfStatements[index][elseIfIndex]) {
+                                updatedInput.elseIfStatements[index][elseIfIndex] = {};
+                            }
+                            if (!updatedInput.elseIfStatements[index][elseIfIndex].thenAction) {
+                                updatedInput.elseIfStatements[index][elseIfIndex].thenAction = {};
+                            }
+                            updatedInput.elseIfStatements[index][elseIfIndex].thenAction[field] = value;
+                            return updatedInput;
+                        });
+
+                        return {
+                            ...condition,
+                            elseIfBlocks: condition.elseIfBlocks.map((elseIfBlock, j) => {
+                                if (j === elseIfIndex) {
+                                    return {
+                                        ...elseIfBlock,
+                                        thenActions: elseIfBlock.thenActions.map((thenAction, k) => {
+                                            return {
+                                                ...thenAction,
+                                                [field]: value
+                                            };
+                                        })
+                                    };
+                                }
+                                return elseIfBlock;
+                            })
+                        };
+                    } else if (isElseBlock) {
+                        // Update the userInput state  
+                        setUserInput(prevInput => {
+                            const updatedInput = { ...prevInput };
+                            if (!updatedInput.elseStatement) {
+                                updatedInput.elseStatement = {};
+                            }
+                            updatedInput.elseStatement[field] = value;
+                            return updatedInput;
+                        });
+
+                        return {
+                            ...condition,
+                            elseBlock: {
+                                ...condition.elseBlock,
+                                [field]: value
+                            }
+                        };
+                    } else {
+                        // Update the userInput state  
+                        setUserInput(prevInput => {
+                            const updatedInput = { ...prevInput };
+                            if (!updatedInput.ifStatements[index]) {
+                                updatedInput.ifStatements[index] = {};
+                            }
+                            if (!updatedInput.ifStatements[index].thenAction) {
+                                updatedInput.ifStatements[index].thenAction = {};
+                            }
+                            updatedInput.ifStatements[index].thenAction[field] = value;
+                            return updatedInput;
+                        });
+
+                        return {
+                            ...condition,
+                            thenAction: {
+                                ...condition.thenAction,
+                                [field]: value
+                            }
+                        };
+                    }
+                }
+                return condition;
+            })
+        );
+    };
+
 
 
 
@@ -422,29 +468,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
         return matchingQuestion;
     }
-
-    // const handleInputChange = (e, id, type, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
-    //     setSubmitSelected(false)
-    //     if (isElseIf) {
-    //         setConditions(prevConditions => {
-    //             const updatedConditions = [...prevConditions];
-    //             const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
-
-    //             conditionToUpdate.value = e.target.value;
-
-    //             return updatedConditions;
-    //         });
-    //     } else {
-    //         setConditions(prevConditions => {
-    //             const updatedConditions = [...prevConditions];
-    //             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-
-    //             conditionToUpdate.value = e.target.value;
-
-    //             return updatedConditions;
-    //         });
-    //     }
-    // }
 
     const handleSelectDropdown = (key, mainIndex, subIndex, type, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
@@ -630,33 +653,89 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             );
         }
     }
-    const structureUserInput = () => {
-        const ifStatements = userInput.ifStatements.map((statement, index) => {
-            const conditions = Object.keys(statement).map(key => {
-                return `${statement[key].question_name} ${statement[key].condition_logic} ${statement[key].value}`;
-            }).join(' and ');
-            return `if (${conditions}) then { STATUS = "${statement.thenAction.status}", REASON = "${statement.thenAction.value}", ACTIONS += "${statement.thenAction.action}" }`;
-        }).join(' else if ');
 
-        const elseIfStatements = userInput.elseIfStatements.map((statements, index) => {
-            return statements.map((statement, elseIfIndex) => {
-                const conditions = Object.keys(statement).map(key => {
-                    return `${statement[key].question_name} ${statement[key].condition_logic} ${statement[key].value}`;
-                }).join(' and ');
-                return `else if (${conditions}) then { STATUS = "${statement.thenAction.status}", REASON = "${statement.thenAction.value}", ACTIONS += "${statement.thenAction.action}" }`;
-            }).join(' else if ');
-        }).join(' else if ');
+    console.log(conditions, 'structureUserInputstructureUserInputs')
 
-        const elseStatement = `else { STATUS = "${userInput.elseStatement.status}", GRADE = "${userInput.elseStatement.grade}" }`;
+    const getComplianceLogic = () => {
+        let condition = conditions[0].conditions;
 
-        return `${ifStatements} ${elseIfStatements} ${elseStatement}`;
-    };
+        // to get the value expression
+        const getValue = (val, condtionType) => {
+            let resultValue = '';
+            switch (condtionType) {
+                case "choiceboxfield": resultValue = `"${val}"`;
+                    break;
+                case "numberfield": resultValue = val;
+                    break;
+            }
+            return resultValue
+        }
 
-    console.log(conditions, 'structureUserInputstructureUserInput')
+        // to get the condition expression
+        const getConditionValue = (item) => {
+            let resultExpression = '';
+            switch (item.condition_logic) {
+                case "includes": resultExpression = `${item.question_name}.includes("${item.value}")`;
+                    break;
+                case "equals": resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "not equal to": resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "does not include": resultExpression = `!${item.question_name}.includes("${item.value}")`;
+                    break;
+            }
+            return resultExpression
+        }
+        const formatExpression = (expr) => {
+            // Split the expression into parts by "||"
+            const orParts = expr.split("||").map((part) => part.trim());
+
+            // Add parentheses around each "&&" group
+            const formatted = orParts
+                .map((part) => {
+                    if (part.includes("&&")) {
+                        return `(${part})`;
+                    }
+                    return part;
+                })
+                .join(" || ");
+
+            return formatted;
+        };
+
+        let result = '';
+
+        condition.map((item, index) => {
+
+            // if(index - 1 !== 0 && (item.andClicked !== condition[index - 1]?.andClicked || item.orClicked !== condition[index - 1]?.orClicked)) {
+            //     result += ')'
+            // }
+            if (item.orClicked && index !== 0) {
+                result += '|| ';
+            }
+
+            if (item.andClicked && index !== 0) {
+                result += ' && ';
+            }
+
+            // if (condition[index + 1]?.andClicked && !item.andClicked) {
+            //     result += '(';
+            // }
+
+            result += `${getConditionValue(item)}`;
+            // if (index === condition.length - 1) {
+            //     result += ') ?'
+            // }
+        });
+
+        console.log(formatExpression(result.toString()), 'get compliance');
+
+    }
 
     return (
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>
+            <button onClick={() => getComplianceLogic()}>Generate</button>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions.map((condition, index) => (
                     <div key={index} className='mb-6 bg-[#EFF1F8] p-4'>
@@ -816,6 +895,24 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             handleChange={(e) => handleThenActionChange(index, 'status', e.target.value)}
                                             basicEditor
                                         />
+                                        {/* <InputWithDropDown
+                                            label='Reason'
+                                            labelStyle='font-semibold text-[#2B333B] text-base'
+                                            id='condition_dropdown'
+                                            top='30px'
+                                            placeholder='Select'
+                                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
+                                            testID={`reason-dropdown`}
+                                            labeltestID={`reason-dropdown-label`}
+                                            selectedOption={options.find(option => option.label === fieldSettingParamsReason?.reason)}
+                                            handleOptionClick={(e)=>handleOptionClick(e.target.value, 'if')}
+                                            mainIndex={index}
+                                            // subIndex={i}
+                                            isDropdownOpen={isDropdownOpen}
+                                            setDropdownOpen={setDropdownOpen}
+                                            options={options}
+                                        // validationError={submitSelected && condition[index]?.condition_logic === ''}
+                                        /> */}
                                         <InputField
                                             label="Reason"
                                             className="w-full"
