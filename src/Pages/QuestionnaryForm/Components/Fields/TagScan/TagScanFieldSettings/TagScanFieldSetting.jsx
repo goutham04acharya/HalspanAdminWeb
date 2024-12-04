@@ -206,7 +206,7 @@ function TagScanFieldSetting({
                         >
                             Add Conditional Logic
                         </button>
-                        {fieldSettingParameters.conditional_logic &&
+                        {fieldSettingParameters?.conditional_logic &&
                             <p className='text-center italic mt-1'>Conditional Logic Added</p>
                         }
                     </div>
