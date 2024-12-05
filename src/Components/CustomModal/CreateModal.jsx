@@ -7,7 +7,6 @@ import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 
 const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice, activeInputs, setActiveInputs }) => {
-    console.log(data, 'dsacadca')
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
             ...prev,
@@ -46,7 +45,6 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
         if (choicesLength < 10) return 'h-[calc(100vh-580px)] ';
         return 'h-[calc(100vh-580px)] ';
     };
-    // console.log(data, 'sdaasd')
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className={`h-auto flex flex-col relative  ${getModalWidth()}`}>

@@ -109,7 +109,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         }
     };
     function getDetails(path, data) {
-        console.log(data, 'datatetete')
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
 
@@ -141,7 +140,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
 
     const handleInputChange = (e, id, type, mainIndex, subIndex) => {
-        console.log(e.target.value, 'hhhhh');
         setSubmitSelected(false);
 
         setConditions(prevConditions => {
@@ -155,7 +153,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
            conditionToUpdate.value = e.target.value;
            return updatedConditions;
         });
-        console.log(conditions, 'fffff')
         
         // Ensure `conditions` is the latest state before dispatching
         // setConditions(prevConditions => {
@@ -174,9 +171,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
-        console.log(key, 'key')
         if (type === 'condition_dropdown') {
-            console.log('condition_dropdown')
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
                 const updatedConditions = [...prevConditions];
@@ -293,7 +288,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 {conditions?.map((condition, index) => (
 
                     <div key={index} className='mb-6'>
-                        {console.log(condition, 'conditionconditionconditioncondition')}
                         {condition['conditions']?.map((sub_cond, i) => (
                             <div className='flex gap-4 items-start justify-between mb-6'>
                                 <div className='w-[97%] flex items-end gap-6 bg-[#EFF1F8] p-2.5'>

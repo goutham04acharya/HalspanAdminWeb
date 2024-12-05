@@ -126,7 +126,8 @@ const Sections = ({
                               src="/Images/setting.svg"
                               title="page-condition-logic"
                               alt="page-condition-logic"
-                              data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                              // data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                              data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
                               className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[80px]`}
                               onClick={
                                 formStatus === 'Draft'

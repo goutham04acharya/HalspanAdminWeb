@@ -140,18 +140,19 @@ After(function (scenario) {
                         console.error('Error writing coverage data:', err);
                     } else {
                         console.log('Coverage data has been written to:', failed_scenarios);
-                        console.log('------------------------------------------------------------------------------');
+                        console.log('------------------------------------------------------------------------------------------');
                     }
                 });
             }
         });
     }
     else if (scenario.result.status === 'PASSED') {
-        console.log('\x1b[33m%s\x1b[0m',`${global.index}. Scenario: ${scenario.pickle.name}`);
+        const featureName = path.basename(scenario.pickle.uri, '.feature'); // Assuming URI contains the .feature file name
+        console.log('\x1b[33m%s\x1b[0m',`${global.index}. Feature: ${featureName} | Scenario: ${scenario.pickle.name}`);
         console.log('\x1b[32m%s\x1b[0m', '✅ Scenario Passed Successfully');
         global.index = global.index + 1;
     }
-    console.log('------------------------------------------------------------------------------');
+    console.log('------------------------------------------------------------------------------------------');
 });
 
 Before("@create_questionnaire", async function () {

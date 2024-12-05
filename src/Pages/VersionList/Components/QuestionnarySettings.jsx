@@ -107,7 +107,6 @@ function QuestionnarySettings({
         const hasChanges = Object.keys(Payload()).length > 0;
         setIsSaveDisabled(!hasChanges); // Disable the button if no changes, enable if there are changes
     }, [editedDetails, queSettingDetails]);
-    console.log(queSettingDetails, 'queSettingDetails?.data')
     return (
         dataLoading ?
             <QuestionnarySettingShimmer />
