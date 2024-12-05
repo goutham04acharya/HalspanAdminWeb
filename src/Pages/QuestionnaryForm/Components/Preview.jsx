@@ -52,7 +52,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
-    console.log(precomputedNavigation, 'stating precomputedNavigation')
 
     const handleConditionalLogic = async (data) => {
         let result = {};
@@ -102,15 +101,20 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     sectionIdMap[section.id] = section.index;
                 });
 
-                const reorganizedSections = questionnaireSections.sort((a, b) => {
-                    return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
-                });
-
+                // let reorganizedSections = questionnaireSections.sort((a, b) => {
+                //     return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
+                // });
+                const reorganizedSections = questionnaireSections
+                    .sort((a, b) => sectionIdMap[a.section_id] - sectionIdMap[b.section_id]) // Sorting sections
+                    .filter((section) =>
+                        section?.pages?.some((page) => page?.questions?.length > 0) // Only include sections with pages having questions
+                    );
                 setSections(reorganizedSections);
+
                 setPreviewNavigation((prev) => ({
                     ...prev,
                     total_pages: reorganizedSections.reduce((total, section) => total + section.pages.length, 0)
-                })) 
+                }))
                 updateConditionalValues(reorganizedSections);
             } catch (error) {
                 console.error(error);
@@ -120,7 +124,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
-    console.log(previewNavigation, 'preview navigation')
 
     const evaluateComplianceLogic = () => {
         let results = [];
@@ -184,7 +187,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                 // Store the results
                 evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
-                console.log(evaluationResult, 'result eval');
 
                 return {
                     label: rule.label,
@@ -245,10 +247,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 return true; // Include sections without conditional logic
             })
             .flatMap((section) =>
-                section.pages.map((page) => ({
-                    page_name: page.page_name,
-                    page_id: page.page_id,
-                }))
+                section.pages
+                    .filter((page) => page.questions && page.questions.length > 0) // Ignore pages without questions
+                    .map((page) => ({
+                        page_name: page.page_name,
+                        page_id: page.page_id,
+                    }))
             );
     };
 
@@ -326,11 +330,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         let nextSection = currentSection;
         let isLastPageInSection = false;
         let isLastSection = false;
-        // setPreviewNavigation((prev) => ({
-        //     ...prev,
-        //     current_page: nextPage,
-        //     current_section: nextSection,
-        // }))
 
         // Find the next visible page in the current section
         while (nextPage < sections[currentSection]?.pages.length && !isPageVisible(currentSection, nextPage)) {
@@ -434,7 +433,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             isLastPageInSection,
             isLastSection,
         });
-        console.log(precomputedNavigation, 'precomputedNavigation here in the compute function')
     };
     // useEffect to evaluate conditional logic dynamically
     useEffect(() => {
@@ -556,7 +554,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         // Get precomputed navigation details for next page/section
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
-        console.log(precomputedNavigation, 'int he nextClick function')
 
         if (isLastSection) {
             setShowComplianceScreen(true);  // Show compliance screen if it's the last section
@@ -887,7 +884,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
-                <img src='/Images/close-preview.svg' data-testid="preview-close" className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
+                <img src='/Images/close-preview.svg' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
@@ -943,12 +940,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 {sections[currentSection]?.section_name}
                             </p>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
-                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${(((previewNavigation.current_page - 1) / previewNavigation.total_pages) * 100).toFixed(0)}%` }}></div>
+                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${(((previewNavigation.current_page - 1) / allPages.length) * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
-                                    <p>Step {previewNavigation.current_page} of {previewNavigation.total_pages}</p>
+                                    <p>Step {previewNavigation.current_page} of {allPages.length}</p>
                                     <span className="text-sm text-gray-600">
                                         {allPages.length > 0
-                                            ? (((previewNavigation.current_page - 1) / previewNavigation.total_pages) * 100).toFixed(0)
+                                            ? (((previewNavigation.current_page - 1) / allPages.length) * 100).toFixed(0)
                                             : 0
                                         }%
                                     </span>
@@ -961,8 +958,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
 
                                     if (list?.conditional_logic !== '') {
-                                        // debugger
-                                        // addDays(Section_1.Page_1.Question_1)
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
                                                 let result = eval(list?.conditional_logic)
