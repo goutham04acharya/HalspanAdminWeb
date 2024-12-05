@@ -47,6 +47,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         isLastPageInSection: false,
         isLastSection: false,
     });
+    const [previewNavigation, setPreviewNavigation] = useState({
+        current_page: 1,
+        current_section: 1,
+        total_pages: 0
+    })
+    console.log(precomputedNavigation, 'stating precomputedNavigation')
 
     const handleConditionalLogic = async (data) => {
         let result = {};
@@ -101,6 +107,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
 
                 setSections(reorganizedSections);
+                setPreviewNavigation((prev) => ({
+                    ...prev,
+                    total_pages: reorganizedSections.reduce((total, section) => total + section.pages.length, 0)
+                })) 
                 updateConditionalValues(reorganizedSections);
             } catch (error) {
                 console.error(error);
@@ -110,6 +120,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+    console.log(previewNavigation, 'preview navigation')
 
     const evaluateComplianceLogic = () => {
         let results = [];
@@ -315,6 +326,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         let nextSection = currentSection;
         let isLastPageInSection = false;
         let isLastSection = false;
+        // setPreviewNavigation((prev) => ({
+        //     ...prev,
+        //     current_page: nextPage,
+        //     current_section: nextSection,
+        // }))
 
         // Find the next visible page in the current section
         while (nextPage < sections[currentSection]?.pages.length && !isPageVisible(currentSection, nextPage)) {
@@ -418,6 +434,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             isLastPageInSection,
             isLastSection,
         });
+        console.log(precomputedNavigation, 'precomputedNavigation here in the compute function')
     };
     // useEffect to evaluate conditional logic dynamically
     useEffect(() => {
@@ -539,6 +556,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         // Get precomputed navigation details for next page/section
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
+        console.log(precomputedNavigation, 'int he nextClick function')
 
         if (isLastSection) {
             setShowComplianceScreen(true);  // Show compliance screen if it's the last section
@@ -552,8 +570,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         } else {
             setCurrentPage(nextPage);
         }
-
+        setPreviewNavigation((prev) => ({
+            ...prev,
+            current_page: previewNavigation.current_page + 1,
+        }))
         setTotalPagesNavigated(totalPagesNavigated + nextSection);
+
     };
 
     const handleBackClick = () => {
@@ -691,6 +713,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         } else {
             setCurrentPage(previousPage);
         }
+        setPreviewNavigation((prev) => ({
+            ...prev,
+            current_page: previewNavigation.current_page - 1,
+        }))
 
         // Reset any section or page-specific states if needed
         // For example, clearing validation errors for the previous page
@@ -917,12 +943,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 {sections[currentSection]?.section_name}
                             </p>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
-                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${((totalPagesNavigated) / allPages.length * 100).toFixed(0)}%` }}></div>
+                                <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${(((previewNavigation.current_page - 1) / previewNavigation.total_pages) * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
-                                    <p>Step {precomputedNavigation.nextPage + precomputedNavigation.nextSection - 1} of {sections.reduce((total, section) => total + section.pages.length, 0)}</p>
+                                    <p>Step {previewNavigation.current_page} of {previewNavigation.total_pages}</p>
                                     <span className="text-sm text-gray-600">
                                         {allPages.length > 0
-                                            ? ((totalPagesNavigated / allPages.length) * 100).toFixed(0)
+                                            ? (((previewNavigation.current_page - 1) / previewNavigation.total_pages) * 100).toFixed(0)
                                             : 0
                                         }%
                                     </span>
@@ -1009,7 +1035,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`} onClick={handleBackClick}>
+                    {!showLabel ? <button disabled={previewNavigation.current_page === 1} type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full disabled:opacity-50`} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
@@ -1039,7 +1065,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             type='button'
                             data-testid="next"
                             className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full`}
-                            onClick={handleNextClick}
+                            onClick={() => handleNextClick()}
                         >
                             {precomputedNavigation.isLastSection ? "Submit" : "Next"}
                         </button>
