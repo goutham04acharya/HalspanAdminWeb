@@ -1448,7 +1448,7 @@ const QuestionnaryForm = () => {
                                                                         <img src="/Images/setting.svg"
                                                                             alt="setting"
                                                                             title='Add Conditional-logic'
-                                                                            data-testid={`add-conditional-btn-${sectionIndex}`}
+                                                                            data-testid={`add-condition-section-${sectionIndex}`}
                                                                             className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
                                                                             onClick={formStatus === 'Draft' ? () =>{ 
                                                                                 setSectionConditionLogicId(sectionData.section_id)

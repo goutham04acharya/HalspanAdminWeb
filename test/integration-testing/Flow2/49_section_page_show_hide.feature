@@ -41,9 +41,11 @@ Feature: Halspan - Admin - Show/hide sections and page
         When I click the preview button
         Then I should see the mobile preview
         When I enter the text as "Inspector" in textbox for section 1 page 1 question 1
+        When I click the next button
         Then I should see the page 2 at section 1
         When I select the choice as "Good" in choice field for section 1 page 2 question 1
 
+        When I close the preview
         When I click on add new section
         When I add a new question to the page 1 in section 2
         When I click the textbox button
