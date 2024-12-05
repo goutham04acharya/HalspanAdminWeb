@@ -119,6 +119,20 @@ const QuestionnaryForm = () => {
         ]
     },
     ])
+    const complianceInitialState = [
+        {
+            'conditions': [
+                {
+                    'question_name': '',
+                    'condition_logic': '',
+                    'value': '',
+                    'dropdown': false,
+                    'condition_dropdown': false,
+                    'condition_type': 'textboxfield',
+                },
+            ]
+        }
+    ]
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
@@ -324,10 +338,15 @@ const QuestionnaryForm = () => {
         try{
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
             console.log(response?.data?.data[0]?.logic, 'compliance response')
-            setConditions(response?.data?.data[0]?.logic);
-            dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+            if(response?.data?.data[0]?.logic){
+                // setConditions(response?.data?.data[0]?.logic);
+                dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+            }else{
+                // setConditions(complianceInitialState);
+                dispatch(setComplianceLogicCondition(complianceInitialState));
+            }
         }catch{
-
+            console.log('error while getting ')
         }
     }
     const handleAddRemoveSection = (event, sectionIndex) => {
@@ -1149,6 +1168,7 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         formDefaultDetails();
+        // handleComplianceLogic()
         fetchComplianceLogic();
         dispatch(setSavedSection(sections));
     }, []);
@@ -1260,7 +1280,7 @@ const QuestionnaryForm = () => {
         const payload = {
             'questionnaire_id': parseInt(questionnaire_id),
             'version_number': parseInt(version_number),
-            'logic' : conditions
+            'logic' : conditions.length !== 0 ? conditions : complianceInitialState
         }
         try {
             const response = await PostAPI(`questionnaires/compliancelogic`, payload);

@@ -126,7 +126,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
-        
+
         let results = [];
 
         const preprocessLogic = (logic) => {
@@ -901,9 +901,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
-                                
+
                                 <>
-                                {console.log(result, 'result')}
+                                    {console.log(result, 'result')}
                                     <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -927,7 +927,17 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             {/* <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3> */}
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">REASON: </h3>
-                                                <span className='text-sm'>{result?.REASON}</span>
+                                                {/* 'NO_ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER' */}
+                                                <span className="text-sm">
+                                                    {{
+                                                        NO_ACCESS: 'No Access',
+                                                        MISSING: 'Missing Asset',
+                                                        RECOMMEND_REPLACEMENT: 'Recommend Replacement',
+                                                        RECOMMEND_REMEDIATION: 'Recommend Remediation',
+                                                        FURTHER_INVESTIGATION: 'Further Investigation Required',
+                                                    }[result?.REASON] || 'Other'}
+                                                </span>
+
                                             </div>
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>

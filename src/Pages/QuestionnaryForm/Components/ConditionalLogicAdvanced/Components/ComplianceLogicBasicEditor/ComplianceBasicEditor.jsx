@@ -24,7 +24,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
 
-    const options = ['NO ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER']
+    const options = ['NO_ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER']
     const updateDropdown = (dropdown, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
         if (isElseIf) {
@@ -808,7 +808,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     return (
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>
-            <button onClick={() => getFinalComplianceLogic()}>getComplianceLogic</button>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions.map((condition, index) => (
                     <div key={index} className='mb-6 bg-[#EFF1F8] p-4'>

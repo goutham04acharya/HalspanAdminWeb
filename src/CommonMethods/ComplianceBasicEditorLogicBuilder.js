@@ -43,22 +43,61 @@ function generateConditionString(conditions) {
 
     conditions.forEach((condition, index) => {
         let operator;
-        switch (condition?.condition_logic) {
-            case 'includes':
-                operator = `.includes('${condition.value}')`;
-                break;
-            case 'does not include':
-                operator = `.includes('${condition.value}') === false`;
-                break;
-            case 'equals':
-                operator = ` === '${condition.value}'`;
-                break;
-            case 'not equal to':
-                operator = ` !== '${condition.value}'`;
-                break;
-            default:
-                throw new Error(`Unsupported condition logic: ${condition?.condition_logic}`);
-        }
+        switch (item.condition_logic) {  
+            case "includes":  
+               resultExpression = `${item.question_name}.includes("${item.value}")`;  
+               break;  
+            case "equals":  
+               resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "not equals to":  
+               resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "does not include":  
+               resultExpression = `!${item.question_name}.includes("${item.value}")`;  
+               break;  
+            case "smaller":  
+               resultExpression = `${item.question_name} < ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "larger":  
+               resultExpression = `${item.question_name} > ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "smaller or equal":  
+               resultExpression = `${item.question_name} <= ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "larger or equal":  
+               resultExpression = `${item.question_name} >= ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "has no files":  
+               resultExpression = `${item.question_name}.length == 0`;  
+               break;  
+            case "has atleast one file":  
+               resultExpression = `${item.question_name}.length > 0`;  
+               break;  
+            case "number of file is":  
+               resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;  
+               break;  
+            case "date is before today":  
+               resultExpression = `${item.question_name} < new Date()`;  
+               break;  
+            case "date is after or equal to today":  
+               resultExpression = `${item.question_name} >= new Date()`;  
+               break;  
+            case "date is before or equal to today":  
+               resultExpression = `${item.question_name} <= new Date()`;  
+               break;  
+            case "date is after today":  
+               resultExpression = `${item.question_name} > new Date()`;  
+               break;  
+            case "date is “X” date of set date":  
+               resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;  
+               break;  
+            default:  
+               // Handle unknown condition logic  
+               console.error(`Unknown condition logic: ${item.condition_logic}`);  
+               break;  
+         }
+         
 
         const conditionStr = `${condition.question_name}${operator}`;
         if (condition.andClicked === true) {

@@ -1251,7 +1251,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     //     }
     // }
     const getComplianceLogic = (condition) => {
-        
+
         // to get the value expression
         const getValue = (val, condtionType) => {
             let resultValue = '';
@@ -1268,17 +1268,62 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const getConditionValue = (item) => {
             let resultExpression = '';
             switch (item.condition_logic) {
-                case "includes": resultExpression = `${item.question_name}.includes("${item.value}")`;
+                case "includes":
+                    resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
-                case "equals": resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                case "equals":
+                    resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
                     break;
-                case "not equal to": resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                case "not equals to":
+                    resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
                     break;
-                case "does not include": resultExpression = `!${item.question_name}.includes("${item.value}")`;
+                case "does not include":
+                    resultExpression = `!${item.question_name}.includes("${item.value}")`;
+                    break;
+                case "smaller":
+                    resultExpression = `${item.question_name} < ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "larger":
+                    resultExpression = `${item.question_name} > ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "smaller or equal":
+                    resultExpression = `${item.question_name} <= ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "larger or equal":
+                    resultExpression = `${item.question_name} >= ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "has no files":
+                    resultExpression = `${item.question_name}.length == 0`;
+                    break;
+                case "has atleast one file":
+                    resultExpression = `${item.question_name}.length > 0`;
+                    break;
+                case "number of file is":
+                    resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "date is before today":
+                    resultExpression = `${item.question_name} < new Date()`;
+                    break;
+                case "date is after or equal to today":
+                    resultExpression = `${item.question_name} >= new Date()`;
+                    break;
+                case "date is before or equal to today":
+                    resultExpression = `${item.question_name} <= new Date()`;
+                    break;
+                case "date is after today":
+                    resultExpression = `${item.question_name} > new Date()`;
+                    break;
+                case "date is “X” date of set date":
+                    resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
+                    break;
+                default:
+                    // Handle unknown condition logic  
+                    console.error(`Unknown condition logic: ${item.condition_logic}`);
                     break;
             }
-            return resultExpression
+            return resultExpression;
         }
+
         const formatExpression = (expr) => {
             // Split the expression into parts by "||"
             const orParts = expr.split("||").map((part) => part.trim());
@@ -1313,25 +1358,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return formatExpression(result.toString());
 
     }
-    
+
     const getFinalComplianceLogic = () => {
         let finalString = '';
         console.log(conditions[0])
-        finalString += '('+getComplianceLogic(conditions[0].conditions)+')'
+        finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
         if (conditions[0].thenAction) {
-            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction);
+            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
         }
         if (conditions[0].elseIfBlocks) {
             finalString += ' : '
             conditions[0].elseIfBlocks.map((outerItem) => {
-                if(outerItem.conditions.length > 0) {
-                    finalString += '('+getComplianceLogic(outerItem.conditions)+')';
+                if (outerItem.conditions.length > 0) {
+                    finalString += '(' + getComplianceLogic(outerItem.conditions) + ')';
                 }
                 if (outerItem.thenActions) {
                     finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
                 }
             })
-            
+
         }
         if (conditions[0].elseBlock) {
             finalString += generateElseBlockString(conditions[0].elseBlock);
@@ -1341,8 +1386,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return finalString;
     }
 
-    
-    
+
+
     const handleSaveBasicEditor = () => {
 
         if (complianceState) {
