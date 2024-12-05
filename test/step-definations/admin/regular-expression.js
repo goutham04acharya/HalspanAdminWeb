@@ -7,7 +7,8 @@ const Key = webdriver.Key
 
 When('I check the field validation', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="Field validation"]`))).click();
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="Field validation"]`))).click();
+    await driver.executeScript("document.querySelector('[data-testid=\"Field validation\"]').click();");
 });
 
 When('I enter the custom regular expression as {string}', async function (regex) {
