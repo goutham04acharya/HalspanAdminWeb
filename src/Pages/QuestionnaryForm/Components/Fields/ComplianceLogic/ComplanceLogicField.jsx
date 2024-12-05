@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { setComplianceLogicId, setSelectedComponent } from '../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 import { defaultContentConverter } from '../../../../../CommonMethods/defaultContentConverter';
+import { setComplianceLogicCondition } from '../fieldSettingParamsSlice';
 
 
 function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic, formStatus }) {
@@ -21,7 +22,10 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
             alt="delete"
             title='Delete'
             className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} z-[9] rounded-full hover:bg-[#FFFFFF] h-[26px]`}
-            onClick={formStatus === 'Draft' ?() => setIsDeleteComplianceLogic(true) : null}
+            onClick={formStatus === 'Draft' ?() => {
+              setIsDeleteComplianceLogic(true)
+              dispatch(setComplianceLogicCondition([]))
+            } : null}
           />
           {/* <img src="/Images/save.svg"
             onClick={formStatus === 'Draft' ? () => complianceSaveHandler():null}

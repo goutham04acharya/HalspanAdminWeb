@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -38,7 +38,7 @@ import Button from '../../Components/Button/button.jsx';
 const QuestionnaryForm = () => {
     const { questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
-    const { getAPI } = useApi();
+    const { getAPI, PostAPI } = useApi();
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
     const dispatch = useDispatch();
@@ -106,7 +106,19 @@ const QuestionnaryForm = () => {
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     // Create the initial dropdown state
     const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
-
+    const [conditions, setConditions] = useState([{
+        'conditions': [
+            {
+                'question_name': '',
+                'condition_logic': '',
+                'value': '',
+                'dropdown': false,
+                'condition_dropdown': false,
+                'condition_type': 'textboxfield',
+            },
+        ]
+    },
+    ])
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
@@ -308,6 +320,16 @@ const QuestionnaryForm = () => {
         }));;
     };
 
+    const fetchComplianceLogic = async () => {
+        try{
+            const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
+            console.log(response?.data?.data[0]?.logic, 'compliance response')
+            setConditions(response?.data?.data[0]?.logic);
+            dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+        }catch{
+
+        }
+    }
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const sectionId = `SEC-${uuidv4()}`;
@@ -1127,6 +1149,7 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         formDefaultDetails();
+        fetchComplianceLogic();
         dispatch(setSavedSection(sections));
     }, []);
 
@@ -1233,7 +1256,20 @@ const QuestionnaryForm = () => {
             navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
     };
-
+    const handleComplianceLogic = async () => {
+        const payload = {
+            'questionnaire_id': parseInt(questionnaire_id),
+            'version_number': parseInt(version_number),
+            'logic' : conditions
+        }
+        try {
+            const response = await PostAPI(`questionnaires/compliancelogic`, payload);
+            console.log(response?.data?.data?.logic, 'sdsdsdsd')
+            
+        } catch {
+            console.log('Error updating API')
+        }
+    }
     // Confirmation modal "Confirm" button action (related to showing the cancle modal)
     const handleConfirmCancel = () => {
         dispatch(setShowCancelModal(false));
@@ -1362,6 +1398,7 @@ const QuestionnaryForm = () => {
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
+            handleComplianceLogic()
             setGlobalSaveLoading(false)
         } catch (error) {
             console.log(error);
@@ -1715,6 +1752,8 @@ const QuestionnaryForm = () => {
                         setPageConditionLogicId={setPageConditionLogicId}
                         sectionConditionLogicId={sectionConditionLogicId}
                         sectionsData={sections}
+                        setConditions={setConditions}
+                        conditions={conditions}
                     />
                 )
             }

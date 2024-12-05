@@ -6,19 +6,15 @@ import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 import { useDispatch } from 'react-redux';
-import { setConditionReason, setNewComponent } from '../../../Fields/fieldSettingParamsSlice';
 import { useSelector } from 'react-redux';
+import { generateElseBlockString, generateThenActionString } from '../../../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
 
-function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected }) {
+function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, setUserInput }) {
     const dispatch = useDispatch();
     const [dropdown, setDropdown] = useState(false)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isDropdownOpen, setDropdownOpen] = useState({});
-    const [userInput, setUserInput] = useState({
-        ifStatements: [],
-        elseIfStatements: [],
-        elseStatement: {}
-    });
+    
     const fieldSettingParamsReason = useSelector(state => state.fieldSettingParams.conditions);
 
     const conditionObj = {
@@ -73,115 +69,123 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         }
     };
 
-    const handleInputChange = (e, id, type, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
-        setSubmitSelected(false)
-        if (isElseIf) {
-            setConditions(prevConditions => {
-                const updatedConditions = [...prevConditions];
-                const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
-
-                conditionToUpdate.value = e.target.value;
-
-                // Update the userInput state  
-                setUserInput(prevInput => {
-                    const updatedInput = { ...prevInput };
-                    if (!updatedInput.elseIfStatements[mainIndex]) {
-                        updatedInput.elseIfStatements[mainIndex] = [];
-                    }
-                    if (!updatedInput.elseIfStatements[mainIndex][elseIfIndex]) {
-                        updatedInput.elseIfStatements[mainIndex][elseIfIndex] = {};
-                    }
-                    updatedInput.elseIfStatements[mainIndex][elseIfIndex][subIndex] = {
-                        question_name: conditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex].question_name,
-                        condition_logic: conditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex].condition_logic,
-                        value: e.target.value
-                    };
-                    return updatedInput;
-                });
-
-                return updatedConditions;
-            });
-        } else {
-            setConditions(prevConditions => {
-                const updatedConditions = [...prevConditions];
-                const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-
-                conditionToUpdate.value = e.target.value;
-
-                // Update the userInput state  
-                setUserInput(prevInput => {
-                    const updatedInput = { ...prevInput };
-                    if (!updatedInput.ifStatements[mainIndex]) {
-                        updatedInput.ifStatements[mainIndex] = {};
-                    }
-                    updatedInput.ifStatements[mainIndex][subIndex] = {
-                        question_name: conditions[mainIndex].conditions[subIndex].question_name,
-                        condition_logic: conditions[mainIndex].conditions[subIndex].condition_logic,
-                        value: e.target.value
-                    };
-                    return updatedInput;
-                });
-
-                return updatedConditions;
-            });
-        }
-    }
-    const handleAddCondition = (blockIndex, isElseIf = false, elseIfIndex = null, isOr = false, isAnd = false) => {
-        setSubmitSelected(false);
-        if (isElseIf) {
-            setConditions(prevConditions =>
-                prevConditions.map((item, index) => {
-                    if (index === blockIndex) {
-                        return {
-                            ...item,
-                            elseIfBlocks: item.elseIfBlocks.map((elseIfBlock, i) => {
-                                if (i === elseIfIndex) {
-                                    return {
-                                        ...elseIfBlock,
-                                        conditions: [...elseIfBlock.conditions, {
-                                            'question_name': '',
-                                            'condition_logic': '',
-                                            'value': '',
-                                            'dropdown': false,
-                                            'condition_dropdown': false,
-                                            'condition_type': 'textboxfield',
-                                            'andClicked': isAnd,
-                                            'orClicked': isOr,
-                                            'isOr': isOr
-                                        }]
-                                    };
-                                }
-                                return elseIfBlock;
-                            })
-                        };
-                    }
-                    return item;
-                })
-            );
-        } else {
-            setConditions(prevConditions =>
-                prevConditions.map((item, index) => {
-                    if (index === blockIndex) {
-                        return {
-                            ...item,
-                            conditions: [...item.conditions, {
-                                'question_name': '',
-                                'condition_logic': '',
-                                'value': '',
-                                'dropdown': false,
-                                'condition_dropdown': false,
-                                'condition_type': 'textboxfield',
-                                'andClicked': isAnd,
-                                'orClicked': isOr,
-                                'isOr': isOr
-                            }]
-                        };
-                    }
-                    return item;
-                })
-            );
-        }
-    };
+    const handleInputChange = (e, id, type, mainIndex, subIndex, isElseIf = false, elseIfIndex = null, questionIndex) => {   
+       
+        setSubmitSelected(false)   
+        if (isElseIf) {  
+           setConditions(prevConditions => {   
+             const updatedConditions = JSON.parse(JSON.stringify(prevConditions)); // Create a deep copy of the state  
+             const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];   
+           
+             conditionToUpdate.value = e.target.value;   
+           
+             // Update the userInput state    
+             setUserInput(prevInput => {   
+                const updatedInput = { ...prevInput };   
+                if (!updatedInput.elseIfStatements[mainIndex]) {   
+                  updatedInput.elseIfStatements[mainIndex] = [];   
+                }   
+                if (!updatedInput.elseIfStatements[mainIndex][elseIfIndex]) {   
+                  updatedInput.elseIfStatements[mainIndex][elseIfIndex] = {};   
+                }   
+                updatedInput.elseIfStatements[mainIndex][elseIfIndex][subIndex] = {   
+                  question_name: updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex].question_name,   
+                  condition_logic: updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex].condition_logic,   
+                  value: e.target.value,   
+                  questionIndex: questionIndex   
+                };   
+                return updatedInput;   
+              });   
+           
+              return updatedConditions;   
+             });   
+        } else {   
+             setConditions(prevConditions => {   
+              const updatedConditions = JSON.parse(JSON.stringify(prevConditions)); // Create a deep copy of the state  
+              const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];   
+           
+              conditionToUpdate.value = e.target.value;   
+           
+              // Update the userInput state    
+              setUserInput(prevInput => {   
+                const updatedInput = { ...prevInput };   
+                if (!updatedInput.ifStatements[mainIndex]) {   
+                  updatedInput.ifStatements[mainIndex] = {};   
+                }   
+                updatedInput.ifStatements[mainIndex][subIndex] = {   
+                  question_name: updatedConditions[mainIndex].conditions[subIndex].question_name,   
+                  condition_logic: updatedConditions[mainIndex].conditions[subIndex].condition_logic,   
+                  value: e.target.value,   
+                  questionIndex: questionIndex   
+                };   
+                return updatedInput;   
+              });   
+           
+              return updatedConditions;   
+             });   
+        }   
+      }
+     
+     
+     const handleAddCondition = (blockIndex, isElseIf = false, elseIfIndex = null, isOr = false, isAnd = false) => {  
+        setSubmitSelected(false);  
+        if (isElseIf) {  
+           setConditions(prevConditions =>  
+             prevConditions.map((item, index) => {  
+                if (index === blockIndex) {  
+                   return {  
+                     ...item,  
+                     elseIfBlocks: item.elseIfBlocks.map((elseIfBlock, i) => {  
+                        if (i === elseIfIndex) {  
+                           return {  
+                             ...elseIfBlock,  
+                             conditions: [...elseIfBlock.conditions, {  
+                                'question_name': '',  
+                                'condition_logic': '',  
+                                'value': '',  
+                                'dropdown': false,  
+                                'condition_dropdown': false,  
+                                'condition_type': 'textboxfield',  
+                                'andClicked': isAnd,  
+                                'orClicked': isOr,  
+                                'isOr': isOr,  
+                                'index': elseIfBlock.conditions.length // add index here  
+                             }]  
+                           };  
+                        }  
+                        return elseIfBlock;  
+                     })  
+                   };  
+                }  
+                return item;  
+             })  
+           );  
+        } else {  
+           setConditions(prevConditions =>  
+             prevConditions.map((item, index) => {  
+                if (index === blockIndex) {  
+                   return {  
+                     ...item,  
+                     conditions: [...item.conditions, {  
+                        'question_name': '',  
+                        'condition_logic': '',  
+                        'value': '',  
+                        'dropdown': false,  
+                        'condition_dropdown': false,  
+                        'condition_type': 'textboxfield',  
+                        'andClicked': isAnd,  
+                        'orClicked': isOr,  
+                        'isOr': isOr,  
+                        'index': item.conditions.length // add index here  
+                     }]  
+                   };  
+                }  
+                return item;  
+             })  
+           );  
+        }  
+     };
+     
 
 
     const handleDeleteElseIf = (blockIndex, elseIfIndex) => {
@@ -199,13 +203,15 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         setSubmitSelected(false);
         const newElseIfBlock = {
             type: 'elseif',
+            index: conditions[0]?.elseIfBlocks?.length,
             conditions: [{
                 'question_name': '',
                 'condition_logic': '',
                 'value': '',
                 'dropdown': false,
                 'condition_dropdown': false,
-                'condition_type': 'textboxfield'
+                'condition_type': 'textboxfield',
+                'index': blockIndex
             }],
             thenActions: [{
                 'status': '',
@@ -327,7 +333,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                             })
                         };
                     } else if (isElseBlock) {
-                        debugger
+                        // debugger
                         // Update the userInput state  
                         setUserInput(prevInput => {
                             const updatedInput = { ...prevInput };
@@ -589,9 +595,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
     console.log(conditions, 'structureUserInputstructureUserInputs')
 
-    const getComplianceLogic = () => {
-        let condition = conditions[0].conditions;
-
+    const getComplianceLogic = (condition) => {
+        
         // to get the value expression
         const getValue = (val, condtionType) => {
             let resultValue = '';
@@ -639,10 +644,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         let result = '';
 
         condition.map((item, index) => {
-
-            // if(index - 1 !== 0 && (item.andClicked !== condition[index - 1]?.andClicked || item.orClicked !== condition[index - 1]?.orClicked)) {
-            //     result += ')'
-            // }
             if (item.orClicked && index !== 0) {
                 result += '|| ';
             }
@@ -651,143 +652,37 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                 result += ' && ';
             }
 
-            // if (condition[index + 1]?.andClicked && !item.andClicked) {
-            //     result += '(';
-            // }
-
             result += `${getConditionValue(item)}`;
-            // if (index === condition.length - 1) {
-            //     result += ') ?'
-            // }
         });
 
-        console.log(formatExpression(result.toString()), 'get compliance');
+        return formatExpression(result.toString());
 
     }
-
-    let ternaryString = '';
-    function generateTernaryOperation() {
-        // Initialize the ternary string  
-
-        // Loop through each condition object  
-        conditions.forEach((condition) => {
-            // Check if there's an 'if' block  
-            if (condition.conditions) {
-                // Generate the 'if' condition string  
-                const ifConditionString = generateConditionString(condition?.conditions);
-                // Add the 'if' condition to the ternary string  
-                ternaryString += `(${ifConditionString}) ? `;
-            }
-
-            // Add the 'then' action to the ternary string  
-            if (condition.thenAction) {
-                ternaryString += generateThenActionString(condition.thenAction);
-            }
-
-            // Check if there are 'else if' blocks  
-            if (condition.elseIfBlocks) {
-                // Loop through each 'else if' block  
-                condition.elseIfBlocks.forEach((elseIfBlock, index) => {
-                    // Generate the 'else if' condition string  
-                    const elseIfConditionString = generateConditionString(elseIfBlock.conditions);
-                    // Add the 'else if' condition to the ternary string  
-                    ternaryString += ` : (${elseIfConditionString}) ? `;
-                    // Add the 'then' action to the ternary string  
-                    ternaryString += generateThenActionString(elseIfBlock.thenActions[0]);
-                });
-            }
-
-            // Check if there's an 'else' block  
-            if (condition.elseBlock) {
-                // Add the 'else' block to the ternary string  
-                ternaryString += ` : ${generateElseBlockString(condition.elseBlock)}`;
-            }
-        });
-        console.log(ternaryString, 'ternaryString')
-        // Return the complete ternary string  
-        return ternaryString;
-    }
-
-    // Helper function to generate a condition string  
-    function generateConditionString(conditions) {
-        // Initialize the condition string  
-        let conditionString = '';
-        let andConditions = [];
-        let orConditions = [];
-
-        // Loop through each condition  
-        conditions.forEach((condition, index) => {
-            // Get the operator based on the condition logic  
-            let operator;
-            switch (condition?.condition_logic) {
-                case 'includes':
-                    operator = `.includes('${condition.value}')`;
-                    break;
-                case 'does not include':
-                    operator = `.includes('${condition.value}') === false`;
-                    break;
-                case 'equals':
-                    operator = `=== '${condition.value}'`;
-                    break;
-                case 'not equal to':
-                    operator = `!== '${condition.value}'`;
-                    break;
-                default:
-                    throw new Error(`Unsupported condition logic: ${condition?.condition_logic}`);
-            }
-
-            // Add the condition to the condition string  
-            const conditionStr = `${condition.question_name}${operator}`;
-            if (condition.andClicked && !condition.isOr) {
-                andConditions.push(conditionStr);
-            } else if (condition.orClicked || condition.isOr) {
-                if (andConditions.length > 0) {
-                    orConditions.push(`(${andConditions.join(' && ')})`);
-                    andConditions = [];
-                }
-                orConditions.push(conditionStr);
-            } else {
-                andConditions.push(conditionStr);
-            }
-        });
-
-        if (andConditions.length > 0) {
-            orConditions.push(`(${andConditions.join(' && ')})`);
+    
+    const getFinalComplianceLogic = () => {
+        let finalString = '';
+        console.log(conditions[0])
+        finalString += '('+getComplianceLogic(conditions[0].conditions)+')'
+        if (conditions[0].thenAction) {
+            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction);
         }
-
-        conditionString = orConditions.join(' || ');
-
-        // Return the complete condition string  
-        return conditionString;
+        if (conditions[0].elseIfBlocks) {
+            finalString += ' : '
+            conditions[0].elseIfBlocks.map((outerItem) => {
+                if(outerItem.conditions.length > 0) {
+                    finalString += '('+getComplianceLogic(outerItem.conditions)+')';
+                }
+                if (outerItem.thenActions) {
+                    finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
+                }
+            })
+            
+        }
+        if (conditions[0].elseBlock) {
+            finalString += generateElseBlockString(conditions[0].elseBlock);
+        }
+        console.log(finalString)
     }
-
-    // Helper function to generate a 'then' action string  
-    function generateThenActionString(action) {
-        // Initialize the action string  
-        let actionString = '';
-
-        // Add the 'then' action to the action string  
-        actionString += `(STATUS = '${action.status.toUpperCase()}', REASON = '${action.value}', ACTION.push('${action.action}'), GRADE = '${action.grade}')`;
-
-        // Return the complete action string  
-        return actionString;
-    }
-
-    // Helper function to generate an 'else' block string  
-    function generateElseBlockString(elseBlock) {
-        // Initialize the else block string  
-        let elseBlockString = '';
-
-        // Add the 'else' block to the else block string  
-        elseBlockString += `(STATUS = '${elseBlock.status.toUpperCase()}', GRADE = '${elseBlock.grade}')`;
-
-        // Return the complete else block string  
-        return elseBlockString;
-    }
-
-    // Example usage:  
-    // const conditions = [...]; // Your conditions array  
-    // console.log(ternaryString);
 
     //this below code will set the dropdown value to the conditions state
     const reasonDropdownHandler = (option, index, subIndex, id, type) => {
@@ -913,7 +808,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     return (
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>
-            <button onClick={() => generateTernaryOperation()}>Generate</button>
+            <button onClick={() => getFinalComplianceLogic()}>getComplianceLogic</button>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions.map((condition, index) => (
                     <div key={index} className='mb-6 bg-[#EFF1F8] p-4'>
@@ -1018,7 +913,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                             maxLength={32}
                                                                             mainIndex={index}
                                                                             subIndex={i}
-                                                                            handleChange={handleInputChange}
+                                                                            handleChange={(e) => handleInputChange(e, '', '', index, i, false, null, i)}
                                                                             onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
                                                                             validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
                                                                             basicEditor
@@ -1214,7 +1109,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                         maxLength={32}
                                                                                         mainIndex={index}
                                                                                         subIndex={i}
-                                                                                        handleChange={(e) => handleInputChange(e, '', '', index, i, true, elseIfIndex)}
+                                                                                        handleChange={(e) => handleInputChange(e, '', '', index, i, true, elseIfIndex, i)} 
                                                                                         onInput={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'dateTimefield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'numberfield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'photofield'}
                                                                                         validationError={submitSelected && conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value === '' && 'This field  is mandatory'}
                                                                                         basicEditor
