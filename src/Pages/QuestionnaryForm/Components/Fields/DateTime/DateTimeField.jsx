@@ -99,10 +99,8 @@ function DateTimeField({
 
 
     function handleFunction(e) {
-        console.log(e, 'dddddddddd') // 03:02:01
         if (type === 'time') {
             const value = e
-            console.log(e, 'seeeeeee')
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false

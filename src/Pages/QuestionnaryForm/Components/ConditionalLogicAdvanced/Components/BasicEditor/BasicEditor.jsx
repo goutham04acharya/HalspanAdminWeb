@@ -5,10 +5,15 @@ import InputWithDropDown from '../../../../../../Components/InputField/Dropdown'
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
+import { useDispatch } from 'react-redux';
+import { setNewLogic } from '../../../Fields/fieldSettingParamsSlice';
+import { useSelector } from 'react-redux';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected }) {
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData }) {
+    const [dropdown, setDropdown] = useState(false)
+    const dispatch = useDispatch();
+    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -135,20 +140,34 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
 
     const handleInputChange = (e, id, type, mainIndex, subIndex) => {
-        setSubmitSelected(false)
+        setSubmitSelected(false);
+
         setConditions(prevConditions => {
+            // Create a deep copy of the conditions array
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
 
-            // Update the condition_logic key with the value sent to the function
-            conditionToUpdate.value = e.target.value;
-
-            // Return the updated array
-            return updatedConditions;
+           // Update the condition_logic key with the value sent to the function
+           conditionToUpdate.value = e.target.value;
+           return updatedConditions;
         });
-    }
+        
+        // Ensure `conditions` is the latest state before dispatching
+        // setConditions(prevConditions => {
+        //     const latestConditions = [...prevConditions]; // Clone before dispatching
+        //     dispatch(
+        //         setNewLogic({
+        //             id: 'conditional_logic',
+        //             value: latestConditions,
+        //             questionId: selectedQuestionId
+        //         })
+        //     );
+        //     return latestConditions; // Return to maintain the state chain
+        // });
+    };
+
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
@@ -266,9 +285,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         <div className='w-full h-customh14'>
             <p className='font-semibold text-[22px]'>Conditional Fields</p>
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
-                {conditions.map((condition, index) => (
+                {conditions?.map((condition, index) => (
+
                     <div key={index} className='mb-6'>
-                        {condition['conditions'].map((sub_cond, i) => (
+                        {condition['conditions']?.map((sub_cond, i) => (
                             <div className='flex gap-4 items-start justify-between mb-6'>
                                 <div className='w-[97%] flex items-end gap-6 bg-[#EFF1F8] p-2.5'>
                                     <div className='w-[97%] -mx-2 flex'>
@@ -365,6 +385,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>}
 
                                     </div>
+
                                     {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />
                                         <p className='text-sm text-[#2B333B] -mt-2 font-semibold cursor-pointer'>AND</p>
@@ -378,6 +399,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         <Image src="trash-black" className="" data-testid="delete" />
                                     </div>
                                 </div>
+
                             </div>
                         ))}
                         {conditions.length - 1 === index ? <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => handleAdd('OR')}>

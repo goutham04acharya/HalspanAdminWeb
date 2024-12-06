@@ -52,7 +52,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                     <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center sticky right-0 bg-white'>ACTION</th>
                 </thead>
                 {loading
-                    ? <Shimmer column={6} row={10} firstIndex />
+                    ? <Shimmer column={7} row={10} firstIndex />
                     : <tbody className='bg-white'>
                         {QueList && QueList.map((QueInfo, index) => (
                             <React.Fragment key={index}>

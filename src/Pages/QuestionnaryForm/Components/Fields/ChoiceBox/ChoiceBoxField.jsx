@@ -30,7 +30,6 @@ const ChoiceBoxField = ({
     const [selectedValues, setSelectedValues] = useState([]);
 
     const handleRadioChange = (selectedValue) => {
-        console.log(selectedValue, 'selected value')
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -62,7 +61,6 @@ const ChoiceBoxField = ({
     };
 
     const handleCheckboxChange = (value) => {
-        console.log(value, 'value')
         setOptionSelected(value.value)
         setIsDropdownOpen(false)
         setSelectedValues(prev => {
@@ -92,7 +90,7 @@ const ChoiceBoxField = ({
             } else {
                 setValue((prev) => ({
                     ...prev,
-                    [question?.question_id]: newSelected,
+                    [question?.question_id]: value.value ,
                 }));
             }
 
@@ -105,7 +103,7 @@ const ChoiceBoxField = ({
                 },
             }));
 
-            return newSelected;
+            return value.value ;
         });
     };
 

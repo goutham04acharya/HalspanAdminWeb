@@ -100,11 +100,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
     const handleQuesList = (questionList, componentType) => {
         if (!questionList || !componentType) {
-            console.log("No questionList or componentType provided.");
             return [];
         }
         const filteredList = questionList.filter((item) => item.component_type === componentType);
-        console.log("Filtered List:", filteredList); // Logs only the filtered list for debugging
         return filteredList.map((item) => ({
             label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentType})`,
             value: item.question_id,

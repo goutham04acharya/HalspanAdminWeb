@@ -16,7 +16,6 @@ function FileFieldSetting({ handleInputChange,
     setConditionalLogic,
     formStatus
 }) {
-    console.log(formParameters, 'formParameters parameters')
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -161,7 +160,7 @@ function FileFieldSetting({ handleInputChange,
                         >
                             Add Conditional Logic
                         </button>
-                        {fieldSettingParameters.conditional_logic &&
+                        {fieldSettingParameters?.conditional_logic &&
                             <p className='text-center italic mt-1'>Conditional Logic Added</p>
                         }
                     </div>

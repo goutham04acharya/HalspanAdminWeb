@@ -62,7 +62,6 @@ function TestFieldSetting({
   const handleOptionClick = (option) => {
     setDropdownOpen(false);
     dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
-    // dispatch(setShouldAutoSave(true));
   };
   const validateRegex = (e) => {
     const value = e.target.value;
@@ -419,7 +418,7 @@ function TestFieldSetting({
             >
               Add Conditional Logic
             </button>
-            {fieldSettingParameters.conditional_logic &&
+            {fieldSettingParameters?.conditional_logic &&
               <p className='text-center italic mt-1'>Conditional Logic Added</p>
             }
           </div>

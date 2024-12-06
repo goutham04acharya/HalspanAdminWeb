@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 const initialState = {
     savedData: {},
     currentData: {},
-    editorToggle: {}
+    editorToggle: {},
+    conditions: [],
 };
 
 // Helper function to process displayType
@@ -67,18 +68,28 @@ const fieldSettingParamsSlice = createSlice({
                 [id]: value
             };
         },
+        setComplianceLogicCondition: (state, action) => {
+            state.conditions = action.payload;
+        },
+        clearConditions: (state) => {
+            state.conditions = [];
+        },
         setNewLogic: (state, action) => {
             const { questionId, id, value } = action.payload;
+        
             if (!state.editorToggle[questionId]) {
                 state.editorToggle[questionId] = {};
-
             }
-
+        
+            const newValue = Array.isArray(value)
+                ? value.map((item) => ({ ...item }))
+                : { ...value };
+        
             state.editorToggle[questionId] = {
                 ...state.editorToggle[questionId],
-                [id]: value
+                [id]: newValue
             };
-        },
+        },     
         addNewFixedChoice: (state, action) => {
             const { questionId } = action.payload;
 
@@ -215,7 +226,9 @@ export const {
     setFixedChoiceValue,
     updateFixedChoiceArray,
     saveCurrentData,
-    setInitialData
+    setInitialData,
+    setComplianceLogicCondition,
+    clearConditions
 } = fieldSettingParamsSlice.actions;
 
 export default fieldSettingParamsSlice.reducer;

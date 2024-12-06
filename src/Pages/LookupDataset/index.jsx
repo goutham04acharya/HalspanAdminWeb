@@ -61,11 +61,9 @@ const LookupDataset = () => {
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [showlookupReplaceModal, setShowLookupReplaceModal] = useState(false);
     const [activeInputs, setActiveInputs] = useState({});
-    console.log(data, 'datadtadt')
     // Functions
     // List Functions
     const fetchLookupList = useCallback(async () => {
-        console.log(isView?.open, 'isView?.open')
         setLoading(true);
         const params = Object.fromEntries(searchParams);
         if (lastEvaluatedKeyRef.current) {
@@ -95,7 +93,6 @@ const LookupDataset = () => {
     const handleChange = (e, id, type) => {
         setErrors(id, '');
         const value = e.target.value;
-        console.log(e, 'eaaef')
         if (type === 'value') {
             const updatedChoices = data.choices.map(choice =>
                 choice.uuid === id
@@ -214,7 +211,6 @@ const LookupDataset = () => {
                 // Add any additional fields to the payload as needed
             };
         }
-        console.log(payload, 'dddddd')
         // Determine which API function to call based on update/create scenario
         const apiFunction = isUpdate ? PatchAPI : PostAPI;
         const endpoint = isUpdate ? `lookup-data/${isView?.id}` : "lookup-data";
@@ -228,7 +224,6 @@ const LookupDataset = () => {
                 //     id: isView?.id
                 // });
                 setLookupList([]); // Clear lookup list
-                console.log(isView?.open, 'isviewjdjdjj')
                 lastEvaluatedKeyRef.current = null
                 fetchLookupList(); // Refetch the lookup list after success
 
@@ -284,7 +279,6 @@ const LookupDataset = () => {
         //     setIsCreateModalOpen(true);
         // }
         const file = event.target.files[0];
-        console.log(file, 'fesfeieke')
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
             setToastError('Please upload a CSV file.');
@@ -297,9 +291,6 @@ const LookupDataset = () => {
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
 
-                console.log(flatData, 'flatData');
-
-                console.log(flatData, 'flat data')
                 if (flatData.length > 500) {
                     handleClose();
                     setIsImportLoading(false);
@@ -308,7 +299,6 @@ const LookupDataset = () => {
                 } else {
                     // debugger
                     const fileName = file.name.replace('.csv', '');
-                    console.log(fileName, 'ddddeee')
                     const payload = {
                         name: fileName,
                         choices: flatData

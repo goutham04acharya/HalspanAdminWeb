@@ -91,7 +91,6 @@ function DisplayFieldSetting({
                 // Check if the upload was successful
                 if (uploadResponse.ok) {
                 } else {
-                    console.error('Failed to upload image:', uploadResponse.status, uploadResponse.statusText);
                     const errorText = await uploadResponse.text();
                     console.error('Response body:', errorText); // Log the full response for more insight
                 }
@@ -159,7 +158,6 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         dispatch(setShouldAutoSave(true));
     }
-    console.log(fieldSettingParameters, 'urlll')
 
     return (
         <>
@@ -454,7 +452,7 @@ function DisplayFieldSetting({
                         >
                             Add Conditional Logic
                         </button>
-                        {fieldSettingParameters.conditional_logic &&
+                        {fieldSettingParameters?.conditional_logic &&
                             <p className='text-center italic mt-1'>Conditional Logic Added</p>
                         }
                     </div>
