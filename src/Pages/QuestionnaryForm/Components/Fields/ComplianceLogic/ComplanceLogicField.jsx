@@ -6,7 +6,7 @@ import { defaultContentConverter } from '../../../../../CommonMethods/defaultCon
 import { setComplianceLogicCondition } from '../fieldSettingParamsSlice';
 
 
-function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic, formStatus }) {
+function ComplanceLogicField({ complianceLogic, setConditions, setComplianceLogic, addNewCompliance, complianceSaveHandler, setIsDeleteComplianceLogic, formStatus }) {
 
   // const {complianceLogicId} = useSelector(state => state.)
   const dispatch = useDispatch()
@@ -25,6 +25,7 @@ function ComplanceLogicField({ complianceLogic, setComplianceLogic, addNewCompli
             onClick={formStatus === 'Draft' ?() => {
               setIsDeleteComplianceLogic(true)
               dispatch(setComplianceLogicCondition([]))
+              setConditions([])
             } : null}
           />
           {/* <img src="/Images/save.svg"

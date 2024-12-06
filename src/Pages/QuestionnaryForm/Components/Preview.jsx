@@ -1046,7 +1046,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button disabled={previewNavigation.current_page === 1} type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full disabled:opacity-50`} onClick={handleBackClick}>
+                    {!showLabel ? <button 
+                    // disabled={previewNavigation.current_page === 1} 
+                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
+                    `} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>

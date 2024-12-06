@@ -1433,7 +1433,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
-            // debugger
             dispatch(setComplianceLogicCondition(conditions));
         }
         setConditionalLogic(false);
@@ -1442,131 +1441,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     }
 
-    function parseConditionalString(condString) {
-        // Helper function to parse condition logic
-        function parseConditionLogic(condition) {
-            if (condition.includes('!==')) {
-                return 'not equal to';
-            } else if (condition.includes('===')) {
-                return 'equals';
-            } else if (condition.includes('includes')) {
-                return condition.includes('=== false') ? 'does not include' : 'includes';
-            }
-            return 'equals';
-        }
-
-        // Helper function to extract question name
-        function extractQuestionName(condition) {
-            return condition.split(/[=!]|\.includes/)[0].trim().replace(/[()]/g, '');
-        }
-
-        // Helper function to extract value
-        function extractValue(condition) {
-            const matches = condition.match(/'([^']+)'/);
-            return matches ? matches[1] : '';
-        }
-
-        // Helper function to parse actions
-        function parseActions(actionStr) {
-            if (!actionStr) return null;
-
-            const actions = {
-                status: '',
-                value: '',
-                action: '',
-                grade: ''
-            };
-
-            const cleanStr = actionStr.replace(/[()]/g, '').trim();
-            const parts = cleanStr.split(',').map(part => part.trim());
-
-            parts.forEach(part => {
-                if (part.startsWith('STATUS')) {
-                    actions.status = part.split('=')[1].trim().replace(/'/g, '').toLowerCase();
-                } else if (part.startsWith('REASON')) {
-                    actions.value = part.split('=')[1].trim().replace(/'/g, '');
-                } else if (part.startsWith('ACTION.push')) {
-                    actions.action = part.match(/'([^']*?)'/)?.[1] || '';
-                } else if (part.startsWith('GRADE')) {
-                    actions.grade = part.split('=')[1].trim().replace(/'/g, '');
-                }
-            });
-
-            return actions;
-        }
-
-        // Function to parse conditions
-        function parseConditions(condStr) {
-            const conditions = [];
-            const cleanStr = condStr.replace(/^\(+|\)+$/g, '').trim();
-            const parts = cleanStr.split(/(\|\||&&)/).filter(Boolean).map(part => part.trim());
-
-            for (let i = 0; i < parts.length; i += 2) {
-                const condition = parts[i];
-                const operator = parts[i + 1];
-
-                const conditionObj = {
-                    question_name: extractQuestionName(condition),
-                    condition_logic: parseConditionLogic(condition),
-                    value: extractValue(condition),
-                    dropdown: false,
-                    condition_dropdown: false,
-                    condition_type: "textboxfield"
-                };
-
-                if (i > 0) {
-                    conditionObj.andClicked = parts[i - 1].trim() === '&&';
-                    conditionObj.orClicked = parts[i - 1].trim() === '||';
-                    conditionObj.isOr = parts[i - 1].trim() === '||';
-                }
-
-                conditions.push(conditionObj);
-            }
-
-            return conditions;
-        }
-
-        // Split the string into parts based on ternary operators
-        let parts = condString.split('?').map(part => part.trim());
-
-        // Parse the initial conditions
-        const mainConditions = parseConditions(parts[0]);
-
-        // Initialize the result structure
-        const result = {
-            conditions: mainConditions,
-            thenAction: null,
-            elseIfBlocks: [],
-            elseBlock: null
-        };
-
-        // Process each part
-        for (let i = 1; i < parts.length; i++) {
-            const [actionPart, nextPart] = parts[i].split(':').map(p => p.trim());
-
-            if (i === 1) {
-                // This is the 'then' action for the main condition
-                result.thenAction = parseActions(actionPart);
-            }
-
-            if (nextPart) {
-                if (nextPart.includes('?')) {
-                    // This is an else-if block
-                    const elseIfConditions = nextPart.split('?')[0];
-                    result.elseIfBlocks.push({
-                        type: "elseif",
-                        conditions: parseConditions(elseIfConditions),
-                        thenActions: [parseActions(parts[i + 1].split(':')[0])]
-                    });
-                } else {
-                    // This is the final else block
-                    result.elseBlock = parseActions(nextPart);
-                }
-            }
-        }
-
-        return [result];
-    }
     useEffect(() => {
         let compliance_logic;
         console.log(complianceLogicCondition, 'complianceLogicCondition ')
