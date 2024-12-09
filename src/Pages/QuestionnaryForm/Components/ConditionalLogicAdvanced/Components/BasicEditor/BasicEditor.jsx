@@ -5,14 +5,8 @@ import InputWithDropDown from '../../../../../../Components/InputField/Dropdown'
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
-import { useDispatch } from 'react-redux';
-import { setNewLogic } from '../../../Fields/fieldSettingParamsSlice';
-import { useSelector } from 'react-redux';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData }) {
-    const [dropdown, setDropdown] = useState(false)
-    const dispatch = useDispatch();
-    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId }) {
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
@@ -149,23 +143,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
 
-           // Update the condition_logic key with the value sent to the function
-           conditionToUpdate.value = e.target.value;
-           return updatedConditions;
+            // Update the condition_logic key with the value sent to the function
+            conditionToUpdate.value = e.target.value;
+            return updatedConditions;
         });
-        
-        // Ensure `conditions` is the latest state before dispatching
-        // setConditions(prevConditions => {
-        //     const latestConditions = [...prevConditions]; // Clone before dispatching
-        //     dispatch(
-        //         setNewLogic({
-        //             id: 'conditional_logic',
-        //             value: latestConditions,
-        //             questionId: selectedQuestionId
-        //         })
-        //     );
-        //     return latestConditions; // Return to maintain the state chain
-        // });
+
     };
 
     //function to set the value from the selection dropdown for selecting the question
@@ -283,7 +265,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
     return (
         <div className='w-full h-customh14'>
-            <p className='font-semibold text-[22px]'>Conditional Fields</p>
+            {sectionConditionLogicId || pageConditionLogicId ? (
+                <p className='font-semibold text-[22px]'>Shows when ...</p>) : (
+                <p className='font-semibold text-[22px]'>Conditional Fields</p>
+            )}
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions?.map((condition, index) => (
 

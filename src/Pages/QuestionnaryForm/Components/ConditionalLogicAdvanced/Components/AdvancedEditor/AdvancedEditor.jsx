@@ -19,6 +19,7 @@ function AdvancedEditor({
     isThreedotLoaderBlack,
     smallLoader,
     setSelectedType
+
 }) {
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');

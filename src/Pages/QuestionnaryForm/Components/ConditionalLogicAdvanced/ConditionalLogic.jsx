@@ -78,7 +78,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
         }
     ]
-    console.log('conditions', conditions)
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -1238,18 +1237,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return false;  // Return false if all keys have values
     };
-    // const handleComplianceLogic = async () => {
-    //     const payload = {
-    //         'questionnaire_id': parseInt(questionnaire_id),
-    //         'version_number': parseInt(version_number),
-    //         'logic' : conditions
-    //     }
-    //     try {
-    //         const response = await PostAPI(`questionnaires/compliancelogic`, payload);
-    //     } catch {
-    //         console.log('Error updating API')
-    //     }
-    // }
+
     const getComplianceLogic = (condition) => {
 
         // to get the value expression
@@ -1361,7 +1349,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const getFinalComplianceLogic = () => {
         let finalString = '';
-        console.log(conditions[0])
         finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
@@ -1381,18 +1368,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0].elseBlock) {
             finalString += generateElseBlockString(conditions[0].elseBlock);
         }
-
-        console.log(finalString)
         return finalString;
     }
-
-
 
     const handleSaveBasicEditor = () => {
 
         if (complianceState) {
             let compliance_logic = getFinalComplianceLogic(conditions);
-            console.log(compliance_logic, 'compliance logic')
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1410,9 +1392,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                console.log(conditions, 'conditions')
                 condition_logic = buildConditionExpression(conditions);
-                console.log(condition_logic, '333 conditionlogic')
             } catch (error) {
             }
         } else {
@@ -1428,8 +1408,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         handleSaveSection(sectionId, true, condition_logic);
-        // console.log(condition_logic, 'condition')
-        console.log(selectedQuestionId, 'question id')
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1443,7 +1421,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         let compliance_logic;
-        console.log(complianceLogicCondition, 'complianceLogicCondition ')
         if (!complianceState) {
             if (sectionConditionLogicId) {
                 // Find the section with the matching section ID
@@ -1451,7 +1428,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 if (section) {
                     // Extract and parse the section's conditional logic
-                    console.log(section.section_conditional_logic, 'ddddd');
                     compliance_logic = parseLogicExpression(section?.section_conditional_logic);
                 } else {
                     console.error('Section not found for the given sectionConditionLogicId');
@@ -1478,19 +1454,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Default: Extract and parse the conditional logic from the selected question
                 compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
             }
-            console.log(compliance_logic, 'compliance_logic')
             setConditions(compliance_logic)
         } else {
             if (complianceLogicCondition[0] !== undefined) {
-                // debugger
-                // console.log(complianceLogicCondition[0], 'complianceInitialStatecomplianceInitialState')
                 setConditions(complianceLogicCondition);
             } else {
                 setConditions(complianceInitialState)
             }
         }
     }, [selectedQuestionId])
-
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
@@ -1551,6 +1523,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setSubmitSelected={setSubmitSelected}
                                     selectedQuestionId={selectedQuestionId}
                                     conditionalLogicData={conditionalLogicData}
+                                    sectionConditionLogicId={sectionConditionLogicId}
+                                    pageConditionLogicId={pageConditionLogicId}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor
