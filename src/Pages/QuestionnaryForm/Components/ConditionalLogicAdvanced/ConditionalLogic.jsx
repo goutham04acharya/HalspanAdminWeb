@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { setAllSectionDetails } from '../../../QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 import useApi from '../../../../services/CustomHook/useApi';
 import { useParams } from 'react-router-dom';
-import { setNewComponent, setNewLogic } from '../Fields/fieldSettingParamsSlice';
+import { setComplianceLogicCondition, setNewComponent, setNewLogic } from '../Fields/fieldSettingParamsSlice';
 import BasicEditor from './Components/BasicEditor/BasicEditor';
 import { buildConditionExpression, buildLogicExpression } from '../../../../CommonMethods/BasicEditorLogicBuilder';
 import GlobalContext from '../../../../Components/Context/GlobalContext';
@@ -20,16 +20,18 @@ import OperatorsModal from '../../../../Components/Modals/OperatorsModal';
 import { DateValidator } from './DateFieldChecker';
 import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
 import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/ComplianceBasicEditor';
+import { generateElseBlockString, generateTernaryOperation, generateThenActionString } from '../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
 
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
     const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const [showSectionList, setShowSectionList] = useState(false)
+    const { PostAPI } = useApi();
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
     const [inputValue, setInputValue] = useState(''); // Track input value
@@ -54,21 +56,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [logic, setLogic] = useState('')
     const [complianceCondition, setComplianceCondition] = useState('')
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
-    const [conditions, setConditions] = useState([{
-        'conditions': [
-            {
-                'question_name': '',
-                'condition_logic': '',
-                'value': '',
-                'dropdown': false,
-                'condition_dropdown': false,
-                'condition_type': 'textboxfield'
-            },
-        ]
-    },
-    ])
+    const [userInput, setUserInput] = useState({
+        ifStatements: [],
+        elseIfStatements: [],
+        elseStatement: {}
+    });
+    const complianceInitialState = [
+        {
+            'conditions': [
+                {
+                    'question_name': '',
+                    'condition_logic': '',
+                    'value': '',
+                    'dropdown': false,
+                    'condition_dropdown': false,
+                    'condition_type': 'textboxfield',
+                },
+            ]
+        }
+    ]
+    console.log('conditions', conditions)
 
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
@@ -448,7 +458,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-        if (!expression) {
+        if (!expression || expression === '') {
             return [{
                 'conditions': [
                     {
@@ -821,7 +831,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
 
                     // Continue with other logic if needed
-                } else {setConditions
+                } else {
+                    setConditions
                     setError("Invalid format. Please use the format `getMonth() === value`.");
                     return;
                 }
@@ -1227,10 +1238,161 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return false;  // Return false if all keys have values
     };
+    // const handleComplianceLogic = async () => {
+    //     const payload = {
+    //         'questionnaire_id': parseInt(questionnaire_id),
+    //         'version_number': parseInt(version_number),
+    //         'logic' : conditions
+    //     }
+    //     try {
+    //         const response = await PostAPI(`questionnaires/compliancelogic`, payload);
+    //     } catch {
+    //         console.log('Error updating API')
+    //     }
+    // }
+    const getComplianceLogic = (condition) => {
+
+        // to get the value expression
+        const getValue = (val, condtionType) => {
+            let resultValue = '';
+            switch (condtionType) {
+                case "choiceboxfield": resultValue = `"${val}"`;
+                    break;
+                case "numberfield": resultValue = val;
+                    break;
+            }
+            return resultValue
+        }
+
+        // to get the condition expression
+        const getConditionValue = (item) => {
+            let resultExpression = '';
+            switch (item.condition_logic) {
+                case "includes":
+                    resultExpression = `${item.question_name}.includes("${item.value}")`;
+                    break;
+                case "equals":
+                    resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "not equals to":
+                    resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "does not include":
+                    resultExpression = `!${item.question_name}.includes("${item.value}")`;
+                    break;
+                case "smaller":
+                    resultExpression = `${item.question_name} < ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "larger":
+                    resultExpression = `${item.question_name} > ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "smaller or equal":
+                    resultExpression = `${item.question_name} <= ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "larger or equal":
+                    resultExpression = `${item.question_name} >= ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "has no files":
+                    resultExpression = `${item.question_name}.length == 0`;
+                    break;
+                case "has atleast one file":
+                    resultExpression = `${item.question_name}.length > 0`;
+                    break;
+                case "number of file is":
+                    resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;
+                    break;
+                case "date is before today":
+                    resultExpression = `${item.question_name} < new Date()`;
+                    break;
+                case "date is after or equal to today":
+                    resultExpression = `${item.question_name} >= new Date()`;
+                    break;
+                case "date is before or equal to today":
+                    resultExpression = `${item.question_name} <= new Date()`;
+                    break;
+                case "date is after today":
+                    resultExpression = `${item.question_name} > new Date()`;
+                    break;
+                case "date is “X” date of set date":
+                    resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
+                    break;
+                default:
+                    // Handle unknown condition logic  
+                    console.error(`Unknown condition logic: ${item.condition_logic}`);
+                    break;
+            }
+            return resultExpression;
+        }
+
+        const formatExpression = (expr) => {
+            // Split the expression into parts by "||"
+            const orParts = expr.split("||").map((part) => part.trim());
+
+            // Add parentheses around each "&&" group
+            const formatted = orParts
+                .map((part) => {
+                    if (part.includes("&&")) {
+                        return `(${part})`;
+                    }
+                    return part;
+                })
+                .join(" || ");
+
+            return formatted;
+        };
+
+        let result = '';
+
+        condition.map((item, index) => {
+            if (item.orClicked && index !== 0) {
+                result += '|| ';
+            }
+
+            if (item.andClicked && index !== 0) {
+                result += ' && ';
+            }
+
+            result += `${getConditionValue(item)}`;
+        });
+
+        return formatExpression(result.toString());
+
+    }
+
+    const getFinalComplianceLogic = () => {
+        let finalString = '';
+        console.log(conditions[0])
+        finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
+        if (conditions[0].thenAction) {
+            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
+        }
+        if (conditions[0].elseIfBlocks) {
+            finalString += ' : '
+            conditions[0].elseIfBlocks.map((outerItem) => {
+                if (outerItem.conditions.length > 0) {
+                    finalString += '(' + getComplianceLogic(outerItem.conditions) + ')';
+                }
+                if (outerItem.thenActions) {
+                    finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
+                }
+            })
+
+        }
+        if (conditions[0].elseBlock) {
+            finalString += generateElseBlockString(conditions[0].elseBlock);
+        }
+
+        console.log(finalString)
+        return finalString;
+    }
+
+
+
     const handleSaveBasicEditor = () => {
 
         if (complianceState) {
-            let compliance_logic = buildConditionExpression(conditions);
+            let compliance_logic = getFinalComplianceLogic(conditions);
+            console.log(compliance_logic, 'compliance logic')
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1246,9 +1408,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         let condition_logic;
-        try {
-            condition_logic = buildConditionExpression(conditions);
-        } catch (error) {
+        if (!complianceState) {
+            try {
+                console.log(conditions, 'conditions')
+                condition_logic = buildConditionExpression(conditions);
+                console.log(condition_logic, '333 conditionlogic')
+            } catch (error) {
+            }
+        } else {
+            condition_logic = conditions;
         }
         let sectionId
         if (sectionConditionLogicId) {
@@ -1260,110 +1428,67 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         handleSaveSection(sectionId, true, condition_logic);
-        dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+        // console.log(condition_logic, 'condition')
+        console.log(selectedQuestionId, 'question id')
+        if (!complianceState) {
+            dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
+        } else {
+            dispatch(setComplianceLogicCondition(conditions));
+        }
         setConditionalLogic(false);
         setSectionConditionLogicId(false);
         setPageConditionLogicId(false);
 
     }
-    /* eslint-disable complexity */
-    const parseBasicEditorLogicExpression = (logic) => {
-        // Helper function to identify condition type
-        if (!logic) {
-            return [{
-                'conditions': [
-                    {
-                        'question_name': '',
-                        'condition_logic': '',
-                        'value': '',
-                        'dropdown': false,
-                        'condition_dropdown': false,
-                        'condition_type': 'textboxfield'
-                    },
-                ]
-            },
-            ];
-        }
-        const getConditionLogic = (expression) => {
-            if (expression.includes("===")) return "equals";
-            if (expression.includes("!==")) return "not equal to";
-            if (expression.includes(".includes")) return expression.startsWith("!") ? "does not include" : "includes";
-            if (expression.includes(".length === 0")) return "has no files";
-            if (expression.includes(".length >= 1")) return "has atleast one file";
-            if (expression.includes(".length ===")) return "number of file is";
-            if (expression.includes(" < ")) return "smaller";
-            if (expression.includes(" > ")) return "larger";
-            if (expression.includes(" <= ")) return "smaller or equal";
-            if (expression.includes(" >= ")) return "larger or equal";
-            return null; // Add more cases as needed
-        };
-
-        // Split the logic into OR groups
-        const groups = logic.split(" || ").map(group => group.trim());
-
-        return groups.map(group => {
-            // Split each group into AND conditions
-            const conditions = group.replace(/[()]/g, "").split(" && ").map(cond => cond.trim());
-
-            return {
-                conditions: conditions.map((cond) => {
-                    const questionMatch = cond.match(/^[^ ]+/); // Match the question name
-                    const valueMatch = cond.match(/"([^"]*)"/); // Match the value in quotes
-                    const conditionLogic = getConditionLogic(cond); // Determine the condition logic
-
-                    // Identify condition type based on the question name (example logic)
-                    const conditionType = questionMatch?.[0]?.includes("Photo_label_name")
-                        ? "photofield"
-                        : "textboxfield";
-                    return {
-                        question_name: questionMatch?.[0] || "",
-                        condition_logic: conditionLogic,
-                        value: valueMatch?.[1] || "",
-                        dropdown: false,
-                        condition_dropdown: false,
-                        condition_type: conditionType,
-                    };
-                }),
-            };
-        });
-    };
-
 
     useEffect(() => {
         let compliance_logic;
-        if (sectionConditionLogicId) {
-            // Find the section with the matching section ID
-            const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
+        console.log(complianceLogicCondition, 'complianceLogicCondition ')
+        if (!complianceState) {
+            if (sectionConditionLogicId) {
+                // Find the section with the matching section ID
+                const section = sectionsData.find(section => section.section_id === sectionConditionLogicId);
 
-            if (section) {
-                // Extract and parse the section's conditional logic
-                compliance_logic = parseLogicExpression(section.section_conditional_logic);
-            } else {
-                console.error('Section not found for the given sectionConditionLogicId');
-            }
-        } else if (pageConditionLogicId) {
-            let pageFound = false;
-
-            // Iterate through sections to find the page with the matching page ID
-            sectionsData.forEach(section => {
-                const page = section.pages?.find(page => page.page_id === pageConditionLogicId);
-
-                if (page) {
-                    pageFound = true;
-                    // Extract and parse the page's conditional logic
-                    compliance_logic = parseLogicExpression(page.page_conditional_logic);
+                if (section) {
+                    // Extract and parse the section's conditional logic
+                    console.log(section.section_conditional_logic, 'ddddd');
+                    compliance_logic = parseLogicExpression(section?.section_conditional_logic);
+                } else {
+                    console.error('Section not found for the given sectionConditionLogicId');
                 }
-            });
+            } else if (pageConditionLogicId) {
+                let pageFound = false;
 
-            if (!pageFound) {
-                console.error('Page not found for the given pageConditionLogicId');
+                // Iterate through sections to find the page with the matching page ID
+                sectionsData.forEach(section => {
+                    const page = section.pages?.find(page => page.page_id === pageConditionLogicId);
+
+                    if (page) {
+                        pageFound = true;
+                        // Extract and parse the page's conditional logic
+                        compliance_logic = parseLogicExpression(page.page_conditional_logic);
+                    }
+                });
+
+                if (!pageFound) {
+                    console.error('Page not found for the given pageConditionLogicId');
+                }
             }
+            else {
+                // Default: Extract and parse the conditional logic from the selected question
+                compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+            }
+            console.log(compliance_logic, 'compliance_logic')
+            setConditions(compliance_logic)
         } else {
-            // Default: Extract and parse the conditional logic from the selected question
-            compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+            if (complianceLogicCondition[0] !== undefined) {
+                // debugger
+                // console.log(complianceLogicCondition[0], 'complianceInitialStatecomplianceInitialState')
+                setConditions(complianceLogicCondition);
+            } else {
+                setConditions(complianceInitialState)
+            }
         }
-
-        setConditions(compliance_logic)
     }, [selectedQuestionId])
 
     return (
@@ -1438,6 +1563,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             setConditions={setConditions}
                             submitSelected={submitSelected}
                             setSubmitSelected={setSubmitSelected}
+                            setUserInput={setUserInput}
                         />
                         }
                         <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>

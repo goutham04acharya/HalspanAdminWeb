@@ -126,6 +126,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     }, [questionnaire_id, version_number]);
 
     const evaluateComplianceLogic = () => {
+
         let results = [];
 
         const preprocessLogic = (logic) => {
@@ -165,28 +166,31 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
 
         results = complianceLogic.map(rule => {
+            console.log(rule, 'rule')
             let evaluationResult = {
                 STATUS: '',
                 REASON: '',
-                ACTIONS: [],
+                ACTION: [],
                 GRADE: ''
             };
 
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
-
+                console.log(processedContent)
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
-                let ACTIONS = [];
+                let ACTION = [];
                 let GRADE = '';
 
                 // Evaluate the processed logic
                 eval(processedContent);
 
                 // Store the results
-                evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
+                evaluationResult = { STATUS, REASON, ACTION, GRADE };
+                console.log(evaluationResult, 'result eval')
+
 
                 return {
                     label: rule.label,
@@ -199,7 +203,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     label: rule.label,
                     STATUS: 'Error',
                     REASON: error.message,
-                    ACTIONS: [],
+                    ACTION: [],
                     GRADE: '',
                     conditionMet: false
                 };
@@ -884,7 +888,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
-                <img src='/Images/close-preview.svg' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
+                <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
                 <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
@@ -897,7 +901,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
+
                                 <>
+                                    {console.log(result, 'result')}
                                     <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -905,15 +911,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         <div className="flex items-center justify-between">
                                             <h3 className="font-semibold text-[#2B333B]">{result?.label}</h3>
                                             <span
-                                                className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'Pass' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
+                                                className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'PASS' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
                                             >
-                                                <img src={`${result?.STATUS === 'Pass' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
-                                                {result?.STATUS === 'Pass' ? 'Compliant' : 'Non-Compliant'}
+                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                {result?.STATUS === 'PASS' ? 'Compliant' : 'Non-Compliant'}
                                             </span>
                                         </div>
 
                                     </div>
-                                    {result?.STATUS === 'Fail' && <div
+                                    {result?.STATUS === 'FAIL' && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -921,11 +927,21 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             {/* <h3 className="font-semibold text-[#2B333B]">STATUS: {result?.STATUS}</h3> */}
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">REASON: </h3>
-                                                <span className='text-sm'>{result?.REASON}</span>
+                                                {/* 'NO_ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER' */}
+                                                <span className="text-sm">
+                                                    {{
+                                                        NO_ACCESS: 'No Access',
+                                                        MISSING: 'Missing Asset',
+                                                        RECOMMEND_REPLACEMENT: 'Recommend Replacement',
+                                                        RECOMMEND_REMEDIATION: 'Recommend Remediation',
+                                                        FURTHER_INVESTIGATION: 'Further Investigation Required',
+                                                    }[result?.REASON] || 'Other'}
+                                                </span>
+
                                             </div>
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>
-                                                <span className='text-sm'>{result?.ACTIONS}</span>
+                                                <span className='text-sm'>{result?.ACTION}</span>
                                             </div>
 
                                         </div>
@@ -1030,7 +1046,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button disabled={previewNavigation.current_page === 1} type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full disabled:opacity-50`} onClick={handleBackClick}>
+                    {!showLabel ? <button 
+                    // disabled={previewNavigation.current_page === 1} 
+                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
+                    `} onClick={handleBackClick}>
                         Back
                     </button> :
                         <>
