@@ -20,6 +20,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         'file': ['has atleast one file', 'has no files', 'number of file is'],
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
+    
     //function to handle dropdowns
     const updateDropdown = (dropdown, mainIndex, subIndex) => {
         setSubmitSelected(false)
@@ -153,19 +154,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
            conditionToUpdate.value = e.target.value;
            return updatedConditions;
         });
-        
-        // Ensure `conditions` is the latest state before dispatching
-        // setConditions(prevConditions => {
-        //     const latestConditions = [...prevConditions]; // Clone before dispatching
-        //     dispatch(
-        //         setNewLogic({
-        //             id: 'conditional_logic',
-        //             value: latestConditions,
-        //             questionId: selectedQuestionId
-        //         })
-        //     );
-        //     return latestConditions; // Return to maintain the state chain
-        // });
     };
 
     //function to set the value from the selection dropdown for selecting the question

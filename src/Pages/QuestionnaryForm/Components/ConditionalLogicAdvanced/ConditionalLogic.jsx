@@ -42,6 +42,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const textareaRef = useRef(null); // To reference the textarea
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
+    const [questionType, setQuestionType] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
 
@@ -78,8 +79,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
         }
     ]
-    console.log('conditions', conditions)
+    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
 
+    useEffect(() => {
+        const choiceBoxOptionsObj = {};
+        questionType.forEach((question) => {
+            if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
+                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray;
+            }
+        });
+        setChoiceBoxOptions(choiceBoxOptionsObj);
+    }, [questionType, fieldSettingParams]);
+    const combinedArray = questionType.map((question) => {  
+        const choiceValues = choiceBoxOptions[question.question_id] || [];  
+        return {  
+           question_detail: question.question_detail,  
+           question_type: question.question_type,  
+           choice_values: choiceValues,  
+        };  
+     });
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -144,7 +162,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const filterSectionDetails = () => {
         // Initialize an empty array to hold the flattened details
         const sectionDetailsArray = [];
-
+        const questionDetailsArray = [];
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
             const sectionName = section.section_name.replace(/\s+/g, '_');
@@ -158,12 +176,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
+                        questionDetailsArray.push({
+                            'question_type': question?.component_type,
+                            'question_id': question?.question_id,
+                            'question_name': question?.question_name,
+                            'question_detail': questionName,
+                        });
                     }
                 });
             });
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
+        setQuestionType(questionDetailsArray);
     };
 
     //function for filtering for the basic editor -- does not need section and page
@@ -1564,6 +1589,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             submitSelected={submitSelected}
                             setSubmitSelected={setSubmitSelected}
                             setUserInput={setUserInput}
+                            combinedArray={combinedArray}
                         />
                         }
                         <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
