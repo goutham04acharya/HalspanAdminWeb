@@ -1242,6 +1242,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     const validateConditions = () => {
+        debugger
         for (let i = 0; i < conditions.length; i++) {
             for (let j = 0; j < conditions[i].conditions.length; j++) {
                 const condition = conditions[i].conditions[j];
@@ -1387,6 +1388,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const getFinalComplianceLogic = () => {
         let finalString = '';
         console.log(conditions[0])
+        if(conditions[0]?.conditions === undefined) { 
+            return
+        }
         finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
@@ -1576,6 +1580,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setSubmitSelected={setSubmitSelected}
                                     selectedQuestionId={selectedQuestionId}
                                     conditionalLogicData={conditionalLogicData}
+                                    combinedArray={combinedArray}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor

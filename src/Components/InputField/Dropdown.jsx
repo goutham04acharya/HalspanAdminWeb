@@ -49,7 +49,10 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)} // Add condition here
+                    onClick={() => {
+                        console.log(' i am jjj')
+                        complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)
+                    }} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded pl-[18px] pr-[40px] placeholder:font-normal placeholder:text-base`}

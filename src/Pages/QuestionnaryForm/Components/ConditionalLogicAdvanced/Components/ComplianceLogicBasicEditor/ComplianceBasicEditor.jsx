@@ -73,6 +73,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         }
     };
 
+
     const handleInputChange = (e, id, type, mainIndex, subIndex, isElseIf = false, elseIfIndex = null, questionIndex) => {
 
         setSubmitSelected(false)
@@ -192,16 +193,20 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
 
 
-    const handleDeleteElseIf = (blockIndex, elseIfIndex) => {
-        setSubmitSelected(false);
-        setConditions(prevConditions => {
-            const updatedConditions = [...prevConditions];
-            if (updatedConditions[blockIndex].elseIfBlocks) {
-                updatedConditions[blockIndex].elseIfBlocks = updatedConditions[blockIndex].elseIfBlocks.filter((_, index) => index !== elseIfIndex);
-            }
-            return updatedConditions;
-        });
-    };
+    const handleDeleteElseIf = (blockIndex, elseIfIndex) => {  
+        setSubmitSelected(false);  
+        setConditions(prevConditions => {  
+           const updatedConditions = [...prevConditions];  
+           if (updatedConditions[blockIndex].elseIfBlocks) {  
+             updatedConditions[blockIndex] = {  
+                ...updatedConditions[blockIndex],  
+                elseIfBlocks: updatedConditions[blockIndex].elseIfBlocks.filter((_, index) => index !== elseIfIndex)  
+             };  
+           }  
+           return updatedConditions;  
+        });  
+     };
+     
 
     const addElseIf = (blockIndex) => {
         setSubmitSelected(false);
@@ -414,6 +419,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
     const handleSelectDropdown = (key, mainIndex, subIndex, type, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
+        console.log('i came', isElseIf)
         if (type === 'condition_dropdown') {
             if (isElseIf) {
                 setConditions(prevConditions => {
@@ -436,9 +442,58 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                     return updatedConditions;
                 });
             }
-            updateDropdown(type, mainIndex, subIndex, isElseIf, elseIfIndex)
-            return;
+            updateDropdown('condition_dropdown', mainIndex, subIndex, isElseIf, elseIfIndex)
+        } else if (type === 'value') {
+            console.log('first i ma here')
+            if(isElseIf){
+                setConditions(prevConditions => {
+                    const updatedConditions = [...prevConditions];
+    
+                    const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
+    
+                    conditionToUpdate.value = key;
+    
+                    return updatedConditions;
+                });
+            }else{
+                setConditions(prevConditions => {
+                    const updatedConditions = [...prevConditions];
+    
+                    const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+    
+                    conditionToUpdate.value = key;
+    
+                    return updatedConditions;
+                });
+            }
+            
+            updateDropdown('value_dropdown', mainIndex, subIndex, isElseIf, elseIfIndex)
+        } else {
+            if(isElseIf){
+                setConditions(prevConditions => {
+                    const updatedConditions = [...prevConditions];
+    
+                    const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
+    
+                    conditionToUpdate.condition_logic = key;
+    
+                    return updatedConditions;
+                });
+            }else{
+                setConditions(prevConditions => {
+                    const updatedConditions = [...prevConditions];
+    
+                    const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+    
+                    conditionToUpdate.condition_logic = key;
+    
+                    return updatedConditions;
+                });
+            }
+            
+            updateDropdown()
         }
+
         let selectedQuestion = getDetails(key, questions);
         if (isElseIf) {
             setConditions(prevConditions => {
@@ -519,9 +574,12 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         return false;
     };
 
-    const showInputValue = (key) => {
+    const showInputValue = (key, type, field) => {
         let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
         if (arr.includes(key)) {
+            return false;
+        }
+        if (type === 'choiceboxfield' && field === 'inputfield') {
             return false;
         }
         return true;
@@ -599,94 +657,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
     console.log(conditions, 'structureUserInputstructureUserInputs')
 
-    const getComplianceLogic = (condition) => {
-
-        // to get the value expression
-        const getValue = (val, condtionType) => {
-            let resultValue = '';
-            switch (condtionType) {
-                case "choiceboxfield": resultValue = `"${val}"`;
-                    break;
-                case "numberfield": resultValue = val;
-                    break;
-            }
-            return resultValue
-        }
-
-        // to get the condition expression
-        const getConditionValue = (item) => {
-            let resultExpression = '';
-            switch (item.condition_logic) {
-                case "includes": resultExpression = `${item.question_name}.includes("${item.value}")`;
-                    break;
-                case "equals": resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
-                    break;
-                case "not equal to": resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
-                    break;
-                case "does not include": resultExpression = `!${item.question_name}.includes("${item.value}")`;
-                    break;
-            }
-            return resultExpression
-        }
-        const formatExpression = (expr) => {
-            // Split the expression into parts by "||"
-            const orParts = expr.split("||").map((part) => part.trim());
-
-            // Add parentheses around each "&&" group
-            const formatted = orParts
-                .map((part) => {
-                    if (part.includes("&&")) {
-                        return `(${part})`;
-                    }
-                    return part;
-                })
-                .join(" || ");
-
-            return formatted;
-        };
-
-        let result = '';
-
-        condition.map((item, index) => {
-            if (item.orClicked && index !== 0) {
-                result += '|| ';
-            }
-
-            if (item.andClicked && index !== 0) {
-                result += ' && ';
-            }
-
-            result += `${getConditionValue(item)}`;
-        });
-
-        return formatExpression(result.toString());
-
-    }
-
-    const getFinalComplianceLogic = () => {
-        let finalString = '';
-        console.log(conditions[0])
-        finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
-        if (conditions[0].thenAction) {
-            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction);
-        }
-        if (conditions[0].elseIfBlocks) {
-            finalString += ' : '
-            conditions[0].elseIfBlocks.map((outerItem) => {
-                if (outerItem.conditions.length > 0) {
-                    finalString += '(' + getComplianceLogic(outerItem.conditions) + ')';
-                }
-                if (outerItem.thenActions) {
-                    finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
-                }
-            })
-
-        }
-        if (conditions[0].elseBlock) {
-            finalString += generateElseBlockString(conditions[0].elseBlock);
-        }
-        console.log(finalString)
-    }
     const statusDropdownHandler = (option, index, subIndex, id, type) => {
         if (type == 'elseIfIndex') {
             dropdownHandler('elseIfBlock', subIndex)
@@ -871,6 +841,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
     };
 
+
     //function to handle opening and closing of the dropdown in complinace basic editor
     const dropdownHandler = (type, index, dropdownType) => {
         if (dropdownType === 'reason') {
@@ -903,9 +874,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             });
         }
     };
-
-
-
 
     return (
         <div className='w-full h-customh14'>
@@ -999,31 +967,52 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                         validationError={submitSelected && conditions[index]?.conditions[i]?.date === '' && 'This field  is mandatory'}
                                                                     />
                                                                 </div>}
-                                                                {showInputValue(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
-                                                                    <div className=''>
-                                                                        <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
-                                                                        <InputField
-                                                                            autoComplete='off'
-                                                                            label=''
-                                                                            id='value'
-                                                                            type='text'
-                                                                            value={conditions[index].conditions[i].value}
-                                                                            className='w-full text-sm'
-                                                                            labelStyle=''
-                                                                            placeholder=''
-                                                                            testId={`value-input-${index}-${i}`}
-                                                                            htmlFor=''
-                                                                            maxLength={32}
-                                                                            mainIndex={index}
-                                                                            subIndex={i}
-                                                                            handleChange={(e) => handleInputChange(e, '', '', index, i, false, null, i)}
-                                                                            onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
-                                                                            validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
-                                                                            basicEditor
-                                                                        />
-                                                                    </div>
+                                                                {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && (
+                                                                    <div className='w-1/3 px-2 '>
+                                                                        <div className=''>
+                                                                            <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
+                                                                            {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ? (
+                                                                                <InputWithDropDown
+                                                                                    label=""
+                                                                                    id="value"
+                                                                                    top="20px"
+                                                                                    placeholder="Select"
+                                                                                    className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
+                                                                                    testID={`value-dropdown-${index}-${i}`}
+                                                                                    selectedOption={conditions[index].conditions[i].value}
+                                                                                    handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', false, null)}
+                                                                                    mainIndex={index}
+                                                                                    subIndex={i}
+                                                                                    isDropdownOpen={conditions[index].conditions[i].value_dropdown}
+                                                                                    setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
+                                                                                    options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                />
 
-                                                                </div>}
+                                                                            ) : (
+                                                                                <InputField
+                                                                                    autoComplete="off"
+                                                                                    label=""
+                                                                                    id="value"
+                                                                                    type="text"
+                                                                                    value={conditions[index].conditions[i].value}
+                                                                                    className="w-full text-sm"
+                                                                                    labelStyle=""
+                                                                                    placeholder=""
+                                                                                    testId={`value-input-${index}-${i}`}
+                                                                                    htmlFor=""
+                                                                                    maxLength={32}
+                                                                                    mainIndex={index}
+                                                                                    subIndex={i}
+                                                                                    handleChange={(e) => handleInputChange(e, '', '', index, i, false, null, i)}
+                                                                                    onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
+                                                                                    validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
+                                                                                    basicEditor
+                                                                                />
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
 
                                                             </div>
 
@@ -1214,31 +1203,52 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                     validationError={submitSelected && conditions[index].elseIfBlocks[elseIfIndex].conditions[i].date === '' && 'This field  is mandatory'}
                                                                                 />
                                                                             </div>}
-                                                                        {showInputValue(conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i].condition_logic) &&
+
+                                                                        {showInputValue(conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i].condition_logic, conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i].condition_type, 'choicefield') && (
                                                                             <div className='w-1/3 px-2 '>
                                                                                 <div className=''>
                                                                                     <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
-                                                                                    <InputField
-                                                                                        autoComplete='off'
-                                                                                        label=''
-                                                                                        id='value'
-                                                                                        type='text'
-                                                                                        value={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value}
-                                                                                        className='w-full'
-                                                                                        labelStyle=''
-                                                                                        placeholder=''
-                                                                                        testId={`value-input-${index}-${i}`}
-                                                                                        htmlFor=''
-                                                                                        maxLength={32}
-                                                                                        mainIndex={index}
-                                                                                        subIndex={i}
-                                                                                        handleChange={(e) => handleInputChange(e, '', '', index, i, true, elseIfIndex, i)}
-                                                                                        onInput={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'dateTimefield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'numberfield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'photofield'}
-                                                                                        validationError={submitSelected && conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value === '' && 'This field  is mandatory'}
-                                                                                        basicEditor
-                                                                                    />
+                                                                                    {conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'choiceboxfield' ? (
+                                                                                        <InputWithDropDown
+                                                                                            label=""
+                                                                                            id="value"
+                                                                                            top="20px"
+                                                                                            placeholder="Select"
+                                                                                            className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
+                                                                                            testID={`value-dropdown-${index}-${i}`}
+                                                                                            selectedOption={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value}
+                                                                                            handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', true, elseIfIndex)}
+                                                                                            mainIndex={index}
+                                                                                            subIndex={i}
+                                                                                            isDropdownOpen={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value_dropdown}
+                                                                                            setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, true, elseIfIndex)}
+                                                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].elseIfBlocks[elseIfIndex].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <InputField
+                                                                                            autoComplete='off'
+                                                                                            label=''
+                                                                                            id='value'
+                                                                                            type='text'
+                                                                                            value={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value}
+                                                                                            className='w-full'
+                                                                                            labelStyle=''
+                                                                                            placeholder=''
+                                                                                            testId={`value-input-${index}-${i}`}
+                                                                                            htmlFor=''
+                                                                                            maxLength={32}
+                                                                                            mainIndex={index}
+                                                                                            subIndex={i}
+                                                                                            handleChange={(e) => handleInputChange(e, '', '', index, i, true, elseIfIndex, i)}
+                                                                                            onInput={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'dateTimefield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'numberfield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'photofield'}
+                                                                                            validationError={submitSelected && conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value === '' && 'This field  is mandatory'}
+                                                                                            basicEditor
+                                                                                        />
+                                                                                    )}
                                                                                 </div>
-                                                                            </div>}
+                                                                            </div>
+                                                                        )}
+
                                                                     </div>
                                                                     {elseIfBlock.conditions.length - 1 === i ? (
                                                                         <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAddCondition(index, true, elseIfIndex, false, true)}>

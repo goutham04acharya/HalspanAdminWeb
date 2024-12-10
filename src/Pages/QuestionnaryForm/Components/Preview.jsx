@@ -53,6 +53,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         total_pages: 0
     })
 
+    console.log(value, 'value')
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
