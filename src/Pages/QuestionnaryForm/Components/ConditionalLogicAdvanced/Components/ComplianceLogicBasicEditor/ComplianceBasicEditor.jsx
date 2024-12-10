@@ -193,20 +193,20 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
 
 
-    const handleDeleteElseIf = (blockIndex, elseIfIndex) => {  
-        setSubmitSelected(false);  
-        setConditions(prevConditions => {  
-           const updatedConditions = [...prevConditions];  
-           if (updatedConditions[blockIndex].elseIfBlocks) {  
-             updatedConditions[blockIndex] = {  
-                ...updatedConditions[blockIndex],  
-                elseIfBlocks: updatedConditions[blockIndex].elseIfBlocks.filter((_, index) => index !== elseIfIndex)  
-             };  
-           }  
-           return updatedConditions;  
-        });  
-     };
-     
+    const handleDeleteElseIf = (blockIndex, elseIfIndex) => {
+        setSubmitSelected(false);
+        setConditions(prevConditions => {
+            const updatedConditions = [...prevConditions];
+            if (updatedConditions[blockIndex].elseIfBlocks) {
+                updatedConditions[blockIndex] = {
+                    ...updatedConditions[blockIndex],
+                    elseIfBlocks: updatedConditions[blockIndex].elseIfBlocks.filter((_, index) => index !== elseIfIndex)
+                };
+            }
+            return updatedConditions;
+        });
+    };
+
 
     const addElseIf = (blockIndex) => {
         setSubmitSelected(false);
@@ -445,52 +445,52 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             updateDropdown('condition_dropdown', mainIndex, subIndex, isElseIf, elseIfIndex)
         } else if (type === 'value') {
             console.log('first i ma here')
-            if(isElseIf){
+            if (isElseIf) {
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
-    
+
                     const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
-    
+
                     conditionToUpdate.value = key;
-    
+
                     return updatedConditions;
                 });
-            }else{
+            } else {
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
-    
+
                     const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-    
+
                     conditionToUpdate.value = key;
-    
+
                     return updatedConditions;
                 });
             }
-            
+
             updateDropdown('value_dropdown', mainIndex, subIndex, isElseIf, elseIfIndex)
         } else {
-            if(isElseIf){
+            if (isElseIf) {
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
-    
+
                     const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
-    
+
                     conditionToUpdate.condition_logic = key;
-    
+
                     return updatedConditions;
                 });
-            }else{
+            } else {
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
-    
+
                     const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-    
+
                     conditionToUpdate.condition_logic = key;
-    
+
                     return updatedConditions;
                 });
             }
-            
+
             updateDropdown()
         }
 
@@ -972,21 +972,26 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                         <div className=''>
                                                                             <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
                                                                             {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ? (
-                                                                                <InputWithDropDown
-                                                                                    label=""
-                                                                                    id="value"
-                                                                                    top="20px"
-                                                                                    placeholder="Select"
-                                                                                    className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
-                                                                                    testID={`value-dropdown-${index}-${i}`}
-                                                                                    selectedOption={conditions[index].conditions[i].value}
-                                                                                    handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', false, null)}
-                                                                                    mainIndex={index}
-                                                                                    subIndex={i}
-                                                                                    isDropdownOpen={conditions[index].conditions[i].value_dropdown}
-                                                                                    setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                                                    options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
-                                                                                />
+                                                                                <>
+                                                                                    <InputWithDropDown
+                                                                                        label=""
+                                                                                        id="value"
+                                                                                        top="20px"
+                                                                                        placeholder="Select"
+                                                                                        className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
+                                                                                        testID={`value-dropdown-${index}-${i}`}
+                                                                                        selectedOption={conditions[index].conditions[i].value}
+                                                                                        handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', false, null)}
+                                                                                        mainIndex={index}
+                                                                                        subIndex={i}
+                                                                                        isDropdownOpen={conditions[index].conditions[i].value_dropdown}
+                                                                                        setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
+                                                                                        options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                        validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
+                                                                                    />
+                                                                                    {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
+                                                                                </>
+
 
                                                                             ) : (
                                                                                 <InputField
@@ -1051,7 +1056,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
                                 <div className='pt-4 w-1/4 bg-white p-3 flex gap-4 rounded-lg'>
                                     <h3 className='text-[#2B333B] font-semibold mt-5 mb-4'>Then</h3>
-                                    <div className='flex flex-col gap-4'>
+                                    <div className={`flex flex-col ${condition.thenAction?.status === undefined ? '' : 'gap-4'} `}>
                                         <InputWithDropDown
                                             label='Status'
                                             labelStyle='font-semibold text-[#2B333B] text-base'
@@ -1068,8 +1073,11 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             setDropdownOpen={() => dropdownHandler('if', index, 'status')}
                                             options={status}
                                             dropDownClassName={`text-sm`}
+                                            validationError={submitSelected && condition.thenAction?.status === undefined}
                                             ifcompliance
                                         />
+
+                                        {submitSelected && condition.thenAction?.status === undefined && <ErrorMessage error={'This field is mandatory'} />}
                                         {condition.thenAction?.status === 'PASS' && (
                                             <InputField
                                                 label="Grade"
@@ -1284,7 +1292,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                         </div>
                                         <div className='pt-4 bg-white w-[24.27%] p-3 flex gap-4 rounded-lg'>
                                             <h3 className='text-[#2B333B] font-semibold mt-5 mb-4'>Then</h3>
-                                            <div className='flex flex-col gap-4'>
+                                            <div className={`flex flex-col ${condition.elseIfBlocks[elseIfIndex].thenActions[0].status === '' ? '' : 'gap-4'}`}>
                                                 <InputWithDropDown
                                                     label='Status'
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -1301,8 +1309,11 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     setDropdownOpen={() => dropdownHandler('elseIfBlock', elseIfIndex, 'status')}
                                                     options={status}
                                                     dropDownClassName={`text-sm`}
+                                                    validationError={submitSelected && condition.elseIfBlocks[elseIfIndex].thenActions[0].status === ''}
                                                     compliance
                                                 />
+                                                {console.log(condition.elseIfBlocks[elseIfIndex].thenActions[0].status, 'condition.elseIfBlocks[elseIfIndex].thenActions[0].status')}
+                                                {submitSelected && condition.elseIfBlocks[elseIfIndex].thenActions[0].status === '' && <ErrorMessage error={'This field is mandatory'} />}
                                                 {condition.elseIfBlocks[elseIfIndex].thenActions[0].status === 'PASS' && (
                                                     <InputField
                                                         label="Grade"
@@ -1369,25 +1380,30 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                 <div className='pt-4 bg-white p-3 flex flex-row gap-4 rounded-lg w-full'>
                                     <h3 className='text-[#2B333B] font-semibold mt-5 mb-4'>Else</h3>
                                     <div className='flex flex-row gap-4 flex-1'>
-                                        <InputWithDropDown
-                                            label='Status'
-                                            labelStyle='font-semibold text-[#2B333B] text-base'
-                                            id='status'
-                                            top='30px'
-                                            placeholder='Select'
-                                            className={`w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]`}
-                                            testID={`status-dropdown`}
-                                            labeltestID={`status-dropdown-label`}
-                                            selectedOption={condition.elseBlock?.status}
-                                            handleOptionClick={(e) => statusDropdownHandler(e, index, null, 'status', 'else')}
-                                            mainIndex={index}
-                                            isDropdownOpen={isStatusDropdownOpen?.[`else-${index}`]}
-                                            setDropdownOpen={() => dropdownHandler('else', index, 'status')}
-                                            options={status}
-                                            dropDownClassName={`text-sm`}
-                                            compliance
-                                            elseBlockDropdown
-                                        />
+                                        <div className='w-full'>
+                                            <InputWithDropDown
+                                                label='Status'
+                                                labelStyle='font-semibold text-[#2B333B] text-base'
+                                                id='status'
+                                                top='30px'
+                                                placeholder='Select'
+                                                className={`w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]`}
+                                                testID={`status-dropdown`}
+                                                labeltestID={`status-dropdown-label`}
+                                                selectedOption={condition.elseBlock?.status}
+                                                handleOptionClick={(e) => statusDropdownHandler(e, index, null, 'status', 'else')}
+                                                mainIndex={index}
+                                                isDropdownOpen={isStatusDropdownOpen?.[`else-${index}`]}
+                                                setDropdownOpen={() => dropdownHandler('else', index, 'status')}
+                                                options={status}
+                                                dropDownClassName={`text-sm`}
+                                                validationError={submitSelected && condition.elseBlock?.status === undefined}
+                                                compliance
+                                                elseBlockDropdown
+                                            />
+                                            {submitSelected && condition.elseBlock?.status === undefined && <ErrorMessage error={'This field is mandatory'} />}
+                                        </div>
+
                                         {condition.elseBlock?.status === 'PASS' && (
                                             <InputField
                                                 label="Grade"

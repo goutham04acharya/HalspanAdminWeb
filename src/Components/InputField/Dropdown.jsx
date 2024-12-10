@@ -50,7 +50,6 @@ function InputWithDropDown({
                     id={id}
                     placeholder={placeholder}
                     onClick={() => {
-                        console.log(' i am jjj')
                         complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)
                     }} // Add condition here
                     data-testid={testID}
