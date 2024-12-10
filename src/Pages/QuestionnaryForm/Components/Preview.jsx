@@ -40,7 +40,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    const [isvalidExpression, setIsValidExpression] = useState(false);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
         nextSection: 0,
@@ -166,7 +165,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
 
         results = complianceLogic.map(rule => {
-            console.log(rule, 'rule')
             let evaluationResult = {
                 STATUS: '',
                 REASON: '',
@@ -177,7 +175,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
-                console.log(processedContent)
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
@@ -189,9 +186,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                 // Store the results
                 evaluationResult = { STATUS, REASON, ACTION, GRADE };
-                console.log(evaluationResult, 'result eval')
-
-
                 return {
                     label: rule.label,
                     ...evaluationResult,
@@ -262,7 +256,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Simulate user interaction or dynamic evaluation
     const allPages = getEvaluatedAllPages();
-
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -749,8 +742,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     testId="preview"
                     setValue={setValue}
                     values={value[question?.question_id]}
-                // setFieldEditable={setFieldEditable}
-                // setFieldValue={setFieldValue}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -798,32 +789,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
-
-    const isLastSectionAndPage = () => {
-        // Check if we are on the last section and last page
-        const isLastPageInSection = currentPage === sections[currentSection]?.pages.length - 1;
-        const isLastSection = currentSection === sections.length - 1;
-
-        if (isLastSection && isLastPageInSection) {
-            return true; // If on the last section and page, it's a "Submit" button
-        }
-
-        // Otherwise, evaluate the next section's conditional logic
-        const nextSectionData = sections[currentSection + 1];
-        if (nextSectionData?.section_conditional_logic) {
-            try {
-                const isSectionEval = eval(nextSectionData.section_conditional_logic);
-                return !isSectionEval; // If the next section logic is invalid, it becomes a "Submit" button
-            } catch (err) {
-                console.error("Error evaluating section conditional logic:", err);
-                return true; // On error, assume "Submit"
-            }
-        }
-
-        return false; // Default: "Next"
-    };
-
-
 
     useEffect(() => {
         sections.forEach(section => {
@@ -877,14 +842,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }));
         dispatch(resetFields())
     }
-    function addDays(date) {
-        if (date) {
-            let result = date;
-            result.setDate(result.getDate() + 1);
-            // return result
-        }
-
-    }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -901,9 +858,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
-
                                 <>
-                                    {console.log(result, 'result')}
                                     <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -1047,7 +1002,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button 
-                    // disabled={previewNavigation.current_page === 1} 
+                    disabled={previewNavigation.current_page === 1} 
                     type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back

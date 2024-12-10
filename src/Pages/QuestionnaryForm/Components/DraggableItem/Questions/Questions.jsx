@@ -28,6 +28,7 @@ const Questions = ({
     const { index, selectedQuestionId, formStatus } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
+        setSelectedQuestionId(null)
         dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
         dispatch(setShowquestionDeleteModal(true));
@@ -99,6 +100,7 @@ const Questions = ({
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         dispatch(setSelectedComponent(componentType));
     };
+    console.log(selectedQuestionId, 'v')
     return (
         <div
             data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${index + 1}`}

@@ -22,15 +22,10 @@ const Sections = ({
   sections,
   setSections,
   handleAutoSave,
-  selectedSection,
-  setSelectedSection,
-  selectedPage,
   setSelectedPage,
   formStatus,
   setDropdown,
-  dropdownOpen,
   setPageConditionLogicId,
-  pageConditionLogicId
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
@@ -72,7 +67,7 @@ const Sections = ({
   useEffect(() => {
     const initialDropdownState = sections.reduce((acc, _, i) => ({ ...acc, [i]: false }), {});
     setDropdown(initialDropdownState);
-  }, [sections]);
+  }, []);
 
   return (
     <div

@@ -73,7 +73,6 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -90,7 +89,6 @@ const QuestionnaryForm = () => {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [saveClick, setSaveClick] = useState(false)
     const [sectionName, setSectionName] = useState('')
@@ -1280,6 +1278,7 @@ const QuestionnaryForm = () => {
             !compareData(fieldSettingParams, savedFieldSettingParams)
         );
     };
+
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges() && formStatus === 'Draft') {
@@ -1288,6 +1287,7 @@ const QuestionnaryForm = () => {
             navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
     };
+
     const handleComplianceLogic = async () => {
         const payload = {
             'questionnaire_id': parseInt(questionnaire_id),
@@ -1306,6 +1306,7 @@ const QuestionnaryForm = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
+
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
@@ -1435,6 +1436,7 @@ const QuestionnaryForm = () => {
         }
     };
 
+
     return (
         <>
             {pageLoading ? (
@@ -1502,7 +1504,7 @@ const QuestionnaryForm = () => {
                                                                         <div className="flex justify-between w-full"
                                                                             id={`${sectionData.section_id}-scroll`}
                                                                         >
-                                                                            <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
+                                                                            <div className='flex items-center' style={{ width: '-webkit-fill-available' }}>
                                                                                 <EditableField
                                                                                     name={sectionData?.section_name}
                                                                                     index={sectionIndex}
@@ -1516,27 +1518,42 @@ const QuestionnaryForm = () => {
                                                                                     formStatus={formStatus}
                                                                                 />
                                                                             </div>
-                                                                            <div className="flex items-center">
-                                                                                <img src="/Images/setting.svg"
-                                                                                    alt="setting"
-                                                                                    title='Add Conditional-logic'
-                                                                                    data-testid={`add-condition-section-${sectionIndex}`}
-                                                                                    className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                                    onClick={formStatus === 'Draft' ? () => {
-                                                                                        setSectionConditionLogicId(sectionData.section_id)
-                                                                                        dispatch(setSelectedQuestionId(''))
-                                                                                        dispatch(setSelectedComponent(null))
-                                                                                    }
-                                                                                        : null}  // Use arrow function
+                                                                            <div className="flex items-center w-[15%]">
+                                                                                {sectionData.section_conditional_logic ? (
+                                                                                    // Dummy icon to show if conditional logic is added
+                                                                                    <img
+                                                                                        src="/Images/condition-added.svg"
+                                                                                        alt="Condition Added"
+                                                                                        title="Condition Added"
+                                                                                        className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}
+                                                                                    />
+                                                                                ) : (
+                                                                                    // Setting icon to add conditional logic
+                                                                                    <img
+                                                                                        src="/Images/setting.svg"
+                                                                                        alt="setting"
+                                                                                        title="Add Conditional-logic"
+                                                                                        data-testid={`add-condition-section-${sectionIndex}`}
+                                                                                        className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}  // Use arrow function
+                                                                                    />
+                                                                                )}
+                                                                                <img src="/Images/trash-black.svg"
+                                                                                    alt="delete"
+                                                                                    title='Delete'
+                                                                                    data-testid={`delete-btn-${sectionIndex}`}
+                                                                                    className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                                    onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                                 />
-                                                                                {sections?.length !== 1 &&
-                                                                                    <img src="/Images/trash-black.svg"
-                                                                                        alt="delete"
-                                                                                        title='Delete'
-                                                                                        data-testid={`delete-btn-${sectionIndex}`}
-                                                                                        className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                                        onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
-                                                                                    />}
                                                                             </div>
                                                                         </div>
                                                                         <Sections

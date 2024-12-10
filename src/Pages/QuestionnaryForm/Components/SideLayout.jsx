@@ -17,6 +17,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
 }) {
 
     const handleDropdown = (sectionId) => {
+        console.log('am here')
         if (dropdownOpen === sectionId) {
             setDropdown('')
             return;
