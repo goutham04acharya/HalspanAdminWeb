@@ -42,6 +42,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const textareaRef = useRef(null); // To reference the textarea
     const [sections, setSections] = useState({})
     const [secDetailsForSearching, setSecDetailsForSearching] = useState([])
+    const [questionType, setQuestionType] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
 
@@ -78,7 +79,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
         }
     ]
+    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
 
+    useEffect(() => {
+        const choiceBoxOptionsObj = {};
+        questionType.forEach((question) => {
+            if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
+                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray;
+            }
+        });
+        setChoiceBoxOptions(choiceBoxOptionsObj);
+    }, [questionType, fieldSettingParams]);
+    const combinedArray = questionType.map((question) => {
+        const choiceValues = choiceBoxOptions[question.question_id] || [];
+        return {
+            question_detail: question.question_detail,
+            question_type: question.question_type,
+            choice_values: choiceValues,
+        };
+    });
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -143,7 +162,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const filterSectionDetails = () => {
         // Initialize an empty array to hold the flattened details
         const sectionDetailsArray = [];
-
+        const questionDetailsArray = [];
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
             const sectionName = section.section_name.replace(/\s+/g, '_');
@@ -157,12 +176,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
+                        questionDetailsArray.push({
+                            'question_type': question?.component_type,
+                            'question_id': question?.question_id,
+                            'question_name': question?.question_name,
+                            'question_detail': questionName,
+                        });
                     }
                 });
             });
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
+        setQuestionType(questionDetailsArray);
     };
 
     //function for filtering for the basic editor -- does not need section and page
@@ -209,6 +235,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
     }, [])
+
+    // useEffect(() => {
+    //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
+    //     setConditions(parseLogicExpression(transformedContent));
+    //     setInputValue(transformedContent);
+    // }, [])
 
     useEffect(() => {
         if (allSectionDetails) {
@@ -740,7 +772,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
-    }, [selectedQuestionId, allSectionDetails]);
+    }, [selectedQuestionId]);
 
     const handleSave = async () => {
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
@@ -755,26 +787,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
             };
-
-            const modifyString = (input) => {
-
-                if (selectedType === 'array') {
-                    const lastIndex = input.lastIndexOf('()');
-                    if (lastIndex !== -1) {
-                        return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
-                    }
-                }
-                return input;
-            };
-
+            // const modifyString = (input) => {
+            //     if (selectedType === 'array') {
+            //         // This regex looks for any ".()" in the string and replaces it with ".length"
+            //         return input.replace(/\.()\b/g, '.length');
+            //     }
+            //     return input;
+            // };
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            let evalInputValue = modifyString(inputValue);
+            let evalInputValue = inputValue.replaceAll('()', 'length');
 
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
@@ -1216,28 +1243,76 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     const validateConditions = () => {
-        for (let i = 0; i < conditions.length; i++) {
-            for (let j = 0; j < conditions[i].conditions.length; j++) {
-                const condition = conditions[i].conditions[j];
-                if (showInputValue(condition.condition_logic)) {
+        if (complianceState) {
+            for (let i = 0; i < conditions.length; i++) {
+                for (let j = 0; j < conditions[i].conditions.length; j++) {
+                    const condition = conditions[i].conditions[j];
+                    const status = conditions[i].thenAction
+                    const elseStatus = conditions[i].elseBlock
+                    if (showInputValue(condition.condition_logic)) {
 
-                    if (condition.question_name === '' || condition.condition_logic === '') {
-                        return true;
+                        if (condition.question_name === '' || condition.condition_logic === '' || status === undefined || elseStatus === undefined) {
+                            return true;
+                        }
+                    } else {
+                        if (
+                            condition.question_name === '' ||
+                            condition.condition_logic === '' ||
+                            condition.value === '' || status === undefined || elseStatus === undefined
+                        ) {
+                            return true;  // Return true if any key is empty  
+                        }
                     }
-                } else {
-                    if (
-                        condition.question_name === '' ||
-                        condition.condition_logic === '' ||
-                        condition.value === ''
-                    ) {
-                        return true;  // Return true if any key is empty
+                }
+
+                // Validate elseIfBlocks  
+                if (conditions[i].elseIfBlocks) {
+                    for (let k = 0; k < conditions[i].elseIfBlocks.length; k++) {
+                        for (let l = 0; l < conditions[i].elseIfBlocks[k].conditions.length; l++) {
+                            const elseIfCondition = conditions[i].elseIfBlocks[k].conditions[l];
+                            const status = conditions[i].elseIfBlocks[k].thenActions;
+                            if (showInputValue(elseIfCondition.condition_logic)) {
+
+                                if (elseIfCondition.question_name === '' || elseIfCondition.condition_logic === '' || status === undefined) {
+                                    return true;
+                                }
+                            } else {
+                                if (
+                                    elseIfCondition.question_name === '' ||
+                                    elseIfCondition.condition_logic === '' ||
+                                    elseIfCondition.value === '' || status === undefined
+                                ) {
+                                    return true;  // Return true if any key is empty  
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
-        return false;  // Return false if all keys have values
-    };
+            return false;  // Return false if all keys have values  
+        } else {
+            for (let i = 0; i < conditions.length; i++) {
+                for (let j = 0; j < conditions[i].conditions.length; j++) {
+                    const condition = conditions[i].conditions[j];
+                    if (showInputValue(condition.condition_logic)) {
 
+                        if (condition.question_name === '' || condition.condition_logic === '') {
+                            return true;
+                        }
+                    } else {
+                        if (
+                            condition.question_name === '' ||
+                            condition.condition_logic === '' ||
+                            condition.value === ''
+                        ) {
+                            return true;  // Return true if any key is empty
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+    };
     const getComplianceLogic = (condition) => {
 
         // to get the value expression
@@ -1247,6 +1322,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case "choiceboxfield": resultValue = `"${val}"`;
                     break;
                 case "numberfield": resultValue = val;
+                    break;
+                case "photofield": resultValue = val;
+                    break;
+                case "filefield": resultValue = val;
+                    break;
+                case "videofield": resultValue = val;
+                    break;
+                case "displayfield": resultValue = val;
                     break;
             }
             return resultValue
@@ -1349,6 +1432,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const getFinalComplianceLogic = () => {
         let finalString = '';
+        if (conditions[0]?.conditions === undefined) {
+            return
+        }
         finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
@@ -1371,7 +1457,44 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return finalString;
     }
 
+    useEffect(() => {
+        if (!complianceState) {
+            const condition_logic = buildConditionExpression(conditions)
+            setInputValue(condition_logic);
+        } else {
+            try {
+                let condition_logic = getFinalComplianceLogic(conditions)
+                    .replaceAll(/ACTION\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                    .replaceAll('?', 'then') // Replace ? with then
+                    .replaceAll('&&', 'and') // Replace && with and
+                    .replaceAll('||', 'or') // Replace || with or
+                    .replaceAll('length', '()')
+
+                if (condition_logic.includes(':')) {
+                    // Split by colon and rebuild with "else if" and "else" logic
+                    const parts = condition_logic.split(':');
+                    const lastPart = parts.pop(); // Remove the last part
+                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+                }
+
+                if (condition_logic !== '()') {
+                    condition_logic = 'if ' + condition_logic;
+                }
+                setInputValue(condition_logic);
+
+            } catch (error) {
+                console.error('Error while converting', error);
+            }
+
+
+        }
+    }, [conditions])
+
     const handleSaveBasicEditor = () => {
+        setSubmitSelected(true);
+        if (validateConditions()) {
+            return;
+        }
 
         if (complianceState) {
             let compliance_logic = getFinalComplianceLogic(conditions);
@@ -1385,10 +1508,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             setCompliancestate(false);
         }
-        setSubmitSelected(true);
-        if (validateConditions()) {
-            return;
-        }
+
         let condition_logic;
         if (!complianceState) {
             try {
@@ -1525,6 +1645,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     conditionalLogicData={conditionalLogicData}
                                     sectionConditionLogicId={sectionConditionLogicId}
                                     pageConditionLogicId={pageConditionLogicId}
+                                    combinedArray={combinedArray}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor
@@ -1538,6 +1659,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             submitSelected={submitSelected}
                             setSubmitSelected={setSubmitSelected}
                             setUserInput={setUserInput}
+                            combinedArray={combinedArray}
                         />
                         }
                         <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>

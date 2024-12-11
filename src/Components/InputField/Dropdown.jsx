@@ -26,6 +26,7 @@ function InputWithDropDown({
     subIndex,
     compliance,
     ifcompliance,
+    dropDownClassName,
     complinace //added this to only use in the complinace basic editor for the dropdown selector
 
 }) {
@@ -48,7 +49,9 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)} // Add condition here
+                    onClick={() => {
+                        complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)
+                    }} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded pl-[18px] pr-[40px] placeholder:font-normal placeholder:text-base`}
@@ -67,7 +70,7 @@ function InputWithDropDown({
                     {options.map((option, index) => (
                         <li key={option}
                             data-testid={`${labeltestID}-${index}`}
-                            className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
+                            className={`py-2 px-4 cursor-pointer hover:bg-[#F4F6FA] ${dropDownClassName}`}
                             onClick={(e) => complinace && !ifcompliance ? handleOptionClick(e) : handleOptionClick(option, mainIndex, subIndex, id)}>
                             {option}
                         </li>

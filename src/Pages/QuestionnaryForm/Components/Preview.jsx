@@ -51,7 +51,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
-
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -166,7 +165,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             let evaluationResult = {
                 STATUS: '',
                 REASON: '',
-                ACTION: [],
+                ACTIONS: [],
                 GRADE: ''
             };
 
@@ -176,14 +175,16 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
-                let ACTION = [];
+                let ACTIONS = [];
                 let GRADE = '';
 
                 // Evaluate the processed logic
                 eval(processedContent);
 
                 // Store the results
-                evaluationResult = { STATUS, REASON, ACTION, GRADE };
+                evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
+
+
                 return {
                     label: rule.label,
                     ...evaluationResult,
@@ -195,7 +196,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     label: rule.label,
                     STATUS: 'Error',
                     REASON: error.message,
-                    ACTION: [],
+                    ACTIONS: [],
                     GRADE: '',
                     conditionMet: false
                 };
@@ -894,7 +895,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             </div>
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>
-                                                <span className='text-sm'>{result?.ACTION}</span>
+                                                <span className='text-sm'>{result?.ACTIONS}</span>
                                             </div>
 
                                         </div>

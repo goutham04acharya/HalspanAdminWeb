@@ -31,8 +31,6 @@ export const generateTernaryOperation = (conditions) => {
             ternaryString += ` : ${generateElseBlockString(condition.elseBlock)}`;
         }
     });
-
-    console.log(ternaryString, 'ternaryString');
     return ternaryString;
 };
 
@@ -43,61 +41,61 @@ function generateConditionString(conditions) {
 
     conditions.forEach((condition, index) => {
         let operator;
-        switch (item.condition_logic) {  
-            case "includes":  
-               resultExpression = `${item.question_name}.includes("${item.value}")`;  
-               break;  
-            case "equals":  
-               resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "not equals to":  
-               resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "does not include":  
-               resultExpression = `!${item.question_name}.includes("${item.value}")`;  
-               break;  
-            case "smaller":  
-               resultExpression = `${item.question_name} < ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "larger":  
-               resultExpression = `${item.question_name} > ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "smaller or equal":  
-               resultExpression = `${item.question_name} <= ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "larger or equal":  
-               resultExpression = `${item.question_name} >= ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "has no files":  
-               resultExpression = `${item.question_name}.length == 0`;  
-               break;  
-            case "has atleast one file":  
-               resultExpression = `${item.question_name}.length > 0`;  
-               break;  
-            case "number of file is":  
-               resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;  
-               break;  
-            case "date is before today":  
-               resultExpression = `${item.question_name} < new Date()`;  
-               break;  
-            case "date is after or equal to today":  
-               resultExpression = `${item.question_name} >= new Date()`;  
-               break;  
-            case "date is before or equal to today":  
-               resultExpression = `${item.question_name} <= new Date()`;  
-               break;  
-            case "date is after today":  
-               resultExpression = `${item.question_name} > new Date()`;  
-               break;  
-            case "date is “X” date of set date":  
-               resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;  
-               break;  
-            default:  
-               // Handle unknown condition logic  
-               console.error(`Unknown condition logic: ${item.condition_logic}`);  
-               break;  
-         }
-         
+        switch (item.condition_logic) {
+            case "includes":
+                resultExpression = `${item.question_name}.includes("${item.value}")`;
+                break;
+            case "equals":
+                resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "not equals to":
+                resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "does not include":
+                resultExpression = `!${item.question_name}.includes("${item.value}")`;
+                break;
+            case "smaller":
+                resultExpression = `${item.question_name} < ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "larger":
+                resultExpression = `${item.question_name} > ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "smaller or equal":
+                resultExpression = `${item.question_name} <= ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "larger or equal":
+                resultExpression = `${item.question_name} >= ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "has no files":
+                resultExpression = `${item.question_name}.length == 0`;
+                break;
+            case "has atleast one file":
+                resultExpression = `${item.question_name}.length > 0`;
+                break;
+            case "number of file is":
+                resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;
+                break;
+            case "date is before today":
+                resultExpression = `${item.question_name} < new Date()`;
+                break;
+            case "date is after or equal to today":
+                resultExpression = `${item.question_name} >= new Date()`;
+                break;
+            case "date is before or equal to today":
+                resultExpression = `${item.question_name} <= new Date()`;
+                break;
+            case "date is after today":
+                resultExpression = `${item.question_name} > new Date()`;
+                break;
+            case "date is “X” date of set date":
+                resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
+                break;
+            default:
+                // Handle unknown condition logic  
+                console.error(`Unknown condition logic: ${item.condition_logic}`);
+                break;
+        }
+
 
         const conditionStr = `${condition.question_name}${operator}`;
         if (condition.andClicked === true) {
@@ -129,9 +127,48 @@ function generateConditionString(conditions) {
 }
 
 export function generateThenActionString(action) {
-    return `(STATUS = '${action.status.toUpperCase()}', REASON = '${action.value}', ACTION.push('${action.action}'), GRADE = '${action.grade}')`;
+    const status = action.status.toUpperCase();
+    let actionString = `(STATUS = '${status}'`;
+
+    if (status === 'PASS') {
+        // If status is PASS, only GRADE should be present
+        if (action.grade !== undefined) {
+            actionString += `, GRADE = '${action.grade}'`;
+        }
+    } else if (status === 'FAIL') {
+        // If status is FAIL, REASON and ACTION should be present
+        if (action.value !== undefined) {
+            actionString += `, REASON = '${action.value}'`;
+        }
+        if (action.action !== undefined) {
+            actionString += `, ACTION.push('${action.action}')`;
+        }
+    }
+
+    actionString += ')';
+    return actionString;
 }
 
 export function generateElseBlockString(elseBlock) {
-    return `(STATUS = '${elseBlock.status.toUpperCase()}', REASON = '${elseBlock.value}', ACTION.push('${elseBlock.action}'), GRADE = '${elseBlock.grade}')`;
+    const status = elseBlock.status.toUpperCase();
+    let elseBlockString = `(STATUS = '${status}'`;
+
+    if (status === 'PASS') {
+        // If status is PASS, only GRADE should be present
+        if (elseBlock.grade !== undefined) {
+            elseBlockString += `, GRADE = '${elseBlock.grade}'`;
+        }
+    } else if (status === 'FAIL') {
+        // If status is FAIL, REASON and ACTION should be present
+        if (elseBlock.value !== undefined) {
+            elseBlockString += `, REASON = '${elseBlock.value}'`;
+        }
+        if (elseBlock.action !== undefined) {
+            elseBlockString += `, ACTION.push('${elseBlock.action}')`;
+        }
+    }
+
+    elseBlockString += ')';
+    return elseBlockString;
 }
+
