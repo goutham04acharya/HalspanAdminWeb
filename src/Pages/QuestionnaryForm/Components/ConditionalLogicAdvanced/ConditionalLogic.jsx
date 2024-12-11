@@ -236,6 +236,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleListSectionDetails();
     }, [])
 
+    // useEffect(() => {
+    //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
+    //     setConditions(parseLogicExpression(transformedContent));
+    //     setInputValue(transformedContent);
+    // }, [])
+
     useEffect(() => {
         if (allSectionDetails) {
             filterSectionDetails(); // Call this when the state is updated
@@ -698,6 +704,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(transformedContent);
+                        console.log(transformedContent, '111')
                     } else {
                         setInputValue('');
                     }
@@ -753,6 +760,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
+            console.log(conditionalLogic, '222')
             // parseLogicExpression(conditionalLogic)
             // {
             //     !isDefaultLogic &&
@@ -766,7 +774,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
-    }, [selectedQuestionId, allSectionDetails]);
+    }, [selectedQuestionId]);
 
     const handleSave = async () => {
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
@@ -781,26 +789,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1');
+                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
             };
 
-            const modifyString = (input) => {
+            // const modifyString = (input) => {
+            //     console.log(input.replaceAll('()', 'length'), 'input')
+            //     // console.log(input.replace(/\.()\b/g, '.length'), 'ddddd')
+            //     if (selectedType === 'array') {
+            //         // This regex looks for any ".()" in the string and replaces it with ".length"
+            //         return input.replace(/\.()\b/g, '.length');
+            //     }
+            //     return input;
+            // };
 
-                if (selectedType === 'array') {
-                    const lastIndex = input.lastIndexOf('()');
-                    if (lastIndex !== -1) {
-                        return input.slice(0, lastIndex) + 'length' + input.slice(lastIndex + 2);
-                    }
-                }
-                return input;
-            };
+            // console.log(modifyString(), 'aceac')
+
 
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            let evalInputValue = modifyString(inputValue);
+            console.log(inputValue.replace('()', 'length'), 'ddddrrrrr')
+            let evalInputValue = inputValue.replaceAll('()', 'length');
 
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
@@ -1242,54 +1253,77 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     const validateConditions = () => {
-        for (let i = 0; i < conditions.length; i++) {
-            for (let j = 0; j < conditions[i].conditions.length; j++) {
-                const condition = conditions[i].conditions[j];
-                const status = conditions[i].thenAction
-                const elseStatus = conditions[i].elseBlock
-                console.log(elseStatus, 'ffffffffff')
-                if (showInputValue(condition.condition_logic)) {
+        if (complianceState) {
+            for (let i = 0; i < conditions.length; i++) {
+                for (let j = 0; j < conditions[i].conditions.length; j++) {
+                    const condition = conditions[i].conditions[j];
+                    const status = conditions[i].thenAction
+                    const elseStatus = conditions[i].elseBlock
+                    console.log(elseStatus, 'ffffffffff')
+                    if (showInputValue(condition.condition_logic)) {
 
-                    if (condition.question_name === '' || condition.condition_logic === '' || status === undefined || elseStatus === undefined) {
-                        return true;
-                    }
-                } else {
-                    if (
-                        condition.question_name === '' ||
-                        condition.condition_logic === '' ||
-                        condition.value === '' || status === undefined || elseStatus === undefined
-                    ) {
-                        return true;  // Return true if any key is empty  
+                        if (condition.question_name === '' || condition.condition_logic === '' || status === undefined || elseStatus === undefined) {
+                            return true;
+                        }
+                    } else {
+                        if (
+                            condition.question_name === '' ||
+                            condition.condition_logic === '' ||
+                            condition.value === '' || status === undefined || elseStatus === undefined
+                        ) {
+                            return true;  // Return true if any key is empty  
+                        }
                     }
                 }
-            }
 
-            // Validate elseIfBlocks  
-            if (conditions[i].elseIfBlocks) {
-                for (let k = 0; k < conditions[i].elseIfBlocks.length; k++) {
-                    for (let l = 0; l < conditions[i].elseIfBlocks[k].conditions.length; l++) {
-                        const elseIfCondition = conditions[i].elseIfBlocks[k].conditions[l];
-                        const status = conditions[i].elseIfBlocks[k].thenActions
-                        console.log(status, 'status')
-                        if (showInputValue(elseIfCondition.condition_logic)) {
+                // Validate elseIfBlocks  
+                if (conditions[i].elseIfBlocks) {
+                    for (let k = 0; k < conditions[i].elseIfBlocks.length; k++) {
+                        for (let l = 0; l < conditions[i].elseIfBlocks[k].conditions.length; l++) {
+                            const elseIfCondition = conditions[i].elseIfBlocks[k].conditions[l];
+                            const status = conditions[i].elseIfBlocks[k].thenActions
+                            console.log(status, 'status')
+                            if (showInputValue(elseIfCondition.condition_logic)) {
 
-                            if (elseIfCondition.question_name === '' || elseIfCondition.condition_logic === '' || status === undefined) {
-                                return true;
-                            }
-                        } else {
-                            if (
-                                elseIfCondition.question_name === '' ||
-                                elseIfCondition.condition_logic === '' ||
-                                elseIfCondition.value === '' || status === undefined
-                            ) {
-                                return true;  // Return true if any key is empty  
+                                if (elseIfCondition.question_name === '' || elseIfCondition.condition_logic === '' || status === undefined) {
+                                    return true;
+                                }
+                            } else {
+                                if (
+                                    elseIfCondition.question_name === '' ||
+                                    elseIfCondition.condition_logic === '' ||
+                                    elseIfCondition.value === '' || status === undefined
+                                ) {
+                                    return true;  // Return true if any key is empty  
+                                }
                             }
                         }
                     }
                 }
             }
+            return false;  // Return false if all keys have values  
+        } else {
+            for (let i = 0; i < conditions.length; i++) {
+                for (let j = 0; j < conditions[i].conditions.length; j++) {
+                    const condition = conditions[i].conditions[j];
+                    if (showInputValue(condition.condition_logic)) {
+
+                        if (condition.question_name === '' || condition.condition_logic === '') {
+                            return true;
+                        }
+                    } else {
+                        if (
+                            condition.question_name === '' ||
+                            condition.condition_logic === '' ||
+                            condition.value === ''
+                        ) {
+                            return true;  // Return true if any key is empty
+                        }
+                    }
+                }
+            }
+            return false;
         }
-        return false;  // Return false if all keys have values  
     };
 
     // const handleComplianceLogic = async () => {
@@ -1313,6 +1347,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case "choiceboxfield": resultValue = `"${val}"`;
                     break;
                 case "numberfield": resultValue = val;
+                    break;
+                case "photofield": resultValue = val;
+                    break;
+                case "filefield": resultValue = val;
+                    break;
+                case "videofield": resultValue = val;
+                    break;
+                case "displayfield": resultValue = val;
                     break;
             }
             return resultValue
@@ -1439,11 +1481,44 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             finalString += generateElseBlockString(conditions[0].elseBlock);
         }
 
-        console.log(finalString)
+        console.log(finalString, 'final string')
         return finalString;
     }
 
+    useEffect(() => {
+        if (!complianceState) {
+            const condition_logic = buildConditionExpression(conditions)
+            setInputValue(condition_logic);
+        } else {
+            try {
+                let condition_logic = getFinalComplianceLogic(conditions)
+                    .replaceAll(/ACTION\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                    .replaceAll('?', 'then') // Replace ? with then
+                    .replaceAll('&&', 'and') // Replace && with and
+                    .replaceAll('||', 'or') // Replace || with or
+                    .replaceAll('length', '()')
 
+                if (condition_logic.includes(':')) {
+                    // Split by colon and rebuild with "else if" and "else" logic
+                    const parts = condition_logic.split(':');
+                    const lastPart = parts.pop(); // Remove the last part
+                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+                }
+
+                if (condition_logic !== '()') {
+                    condition_logic = 'if ' + condition_logic;
+                }
+
+                console.log(condition_logic, 'llll');
+                setInputValue(condition_logic);
+
+            } catch (error) {
+                console.error('Error while converting', error);
+            }
+
+
+        }
+    }, [conditions])
 
     const handleSaveBasicEditor = () => {
         setSubmitSelected(true);
@@ -1464,7 +1539,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             setCompliancestate(false);
         }
-        
+
         let condition_logic;
         if (!complianceState) {
             try {
