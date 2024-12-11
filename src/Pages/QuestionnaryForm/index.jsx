@@ -337,7 +337,6 @@ const QuestionnaryForm = () => {
     const fetchComplianceLogic = async () => {
         try{
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
-            console.log(response?.data?.data[0]?.logic, 'compliance response')
             if(response?.data?.data[0]?.logic){
                 // setConditions(response?.data?.data[0]?.logic);
                 dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
@@ -642,7 +641,6 @@ const QuestionnaryForm = () => {
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
-            console.log(compliance, 'compliance sssssssssss')
 
             compliance[complianceLogicId].default_content = payloadString;
 
@@ -1284,7 +1282,6 @@ const QuestionnaryForm = () => {
         }
         try {
             const response = await PostAPI(`questionnaires/compliancelogic`, payload);
-            console.log(response?.data?.data?.logic, 'sdsdsdsd')
             
         } catch {
             console.log('Error updating API')

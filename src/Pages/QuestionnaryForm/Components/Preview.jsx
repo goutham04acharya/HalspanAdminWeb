@@ -52,7 +52,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
-
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -166,30 +165,27 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
 
         results = complianceLogic.map(rule => {
-            console.log(rule, 'rule')
             let evaluationResult = {
                 STATUS: '',
                 REASON: '',
-                ACTION: [],
+                ACTIONS: [],
                 GRADE: ''
             };
 
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
-                console.log(processedContent)
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
-                let ACTION = [];
+                let ACTIONS = [];
                 let GRADE = '';
 
                 // Evaluate the processed logic
                 eval(processedContent);
 
                 // Store the results
-                evaluationResult = { STATUS, REASON, ACTION, GRADE };
-                console.log(evaluationResult, 'result eval')
+                evaluationResult = { STATUS, REASON, ACTIONS, GRADE };
 
 
                 return {
@@ -203,7 +199,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     label: rule.label,
                     STATUS: 'Error',
                     REASON: error.message,
-                    ACTION: [],
+                    ACTIONS: [],
                     GRADE: '',
                     conditionMet: false
                 };
@@ -903,7 +899,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             {evaluateComplianceLogic().map((result, index) => (
 
                                 <>
-                                    {console.log(result, 'result')}
                                     <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -941,7 +936,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             </div>
                                             <div className=' flex items-center gap-2'>
                                                 <h3 className="font-semibold text-[#2B333B]">ACTION: </h3>
-                                                <span className='text-sm'>{result?.ACTION}</span>
+                                                <span className='text-sm'>{result?.ACTIONS}</span>
                                             </div>
 
                                         </div>

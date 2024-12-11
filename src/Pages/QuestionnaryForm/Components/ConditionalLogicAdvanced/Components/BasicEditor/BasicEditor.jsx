@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setNewLogic } from '../../../Fields/fieldSettingParamsSlice';
 import { useSelector } from 'react-redux';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData }) {
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, combinedArray }) {
     const [dropdown, setDropdown] = useState(false)
     const dispatch = useDispatch();
     const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
@@ -20,6 +20,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         'file': ['has atleast one file', 'has no files', 'number of file is'],
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
+
     //function to handle dropdowns
     const updateDropdown = (dropdown, mainIndex, subIndex) => {
         setSubmitSelected(false)
@@ -113,9 +114,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         const [sectionPart, pagePart, questionPart] = path.split('.');
 
         // Step 2: Replace underscores with spaces to match the actual names
-        const sectionName = sectionPart.replace(/_/g, ' ');
-        const pageName = pagePart.replace(/_/g, ' ');
-        const questionName = questionPart.replace(/_/g, ' ');
+        const sectionName = sectionPart?.replace(/_/g, ' ');
+        const pageName = pagePart?.replace(/_/g, ' ');
+        const questionName = questionPart?.replace(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.sections.find(section => section.section_name === sectionName);
@@ -149,28 +150,16 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
 
-           // Update the condition_logic key with the value sent to the function
-           conditionToUpdate.value = e.target.value;
-           return updatedConditions;
+            // Update the condition_logic key with the value sent to the function
+            conditionToUpdate.value = e.target.value;
+            return updatedConditions;
         });
-        
-        // Ensure `conditions` is the latest state before dispatching
-        // setConditions(prevConditions => {
-        //     const latestConditions = [...prevConditions]; // Clone before dispatching
-        //     dispatch(
-        //         setNewLogic({
-        //             id: 'conditional_logic',
-        //             value: latestConditions,
-        //             questionId: selectedQuestionId
-        //         })
-        //     );
-        //     return latestConditions; // Return to maintain the state chain
-        // });
     };
 
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
+        let selectedQuestion = getDetails(key, questions);
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
@@ -187,8 +176,23 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             });
             updateDropdown(type, mainIndex, subIndex)
             return; // Exit the function if type is 'conditional_dropdown'
+        } else if (type === 'value') {
+            setConditions(prevConditions => {
+                // Create a new array from the current conditions
+                const updatedConditions = [...prevConditions];
+
+                // Access the specific condition using mainIndex and subIndex
+                const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+
+                // Update the condition_logic key with the value sent to the function
+                conditionToUpdate.value = key;
+
+                // Return the updated array
+                return updatedConditions;
+            });
+            updateDropdown('value_dropdown', mainIndex, subIndex)
+            return;
         }
-        let selectedQuestion = getDetails(key, questions);
         setConditions(prevConditions => {
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
@@ -198,19 +202,20 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
             // Update question_name and condition_type with the new values
             conditionToUpdate.question_name = key;
-            conditionToUpdate.condition_type = selectedQuestion.component_type;
+            conditionToUpdate.condition_type = selectedQuestion?.component_type;
             conditionToUpdate.value = '';
             conditionToUpdate.condition_logic = '';
 
-            if (selectedQuestion.component_type === 'dateTimefield') {
+            if (selectedQuestion?.component_type === 'dateTimefield') {
                 conditionToUpdate['date'] = '';
             }
-
 
             // Return the updated array
             return updatedConditions;
         });
         updateDropdown(type, mainIndex, subIndex)
+
+
     }
     const getConditions = (key) => {
         let arr = []
@@ -253,11 +258,14 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     };
 
     // function to render the input value field as it is not  there for some conditions 
-    const showInputValue = (key) => {
+    const showInputValue = (key, type, field) => {
         //this is the array of cndition where the input value  tap will not be  shown
         let arr = ['has no files', 'has atleast one file', 'date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today']
         // check whether the condition key  is there in array, if yes then return false because the input value should not be shown 
         if (arr.includes(key)) {
+            return false;
+        }
+        if (type === 'choiceboxfield' && field === 'inputfield') {
             return false;
         }
         // if  its not there then return tru as the input box is required for  other condiitons 
@@ -358,28 +366,52 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                 validationError={submitSelected && conditions[index]?.conditions[i]?.date === '' && 'This field  is mandatory'}
                                             />
                                         </div>}
-                                        {showInputValue(conditions[index]?.conditions[i]?.condition_logic) && <div className='w-1/3 px-2 '>
+                                        {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && <div className='w-1/3 px-2 '>
                                             <div className=''>
                                                 <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
-                                                <InputField
-                                                    autoComplete='off'
-                                                    label=''
-                                                    id='value'
-                                                    type='text'
-                                                    value={conditions[index].conditions[i].value}
-                                                    className='w-full'
-                                                    labelStyle=''
-                                                    placeholder=''
-                                                    testId={`value-input-${index}-${i}`}
-                                                    htmlFor=''
-                                                    maxLength={32}
-                                                    mainIndex={index}
-                                                    subIndex={i}
-                                                    handleChange={handleInputChange}
-                                                    onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
-                                                    validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
-                                                    basicEditor
-                                                />
+                                                {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ?
+                                                    <>
+                                                        <InputWithDropDown
+                                                            label=""
+                                                            id="value"
+                                                            top="20px"
+                                                            placeholder="Select"
+                                                            className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
+                                                            testID={`value-dropdown-${index}-${i}`}
+                                                            selectedOption={conditions[index].conditions[i].value}
+                                                            handleOptionClick={(key) => {
+                                                                handleSelectDropdown(key, index, i, 'value', false, null)
+                                                            }}
+                                                            mainIndex={index}
+                                                            subIndex={i}
+                                                            isDropdownOpen={conditions[index].conditions[i].value_dropdown}
+                                                            setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
+                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                            validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
+                                                        />
+                                                        {submitSelected && conditions[index]?.conditions[i]?.value=== '' && <ErrorMessage error={'This field is mandatory'} />}
+                                                    </>
+                                                    :
+                                                    <InputField
+                                                        autoComplete='off'
+                                                        label=''
+                                                        id='value'
+                                                        type='text'
+                                                        value={conditions[index].conditions[i].value}
+                                                        className='w-full'
+                                                        labelStyle=''
+                                                        placeholder=''
+                                                        testId={`value-input-${index}-${i}`}
+                                                        htmlFor=''
+                                                        maxLength={32}
+                                                        mainIndex={index}
+                                                        subIndex={i}
+                                                        handleChange={handleInputChange}
+                                                        onInput={conditions[index].conditions[i].condition_type === 'dateTimefield' || conditions[index].conditions[i].condition_type === 'numberfield' || conditions[index].conditions[i].condition_type === 'photofield'}
+                                                        validationError={submitSelected && conditions[index].conditions[i].value === '' && 'This field  is mandatory'}
+                                                        basicEditor
+                                                    />
+                                                }
                                             </div>
 
                                         </div>}
