@@ -25,8 +25,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         'date': ['date is before today', 'date is before or equal to today', 'date is after today', 'date is after or equal to today', 'date is “X” date of set date']
     }
     const fieldSettingsParams = useSelector(state => state.fieldSettingParams.currentData)
-    console.log(combinedArray, 'combinedArray')
-    console.log(secDetailsForSearching, 'secDetailsForSearching')
     const options = ['NO_ACCESS', 'MISSING', 'RECOMMEND_REPLACEMENT', 'RECOMMEND_REMEDIATION', 'FURTHER_INVESTIGATION', 'OTHER'];
     const status = ['PASS', 'FAIL'];
     const updateDropdown = (dropdown, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
@@ -419,7 +417,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
     const handleSelectDropdown = (key, mainIndex, subIndex, type, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false)
-        console.log('i came', isElseIf)
         if (type === 'condition_dropdown') {
             if (isElseIf) {
                 setConditions(prevConditions => {
@@ -444,7 +441,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             }
             updateDropdown('condition_dropdown', mainIndex, subIndex, isElseIf, elseIfIndex)
         } else if (type === 'value') {
-            console.log('first i ma here')
             if (isElseIf) {
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
@@ -655,8 +651,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         }
     }
 
-    console.log(conditions, 'structureUserInputstructureUserInputs')
-
     const statusDropdownHandler = (option, index, subIndex, id, type) => {
         if (type == 'elseIfIndex') {
             dropdownHandler('elseIfBlock', subIndex)
@@ -761,7 +755,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                         // Ensure there are conditions to update
                         if (thenActions && thenActions.length > 0) {
                             // Update the value of the first condition (or modify logic as needed)
-                            console.log(thenActions, 'popop')
                             thenActions[0] = {
                                 ...thenActions[0],
                                 [id]: option,
@@ -1312,7 +1305,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     validationError={submitSelected && condition.elseIfBlocks[elseIfIndex].thenActions[0].status === ''}
                                                     compliance
                                                 />
-                                                {console.log(condition.elseIfBlocks[elseIfIndex].thenActions[0].status, 'condition.elseIfBlocks[elseIfIndex].thenActions[0].status')}
                                                 {submitSelected && condition.elseIfBlocks[elseIfIndex].thenActions[0].status === '' && <ErrorMessage error={'This field is mandatory'} />}
                                                 {condition.elseIfBlocks[elseIfIndex].thenActions[0].status === 'PASS' && (
                                                     <InputField

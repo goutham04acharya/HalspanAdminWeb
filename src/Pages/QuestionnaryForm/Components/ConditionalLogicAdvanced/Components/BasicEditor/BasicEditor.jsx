@@ -159,8 +159,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
-        console.log(key, 'key')
-        console.log(questions, 'questions')
         let selectedQuestion = getDetails(key, questions);
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
@@ -196,7 +194,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return;
         }
         setConditions(prevConditions => {
-            console.log(selectedQuestion, 'selected question')
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
 
@@ -212,7 +209,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             if (selectedQuestion?.component_type === 'dateTimefield') {
                 conditionToUpdate['date'] = '';
             }
-            console.log(updatedConditions, 'updated cond')
 
             // Return the updated array
             return updatedConditions;
@@ -384,7 +380,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                             testID={`value-dropdown-${index}-${i}`}
                                                             selectedOption={conditions[index].conditions[i].value}
                                                             handleOptionClick={(key) => {
-                                                                console.log(key, 'keyeyyey')
                                                                 handleSelectDropdown(key, index, i, 'value', false, null)
                                                             }}
                                                             mainIndex={index}
