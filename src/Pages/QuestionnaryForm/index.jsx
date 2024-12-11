@@ -1156,6 +1156,7 @@ const QuestionnaryForm = () => {
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
+        console.log(result, 'result')
 
         // setExpandedSections({ 0: false })
         setSections(reorderedItems);
@@ -1305,10 +1306,14 @@ const QuestionnaryForm = () => {
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
+            console.log(sections, 'hhhhhhhh')
+
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
+            console.log(sectionBody, 'body')
+            console.log(sectionBody, 'here')
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
@@ -1410,11 +1415,16 @@ const QuestionnaryForm = () => {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
                     sectionBody['sections'].forEach(section => {
+                        console.log(sections, 'nayna')
                         delete section.created_at;
                         delete section.updated_at;
                         delete section.questionnaire_id;
                         delete section.version_number;
                         delete section['ttl'];
+                        section.pages.forEach(page => {
+                            delete page.index;
+                            delete page.sectionIndex;
+                        });
                     });
                 } else {
                     console.error("sectionBody is not an array:", sectionBody);
