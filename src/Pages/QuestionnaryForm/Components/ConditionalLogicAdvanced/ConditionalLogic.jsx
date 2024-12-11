@@ -704,7 +704,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(transformedContent);
-                        console.log(transformedContent, '111')
                     } else {
                         setInputValue('');
                     }
@@ -760,7 +759,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
-            console.log(conditionalLogic, '222')
             // parseLogicExpression(conditionalLogic)
             // {
             //     !isDefaultLogic &&
@@ -791,26 +789,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
             };
-
             // const modifyString = (input) => {
-            //     console.log(input.replaceAll('()', 'length'), 'input')
-            //     // console.log(input.replace(/\.()\b/g, '.length'), 'ddddd')
             //     if (selectedType === 'array') {
             //         // This regex looks for any ".()" in the string and replaces it with ".length"
             //         return input.replace(/\.()\b/g, '.length');
             //     }
             //     return input;
             // };
-
-            // console.log(modifyString(), 'aceac')
-
-
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            console.log(inputValue.replace('()', 'length'), 'ddddrrrrr')
             let evalInputValue = inputValue.replaceAll('()', 'length');
 
             if (isDefaultLogic || complianceState) {
@@ -1259,7 +1249,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const condition = conditions[i].conditions[j];
                     const status = conditions[i].thenAction
                     const elseStatus = conditions[i].elseBlock
-                    console.log(elseStatus, 'ffffffffff')
                     if (showInputValue(condition.condition_logic)) {
 
                         if (condition.question_name === '' || condition.condition_logic === '' || status === undefined || elseStatus === undefined) {
@@ -1281,8 +1270,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     for (let k = 0; k < conditions[i].elseIfBlocks.length; k++) {
                         for (let l = 0; l < conditions[i].elseIfBlocks[k].conditions.length; l++) {
                             const elseIfCondition = conditions[i].elseIfBlocks[k].conditions[l];
-                            const status = conditions[i].elseIfBlocks[k].thenActions
-                            console.log(status, 'status')
+                            const status = conditions[i].elseIfBlocks[k].thenActions;
                             if (showInputValue(elseIfCondition.condition_logic)) {
 
                                 if (elseIfCondition.question_name === '' || elseIfCondition.condition_logic === '' || status === undefined) {
@@ -1325,19 +1313,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return false;
         }
     };
-
-    // const handleComplianceLogic = async () => {
-    //     const payload = {
-    //         'questionnaire_id': parseInt(questionnaire_id),
-    //         'version_number': parseInt(version_number),
-    //         'logic' : conditions
-    //     }
-    //     try {
-    //         const response = await PostAPI(`questionnaires/compliancelogic`, payload);
-    //     } catch {
-    //         console.log('Error updating API')
-    //     }
-    // }
     const getComplianceLogic = (condition) => {
 
         // to get the value expression
@@ -1457,7 +1432,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const getFinalComplianceLogic = () => {
         let finalString = '';
-        console.log(conditions[0])
         if (conditions[0]?.conditions === undefined) {
             return
         }
@@ -1480,8 +1454,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0].elseBlock) {
             finalString += generateElseBlockString(conditions[0].elseBlock);
         }
-
-        console.log(finalString, 'final string')
         return finalString;
     }
 
@@ -1508,8 +1480,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (condition_logic !== '()') {
                     condition_logic = 'if ' + condition_logic;
                 }
-
-                console.log(condition_logic, 'llll');
                 setInputValue(condition_logic);
 
             } catch (error) {
@@ -1528,7 +1498,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         if (complianceState) {
             let compliance_logic = getFinalComplianceLogic(conditions);
-            console.log(compliance_logic, 'compliance logic')
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1543,9 +1512,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                console.log(conditions, 'conditions')
                 condition_logic = buildConditionExpression(conditions);
-                console.log(condition_logic, '333 conditionlogic')
             } catch (error) {
             }
         } else {
@@ -1561,8 +1528,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         handleSaveSection(sectionId, true, condition_logic);
-        // console.log(condition_logic, 'condition')
-        console.log(selectedQuestionId, 'question id')
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1576,7 +1541,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         let compliance_logic;
-        console.log(complianceLogicCondition, 'complianceLogicCondition ')
         if (!complianceState) {
             if (sectionConditionLogicId) {
                 // Find the section with the matching section ID
@@ -1584,7 +1548,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 if (section) {
                     // Extract and parse the section's conditional logic
-                    console.log(section.section_conditional_logic, 'ddddd');
                     compliance_logic = parseLogicExpression(section?.section_conditional_logic);
                 } else {
                     console.error('Section not found for the given sectionConditionLogicId');
@@ -1611,12 +1574,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Default: Extract and parse the conditional logic from the selected question
                 compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
             }
-            console.log(compliance_logic, 'compliance_logic')
             setConditions(compliance_logic)
         } else {
             if (complianceLogicCondition[0] !== undefined) {
-                // debugger
-                // console.log(complianceLogicCondition[0], 'complianceInitialStatecomplianceInitialState')
                 setConditions(complianceLogicCondition);
             } else {
                 setConditions(complianceInitialState)

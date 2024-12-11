@@ -31,8 +31,6 @@ export const generateTernaryOperation = (conditions) => {
             ternaryString += ` : ${generateElseBlockString(condition.elseBlock)}`;
         }
     });
-
-    console.log(ternaryString, 'ternaryString');
     return ternaryString;
 };
 
