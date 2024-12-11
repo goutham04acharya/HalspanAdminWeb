@@ -555,6 +555,8 @@ const QuestionnaryForm = () => {
                     type: question?.type,
                     source_value: question?.source_value,
                     source: question?.source,
+                    lookup_value:question?.lookup_value,
+                    lookup_id:question?.lookup_id,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
                     format: question?.format,
@@ -596,7 +598,6 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
-                    console.log(sections, 'jjjjjjj')
                     setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
@@ -706,6 +707,7 @@ const QuestionnaryForm = () => {
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                            lookup_value:fieldSettingParams[question.question_id].lookupValue,
                             options: fieldSettingParams[question.question_id].options,
                             default_value: fieldSettingParams[question.question_id].defaultValue,
                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1076,14 +1078,6 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(true));
     }
 
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         handleDeleteSection(sections[sectionToDelete].section_id);
-    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
-    //         dispatch(setModalOpen(false)); // Close the modal  
-    //     }
-    // }
-
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
             handleDeleteSection(sections[sectionToDelete].section_id);
@@ -1365,6 +1359,7 @@ const QuestionnaryForm = () => {
                                                     fieldSettingParams[question.question_id].lookupOptionChoice
                                             ,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                                            lookup_value:fieldSettingParams[question.question_id].lookupValue,
                                             options: fieldSettingParams[question.question_id].options,
                                             default_value: fieldSettingParams[question.question_id].defaultValue,
                                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1436,7 +1431,6 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
     };
-
     return (
         <>
             {pageLoading ? (
@@ -1725,7 +1719,7 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
+                        subText={`You are about to delete the "${questionToDelete?.questionName}" question. This action cannot be undone.`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
