@@ -74,14 +74,15 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
-
+console.log(selectedOption, 'gfgfgg')
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.name,
+      asset_type: selectedOption?.asset_type?.id.toString(),
+      asset_name: selectedOption?.asset_type?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
@@ -137,7 +138,6 @@ function CreateQuestionnary() {
 
         setIsThreedotLoader(false);
       } else if (response?.data?.status === 409) {
-        // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
@@ -175,7 +175,7 @@ function CreateQuestionnary() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        openDropdown === 'asset_type' &&
+        openDropdown === 'asset_name' &&
         assetDropdownRef.current &&
         !assetDropdownRef.current.contains(event.target)
       ) {
@@ -279,11 +279,11 @@ function CreateQuestionnary() {
                     selectedOption={selectedOption?.asset_type}
                     handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
                     dropdownRef={assetDropdownRef}
-                    validationError={validationErrors?.asset_type}
+                    validationError={validationErrors?.asset_name}
                     assetType
                   />
                 </div>
-                {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
+                {validationErrors?.asset_name && <ErrorMessage error={validationErrors?.asset_name} />}
               </div>
               <div className='w-1/2'>
                 <InputWithDropDown

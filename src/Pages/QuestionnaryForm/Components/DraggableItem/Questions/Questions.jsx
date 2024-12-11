@@ -100,7 +100,6 @@ const Questions = ({
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         dispatch(setSelectedComponent(componentType));
     };
-    console.log(selectedQuestionId, 'v')
     return (
         <div
             data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${index + 1}`}

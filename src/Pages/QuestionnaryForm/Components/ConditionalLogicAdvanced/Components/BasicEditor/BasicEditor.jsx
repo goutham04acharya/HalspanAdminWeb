@@ -6,7 +6,7 @@ import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId }) {
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, sectionConditionLogicId, pageConditionLogicId }) {
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
@@ -263,6 +263,23 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return updatedConditions;
         });
     }
+    const handleClearConditionValues = () => {
+        setConditions((prevConditions) =>
+            prevConditions.map((conditionGroup) => ({
+                ...conditionGroup,
+                conditions: conditionGroup.conditions.map((condition) => ({
+                    ...condition,
+                    question_name: "",
+                    condition_logic: "",
+                    value: "",
+                    dropdown: false,
+                    condition_dropdown: false,
+                    condition_type: condition.condition_type, // Preserve type if needed
+                })),
+            }))
+        );
+    };
+
     return (
         <div className='w-full h-customh14'>
             {sectionConditionLogicId || pageConditionLogicId ? (
@@ -271,7 +288,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             )}
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions?.map((condition, index) => (
-
                     <div key={index} className='mb-6'>
                         {condition['conditions']?.map((sub_cond, i) => (
                             <div className='flex gap-4 items-start justify-between mb-6'>
@@ -366,11 +382,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     basicEditor
                                                 />
                                             </div>
-
                                         </div>}
-
                                     </div>
-
                                     {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />
                                         <p className='text-sm text-[#2B333B] -mt-2 font-semibold cursor-pointer'>AND</p>
@@ -380,7 +393,15 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     </div>}
                                 </div>
                                 <div className='w-[3%] flex justify-end'>
-                                    <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit' onClick={() => handleAdd("delete", index, i)}>
+                                    <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit'
+                                        // onClick={() =>{conditions?.length !== 1 ? handleAdd("delete", index, i) : ''}}>
+                                        onClick={() => {
+                                            if (conditions?.length === 1) {
+                                                handleClearConditionValues(); // Clear values for the single condition
+                                            } else {
+                                                handleAdd("delete", index, i); // Handle deletion for other cases
+                                            }
+                                        }}>
                                         <Image src="trash-black" className="" data-testid="delete" />
                                     </div>
                                 </div>

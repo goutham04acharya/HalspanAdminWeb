@@ -596,6 +596,7 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
+                    console.log(sections, 'jjjjjjj')
                     setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
@@ -1436,7 +1437,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-
     return (
         <>
             {pageLoading ? (
@@ -1466,7 +1466,7 @@ const QuestionnaryForm = () => {
                     <div className='w-[50%] '>
                         <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
                             <div className='flex items-center'>
-                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_name} - Version {formDefaultInfo?.version_number}</p>
                                 <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                     {getStatusText(formDefaultInfo?.status)}
                                 </button>
