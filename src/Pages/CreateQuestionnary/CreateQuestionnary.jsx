@@ -93,8 +93,8 @@ function CreateQuestionnary() {
     if (!createDetails.internal_name.trim()) {
       errors.internal_name = 'This field is mandatory';
     }
-    if (!selectedOption.asset_type) {
-      errors.asset_type = 'This field is mandatory';
+    if (!selectedOption.asset_name) {
+      errors.asset_name = 'This field is mandatory';
     }
     if (!selectedOption.language) {
       errors.language = 'This field is mandatory';
@@ -273,10 +273,10 @@ function CreateQuestionnary() {
                     testID='drop-btn'
                     labeltestID='asset'
                     options={options}
-                    isDropdownOpen={openDropdown === 'asset_type'}
-                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
-                    selectedOption={selectedOption?.asset_type}
-                    handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
+                    isDropdownOpen={openDropdown === 'asset_name'}
+                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_name' ? null : 'asset_name')}
+                    selectedOption={selectedOption?.asset_name}
+                    handleOptionClick={(option) => handleOptionClick(option, 'asset_name')}
                     dropdownRef={assetDropdownRef}
                     validationError={validationErrors?.asset_name}
                     assetType
