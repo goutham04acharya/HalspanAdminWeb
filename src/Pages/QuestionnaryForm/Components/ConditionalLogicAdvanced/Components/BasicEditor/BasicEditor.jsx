@@ -7,9 +7,7 @@ import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId , combinedArray }) {
-    const [dropdown, setDropdown] = useState(false)
-    const dispatch = useDispatch();
-    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
@@ -319,7 +317,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='w-[97%] -mx-2 flex'>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Select</p>
                                                 <InputWithDropDown
                                                     label=''
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -343,7 +341,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Condition</p>
                                                 <InputWithDropDown
                                                     // label='Format'
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -385,7 +383,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>}
                                         {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
+                                                <p className='text-sm text-[#2B333B] mb-3 font-medium'>Value</p>
                                                 {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ?
                                                     <>
                                                         <InputWithDropDown

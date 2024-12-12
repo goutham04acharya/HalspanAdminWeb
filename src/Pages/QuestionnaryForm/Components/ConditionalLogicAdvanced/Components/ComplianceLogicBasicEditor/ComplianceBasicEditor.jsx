@@ -894,7 +894,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                             <div className='w-[97%] -mx-2 flex'>
                                                                 <div className='w-1/3 px-2 '>
                                                                     <div className=''>
-                                                                        <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
+                                                                        <p className='text-sm text-[#2B333B] font-medium'>Select</p>
                                                                         <InputWithDropDown
                                                                             label=''
                                                                             labelStyle='font-semibold text-[#2B333B] text-base'
@@ -919,7 +919,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                 </div>
                                                                 <div className='w-1/3 px-2 '>
                                                                     <div className=''>
-                                                                        <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
+                                                                        <p className='text-sm text-[#2B333B] font-medium'>Condition</p>
                                                                         <InputWithDropDown
                                                                             // label='Format'   
                                                                             labelStyle='font-semibold text-[#2B333B] text-base'
@@ -963,7 +963,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                 {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && (
                                                                     <div className='w-1/3 px-2 '>
                                                                         <div className=''>
-                                                                            <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
+                                                                            <p className='text-sm text-[#2B333B] mb-3 font-medium'>Value</p>
                                                                             {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ? (
                                                                                 <>
                                                                                     <InputWithDropDown
