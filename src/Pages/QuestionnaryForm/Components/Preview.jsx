@@ -841,7 +841,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }));
         dispatch(resetFields())
     }
-    return (
+    console.log(showComplianceScreen, 'showComplianceScreen')
+        return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
                 <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
@@ -1001,7 +1002,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button 
-                    disabled={previewNavigation.current_page === 1} 
+                    disabled={previewNavigation.current_page === 1 || !showComplianceScreen} 
                     type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back

@@ -43,7 +43,6 @@ const Sections = ({
     const reorderedPages = Array.from(updatedSections[sectionIndex]?.pages || []);
     const [movedPage] = reorderedPages.splice(source.index, 1);
     reorderedPages.splice(destination.index, 0, movedPage);
-    console.log(reorderedPages, 'hhhhhghghghgh')
 
     const updatedPageList = reorderedPages.map((pageData, index) => ({
       ...pageData,

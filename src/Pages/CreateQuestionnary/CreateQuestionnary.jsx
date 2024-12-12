@@ -74,7 +74,6 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
-  console.log(selectedOption, 'selectedOption')
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
