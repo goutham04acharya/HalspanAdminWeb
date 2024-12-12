@@ -141,7 +141,7 @@ export function generateThenActionString(action) {
             actionString += `, REASON = '${action.value}'`;
         }
         if (action.action !== undefined) {
-            actionString += `, ACTION.push('${action.action}')`;
+            actionString += `, ACTIONS.push('${action.action}')`;
         }
     }
 
@@ -164,7 +164,7 @@ export function generateElseBlockString(elseBlock) {
             elseBlockString += `, REASON = '${elseBlock.value}'`;
         }
         if (elseBlock.action !== undefined) {
-            elseBlockString += `, ACTION.push('${elseBlock.action}')`;
+            elseBlockString += `, ACTIONS.push('${elseBlock.action}')`;
         }
     }
 

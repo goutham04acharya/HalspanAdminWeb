@@ -1023,7 +1023,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                             </div>}
                                                         </div>
                                                         <div className='w-[3%] flex justify-end'>
-                                                            <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit' onClick={() => handleAdd("delete", index, i)}>
+                                                            <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
                                                                 <Image src="trash-black" className="" data-testid="delete" />
                                                             </div>
                                                         </div>
@@ -1263,7 +1263,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                     )}
                                                                 </div>
                                                                 <div className='w-[3%] flex justify-end'>
-                                                                    <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit' onClick={() => handleDeleteCondition(index, i, true, elseIfIndex)}>
+                                                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleDeleteCondition(index, i, true, elseIfIndex)}>
                                                                         <Image src="trash-black" className="" data-testid="delete" />
                                                                     </div>
                                                                 </div>
@@ -1350,7 +1350,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                         </div>
                                         <div className=' items-start'>
                                             <button
-                                                className='-right-2 bg-white -top-2 p-2 rounded-sm'
+                                                className='-right-2 bg-[#EFF1F8] -top-2 p-2 rounded-lg hover:bg-white'
                                                 onClick={() => handleDeleteElseIf(index, elseIfIndex)}
                                                 data-testid={`delete-elseif-${index}-${elseIfIndex}`}
                                             >
