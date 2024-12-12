@@ -23,7 +23,7 @@ function CreateQuestionnary() {
     public_name: '',
     internal_name: '',
     description: '',
-    asset_type: '',
+    asset_name: '',
     services_type: '',
     language: 'UK- English',  // Default language set here
     is_adhoc: 'No',
@@ -32,7 +32,7 @@ function CreateQuestionnary() {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const [selectedOption, setSelectedOption] = useState({
-    asset_type: null,
+    asset_name: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
     services_type: null,
   });
@@ -74,14 +74,15 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
+  console.log(selectedOption, 'selectedOption')
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.id.toString(),
-      asset_name: selectedOption?.asset_type?.name,
+      asset_type: selectedOption?.asset_name?.id.toString(),
+      asset_name: selectedOption?.asset_name?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,

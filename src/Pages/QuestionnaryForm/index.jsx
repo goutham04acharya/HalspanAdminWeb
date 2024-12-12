@@ -1435,7 +1435,6 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
     };
-    // console.log(selectedSectionData?.['questions'].length, 'selectedSectionData?.length')
     return (
         <>
             {pageLoading ? (
