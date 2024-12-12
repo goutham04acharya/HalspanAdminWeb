@@ -427,7 +427,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     </div>}
                                 </div>
                                 <div className='w-[3%] flex justify-end'>
-                                    <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit' onClick={() => handleAdd("delete", index, i)}>
+                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
                                         <Image src="trash-black" className="" data-testid="delete" />
                                     </div>
                                 </div>
