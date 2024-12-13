@@ -868,7 +868,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             <span
                                                 className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'PASS' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
                                             >
-                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} data-testid={result?.STATUS === 'PASS' ? 'compliant' : 'non-compliant'} />
                                                 {result?.STATUS === 'PASS' ? 'Compliant' : 'Non-Compliant'}
                                             </span>
                                         </div>
