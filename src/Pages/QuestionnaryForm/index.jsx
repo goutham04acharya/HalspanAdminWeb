@@ -103,6 +103,8 @@ const QuestionnaryForm = () => {
     const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
+    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
+
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -555,8 +557,8 @@ const QuestionnaryForm = () => {
                     type: question?.type,
                     source_value: question?.source_value,
                     source: question?.source,
-                    lookup_value:question?.lookup_value,
-                    lookup_id:question?.lookup_id,
+                    lookup_value: question?.lookup_value,
+                    lookup_id: question?.lookup_id,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
                     format: question?.format,
@@ -707,7 +709,7 @@ const QuestionnaryForm = () => {
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                            lookup_value:fieldSettingParams[question.question_id].lookupValue,
+                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                             options: fieldSettingParams[question.question_id].options,
                             default_value: fieldSettingParams[question.question_id].defaultValue,
                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1150,9 +1152,18 @@ const QuestionnaryForm = () => {
         }
     };
 
-    const onDragEnd = (result) => {
-        if (!result.destination) return;
+    // const handleDragStart = (start, provided) => {
+    //     setSectionWarningShown(false);
+    //     const section = sections[start.source.index];
 
+    //     if (section.section_conditional_logic && !sectionWarningShown) {
+    //       setSectionWarningShown(true);
+    //     }
+    //   };
+
+    const onDragEnd = (result) => {
+        // setSectionWarningShown(false); // Reset warning state
+        if (!result.destination) return;
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
@@ -1359,7 +1370,7 @@ const QuestionnaryForm = () => {
                                                     fieldSettingParams[question.question_id].lookupOptionChoice
                                             ,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                                            lookup_value:fieldSettingParams[question.question_id].lookupValue,
+                                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                                             options: fieldSettingParams[question.question_id].options,
                                             default_value: fieldSettingParams[question.question_id].defaultValue,
                                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1435,6 +1446,7 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
     };
+
     return (
         <>
             {pageLoading ? (
@@ -1454,6 +1466,7 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
+                            // handleDragStart={handleDragStart}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1598,8 +1611,10 @@ const QuestionnaryForm = () => {
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
                             <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
-                                onClick={() => {handleDataChanges()
-                                    dispatch(setSelectedComponent(false))}}>
+                                onClick={() => {
+                                    handleDataChanges()
+                                    dispatch(setSelectedComponent(false))
+                                }}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
@@ -1669,7 +1684,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}
+                        subText={`${selectedSectionData?.section_conditional_logic ? `You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages and this includes conditional logic, This action cannot be undone.` : `You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1705,7 +1720,14 @@ const QuestionnaryForm = () => {
                 showPageDeleteModal && (
                     <ConfirmationModal
                         text='Delete Page'
-                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        subText={
+                            selectedSectionData?.page_conditional_logic && selectedSectionData?.['questions'].length > 0
+                                ? 'This page includes conditional logic and multiple questions, Are you sure you want to delete it?'
+                                : selectedSectionData?.['questions'].length > 0
+                                    ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions${selectedSectionData?.page_conditional_logic ? ' and which includes conditional logic' : ''
+                                    }. This action cannot be undone.`
+                                    : 'Are you sure you want to delete this page?'
+                        }
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1723,7 +1745,7 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`You are about to delete the "${questionToDelete?.questionName}" question. This action cannot be undone.`}
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${questionToDelete?.questionName}" question and this conatins conditional logic This action cannot be undone.` : `You are about to delete the "${questionToDelete?.questionName}" question. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1813,6 +1835,16 @@ const QuestionnaryForm = () => {
                     fieldSettingParameters={fieldSettingParams}
                 />
             }
+            {/* {sectionWarningShown && <ConfirmationModal
+                setModalOpen={setModalOpen}
+                isOpen={isModalOpen}
+                text="This Section can’t be moved here"
+                subText="It is connected to another Section, and can’t be placed before it."
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                src={`testing-error`}
+                sectionWarningShown={sectionWarningShown}
+                setSectionWarningShown={setSectionWarningShown}
+            />} */}
         </>
     );
 }

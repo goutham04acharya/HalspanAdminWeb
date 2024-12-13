@@ -46,8 +46,8 @@ const Sections = ({
 
     const updatedPageList = reorderedPages.map((pageData, index) => ({
       ...pageData,
-      // sectionIndex: sectionIndex,
-      // index: index,
+      sectionIndex: sectionIndex,
+      index: index,
     }));
 
     updatedSections[sectionIndex] = {
@@ -116,24 +116,42 @@ const Sections = ({
                             />
                           </div>
                           <div className="flex items-center ">
-                            {/* Page Condition Logic Button */}
-                            <img
-                              src="/Images/setting.svg"
-                              title="page-condition-logic"
-                              alt="page-condition-logic"
-                              // data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                              data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
-                              className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[80px]`}
-                              onClick={
-                                formStatus === 'Draft'
-                                  ? () => {setPageConditionLogicId(pageData?.page_id)
-                                    dispatch(setSelectedQuestionId(''))
-                                    dispatch(setSelectedComponent(null));}
-                                  : null
-                              }
-                            />
-
-                            {/* Drag Button */}
+                            {pageData.page_conditional_logic ? (
+                              <img
+                                src="/Images/condition-added.svg"
+                                alt="Condition Added"
+                                title="Condition Added"
+                                className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <img
+                                src="/Images/setting.svg"
+                                title="page-condition-logic"
+                                alt="page-condition-logic"
+                                data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
+                                className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full w-[80px]`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            )}
                             {formStatus === 'Draft' ? (
                               <img
                                 className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"

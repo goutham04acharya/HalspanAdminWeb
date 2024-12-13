@@ -13,11 +13,11 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     formStatus,
     handleAddRemoveSection,
     handleSectionSaveOrder,
-    handleSectionScroll
+    handleSectionScroll,
+    // handleDragStart
 }) {
 
     const handleDropdown = (sectionId) => {
-        console.log('am here')
         if (dropdownOpen === sectionId) {
             setDropdown('')
             return;
@@ -39,7 +39,8 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                     className='ml-3 font-semibold text-base text-[#2B333B] truncate w-[90%]'>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
-                <DragDropContext onDragEnd={onDragEnd}>
+            {/* onDragStart={handleDragStart} */}
+                <DragDropContext  onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable">
                         {(provided) => (
                             <ul
