@@ -975,6 +975,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                         placeholder="Select"
                                                                                         className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
                                                                                         testID={`value-dropdown-${index}-${i}`}
+                                                                                        labeltestID={`value-dropdown-${index}-${i}`}
                                                                                         selectedOption={conditions[index].conditions[i].value}
                                                                                         handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', false, null)}
                                                                                         mainIndex={index}
@@ -1059,7 +1060,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             top='30px'
                                             placeholder='Select'
                                             className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                                            testID={`status-dropdown`}
+                                            testID={`status-dropdown-${index}`}
                                             labeltestID={`status-dropdown-label`}
                                             selectedOption={condition.thenAction?.status}
                                             handleOptionClick={(e) => statusDropdownHandler(e, index, null, 'status', '')}
@@ -1077,6 +1078,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             <InputField
                                                 label="Grade"
                                                 className="w-full"
+                                                testId={`grade-${index}`}
                                                 placeholder="Enter grade"
                                                 value={condition.thenAction?.grade || ''}
                                                 handleChange={(e) => handleThenActionChange(index, 'grade', e.target.value)}
@@ -1092,7 +1094,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                                                    testID={`reason-dropdown`}
+                                                    testID={`reason-dropdown-${index}`}
                                                     labeltestID={`reason-dropdown-label`}
                                                     selectedOption={condition.thenAction?.value}
                                                     handleOptionClick={(e) => reasonDropdownHandler(e, index, null, 'value', '')}
@@ -1106,6 +1108,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                 <InputField
                                                     label="Action"
                                                     className="w-full"
+                                                    testId={`action-${index}`}
                                                     placeholder="Enter action"
                                                     value={condition.thenAction?.action || ''}
                                                     handleChange={(e) => handleThenActionChange(index, 'action', e.target.value)}
@@ -1382,8 +1385,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                 top='30px'
                                                 placeholder='Select'
                                                 className={`w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]`}
-                                                testID={`status-dropdown`}
-                                                labeltestID={`status-dropdown-label`}
+                                                testID={`else-status-dropdown`}
+                                                labeltestID={`else-status-dropdown-label`}
                                                 selectedOption={condition.elseBlock?.status}
                                                 handleOptionClick={(e) => statusDropdownHandler(e, index, null, 'status', 'else')}
                                                 mainIndex={index}
@@ -1402,6 +1405,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                             <InputField
                                                 label="Grade"
                                                 className="w-full"
+                                                testId='else-grade'
                                                 placeholder="Enter grade"
                                                 value={condition.elseBlock?.grade || ''}
                                                 handleChange={(e) => handleThenActionChange(index, 'grade', e.target.value, true)}
@@ -1417,8 +1421,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                                                    testID={`reason-dropdown`}
-                                                    labeltestID={`reason-dropdown-label`}
+                                                    testID={`else-reason-dropdown`}
+                                                    labeltestID={`else-reason-dropdown-label`}
                                                     selectedOption={condition.elseBlock?.value}
                                                     handleOptionClick={(e) => reasonDropdownHandler(e, index, null, 'value', 'else')}
                                                     mainIndex={index}
@@ -1431,6 +1435,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                 <InputField
                                                     label="Action"
                                                     className="w-full"
+                                                    testId='else-action'
                                                     placeholder="Enter action"
                                                     value={condition.elseBlock?.action || ''}
                                                     handleChange={(e) => handleThenActionChange(index, 'action', e.target.value, true)}
