@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import ImageUploader from '../../../../../Components/ImageUploader/ImageUploader';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { useDispatch } from 'react-redux';
 
 function PhotoField({ label,
     type,
@@ -26,10 +27,12 @@ function PhotoField({ label,
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename  
+    const dispatch = useDispatch();
+    const questionValue = useSelector(state => state.questionValues.questions);
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (!files.length) return; // Exit if no files are selected
-
+        console.log(files, 'files files')
         // Create a new file list that includes existing files plus new selections
         const newFilesList = [
             ...(fileState[question?.question_id] || []), // Existing files

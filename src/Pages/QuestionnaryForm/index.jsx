@@ -97,6 +97,7 @@ const QuestionnaryForm = () => {
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
     const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
+    const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
@@ -600,6 +601,7 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
+                    console.log(sections, 'jjjjjjj')
                     setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
@@ -1080,6 +1082,14 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(true));
     }
 
+    // const confirmDeleteSection = () => {
+    //     if (sectionToDelete !== null) {
+    //         handleDeleteSection(sections[sectionToDelete].section_id);
+    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
+    //         dispatch(setModalOpen(false)); // Close the modal  
+    //     }
+    // }
+
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
             handleDeleteSection(sections[sectionToDelete].section_id);
@@ -1312,6 +1322,7 @@ const QuestionnaryForm = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
+
 
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)

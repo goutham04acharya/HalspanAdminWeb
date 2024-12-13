@@ -21,6 +21,8 @@ Then('I should see the compliance logic advanced editor for choice field', async
 
 Then('I should see the compliance logic suggestions for questions for choice', async function () {
     await new Promise(resolve => setTimeout(resolve, 500));
+    let logic = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
+    await logic.sendKeys(Keys.CONTROL, 'a', Keys.DELETE);
     let bool = true;
     let suggestions = ['Section_1.Page_1.Sample_Choice_Label_Name'];
     let i = 0;
@@ -36,8 +38,9 @@ Then('I should see the compliance logic suggestions for questions for choice', a
 
 When('I enter the incorrect compliance logic for choice field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Random_Question > 10');
+    let logic = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
+    await logic.sendKeys(Keys.CONTROL, 'a', Keys.DELETE);
+    await logic.sendKeys('Section_1.Page_1.Random_Question > 10');
 });
 
 Then('I click the save button for compliance logic', async function () {
@@ -66,7 +69,7 @@ When('I select the question from the compliance logic suggestions for choice fie
 
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('.');
 
-    let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()','includes()'];
+    let conditions = ['toUpperCase()', 'toLowerCase()', 'trim()', 'includes()'];
 
     bool = true;
     i = 0;
@@ -90,8 +93,10 @@ When('I select the question from the compliance logic suggestions for choice fie
 When('I enter the correct compliance logic for choice field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line max-len
-    const default_value = `if ( Section_1.Page_1.Sample_Choice_Label_Name === "No"  ) then ( STATUS = "Fail", REASON = "REPLACEMENT", ACTIONS += "Replace a new door" ) else ( STATUS = "Pass", GRADE = "1" )`;
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
+    const default_value = `if ( Section_1.Page_1.Sample_Choice_Label_Name === "No"  ) then ( STATUS = "FAIL", REASON = "RECOMMEND_REPLACEMENT", ACTIONS += "Replace a new door" ) else ( STATUS = "PASS", GRADE = "1" )`;
+    let logic = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
+    await logic.sendKeys(Keys.CONTROL, 'a', Keys.DELETE);
+    await logic.sendKeys(default_value);
     this.default_value = default_value;
 });
 
@@ -105,10 +110,88 @@ Then('I should see the compliance logic in default value field', async function 
 When('I click the add compliance button', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css('[data-testid="compliance"]'))).click();
-}); 
+});
 
 When('I click the add default value button for compliance logic', async function () {
     await new Promise(resolve => setTimeout(resolve, 950));
     await driver.wait(until.elementLocated(By.css(`[data-testid="default-value"]`))).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="advance-editor-tab"]`))).click();
+});
+
+Then('I should see the compliance status as {string}', async function (status) {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="${status}"]`)));
+});
+
+Then('I should see the actions and reason', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()="Recommend Replacement"]`)));
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()="Replace a new door"]`)));
+});
+
+When('I select the condition from basic editor', async function () {
+    let i = 0;
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="select-0-0"]`))).click();
+    console.log('pass 1');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="select-dropdown-0-0-0"]`))).click();
+    console.log('pass 2');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0-0"]`))).click();
+    console.log('pass 3');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-dropdown-0-0-0"]`))).click();
+    console.log('pass 4');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="value-dropdown-0-0"]`))).click();
+    console.log('pass 5');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="value-dropdown-0-0-0"]`))).click();
+    console.log('pass 6');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="status-dropdown-0"]`))).click();
+    console.log('pass 7');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="status-dropdown-label-0"]`))).click();
+    console.log('pass 8');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="grade-0"]`))).sendKeys('A');
+    console.log('pass 9');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-status-dropdown"]`))).click();
+    console.log('pass 10');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-status-dropdown-label-1"]`))).click();
+    console.log('pass 11');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-reason-dropdown"]`))).click();
+    console.log('pass 12');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-reason-dropdown-label-0"]`))).click();
+    console.log('pass 13');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-action"]`))).sendKeys('Replace');
+    console.log('pass 14');
+});
+
+
+When('I click add default value button for compliance logic', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="default-value"]`))).click();
+});
+
+Then('I should see the basic editor compliance logic in default value field', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    // eslint-disable-next-line max-len
+    let condition = `(Section_1.Page_1.Sample_Choice_Label_Name.includes("Yes")) then (STATUS = 'PASS', GRADE = 'A') else (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "Replace")`;
+    // eslint-disable-next-line max-len
+    const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
+    assert.equal(default_value, condition);
+});
+
+Then('I should see the actions and reason for basic condition', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()="No Access"]`)));
+    await driver.wait(until.elementLocated(By.xpath(`//*[text()="Replace"]`)));
 });

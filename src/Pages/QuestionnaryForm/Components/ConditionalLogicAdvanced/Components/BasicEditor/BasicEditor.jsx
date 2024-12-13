@@ -301,7 +301,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             }))
         );
     };
-    console.log(conditions[0]?.conditions?.length, 'onditions?.length')
+
     return (
         <div className='w-full h-customh14'>
             {sectionConditionLogicId || pageConditionLogicId ? (

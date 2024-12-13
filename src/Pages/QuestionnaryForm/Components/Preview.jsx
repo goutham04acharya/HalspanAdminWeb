@@ -22,6 +22,7 @@ import {
     setFieldEditable,
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
+import { clearQuestions } from './previewQuestionnaireValuesSlice.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -793,28 +794,28 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
-                    const { default_conditional_logic, default_content } = question;
-
+                    const { default_conditional_logic, default_content, component_type } = question;
                     // Check if default_conditional_logic is not empty
                     if (!fieldStatus[question?.question_id]) {
                         if (default_conditional_logic) {
                             try {
+                                const result = eval(default_conditional_logic);
+                                console.log(result, 'ffff')
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
-
                                     }))
                                 } else {
                                     setValue((prev) => ({
                                         ...prev,
-                                        [question.question_id]: default_conditional_logic
+                                        [question.question_id]: result
 
                                     }))
                                 }
-
+                                console.log(value,'ddd')
                             } catch (error) {
                                 // Log the error if eval fails
                                 console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
@@ -839,10 +840,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_videofield: '',
             preview_gpsfield: '',
         }));
+        dispatch(clearQuestions())
         dispatch(resetFields())
     }
-    console.log(showComplianceScreen, 'showComplianceScreen')
-        return (
+    return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
                 <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
@@ -868,7 +869,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             <span
                                                 className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'PASS' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
                                             >
-                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} data-testid={result?.STATUS === 'PASS' ? 'compliant' : 'non-compliant'} />
                                                 {result?.STATUS === 'PASS' ? 'Compliant' : 'Non-Compliant'}
                                             </span>
                                         </div>

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import TimePicker from '../../../../../Components/TimePicker/TimePicker';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 
 function DateTimeField({
     label,
@@ -24,7 +27,8 @@ function DateTimeField({
 }) {
     const [dateVal, setDateVal] = useState('');
     const [timeValue, setTimeValue] = useState('');
-
+    const dispatch = useDispatch();
+    const questionValue = useSelector(state => state.questionValues.questions);
     const splitDate = (dateStr) => {
         if (!dateStr || typeof dateStr !== 'string') {
             return new Date().toISOString().split('T')[0];
@@ -47,8 +51,14 @@ function DateTimeField({
     };
     const handleDateTime = (date, time) => {
         // Update states when inputs change
-        if (date) setDateVal(date);
-        if (time) setTimeValue(time);
+        if (date) {
+            setDateVal(date)  
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: date})) 
+        }
+        if (time) {
+            setTimeValue(time)
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: time}))
+        };
 
         // Combine date and time if both are available
         if (date && time) {
@@ -85,6 +95,7 @@ function DateTimeField({
                 ...prev,
                 [question?.question_id]: dateTimeString, // Ensure this stores the correct string value
             }));
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: dateTimeString}))
 
             // Clear validation errors for the current field
             setValidationErrors((prevErrors) => ({
@@ -105,6 +116,8 @@ function DateTimeField({
                 ...prev,
                 [question?.question_id]: value || false
             }));
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: value}))
+
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_datetimefield: {
@@ -139,6 +152,8 @@ function DateTimeField({
                     }
                 }
             }));
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: value}))
+
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value
@@ -152,6 +167,8 @@ function DateTimeField({
             }));
         }
     }
+
+    console.log(questionValue[question?.question_id])
 
 
     return (
@@ -172,7 +189,7 @@ function DateTimeField({
                         data-testid="input"
                         type="date"
                         id={textId}
-                        value={value}
+                        value={questionValue[question?.question_id]}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-md ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content || fieldSettingParameters?.placeholderContent}
                         onChange={(e) => handleFunction(e)}
@@ -189,6 +206,7 @@ function DateTimeField({
                                 [question?.question_id]: errorMessage
                             }
                         }))}
+                        questionValue={questionValue[question?.question_id]}
                     />
                 )}
 
@@ -198,7 +216,7 @@ function DateTimeField({
                             data-testid="input"
                             type="date"
                             id={textId}
-                            value={dateVal} // Use state to manage date value
+                            value={questionValue[question?.question_id]?.split(' ')[0]} // Use state to manage date value
                             className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
@@ -214,6 +232,7 @@ function DateTimeField({
                                 [question?.question_id]: errorMessage
                             }
                         }))}
+                        questionValue={questionValue[question?.question_id]?.split(' ')[1]}
                     />
                 </div>}
 

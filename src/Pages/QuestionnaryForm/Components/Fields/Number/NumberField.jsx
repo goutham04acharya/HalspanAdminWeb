@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleSliderValue } from '../RangeSliderDataSlice';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 
 
 function NumberField({
@@ -24,10 +25,10 @@ function NumberField({
 }) {
     const dispatch = useDispatch();
     const [localSliderValue, setLocalSliderValue] = useState(0);
-
+    const questionValue = useSelector(state => state.questionValues.questions);
     // Get slider value from Redux store
     const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
-
+    console.log(sliderValue, 'slidervalue')
     // Get increment_by value from fieldSettingParameters with a fallback to 1
     const incrementByValue = fieldSettingParameters?.incrementby || 1;
 
@@ -45,6 +46,11 @@ function NumberField({
     useEffect(() => {
         if (fieldSettingParameters?.value !== undefined && fieldSettingParameters.value !== sliderValue) {
             dispatch(handleSliderValue({ sliderValue: fieldSettingParameters.value }));
+            dispatch(setQuestionValue({ 
+                question_id: question?.question_id, 
+                value: fieldSettingParameters.value,
+            }));
+            setLocalSliderValue(fieldSettingParameters.value)
         }
     }, [fieldSettingParameters?.value, sliderValue, dispatch]);
 
@@ -68,6 +74,10 @@ function NumberField({
         // dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
         if (preview) {
             setLocalSliderValue(newValue);
+            dispatch(setQuestionValue({ 
+                question_id: question?.question_id, 
+                value: nearestMultiple 
+            }));
         } else {
             dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
         }
@@ -90,6 +100,10 @@ function NumberField({
                 }
             }
         }));
+        dispatch(setQuestionValue({ 
+            question_id: question?.question_id, 
+            value: newValue 
+        }));
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: newValue
@@ -99,7 +113,7 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-
+    console.log(value,'jjjjjj')
     return (
         <div>
             <label
@@ -139,7 +153,7 @@ function NumberField({
                                     'text'
                     }
                     step={question?.type === 'float' ? 'any' : ''}
-                    value={value}
+                    value={questionValue[question?.question_id]}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                     onChange={(e) => handleInputChange(e)}
                     placeholder={question?.placeholder_content}

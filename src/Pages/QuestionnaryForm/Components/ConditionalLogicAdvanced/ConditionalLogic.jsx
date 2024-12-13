@@ -21,6 +21,7 @@ import { DateValidator } from './DateFieldChecker';
 import { defaultContentConverter } from '../../../../CommonMethods/defaultContentConverter';
 import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/ComplianceBasicEditor';
 import { generateElseBlockString, generateTernaryOperation, generateThenActionString } from '../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
+import parseExpression from '../../../../CommonMethods/advancedToBasicLogic';
 
 
 
@@ -284,9 +285,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
+        console.log(value, 'value')
         setLogic(value);
         setInputValue(value)
-
+        const updatedLogic = parseExpression(value)
+        console.log(updatedLogic, 'updated')
+        // setConditions(updatedLogic)
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
@@ -1051,10 +1055,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let STATUS = ''
             let ACTIONS = []
             let REASON = ''
-            let GRADE;
+            let GRADE = '';
             const result = eval(evalInputValue);
 
-            if (isDefaultLogic) {
+            console.log(typeof result, result, 'result')
+            if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
                     case 'textboxfield':
@@ -1105,6 +1110,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'compliancelogic':
                     case 'tagScanfield':
                         if (typeof result !== 'string') {
+                            console.log(typeof result, 'type')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
@@ -1138,6 +1144,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             setIsThreedotLoader(true);
             if (!error) {
+                if(complianceState){
+                    console.log(payloadString, 'payload string')
+                    setInputValue(payloadString)
+                }
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
@@ -1331,6 +1341,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     break;
                 case "displayfield": resultValue = val;
                     break;
+                case "textboxfield": resultValue = val;
+                    break;
             }
             return resultValue
         }
@@ -1343,7 +1355,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                    resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     break;
                 case "not equals to":
                     resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
@@ -1435,7 +1447,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0]?.conditions === undefined) {
             return
         }
-        finalString += '(' + getComplianceLogic(conditions[0].conditions) + ')'
+        // console.log(conditions[0], 'conditions[0].conditions')
+        finalString += conditions[0].conditions[0].question_name !== '' ? 'if (' + getComplianceLogic(conditions[0].conditions) + ')' : ''
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
         }
@@ -1464,11 +1477,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                    .replaceAll(/ACTION\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                     .replaceAll('?', 'then') // Replace ? with then
                     .replaceAll('&&', 'and') // Replace && with and
                     .replaceAll('||', 'or') // Replace || with or
-                    .replaceAll('length', '()')
+                    .replaceAll('.length', '.()')
 
                 if (condition_logic.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
@@ -1477,9 +1490,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
 
-                if (condition_logic !== '()') {
-                    condition_logic = 'if ' + condition_logic;
-                }
                 setInputValue(condition_logic);
 
             } catch (error) {
@@ -1538,7 +1548,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setPageConditionLogicId(false);
 
     }
-
+    
+    console.log(conditions, 'conditions')
     useEffect(() => {
         let compliance_logic;
         if (!complianceState) {
@@ -1646,6 +1657,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     sectionConditionLogicId={sectionConditionLogicId}
                                     pageConditionLogicId={pageConditionLogicId}
                                     combinedArray={combinedArray}
+                                    sectionConditionLogicId={sectionConditionLogicId}
+                                    pageConditionLogicId={pageConditionLogicId}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor

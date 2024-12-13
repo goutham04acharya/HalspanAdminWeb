@@ -100,6 +100,10 @@ When('I select the choice as {string} in choice field for section {int} page {in
         await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="choices-0"]`))).click();
     else if (choice === 'Unsatisfied')
         await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="choices-2"]`))).click();
+    else if (choice === 'Yes')
+        await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="choices-0"]`))).click();
+    else if (choice === 'No')
+        await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="choices-1"]`))).click();
 });
 
 Then('I should not see the photo field at section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
