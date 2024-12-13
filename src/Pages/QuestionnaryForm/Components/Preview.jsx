@@ -22,6 +22,7 @@ import {
     setFieldEditable,
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
+import { clearQuestions } from './previewQuestionnaireValuesSlice.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -742,7 +743,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     question_id={question?.question_id}
                     testId="preview"
                     setValue={setValue}
-                    values={value[question?.question_id]}
+                    values={value[question?.question_id]} 
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -840,6 +841,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_videofield: '',
             preview_gpsfield: '',
         }));
+        dispatch(clearQuestions())
         dispatch(resetFields())
     }
     return (

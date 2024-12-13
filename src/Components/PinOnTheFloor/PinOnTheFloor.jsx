@@ -199,7 +199,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                         style={{
                                             width: "100%",
                                             height: "100%",
-                                            objectFit: "cover",
+                                            objectFit: "contain",
                                         }}
                                         onMouseDown={(e) => e.preventDefault()}
                                     />

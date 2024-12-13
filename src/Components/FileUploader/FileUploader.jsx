@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
+import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handleChange, handleRemove, setFileState, fileState, setConditionalValues, sections, question }) => {
     const [files, setFiles] = useState(fileState.files || []);
     const [error, setError] = useState('');
-
+    const dispatch = useDispatch()
+    const questionValue = useSelector(state => state.questionValues.questions);
+    
     const handleFileChange = (e) => {
         const uploadedFiles = e.target.files;
 
@@ -42,6 +47,11 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                     preview_filefield: '', // Or remove the key if you prefer     
                 }));
             }
+            console.log(newFiles,'files')
+            dispatch(setQuestionValue({ 
+                question_id: question?.question_id, 
+                value: newFiles 
+            }));
             setFiles(newFiles);
         }
         handleChange(e);
@@ -49,9 +59,12 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
 
 
     const handleRemoveFile = (index) => {
-        const newFiles = [...files];
+        const newFiles = [...questionValue?.[question?.question_id]];
         newFiles.splice(index, 1);
-
+        dispatch(setQuestionValue({ 
+            question_id: question?.question_id, 
+            value: newFiles 
+        }));
         setFiles(newFiles);
 
         setFileState((prevState) => ({
@@ -79,9 +92,9 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                 </span>
             </label>
             {error && <p className='text-red-500 text-sm'>{error}</p>}
-            {files.length > 0 && (
+            {questionValue?.[question?.question_id] && (
                 <ul>
-                    {files.map((file, index) => (
+                    {questionValue?.[question?.question_id].map((file, index) => (
                         <li key={index} className='bg-[#DFE0E2] my-2 p-2 rounded flex justify-between'>
                             <span className='truncate w-[190px]'>{file.name}</span>
                             <div className=' flex gap-2'>

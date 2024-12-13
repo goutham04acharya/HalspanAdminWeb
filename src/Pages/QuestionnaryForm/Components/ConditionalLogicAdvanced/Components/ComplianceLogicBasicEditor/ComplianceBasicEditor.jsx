@@ -76,6 +76,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
         setSubmitSelected(false)
         if (isElseIf) {
+            const updated = conditions;
+            
             setConditions(prevConditions => {
                 const updatedConditions = JSON.parse(JSON.stringify(prevConditions)); // Create a deep copy of the state  
                 const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
