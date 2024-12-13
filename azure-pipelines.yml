@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
       - develop
+      - qa
       - pre-production
       - master
 pr:
@@ -20,6 +21,10 @@ variables:
       value: 'Production'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
     - group: qa
+    - name: ENV
+      value: 'Testing'
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/qa') }}:
+    - group: halspan-qa
     - name: ENV
       value: 'Testing'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/pre-production') }}:
