@@ -97,7 +97,6 @@ const QuestionnaryForm = () => {
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
     const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
-    const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
