@@ -1331,6 +1331,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     break;
                 case "displayfield": resultValue = val;
                     break;
+                case "textboxfield": resultValue = val;
+                    break;
             }
             return resultValue
         }
@@ -1343,7 +1345,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    resultExpression = `${item.question_name} == ${getValue(item.value, item.condition_type)}`;
+                    resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     break;
                 case "not equals to":
                     resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
@@ -1463,12 +1465,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(condition_logic);
         } else {
             try {
+
                 let condition_logic = getFinalComplianceLogic(conditions)
-                    .replaceAll(/ACTION\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                     .replaceAll('?', 'then') // Replace ? with then
                     .replaceAll('&&', 'and') // Replace && with and
                     .replaceAll('||', 'or') // Replace || with or
-                    .replaceAll('length', '()')
+                    .replaceAll('.length', '.()')
 
                 if (condition_logic.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
@@ -1583,7 +1586,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         }
     }, [selectedQuestionId])
-
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
@@ -1645,6 +1647,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     selectedQuestionId={selectedQuestionId}
                                     conditionalLogicData={conditionalLogicData}
                                     combinedArray={combinedArray}
+                                    sectionConditionLogicId={sectionConditionLogicId}
+                                    pageConditionLogicId={pageConditionLogicId}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor

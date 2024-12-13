@@ -99,7 +99,7 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-
+    console.log(value,'jjjjjj')
     return (
         <div>
             <label

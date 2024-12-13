@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import useOnClickOutside from '../../CommonMethods/outSideClick';
 
-const TimePicker = ({ onChange, format, setErrorMessage }) => {
+const TimePicker = ({ onChange, format, setErrorMessage, questionValue }) => {
     const [time, setTime] = useState('');
     const [isDropdownOpen, setIsDropdown] = useState(false);
     const [hour, setHour] = useState('');
@@ -93,7 +93,7 @@ const TimePicker = ({ onChange, format, setErrorMessage }) => {
                 <input 
                     type="text" 
                     className="custom-time-input py-2 px-[18px] text-[#2B333B]"
-                    value={time || 'hh:mm:ss'}
+                    value={questionValue || 'hh:mm:ss'}
                     onChange={handleTimeChange}
                     onClick={() => setIsDropdown(!isDropdownOpen)}
                 />

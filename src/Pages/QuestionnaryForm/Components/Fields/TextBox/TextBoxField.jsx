@@ -3,6 +3,8 @@ import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 import { useDispatch } from 'react-redux';
 import { setFieldEditable } from '../../defaultContentPreviewSlice';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { useSelector } from 'react-redux';
 
 const TextBoxField = ({
     label,
@@ -32,6 +34,8 @@ const TextBoxField = ({
     values,
 }) => {
     const dispatch = useDispatch();
+    const questionValue = useSelector(state => state.questionValues.questions);
+    
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -77,6 +81,7 @@ const TextBoxField = ({
             isEditable: true
         }
         dispatch(setFieldEditable(obj));
+        dispatch(setQuestionValue({ question_id: question_id, value: newValue}))
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
@@ -131,7 +136,7 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={values || ''}
+                    value={questionValue[question?.question_id] || ''}
                     className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
@@ -186,7 +191,7 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={values || ''}
+                    value={questionValue[question?.question_id] || ''}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
