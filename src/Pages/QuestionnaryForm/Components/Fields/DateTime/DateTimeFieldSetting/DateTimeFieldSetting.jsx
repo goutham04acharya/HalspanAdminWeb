@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
+import Button2 from '../../../../../../Components/Button2/ButtonLight';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -29,6 +30,7 @@ function DateTimeFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
+  console.log(fieldSettingParameters)
 
   return (
     <>
@@ -194,6 +196,13 @@ function DateTimeFieldSetting({
             {fieldSettingParameters?.conditional_logic &&
               <p className='text-center italic mt-1'>Conditional Logic Added</p>
             }
+            {/* <button
+            testId='Reomove logic'
+            onClick={dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+          }
+            className='w-[162px] h-[50px] ml-[32px] font-normal'
+            text='Reomove logic'
+          /> */}
           </div>
         </div>
       </div >

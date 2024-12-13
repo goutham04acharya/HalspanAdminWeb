@@ -6,7 +6,7 @@ import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId , combinedArray }) {
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray }) {
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
@@ -301,7 +301,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             }))
         );
     };
-
+    console.log(conditions[0]?.conditions?.length, 'onditions?.length')
     return (
         <div className='w-full h-customh14'>
             {sectionConditionLogicId || pageConditionLogicId ? (
@@ -401,10 +401,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                             subIndex={i}
                                                             isDropdownOpen={conditions[index].conditions[i].value_dropdown}
                                                             setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item?.question_detail === conditions[index]?.conditions[i]?.question_name)?.choice_values.map((choice) => choice?.value) : []}
                                                             validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
                                                         />
-                                                        {submitSelected && conditions[index]?.conditions[i]?.value=== '' && <ErrorMessage error={'This field is mandatory'} />}
+                                                        {submitSelected && conditions[index]?.conditions[i]?.value === '' && <ErrorMessage error={'This field is mandatory'} />}
                                                     </>
                                                     :
                                                     <InputField
@@ -442,7 +442,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit'
                                         // onClick={() =>{conditions?.length !== 1 ? handleAdd("delete", index, i) : ''}}>
                                         onClick={() => {
-                                            if (conditions?.length === 1) {
+                                            if (conditions[0]?.conditions?.length === 1) {
                                                 handleClearConditionValues(); // Clear values for the single condition
                                             } else {
                                                 handleAdd("delete", index, i); // Handle deletion for other cases
