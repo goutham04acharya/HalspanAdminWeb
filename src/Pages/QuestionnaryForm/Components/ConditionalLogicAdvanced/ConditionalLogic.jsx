@@ -285,11 +285,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'value')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
-        console.log(updatedLogic, 'updated')
         // setConditions(updatedLogic)
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
@@ -394,6 +392,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
+            //this was commented i uncommeneted bczthe defualt value is not updating
             // if (isDefaultLogic) {
             //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
             // } else {
@@ -1058,7 +1057,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let GRADE = '';
             const result = eval(evalInputValue);
 
-            console.log(typeof result, result, 'result')
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -1110,7 +1108,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'compliancelogic':
                     case 'tagScanfield':
                         if (typeof result !== 'string') {
-                            console.log(typeof result, 'type')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
@@ -1144,8 +1141,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             setIsThreedotLoader(true);
             if (!error) {
-                if(complianceState){
-                    console.log(payloadString, 'payload string')
+                if (complianceState) {
                     setInputValue(payloadString)
                 }
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
@@ -1447,8 +1443,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0]?.conditions === undefined) {
             return
         }
-        // console.log(conditions[0], 'conditions[0].conditions')
-        finalString += conditions[0].conditions[0].question_name !== '' ? 'if (' + getComplianceLogic(conditions[0].conditions) + ')' : ''
+        finalString += conditions[0].conditions[0].question_name !== '' ? '(' + getComplianceLogic(conditions[0].conditions) + ')' : ''
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
         }
@@ -1474,6 +1469,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             const condition_logic = buildConditionExpression(conditions)
             setInputValue(condition_logic);
+            console.log(inputValue, 'nnn')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
@@ -1548,8 +1544,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setPageConditionLogicId(false);
 
     }
-    
-    console.log(conditions, 'conditions')
+
     useEffect(() => {
         let compliance_logic;
         if (!complianceState) {
@@ -1657,8 +1652,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     sectionConditionLogicId={sectionConditionLogicId}
                                     pageConditionLogicId={pageConditionLogicId}
                                     combinedArray={combinedArray}
-                                    sectionConditionLogicId={sectionConditionLogicId}
-                                    pageConditionLogicId={pageConditionLogicId}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor

@@ -31,10 +31,8 @@ const ChoiceBoxField = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
     const [choiceSelected, setChoiceSelected] = useState('')
-    const [selectedValues, setSelectedValues] = useState([]);
     const dispatch = useDispatch()
     const questionValue = useSelector(state => state.questionValues.questions);
-    console.log(questionValue[question?.question_id], 'hshshshhs')
     const handleRadioChange = (selectedValue) => {
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
@@ -47,7 +45,6 @@ const ChoiceBoxField = ({
                 }
             }
         }))
-        console.log(selectedValue, 'selected value')
         // Update the selected value in the parent state for the specific question
         dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }))
         setValue((prev) => ({
@@ -68,11 +65,9 @@ const ChoiceBoxField = ({
         setOptionSelected(questionValue[question?.question_id]);
     };
     const handleDropdownChange = (value) => {
-        console.log(questionValue[question?.question_id], 'questionValue[question?.question_id]')
         setChoiceSelected(questionValue[question?.question_id]);
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value.value }))
-        console.log(value, 'ssss')
         setIsDropdownOpen(false)
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
@@ -100,12 +95,9 @@ const ChoiceBoxField = ({
     }
     const handleCheckboxChange = (value) => {
         // setOptionSelected(value.value);
-
-        console.log(questionValue[question?.question_id], 'questionValue[question?.question_id]')
         setChoiceSelected(questionValue[question?.question_id]);
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
-        console.log(value, 'ssss')
         setIsDropdownOpen(false)
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
