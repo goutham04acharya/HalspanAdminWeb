@@ -235,6 +235,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         handleListSectionDetails();
+        let condition_logic = getFinalComplianceLogic(conditions)
+                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                    .replaceAll('?', 'then') // Replace ? with then
+                    .replaceAll('&&', 'and') // Replace && with and
+                    .replaceAll('||', 'or') // Replace || with or
+                    .replaceAll('.length', '.()')
+
+                if (condition_logic.includes(':')) {
+                    // Split by colon and rebuild with "else if" and "else" logic
+                    const parts = condition_logic.split(':');
+                    const lastPart = parts.pop(); // Remove the last part
+                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+                }
+        if (!condition_logic && defaultContentConverter(complianceLogic[0].default_content)) {
+            setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
+        }
     }, [])
 
     // useEffect(() => {
@@ -288,9 +304,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         console.log(value, 'value')
         setLogic(value);
         setInputValue(value)
-        const updatedLogic = parseExpression(value)
-        console.log(updatedLogic, 'updated')
-        // setConditions(updatedLogic)
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
@@ -779,6 +792,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
+
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1144,9 +1158,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             setIsThreedotLoader(true);
             if (!error) {
-                if(complianceState){
+                if (complianceState) {
                     console.log(payloadString, 'payload string')
                     setInputValue(payloadString)
+                    setConditions(complianceInitialState)
+                    dispatch(setComplianceLogicCondition(complianceInitialState))
                 }
                 handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
@@ -1470,12 +1486,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return finalString;
     }
 
+
     useEffect(() => {
         if (!complianceState) {
             const condition_logic = buildConditionExpression(conditions)
-            setInputValue(condition_logic);
+            console.log(condition_logic, 'fffff')
+            // setInputValue(condition_logic);
+
         } else {
             try {
+                console.log(getFinalComplianceLogic(conditions))
                 let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                     .replaceAll('?', 'then') // Replace ? with then
@@ -1489,8 +1509,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-
-                setInputValue(condition_logic);
+                console.log(condition_logic, 'tttttt')
+                setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
 
             } catch (error) {
                 console.error('Error while converting', error);
@@ -1548,7 +1568,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setPageConditionLogicId(false);
 
     }
-    
+
     console.log(conditions, 'conditions')
     useEffect(() => {
         let compliance_logic;

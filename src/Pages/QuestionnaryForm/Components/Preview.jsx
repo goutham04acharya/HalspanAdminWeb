@@ -40,6 +40,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
+    const questionValue = useSelector(state => state.questionValues.questions);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -488,8 +489,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'photofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined || questionValue[question?.question_id].length === 0) {
                                     acc.preview_photofield[question.question_id] = 'This is a mandatory field';
+                                }else if(questionValue[question?.question_id].length < question?.field_range?.min){
+                                    acc.preview_photofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
                                 }
                             }
                             break;
@@ -504,8 +507,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'videofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_videofield[question.question_id] = 'This is a mandatory field';
+                                }else if(questionValue[question?.question_id].length < question?.field_range?.min){
+                                    acc.preview_videofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} videos`;
                                 }
                             }
                             break;
@@ -743,7 +749,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     question_id={question?.question_id}
                     testId="preview"
                     setValue={setValue}
-                    values={value[question?.question_id]} 
+                    values={value[question?.question_id]}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -816,7 +822,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     }))
                                 }
-                                console.log(value,'ddd')
+                                console.log(value, 'ddd')
                             } catch (error) {
                                 // Log the error if eval fails
                                 console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
@@ -1003,9 +1009,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button 
-                    disabled={previewNavigation.current_page === 1} 
-                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
+                    {!showLabel ? <button
+                        disabled={previewNavigation.current_page === 1}
+                        type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
                     </button> :

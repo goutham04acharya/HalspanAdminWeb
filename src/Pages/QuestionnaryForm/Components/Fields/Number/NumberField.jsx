@@ -25,6 +25,7 @@ function NumberField({
 }) {
     const dispatch = useDispatch();
     const [localSliderValue, setLocalSliderValue] = useState(0);
+    const [sliderPercentage, setSliderPercentage] = useState('')
     const questionValue = useSelector(state => state.questionValues.questions);
     // Get slider value from Redux store
     const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
@@ -37,15 +38,15 @@ function NumberField({
     const maxRange = parseInt(fieldSettingParameters?.max) || 100;
 
     // Calculate percentage for slider fill (relative to min/max range)
-    const sliderPercentage = preview
-        ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) / ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
-        : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
-    if (preview) {
-        setValue((prev) => ({
-            ...prev,
-            [question?.question_id]: sliderPercentage
-        }))
-    }
+    // const sliderPercentage = preview
+    //     ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) / ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
+    //     : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+    // if (preview) {
+    //     setValue((prev) => ({
+    //         ...prev,
+    //         [question?.question_id]: sliderPercentage
+    //     }))
+    // }
 
     // Sync the fieldSettingParameters value with slider value
     useEffect(() => {
@@ -55,9 +56,23 @@ function NumberField({
                 question_id: question?.question_id,
                 value: fieldSettingParameters.value,
             }));
-            setLocalSliderValue(fieldSettingParameters.value)
+            setLocalSliderValue(questionValue[question?.question_id])
         }
-    }, [fieldSettingParameters?.value, sliderValue, dispatch]);
+        const percentage = preview
+            ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) /
+                ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
+            : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+
+        setSliderPercentage(percentage);
+
+        if (preview) {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: percentage
+            }));
+        }
+    }, [fieldSettingParameters?.value, sliderValue, localSliderValue, minRange, maxRange, preview, question?.field_range, question?.question_id, dispatch, setValue]);
+
 
     // Handle range slider changes and snap to the nearest multiple of incrementByValue
     const handleRange = (event) => {
@@ -94,6 +109,10 @@ function NumberField({
     };
     const handleInputChange = (e) => {
         const newValue = e.target.value
+        const invalidKeys = ['e'];
+        if (invalidKeys.includes(e.key)) {
+            e.preventDefault();
+        }
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -118,7 +137,9 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-    console.log(value, 'jjjjjj')
+    useEffect(() => {
+
+    }, [])
     return (
         <div>
             <label
@@ -162,6 +183,9 @@ function NumberField({
                     className={`w-full h-auto break-words border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                     onChange={(e) => handleInputChange(e)}
                     placeholder={question?.placeholder_content}
+                    onKeyDown={(e) => {
+                        if (e.key === 'e' || e.key === 'E') e.preventDefault();
+                    }}
                 /> : ''}
             {((preview ? question?.source === 'slider' : fieldSettingParameters?.source === 'slider') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
                 <div data-testid="slider" className=''>

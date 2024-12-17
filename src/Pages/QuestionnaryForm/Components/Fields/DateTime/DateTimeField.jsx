@@ -5,6 +5,7 @@ import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPage
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import DatePicker from 'react-date-picker';
 
 function DateTimeField({
     label,
@@ -29,6 +30,8 @@ function DateTimeField({
     const [timeValue, setTimeValue] = useState('');
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
+    const [date, setDate] = useState(questionValue[question?.question_id]?.split(' ')[0] ? new Date(questionValue[question?.question_id]?.split(' ')[0]) : null);
+
     const splitDate = (dateStr) => {
         if (!dateStr || typeof dateStr !== 'string') {
             return new Date().toISOString().split('T')[0];
@@ -37,6 +40,13 @@ function DateTimeField({
         return `${year}-${month}-${day}`;
     }
 
+    const handleDatwChange = (selectedDate) => {
+        if (selectedDate) {
+            const formattedDate = selectedDate.toLocaleDateString('en-GB'); // Converts to DD/MM/YYYY
+            setDate(selectedDate);
+            handleDateTime(formattedDate, timeValue);
+        }
+    };
     const splitTime = (timeStr) => {
         if (!timeStr) {
             return { hours: 0, minutes: 0, seconds: 0 };
@@ -197,11 +207,22 @@ function DateTimeField({
                         data-testid="input"
                         type="date"
                         id={textId}
-                        value={questionValue[question?.question_id]}
-                        className={`w-full h-auto break-words border border-[#AEB3B7] rounded-md ${preview ? 'mt-1' : 'mt-5'} bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                        placeholder={question?.placeholder_content || fieldSettingParameters?.placeholderContent}
-                        onChange={(e) => handleFunction(e)}
+                        value={questionValue[question?.question_id]?.split(' ')[0]}
+                        className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        placeholder={question?.placeholder_content}
+                        onChange={(e) => handleDateTime(e.target.value, timeValue)}
+                        onInput={(e) => {
+                            const date = e.target.value;
+                            const [year, month, day] = date.split('-');
+
+                            if (year?.length > 4) {
+                                const truncatedYear = year.slice(0, 4); // Restrict year to 4 digits
+                                e.target.value = `${truncatedYear}${month ? '-' + month : ''}${day ? '-' + day : ''}`;
+                            }
+                        }}
                     />
+
+
                 )}
                 {preview && type === 'time' && (
                     <TimePicker
@@ -228,6 +249,10 @@ function DateTimeField({
                             className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
+                            onKeyDown={(e) => {
+                                // Prevent user from entering non-numeric values
+                                    e.preventDefault();
+                            }}
                         />
                     </div>
                     <TimePicker
