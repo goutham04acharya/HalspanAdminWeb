@@ -52,12 +52,20 @@ function DateTimeField({
     const handleDateTime = (date, time) => {
         // Update states when inputs change
         if (date) {
-            setDateVal(date)  
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: date})) 
+            setDateVal(date)
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: date }))
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: date, // Ensure this stores the correct string value
+            }));
         }
         if (time) {
             setTimeValue(time)
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: time}))
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: time }))
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: time, // Ensure this stores the correct string value
+            }));
         };
 
         // Combine date and time if both are available
@@ -95,7 +103,7 @@ function DateTimeField({
                 ...prev,
                 [question?.question_id]: dateTimeString, // Ensure this stores the correct string value
             }));
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: dateTimeString}))
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: dateTimeString }))
 
             // Clear validation errors for the current field
             setValidationErrors((prevErrors) => ({
@@ -116,7 +124,7 @@ function DateTimeField({
                 ...prev,
                 [question?.question_id]: value || false
             }));
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: value}))
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
 
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
@@ -152,7 +160,7 @@ function DateTimeField({
                     }
                 }
             }));
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: value}))
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
 
             setValue((prev) => ({
                 ...prev,
@@ -168,7 +176,7 @@ function DateTimeField({
         }
     }
 
-    console.log(questionValue[question?.question_id])
+    console.log(validationErrors, 'validationErrors?.preview_datetimefield[question?.question_id]')
 
 
     return (
@@ -199,18 +207,18 @@ function DateTimeField({
                     <TimePicker
                         onChange={handleFunction}
                         format={question?.format}
-                        setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
-                            ...prevErrors,
-                            preview_datetimefield: {
-                                ...prevErrors.preview_datetimefield,
-                                [question?.question_id]: errorMessage
-                            }
-                        }))}
+                        // setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
+                        //     ...prevErrors,
+                        //     preview_datetimefield: {
+                        //         ...prevErrors.preview_datetimefield,
+                        //         [question?.question_id]: errorMessage
+                        //     }
+                        // }))}
                         questionValue={questionValue[question?.question_id]}
                     />
                 )}
 
-                {(preview && type === 'datetime') &&<div className='flex flex-wrap z-[-1] w-full'>
+                {(preview && type === 'datetime') && <div className='flex flex-wrap z-[-1] w-full'>
                     <div className="flex w-full flex-wrap mb-2 flex-col">
                         <input
                             data-testid="input"
@@ -236,9 +244,7 @@ function DateTimeField({
                     />
                 </div>}
 
-                {(question?.question_id && validationErrors?.preview_datetimefield && validationErrors?.preview_datetimefield[question?.question_id]) && (
-                    <ErrorMessage error={validationErrors?.preview_datetimefield[question?.question_id]} />
-                )}
+
 
 
                 {!preview && (
@@ -269,6 +275,9 @@ function DateTimeField({
                     <img src="/Images/calendar-clock.svg" alt="calender-clock" className={`absolute ${preview ? 'top-4' : 'top-8'} right-3 cursor-pointer`} />
                 )}
             </div>
+            {(question?.question_id && validationErrors?.preview_datetimefield && validationErrors?.preview_datetimefield[question?.question_id]) && (
+                <ErrorMessage error={validationErrors?.preview_datetimefield[question?.question_id]} />
+            )}
             <p
                 data-testid="help-text"
                 className="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"

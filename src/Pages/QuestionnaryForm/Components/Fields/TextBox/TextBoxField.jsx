@@ -120,6 +120,7 @@ const TextBoxField = ({
     const handleFunction = () => {
         
     }
+    console.log(validationErrors?.preview_textboxfield?.[question.question_id], 'validationErrors?.preview_textboxfield?.[question.question_id]')
     return (
         <div className=''>
             <label
@@ -137,7 +138,7 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={questionValue[question?.question_id] || ''}
-                    className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    className={`h-[156px] resize-none w-full break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
                     // onBlur={(e) => handleInputChange(e)}
@@ -192,7 +193,8 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={questionValue[question?.question_id] || ''}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    
+                    className={`w-full h-auto break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'}  rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
                     // onBlur={(e) => handleInputChange(e)}

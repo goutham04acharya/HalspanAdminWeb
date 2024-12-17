@@ -54,6 +54,10 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
         
         // Update Redux store with new image array
         // const imageUrls = newImages.map((image) => URL.createObjectURL(image));
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: newImages
+        }));
         dispatch(setQuestionValue({ 
             question_id: question?.question_id, 
             value: newImages 

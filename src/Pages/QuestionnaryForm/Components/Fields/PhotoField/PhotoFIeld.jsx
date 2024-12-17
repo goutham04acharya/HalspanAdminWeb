@@ -27,8 +27,6 @@ function PhotoField({ label,
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename  
-    const dispatch = useDispatch();
-    const questionValue = useSelector(state => state.questionValues.questions);
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (!files.length) return; // Exit if no files are selected

@@ -826,7 +826,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
             });
         });
-    }, [conditionalValues])
+    }, [sections, setValue])
 
     const handleClose = () => {
         setModalOpen(false)

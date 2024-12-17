@@ -101,7 +101,7 @@ const ChoiceBoxField = ({
     const handleCheckboxChange = (value) => {
         // setOptionSelected(value.value);
 
-        console.log(questionValue[question?.question_id], 'questionValue[question?.question_id]')
+        console.log(value, 'value')
         setChoiceSelected(questionValue[question?.question_id]);
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
@@ -118,6 +118,17 @@ const ChoiceBoxField = ({
                 }
             }
         }))
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors?.preview_choiceboxfield,
+                [question?.question_id]: null,
+            },
+        }));
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: value,
+        }));
         // setSelectedValues(prev => {
         //     let newSelected;
         //     if (prev.includes(value?.value)) {
@@ -234,6 +245,7 @@ const ChoiceBoxField = ({
                         selectedOption={questionValue[question?.question_id]}
                         preview
                         choiceBox
+                        validationError={validationErrors?.preview_choiceboxfield?.[question.question_id]}
                         type={question?.type}
                     />}
                 </div>

@@ -40,14 +40,19 @@ function NumberField({
     const sliderPercentage = preview
         ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) / ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
         : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
-
+    if (preview) {
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: sliderPercentage
+        }))
+    }
 
     // Sync the fieldSettingParameters value with slider value
     useEffect(() => {
         if (fieldSettingParameters?.value !== undefined && fieldSettingParameters.value !== sliderValue) {
             dispatch(handleSliderValue({ sliderValue: fieldSettingParameters.value }));
-            dispatch(setQuestionValue({ 
-                question_id: question?.question_id, 
+            dispatch(setQuestionValue({
+                question_id: question?.question_id,
                 value: fieldSettingParameters.value,
             }));
             setLocalSliderValue(fieldSettingParameters.value)
@@ -74,9 +79,9 @@ function NumberField({
         // dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
         if (preview) {
             setLocalSliderValue(newValue);
-            dispatch(setQuestionValue({ 
-                question_id: question?.question_id, 
-                value: nearestMultiple 
+            dispatch(setQuestionValue({
+                question_id: question?.question_id,
+                value: nearestMultiple
             }));
         } else {
             dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
@@ -100,9 +105,9 @@ function NumberField({
                 }
             }
         }));
-        dispatch(setQuestionValue({ 
-            question_id: question?.question_id, 
-            value: newValue 
+        dispatch(setQuestionValue({
+            question_id: question?.question_id,
+            value: newValue
         }));
         setValue((prev) => ({
             ...prev,
@@ -113,7 +118,7 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-    console.log(value,'jjjjjj')
+    console.log(value, 'jjjjjj')
     return (
         <div>
             <label
@@ -154,7 +159,7 @@ function NumberField({
                     }
                     step={question?.type === 'float' ? 'any' : ''}
                     value={questionValue[question?.question_id]}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
+                    className={`w-full h-auto break-words border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                     onChange={(e) => handleInputChange(e)}
                     placeholder={question?.placeholder_content}
                 /> : ''}
@@ -177,7 +182,7 @@ function NumberField({
                                 style={{
                                     '--percent': `${sliderPercentage}%`
                                 }}
-                                className='mt-6 custom-slider w-full'
+                                className='mt-6  w-full'
                                 data-testid="number-slider"
                             />
                         </div>
