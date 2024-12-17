@@ -600,7 +600,6 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
-                    console.log(sections, 'jjjjjjj')
                     setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  

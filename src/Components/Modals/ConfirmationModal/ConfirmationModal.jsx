@@ -5,7 +5,7 @@ import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 
 
-function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus , sectionWarningShown, setSectionWarningShown }) {
+function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -39,7 +39,6 @@ function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Butto
                 <Image src={src} className={`${className} mx-auto`} />
                 <p className='text-center text-lg text-[#2B333B] font-semibold mt-5'>{text}</p>
                 <p className='font-normal text-base text-[#2B333B] mt-2 text-center break-words'>{subText}</p>
-                {!sectionWarningShown &&
                 <div className='mt-5 flex items-center justify-between'>
                     {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
                         {!loading ? Button1text : <BeatLoader color="#fff" size={'10px'} />}
@@ -72,7 +71,7 @@ function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Butto
                     }}>
                         {Button2text}
                     </button>
-                </div>}
+                </div>
             </div>
         </div>
     )

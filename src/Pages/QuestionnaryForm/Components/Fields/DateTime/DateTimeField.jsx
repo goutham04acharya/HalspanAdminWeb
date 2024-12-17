@@ -168,9 +168,6 @@ function DateTimeField({
         }
     }
 
-    console.log(questionValue[question?.question_id])
-
-
     return (
         <div>
             <label

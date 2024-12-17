@@ -90,7 +90,7 @@ function PhotoFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value='draw_image_yes'
                                     checked={fieldSettingParameters?.draw_image === 'yes'}
-                                    onClick={ formStatus === 'Draft' ? () => {
+                                    onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'yes', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
                                     } : null}
@@ -113,7 +113,7 @@ function PhotoFieldSetting({
                                     onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }:null}
+                                    } : null}
                                 />
                                 <label htmlFor='draw_image_no'
                                     data-testid='draw-no'
@@ -136,7 +136,7 @@ function PhotoFieldSetting({
                                     onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'yes', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }:null} />
+                                    } : null} />
                                 <label htmlFor='include_metadata_yes'
                                     data-testid='metadata-yes'
                                     className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -155,7 +155,7 @@ function PhotoFieldSetting({
                                     onClick={formStatus === 'Draft' ? () => {
                                         dispatch(setNewComponent({ id: 'include_metadata', value: 'no', questionId: selectedQuestionId }));
                                         dispatch(setShouldAutoSave(true));
-                                    }: null}
+                                    } : null}
                                 />
                                 <label htmlFor='include_metadata_no'
                                     data-testid='metadata-no'
@@ -184,14 +184,28 @@ function PhotoFieldSetting({
                             />
                         </div>
                         <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-                            <button
-                                type='button'
-                                data-testId="add-conditional-logic"
-                                className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
-                            >
-                                Add Conditional Logic
-                            </button>
+                            <div className='flex items-center w-full'>
+                                <button
+                                    type='button'
+                                    data-testid="add-conditional-logic"
+                                    className={`mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? 'px-[40px] w-[50%] ' : 'px-[52px] w-[80%]'}`}
+                                    onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
+                                >
+                                    Add Conditional Logic
+                                </button>
+                                {fieldSettingParameters?.conditional_logic &&
+                                    <button
+                                        type='button'
+                                        data-testid="remove-conditional-logic"
+                                        className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
+                                        onClick={() => {
+                                            dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                        }}
+                                    >
+                                        Remove Conditional Logic
+                                    </button>
+                                }
+                            </div>
                             {fieldSettingParameters?.conditional_logic &&
                                 <p className='text-center italic mt-1'>Conditional Logic Added</p>
                             }
