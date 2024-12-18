@@ -23,6 +23,7 @@ import {
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
 import { clearQuestions } from './previewQuestionnaireValuesSlice.js';
+import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -40,7 +41,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
-    const questionValue = useSelector(state => state.questionValues.questions);
+    const questionValue = useSelector(state => state?.questionValues?.questions);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -476,14 +477,25 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             break;
 
                         case 'numberfield':
-                            if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-                                acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+                                if (questionValue[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                    acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                                }
                             }
                             break;
 
                         case 'dateTimefield':
-                            if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-                                acc.preview_datetimefield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+                                // debugger
+                                console.log(questionValue, 'ddddaawad')
+                                if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                    console.log('am h')
+                                    // Initialize acc.preview_datetimefield if it is undefined
+                                    acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                    acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                } else {
+                                    console.log('am here')
+                                }
                             }
                             break;
 
@@ -491,8 +503,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             if (!question?.options?.optional) {
                                 if (value[question?.question_id] === false || value[question?.question_id] === undefined || questionValue[question?.question_id].length === 0) {
                                     acc.preview_photofield[question.question_id] = 'This is a mandatory field';
-                                }else if(questionValue[question?.question_id].length < question?.field_range?.min){
-                                    acc.preview_photofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_photofield[question?.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
                                 }
                             }
                             break;
@@ -507,10 +519,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'videofield':
                             if (!question?.options?.optional) {
-                                
+
                                 if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_videofield[question.question_id] = 'This is a mandatory field';
-                                }else if(questionValue[question?.question_id].length < question?.field_range?.min){
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
                                     acc.preview_videofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} videos`;
                                 }
                             }
@@ -849,6 +861,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }));
         dispatch(clearQuestions())
         dispatch(resetFields())
+        dispatch(clearAllSignatures());
     }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>

@@ -177,7 +177,7 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
             )}
 
             {modalOpen && (
-                <div className="modal-overlay absolute rounded-[50px] top-0 flex-col left-0 w-[356px] h-full bg-white flex justify-center items-center">
+                <div className="modal-overlay absolute rounded-[50px] top-0 flex-col z-20 left-0 w-[356px] h-full bg-white flex justify-center items-center">
                     <span 
                         className="close-icon delay-300 z-[2] items-end text-[20px] ml-[325px] top-10 relative hover:bg-slate-700 transition-transform bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer" 
                         onClick={handleModalClose}
@@ -186,12 +186,12 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
                     </span>
 
                     {drawOnImage ? (
-                        <div className="modal-content w-[370px] h-[400px] p-2 rounded-2xl">
+                        <div className="modal-content w-[370px] h-[400px] p-2 rounded-2xl ">
                             <ReactSketchCanvas
                                 ref={canvasRef}
                                 strokeWidth={4}
                                 strokeColor={strokeColor}
-                                style={{ backgroundColor: 'none' }}
+                                style={{ backgroundColor: 'white' }}
                                 backgroundImage={URL.createObjectURL(currentImage)}
                             />
                             <div className='flex flex-col top-[-140px] mr-[650px] relative'>
@@ -222,7 +222,7 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
                         </div>
                     ) : (
                         <div className='z-[1]'>
-                            <img src={URL.createObjectURL(currentImage)} className='w-[374px] h-[500px] p-2 rounded-lg' alt="" />
+                            <img src={URL.createObjectURL(currentImage)} className='w-[374px] h-[600px] bg-white p-2 rounded-lg object-contain' alt="" />
                         </div>
                     )}
                 </div>

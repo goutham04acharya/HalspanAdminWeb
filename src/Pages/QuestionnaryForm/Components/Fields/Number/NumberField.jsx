@@ -59,10 +59,9 @@ function NumberField({
             setLocalSliderValue(questionValue[question?.question_id])
         }
         const percentage = preview
-            ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) /
-                ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
+            ? ((localSliderValue - (question?.field_range?.min || 0)) /
+                ((question?.field_range?.max || 100) - (question?.field_range?.min || 0))) * 100
             : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
-
         setSliderPercentage(percentage);
 
         if (preview) {
@@ -212,6 +211,7 @@ function NumberField({
                         </div>
                         <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_range?.max : fieldSettingParameters?.max}</p>
                         <p className={`w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>
+
                     </div>
                     {!preview ? <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
                         Select Value: {fieldSettingParameters?.type === 'float' ? sliderValue.toFixed(2) : sliderValue}
