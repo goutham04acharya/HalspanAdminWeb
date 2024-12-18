@@ -760,7 +760,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     testId="preview"
                     setValue={setValue}
                     values={value[question?.question_id]}
-                    values={value[question?.question_id]}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
