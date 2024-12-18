@@ -132,7 +132,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                 data-testid="floorplan-image"
             >
                 <img
-                    src={floorPlan ? '/floorplan.png' :imageSrc}
+                    src={floorPlan ? '/floorplan.png' : imageSrc}
                     alt="Thumbnail"
                     style={{
                         width: "100px",
@@ -159,7 +159,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                         width: '358px',
                         borderRadius: '52px'
                     }}
-                    // className="mx-auto"
+                // className="mx-auto"
                 >
                     <div
                         style={{
@@ -177,7 +177,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             minScale={1}
                             maxScale={5}
                             onZoom={handleZoom}
-                            
+
                             disabled={isDrawMode || eraserClick || resetClick}
                         >
                             <TransformComponent pointerEvents="none"  >
@@ -229,22 +229,20 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                     transform: `translate(-50%, -100%)`,
                                                     cursor: "move",
                                                 }}
-                                                // onMouseDown={(e) => handlePinMouseDown(pin.id, e)}
                                             >
                                                 <img
                                                     src="/Images/pin.svg"
                                                     alt="Pin"
                                                     style={{ width: "100%", height: "100%" }}
                                                 />
+
                                                 <div
                                                     style={{
                                                         position: "absolute",
-                                                        top: "-10px",
-                                                        right: "-10px",
-                                                        width: "20px",
-                                                        height: "20px",
+                                                        right: "-40%",
+                                                        top: "50%",
+                                                        transform: `translate(-50%, -150%) scale(${1 / currentZoom})`, // Adjust transform  
                                                         borderRadius: "50%",
-                                                        
                                                         display: "flex",
                                                         justifyContent: "center",
                                                         alignItems: "center",
@@ -256,24 +254,20 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                         handleRemovePin(pin.id);
                                                     }}
                                                 >
-                                                    ×
+                                                    <img
+                                                        src="/Images/close.svg"
+                                                        alt="Close"
+                                                        style={{
+                                                            width: "20px",
+                                                            height: "20px",
+                                                        }}
+                                                    />
                                                 </div>
-                                            </div>
-                                            <div
-                                                style={{
-                                                    position: "absolute",
-                                                    top: `${pin.y * 100}%`,
-                                                    left: `${pin.x * 100}%`,
-                                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                    transform: "translate(-50%, 10px)",
-                                                }}
-                                            >
-                                                {/* {`plan_x: ${pin.x.toFixed(2)}\nplan_y: ${pin.y.toFixed(2)}`} */}
                                             </div>
                                         </React.Fragment>
                                     ))}
+
+
                                 </div>
                             </TransformComponent>
                         </TransformWrapper>

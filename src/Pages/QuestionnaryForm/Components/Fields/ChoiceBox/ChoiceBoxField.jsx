@@ -110,6 +110,17 @@ const ChoiceBoxField = ({
                 }
             }
         }))
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors?.preview_choiceboxfield,
+                [question?.question_id]: null,
+            },
+        }));
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: value,
+        }));
         // setSelectedValues(prev => {
         //     let newSelected;
         //     if (prev.includes(value?.value)) {
@@ -226,6 +237,7 @@ const ChoiceBoxField = ({
                         selectedOption={questionValue[question?.question_id]}
                         preview
                         choiceBox
+                        validationError={validationErrors?.preview_choiceboxfield?.[question.question_id]}
                         type={question?.type}
                     />}
                 </div>

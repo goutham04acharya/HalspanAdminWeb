@@ -3,9 +3,10 @@ import { ReactSketchCanvas } from 'react-sketch-canvas';
 import { useDispatch } from 'react-redux';
 import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
 import { useSelector } from 'react-redux';
+import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
 
 
-function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, setValue, handleRemoveImage, question, setFileState }) {
+function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFileChange, setConditionalValues, setValue, handleRemoveImage, question, setFileState , handleBlur}) {
     const [images, setImages] = useState([]);
     const [currentImage, setCurrentImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -15,45 +16,83 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
     const [colorPicker, setColorPicker] = useState(false);
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
+    console.log(questionValue, 'question value')
     const handleImageChange = (e) => {
-        const files = e.target.files;
-        const newImages = [...images];
-        
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
+        const files = Array.from(e.target.files); // Convert FileList to array
+        let newImages = [...images]; // Copy existing images
+        let isFileTypeError = false; // Track if there's any file type error
+        handleFileChange(e)
+        files.forEach((file) => {
             const fileType = file.type;
             if (fileType === 'image/png' || fileType === 'image/jpeg' || fileType === 'image/svg+xml') {
-                newImages.push(file);
-                setFileTypeError(false);
+                if (newImages.length < maxImages) {
+                    newImages.push(file);
+                }
             } else {
-                setFileTypeError(true);
+                isFileTypeError = true; // Set the file type error only if file type is invalid
             }
+        });
+    
+        if (newImages.length > maxImages) {
+            newImages = newImages.slice(0, maxImages); // Limit to maxImages
         }
-        
+    
         setImages(newImages);
-        handleFileChange(e);
-        
+        setFileTypeError(isFileTypeError); // Show the error only if there's an invalid file type
+    
+        // Reset file input to allow the same file to be added again
+        e.target.value = ''; 
+    
         // Dispatch to Redux store
-        // const imageUrls = newImages.map((image) => URL.createObjectURL(image));
         dispatch(setQuestionValue({ 
             question_id: question?.question_id, 
             value: newImages 
         }));
-
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newImages
+                }
+            }
+        }));
+        
+    
         // Optional: Set value for parent component
         setValue((prev) => ({ ...prev, [question?.question_id]: true }));
     };
+    
+    
+    
 
     const handleImageRemove = (index) => {
         const newImages = [...questionValue?.[question?.question_id] ];
         newImages.splice(index, 1);
-        
+        console.log(newImages, 'newImages')
         setImages(newImages);
-
+        handleRemoveImage(newImages)
         console.log(newImages, 'newImages')
         
         // Update Redux store with new image array
         // const imageUrls = newImages.map((image) => URL.createObjectURL(image));
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: newImages
+        }));
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name],
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: newImages
+                }
+            }
+        }));
         dispatch(setQuestionValue({ 
             question_id: question?.question_id, 
             value: newImages 
@@ -101,6 +140,7 @@ function ImageUploader({ maxImages, drawOnImage, minImages, handleFileChange, se
                     multiple
                     onChange={handleImageChange}
                     accept="image/*"
+                    onBlur={handleBlur}
                     data-testid="add-image"
                     className={`hidden-input ${!images?.length >= maxImages ? 'cursor-default' : 'cursor-pointer'}`}
                     disabled={images.length >= maxImages}

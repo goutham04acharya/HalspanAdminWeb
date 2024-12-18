@@ -43,25 +43,28 @@ function VideoField({ label,
             [question?.question_id]: newFilesList
         }));
 
-        const updatedFileCount = newFilesList.length;
+        // const updatedFileCount = newFilesList.length;
 
-        // Check if the minimum required number of files has been uploaded
-        if (updatedFileCount >= (question?.field_range?.min || 0)) {
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: true
-            }));
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_videofield: '' // Clear validation error if criteria met
-            }));
-        } else {
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: false
-            }));
-        }
-
+        // // Check if the minimum required number of files has been uploaded
+        // if (updatedFileCount >= (question?.field_range?.min || 0)) {
+        //     setValue((prev) => ({
+        //         ...prev,
+        //         [question?.question_id]: true
+        //     }));
+        //     setValidationErrors((prevErrors) => ({
+        //         ...prevErrors,
+        //         preview_videofield: '' // Clear validation error if criteria met
+        //     }));
+        // } else {
+        //     setValue((prev) => ({
+        //         ...prev,
+        //         [question?.question_id]: false
+        //     }));
+        // }
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_videofield: '' // Clear validation error if criteria met
+        }));
         // Update conditional values with the current file list
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({

@@ -22,22 +22,29 @@ function PhotoField({ label,
     photoValue,
     setConditionalValues,
     sections
-
-
 }) {
     const [fileName, setFileName] = useState('');
-    const [fileState, setFileState] = useState({}); // Create a state to store the filename  
-    const dispatch = useDispatch();
+    const [fileState, setFileState] = useState({}); // Create a state to store the filename
     const questionValue = useSelector(state => state.questionValues.questions);
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (!files.length) return; // Exit if no files are selected
-        console.log(files, 'files files')
-        // Create a new file list that includes existing files plus new selections
+
+        const maxFiles = question?.field_range?.max || Infinity; // Get the max limit, default to Infinity if not set
+        const existingFiles = fileState[question?.question_id] || []; // Existing files for this question
+
+        // Calculate how many more files can be added
+        const availableSlots = maxFiles - existingFiles.length;
+
+        // Limit the new files to only the remaining slots
+        const limitedNewFiles = files.slice(0, availableSlots);
+
+        // Create a new file list that includes existing files plus the new selections
         const newFilesList = [
-            ...(fileState[question?.question_id] || []), // Existing files
-            ...files.map(file => file) // New files
+            ...existingFiles, // Existing files
+            ...limitedNewFiles // New files (limited)
         ];
+
         // Update fileName to display all file names as a comma-separated list
         setFileName(newFilesList.map(file => file.name).join(', '));
 
@@ -46,25 +53,28 @@ function PhotoField({ label,
             ...prev,
             [question?.question_id]: newFilesList
         }));
+        // setValidationErrors((prevErrors) => ({
+        //     ...prevErrors,
+        //     preview_videofield: '' // Clear the validation error
+        // }));
 
-        const updatedFileCount = newFilesList.length;
-
-        // Check if the minimum required number of files has been uploaded
-        if (updatedFileCount >= (question?.field_range?.min || 0)) {
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: true
-            }));
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_photofield: '' // Clear validation error if criteria met
-            }));
-        } else {
-            setValue((prev) => ({
-                ...prev,
-                [question?.question_id]: false
-            }));
-        }
+        // const updatedFileCount = newFilesList.length;
+        // // Check if the minimum required number of files has been uploaded
+        // if (updatedFileCount >= (question?.field_range?.min || 0)) {
+        //     setValidationErrors((prevErrors) => ({
+        //         ...prevErrors,
+        //         preview_photofield: '' // Clear validation error if criteria met
+        //     }));
+        // } else {
+        //     setValidationErrors((prevErrors) => ({
+        //         ...prevErrors,
+        //         preview_photofield: '' // Clear validation error if criteria met
+        //     }));
+        // }
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_photofield: '' // Clear validation error if criteria met
+        }));
 
         // Update conditional values to track the current file count
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
@@ -78,11 +88,9 @@ function PhotoField({ label,
                 }
             }
         }));
-
     };
 
     const handleImageRemove = (newImages, fileNameToRemove) => {
-
         setFileState((prev) => ({
             ...prev,
             [question?.question_id]: newImages
@@ -106,6 +114,7 @@ function PhotoField({ label,
                 preview_photofield: 'Minimum file requirement not met'
             }));
         }
+        
 
         // Update conditional values to reflect the new file count
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
@@ -120,9 +129,6 @@ function PhotoField({ label,
             }
         }));
     };
-
-
-
 
     function handleFunction(e) {
         const value = e.target.value;
@@ -140,6 +146,21 @@ function PhotoField({ label,
             }));
         }
     }
+    // useEffect(() => {
+    //   if(questionValue?.[question?.question_id]?.length !== 0){
+    //     setValidationErrors((prevErrors) => ({
+    //         ...prevErrors,
+    //         preview_videofield: '' // Clear the validation error
+    //     }));
+    //   }else{
+    //     setValidationErrors((prevErrors) => ({
+    //         ...prevErrors,
+    //         preview_videofield: 'This is a mandatory field' // Clear the validation error
+    //     }));
+    //   }
+      
+    // }, [questionValue, setValidationErrors])
+    
 
     return (
         <div>
@@ -172,7 +193,7 @@ function PhotoField({ label,
                     {fileName || (fieldSettingParameters?.placeholderContent) || 'No file chosen'}
                 </span>
             </div> : <div className={``}>
-                <ImageUploader setFileState={setFileState} setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} />
+                <ImageUploader handleBlur={handleBlur} setConditionalValues={setConditionalValues} setFileState={setFileState} setValidationErrors={setValidationErrors} sections={sections} setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} />
             </div>}
             {(question?.question_id && validationErrors?.preview_photofield && validationErrors.preview_photofield[question.question_id]) && (
                 <ErrorMessage error={validationErrors.preview_photofield[question.question_id]} />
@@ -187,4 +208,4 @@ function PhotoField({ label,
     )
 }
 
-export default PhotoField
+export default PhotoField;

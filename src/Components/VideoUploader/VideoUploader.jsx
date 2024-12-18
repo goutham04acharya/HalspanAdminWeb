@@ -78,7 +78,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                     <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Video ({max})
                 </span>
             </label>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             {questionValue?.[question?.question_id] && (
                 <ul>
                     {questionValue?.[question?.question_id].map((file, index) => (
