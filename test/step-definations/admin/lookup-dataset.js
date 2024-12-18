@@ -146,3 +146,68 @@ When('I click the delete option for a searched lookup dataset', async function (
     this.id = id
     await driver.wait(until.elementLocated(By.css(`[data-testid="delete-${this.id}"]`))).click();
 });
+
+When('I search recently created lookup dataset by bddtest', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const searchName = await driver.wait(until.elementLocated(By.css('[data-testid = "searchBox"]')));
+    await searchName.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    await searchName.sendKeys(global.lookupName);
+});
+
+
+When('I click on close button', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="cancel"]'))).click();
+});
+
+When('I edit the lookup data set name', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const name = await driver.wait(until.elementLocated(By.css('[data-testid="name"]')));
+    await name.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    const lookupName = `lookup${faker.string.alphanumeric(5)}`;
+    console.log(lookupName);
+    await name.sendKeys(lookupName);
+});
+
+When('I edit the values in lookup dataset', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const value = await driver.wait(until.elementLocated(By.css('[data-testid="value-0"]')));
+    await value.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    await value.sendKeys('Someshwara');
+});
+
+When('I delete the values in lookup dataset', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const value = await driver.wait(until.elementLocated(By.css('[data-testid="delete-choice-1"]'))).click();
+});
+
+When('I add the values to lookup dataset', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="add-choice-2"]'))).click();
+    await driver.wait(until.elementLocated(By.css('[data-testid="additional-value-0"]'))).sendKeys('India, Sri lanka');
+});
+
+When('I click on update button', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="create"]'))).click();
+});
+
+Then('I should read a message stating that the lookup dataset has been updated', async function () {
+    let check = false;
+    let retries = 400;
+
+    console.log(`Updated lookup dataset ID ${this.id} successfully.`)
+    while (retries > 0) {
+        const pageSource = await driver.getPageSource();
+        console.log(this.id, 'the id');
+        check = pageSource.includes(`Updated lookup dataset ID ${this.id} successfully.`);
+        console.log(check);
+        if (check) {
+            return 'passed';
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries--;
+        }
+    }
+    throw new Error('Failed');
+});
