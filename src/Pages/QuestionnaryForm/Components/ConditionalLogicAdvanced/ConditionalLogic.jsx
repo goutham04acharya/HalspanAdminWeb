@@ -1469,7 +1469,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             const condition_logic = buildConditionExpression(conditions)
             setInputValue(condition_logic);
-            console.log(inputValue, 'nnn')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)

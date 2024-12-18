@@ -44,7 +44,6 @@ function TestFieldSetting({
   const { getAPI } = useApi();
 
   const dispatch = useDispatch();
-  console.log(fieldSettingParameters, 'fieldsettingparameters')
   const options = [
     { value: 'Alpha', label: 'Alpha' },
     { value: 'Alphanumeric', label: 'Alphanumeric' },

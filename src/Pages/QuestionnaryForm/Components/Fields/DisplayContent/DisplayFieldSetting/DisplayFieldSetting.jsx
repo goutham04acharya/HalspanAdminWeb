@@ -8,6 +8,7 @@ import useApi from '../../../../../../services/CustomHook/useApi';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { v4 as uuidv4 } from 'uuid'; // Make sure you import uuidv4 if not already done
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import { BeatLoader } from 'react-spinners';
 
 
 function DisplayFieldSetting({
@@ -17,7 +18,8 @@ function DisplayFieldSetting({
     handleRadiobtn,
     setReplaceModal,
     setConditionalLogic,
-    formStatus
+    formStatus,
+    smallLoader
 }) {
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -26,6 +28,7 @@ function DisplayFieldSetting({
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [selectedUrlOption, setSelectedUrlOption] = useState(fieldSettingParameters?.format || '');
     const [errorMessage, setErrorMessage] = useState(false);
+    const [imageLoader, setImageLoader] = useState(false);
 
 
     const options = [
@@ -39,7 +42,6 @@ function DisplayFieldSetting({
 
     const handleOptionClick = (option) => {
         setSelectedUrlOption(option.value);
-        // setTypeInput(option.value)
         setDropdownOpen(false);
 
         dispatch(setNewComponent({ id: 'urlType', value: option.value, questionId: selectedQuestionId }));
@@ -52,6 +54,7 @@ function DisplayFieldSetting({
 
     const handleFileUploadClick = () => {
         if (selectedFile) {
+            setImageLoader(false);
             setReplaceModal(true);
             dispatch(setShouldAutoSave(true));
         } else {
@@ -60,6 +63,7 @@ function DisplayFieldSetting({
     };
 
     const handleUploadImage = async (file) => {
+        setImageLoader(true);
         try {
             // Format the file name
             const formattedFileName = encodeURIComponent(file?.name.replace(/\s+/g, '_'));
@@ -70,6 +74,7 @@ function DisplayFieldSetting({
             );
 
             if (response?.data?.status) {
+                setImageLoader(true);
 
                 const { url } = response?.data?.data;
 
@@ -87,6 +92,7 @@ function DisplayFieldSetting({
                 });
                 dispatch(setNewComponent({ id: 'image', value: uploadResponse?.url.split('?')[0], questionId: selectedQuestionId }));
                 dispatch(setShouldAutoSave(true));
+                setImageLoader(false);
 
                 // Check if the upload was successful
                 if (uploadResponse.ok) {
@@ -115,6 +121,7 @@ function DisplayFieldSetting({
     }
 
     const handleFileChange = (e) => {
+
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
 
@@ -126,6 +133,7 @@ function DisplayFieldSetting({
             }
 
             // Clear error if valid file is selected
+            setImageLoader(false);
             setSelectedFile(file);
             setErrorMessage(false);
             handleUploadImage(file);  // Pass file directly here
@@ -157,7 +165,9 @@ function DisplayFieldSetting({
         dispatch(setNewComponent({ id: 'pin_drop', value: 'no', questionId: selectedQuestionId }));
         dispatch(setNewComponent({ id: 'draw_image', value: 'no', questionId: selectedQuestionId }));
         dispatch(setShouldAutoSave(true));
+        setImageLoader(false);
     }
+    console.log(imageLoader, 'kodaer') 
 
     return (
         <>
@@ -262,13 +272,22 @@ function DisplayFieldSetting({
                                                 className='hidden'
                                                 onChange={formStatus === 'Draft' ? handleFileChange : null}
                                             />
+
                                             <label
                                                 onClick={formStatus === 'Draft' ? handleFileUploadClick : null}
-                                                data-testid="upload-image" className='bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white'
+                                                data-testid="upload-image"
+                                                className="bg-[#2B333B] rounded h-[50px] w-full flex items-center justify-center cursor-pointer font-semibold text-base text-white"
                                             >
-                                                Add Image
-                                                <img src="/Images/fileUpload.svg" alt="Upload" className='ml-2.5' />
+                                                {imageLoader ? (
+                                                    <BeatLoader color="#FFFFFF" size={smallLoader ? '7px' : '10px'} />
+                                                ) : (
+                                                    <>
+                                                        Add Image
+                                                        <img src="/Images/fileUpload.svg" alt="Upload" className="ml-2.5" />
+                                                    </>
+                                                )}
                                             </label>
+
                                         </div>
                                         {(fieldSettingParameters?.image || selectedFile) && (
                                             <label className='ml-3 break-words max-w-[50%]'>{extractFileNameFromUrl(fieldSettingParameters.image)}</label>

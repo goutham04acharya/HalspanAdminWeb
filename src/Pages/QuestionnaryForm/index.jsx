@@ -1321,7 +1321,6 @@ const QuestionnaryForm = () => {
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
-
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
@@ -1455,6 +1454,14 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
     };
+
+    const truncateText = (text, maxLength) => {
+        if (!text || text.length <= maxLength) {
+            return text;
+        }
+        return `${text.slice(0, maxLength)}...`;
+    };
+
 
     return (
         <>
@@ -1693,7 +1700,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`${selectedSectionData?.section_conditional_logic ? `You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages and this includes conditional logic, This action cannot be undone.` : `You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}`}
+                        subText={`${selectedSectionData?.section_conditional_logic ? `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages and this includes conditional logic, This action cannot be undone.` : `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1733,7 +1740,7 @@ const QuestionnaryForm = () => {
                             selectedSectionData?.page_conditional_logic && selectedSectionData?.['questions'].length > 0
                                 ? 'This page includes conditional logic and multiple questions, Are you sure you want to delete it?'
                                 : selectedSectionData?.['questions'].length > 0
-                                    ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions${selectedSectionData?.page_conditional_logic ? ' and which includes conditional logic' : ''
+                                    ? `You are about to delete the "${truncateText(selectedSectionData?.page_name, 50)}" page, which may contain multiple questions${selectedSectionData?.page_conditional_logic ? ' and which includes conditional logic' : ''
                                     }. This action cannot be undone.`
                                     : 'Are you sure you want to delete this page?'
                         }
@@ -1754,7 +1761,7 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${questionToDelete?.questionName}" question and this conatins conditional logic This action cannot be undone.` : `You are about to delete the "${questionToDelete?.questionName}" question. This action cannot be undone.`}`}
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
