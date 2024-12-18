@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imageSrc, floorPlan }) => {
+const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -138,6 +138,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                         width: "100px",
                         height: "100px",
                         objectFit: "cover",
+                        zIndex: "-9"
                     }}
                     className="rounded-lg"
                 />
@@ -184,7 +185,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                 <div
                                     style={{
                                         width: '380px',
-                                        height: imageSize.height,
+                                        height: '600px',
                                         position: "relative",
                                         backgroundColor: "white"
                                     }}
@@ -290,14 +291,14 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
 
                             className="absolute bottom-[10px] left-0 flex flex-col"
                         >
-                            <button
+                            {isPin === "yes" &&<button
                                 data-testid="floorplan-pin"
                                 className={` px-3 text-white rounded-lg cursor-pointer `}
                                 onClick={togglePinMode}
                             >
                                 <img src="/Images/pin-icon.svg" alt="" width={40} className={` ${isPinMode ? 'border border-white rounded-sm' : ' border border-transparent'}`} />
-                            </button>
-                            <div className="flex flex-wrap">
+                            </button>}
+                            {isDraw === "yes" &&<><div className="flex flex-wrap">
                                 <button
                                     data-testid="floorplan-draw"
                                     className={` px-3 text-white rounded-lg cursor-pointer `}
@@ -312,12 +313,9 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                         onChange={(e) => setStrokeColor(e.target.value)}
                                         value={strokeColor}
                                         // style={{ display: 'none' }}
-                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent '
-                                    />
+                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent ' />
                                 </span>}
-                            </div>
-                            <button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button>
-                            <button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button>
+                            </div><button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button><button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button></>}
                         </div>
                     </div>
                 </div>

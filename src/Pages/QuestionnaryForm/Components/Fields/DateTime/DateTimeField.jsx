@@ -208,14 +208,9 @@ function DateTimeField({
                         className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleDateTime(e.target.value, timeValue)}
-                        onInput={(e) => {
-                            const date = e.target.value;
-                            const [year, month, day] = date.split('-');
-
-                            if (year?.length > 4) {
-                                const truncatedYear = year.slice(0, 4); // Restrict year to 4 digits
-                                e.target.value = `${truncatedYear}${month ? '-' + month : ''}${day ? '-' + day : ''}`;
-                            }
+                        onKeyDown={(e) => {
+                            // Prevent user from entering non-numeric values
+                                e.preventDefault();
                         }}
                     />
 
