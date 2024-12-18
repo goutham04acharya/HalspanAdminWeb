@@ -251,7 +251,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     const handleAdd = (type, blockId, innerIndex, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false);
         const totalConditions = conditions.reduce((acc, curr) => acc + curr.conditions.length, 0);
-        const totalElseIfConditions = conditions[0].elseIfBlocks.reduce((acc, curr) => acc + curr.conditions.length, 0);
+        const totalElseIfConditions = conditions[0]?.elseIfBlocks?.reduce((acc, curr) => acc + curr.conditions.length, 0);
         console.log(totalElseIfConditions, 'totalElseIfConditions')
 
         if (type === "delete") {
