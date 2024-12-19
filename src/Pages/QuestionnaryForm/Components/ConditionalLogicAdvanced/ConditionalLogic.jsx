@@ -1365,6 +1365,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // to get the condition expression
         const getConditionValue = (item) => {
+            console.log(item, 'item')
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
@@ -1401,16 +1402,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;
                     break;
                 case "date is before today":
-                    resultExpression = `${item.question_name} < new Date()`;
+                    resultExpression = `${item.question_name} < new Date().toDateString()`;
                     break;
                 case "date is after or equal to today":
-                    resultExpression = `${item.question_name} >= new Date()`;
+                    resultExpression = `${item.question_name} >= new Date().toDateString()`;
                     break;
                 case "date is before or equal to today":
-                    resultExpression = `${item.question_name} <= new Date()`;
+                    resultExpression = `${item.question_name} <= new Date().toDateString()`;
                     break;
                 case "date is after today":
-                    resultExpression = `${item.question_name} > new Date()`;
+                    resultExpression = `${item.question_name} > new Date().toDateString()`;
                     break;
                 case "date is “X” date of set date":
                     resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;

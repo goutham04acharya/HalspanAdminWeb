@@ -214,12 +214,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Initial State: Exclude sections with non-empty `section_conditional_logic`
     const initialAllPages = sections
-        .filter((section) => !section.section_conditional_logic || section.section_conditional_logic.trim() === '')
+        .filter((section) => !section?.section_conditional_logic || section?.section_conditional_logic.trim() === '')
         .filter((section) => {
-            if (section.section_conditional_logic) {
+            if (section?.section_conditional_logic) {
                 try {
                     // Evaluate the section's conditional logic
-                    return eval(section.section_conditional_logic);
+                    return eval(section?.section_conditional_logic);
                 } catch (err) {
                     console.error('Error evaluating section conditional logic:', err);
                     return false; // Exclude the section if evaluation fails
@@ -238,10 +238,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const getEvaluatedAllPages = () => {
         return sections
             .filter((section) => {
-                if (section.section_conditional_logic) {
+                if (section?.section_conditional_logic) {
                     try {
                         // Evaluate the section's conditional logic
-                        return eval(section.section_conditional_logic);
+                        return eval(section?.section_conditional_logic);
                     } catch (err) {
                         console.error('Error evaluating section conditional logic:', err);
                         return false; // Exclude the section if evaluation fails
@@ -848,7 +848,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue])
-
+    console.log(conditionalValues, 'cv')
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({

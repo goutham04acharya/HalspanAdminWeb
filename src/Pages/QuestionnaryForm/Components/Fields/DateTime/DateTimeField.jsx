@@ -158,7 +158,7 @@ function DateTimeField({
                 }
             }))
         } else if (type === 'date') {
-            const value = e.target.value;
+            const value = e;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
             setConditionalValues((prevValues) => ({
                 ...prevValues,
@@ -186,9 +186,6 @@ function DateTimeField({
         }
     }
 
-    console.log(validationErrors, 'validationErrors?.preview_datetimefield[question?.question_id]')
-
-
     return (
         <div>
             <label
@@ -210,7 +207,7 @@ function DateTimeField({
                         value={questionValue[question?.question_id]?.split(' ')[0]}
                         className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
-                        onChange={(e) => handleDateTime(e.target.value, timeValue)}
+                        onChange={(e) => handleFunction(e.target.value)}
                         onKeyDown={(e) => {
                             // Prevent user from entering non-numeric values
                                 e.preventDefault();

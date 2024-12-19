@@ -35,7 +35,7 @@ const TextBoxField = ({
 }) => {
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-    
+
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -81,7 +81,7 @@ const TextBoxField = ({
             isEditable: true
         }
         dispatch(setFieldEditable(obj));
-        dispatch(setQuestionValue({ question_id: question_id, value: newValue}))
+        dispatch(setQuestionValue({ question_id: question_id, value: newValue }))
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
@@ -118,9 +118,43 @@ const TextBoxField = ({
         }
     };
     const handleFunction = () => {
-        
+
     }
-    console.log(validationErrors?.preview_textboxfield?.[question.question_id], 'validationErrors?.preview_textboxfield?.[question.question_id]')
+    const handleKeyDown = (e, format, regex) => {
+        const keyValue = e.key;
+        console.log(keyValue, 'key')
+        // Allow special keys  
+        if (['Backspace', 'Tab', 'Enter', 'Shift', 'Control', 'Alt', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(keyValue)) {
+            return;
+        }
+
+        // Check format and prevent default if necessary  
+        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
+            displayValidationError('Only alphabets are allowed.');
+            e.preventDefault();
+        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
+            displayValidationError('Only alphabets and numbers are allowed.');
+            e.preventDefault();
+        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
+            displayValidationError('Only numbers are allowed.');
+            e.preventDefault();
+        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
+            displayValidationError('Invalid format. Please enter a value in the correct format.');
+            e.preventDefault();
+        }
+    };
+
+
+    const displayValidationError = (message) => {
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_textboxfield: {
+                ...prevErrors.preview_textboxfield,
+                [question.question_id]: message,
+            },
+        }));
+    }
+
     return (
         <div className=''>
             <label
@@ -141,51 +175,11 @@ const TextBoxField = ({
                     className={`h-[156px] resize-none w-full break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
-                    // onBlur={(e) => handleInputChange(e)}
-                    onKeyDown={(e) => {
-                        const format = question.format;
-                        const regex = question.regular_expression;
-                        const keyValue = e.key;
-
-                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
-                            setIsFormatError(true)
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
-                                },
-                            }));
-                        }
-                    }}
+                    onKeyDown={(e) => handleKeyDown(e, question?.format, question?.regular_expression)}
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
-                    // disabled={formStatus !== 'Draft'}
+                // disabled={formStatus !== 'Draft'}
                 />
                 :
                 <input
@@ -193,51 +187,11 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={questionValue[question?.question_id] || ''}
-                    
+
                     className={`w-full h-auto break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'}  rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
-                    // onBlur={(e) => handleInputChange(e)}
-                    onKeyDown={(e) => {
-                        const format = question.format;
-                        const regex = question.regular_expression;
-                        const keyValue = e.key;
-
-                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
-                            setIsFormatError(true)
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
-                                },
-                            }));
-                        }
-                    }}
+                    onKeyDown={(e) => handleKeyDown(e, question?.format, question?.regular_expression)}
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}

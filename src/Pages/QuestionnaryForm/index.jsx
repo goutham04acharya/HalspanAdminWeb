@@ -593,29 +593,28 @@ const QuestionnaryForm = () => {
                 //     'compliance_logic': complianceInitialState,
                 // }
                 // const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
-                if(sectionsData.length > 1){
-                    const sectionOrder = await GetSectionOrder();
-                    if (sectionOrder === 'no_data') {
-                        setSections(sectionsData);
-                        setCompareSavedSections(sectionsData)
-                        return;
-                    }
-    
-                    if (sectionOrder) {
-                        const orderedSectionsData = [...sectionsData].sort((a, b) => {
-                            return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
-                        });
-    
-                        dispatch(setDataIsSame(orderedSectionsData));
-                        setSections(orderedSectionsData); // Set ordered sections  
-                        console.log(sections, 'jjjjjjj')
-                        setCompareSavedSections(orderedSectionsData)
-                    } else {
-                        // If sectionOrder is invalid, use initial sections order  
-                        setSections(sectionsData);
-                        setCompareSavedSections(sectionsData)
-                    }
+                const sectionOrder = await GetSectionOrder();
+                if (sectionOrder === 'no_data') {
+                    setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
+                    return;
                 }
+
+                if (sectionOrder) {
+                    const orderedSectionsData = [...sectionsData].sort((a, b) => {
+                        return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
+                    });
+
+                    dispatch(setDataIsSame(orderedSectionsData));
+                    setSections(orderedSectionsData); // Set ordered sections  
+                    console.log(sections, 'jjjjjjj')
+                    setCompareSavedSections(orderedSectionsData)
+                } else {
+                    // If sectionOrder is invalid, use initial sections order  
+                    setSections(sectionsData);
+                    setCompareSavedSections(sectionsData)
+                }
+
             } else {
                 setToastError('Something went wrong fetching form details');
             }
