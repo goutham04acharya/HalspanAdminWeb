@@ -37,7 +37,7 @@ Then('I click the save button for conditional logic', async function () {
 
 Given('I am on the Questionnaire management sections', async function () {
     await new Promise((resolve) => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.xpath('//*[text()="Minerva Levy"]')));
+    await driver.wait(until.elementLocated(By.xpath('//*[text()="Minerva Levy 1"]')));
 });
 
 Then('I should read a error message', async function () {
