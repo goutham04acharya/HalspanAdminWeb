@@ -540,7 +540,7 @@ const QuestionnaryForm = () => {
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
                 dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
-
+                console.log(response?.data?.data, 'section dateteatettea')
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -579,29 +579,42 @@ const QuestionnaryForm = () => {
                     status: true,
                     time: response?.data?.time,
                 };
-
+                // console.log(sectionsData.map((section, index) => ({
+                //     index: index,
+                //     id: section.section_id
+                // })), 'ssssdxcscdm')
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
-
-                const sectionOrder = await GetSectionOrder();
-                if (sectionOrder === 'no_data') {
-                    setSections(sectionsData);
-                    setCompareSavedSections(sectionsData)
-                    return;
-                }
-
-                if (sectionOrder) {
-                    const orderedSectionsData = [...sectionsData].sort((a, b) => {
-                        return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
-                    });
-
-                    dispatch(setDataIsSame(orderedSectionsData));
-                    setSections(orderedSectionsData); // Set ordered sections  
-                    console.log(sections, 'jjjjjjj')
-                    setCompareSavedSections(orderedSectionsData)
-                } else {
-                    // If sectionOrder is invalid, use initial sections order  
-                    setSections(sectionsData);
-                    setCompareSavedSections(sectionsData)
+                // const body = {
+                //     "public_name": response?.data?.data?.public_name,
+                //     "sections": sectionsData.map((section, index) => ({
+                //         index: index,
+                //         id: section.section_id
+                //     })),
+                //     'compliance_logic': complianceInitialState,
+                // }
+                // const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+                if(sectionsData.length > 1){
+                    const sectionOrder = await GetSectionOrder();
+                    if (sectionOrder === 'no_data') {
+                        setSections(sectionsData);
+                        setCompareSavedSections(sectionsData)
+                        return;
+                    }
+    
+                    if (sectionOrder) {
+                        const orderedSectionsData = [...sectionsData].sort((a, b) => {
+                            return sectionOrder.indexOf(a.section_id) - sectionOrder.indexOf(b.section_id);
+                        });
+    
+                        dispatch(setDataIsSame(orderedSectionsData));
+                        setSections(orderedSectionsData); // Set ordered sections  
+                        console.log(sections, 'jjjjjjj')
+                        setCompareSavedSections(orderedSectionsData)
+                    } else {
+                        // If sectionOrder is invalid, use initial sections order  
+                        setSections(sectionsData);
+                        setCompareSavedSections(sectionsData)
+                    }
                 }
             } else {
                 setToastError('Something went wrong fetching form details');
@@ -1115,6 +1128,7 @@ const QuestionnaryForm = () => {
 
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
+        console.log(updatedSection, 'updatedkskdksk')
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({

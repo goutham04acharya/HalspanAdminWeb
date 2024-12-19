@@ -177,6 +177,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
+                processedContent = processedContent?.replace('if', '')
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';

@@ -480,7 +480,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
 
-                    const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
+                    const conditionToUpdate = updatedConditions[mainIndex]?.elseIfBlocks[elseIfIndex]?.conditions[subIndex];
 
                     conditionToUpdate.condition_logic = key;
 
@@ -490,7 +490,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                 setConditions(prevConditions => {
                     const updatedConditions = [...prevConditions];
 
-                    const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+                    const conditionToUpdate = updatedConditions[mainIndex]?.conditions[subIndex];
 
                     conditionToUpdate.condition_logic = key;
 
@@ -506,14 +506,14 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             setConditions(prevConditions => {
                 const updatedConditions = [...prevConditions];
 
-                const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
+                const conditionToUpdate = updatedConditions[mainIndex]?.elseIfBlocks[elseIfIndex]?.conditions[subIndex];
 
                 conditionToUpdate.question_name = key;
-                conditionToUpdate.condition_type = selectedQuestion.component_type;
+                conditionToUpdate.condition_type = selectedQuestion?.component_type;
                 conditionToUpdate.value = '';
                 conditionToUpdate.condition_logic = '';
 
-                if (selectedQuestion.component_type === 'dateTimefield') {
+                if (selectedQuestion?.component_type === 'dateTimefield') {
                     conditionToUpdate['date'] = '';
                 }
 
@@ -523,14 +523,14 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             setConditions(prevConditions => {
                 const updatedConditions = [...prevConditions];
 
-                const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
+                const conditionToUpdate = updatedConditions[mainIndex]?.conditions[subIndex];
 
                 conditionToUpdate.question_name = key;
-                conditionToUpdate.condition_type = selectedQuestion.component_type;
+                conditionToUpdate.condition_type = selectedQuestion?.component_type;
                 conditionToUpdate.value = '';
                 conditionToUpdate.condition_logic = '';
 
-                if (selectedQuestion.component_type === 'dateTimefield') {
+                if (selectedQuestion?.component_type === 'dateTimefield') {
                     conditionToUpdate['date'] = '';
                 }
 
