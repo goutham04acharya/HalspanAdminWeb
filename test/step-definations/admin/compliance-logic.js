@@ -184,7 +184,7 @@ When('I click add default value button for compliance logic', async function () 
 Then('I should see the basic editor compliance logic in default value field', async function () {
     await new Promise(resolve => setTimeout(resolve, 950));
     // eslint-disable-next-line max-len
-    let condition = `(Section_1.Page_1.Sample_Choice_Label_Name.includes("Yes")) then (STATUS = 'PASS', GRADE = 'A') else (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "Replace")`;
+    let condition = `if (Section_1.Page_1.Sample_Choice_Label_Name.includes("Yes")) then (STATUS = 'PASS', GRADE = 'A') else (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "Replace")`;
     // eslint-disable-next-line max-len
     const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
     assert.equal(default_value, condition);
