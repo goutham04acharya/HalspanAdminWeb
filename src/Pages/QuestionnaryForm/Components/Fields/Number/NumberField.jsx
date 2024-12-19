@@ -169,23 +169,24 @@ function NumberField({
                 placeholder={fieldSettingParameters?.placeholderContent}
                 onChange={() => handleChange(fieldSettingParameters)}
             /> : ((preview && question?.source === 'entryfield') || (preview && question?.source === 'both')) ?
-                <input
-                    data-testid='input'
-                    type={
-                        question?.type === 'integer' ? 'number' :
+                <div className={`flex border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg items-center`}>
+                    {(question?.field_texts?.pre_field_text || fieldSettingParameters?.preField) && <p className={`w-1/5 max-w-[20%] break-all overflow-auto ml-2`}>{preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField}</p>}
+                    <input
+                        data-testid='input'
+                        type={question?.type === 'integer' ? 'number' :
                             question?.type === 'float' ? 'number' :
                                 question?.type === 'rating' ? 'range' :
-                                    'text'
-                    }
-                    step={question?.type === 'float' ? 'any' : ''}
-                    value={questionValue[question?.question_id]}
-                    className={`w-full h-auto break-words border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
-                    onChange={(e) => handleInputChange(e)}
-                    placeholder={question?.placeholder_content}
-                    onKeyDown={(e) => {
-                        if (e.key === 'e' || e.key === 'E') e.preventDefault();
-                    }}
-                /> : ''}
+                                    'text'}
+                        step={question?.type === 'float' ? 'any' : ''}
+                        value={questionValue[question?.question_id]}
+                        className={`w-full h-auto break-words  bg-white py-3 px-4 mt-1 mb-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
+                        onChange={(e) => handleInputChange(e)}
+                        placeholder={question?.placeholder_content}
+                        onKeyDown={(e) => {
+                            if (e.key === 'e' || e.key === 'E') e.preventDefault();
+                        }} />
+                    {(question?.field_texts?.post_field_text || fieldSettingParameters?.postField) && <p className={`w-1/5 max-w-[20%] break-all overflow-auto mr-2`}>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>}
+                </div> : ''}
             {((preview ? question?.source === 'slider' : fieldSettingParameters?.source === 'slider') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
                 <div data-testid="slider" className=''>
                     <div className='flex items-center w-full'>
@@ -203,7 +204,8 @@ function NumberField({
                                 onChange={handleRange}
                                 maxLength={50}
                                 style={{
-                                    '--percent': `${sliderPercentage}%`
+                                    '--percent': `${sliderPercentage}%`,
+                                    // 'backgroundColor' : ''
                                 }}
                                 className='mt-6  w-full'
                                 data-testid="number-slider"

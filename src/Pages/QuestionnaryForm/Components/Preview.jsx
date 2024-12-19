@@ -511,15 +511,17 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'filefield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_filefield[question.question_id] = 'This is a mandatory field';
+                                }else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_filefield[question.question_id] = `Upload minimum of ${question?.field_range?.min} files`;
                                 }
                             }
                             break;
 
                         case 'videofield':
                             if (!question?.options?.optional) {
-
                                 if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_videofield[question.question_id] = 'This is a mandatory field';
                                 } else if (questionValue[question?.question_id].length < question?.field_range?.min) {

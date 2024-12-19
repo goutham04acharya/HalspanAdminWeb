@@ -279,11 +279,12 @@ console.log(selectedOption, 'gfgfgg')
                     selectedOption={selectedOption?.asset_type}
                     handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
                     dropdownRef={assetDropdownRef}
-                    validationError={validationErrors?.asset_name}
+                    validationError={validationErrors?.asset_type}
                     assetType
                   />
                 </div>
-                {validationErrors?.asset_name && <ErrorMessage error={validationErrors?.asset_name} />}
+                {console.log(validationErrors?.asset_type, 'validationErrors?.asset_name')}
+                {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
               </div>
               <div className='w-1/2'>
                 <InputWithDropDown
