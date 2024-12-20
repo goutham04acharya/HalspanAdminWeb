@@ -158,23 +158,19 @@ function DateTimeField({
                 }
             }))
         } else if (type === 'date') {
-            const value = e; // Assuming 'e' is '2024-12-20'
-
+            const value = e;
+            console.log(value, 'value')
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
-            const currentMilliSeconds = new Date().getMilliseconds();
-
-            // Create a Date object for the provided date (value) and set the current time
-            const selectedDate = new Date(value); // This will be 2024-12-20T00:00:00.000Z initially
+            const currentMilliSeconds = new Date().getMilliseconds() + 100;
+            console.log(currentMilliSeconds + 100, 'current milliseconds', new Date().getMilliseconds())
+            const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
-
             console.log(selectedDate, 'current date time');
-            // Expected output: Fri Dec 20 2024 10:25:09 GMT+0530 (India Standard Time)
-
-            const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            console.log(systemTimeZone, 'system time zone');
+            // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // console.log(systemTimeZone, 'system time zone');
 
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({

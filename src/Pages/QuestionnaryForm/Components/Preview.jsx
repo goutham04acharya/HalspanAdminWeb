@@ -22,7 +22,7 @@ import {
     setFieldEditable,
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
-import { clearQuestions } from './previewQuestionnaireValuesSlice.js';
+import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
 import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
@@ -816,6 +816,21 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         if (default_conditional_logic) {
                             try {
                                 const result = eval(default_conditional_logic);
+                                console.log(default_conditional_logic,'default logic')
+                                console.log(result, 'dddd')
+                                if(component_type === "dateTimefield"){
+                                    const splitDate = (dateStr) => {
+                                        if (!dateStr || typeof dateStr !== 'string') {
+                                            return new Date().toISOString().split('T')[0];
+                                        }
+                                        const [day, month, year] = dateStr.split("/");
+                                        return `${year}-${month}-${day}`;
+                                    }
+                                    console.log(typeof splitDate(result), splitDate(result), 'ppp');
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
+                                }else if(component_type === "numberfield"){
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
+                                }
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
@@ -839,7 +854,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
             });
         });
-    }, [sections, setValue])
+    }, [sections, setValue, questionValue, setQuestionValue, dispatch])
     console.log(conditionalValues, 'cv')
     const handleClose = () => {
         setModalOpen(false)

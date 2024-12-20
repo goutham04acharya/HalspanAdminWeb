@@ -234,6 +234,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     useEffect(() => {
+        console.log(complianceLogicCondition[0]?.conditions[0], 'complianceLogicCondition[0]?.conditions[0]?.value')
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -248,7 +249,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-        if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content)) {
+        if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
     }, [])
