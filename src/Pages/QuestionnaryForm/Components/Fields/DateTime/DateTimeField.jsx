@@ -224,11 +224,15 @@ function DateTimeField({
                         className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleFunction(e.target.value)}
-                        onKeyDown={(e) => {
-                            // Prevent user from entering non-numeric values
-                            e.preventDefault();
-                        }}
+                        pattern='\d{4}-\d{2}-\d{2}'
+                        min="1000-01-01"
+                        max="9999-12-31"
+                        onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
+                        // onKeyDown={(e) => {
+                        //     e.preventDefault(); // This is preventing input, make sure it’s intentional
+                        // }}
                     />
+
 
 
                 )}
