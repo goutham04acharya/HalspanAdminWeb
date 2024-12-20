@@ -10,7 +10,6 @@ const questionsSlice = createSlice({
     reducers: {
         setQuestionValue: (state, action) => {
             const { question_id, value } = action.payload;
-            console.log(action.payload, 'action')
             state.questions[question_id] = value;
         },
         removeQuestionValue: (state, action) => {

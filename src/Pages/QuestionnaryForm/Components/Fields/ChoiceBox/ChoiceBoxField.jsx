@@ -34,7 +34,6 @@ const ChoiceBoxField = ({
     const [selectedValues, setSelectedValues] = useState([]);
     const dispatch = useDispatch()
     const questionValue = useSelector(state => state.questionValues.questions);
-    console.log(questionValue[question?.question_id], 'hshshshhs')
     const handleRadioChange = (selectedValue) => {
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
@@ -47,7 +46,6 @@ const ChoiceBoxField = ({
                 }
             }
         }))
-        console.log(selectedValue, 'selected value')
         // Update the selected value in the parent state for the specific question
         dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }))
         setValue((prev) => ({

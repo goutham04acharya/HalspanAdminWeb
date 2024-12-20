@@ -487,15 +487,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'dateTimefield':
                             if (!question.options?.optional) {
-                                // debugger
-                                console.log(questionValue, 'ddddaawad')
                                 if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
-                                    console.log('am h')
-                                    // Initialize acc.preview_datetimefield if it is undefined
                                     acc.preview_datetimefield = acc.preview_datetimefield || {};
                                     acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
-                                } else {
-                                    console.log('am here')
                                 }
                             }
                             break;
@@ -822,7 +816,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         if (default_conditional_logic) {
                             try {
                                 const result = eval(default_conditional_logic);
-                                console.log(result, 'ffff')
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
@@ -837,7 +830,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     }))
                                 }
-                                console.log(value, 'ddd')
                             } catch (error) {
                                 // Log the error if eval fails
                                 console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
@@ -954,6 +946,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
+                                            console.log(new Date(), 'new Date')
+                                            console.log(list?.conditional_logic, 'list?.conditional_logic')
                                             try {
                                                 let result = eval(list?.conditional_logic)
                                                 if (!eval(list?.conditional_logic)) {

@@ -88,7 +88,6 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
-  console.log(selectedOption, 'gfgfgg')
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
@@ -303,7 +302,6 @@ function CreateQuestionnary() {
                     assetType
                   />
                 </div>
-                {console.log(validationErrors?.asset_type, 'validationErrors?.asset_name')}
                 {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
               </div>
               <div className='w-1/2'>

@@ -540,7 +540,6 @@ const QuestionnaryForm = () => {
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
                 dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
-                console.log(response?.data?.data, 'section dateteatettea')
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -607,7 +606,6 @@ const QuestionnaryForm = () => {
 
                     dispatch(setDataIsSame(orderedSectionsData));
                     setSections(orderedSectionsData); // Set ordered sections  
-                    console.log(sections, 'jjjjjjj')
                     setCompareSavedSections(orderedSectionsData)
                 } else {
                     // If sectionOrder is invalid, use initial sections order  
@@ -1127,7 +1125,6 @@ const QuestionnaryForm = () => {
 
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
-        console.log(updatedSection, 'updatedkskdksk')
         const body = {
             "public_name": formDefaultInfo.public_name,
             "sections": updatedSection.map((section, index) => ({

@@ -9,7 +9,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
     const [error, setError] = useState('');
     const dispatch = useDispatch()
     const questionValue = useSelector(state => state.questionValues.questions);
-    console.log(questionValue, 'dddd')
     const handleFileChange = (e) => {
         const uploadedFiles = e.target.files;
 

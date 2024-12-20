@@ -301,7 +301,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'value')
         setLogic(value);
         setInputValue(value)
         const cursorPosition = event.target.selectionStart; // Get the cursor position
@@ -1072,7 +1071,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let GRADE = '';
             const result = eval(evalInputValue);
 
-            console.log(typeof result, result, 'result')
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -1124,7 +1122,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     case 'compliancelogic':
                     case 'tagScanfield':
                         if (typeof result !== 'string') {
-                            console.log(typeof result, 'type')
                             handleError('The evaluated result is not a string. The field type expects a string.');
                             return;
                         }
@@ -1159,7 +1156,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(true);
             if (!error) {
                 if (complianceState) {
-                    console.log(payloadString, 'payload string')
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
@@ -1365,7 +1361,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // to get the condition expression
         const getConditionValue = (item) => {
-            console.log(item, 'item')
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
@@ -1402,16 +1397,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.length == ${getValue(item.value, item.condition_type)}`;
                     break;
                 case "date is before today":
-                    resultExpression = `${item.question_name} < new Date().toDateString()`;
+                    resultExpression = `${item.question_name} < new Date()`;
                     break;
                 case "date is after or equal to today":
-                    resultExpression = `${item.question_name} >= new Date().toDateString()`;
+                    resultExpression = `${item.question_name} >= new Date()`;
                     break;
                 case "date is before or equal to today":
-                    resultExpression = `${item.question_name} <= new Date().toDateString()`;
+                    resultExpression = `${item.question_name} <= new Date()`;
                     break;
                 case "date is after today":
-                    resultExpression = `${item.question_name} > new Date().toDateString()`;
+                    resultExpression = `${item.question_name} > new Date()`;
                     break;
                 case "date is “X” date of set date":
                     resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
@@ -1456,7 +1451,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         });
 
         return formatExpression(result.toString());
-
     }
 
     const getFinalComplianceLogic = () => {
@@ -1464,7 +1458,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0]?.conditions === undefined) {
             return
         }
-        // console.log(conditions[0], 'conditions[0].conditions')
         finalString += conditions[0].conditions[0].question_name !== '' ? 'if (' + getComplianceLogic(conditions[0].conditions) + ')' : ''
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
@@ -1491,12 +1484,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         if (!complianceState) {
             const condition_logic = buildConditionExpression(conditions)
-            console.log(condition_logic, 'fffff')
             // setInputValue(condition_logic);
 
         } else {
             try {
-                console.log(getFinalComplianceLogic(conditions))
                 let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                     .replaceAll('?', 'then') // Replace ? with then
@@ -1510,7 +1501,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-                console.log(condition_logic, 'tttttt')
                 setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
 
             } catch (error) {
@@ -1570,7 +1560,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     }
 
-    console.log(conditions, 'conditions')
     useEffect(() => {
         let compliance_logic;
         if (!complianceState) {

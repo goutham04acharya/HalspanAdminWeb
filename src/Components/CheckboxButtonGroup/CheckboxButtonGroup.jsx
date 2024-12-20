@@ -3,11 +3,6 @@ import React, { useEffect, useState } from 'react';
 const CustomCheckboxGroup = ({ values, onChange, questionValue, question }) => {
     // Initialize with the first value selected by default
     const [selectedValues, setSelectedValues] = useState([]);
-    console.log(questionValue[question?.question_id], 'selected values')
-    // [
-    //     "yes",
-    //     "no"
-    // ]
 
     useEffect(() => {
         // Set initial values from the provided questionValue
@@ -17,7 +12,6 @@ const CustomCheckboxGroup = ({ values, onChange, questionValue, question }) => {
         }
     }, [questionValue, question?.question_id]);
     const handleCheckboxChange = (value) => {
-        console.log('i am here', selectedValues)
         let updatedValues;
             if (selectedValues.includes(value)) {
                 updatedValues =  selectedValues.filter(item => item !== value);

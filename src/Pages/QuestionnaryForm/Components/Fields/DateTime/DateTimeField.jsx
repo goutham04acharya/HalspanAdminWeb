@@ -30,7 +30,7 @@ function DateTimeField({
     const [timeValue, setTimeValue] = useState('');
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-    const [date, setDate] = useState(questionValue[question?.question_id]?.split(' ')[0] ? new Date(questionValue[question?.question_id]?.split(' ')[0]) : null);
+    // const [date, setDate] = useState(questionValue[question?.question_id]?.split(' ')[0] ? new Date(questionValue[question?.question_id]?.split(' ')[0]) : '');
 
     const splitDate = (dateStr) => {
         if (!dateStr || typeof dateStr !== 'string') {
@@ -158,24 +158,43 @@ function DateTimeField({
                 }
             }))
         } else if (type === 'date') {
-            const value = e;
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+            const value = e; // Assuming 'e' is '2024-12-20'
+
+            // Extract current time
+            const currentHours = new Date().getHours();
+            const currentMinutes = new Date().getMinutes();
+            const currentSeconds = new Date().getSeconds();
+            const currentMilliSeconds = new Date().getMilliseconds();
+
+            // Create a Date object for the provided date (value) and set the current time
+            const selectedDate = new Date(value); // This will be 2024-12-20T00:00:00.000Z initially
+            selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
+
+            console.log(selectedDate, 'current date time');
+            // Expected output: Fri Dec 20 2024 10:25:09 GMT+0530 (India Standard Time)
+
+            const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            console.log(systemTimeZone, 'system time zone');
+
+            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
-                    ...prevValues[section_name], // Preserve existing entries for this section
+                    ...prevValues[section_name],
                     [page_name]: {
-                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: new Date(splitDate(value)) // Add or update the label key with newValue
+                        ...prevValues[section_name]?.[page_name],
+                        [label]: selectedDate // Add or update the label key with the selectedDate
                     }
                 }
             }));
-            dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
+
+            dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
 
             setValue((prev) => ({
                 ...prev,
-                [question?.question_id]: value
+                [question?.question_id]: selectedDate
             }));
+
             setValidationErrors((prevErrors) => ({
                 ...prevErrors,
                 preview_datetimefield: {
@@ -184,6 +203,7 @@ function DateTimeField({
                 }
             }));
         }
+
     }
 
     return (
@@ -204,13 +224,13 @@ function DateTimeField({
                         data-testid="input"
                         type="date"
                         id={textId}
-                        value={questionValue[question?.question_id]?.split(' ')[0]}
+                        value={questionValue?.[question?.question_id]}
                         className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleFunction(e.target.value)}
                         onKeyDown={(e) => {
                             // Prevent user from entering non-numeric values
-                                e.preventDefault();
+                            e.preventDefault();
                         }}
                     />
 
@@ -227,7 +247,7 @@ function DateTimeField({
                         //         [question?.question_id]: errorMessage
                         //     }
                         // }))}
-                        questionValue={questionValue[question?.question_id]}
+                        questionValue={questionValue?.[question?.question_id]}
                     />
                 )}
 
@@ -237,13 +257,13 @@ function DateTimeField({
                             data-testid="input"
                             type="date"
                             id={textId}
-                            value={questionValue[question?.question_id]?.split(' ')[0]} // Use state to manage date value
+                            value={questionValue?.[question?.question_id]?.split(' ')[0]} // Use state to manage date value
                             className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
                             onKeyDown={(e) => {
                                 // Prevent user from entering non-numeric values
-                                    e.preventDefault();
+                                e.preventDefault();
                             }}
                         />
                     </div>

@@ -29,7 +29,6 @@ function NumberField({
     const questionValue = useSelector(state => state.questionValues.questions);
     // Get slider value from Redux store
     const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
-    console.log(sliderValue, 'slidervalue')
     // Get increment_by value from fieldSettingParameters with a fallback to 1
     const incrementByValue = fieldSettingParameters?.incrementby || 1;
 

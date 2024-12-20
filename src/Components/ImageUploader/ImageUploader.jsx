@@ -16,7 +16,6 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
     const [colorPicker, setColorPicker] = useState(false);
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-    console.log(questionValue, 'question value')
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files); // Convert FileList to array
         let newImages = [...images]; // Copy existing images
@@ -71,10 +70,9 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
     const handleImageRemove = (index) => {
         const newImages = [...questionValue?.[question?.question_id] ];
         newImages.splice(index, 1);
-        console.log(newImages, 'newImages')
         setImages(newImages);
         handleRemoveImage(newImages)
-        console.log(newImages, 'newImages')
+
         
         // Update Redux store with new image array
         // const imageUrls = newImages.map((image) => URL.createObjectURL(image));
