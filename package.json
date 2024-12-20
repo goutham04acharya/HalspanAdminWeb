@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "test": "react-scripts test",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
@@ -13,7 +13,8 @@
     "generate_report": "nyc report --temp-dir ./test/step-definations/coverageData --reporter html --report-dir ./coverage",
     "code_coverage": "nyc check-coverage --temp-dir ./test/step_definitions/coverageData",
     "owasp": "owasp-dependency-check --out=./dependency-check-reports --project Halspan -f JSON -f HTML --prettyPrint --failOnCVSS 8 --data=$(node -p \"require('os').homedir() + '/dependency-check-data'\") --noupdate --scan=package-lock.json --log=logs.txt && cat logs.txt",
-    "generate_report_cobertura": "nyc report --temp-dir ./test/step-definations/coverageData --reporter cobertura --report-dir ./coverage-cobertura"
+    "generate_report_cobertura": "nyc report --temp-dir ./test/step-definations/coverageData --reporter cobertura --report-dir ./coverage-cobertura",
+    "cucumber": "npx cucumber-js --import test"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
@@ -49,6 +50,7 @@
     "papaparse": "^5.4.1",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
+    "react-date-picker": "^11.0.0",
     "react-dom": "^18.3.1",
     "react-draggable-list": "^4.2.1",
     "react-image-marker": "^1.2.0",

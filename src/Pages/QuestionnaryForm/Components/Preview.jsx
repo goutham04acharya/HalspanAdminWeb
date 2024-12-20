@@ -22,6 +22,8 @@ import {
     setFieldEditable,
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
+import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
+import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -39,8 +41,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
+    const questionValue = useSelector(state => state?.questionValues?.questions);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    const [isvalidExpression, setIsValidExpression] = useState(false);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
         nextSection: 0,
@@ -175,6 +177,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
+                processedContent = processedContent?.replace('if', '')
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
@@ -211,12 +214,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Initial State: Exclude sections with non-empty `section_conditional_logic`
     const initialAllPages = sections
-        .filter((section) => !section.section_conditional_logic || section.section_conditional_logic.trim() === '')
+        .filter((section) => !section?.section_conditional_logic || section?.section_conditional_logic.trim() === '')
         .filter((section) => {
-            if (section.section_conditional_logic) {
+            if (section?.section_conditional_logic) {
                 try {
                     // Evaluate the section's conditional logic
-                    return eval(section.section_conditional_logic);
+                    return eval(section?.section_conditional_logic);
                 } catch (err) {
                     console.error('Error evaluating section conditional logic:', err);
                     return false; // Exclude the section if evaluation fails
@@ -235,10 +238,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const getEvaluatedAllPages = () => {
         return sections
             .filter((section) => {
-                if (section.section_conditional_logic) {
+                if (section?.section_conditional_logic) {
                     try {
                         // Evaluate the section's conditional logic
-                        return eval(section.section_conditional_logic);
+                        return eval(section?.section_conditional_logic);
                     } catch (err) {
                         console.error('Error evaluating section conditional logic:', err);
                         return false; // Exclude the section if evaluation fails
@@ -258,7 +261,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Simulate user interaction or dynamic evaluation
     const allPages = getEvaluatedAllPages();
-
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -476,37 +478,49 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             break;
 
                         case 'numberfield':
-                            if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-                                acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+                                if (questionValue[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                    acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                                }
                             }
                             break;
 
                         case 'dateTimefield':
-                            if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-                                acc.preview_datetimefield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+                                if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                    acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                    acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                }
                             }
                             break;
 
                         case 'photofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined || questionValue[question?.question_id].length === 0) {
                                     acc.preview_photofield[question.question_id] = 'This is a mandatory field';
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_photofield[question?.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
                                 }
                             }
                             break;
 
                         case 'filefield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_filefield[question.question_id] = 'This is a mandatory field';
+                                }else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_filefield[question.question_id] = `Upload minimum of ${question?.field_range?.min} files`;
                                 }
                             }
                             break;
 
                         case 'videofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_videofield[question.question_id] = 'This is a mandatory field';
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_videofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} videos`;
                                 }
                             }
                             break;
@@ -745,8 +759,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     testId="preview"
                     setValue={setValue}
                     values={value[question?.question_id]}
-                // setFieldEditable={setFieldEditable}
-                // setFieldValue={setFieldValue}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -794,59 +806,45 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key] = value;
     });
-
-    const isLastSectionAndPage = () => {
-        // Check if we are on the last section and last page
-        const isLastPageInSection = currentPage === sections[currentSection]?.pages.length - 1;
-        const isLastSection = currentSection === sections.length - 1;
-
-        if (isLastSection && isLastPageInSection) {
-            return true; // If on the last section and page, it's a "Submit" button
-        }
-
-        // Otherwise, evaluate the next section's conditional logic
-        const nextSectionData = sections[currentSection + 1];
-        if (nextSectionData?.section_conditional_logic) {
-            try {
-                const isSectionEval = eval(nextSectionData.section_conditional_logic);
-                return !isSectionEval; // If the next section logic is invalid, it becomes a "Submit" button
-            } catch (err) {
-                console.error("Error evaluating section conditional logic:", err);
-                return true; // On error, assume "Submit"
-            }
-        }
-
-        return false; // Default: "Next"
-    };
-
-
-
     useEffect(() => {
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
-                    const { default_conditional_logic, default_content } = question;
-
+                    const { default_conditional_logic, default_content, component_type } = question;
                     // Check if default_conditional_logic is not empty
                     if (!fieldStatus[question?.question_id]) {
                         if (default_conditional_logic) {
                             try {
+                                const result = eval(default_conditional_logic);
+                                console.log(default_conditional_logic,'default logic')
+                                console.log(result, 'dddd')
+                                if(component_type === "dateTimefield"){
+                                    const splitDate = (dateStr) => {
+                                        if (!dateStr || typeof dateStr !== 'string') {
+                                            return new Date().toISOString().split('T')[0];
+                                        }
+                                        const [day, month, year] = dateStr.split("/");
+                                        return `${year}-${month}-${day}`;
+                                    }
+                                    console.log(typeof splitDate(result), splitDate(result), 'ppp');
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
+                                }else if(component_type === "numberfield"){
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
+                                }
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
                                     const result = eval(default_conditional_logic);
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
-
                                     }))
                                 } else {
                                     setValue((prev) => ({
                                         ...prev,
-                                        [question.question_id]: default_conditional_logic
+                                        [question.question_id]: result
 
                                     }))
                                 }
-
                             } catch (error) {
                                 // Log the error if eval fails
                                 console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
@@ -856,8 +854,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
             });
         });
-    }, [conditionalValues])
-
+    }, [sections, setValue, questionValue, setQuestionValue, dispatch])
+    console.log(conditionalValues, 'cv')
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({
@@ -871,15 +869,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_videofield: '',
             preview_gpsfield: '',
         }));
+        dispatch(clearQuestions())
         dispatch(resetFields())
-    }
-    function addDays(date) {
-        if (date) {
-            let result = date;
-            result.setDate(result.getDate() + 1);
-            // return result
-        }
-
+        dispatch(clearAllSignatures());
     }
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
@@ -897,7 +889,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
                             {evaluateComplianceLogic().map((result, index) => (
-
                                 <>
                                     <div
                                         key={index}
@@ -908,7 +899,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             <span
                                                 className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'PASS' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
                                             >
-                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} data-testid={result?.STATUS === 'PASS' ? 'compliant' : 'non-compliant'} />
                                                 {result?.STATUS === 'PASS' ? 'Compliant' : 'Non-Compliant'}
                                             </span>
                                         </div>
@@ -970,6 +961,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
+                                            console.log(new Date(), 'new Date')
+                                            console.log(list?.conditional_logic, 'list?.conditional_logic')
                                             try {
                                                 let result = eval(list?.conditional_logic)
                                                 if (!eval(list?.conditional_logic)) {
@@ -1041,9 +1034,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button 
-                    // disabled={previewNavigation.current_page === 1} 
-                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
+                    {!showLabel ? <button
+                        disabled={previewNavigation.current_page === 1}
+                        type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
                     </button> :

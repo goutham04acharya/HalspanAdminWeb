@@ -10,7 +10,8 @@ test/step-definations/failed_scenarios/*.png
 *.xlsx
 # Compiled Java class files
 *.class
-
+test/unit-testing/unit-testing2/51_dummy.feature
+test/step-definations/admin/dummy.js
 *.xlsx
 package-lock.json/
 # Compiled Python bytecode

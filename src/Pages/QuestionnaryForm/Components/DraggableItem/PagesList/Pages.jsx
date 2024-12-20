@@ -15,10 +15,8 @@ function Pages({ pageIndex,
   sections,
   handleAutoSave,
   setSections,
-  scrollToPage,
-  formStatus
+  formStatus,
 }) {
-
   const pageRefs = useRef({});
   const dispatch = useDispatch();
 

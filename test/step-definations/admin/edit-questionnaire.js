@@ -33,7 +33,7 @@ Then('I should be redirected to the questionnaire management section of that ver
     await new Promise((resolve) => setTimeout(resolve, 1500));
     // await driver.wait(until.elementLocated(By.xpath('//p[text()="Version 1"]')));
     console.log(global.internalNameVersion);
-    await driver.wait(until.elementLocated(By.xpath(`//p[text()="Minerva Levy"]`)));
+    await driver.wait(until.elementLocated(By.xpath(`//p[text()="Minerva Levy 1"]`)));
 });
 
 // Given('I am on the questionnaire version listing screens', async function () {

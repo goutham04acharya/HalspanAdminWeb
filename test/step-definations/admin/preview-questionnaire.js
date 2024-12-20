@@ -582,6 +582,7 @@ When('I enter the date\\/time for section {int} page {int} question {int}', asyn
     await driver.wait(until.elementIsVisible(date_area), 2000);
     await date_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     await date_area.sendKeys('31/10/2024');
+    // await date_area.click();
 });
 
 When('I click the next button', async function () {
@@ -622,7 +623,7 @@ When('I see the floorplan for section {int} page {int} question {int}', async fu
 
 When('I place the pin and draw on the floorplan', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-pin"]`)), 5000).click();
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-pin"]`)), 5000).click();
     const floorplanImage = await driver.wait(until.elementLocated(By.css('[data-testid="floorplan"]')), 5000);
     // const floorplanSize = await floorplanImage.getRect(); // get the dimensions and location of the floorplan
 

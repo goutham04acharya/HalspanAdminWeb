@@ -24,7 +24,9 @@ const DatePicker = ({
     prefixValue,
     mainIndex,
     subIndex,
+    placeholder
 }) => {
+
 
     const [open, setOpen] = useState(false)
     const calederRef = useRef()
@@ -38,6 +40,7 @@ const DatePicker = ({
                     htmlFor={htmlFor}
                     id={id}
                     type={type}
+                    placeholder={placeholder || null}
                     value={value ? formatDate(value) : ''}
                     className={`placeholder:text-[#9FACB9] placeholder:font-normal placeholder:text-base cursor-pointer
                      py-[11px] ${type === 'password' ? 'pr-[62px]' : ''} ${prefixValue ? 'pl-[26%] pr-[10px]' : 'pl-[10px] pr-[10px]'}}

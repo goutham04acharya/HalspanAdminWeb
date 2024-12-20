@@ -30,7 +30,7 @@ function NavrBar({ setModalOpen }) {
                         Lookup Dataset
                     </p>
                 </div>
-                <div className='flex items-center cursor-pointer h-[35px]'>
+                <div data-testid="my-account" className='flex items-center cursor-pointer h-[35px]'>
                     <a href="https://dev.uvik.halspantest.com/en/home" className='flex items-center'>
                         <Image src="Myaccount" className="w-auto" />
                         <p className='font-semibold text-base text-[#2B333B] ml-4'>My Account</p></a>

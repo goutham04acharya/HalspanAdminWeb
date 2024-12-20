@@ -16,7 +16,7 @@ Given('I am on the questionnaire version listing screen', async function () {
         await driver.get(`http://localhost:3000/questionnaries/version-list/${questionnaireId}`);
         await new Promise((resolve) => setTimeout(resolve, 500));
         const pageSource = await driver.getPageSource();
-        check = pageSource.includes('Minerva Levy');
+        check = pageSource.includes('Minerva Levy 1');
     } else {
         throw new Error(`Questionnaire ID = ${questionnaireId} is missing.`);
     }

@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
+import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handleChange, handleRemove, setFileState, fileState, setConditionalValues, sections, question }) => {
     const [files, setFiles] = useState(fileState.files || []);
     const [error, setError] = useState('');
+    const dispatch = useDispatch();
+    const questionValue = useSelector(state => state.questionValues.questions);
 
     const handleFileChange = (e) => {
-        const uploadedFiles = e.target.files;
-
+        const uploadedFiles = Array.from(e.target.files); // Convert FileList to Array
         if (uploadedFiles.length > 0) {
-            const allowedTypes = (fileType ? fileType.split(',').map((type) => type.trim().toLowerCase()) : []);
+            const allowedTypes = fileType ? fileType.split(',').map((type) => type.trim().toLowerCase()) : [];
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
-            const newFiles = [...files];
+            let newFiles = [...files];
 
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
@@ -29,19 +32,32 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                 }
 
                 newFiles.push(file);
+
+                // Limit total files to `max`
+                if (newFiles.length >= max) break;
             }
 
+            // Ensure we only have up to the `max` number of files
+            newFiles = newFiles.slice(0, max);
+
             if (newFiles.length < min) {
-                setError(`Minimum ${min} files required`);
-            } else if (newFiles.length > max) {
-                setError(`Maximum ${max} files allowed`);
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    preview_filefield: `Minimum ${min} files required`, // Or remove the key if you prefer  
+                }));
+                // setError();
             } else {
                 setError('');
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
-                    preview_filefield: '', // Or remove the key if you prefer     
+                    preview_filefield: '', // Or remove the key if you prefer  
                 }));
             }
+
+            dispatch(setQuestionValue({
+                question_id: question?.question_id,
+                value: newFiles
+            }));
             setFiles(newFiles);
         }
         handleChange(e);
@@ -49,22 +65,26 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
 
 
     const handleRemoveFile = (index) => {
-        const newFiles = [...files];
+        const newFiles = [...questionValue?.[question?.question_id]];
         newFiles.splice(index, 1);
 
-        setFiles(newFiles);
+        dispatch(setQuestionValue({
+            question_id: question?.question_id,
+            value: newFiles
+        }));
 
+        setFiles(newFiles);
         setFileState((prevState) => ({
             ...prevState,
             files: newFiles,
         }));
 
-        handleRemove(newFiles,index); 
+        handleRemove(newFiles, index);
     };
 
 
     return (
-        <div className=' w-full '>
+        <div className='w-full'>
             <label className="custom-file-label custom-file-input-wrapper w-fit h-auto mt-1 flex items-center bg-[#DFE0E2] border border-[#AEB3B7] p-0 rounded-md">
                 <input
                     type="file"
@@ -74,17 +94,17 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                     className={`hidden-input ${files.length >= max && files.length > 0 ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                     disabled={files.length >= max && files.length > 0}
                 />
-                <span className={` text-[12px] my-2 items-center justify-center flex px-3 ${files.length >= max && files.length > 0 ? 'disabled' : ''}`}>
+                <span className={`text-[12px] my-2 items-center justify-center flex px-3 ${files.length >= max && files.length > 0 ? 'disabled' : ''}`}>
                     <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add File ({max})
                 </span>
             </label>
             {error && <p className='text-red-500 text-sm'>{error}</p>}
-            {files.length > 0 && (
+            {questionValue?.[question?.question_id] && (
                 <ul>
-                    {files.map((file, index) => (
+                    {questionValue?.[question?.question_id].map((file, index) => (
                         <li key={index} className='bg-[#DFE0E2] my-2 p-2 rounded flex justify-between'>
                             <span className='truncate w-[190px]'>{file.name}</span>
-                            <div className=' flex gap-2'>
+                            <div className='flex gap-2'>
                                 <span className='text-[#2B333B]'>
                                     {file.size < 1024 * 1024
                                         ? `${(file.size / 1024).toFixed(2)} KB`

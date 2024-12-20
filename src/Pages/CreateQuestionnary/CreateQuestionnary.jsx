@@ -29,6 +29,20 @@ function CreateQuestionnary() {
     is_adhoc: 'No',
   });
 
+  const complianceInitialState = [
+    {
+      'conditions': [
+        {
+          'question_name': '',
+          'condition_logic': '',
+          'value': '',
+          'dropdown': false,
+          'condition_dropdown': false,
+          'condition_type': 'textboxfield',
+        },
+      ]
+    }
+  ]
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const [selectedOption, setSelectedOption] = useState({
@@ -49,7 +63,7 @@ function CreateQuestionnary() {
     { value: 'INSPECTION', label: 'INSPECTION' },
     { value: 'MAINTENANCE', label: 'MAINTENANCE' }
   ];
-  
+
 
   const handleChange = (e, id) => {
     const { value } = e.target;
@@ -74,14 +88,14 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
-
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.name,
+      asset_type: selectedOption?.asset_type?.id.toString(),
+      asset_name: selectedOption?.asset_type?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
@@ -114,6 +128,12 @@ function CreateQuestionnary() {
     try {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
+      const complianceState = {
+        'questionnaire_id': parseInt(response?.data?.data?.questionnaire_id),
+        'version_number': parseInt(response?.data?.data?.version_number),
+        'logic': complianceInitialState
+      }
+      const complianceResponse = await PostAPI(`questionnaires/compliancelogic`, complianceState);
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
@@ -137,7 +157,6 @@ function CreateQuestionnary() {
 
         setIsThreedotLoader(false);
       } else if (response?.data?.status === 409) {
-        // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
@@ -175,7 +194,7 @@ function CreateQuestionnary() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        openDropdown === 'asset_type' &&
+        openDropdown === 'asset_name' &&
         assetDropdownRef.current &&
         !assetDropdownRef.current.contains(event.target)
       ) {
@@ -341,7 +360,8 @@ function CreateQuestionnary() {
               options={services_type_list}
               isDropdownOpen={openDropdown === 'services_type'}
               setDropdownOpen={() => {
-                setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')}}
+                setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')
+              }}
               selectedOption={selectedOption?.services_type}
               handleOptionClick={(option) => handleOptionClick(option, 'services_type')}
               dropdownRef={serviceDropdownRef}
