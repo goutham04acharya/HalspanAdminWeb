@@ -149,7 +149,6 @@ const fieldSettingParamsSlice = createSlice({
             data.forEach(item => {
                 const questionId = item.question_id;
                 const displayType = item.display_type || {}; // Ensure displayType is defined
-
                 const customizedData = {
                     componentType: item.component_type,
                     label: item.label,
@@ -165,6 +164,7 @@ const fieldSettingParamsSlice = createSlice({
                     note: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
+                    lookupValue: item.lookup_value,
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,

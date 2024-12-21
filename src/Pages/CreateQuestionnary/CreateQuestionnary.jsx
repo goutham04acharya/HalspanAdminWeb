@@ -23,7 +23,7 @@ function CreateQuestionnary() {
     public_name: '',
     internal_name: '',
     description: '',
-    asset_type: '',
+    asset_name: '',
     services_type: '',
     language: 'UK- English',  // Default language set here
     is_adhoc: 'No',
@@ -46,7 +46,7 @@ function CreateQuestionnary() {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const [selectedOption, setSelectedOption] = useState({
-    asset_type: null,
+    asset_name: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
     services_type: null,
   });
@@ -94,8 +94,8 @@ function CreateQuestionnary() {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.id.toString(),
-      asset_name: selectedOption?.asset_type?.name,
+      asset_type: selectedOption?.asset_name?.id.toString(),
+      asset_name: selectedOption?.asset_name?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
@@ -107,8 +107,8 @@ function CreateQuestionnary() {
     if (!createDetails.internal_name.trim()) {
       errors.internal_name = 'This field is mandatory';
     }
-    if (!selectedOption.asset_type) {
-      errors.asset_type = 'This field is mandatory';
+    if (!selectedOption.asset_name) {
+      errors.asset_name = 'This field is mandatory';
     }
     if (!selectedOption.language) {
       errors.language = 'This field is mandatory';
@@ -293,10 +293,10 @@ function CreateQuestionnary() {
                     testID='drop-btn'
                     labeltestID='asset'
                     options={options}
-                    isDropdownOpen={openDropdown === 'asset_type'}
-                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
-                    selectedOption={selectedOption?.asset_type}
-                    handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
+                    isDropdownOpen={openDropdown === 'asset_name'}
+                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_name' ? null : 'asset_name')}
+                    selectedOption={selectedOption?.asset_name}
+                    handleOptionClick={(option) => handleOptionClick(option, 'asset_name')}
                     dropdownRef={assetDropdownRef}
                     validationError={validationErrors?.asset_type}
                     assetType
