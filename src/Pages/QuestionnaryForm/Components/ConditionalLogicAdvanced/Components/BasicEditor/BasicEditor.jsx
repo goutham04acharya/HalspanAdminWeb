@@ -5,13 +5,9 @@ import InputWithDropDown from '../../../../../../Components/InputField/Dropdown'
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, combinedArray, sectionConditionLogicId, pageConditionLogicId }) {
-    const [dropdown, setDropdown] = useState(false)
-    const dispatch = useDispatch();
-    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray }) {
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
@@ -153,6 +149,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             conditionToUpdate.value = e.target.value;
             return updatedConditions;
         });
+
     };
 
     //function to set the value from the selection dropdown for selecting the question
@@ -320,7 +317,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='w-[97%] -mx-2 flex'>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Select</p>
                                                 <InputWithDropDown
                                                     label=''
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -344,7 +341,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Condition</p>
                                                 <InputWithDropDown
                                                     // label='Format'
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -386,7 +383,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>}
                                         {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
+                                                <p className='text-sm text-[#2B333B] mb-3 font-medium'>Value</p>
                                                 {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ?
                                                     <>
                                                         <InputWithDropDown
@@ -404,10 +401,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                             subIndex={i}
                                                             isDropdownOpen={conditions[index].conditions[i].value_dropdown}
                                                             setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item?.question_detail === conditions[index]?.conditions[i]?.question_name)?.choice_values.map((choice) => choice?.value) : []}
                                                             validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
                                                         />
-                                                        {submitSelected && conditions[index]?.conditions[i]?.value=== '' && <ErrorMessage error={'This field is mandatory'} />}
+                                                        {submitSelected && conditions[index]?.conditions[i]?.value === '' && <ErrorMessage error={'This field is mandatory'} />}
                                                     </>
                                                     :
                                                     <InputField
@@ -445,7 +442,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit'
                                         // onClick={() =>{conditions?.length !== 1 ? handleAdd("delete", index, i) : ''}}>
                                         onClick={() => {
-                                            if (conditions?.length === 1) {
+                                            if (conditions[0]?.conditions?.length === 1) {
                                                 handleClearConditionValues(); // Clear values for the single condition
                                             } else {
                                                 handleAdd("delete", index, i); // Handle deletion for other cases

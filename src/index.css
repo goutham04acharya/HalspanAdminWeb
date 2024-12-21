@@ -469,7 +469,7 @@ custom-toggle-switch input:checked+.slider::before {
 
 .custom-radioBlue input[type="radio"]:disabled+label {
   cursor: not-allowed !important;
-  color: #DDDDDD;
+  color: #2B333B;
 }
 
 .custom-radioBlue input[type="radio"]:disabled {

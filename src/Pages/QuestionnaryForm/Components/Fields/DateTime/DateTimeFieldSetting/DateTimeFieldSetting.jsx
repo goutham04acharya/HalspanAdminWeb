@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
+import Button2 from '../../../../../../Components/Button2/ButtonLight';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -29,6 +30,7 @@ function DateTimeFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
+  console.log(fieldSettingParameters)
 
   return (
     <>
@@ -54,12 +56,12 @@ function DateTimeFieldSetting({
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
             <div className='relative w-full'>
               <input
-                value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : '' }
+                value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''}
                 type="text"
                 disabled={formStatus !== 'Draft'}
                 id='Label'
                 data-testid="default-value-input"
-                onChange={formStatus === 'Draft' ? (e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId })): null}
+                onChange={formStatus === 'Draft' ? (e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId })) : null}
                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                 placeholder='Populates the content' />
               <img src="/Images/setting.svg" alt="setting"
@@ -67,7 +69,7 @@ function DateTimeFieldSetting({
                 className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={formStatus === 'Draft' ? () => {
                   setIsDefaultLogic(true);
                   setConditionalLogic(false);
-                }:null} />
+                } : null} />
             </div>
           </div>
           <div className='mt-7'>
@@ -140,7 +142,7 @@ function DateTimeFieldSetting({
                   checked={fieldSettingParameters?.format === '12'}
                   onClick={formStatus === 'Draft' ? () => {
                     handletimeradiobtn('12')
-                  }:null} />
+                  } : null} />
                 <label htmlFor='format12'
                   data-testid='format-12'
                   className='ml-7 font-normal text-base text-[#2B333B] cursor-pointer'>
@@ -165,7 +167,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           }
-          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus}/>
+          <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus} />
           <div className='mt-7'>
             <InputField
               autoComplete='off'
@@ -183,20 +185,34 @@ function DateTimeFieldSetting({
               handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
           </div>
           <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-            <button
-              type='button'
-              data-testid="add-conditional-logic"
-              className={`w-[80%] mx-auto py-[13px] bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px] ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-              onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
-            >
-              Add Conditional Logic
-            </button>
+            <div className='flex items-center w-full'>
+              <button
+                type='button'
+                data-testid="add-conditional-logic"
+                className={`mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? 'px-[40px] w-[50%] ' : 'px-[52px] w-[80%]'}`}
+                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
+              >
+                Add Conditional Logic
+              </button>
+              {fieldSettingParameters?.conditional_logic &&
+                <button
+                  type='button'
+                  data-testid="remove-conditional-logic"
+                  className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
+                  onClick={() => {
+                    dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                  }}
+                >
+                  Remove Conditional Logic
+                </button>
+              }
+            </div>
             {fieldSettingParameters?.conditional_logic &&
               <p className='text-center italic mt-1'>Conditional Logic Added</p>
             }
           </div>
         </div>
-      </div >
+      </div>
     </>
   )
 }

@@ -135,9 +135,6 @@ function NumberField({
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
     }
-    useEffect(() => {
-
-    }, [])
     return (
         <div>
             <label

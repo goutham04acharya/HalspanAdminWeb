@@ -9,7 +9,7 @@ import QuestionnaryForm from '../Pages/QuestionnaryForm/index.jsx';
 import LookupDataset from '../Pages/LookupDataset/index.jsx';
 import VersionList from '../Pages/VersionList/VersionList.jsx';
 import { useAuth0 } from '@auth0/auth0-react';
-
+import NotFound from '../Components/NotFoundPage/NotFound.jsx'; 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   const { logout, getAccessTokenSilently, getIdTokenClaims } = useAuth0();
  
@@ -60,7 +60,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
 
     checkAuthentication();
   }, [isAuthenticated, getAccessTokenSilently, logout]);
-  return (
+ return (
     <>
       <AuthRedirect isAuthenticated={isAuthenticated} isLoading={isLoading} />
       <Routes>
@@ -72,7 +72,8 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           <Route path="/questionnaries/create-questionnary/questionnary-form/:questionnaire_id/:version_number" element={<QuestionnaryForm />} />
           <Route path="/questionnaries/version-list/:questionnaire_id" element={<VersionList />} />
         </Route>
-        {/* Add other routes here */}
+        {/* Wildcard route for 404 - MUST BE LAST */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

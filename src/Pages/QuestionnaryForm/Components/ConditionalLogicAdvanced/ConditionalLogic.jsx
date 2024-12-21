@@ -304,6 +304,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const value = event.target.value;
         setLogic(value);
         setInputValue(value)
+        const updatedLogic = parseExpression(value)
+        // setConditions(updatedLogic)
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
@@ -407,6 +409,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
+            //this was commented i uncommeneted bczthe defualt value is not updating
             // if (isDefaultLogic) {
             //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
             // } else {
@@ -1665,9 +1668,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     setSubmitSelected={setSubmitSelected}
                                     selectedQuestionId={selectedQuestionId}
                                     conditionalLogicData={conditionalLogicData}
-                                    combinedArray={combinedArray}
                                     sectionConditionLogicId={sectionConditionLogicId}
                                     pageConditionLogicId={pageConditionLogicId}
+                                    combinedArray={combinedArray}
                                 />
                             ) : (complianceState) &&
                         <ComplianceBasicEditor
