@@ -298,11 +298,11 @@ function CreateQuestionnary() {
                     selectedOption={selectedOption?.asset_name}
                     handleOptionClick={(option) => handleOptionClick(option, 'asset_name')}
                     dropdownRef={assetDropdownRef}
-                    validationError={validationErrors?.asset_type}
+                    validationError={validationErrors?.asset_name}
                     assetType
                   />
                 </div>
-                {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
+                {validationErrors?.asset_name && <ErrorMessage error={validationErrors?.asset_name} />}
               </div>
               <div className='w-1/2'>
                 <InputWithDropDown

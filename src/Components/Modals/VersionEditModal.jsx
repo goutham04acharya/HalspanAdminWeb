@@ -55,11 +55,12 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                         />
                     </div>
                     {dropdownsOpen && (
-                        <ul className="relative bg-white border border-[#AEB3B7] mt-1 w-full z-[100000]">
+                        <ul className="relative mt-5 bg-white border border-[#AEB3B7] w-full z-[100000] max-h-[200px] overflow-auto scrollbar_gray h-customh11">
                             {versionList?.data?.items?.map(versionNumber => (
-                                <li key={versionNumber}
+                                <li
+                                    key={versionNumber?.version_number}
                                     data-testid={`Version-${versionNumber?.version_number}`}
-                                    className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
+                                    className="py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]"
                                     onClick={() => handleOptionClick(versionNumber?.version_number)}>
                                     Version {versionNumber?.version_number}
                                 </li>
