@@ -80,3 +80,5 @@ Feature: Halspan - Admin - Implement default values of Date Fields
     When I enter the default value correct conditional logic for date/time field
     Then I click the save button for default value
     And I should see the conditional logic in default value field for date/time
+    When I delete the default value condition
+    Then I should not see the condition
