@@ -58,3 +58,5 @@ Feature: Halspan - Admin - Implement default values of Number Fields(Conditional
     When I enter the default value correct conditional logic for number field
     Then I click the save button for default value
     And I should see the conditional logic in default value field for number
+    When I delete the default value condition
+    Then I should not see the condition

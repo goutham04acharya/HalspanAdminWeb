@@ -89,3 +89,5 @@ Feature: Halspan - Admin - Implement default values of Text Fields(Conditional L
     When I enter the default value correct conditional logic for textbox field
     Then I click the save button for default value
     And I should see the conditional logic in default value field for textbox
+    When I delete the default value condition
+    Then I should not see the condition
