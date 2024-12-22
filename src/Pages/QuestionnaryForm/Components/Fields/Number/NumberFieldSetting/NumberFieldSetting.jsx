@@ -58,24 +58,68 @@ function NumberFieldSetting({
                     />
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
                         <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
-                        <div className='relative w-full'>
-                            <input type="text"
+                        <div className='flex items-center justify-between w-full'>
+                            <div className='relative w-full'>
+                                <input
+                                type="text"
                                 id='Label'
                                 data-testid="default-value-input"
-                                disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                                value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
-                                onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
-                                placeholder='Populates the content' />
-                            <img src="/Images/setting.svg"
+                                placeholder='Populates the content'
+                                disabled={formStatus !== 'Draft'}
+                                value={
+                                    fieldSettingParameters?.default_conditional_logic
+                                    ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                                    : ''
+                                } // Prefill the input with `defaultString` if it exists, otherwise empty string
+                                onChange={
+                                    formStatus === 'Draft'
+                                    ? (e) =>
+                                        dispatch(
+                                            setNewComponent({
+                                            id: 'default_conditional_logic',
+                                            value: e.target.value,
+                                            questionId: selectedQuestionId,
+                                            })
+                                        )
+                                    : null
+                                }
+                                />
+                                <img
+                                src="/Images/setting.svg"
                                 alt="setting"
                                 data-testid="default-value"
+                                className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} `}
+                                onClick={
+                                    formStatus === 'Draft'
+                                    ? () => {
+                                        setIsDefaultLogic(true);
+                                        setConditionalLogic(false);
+                                        }
+                                    : null
+                                }
+                                />
+                            </div>
+
+                            {/* Conditionally render the delete icon */}
+                            {fieldSettingParameters?.default_conditional_logic && (
+                                <img
+                                src="/Images/trash-black.svg"
+                                alt="delete"
+                                data-testid="delete-default-value"
+                                className='w-7 h-7 cursor-pointer ml-3 mt-2'
                                 onClick={() => {
-                                    setIsDefaultLogic(true);
-                                    setConditionalLogic(false);
+                                    dispatch(
+                                    setNewComponent({
+                                        id: 'default_conditional_logic',
+                                        value: '',
+                                        questionId: selectedQuestionId,
+                                    })
+                                    );
                                 }}
-                                className='absolute top-5 right-3 cursor-pointer' />
-                        </div>
+                                />
+                            )}
+                            </div>
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Type</p>
