@@ -54,6 +54,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
+
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -815,8 +816,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         if (default_conditional_logic) {
                             try {
                                 const result = eval(default_conditional_logic);
-                                console.log(default_conditional_logic,'default logic')
-                                console.log(result, 'dddd')
                                 if(component_type === "dateTimefield"){
                                     const splitDate = (dateStr) => {
                                         if (!dateStr || typeof dateStr !== 'string') {
@@ -825,7 +824,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         const [day, month, year] = dateStr.split("/");
                                         return `${year}-${month}-${day}`;
                                     }
-                                    console.log(typeof splitDate(result), splitDate(result), 'ppp');
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
                                 }else if(component_type === "numberfield"){
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
@@ -854,7 +852,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
-    console.log(conditionalValues, 'cv')
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({
@@ -960,8 +957,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
-                                            console.log(new Date(), 'new Date')
-                                            console.log(list?.conditional_logic, 'list?.conditional_logic')
                                             try {
                                                 let result = eval(list?.conditional_logic)
                                                 if (!eval(list?.conditional_logic)) {
@@ -1034,7 +1029,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button 
-                    disabled={previewNavigation.current_page === 1 || !showComplianceScreen} 
+                    disabled={previewNavigation.current_page === 1} 
                     type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
