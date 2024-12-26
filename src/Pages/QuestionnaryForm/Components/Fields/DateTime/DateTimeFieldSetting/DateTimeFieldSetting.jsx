@@ -30,7 +30,6 @@ function DateTimeFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
-  console.log(fieldSettingParameters)
 
   return (
     <>

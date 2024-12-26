@@ -159,18 +159,14 @@ function DateTimeField({
             }))
         } else if (type === 'date') {
             const value = e;
-            console.log(value, 'value')
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
             const currentMilliSeconds = new Date().getMilliseconds() + 100;
-            console.log(currentMilliSeconds + 100, 'current milliseconds', new Date().getMilliseconds())
             const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
-            console.log(selectedDate, 'current date time');
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            // console.log(systemTimeZone, 'system time zone');
 
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
@@ -232,9 +228,6 @@ function DateTimeField({
                         //     e.preventDefault(); // This is preventing input, make sure it’s intentional
                         // }}
                     />
-
-
-
                 )}
                 {preview && type === 'time' && (
                     <TimePicker
@@ -280,9 +273,6 @@ function DateTimeField({
                         questionValue={questionValue[question?.question_id]?.split(' ')[1]}
                     />
                 </div>}
-
-
-
 
                 {!preview && (
                     <input

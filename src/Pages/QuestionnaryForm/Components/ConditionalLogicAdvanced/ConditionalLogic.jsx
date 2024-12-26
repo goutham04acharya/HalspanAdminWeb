@@ -234,7 +234,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     useEffect(() => {
-        console.log(complianceLogicCondition[0]?.conditions[0], 'complianceLogicCondition[0]?.conditions[0]?.value')
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic

@@ -21,6 +21,8 @@ function AdvancedEditor({
     setSelectedType
 
 }) {
+    console.log(secDetailsForSearching, 'secDetailsForSearching')
+    console.log(suggestions, 'suggestions')
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -106,7 +108,7 @@ function AdvancedEditor({
             {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
-                    <span data-testid="error-message" className='w-[4%] mr-2'><img src="/Images/alert-icon.svg" alt=""className='min-w-6' /></span>
+                    <span data-testid="error-message" className='w-[4%] mr-2'><img src="/Images/alert-icon.svg" alt="" className='min-w-6' /></span>
                     {error}</div>
             ) : (
                 isThreedotLoaderBlack ? (
