@@ -50,6 +50,16 @@ Feature: Halspan - Admin - Implement default values of Number Fields(Conditional
 
     When I click the add default value button
     Then I should see the default value advanced editor for number field
+    Then I should see the default value suggestions for questions for number
+    When I enter the incorrect default value conditional logic for number field
+    Then I should read a message stating that "No items found"
+    Then I click the save button for default value
+    Then I should read a error message
+    When I click the cancel button
+    Then I should see field settings
+
+    When I click the add default value button
+    Then I should see the default value advanced editor for number field
     When I select the question from the default value suggestions for number field
     When I click the cancel button
     Then I should see field settings

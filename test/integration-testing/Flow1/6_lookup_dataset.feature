@@ -29,6 +29,7 @@ Feature: Halspan - Admin- Lookup data set
         Deleting an item will not remove it from a previously completed Questionnaires data but will remove it as an option in the future. (It will only remove from offline when the next sync is performed)
         Lookup dataset is applicable for Single line, Multi line and Dropdown.
         There must be an option to view and select the previously added lookup dataset.
+        
         Information to display
         Lookup Dataset ID
         Lookup Dataset Name
@@ -51,6 +52,22 @@ Feature: Halspan - Admin- Lookup data set
     Scenario: List all lookup dataset
         Given I am on the lookup dataset listing screen
         Then I should see the table header containing '["ID", "NAME", "ACTION"]'
+
+    Scenario: Admin cancels the create lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I enter the name of the lookup dataset
+        * I enter the choices in csv format
+        * I click the close button
+        Then I should be redirected to the lookup dataset listing screen
+
+    Scenario: Import Invalid file with 600 data for lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I upload the valid file csv as "600.csv"
+        Then I should read a message stating that "Only 500 data entries are accepted."
 
     Scenario: Import the valid lookup dataset
         Given I am on the lookup dataset listing screen
@@ -76,6 +93,11 @@ Feature: Halspan - Admin- Lookup data set
         * I click the create button
         Then I should read a message stating that "Created new lookup dataset successfully"
 
+    Scenario: Invalid search attempt
+        Given I am on the lookup dataset listing screen
+        When I search by the name "random12321"
+        Then I should read a message stating that "We're sorry, but we couldn't find any results matching your search query."
+
     Scenario: Searching by lookup dataset name
         Given I am on the lookup dataset listing screen
         When I search by the name
@@ -85,9 +107,14 @@ Feature: Halspan - Admin- Lookup data set
         Given I am on the lookup dataset listing screen
         Then I should see the table header containing '["ID", "NAME", "ACTION"]'
         When I search recently created lookup dataset by bddtest
+        # When I click on the view dataset
+        # When I click on cancel button
+        When I click on the view dataset
+        When I click on close button
         When I click on the view dataset
         Then I should see a popup window to view lookup dataset
         When I edit the lookup data set name
+        # When I edit the values in lookup dataset
         When I delete the values in lookup dataset
         When I add the values to lookup dataset
         When I click on update button
