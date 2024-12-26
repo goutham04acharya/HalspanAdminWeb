@@ -141,12 +141,19 @@ Feature: Halspan - Admin - Preview the Questionnaire
     Given I am on the Questionnaire management sections
     When I click the preview button 
     Then I should see the mobile preview
+    When I click the next button
+    # Then I should read a message stating that "This is a mandatory field"
     Then I validate the data entered exists in the mobile preview for section 1 page 1
+    When I enter invalid text for custom regular expression for section 1 page 1 question 1
+    When I click the next button
+    # Then I should read a message stating that "Invalid PAN format"
     When I enter the text in textbox for section 1 page 1 question 1
     When I select the choice for section 1 page 1 question 2
     When I enter the date/time for section 1 page 1 question 3
     When I click the next button
     Then I validate the data entered exists in the mobile preview for section 1 page 2
+    When I upload a invalid image to section 1 page 2 question 1
+    Then I should read a message stating that "Only .png, .jpg, and .svg files are allowed"
     When I upload photo for section 1 page 2 question 1
     When I see the floorplan for section 1 page 2 question 2
     When I place the pin and draw on the floorplan 
