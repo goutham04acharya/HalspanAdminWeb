@@ -1473,10 +1473,6 @@ const QuestionnaryForm = () => {
         }
         return `${text.slice(0, maxLength)}...`;
     };
-    // console.log(questionToDelete?.questionName, 'fieldSettingParams[selectedQuestionId]')
-    console.log(questionToDelete?.questionName, 'fghjk')
-
-
 
     return (
         <>
