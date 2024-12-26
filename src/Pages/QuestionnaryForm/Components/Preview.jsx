@@ -960,11 +960,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
-                                            console.log(new Date(), 'new Date')
-                                            console.log(list?.conditional_logic, 'list?.conditional_logic')
+                                            let replacedLogic = list?.conditional_logic.replaceAll('new Date()', 'new Date(new Date(), new Date().getMilliseconds() + 100)')
+                                            console.log(new Date().toUTCString(), 'new Date')
+                                            console.log(replacedLogic, 'replacedLogic')
                                             try {
-                                                let result = eval(list?.conditional_logic)
-                                                if (!eval(list?.conditional_logic)) {
+                                                // let result = eval(list?.conditional_logic)
+                                                if (!eval(replacedLogic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
@@ -1034,7 +1035,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button 
-                    disabled={previewNavigation.current_page === 1 || !showComplianceScreen} 
+                    disabled={previewNavigation.current_page === 1} 
                     type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
