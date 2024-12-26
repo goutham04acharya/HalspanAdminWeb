@@ -22,6 +22,9 @@ options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
 options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
+options.addArguments('--start-fullscreen')
+options.addArguments('--force-device-scale-factor=0.75');
+options.addArguments('--high-dpi-support=1');
 setDefaultTimeout(34000);
 
 global.driver = new Builder()

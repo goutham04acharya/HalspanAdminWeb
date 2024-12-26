@@ -94,7 +94,6 @@ const ChoiceBoxField = ({
 
     }
     const handleCheckboxChange = (value) => {
-        // setOptionSelected(value.value);
         setChoiceSelected(questionValue[question?.question_id]);
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
