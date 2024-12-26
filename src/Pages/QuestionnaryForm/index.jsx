@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType, setPageToDelete, setQuestionToDelete } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -104,7 +104,6 @@ const QuestionnaryForm = () => {
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
     // const [sectionWarningShown, setSectionWarningShown] = useState(false);
-
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -229,6 +228,7 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
+
 
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
@@ -1436,6 +1436,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
+
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1472,7 +1473,6 @@ const QuestionnaryForm = () => {
         }
         return `${text.slice(0, maxLength)}...`;
     };
-
 
     return (
         <>
@@ -1772,7 +1772,9 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` 
+                            : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
+
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'

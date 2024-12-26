@@ -9,6 +9,17 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
     Users should be able to perform a search and apply filters at the same time to refine their results.
 
   @create_questionnaire
+  Scenario: Invalid search attempt
+    Given I am in questionnaire listing screen
+    When I enter search term as <search_term>
+    Then I should read a message stating that "We're sorry, but we couldn't find any results matching your search query."
+
+    Examples:
+      | search_term  |
+      | "suggwh"     |
+      | "562563576g" |
+      | "!@#$%^&*"   |
+
   Scenario: Searching by internal name
     Given I am in questionnaire listing screen
     When I search by internal name
