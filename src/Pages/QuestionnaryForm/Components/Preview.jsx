@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Image from '../../../Components/Image/Image.jsx';
-import useOnClickOutside from '../../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx';

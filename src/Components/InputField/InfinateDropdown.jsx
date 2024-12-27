@@ -32,6 +32,7 @@ function InfinateDropdown({
     failGrade,
     mainDivStyle
 }) {
+
     const [searchTerm, setSearchTerm] = useState(''); // Initialize searchTerm
     const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
 

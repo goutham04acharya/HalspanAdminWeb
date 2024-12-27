@@ -582,20 +582,9 @@ const QuestionnaryForm = () => {
                     status: true,
                     time: response?.data?.time,
                 };
-                // console.log(sectionsData.map((section, index) => ({
-                //     index: index,
-                //     id: section.section_id
-                // })), 'ssssdxcscdm')
+
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
-                // const body = {
-                //     "public_name": response?.data?.data?.public_name,
-                //     "sections": sectionsData.map((section, index) => ({
-                //         index: index,
-                //         id: section.section_id
-                //     })),
-                //     'compliance_logic': complianceInitialState,
-                // }
-                // const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
