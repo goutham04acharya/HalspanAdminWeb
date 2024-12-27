@@ -377,6 +377,7 @@ stages:
 #           inputs:
 #             testResultsFormat: 'JUnit'
 #             testResultsFiles: 'reports-xml/*.xml'
+
           
     - job: BrowserPerformanceTesting
       displayName: "Browser Performance Testing"
