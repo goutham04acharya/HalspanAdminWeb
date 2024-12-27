@@ -192,8 +192,8 @@ stages:
           displayName: 'Build'
         - publish: $(System.DefaultWorkingDirectory)/artifact
           artifact: bundle
-# - stage: Test
-#   jobs:
+- stage: Test
+  jobs:
 #     - job: UnitTesting1
 #       displayName: "Unit Testing 1"
 #       condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
