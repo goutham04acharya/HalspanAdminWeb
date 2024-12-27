@@ -1,9 +1,7 @@
 trigger:
   branches:
     include:
-      - develop
-      - pre-production
-      - master
+      - none
 pr:
   branches:
     include:
