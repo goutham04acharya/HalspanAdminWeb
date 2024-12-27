@@ -234,7 +234,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     useEffect(() => {
-        console.log(complianceLogicCondition[0]?.conditions[0], 'complianceLogicCondition[0]?.conditions[0]?.value')
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -580,6 +579,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
+                        console.log(question, 'question')
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
                             value = 'new Date()';
@@ -1530,13 +1530,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         : item
                 );
             });
-
             setCompliancestate(false);
         }
 
         let condition_logic;
         if (!complianceState) {
             try {
+                console.log(fieldSettingParams, 'conditions')
+                console.log(conditions, 'condiioiansns')
                 condition_logic = buildConditionExpression(conditions);
             } catch (error) {
             }

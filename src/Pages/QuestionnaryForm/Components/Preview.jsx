@@ -954,15 +954,16 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-
+                                    // let selectedDate = new Date().toDateString();
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
-                                            let replacedLogic = list?.conditional_logic.replaceAll('new Date()', 'new Date(new Date(), new Date().getMilliseconds() + 100)')
-                                            console.log(new Date().toUTCString(), 'new Date')
-                                            console.log(replacedLogic, 'replacedLogic')
+                                            // let replacedLogic = list?.conditional_logic.replaceAll('new Date()', selectedDate);
                                             try {
+                                                // console.log(new Date(), 'new date(')
+                                                // console.log(conditionalValues, 'dddaadf')
+                                                // console.log(replacedLogic, 'replacedLogic')
                                                 // let result = eval(list?.conditional_logic)
-                                                if (!eval(replacedLogic)) {
+                                                if (!eval(list?.conditional_logic)) {
                                                     return null;
                                                 }
                                             } catch (error) {

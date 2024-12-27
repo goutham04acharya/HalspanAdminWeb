@@ -96,7 +96,7 @@ function DateTimeField({
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
 
             // Update conditional values
-            
+
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
@@ -163,6 +163,36 @@ function DateTimeField({
             const value = e;
             console.log(value, 'value') // 24-10-2024
             console.log(fieldSettingParameters, 'fieldSettingParameters')
+            // const value = new Date().toDateString()
+            // const currentHours = new Date().getHours();
+            // const currentMinutes = new Date().getMinutes();
+            // const currentSeconds = new Date().getSeconds();
+            // const currentMilliSeconds = new Date().getMilliseconds();
+            // // // let value = '2024-12-27';
+            // // let epochOfDate = new Date(value).getTime();
+            // // console.log(epochOfDate)
+            // const selectedDate = new Date(value);
+            // selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
+            // let obj = {
+            //     Section_1: {
+            //         Page_1: {
+            //             Question_1: selectedDate
+            //         }
+            //     }
+            // }
+            // const now = new Date();
+            // const year = now.getUTCFullYear();
+            // const month = now.getUTCMonth() + 1; // Months are zero-based
+            // const date = now.getUTCDate();
+            // const hours = now.getUTCHours();
+            // const minutes = now.getUTCMinutes();
+            // const seconds = now.getUTCSeconds();
+
+            // console.log(`${year}-${month}-${date} ${hours}:${minutes}:${seconds} GMT`);
+
+            console.log(selectedDate) // 2024-12-27T05:52:09.504Z
+            console.log(new Date()) // 2024-12-27T05:52:09.509Z
+            console.log(eval(obj.Section_1.Page_1.Question_1 < new Date())) // true
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
@@ -171,7 +201,7 @@ function DateTimeField({
             console.log(currentMilliSeconds, 'current milliseconds', new Date().getMilliseconds())
             const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
-            console.log(selectedDate, currentMilliSeconds, 'current date time');
+            // console.log(selectedDate, currentMilliSeconds, 'current date time');
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             // console.log(systemTimeZone, 'system time zone');
 
@@ -231,9 +261,9 @@ function DateTimeField({
                         min="1000-01-01"
                         max="9999-12-31"
                         onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
-                        // onKeyDown={(e) => {
-                        //     e.preventDefault(); // This is preventing input, make sure it’s intentional
-                        // }}
+                    // onKeyDown={(e) => {
+                    //     e.preventDefault(); // This is preventing input, make sure it’s intentional
+                    // }}
                     />
 
 
