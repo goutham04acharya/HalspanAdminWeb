@@ -236,18 +236,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
-                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                    .replaceAll('?', 'then') // Replace ? with then
-                    .replaceAll('&&', 'and') // Replace && with and
-                    .replaceAll('||', 'or') // Replace || with or
-                    .replaceAll('.length', '.()')
+            .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+            .replaceAll('?', 'then') // Replace ? with then
+            .replaceAll('&&', 'and') // Replace && with and
+            .replaceAll('||', 'or') // Replace || with or
+            .replaceAll('.length', '.()')
 
-                if (condition_logic.includes(':')) {
-                    // Split by colon and rebuild with "else if" and "else" logic
-                    const parts = condition_logic.split(':');
-                    const lastPart = parts.pop(); // Remove the last part
-                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
-                }
+        if (condition_logic.includes(':')) {
+            // Split by colon and rebuild with "else if" and "else" logic
+            const parts = condition_logic.split(':');
+            const lastPart = parts.pop(); // Remove the last part
+            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+        }
         if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
@@ -821,7 +821,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            let evalInputValue = inputValue.replaceAll('()', 'length');
+            let evalInputValue = inputValue.replaceAll('.()', '.length');
 
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
@@ -861,12 +861,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
+
             if (evalInputValue.includes('getMonth')) {
+
                 // Extract the value after `getMonth()` with any comparison operator using regex
                 const monthValueMatch = evalInputValue.match(/getMonth\(\)\s*(===|!==|>=|<=|>|<)\s*(\d+)/);
 
                 // Check if a valid match was found
                 if (monthValueMatch) {
+                    console.log('here')
+
                     const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
                     const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
 
@@ -883,6 +887,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
+
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
                 const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
@@ -1246,7 +1251,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             // Check if the part matches the valid expression pattern
             else if (!validExpressionRegex.test(part) && !addDaysValidator.test(part)) {
-                errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+                // errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+                errors.push(`Error in expression: The Expression format is incorrect.`);
+
             }
             // If the expression is correct, log that it's valid
             else {
@@ -1338,6 +1345,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return false;
         }
     };
+
     const getComplianceLogic = (condition) => {
 
         // to get the value expression
@@ -1482,7 +1490,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return finalString;
     }
-
 
     useEffect(() => {
         if (!complianceState) {
