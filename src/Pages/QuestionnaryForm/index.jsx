@@ -96,12 +96,12 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    const [selectedSection, setSelectedSection] = useState(sections[0].section_id);
+    const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     // Create the initial dropdown state
-    const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
+    const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
 
     const handleCancel = () => {
         dispatch(setModalOpen(false));
@@ -592,7 +592,7 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
-        sectionId = sectionId?.replace('bddtest#','')
+        sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
@@ -1289,6 +1289,7 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
     };
+    console.log(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0, 'dddddddd')
 
     return (
         <>
@@ -1326,57 +1327,71 @@ const QuestionnaryForm = () => {
                             </div>
                             {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
-                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] overflow-auto'>
                             <p
                                 title={formDefaultInfo?.internal_name}
                                 className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
                                 data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
                             </p>
-                            <div>
-                                <DragDropContext onDragEnd={onDragEnd}>
-                                    <Droppable droppableId="droppable">
-                                        {(provided) => (
-                                            <ul
-                                                {...provided.droppableProps} ref={provided.innerRef}
-                                            >
-                                                {sections.map((sectionData, sectionIndex) => (
-                                                    <Draggable
-                                                        key={sectionData.section_id}
-                                                        draggableId={sectionData.section_id}
-                                                        index={sectionIndex}
+                            {sections.length === 0 ?
+                                <p
+                                    className={`flex items-center justify-center ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
+                                        ? 'h-customh15 overflow-auto'
+                                        : 'h-customh14 overflow-auto'
+                                        } text-lg font-semibold bg-[#EFF1F8] w-full`}
+                                >
+                                    No Sections available for this Questionnaire
+                                </p> : (
+                                    <div
+                                        className={`overflow-auto default-sidebar ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
+                                                ? 'h-customh15'
+                                                : 'h-customh14'
+                                            }`}
+                                    >
+                                        <DragDropContext onDragEnd={onDragEnd}>
+                                            <Droppable droppableId="droppable">
+                                                {(provided) => (
+                                                    <ul
+                                                        {...provided.droppableProps} ref={provided.innerRef}
                                                     >
-                                                        {(provided) => (
-                                                            <li
-                                                                className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
+                                                        {sections.map((sectionData, sectionIndex) => (
+                                                            <Draggable
+                                                                key={sectionData.section_id}
+                                                                draggableId={sectionData.section_id}
+                                                                index={sectionIndex}
+                                                            >
+                                                                {(provided) => (
+                                                                    <li
+                                                                        className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
                                                                     ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
                                                                     border hover:border-[#2B333B] border-transparent mb-2.5`}
-                                                            >
-                                                                <div className="flex justify-between w-full"
-                                                                    id={`${sectionData.section_id}-scroll`}
-                                                                >
-                                                                    <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
-                                                                        <EditableField
-                                                                            name={sectionData?.section_name}
-                                                                            index={sectionIndex}
-                                                                            handleSave={handleSaveSectionName}
-                                                                            section={true}
-                                                                            testId={`section-${sectionIndex}-name`}
-                                                                            saveClick={saveClick}
-                                                                            setSaveClick={setSaveClick}
-                                                                            setSectionName={setSectionName}
-                                                                            sectionName={sectionName}
-                                                                            formStatus={formStatus}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="flex items-center">
-                                                                        <img src="/Images/trash-black.svg"
-                                                                            alt="delete"
-                                                                            title='Delete'
-                                                                            data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                            onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
-                                                                        />
-                                                                        {/* <img
+                                                                    >
+                                                                        <div className="flex justify-between w-full"
+                                                                            id={`${sectionData.section_id}-scroll`}
+                                                                        >
+                                                                            <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
+                                                                                <EditableField
+                                                                                    name={sectionData?.section_name}
+                                                                                    index={sectionIndex}
+                                                                                    handleSave={handleSaveSectionName}
+                                                                                    section={true}
+                                                                                    testId={`section-${sectionIndex}-name`}
+                                                                                    saveClick={saveClick}
+                                                                                    setSaveClick={setSaveClick}
+                                                                                    setSectionName={setSectionName}
+                                                                                    sectionName={sectionName}
+                                                                                    formStatus={formStatus}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex items-center">
+                                                                                <img src="/Images/trash-black.svg"
+                                                                                    alt="delete"
+                                                                                    title='Delete'
+                                                                                    data-testid={`delete-btn-${sectionIndex}`}
+                                                                                    className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                                    onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
+                                                                                />
+                                                                                {/* <img
                                                                             src="/Images/save.svg"
                                                                             alt="save"
                                                                             title="Save"
@@ -1386,40 +1401,41 @@ const QuestionnaryForm = () => {
                                                                                 handleSaveSection(sectionData?.section_id);
                                                                             } : null}
                                                                         /> */}
-                                                                    </div>
-                                                                </div>
-                                                                <Sections
-                                                                    sectionData={sectionData}
-                                                                    sectionIndex={sectionIndex}
-                                                                    selectedQuestionId={selectedQuestionId}
-                                                                    handleAddRemoveQuestion={handleAddRemoveQuestion}
-                                                                    handleSaveSectionName={handleSaveSectionName}
-                                                                    dataIsSame={dataIsSame}
-                                                                    setSections={setSections}
-                                                                    sections={sections}
-                                                                    handleAddRemovePage={handleAddRemovePage}
-                                                                    handleSaveSection={handleSaveSection}
-                                                                    handleAutoSave={handleSaveSection}
-                                                                    handleDeleteModal={handleDeleteModal}
-                                                                    selectedSection={selectedSection}
-                                                                    setSelectedSection={setSelectedSection}
-                                                                    selectedPage={selectedPage}
-                                                                    setSelectedPage={setSelectedPage}
-                                                                    formStatus={formStatus}
-                                                                    setDropdown={setDropdown}
-                                                                    dropdownOpen={dropdownOpen}
-                                                                />
-                                                            </li>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </ul>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                                {/* //add section buttion was there here */}
-                            </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <Sections
+                                                                            sectionData={sectionData}
+                                                                            sectionIndex={sectionIndex}
+                                                                            selectedQuestionId={selectedQuestionId}
+                                                                            handleAddRemoveQuestion={handleAddRemoveQuestion}
+                                                                            handleSaveSectionName={handleSaveSectionName}
+                                                                            dataIsSame={dataIsSame}
+                                                                            setSections={setSections}
+                                                                            sections={sections}
+                                                                            handleAddRemovePage={handleAddRemovePage}
+                                                                            handleSaveSection={handleSaveSection}
+                                                                            handleAutoSave={handleSaveSection}
+                                                                            handleDeleteModal={handleDeleteModal}
+                                                                            selectedSection={selectedSection}
+                                                                            setSelectedSection={setSelectedSection}
+                                                                            selectedPage={selectedPage}
+                                                                            setSelectedPage={setSelectedPage}
+                                                                            formStatus={formStatus}
+                                                                            setDropdown={setDropdown}
+                                                                            dropdownOpen={dropdownOpen}
+                                                                        />
+                                                                    </li>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
+                                                    </ul>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
+                                        {/* //add section buttion was there here */}
+                                    </div>
+                                )}
                             {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
                                 <div>
                                     <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
