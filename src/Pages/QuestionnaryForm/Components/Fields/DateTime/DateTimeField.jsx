@@ -163,36 +163,7 @@ function DateTimeField({
             const value = e;
             console.log(value, 'value') // 24-10-2024
             console.log(fieldSettingParameters, 'fieldSettingParameters')
-            // const value = new Date().toDateString()
-            // const currentHours = new Date().getHours();
-            // const currentMinutes = new Date().getMinutes();
-            // const currentSeconds = new Date().getSeconds();
-            // const currentMilliSeconds = new Date().getMilliseconds();
-            // // // let value = '2024-12-27';
-            // // let epochOfDate = new Date(value).getTime();
-            // // console.log(epochOfDate)
-            // const selectedDate = new Date(value);
-            // selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
-            // let obj = {
-            //     Section_1: {
-            //         Page_1: {
-            //             Question_1: selectedDate
-            //         }
-            //     }
-            // }
-            // const now = new Date();
-            // const year = now.getUTCFullYear();
-            // const month = now.getUTCMonth() + 1; // Months are zero-based
-            // const date = now.getUTCDate();
-            // const hours = now.getUTCHours();
-            // const minutes = now.getUTCMinutes();
-            // const seconds = now.getUTCSeconds();
-
-            // console.log(`${year}-${month}-${date} ${hours}:${minutes}:${seconds} GMT`);
-
-            console.log(selectedDate) // 2024-12-27T05:52:09.504Z
-            console.log(new Date()) // 2024-12-27T05:52:09.509Z
-            console.log(eval(obj.Section_1.Page_1.Question_1 < new Date())) // true
+            // console.log(eval(obj.Section_1.Page_1.Question_1 < new Date())) // true
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
@@ -212,11 +183,11 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: selectedDate // Add or update the label key with the selectedDate
+                        [label]: Math.round(selectedDate.getTime() / 1000) // Add or update the label key with the selectedDate
                     }
                 }
             }));
-
+            
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
 
             setValue((prev) => ({
