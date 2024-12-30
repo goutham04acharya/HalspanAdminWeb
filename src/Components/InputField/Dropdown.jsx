@@ -23,7 +23,12 @@ function InputWithDropDown({
     setSelectedUrlOption,
     selectedQuestionId,
     mainIndex,
-    subIndex
+    subIndex,
+    compliance,
+    ifcompliance,
+    dropDownClassName,
+    complinace //added this to only use in the complinace basic editor for the dropdown selector
+
 }) {
     const dispatch = useDispatch();
 
@@ -44,7 +49,9 @@ function InputWithDropDown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => setDropdownOpen(id, mainIndex, subIndex)} // Add condition here
+                    onClick={() => {
+                        complinace || ifcompliance ? setDropdownOpen() : setDropdownOpen(id, mainIndex, subIndex)
+                    }} // Add condition here
                     data-testid={testID}
                     value={selectedOption ? selectedOption : ''}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded pl-[18px] pr-[40px] placeholder:font-normal placeholder:text-base`}
@@ -52,6 +59,7 @@ function InputWithDropDown({
                 />
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={() => handleRemove()} />
+                    : (ifcompliance || compliance) ? <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute top-[43px] right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`} />
                     :
                     <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
                         style={{ top }} />
@@ -62,8 +70,8 @@ function InputWithDropDown({
                     {options.map((option, index) => (
                         <li key={option}
                             data-testid={`${labeltestID}-${index}`}
-                            className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
-                            onClick={() => handleOptionClick(option, mainIndex, subIndex, id)}>
+                            className={`py-2 px-4 cursor-pointer hover:bg-[#F4F6FA] ${dropDownClassName}`}
+                            onClick={(e) => complinace && !ifcompliance ? handleOptionClick(e) : handleOptionClick(option, mainIndex, subIndex, id)}>
                             {option}
                         </li>
                     ))}

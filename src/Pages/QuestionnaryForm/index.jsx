@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, resetFixedChoice, saveCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType, setPageToDelete, setQuestionToDelete } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -38,7 +38,7 @@ import Button from '../../Components/Button/button.jsx';
 const QuestionnaryForm = () => {
     const { questionnaire_id, version_number } = useParams();
     const navigate = useNavigate();
-    const { getAPI } = useApi();
+    const { getAPI, PostAPI } = useApi();
     const { PatchAPI } = useApi();
     const { DeleteAPI } = useApi();
     const dispatch = useDispatch();
@@ -47,9 +47,11 @@ const QuestionnaryForm = () => {
     let [sections, setSections] = useState([{
         section_name: 'Section 1',
         section_id: section1Id,
+        section_conditional_logic: 'section_conditional_logic',
         pages: [{
             page_id: page1Id,
             page_name: 'Page 1',
+            page_conditional_logic: 'page_conditional_logic',
             questions: []
         }],
 
@@ -71,7 +73,6 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -88,7 +89,6 @@ const QuestionnaryForm = () => {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [saveClick, setSaveClick] = useState(false)
     const [sectionName, setSectionName] = useState('')
@@ -100,9 +100,37 @@ const QuestionnaryForm = () => {
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
-    // Create the initial dropdown state
+    const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
+    const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
-
+    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
+    const [conditions, setConditions] = useState([{
+        'conditions': [
+            {
+                'question_name': '',
+                'condition_logic': '',
+                'value': '',
+                'dropdown': false,
+                'condition_dropdown': false,
+                'condition_type': 'textboxfield',
+            },
+        ]
+    },
+    ])
+    const complianceInitialState = [
+        {
+            'conditions': [
+                {
+                    'question_name': '',
+                    'condition_logic': '',
+                    'value': '',
+                    'dropdown': false,
+                    'condition_dropdown': false,
+                    'condition_type': 'textboxfield',
+                },
+            ]
+        }
+    ]
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
@@ -200,6 +228,7 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
+
 
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
@@ -304,6 +333,20 @@ const QuestionnaryForm = () => {
         }));;
     };
 
+    const fetchComplianceLogic = async () => {
+        try {
+            const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
+            if (response?.data?.data[0]?.logic) {
+                // setConditions(response?.data?.data[0]?.logic);
+                dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+            } else {
+                // setConditions(complianceInitialState);
+                dispatch(setComplianceLogicCondition(complianceInitialState));
+            }
+        } catch {
+            console.log('error while getting ')
+        }
+    }
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const sectionId = `SEC-${uuidv4()}`;
@@ -311,9 +354,11 @@ const QuestionnaryForm = () => {
             const newSection = {
                 section_name: `Section ${sections && sections.length + 1}`,
                 section_id: sectionId,
+                section_conditional_logic: '',
                 pages: [{
                     page_id: pageId,
                     page_name: 'Page 1',
+                    page_conditional_logic: '',
                     questions: []
                 }],
             };
@@ -497,7 +542,6 @@ const QuestionnaryForm = () => {
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
                 dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
-
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -512,6 +556,8 @@ const QuestionnaryForm = () => {
                     type: question?.type,
                     source_value: question?.source_value,
                     source: question?.source,
+                    lookup_value: question?.lookup_value,
+                    lookup_id: question?.lookup_id,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
                     format: question?.format,
@@ -536,9 +582,20 @@ const QuestionnaryForm = () => {
                     status: true,
                     time: response?.data?.time,
                 };
-
+                // console.log(sectionsData.map((section, index) => ({
+                //     index: index,
+                //     id: section.section_id
+                // })), 'ssssdxcscdm')
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
-
+                // const body = {
+                //     "public_name": response?.data?.data?.public_name,
+                //     "sections": sectionsData.map((section, index) => ({
+                //         index: index,
+                //         id: section.section_id
+                //     })),
+                //     'compliance_logic': complianceInitialState,
+                // }
+                // const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
@@ -559,6 +616,7 @@ const QuestionnaryForm = () => {
                     setSections(sectionsData);
                     setCompareSavedSections(sectionsData)
                 }
+
             } else {
                 setToastError('Something went wrong fetching form details');
             }
@@ -596,6 +654,7 @@ const QuestionnaryForm = () => {
         if (compliance) {
             let compliance = [...complianceLogic]
             compliance[complianceLogicId].default_content = payloadString;
+
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
                     index === complianceLogicId
@@ -605,6 +664,8 @@ const QuestionnaryForm = () => {
             );
             setIsThreedotLoader(false);
             setConditionalLogic(false);
+            setSectionConditionLogicId('');
+            setPageConditionLogicId('')
             setIsDefaultLogic(false);
             setCompliancestate(false);
             setSaveClick(false);
@@ -617,6 +678,8 @@ const QuestionnaryForm = () => {
             if (isDataSame && !payloadString) {
                 setIsThreedotLoader(false);
                 setConditionalLogic(false)
+                setSectionConditionLogicId('');
+                setPageConditionLogicId('')
                 // If data is the same, return early and don't call the API  
                 return;
             }
@@ -625,10 +688,12 @@ const QuestionnaryForm = () => {
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
+                section_conditional_logic: sectionToSave?.section_conditional_logic,
                 pages: sectionToSave.pages.map(page => (
                     {
                         page_id: page.page_id,
                         page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
+                        page_conditional_logic: page?.page_conditional_logic,
                         questions: page.questions.map(question => ({
                             question_id: question.question_id,
                             question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
@@ -655,6 +720,7 @@ const QuestionnaryForm = () => {
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                             options: fieldSettingParams[question.question_id].options,
                             default_value: fieldSettingParams[question.question_id].defaultValue,
                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -721,24 +787,85 @@ const QuestionnaryForm = () => {
 
                     if (defaultString) {
                         dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+                    } else if (sectionConditionLogicId) {
+                        const sectionIndex = sections.findIndex(section => section.section_id === sectionConditionLogicId);
+                        // Get the section_condition_logic if it exists
+                        if (sectionIndex !== -1) {
+                            // Create a shallow copy of the specific section
+                            const updatedSection = {
+                                ...sections[sectionIndex],
+                                section_conditional_logic: payloadString, // Add or update the property
+                            };
+
+                            // Create a new array with the updated section
+                            const updatedSections = [
+                                ...sections.slice(0, sectionIndex),  // Keep sections before the updated section
+                                updatedSection,                     // Add the updated section
+                                ...sections.slice(sectionIndex + 1) // Keep sections after the updated section
+                            ];
+
+                            // Update state
+                            setSections(updatedSections);
+                        } else {
+                            console.error('Section not found for the given sectionConditionLogicId');
+                        }
+                    } else if (pageConditionLogicId) {
+                        // Iterate through sections to find the page with the given pageConditionLogicId
+                        let pageFound = false;
+                        const updatedSections = sections.map(section => {
+                            const pageIndex = section?.pages.findIndex(page => page.page_id === pageConditionLogicId);
+
+                            if (pageIndex !== -1) {
+                                pageFound = true;
+                                // Create a shallow copy of the specific page
+                                const updatedPage = {
+                                    ...section.pages[pageIndex],
+                                    page_conditional_logic: payloadString, // Add or update the property
+                                };
+
+                                // Update the pages array
+                                const updatedPages = [
+                                    ...section.pages.slice(0, pageIndex),
+                                    updatedPage,
+                                    ...section.pages.slice(pageIndex + 1),
+                                ];
+
+                                // Return the updated section with updated pages
+                                return {
+                                    ...section,
+                                    pages: updatedPages,
+                                };
+                            }
+                            return section; // Return the original section if no changes
+                        });
+
+                        if (pageFound) {
+                            setSections(updatedSections);
+                        } else {
+                            console.error('Page not found for the given pageConditionLogicId');
+                        }
                     } else {
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
-                    dispatch(saveCurrentData());
-                    setIsThreedotLoader(false);
-                    setConditionalLogic(false);
-                    setIsDefaultLogic(false);
-                    setCompliancestate(false)
-                    // Update the saved status  
-                    const update = { ...dataIsSame };
-                    update[sections[sectionIndex].section_id] = true;
-
-                    dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
-                    setSaveClick(false)
+                } else {
+                    // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                 }
-            } catch (error) {
-                console.log(error)
-                setToastError('Something went wrong');
+                dispatch(saveCurrentData());
+                setIsThreedotLoader(false);
+                setConditionalLogic(false);
+                setSectionConditionLogicId('');
+                setPageConditionLogicId('')
+                setIsDefaultLogic(false);
+                setCompliancestate(false)
+                // Update the saved status  
+                const update = { ...dataIsSame };
+                update[sections[sectionIndex].section_id] = true;
+
+                dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+                setSaveClick(false)
+            }
+            catch (error) {
+                setToastError('Something went wrong!!');
             }
         }
 
@@ -964,24 +1091,43 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(true));
     }
 
+    // const confirmDeleteSection = () => {
+    //     if (sectionToDelete !== null) {
+    //         handleDeleteSection(sections[sectionToDelete].section_id);
+    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
+    //         dispatch(setModalOpen(false)); // Close the modal  
+    //     }
+    // }
+
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
             handleDeleteSection(sections[sectionToDelete].section_id);
-            handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
-            dispatch(setModalOpen(false)); // Close the modal  
+
+            // Determine the next section to select
+            const updatedSections = sections.filter((_, index) => index !== sectionToDelete);
+            if (updatedSections.length > 0) {
+                const nextSectionIndex = sectionToDelete < updatedSections.length
+                    ? sectionToDelete // Select the next section
+                    : updatedSections.length - 1; // Select the last section if the deleted one was the last
+                const nextSectionId = updatedSections[nextSectionIndex]?.section_id;
+
+                // Update selection
+                setSelectedSection(nextSectionId);
+                setDropdown(nextSectionId);
+            } else {
+                // No sections left
+                setSelectedSection(null);
+                setDropdown(null);
+            }
+
+            // Reflect deletion in the parent state
+            handleAddRemoveSection('remove', sectionToDelete);
+
+            // Close the modal
+            dispatch(setModalOpen(false));
         }
-    }
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         const updatedSections = sections.filter((section) => section.section_id !== selectedSectionData.section_id);
-    //         setSections(updatedSections); // Assuming setSections updates the state
-    //         // Update sections state
-    //         setSectionToDelete(null);  // Reset sectionToDelete
-    //         dispatch(setModalOpen(false));  // Close modal
-    //         // globalSaveHandler(updatedSections);
-    //         console.log(updatedSections, sections, '555555')
-    //     }
-    // };
+    };
+
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
@@ -1025,9 +1171,18 @@ const QuestionnaryForm = () => {
         }
     };
 
-    const onDragEnd = (result) => {
-        if (!result.destination) return;
+    // const handleDragStart = (start, provided) => {
+    //     setSectionWarningShown(false);
+    //     const section = sections[start.source.index];
 
+    //     if (section.section_conditional_logic && !sectionWarningShown) {
+    //       setSectionWarningShown(true);
+    //     }
+    //   };
+
+    const onDragEnd = (result) => {
+        // setSectionWarningShown(false); // Reset warning state
+        if (!result.destination) return;
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
@@ -1050,6 +1205,8 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         formDefaultDetails();
+        // handleComplianceLogic()
+        fetchComplianceLogic();
         dispatch(setSavedSection(sections));
     }, []);
 
@@ -1146,6 +1303,7 @@ const QuestionnaryForm = () => {
             !compareData(fieldSettingParams, savedFieldSettingParams)
         );
     };
+
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges() && formStatus === 'Draft') {
@@ -1155,11 +1313,25 @@ const QuestionnaryForm = () => {
         }
     };
 
+    const handleComplianceLogic = async () => {
+        const payload = {
+            'questionnaire_id': parseInt(questionnaire_id),
+            'version_number': parseInt(version_number),
+            'logic': conditions.length !== 0 ? conditions : complianceInitialState
+        }
+        try {
+            const response = await PostAPI(`questionnaires/compliancelogic`, payload);
+
+        } catch {
+            console.log('Error updating API')
+        }
+    }
     // Confirmation modal "Confirm" button action (related to showing the cancle modal)
     const handleConfirmCancel = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
+
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
         try {
@@ -1217,6 +1389,7 @@ const QuestionnaryForm = () => {
                                                     fieldSettingParams[question.question_id].lookupOptionChoice
                                             ,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                                             options: fieldSettingParams[question.question_id].options,
                                             default_value: fieldSettingParams[question.question_id].defaultValue,
                                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1263,6 +1436,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
+
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1272,24 +1446,33 @@ const QuestionnaryForm = () => {
                         delete section.questionnaire_id;
                         delete section.version_number;
                         delete section['ttl'];
+                        section.pages.forEach(page => {
+                            delete page.index;
+                            delete page.sectionIndex;
+                        });
                     });
                 } else {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
-
             cleanSections();
-
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
+            handleComplianceLogic()
             setGlobalSaveLoading(false)
         } catch (error) {
             console.log(error);
             setGlobalSaveLoading(false)
         }
     };
-    console.log(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0, 'dddddddd')
+
+    const truncateText = (text, maxLength) => {
+        if (!text || text.length <= maxLength) {
+            return text;
+        }
+        return `${text.slice(0, maxLength)}...`;
+    };
 
     return (
         <>
@@ -1310,6 +1493,7 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
+                            // handleDragStart={handleDragStart}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1320,7 +1504,7 @@ const QuestionnaryForm = () => {
                     <div className='w-[50%] '>
                         <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
                             <div className='flex items-center'>
-                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_name} - Version {formDefaultInfo?.version_number}</p>
                                 <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                     {getStatusText(formDefaultInfo?.status)}
                                 </button>
@@ -1446,7 +1630,10 @@ const QuestionnaryForm = () => {
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
                             <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
-                                onClick={() => handleDataChanges()}>
+                                onClick={() => {
+                                    handleDataChanges()
+                                    dispatch(setSelectedComponent(false))
+                                }}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
@@ -1516,7 +1703,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}
+                        subText={`${selectedSectionData?.section_conditional_logic ? `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages and this includes conditional logic, This action cannot be undone.` : `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1552,7 +1739,14 @@ const QuestionnaryForm = () => {
                 showPageDeleteModal && (
                     <ConfirmationModal
                         text='Delete Page'
-                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        subText={
+                            selectedSectionData?.page_conditional_logic && selectedSectionData?.['questions'].length > 0
+                                ? 'This page includes conditional logic and multiple questions, Are you sure you want to delete it?'
+                                : selectedSectionData?.['questions'].length > 0
+                                    ? `You are about to delete the "${truncateText(selectedSectionData?.page_name, 50)}" page, which may contain multiple questions${selectedSectionData?.page_conditional_logic ? ' and which includes conditional logic' : ''
+                                    }. This action cannot be undone.`
+                                    : 'Are you sure you want to delete this page?'
+                        }
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1570,7 +1764,9 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` 
+                            : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
+
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1621,7 +1817,7 @@ const QuestionnaryForm = () => {
                 )
             }
             {
-                (conditionalLogic || isDefaultLogic || complianceState) && (
+                (conditionalLogic || isDefaultLogic || complianceState || sectionConditionLogicId || pageConditionLogicId) && (
                     <ConditionalLogic
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
@@ -1634,6 +1830,13 @@ const QuestionnaryForm = () => {
                         setCompliancestate={setCompliancestate}
                         complianceLogic={complianceLogic}
                         setComplianceLogic={setComplianceLogic}
+                        setSectionConditionLogicId={setSectionConditionLogicId}
+                        pageConditionLogicId={pageConditionLogicId}
+                        setPageConditionLogicId={setPageConditionLogicId}
+                        sectionConditionLogicId={sectionConditionLogicId}
+                        sectionsData={sections}
+                        setConditions={setConditions}
+                        conditions={conditions}
                     />
                 )
             }
@@ -1653,6 +1856,16 @@ const QuestionnaryForm = () => {
                     fieldSettingParameters={fieldSettingParams}
                 />
             }
+            {/* {sectionWarningShown && <ConfirmationModal
+                setModalOpen={setModalOpen}
+                isOpen={isModalOpen}
+                text="This Section can’t be moved here"
+                subText="It is connected to another Section, and can’t be placed before it."
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                src={`testing-error`}
+                sectionWarningShown={sectionWarningShown}
+                setSectionWarningShown={setSectionWarningShown}
+            />} */}
         </>
     );
 }

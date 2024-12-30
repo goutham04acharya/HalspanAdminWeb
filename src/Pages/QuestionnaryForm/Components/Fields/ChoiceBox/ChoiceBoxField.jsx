@@ -5,6 +5,9 @@ import CheckboxButtonGroup from '../../../../../Components/CheckboxButtonGroup/C
 import InfinateDropdown from '../../../../../Components/InputField/InfinateDropdown';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const ChoiceBoxField = ({
     label,
@@ -27,10 +30,10 @@ const ChoiceBoxField = ({
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
-    const [selectedValues, setSelectedValues] = useState([]);
-
+    const [choiceSelected, setChoiceSelected] = useState('')
+    const dispatch = useDispatch()
+    const questionValue = useSelector(state => state.questionValues.questions);
     const handleRadioChange = (selectedValue) => {
-        console.log(selectedValue, 'selected value')
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -43,6 +46,7 @@ const ChoiceBoxField = ({
             }
         }))
         // Update the selected value in the parent state for the specific question
+        dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }))
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: selectedValue,
@@ -58,55 +62,109 @@ const ChoiceBoxField = ({
         }));
 
         // Set the selected value locally for dropdown purposes or other UI updates
-        setOptionSelected(selectedValue);
+        setOptionSelected(questionValue[question?.question_id]);
     };
-
-    const handleCheckboxChange = (value) => {
-        console.log(value, 'value')
-        setOptionSelected(value.value)
+    const handleDropdownChange = (value) => {
+        setChoiceSelected(questionValue[question?.question_id]);
+        setOptionSelected(questionValue[question?.question_id]);
+        dispatch(setQuestionValue({ question_id: question?.question_id, value: value.value }))
         setIsDropdownOpen(false)
-        setSelectedValues(prev => {
-            let newSelected;
-            if (prev.includes(value.value)) {
-                newSelected = prev.filter(item => item !== value.value);
-            } else {
-                newSelected = [...prev, value.value];
-            }
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
-            setConditionalValues((prevValues) => ({
-                ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name], // Preserve existing entries for this section
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: value.value // Add or update the label key with newValue
-                    }
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name], // Preserve existing entries for this section
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                    [label]: value.value // Add or update the label key with newValue
                 }
-            }))
-            // Update parent component state
-            if (newSelected.length === 0) {
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: '',
-                }));
-            } else {
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: newSelected,
-                }));
             }
+        }))
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: value.value,
+        }));
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors?.preview_choiceboxfield,
+                [question?.question_id]: null,
+            },
+        }));
 
-            // Clear validation errors
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_choiceboxfield: {
-                    ...prevErrors?.preview_choiceboxfield,
-                    [question?.question_id]: null,
-                },
-            }));
+    }
+    const handleCheckboxChange = (value) => {
+        setChoiceSelected(questionValue[question?.question_id]);
+        setOptionSelected(questionValue[question?.question_id]);
+        dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
+        setIsDropdownOpen(false)
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+        setConditionalValues((prevValues) => ({
+            ...prevValues,
+            [section_name]: {
+                ...prevValues[section_name], // Preserve existing entries for this section
+                [page_name]: {
+                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                    [label]: value // Add or update the label key with newValue
+                }
+            }
+        }))
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_choiceboxfield: {
+                ...prevErrors?.preview_choiceboxfield,
+                [question?.question_id]: null,
+            },
+        }));
+        setValue((prev) => ({
+            ...prev,
+            [question?.question_id]: value,
+        }));
+        // setSelectedValues(prev => {
+        //     let newSelected;
+        //     if (prev.includes(value?.value)) {
+        //         newSelected = prev.filter(item => item !== value?.value);
+        //     } else {
+        //         newSelected = [...prev, value.value];
+        //     }
+        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+        //     setConditionalValues((prevValues) => ({
+        //         ...prevValues,
+        //         [section_name]: {
+        //             ...prevValues[section_name], // Preserve existing entries for this section
+        //             [page_name]: {
+        //                 ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+        //                 [label]: value.value // Add or update the label key with newValue
+        //             }
+        //         }
+        //     }))
 
-            return newSelected;
-        });
+        //     // Update parent component state
+        //     if (newSelected.length === 0) {
+        //         dispatch(setQuestionValue({ question_id: question?.question_id, value: '' }))
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: '',
+        //         }));
+        //     } else {
+        //         dispatch(setQuestionValue({ question_id: question?.question_id, value: value.value }))
+        //         setValue((prev) => ({
+        //             ...prev,
+        //             [question?.question_id]: value.value,
+        //         }));
+        //     }
+
+        //     // Clear validation errors
+        //     setValidationErrors((prevErrors) => ({
+        //         ...prevErrors,
+        //         preview_choiceboxfield: {
+        //             ...prevErrors?.preview_choiceboxfield,
+        //             [question?.question_id]: null,
+        //         },
+        //     }));
+
+        //     return value.value;
+        // });
     };
 
     const renderInputGroup = () => {
@@ -123,9 +181,9 @@ const ChoiceBoxField = ({
         }
 
         if (type === 'single_choice') {
-            return <RadioButtonGroup testId={testId} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
+            return <RadioButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
         } else if (type === 'multi_choice') {
-            return <CheckboxButtonGroup testId={testId} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
+            return <CheckboxButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
         }
     };
 
@@ -172,12 +230,13 @@ const ChoiceBoxField = ({
                         labeltestID='lookup-list'
                         isDropdownOpen={isDropdownOpen}
                         setDropdownOpen={setIsDropdownOpen}
-                        handleOptionClick={handleCheckboxChange}
+                        handleOptionClick={handleDropdownChange}
                         top='20px'
                         options={question?.source_value ? question?.source_value : null}
-                        selectedOption={optionSelected}
+                        selectedOption={questionValue[question?.question_id]}
                         preview
                         choiceBox
+                        validationError={validationErrors?.preview_choiceboxfield?.[question.question_id]}
                         type={question?.type}
                     />}
                 </div>

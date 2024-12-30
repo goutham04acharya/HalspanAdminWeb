@@ -40,6 +40,11 @@ Feature: Halspan- Admin - Show/Hide entire Section/Pages for Date/Time fields(Ba
 
     When I click the add conditional logic button
     Then I should see the basic editor for textfield
+    When I click the cancel button
+    Then I should see field settings
+
+    When I click the add conditional logic button
+    Then I should see the basic editor for textfield
     When I enter the correct date/time conditional logic for basic editor
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"

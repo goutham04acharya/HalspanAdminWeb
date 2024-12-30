@@ -25,6 +25,8 @@ module.exports = {
             'test/integration-testing/Flow2/46_load_from_previous.feature',
             'test/integration-testing/Flow2/48_asset_type.feature',
             'test/integration-testing/Flow2/47_cloning_questionnaire.feature',
+            'test/integration-testing/Flow2/49_section_page_show_hide.feature',
+            'test/integration-testing/Flow2/50_my_account.feature',
             'test/integration-testing/Flow2/2_logout.feature'
         ]
     }

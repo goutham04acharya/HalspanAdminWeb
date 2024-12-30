@@ -7,7 +7,9 @@ import {
   setShowPageDeleteModal,
   setSelectedSectionData,
   setPageToDelete,
-  setDataIsSame
+  setDataIsSame,
+  setSelectedQuestionId,
+  setSelectedComponent
 } from "../../QuestionnaryFormSlice";
 
 const Sections = ({
@@ -20,13 +22,10 @@ const Sections = ({
   sections,
   setSections,
   handleAutoSave,
-  selectedSection,
-  setSelectedSection,
-  selectedPage,
   setSelectedPage,
   formStatus,
   setDropdown,
-  dropdownOpen
+  setPageConditionLogicId,
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
@@ -64,12 +63,12 @@ const Sections = ({
     dispatch(setDataIsSame(updatedDataIsSame));
     handleAutoSave(sectionId, updatedSections);
   };
-  
+
   useEffect(() => {
     const initialDropdownState = sections.reduce((acc, _, i) => ({ ...acc, [i]: false }), {});
     setDropdown(initialDropdownState);
-  }, [sections]);
-    
+  }, []);
+
   return (
     <div
       key={sectionData?.section_id}
@@ -77,70 +76,106 @@ const Sections = ({
       ref={(el) => (sectionRefs.current[sectionIndex] = el)}
       className={"pb-0 mt-[10px] mb-0"}
     >
-        <>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="droppable">
-              {(provided) => (
-                <ul {...provided.droppableProps} ref={provided.innerRef}>
-                  {sectionData?.pages?.map((pageData, pageIndex) => (
-                    <Draggable
-                      key={pageData.page_id}
-                      draggableId={pageData.page_id}
-                      index={pageIndex}
-                    >
-                      {(provided) => (
-                        <li
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          style={{
-                            ...provided.draggableProps.style,
-                            transform: provided.draggableProps.style?.transform
-                              ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
-                              : "none",
-                          }}
-                          onClick={() => {
-                            setSelectedPage(pageIndex);
-                          }}
-                          id={`${pageData?.page_id}-scroll`}
-                          className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
-                        >
-                          <div className="flex justify-between">
-                            <div className="flex items-center w-full">
-                              <EditableField
-                                name={pageData?.page_name}
-                                index={sectionIndex}
-                                secondIndex={pageIndex}
-                                handleSave={handleSaveSectionName}
-                                testId={`page-${pageIndex}-name`}
-                                maxLength={1}
-                                formStatus={formStatus}
-                              />
-                            </div>
-                            <div className="flex items-center">
-                              {formStatus === 'Draft' ? (
-                                <img
-                                  className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
-                                  title="Drag"
-                                  src={`/Images/drag.svg`}
-                                  alt="Drag"
-                                  {...provided.dragHandleProps}
-                                />
-                              ) : (
-                                <img
-                                  className="cursor-not-allowed p-2 rounded-full"
-                                  title="Drag"
-                                  src={`/Images/drag.svg`}
-                                  alt="Drag"
-                                />
-                              )}
+      <>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="droppable">
+            {(provided) => (
+              <ul {...provided.droppableProps} ref={provided.innerRef}>
+                {sectionData?.pages?.map((pageData, pageIndex) => (
+                  <Draggable
+                    key={pageData.page_id}
+                    draggableId={pageData.page_id}
+                    index={pageIndex}
+                  >
+                    {(provided) => (
+                      <li
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        style={{
+                          ...provided.draggableProps.style,
+                          transform: provided.draggableProps.style?.transform
+                            ? `translateY(${provided.draggableProps.style.transform.split(",")[1]}`
+                            : "none",
+                        }}
+                        onClick={() => {
+                          setSelectedPage(pageIndex);
+                        }}
+                        id={`${pageData?.page_id}-scroll`}
+                        className="disable-select select-none w-full rounded-[10px] p-4 border mt-1 hover:border-[#2B333B] border-transparent bg-[#FFFFFF] mb-2.5"
+                      >
+                        <div className="flex justify-between w-full">
+                          <div className="flex items-center w-full">
+                            <EditableField
+                              name={pageData?.page_name}
+                              index={sectionIndex}
+                              secondIndex={pageIndex}
+                              handleSave={handleSaveSectionName}
+                              testId={`page-${pageIndex}-name`}
+                              maxLength={1}
+                              formStatus={formStatus}
+                            />
+                          </div>
+                          <div className="flex items-center ">
+                            {pageData.page_conditional_logic ? (
                               <img
-                                src="/Images/trash-black.svg"
-                                title="Delete"
-                                alt="Delete"
-                                data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                                className={`pl-2.5 ${
-                                  formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'
-                                } p-2 rounded-full w-[47px]`}
+                                src="/Images/condition-added.svg"
+                                alt="Condition Added"
+                                title="Condition Added"
+                                className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <img
+                                src="/Images/setting.svg"
+                                title="page-condition-logic"
+                                alt="page-condition-logic"
+                                data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
+                                className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full w-[80px]`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            )}
+                            {formStatus === 'Draft' ? (
+                              <img
+                                className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"
+                                title="Drag"
+                                src="/Images/drag.svg"
+                                alt="Drag"
+                                {...provided.dragHandleProps}
+                              />
+                            ) : (
+                              <img
+                                className="cursor-not-allowed p-2 rounded-full"
+                                title="Drag"
+                                src="/Images/drag.svg"
+                                alt="Drag"
+                              />
+                            )}
+
+                            {/* Delete Button */}
+                            <img
+                              src="/Images/trash-black.svg"
+                              title="Delete"
+                              alt="Delete"
+                              data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
+                              className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[47px]`}
                               onClick={
                                 formStatus === 'Draft'
                                   ? () => {

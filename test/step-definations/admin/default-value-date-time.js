@@ -63,8 +63,7 @@ When('I select the question from the default value suggestions for date\\/time f
         'getMinutes()',
         'getSeconds()',
         'getMilliseconds()',
-        'getTime()',
-        'Date()'];
+        'getTime()'];
 
     bool = true;
     i = 0;
@@ -81,7 +80,7 @@ When('I select the question from the default value suggestions for date\\/time f
         i++;
     }
 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-11"]`)), 10000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-10"]`)), 10000).click();
 
     const element = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
     // Move the cursor one character to the left using the LEFT arrow key
@@ -101,7 +100,7 @@ When('I select the question from the default value suggestions for date\\/time f
 
 When('I enter the default value correct conditional logic for date\\/time field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Date_or_time === "Today") then Date(7/14/2022) else Date()`;
+    const default_value = `if (Section_1.Page_1.Date_or_time === "Today") then "30/11/2024" else "25/11/2024"`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
     this.default_value = default_value;
 });
@@ -111,4 +110,16 @@ Then('I should see the conditional logic in default value field for date\\/time'
     // eslint-disable-next-line max-len
     const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
     assert.equal(default_value, this.default_value);
+});
+
+When('I delete the default value condition', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-default-value"]'))).click();
+});
+
+Then('I should not see the condition', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    // eslint-disable-next-line max-len
+    const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
+    assert.equal(default_value, '');
 });

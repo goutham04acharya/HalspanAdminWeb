@@ -8,6 +8,7 @@ import questionnaryFormSlice from '../Pages/QuestionnaryForm/Components/Question
 import allSectionDetailsSlice from '../Pages/QuestionnaryForm/Components/ConditionalLogicAdvanced/Components/SectionDetailsSlice'
 import signatureSlice from '../Pages/QuestionnaryForm/Components/Fields/Signature/signatureSlice';
 import defaultContentPreviewSlice from '../Pages/QuestionnaryForm/Components/defaultContentPreviewSlice';
+import previewQuestionnaireValuesSlice from '../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
 
 const persistConfig = {
     key: 'root', // key for the storage
@@ -23,7 +24,8 @@ const store = configureStore({
         questionnaryForm: questionnaryFormSlice, // Add the question reducer to the store
         allsectiondetails: allSectionDetailsSlice,
         signature: signatureSlice,
-        defaultContent : defaultContentPreviewSlice
+        defaultContent : defaultContentPreviewSlice,
+        questionValues: previewQuestionnaireValuesSlice
     },
 });
 

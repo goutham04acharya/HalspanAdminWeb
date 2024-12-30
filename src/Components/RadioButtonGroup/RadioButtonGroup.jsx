@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
+import { useDispatch } from 'react-redux';
 
-const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidationErrors, preview, question }) => {
+const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidationErrors, preview, question, questionValue }) => {
     const [selectedValue, setSelectedValue] = useState('');
-
+    const dispatch = useDispatch()
     const handleChange = (event) => {
         const newValue = event.target.value;
+        dispatch(setQuestionValue({ question_id: question?.question_id, value: newValue }))
         setSelectedValue(newValue);
         // onChange(newValue)  
         // setValue((prev) => ({
@@ -35,13 +38,12 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
                             <input
                                 type="radio"
                                 value={option}
-                                checked={selectedValue === option}
-                                onChange={(e) => setSelectedValue(e.target.value)}
+                                checked={questionValue[question?.question_id] === option}
                                 onClick={(e) => handleChange(e)}
                                 className="absolute w-0 h-0 opacity-0"
                             />
                             <div className="w-5 h-5 border-2 border-[#2B333B] rounded-full">
-                                {selectedValue === option && (
+                                {(preview ? questionValue[question?.question_id] : selectedValue) === option && (
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#2B333B] rounded-full" />
                                 )}
                             </div>

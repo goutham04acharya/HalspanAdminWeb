@@ -11,13 +11,7 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     f) Larger or Equal: Returns true if the number field value is greater than or equal to the specified number.
 
   @create_question
-  Scenario: Admin views all types of field to create the form
-    Given I am on the questionnaire management section
-    Then I should see the add field
-    And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
-
-  @create_question
-  Scenario: Admin adds number from the add field section
+  Scenario: Admin adds number field from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -44,6 +38,22 @@ Feature: Halspan- Admin-Show/Hide entire sections/pages for Number field(Advance
     Then I should see the help text for number updated in the section 2
     When I enter the placeholder content for number
     Then I should see the placeholder content for number updated in the section 2
+    When I click the add conditional logic button
+    Then I should see the advanced editor for number field
+    Then I should see the suggestions for questions
+    When I enter the incorrect conditional logic for number field
+    Then I should read a message stating that "No items found"
+    Then I click the save button for conditional logic
+    Then I should read a error message 
+    When I click the cancel button
+    Then I should see field settings
+    
+    When I click the add conditional logic button
+    Then I should see the advanced editor for number field
+    When I select the question from the suggestions for number field
+    When I click the cancel button
+    Then I should see field settings
+
     When I click the add conditional logic button
     Then I should see the advanced editor for number field
     When I enter the correct conditional logic for number field

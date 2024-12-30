@@ -52,6 +52,9 @@ Feature: Halspan - Admin - Create a Questionnaire using Display Content as a Fie
     When I click the add image
     Then I should see a confirmation prompt stating to replace image
     When I click the cancel button
+    When I click the add image
+    Then I should see a confirmation prompt stating to replace image
+    When I click the close button
     When I upload the image from disk
     Then I should be able see image updated in question 1 page 1 section 1
 

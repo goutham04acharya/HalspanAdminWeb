@@ -13,11 +13,12 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     formStatus,
     handleAddRemoveSection,
     handleSectionSaveOrder,
-    handleSectionScroll
+    handleSectionScroll,
+    // handleDragStart
 }) {
 
     const handleDropdown = (sectionId) => {
-        if(dropdownOpen === sectionId){
+        if (dropdownOpen === sectionId) {
             setDropdown('')
             return;
         }
@@ -41,7 +42,8 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                     className='ml-3 font-semibold text-base text-[#2B333B] truncate w-[90%]'>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
-                <DragDropContext onDragEnd={onDragEnd}>
+            {/* onDragStart={handleDragStart} */}
+                <DragDropContext  onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable">
                         {(provided) => (
                             <ul
@@ -75,7 +77,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                     className={`${selectedSection === sectionItem?.section_id ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
                                                     <div className='flex items-center'>
                                                         <img src="/Images/down-arrow.svg" alt="down-arrow"
-                                                            className={dropdownOpen ===  sectionItem?.section_id ? 'rotate-0' : 'rotate-270'}
+                                                            className={dropdownOpen === sectionItem?.section_id ? 'rotate-0' : 'rotate-270'}
                                                         />
                                                         <p
                                                             data-testid={`sidebar-section-${sectionIndex}`}
@@ -104,7 +106,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                     </div>
                                                 </div>
                                                 {sectionItem?.pages?.length > 0 && sectionItem?.pages.map((pageItem, pageIndex) => (
-                                                    dropdownOpen === sectionItem?.section_id  && (
+                                                    dropdownOpen === sectionItem?.section_id && (
                                                         <div
                                                             key={pageItem?.page_id}
                                                             onClick={() => {

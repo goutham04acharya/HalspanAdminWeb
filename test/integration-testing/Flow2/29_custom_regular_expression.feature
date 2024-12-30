@@ -14,7 +14,7 @@ Feature: Halspan - Admin - Regular expression for pattern matching
     And I should see types of field '["Textbox", "Choice", "Date / Time", "Tag Scan", "Floorplan", "Photo", "Video", "File", "GPS", "Number", "Display", "Signature", "Asset Location", "Compliance"]'
 
   @create_question
-  Scenario: Admin adds the field values
+  Scenario Outline: Admin adds the field values
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -27,10 +27,20 @@ Feature: Halspan - Admin - Regular expression for pattern matching
     When I enter the placeholder content for textbox
     Then I should see the placeholder content updated in the section 1
     When I check the field validation 
-    When I select the type as "single_line"
-    * I select the format as "custom-regular-expression"
+    When I select the type as <type>
+    * I select the format as <format>
+    When I enter the custom regular expression as ""
+    When I enter the format error message as "Invalid"
+    Then I should read a message stating that "Regular expression cannot be empty"
+    When I enter the custom regular expression as "["
+    When I enter the format error message as "Invalid"
+    Then I should read a message stating that "Invalid regular expression"
     When I enter the custom regular expression as "^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
     When I enter the format error message as "Invalid PAN format"
     # Then I should see the format reflected on the text box section 1
     * I enter the minimum and maximum number of characters
     * I enter the admin field notes
+
+    Examples:
+      | type          | format                      |
+      | "single_line" | "custom-regular-expression" |

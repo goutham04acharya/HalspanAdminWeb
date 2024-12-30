@@ -40,9 +40,6 @@ function Questionnaries() {
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState('')
   const [cloneLoading, setCloneLoading] = useState(false)
   const [options, setOptions] = useState([])
-  // const options = [
-  //   { value: 'Door', label: 'Door' },
-  // ];
 
   const handleSelect = (option) => {
   };
@@ -53,9 +50,9 @@ function Questionnaries() {
   };
 
   const handleFilter = (option) => {
-    setSelectedOption(option);
+    setSelectedOption(option?.name);
     let params = Object.fromEntries(searchParams);
-    if (params.asset_type === option?.name) {
+    if (params.asset_type === option?.id) {
       setDropdownOpen(false);
       return;
     } else {
@@ -63,9 +60,11 @@ function Questionnaries() {
       setQueList([])
     }
     if (option) {
-      params['asset_type'] = option.name;
+      params['asset_type'] = option.id;
+      params['asset_name'] = option.name
     } else {
       delete params.asset_type;
+      delete params.asset_name;
     }
     setDropdownOpen(false);
     setSearchParams({ ...params });
@@ -75,6 +74,7 @@ function Questionnaries() {
     let params = Object.fromEntries(searchParams);
     delete params?.start_key;
     delete params?.asset_type;
+    delete params?.asset_name;
     lastEvaluatedKeyRef.current = null
     setQueList([])
     setDropdownOpen(false);
@@ -88,8 +88,8 @@ function Questionnaries() {
     if (lastEvaluatedKeyRef.current) {
       params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
-    if (params.asset_type !== '') {
-      setSelectedOption(params.asset_type)
+    if (params.asset_name !== '') {
+      setSelectedOption(params.asset_name)
     }
     if (searchValue !== '') {
       delete params.start_key
@@ -168,7 +168,6 @@ function Questionnaries() {
     try {
       let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)
       setOptions(response?.data?.results)
-      console.log(options, 'options')
     } catch (error) {
 
     }

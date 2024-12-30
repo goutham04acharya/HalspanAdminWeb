@@ -3,6 +3,8 @@ import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 import { useDispatch } from 'react-redux';
 import { setFieldEditable } from '../../defaultContentPreviewSlice';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { useSelector } from 'react-redux';
 
 const TextBoxField = ({
     label,
@@ -32,6 +34,8 @@ const TextBoxField = ({
     values,
 }) => {
     const dispatch = useDispatch();
+    const questionValue = useSelector(state => state.questionValues.questions);
+
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -52,13 +56,16 @@ const TextBoxField = ({
             ...prevErrors,
             preview_textboxfield: {
                 ...prevErrors.preview_textboxfield,
-                [question_id]: null,
+                [question?.question_id]: null,
             },
         }))
+        const keyValue = e.key;
         const newValue = e.target.value;
-        const format = question?.format_error;
+        const formatError = question?.format_error;
+        const format = question?.format;
         const regex = question?.regular_expression;
         const { section_name, page_name, label } = findSectionAndPageName(sections, question_id)
+
         setConditionalValues((prevValues) => ({
             ...prevValues,
             [section_name]: {
@@ -69,52 +76,54 @@ const TextBoxField = ({
                 }
             }
         }));
-        // if (isEditable) {
-        //     onStartEdit();
-        // }
         let obj = {
             'fieldId': question_id,
             isEditable: true
         }
         dispatch(setFieldEditable(obj));
+        dispatch(setQuestionValue({ question_id: question_id, value: newValue }))
         setValue((prev) => ({
             ...prev,
             [question_id]: newValue
         }))
-        // Check for validation if the field is not optional   
-        if (!question?.options?.optional && newValue.trim() === '') {
-            setIsFormatError(false)
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: {
-                    ...prevErrors.preview_textboxfield,
-                    [question.question_id]: 'This is a mandatory field',
-                },
-            }));
-        } else if (!validateFormat(newValue, format, regex)) {
-            setIsFormatError(true)
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: {
-                    ...prevErrors.preview_textboxfield,
-                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
-                },
-            }));
+        if (format === 'Alpha' && /[^a-zA-Z ]+|^(Backspace|Tab|Enter|Shift|Control|Alt|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|CapsLock|\s)$/
+            .test(newValue)) {
+            displayValidationError('Only alphabets are allowed.');
+        } else if (format === 'Alphanumeric' && /[^a-zA-Z0-9 ]+|^(Backspace|Tab|Enter|Shift|Control|Alt|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|CapsLock|\s)$/.test(newValue)) {
+            displayValidationError('Only alphabets and numbers are allowed.');
+        } else if (format === 'Numeric' && /[^0-9 ]+|^(Backspace|Tab|Enter|Shift|Control|Alt|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|CapsLock|\s)$/.test(newValue)) {
+            displayValidationError('Only numbers are allowed.');
+        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(newValue)) {
+            displayValidationError(formatError);
         } else {
             // Clear the error if the field is filled and format is valid 
             setIsFormatError(false)
-            setValidationErrors((prevErrors) => ({
-                ...prevErrors,
-                preview_textboxfield: {
-                    ...prevErrors.preview_textboxfield,
-                    [question.question_id]: null,
-                },
-            }));
+            displayValidationError(null);
         }
     };
     const handleFunction = () => {
-        
+
     }
+
+
+    const displayValidationError = (message) => {
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            preview_textboxfield: {
+                ...prevErrors.preview_textboxfield,
+                [question.question_id]: message,
+            },
+        }));
+    }
+
+    const handleKeyDown = (e) => {
+        const keyValue = e.key;
+        if (['Backspace', 'Tab', 'Enter', 'Shift', 'Control', 'Alt', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'CapsLock'].includes(keyValue)) {
+            return;
+        }
+        console.log('Key Pressed:', keyValue); // This will now log the key pressed
+    };
+
     return (
         <div className=''>
             <label
@@ -131,106 +140,29 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={values || ''}
-                    className={`h-[156px] resize-none w-full break-words border border-[#AEB3B7] rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    value={questionValue[question?.question_id] || ''}
+                    className={`h-[156px] resize-none w-full break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg bg-white ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
-                    // onBlur={(e) => handleInputChange(e)}
-                    onKeyDown={(e) => {
-                        const format = question.format;
-                        const regex = question.regular_expression;
-                        const keyValue = e.key;
-
-                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
-                            setIsFormatError(true)
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
-                                },
-                            }));
-                        }
-                    }}
+                    // onKeyDown={(e) => handleKeyDown(e, question?.format, question?.regular_expression)}
+                    onKeyDown={(e) => handleKeyDown(e)}
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}
-                    // disabled={formStatus !== 'Draft'}
+                // disabled={formStatus !== 'Draft'}
                 />
                 :
                 <input
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={values || ''}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                    value={questionValue[question?.question_id] || ''}
+
+                    className={`w-full h-auto break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'}  rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
-                    // onBlur={(e) => handleInputChange(e)}
-                    onKeyDown={(e) => {
-                        const format = question.format;
-                        const regex = question.regular_expression;
-                        const keyValue = e.key;
-
-                        if (format === 'Alpha' && !/^[a-zA-Z]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Alphanumeric' && !/^[a-zA-Z0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only alphabets and numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Numeric' && !/^[0-9]$/.test(keyValue)) {
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: `Only numbers are allowed.`,
-                                },
-                            }));
-                        } else if (format === 'Custom Regular Expression' && !new RegExp(regex).test(keyValue)) {
-                            setIsFormatError(true)
-                            setValidationErrors((prevErrors) => ({
-                                ...prevErrors,
-                                preview_textboxfield: {
-                                    ...prevErrors.preview_textboxfield,
-                                    [question.question_id]: question?.format_error ? question?.format_error : `Invalid format. Please enter a value in the correct format.`,
-                                },
-                            }));
-                        }
-                    }}
+                    // onKeyDown={(e) => handleKeyDown(e, question?.format, question?.regular_expression)}
+                    onKeyDown={(e) => handleKeyDown(e)}
                     onChange={(e) => handleInputChange(e)}
                     maxLength={question?.field_range?.max}
                     required={question?.options?.optional === true ? true : false}

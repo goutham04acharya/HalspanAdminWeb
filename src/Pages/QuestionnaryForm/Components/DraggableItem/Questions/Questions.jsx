@@ -20,6 +20,7 @@ import TagScanField from '../../Fields/TagScan/TagScanField';
 const Questions = ({
     item,
     dragHandleProps,
+    questionData
 
 }) => {
     
@@ -27,8 +28,12 @@ const Questions = ({
     const { onMouseDown, onTouchStart } = dragHandleProps;
     const { index, selectedQuestionId, formStatus } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
-    const handleDeletequestionModal = (sectionIndex, pageIndex, questionData) => {
-        dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: questionData.index }));
+
+    const handleDeletequestionModal = (sectionIndex, pageIndex, item) => {
+        console.log(questionData, 'questionData')
+        console.log(item, 'item')
+        setSelectedQuestionId(null)
+        dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: item.index , questionName: fieldSettingParams[item.question_id].label}));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
         dispatch(setShowquestionDeleteModal(true));
     };

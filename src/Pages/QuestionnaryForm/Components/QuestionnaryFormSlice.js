@@ -15,7 +15,7 @@ const initialState = {
     selectedComponent: null,
     sectionToDelete: null,
     pageToDelete: { sectionIndex: null, pageIndex: null },
-    questionToDelete: { sectionIndex: null, pageIndex: null, questionIndex: null },
+    questionToDelete: { sectionIndex: null, pageIndex: null, questionIndex: null, questionName: '' },
     showquestionDeleteModal: '',
     showCancelModal: false,
     showPageDeleteModal: '',
@@ -93,6 +93,7 @@ const questionnaryFormSlice = createSlice({
         setSelectedQuestionnaryOption: (state, action) => {
             state.selectedQuestionnaryOption = action.payload
         }
+
     }
 });
 

@@ -52,7 +52,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                     <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center sticky right-0 bg-white'>ACTION</th>
                 </thead>
                 {loading
-                    ? <Shimmer column={6} row={10} firstIndex />
+                    ? <Shimmer column={7} row={10} firstIndex />
                     : <tbody className='bg-white'>
                         {QueList && QueList.map((QueInfo, index) => (
                             <React.Fragment key={index}>
@@ -78,7 +78,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                                             )}
                                     </td>
                                     {/* <td className={`py-6 text-start bg-[#F4F6FA]  px-6 ${getStatusStyles(QueInfo?.status)}`} title={`${getStatusText(QueInfo?.status)}`}>{getStatusText(QueInfo?.status) || '-'}</td> */}
-                                    <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_type}</td>
+                                    <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_name || '-' }</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6 truncate max-w-[200px]'>{QueInfo?.description}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] min-w-[120px]  flex justify-center sticky right-0 rounded-tr-[10px] rounded-br-[10px]'>
                                         <img src="/Images/copy.svg" 

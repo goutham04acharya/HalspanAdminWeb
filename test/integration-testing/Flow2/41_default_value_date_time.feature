@@ -68,15 +68,25 @@ Feature: Halspan - Admin - Implement default values of Date Fields
     Then I should see the help text for date/time updated in the section 2
     When I enter the placeholder content for date/time
     Then I should see the placeholder content for date/time updated in the section 2
-    
-    # When I click the add default value button
-    # Then I should see the default value advanced editor for date/time field
-    # When I select the question from the default value suggestions for date/time field
-    # When I click the cancel button
-    # Then I should see field settings
+    When I click the add default value button
+    Then I should see the default value advanced editor for date/time field
+    Then I should see the default value suggestions for questions for date/time
+    When I enter the incorrect default value conditional logic for date/time field
+    Then I should read a message stating that "No items found"
+    Then I click the save button for default value
+    Then I should read a error message 
+    When I click the cancel button
+    Then I should see field settings
+    When I click the add default value button
+    Then I should see the default value advanced editor for date/time field
+    When I select the question from the default value suggestions for date/time field
+    When I click the cancel button
+    Then I should see field settings
 
     When I click the add default value button
     Then I should see the default value advanced editor for date/time field
     When I enter the default value correct conditional logic for date/time field
     Then I click the save button for default value
     And I should see the conditional logic in default value field for date/time
+    When I delete the default value condition
+    Then I should not see the condition

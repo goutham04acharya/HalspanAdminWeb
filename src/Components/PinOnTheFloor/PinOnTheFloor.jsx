@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imageSrc, floorPlan }) => {
+const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -132,12 +132,13 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                 data-testid="floorplan-image"
             >
                 <img
-                    src={floorPlan ? '/floorplan.png' :imageSrc}
+                    src={floorPlan ? '/floorplan.png' : imageSrc}
                     alt="Thumbnail"
                     style={{
                         width: "100px",
                         height: "100px",
                         objectFit: "cover",
+                        zIndex: "-9"
                     }}
                     className="rounded-lg"
                 />
@@ -159,7 +160,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                         width: '358px',
                         borderRadius: '52px'
                     }}
-                    // className="mx-auto"
+                // className="mx-auto"
                 >
                     <div
                         style={{
@@ -177,14 +178,14 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                             minScale={1}
                             maxScale={5}
                             onZoom={handleZoom}
-                            
+
                             disabled={isDrawMode || eraserClick || resetClick}
                         >
                             <TransformComponent pointerEvents="none"  >
                                 <div
                                     style={{
                                         width: '380px',
-                                        height: imageSize.height,
+                                        height: '600px',
                                         position: "relative",
                                         backgroundColor: "white"
                                     }}
@@ -199,7 +200,7 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                         style={{
                                             width: "100%",
                                             height: "100%",
-                                            objectFit: "cover",
+                                            objectFit: "contain",
                                         }}
                                         onMouseDown={(e) => e.preventDefault()}
                                     />
@@ -229,22 +230,20 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                     transform: `translate(-50%, -100%)`,
                                                     cursor: "move",
                                                 }}
-                                                // onMouseDown={(e) => handlePinMouseDown(pin.id, e)}
                                             >
                                                 <img
                                                     src="/Images/pin.svg"
                                                     alt="Pin"
                                                     style={{ width: "100%", height: "100%" }}
                                                 />
+
                                                 <div
                                                     style={{
                                                         position: "absolute",
-                                                        top: "-10px",
-                                                        right: "-10px",
-                                                        width: "20px",
-                                                        height: "20px",
+                                                        right: "-40%",
+                                                        top: "50%",
+                                                        transform: `translate(-50%, -150%) scale(${1 / currentZoom})`, // Adjust transform  
                                                         borderRadius: "50%",
-                                                        
                                                         display: "flex",
                                                         justifyContent: "center",
                                                         alignItems: "center",
@@ -256,24 +255,20 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                                         handleRemovePin(pin.id);
                                                     }}
                                                 >
-                                                    ×
+                                                    <img
+                                                        src="/Images/close.svg"
+                                                        alt="Close"
+                                                        style={{
+                                                            width: "20px",
+                                                            height: "20px",
+                                                        }}
+                                                    />
                                                 </div>
-                                            </div>
-                                            <div
-                                                style={{
-                                                    position: "absolute",
-                                                    top: `${pin.y * 100}%`,
-                                                    left: `${pin.x * 100}%`,
-                                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                                    padding: "5px",
-                                                    borderRadius: "3px",
-                                                    transform: "translate(-50%, 10px)",
-                                                }}
-                                            >
-                                                {/* {`plan_x: ${pin.x.toFixed(2)}\nplan_y: ${pin.y.toFixed(2)}`} */}
                                             </div>
                                         </React.Fragment>
                                     ))}
+
+
                                 </div>
                             </TransformComponent>
                         </TransformWrapper>
@@ -296,14 +291,14 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
 
                             className="absolute bottom-[10px] left-0 flex flex-col"
                         >
-                            <button
+                            {isPin === "yes" &&<button
                                 data-testid="floorplan-pin"
                                 className={` px-3 text-white rounded-lg cursor-pointer `}
                                 onClick={togglePinMode}
                             >
                                 <img src="/Images/pin-icon.svg" alt="" width={40} className={` ${isPinMode ? 'border border-white rounded-sm' : ' border border-transparent'}`} />
-                            </button>
-                            <div className="flex flex-wrap">
+                            </button>}
+                            {isDraw === "yes" &&<><div className="flex flex-wrap">
                                 <button
                                     data-testid="floorplan-draw"
                                     className={` px-3 text-white rounded-lg cursor-pointer `}
@@ -318,12 +313,9 @@ const ImageZoomPin = ({ imageSrc, floorPlan }) => {
                                         onChange={(e) => setStrokeColor(e.target.value)}
                                         value={strokeColor}
                                         // style={{ display: 'none' }}
-                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent '
-                                    />
+                                        className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent ' />
                                 </span>}
-                            </div>
-                            <button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button>
-                            <button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button>
+                            </div><button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button><button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button></>}
                         </div>
                     </div>
                 </div>

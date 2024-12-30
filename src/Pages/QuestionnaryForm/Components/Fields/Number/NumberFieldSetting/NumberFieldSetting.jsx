@@ -58,24 +58,68 @@ function NumberFieldSetting({
                     />
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
                         <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
-                        <div className='relative w-full'>
-                            <input type="text"
+                        <div className='flex items-center justify-between w-full'>
+                            <div className='relative w-full'>
+                                <input
+                                type="text"
                                 id='Label'
                                 data-testid="default-value-input"
-                                disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                                value={fieldSettingParameters?.default_conditional_logic ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic) : ''} // Prefill the input with `defaultString` if it exists, otherwise empty string
-                                onChange={(e) => dispatch(setNewComponent({ id: 'default_conditional_logic', value: e.target.value, questionId: selectedQuestionId }))}
-                                placeholder='Populates the content' />
-                            <img src="/Images/setting.svg"
+                                placeholder='Populates the content'
+                                disabled={formStatus !== 'Draft'}
+                                value={
+                                    fieldSettingParameters?.default_conditional_logic
+                                    ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                                    : ''
+                                } // Prefill the input with `defaultString` if it exists, otherwise empty string
+                                onChange={
+                                    formStatus === 'Draft'
+                                    ? (e) =>
+                                        dispatch(
+                                            setNewComponent({
+                                            id: 'default_conditional_logic',
+                                            value: e.target.value,
+                                            questionId: selectedQuestionId,
+                                            })
+                                        )
+                                    : null
+                                }
+                                />
+                                <img
+                                src="/Images/setting.svg"
                                 alt="setting"
                                 data-testid="default-value"
+                                className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} `}
+                                onClick={
+                                    formStatus === 'Draft'
+                                    ? () => {
+                                        setIsDefaultLogic(true);
+                                        setConditionalLogic(false);
+                                        }
+                                    : null
+                                }
+                                />
+                            </div>
+
+                            {/* Conditionally render the delete icon */}
+                            {fieldSettingParameters?.default_conditional_logic && (
+                                <img
+                                src="/Images/trash-black.svg"
+                                alt="delete"
+                                data-testid="delete-default-value"
+                                className='w-7 h-7 cursor-pointer ml-3 mt-2'
                                 onClick={() => {
-                                    setIsDefaultLogic(true);
-                                    setConditionalLogic(false);
+                                    dispatch(
+                                    setNewComponent({
+                                        id: 'default_conditional_logic',
+                                        value: '',
+                                        questionId: selectedQuestionId,
+                                    })
+                                    );
                                 }}
-                                className='absolute top-5 right-3 cursor-pointer' />
-                        </div>
+                                />
+                            )}
+                            </div>
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Type</p>
@@ -208,7 +252,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='min'
                                 type='text'
-                                value={fieldSettingParameters?.min}
+                                value={fieldSettingParameters?.min || ''}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Minimum'
@@ -218,13 +262,14 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                             <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
+                            {console.log(fieldSettingParameters?.max, 'max')}
                             <InputField
                                 autoComplete='off'
                                 label=''
                                 id='max'
                                 type='text'
                                 formStatus={formStatus}
-                                value={fieldSettingParameters?.max}
+                                value={fieldSettingParameters?.max || ''}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -245,7 +290,7 @@ function NumberFieldSetting({
                                 id='incrementby'
                                 type='text'
                                 formStatus={formStatus}
-                                value={fieldSettingParameters?.incrementby}
+                                value={fieldSettingParameters?.incrementby || ''}
                                 className='w-full mt-2.5'
                                 labelStyle=''
                                 placeholder='Increment By'
@@ -263,7 +308,7 @@ function NumberFieldSetting({
                             <p
                                 data-testid="pre-field-option" className={`font-semibold text-base ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ${activeTab === 'preField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
-                                onClick={formStatus === 'Draft'?() => handleTabClick('preField'):null}
+                                onClick={formStatus === 'Draft' ? () => handleTabClick('preField') : null}
                                 disabled={formStatus !== 'Draft'}
                             >
                                 Pre-field Text
@@ -271,7 +316,7 @@ function NumberFieldSetting({
                             <p
                                 data-testid="post-field-option" className={`font-semibold text-base ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ${activeTab === 'postField' ? 'text-black border-b-2 border-[#000000] pb-2' : 'text-[#9FACB9]'
                                     }`}
-                                onClick={formStatus === 'Draft'?() => handleTabClick('postField'):null}
+                                onClick={formStatus === 'Draft' ? () => handleTabClick('postField') : null}
                                 disabled={formStatus !== 'Draft'}
                             >
                                 Post-field Text
@@ -284,7 +329,7 @@ function NumberFieldSetting({
                                     autoComplete='off'
                                     id='preField'
                                     type='preField'
-                                    value={fieldSettingParameters?.preField}
+                                    value={fieldSettingParameters?.preField || ''}
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Pre-field text'
@@ -303,7 +348,7 @@ function NumberFieldSetting({
                                     autoComplete='off'
                                     id='postField'
                                     type='postField'
-                                    value={fieldSettingParameters?.postField}
+                                    value={fieldSettingParameters?.postField || ''}
                                     className='w-full'
                                     formStatus={formStatus}
                                     labelStyle='font-semibold text-base text-[#2B333B]'
@@ -316,7 +361,7 @@ function NumberFieldSetting({
                             </div>
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus}/>
+                    <OptionsComponent selectedQuestionId={selectedQuestionId} fieldSettingParameters={fieldSettingParameters} formStatus={formStatus} />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
@@ -324,7 +369,7 @@ function NumberFieldSetting({
                             id='note'
                             type='text'
                             formStatus={formStatus}
-                            value={fieldSettingParameters?.note}
+                            value={fieldSettingParameters?.note || ''}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
@@ -336,16 +381,29 @@ function NumberFieldSetting({
                         />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-                        <button
-                            type='button'
-                            disabled={formStatus !== 'Draft'}
-                            data-testid="add-conditional-logic"
-                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
-                            onClick={() => setConditionalLogic(true)}  // Use arrow function
-                        >
-                            Add Conditional Logic
-                        </button>
-                        {fieldSettingParameters.conditional_logic &&
+                        <div className='flex items-center w-full'>
+                            <button
+                                type='button'
+                                data-testid="add-conditional-logic"
+                                className={`mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? 'px-[40px] w-[50%] ' : 'px-[52px] w-[80%]'}`}
+                                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
+                            >
+                                Add Conditional Logic
+                            </button>
+                            {fieldSettingParameters?.conditional_logic &&
+                                <button
+                                    type='button'
+                                    data-testid="remove-conditional-logic"
+                                    className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                    }}
+                                >
+                                    Remove Conditional Logic
+                                </button>
+                            }
+                        </div>
+                        {fieldSettingParameters?.conditional_logic &&
                             <p className='text-center italic mt-1'>Conditional Logic Added</p>
                         }
                     </div>

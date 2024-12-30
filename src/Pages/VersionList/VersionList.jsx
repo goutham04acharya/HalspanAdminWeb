@@ -1,13 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import useApi from '../../services/CustomHook/useApi';
 import { useNavigate, useParams } from 'react-router-dom';
-import Table from '../../Pages/VersionList/Components/Table.jsx'
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import QuestionnarySettings from './Components/QuestionnarySettings.jsx';
-import CreateModal from '../../Components/CustomModal/CreateModal.jsx';
-import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 import { useDispatch } from 'react-redux';
-import { setInitialData } from '../QuestionnaryForm/Components/Fields/fieldSettingParamsSlice.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import VersionEditModal from '../../Components/Modals/VersionEditModal.jsx';
