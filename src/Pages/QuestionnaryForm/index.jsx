@@ -624,7 +624,6 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
-
                 // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
@@ -1117,7 +1116,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
             "public_name": formDefaultInfo.public_name,
@@ -1248,58 +1246,99 @@ const QuestionnaryForm = () => {
 
     // Function to compare sections state with compareSavedSections to show the cancle modal or not
     const compareSections = (sections, compareSavedSections) => {
+        // Check if the number of sections matches
         if (sections.length !== compareSavedSections.length) {
-            return false; // Different number of sections
+            console.log('Number of sections does not match');
+            return false;
         }
-
-        // Compare each section in detail (excluding questions)
+    
+        // Compare each section in detail
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             const savedSection = compareSavedSections[i];
-
-            // Compare section names and ids
-            if (section.section_name !== savedSection.section_name ||
-                section.section_id !== savedSection.section_id) {
-                return false; // Section names or ids are different
+    
+            // Compare section-level properties
+            if (
+                section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id ||
+                section.updated_at !== savedSection.updated_at
+            ) {
+                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
+                return false;
             }
-
-            // Compare pages within each section (excluding questions)
+    
+            // Compare pages within the section
             if (section.pages.length !== savedSection.pages.length) {
-                return false; // Different number of pages
+                console.log(`Mismatch in the number of pages in section ${i + 1}`);
+                return false;
             }
-
-            // Compare each page's details (without comparing questions)
+    
             for (let j = 0; j < section.pages.length; j++) {
                 const page = section.pages[j];
                 const savedPage = savedSection.pages[j];
-
-                // Compare page names and page_ids
-                if (page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id) {
-                    return false; // Different page names or page_ids
+    
+                // Compare page-level properties
+                if (
+                    page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id
+                ) {
+                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
+                        page,
+                        savedPage,
+                    });
+                    return false;
+                }
+    
+                // Compare questions within the page
+                if (page.questions.length !== savedPage.questions.length) {
+                    console.log(
+                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
+                    );
+                    return false;
+                }
+    
+                for (let k = 0; k < page.questions.length; k++) {
+                    const question = page.questions[k];
+                    const savedQuestion = savedPage.questions[k];
+    
+                    // Compare question-level properties
+                    if (
+                        question.question_id !== savedQuestion.question_id ||
+                        question.question_name !== savedQuestion.question_name
+                    ) {
+                        console.log(
+                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
+                            { question, savedQuestion }
+                        );
+                        return false;
+                    }
                 }
             }
         }
-
-        return true; // Sections and pages match
+    
+        return true; // Sections, pages, and questions are identical
     };
-
+    
     // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
     const hasUnsavedChanges = () => {
-        // If sections have changed, or compareData is false, we show the modal
         return (
-            !compareSections(sections, compareSavedSections) ||
-            !compareData(fieldSettingParams, savedFieldSettingParams)
+            !compareSections(sections, compareSavedSections)
         );
     };
 
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges() && formStatus === 'Draft') {
-            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
+            dispatch(setShowCancelModal(true)); // Show confirmation modal
         } else {
             navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
+    };
+
+    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
+    const handleConfirmCancel = () => {
+        dispatch(setShowCancelModal(false));
+        navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
     const handleComplianceLogic = async () => {
@@ -1315,11 +1354,6 @@ const QuestionnaryForm = () => {
             console.log('Error updating API')
         }
     }
-    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
-    const handleConfirmCancel = () => {
-        dispatch(setShowCancelModal(false));
-        navigate(`/questionnaries/version-list/${questionnaire_id}`);
-    };
 
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
@@ -1446,6 +1480,8 @@ const QuestionnaryForm = () => {
             }
             cleanSections();
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+            // Sync compareSavedSections with the updated sections
+            setCompareSavedSections(sections);
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
             handleComplianceLogic()
@@ -1500,32 +1536,22 @@ const QuestionnaryForm = () => {
                             </div>
                             {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
-                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] overflow-auto'>
-                            <p
-                                title={formDefaultInfo?.internal_name}
-                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
-                                data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
-                            </p>
-                            {sections.length === 0 ?
-                                <p
-                                    className={`flex items-center justify-center ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
-                                        ? 'h-customh15 overflow-auto'
-                                        : 'h-customh14 overflow-auto'
-                                        } text-lg font-semibold bg-[#EFF1F8] w-full`}
-                                >
-                                    No Sections available for this Questionnaire
-                                </p> : (
-                                    <div
-                                        className={`overflow-auto default-sidebar ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
-                                                ? 'h-customh15'
-                                                : 'h-customh14'
-                                            }`}
-                                    >
+                        {sections.length === 0 ?
+                            (<p className='flex items-center justify-center h-customh6 text-lg font-semibold bg-[#EFF1F8] w-full'>No Sections available for this Questionnaire</p>)
+                            : (
+                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                                    <p
+                                        title={formDefaultInfo?.internal_name}
+                                        className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
+                                        data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                                    </p>
+                                    <div>
                                         <DragDropContext onDragEnd={onDragEnd}>
                                             <Droppable droppableId="droppable">
                                                 {(provided) => (
                                                     <ul
-                                                        {...provided.droppableProps} ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                        ref={provided.innerRef}
                                                     >
                                                         {sections.map((sectionData, sectionIndex) => (
                                                             <Draggable
@@ -1536,13 +1562,13 @@ const QuestionnaryForm = () => {
                                                                 {(provided) => (
                                                                     <li
                                                                         className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
-                                                                    ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
-                                                                    border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                                        ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
+                                                                        border hover:border-[#2B333B] border-transparent mb-2.5`}
                                                                     >
                                                                         <div className="flex justify-between w-full"
                                                                             id={`${sectionData.section_id}-scroll`}
                                                                         >
-                                                                            <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
+                                                                            <div className='flex items-center' style={{ width: '-webkit-fill-available' }}>
                                                                                 <EditableField
                                                                                     name={sectionData?.section_name}
                                                                                     index={sectionIndex}
@@ -1556,7 +1582,35 @@ const QuestionnaryForm = () => {
                                                                                     formStatus={formStatus}
                                                                                 />
                                                                             </div>
-                                                                            <div className="flex items-center">
+                                                                            <div className="flex items-center w-[15%]">
+                                                                                {sectionData.section_conditional_logic ? (
+                                                                                    // Dummy icon to show if conditional logic is added
+                                                                                    <img
+                                                                                        src="/Images/condition-added.svg"
+                                                                                        alt="Condition Added"
+                                                                                        title="Condition Added"
+                                                                                        className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}
+                                                                                    />
+                                                                                ) : (
+                                                                                    // Setting icon to add conditional logic
+                                                                                    <img
+                                                                                        src="/Images/setting.svg"
+                                                                                        alt="setting"
+                                                                                        title="Add Conditional-logic"
+                                                                                        data-testid={`add-condition-section-${sectionIndex}`}
+                                                                                        className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}  // Use arrow function
+                                                                                    />
+                                                                                )}
                                                                                 <img src="/Images/trash-black.svg"
                                                                                     alt="delete"
                                                                                     title='Delete'
@@ -1564,16 +1618,6 @@ const QuestionnaryForm = () => {
                                                                                     className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
                                                                                     onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                                 />
-                                                                                {/* <img
-                                                                            src="/Images/save.svg"
-                                                                            alt="save"
-                                                                            title="Save"
-                                                                            data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
-                                                                            onClick={formStatus === 'Draft' ? () => {
-                                                                                handleSaveSection(sectionData?.section_id);
-                                                                            } : null}
-                                                                        /> */}
                                                                             </div>
                                                                         </div>
                                                                         <Sections
@@ -1596,6 +1640,8 @@ const QuestionnaryForm = () => {
                                                                             formStatus={formStatus}
                                                                             setDropdown={setDropdown}
                                                                             dropdownOpen={dropdownOpen}
+                                                                            setPageConditionLogicId={setPageConditionLogicId}
+                                                                            pageConditionLogicId={setPageConditionLogicId}
                                                                         />
                                                                     </li>
                                                                 )}
@@ -1608,13 +1654,13 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                )}
-                            {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
-                                <div>
-                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
+                                        <div>
+                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                        </div>
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
@@ -1753,7 +1799,7 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` 
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.`
                             : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
 
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'

@@ -137,6 +137,15 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
         }
     };
 
+    // Function to filter options for a specific version
+    const filteredOptions = (versionList) => {
+        if (!versionInfo.is_question_exists) {
+            console.log(versionInfo, 'versionInfo.is_question_exists')
+            return options.filter(option => option !== 'Published'); // Remove "Published" only for `false`
+        }
+        return options; // Return all options otherwise
+    };
+
     return (
         <>
             <div className='overflow-auto scrollbar_gray h-customh11'>
@@ -194,8 +203,12 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                         </span>
                                                     )}
                                                     {dropdownsOpen[versionListInfo?.version_number] && (
-                                                        <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2) ? 'top-[-145px]' : 'top-[58px]') : 'top-[58px]'} z-10`}>
-                                                            {options.map(option => (
+                                                        <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] 
+                                                        ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2)
+                                                                ? 'top-[-145px]'
+                                                                : 'top-[58px]')
+                                                                : 'top-[58px]'} z-10`}>
+                                                            {filteredOptions(versionListInfo).map((option) => (
                                                                 <li key={option}
                                                                     data-testid={`${option}`}
                                                                     className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
