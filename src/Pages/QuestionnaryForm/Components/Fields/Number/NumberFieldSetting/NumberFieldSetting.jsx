@@ -253,7 +253,7 @@ function NumberFieldSetting({
                                 label=''
                                 id='min'
                                 type='text'
-                                value={fieldSettingParameters?.min}
+                                value={fieldSettingParameters?.min || ''}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Minimum'
@@ -263,13 +263,14 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                             <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
+                            {console.log(fieldSettingParameters?.max, 'max')}
                             <InputField
                                 autoComplete='off'
                                 label=''
                                 id='max'
                                 type='text'
                                 formStatus={formStatus}
-                                value={fieldSettingParameters?.max}
+                                value={fieldSettingParameters?.max || ''}
                                 className='w-full'
                                 labelStyle=''
                                 placeholder='Maximum'
@@ -290,7 +291,7 @@ function NumberFieldSetting({
                                 id='incrementby'
                                 type='text'
                                 formStatus={formStatus}
-                                value={fieldSettingParameters?.incrementby}
+                                value={fieldSettingParameters?.incrementby || ''}
                                 className='w-full mt-2.5'
                                 labelStyle=''
                                 placeholder='Increment By'
@@ -329,7 +330,7 @@ function NumberFieldSetting({
                                     autoComplete='off'
                                     id='preField'
                                     type='preField'
-                                    value={fieldSettingParameters?.preField}
+                                    value={fieldSettingParameters?.preField || ''}
                                     className='w-full'
                                     labelStyle='font-semibold text-base text-[#2B333B]'
                                     placeholder='Pre-field text'
@@ -348,7 +349,7 @@ function NumberFieldSetting({
                                     autoComplete='off'
                                     id='postField'
                                     type='postField'
-                                    value={fieldSettingParameters?.postField}
+                                    value={fieldSettingParameters?.postField || ''}
                                     className='w-full'
                                     formStatus={formStatus}
                                     labelStyle='font-semibold text-base text-[#2B333B]'
@@ -369,7 +370,7 @@ function NumberFieldSetting({
                             id='note'
                             type='text'
                             formStatus={formStatus}
-                            value={fieldSettingParameters?.note}
+                            value={fieldSettingParameters?.note || ''}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'

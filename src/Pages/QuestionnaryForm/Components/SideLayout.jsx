@@ -26,10 +26,13 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
     }
 
     useEffect(() => {
-        setSelectedSection(sections[0]?.section_id)
-        setDropdown(sections[0]?.section_id)
-    }, [])
-
+        if (sections?.length > 0) {
+            setSelectedSection(sections[0]?.section_id);
+            setDropdown(sections[0]?.section_id);
+        }
+    }, [sections]);
+    
+    
     return (
         <div className='py-4'>
             <div className='flex items-center px-9'>
@@ -100,13 +103,6 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
                                                             alt="Drag"
 
                                                         />}
-                                                        {/* <img src="/Images/trash-black.svg"
-                                                            alt="delete"
-                                                            title='Delete'
-                                                            data-testid={`delete-btn-${sectionIndex}`}
-                                                            className={`pl-2.5 w-10 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                            onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionItem) : null}
-                                                        /> */}
                                                     </div>
                                                 </div>
                                                 {sectionItem?.pages?.length > 0 && sectionItem?.pages.map((pageItem, pageIndex) => (

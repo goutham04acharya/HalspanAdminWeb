@@ -1500,16 +1500,27 @@ const QuestionnaryForm = () => {
                             </div>
                             {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
-                        {sections.length === 0 ?
-                            (<p className='flex items-center justify-center h-customh6 text-lg font-semibold bg-[#EFF1F8] w-full'>No Sections available for this Questionnaire</p>)
-                            : (
-                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                                    <p
-                                        title={formDefaultInfo?.internal_name}
-                                        className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
-                                        data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
-                                    </p>
-                                    <div>
+                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] overflow-auto'>
+                            <p
+                                title={formDefaultInfo?.internal_name}
+                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
+                                data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                            </p>
+                            {sections.length === 0 ?
+                                <p
+                                    className={`flex items-center justify-center ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
+                                        ? 'h-customh15 overflow-auto'
+                                        : 'h-customh14 overflow-auto'
+                                        } text-lg font-semibold bg-[#EFF1F8] w-full`}
+                                >
+                                    No Sections available for this Questionnaire
+                                </p> : (
+                                    <div
+                                        className={`overflow-auto default-sidebar ${selectedComponent === 'compliancelogic' || complianceLogic?.length > 0
+                                                ? 'h-customh15'
+                                                : 'h-customh14'
+                                            }`}
+                                    >
                                         <DragDropContext onDragEnd={onDragEnd}>
                                             <Droppable droppableId="droppable">
                                                 {(provided) => (
@@ -1525,13 +1536,13 @@ const QuestionnaryForm = () => {
                                                                 {(provided) => (
                                                                     <li
                                                                         className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
-                                                                        ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
-                                                                        border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                                    ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
+                                                                    border hover:border-[#2B333B] border-transparent mb-2.5`}
                                                                     >
                                                                         <div className="flex justify-between w-full"
                                                                             id={`${sectionData.section_id}-scroll`}
                                                                         >
-                                                                            <div className='flex items-center' style={{ width: '-webkit-fill-available' }}>
+                                                                            <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
                                                                                 <EditableField
                                                                                     name={sectionData?.section_name}
                                                                                     index={sectionIndex}
@@ -1545,34 +1556,7 @@ const QuestionnaryForm = () => {
                                                                                     formStatus={formStatus}
                                                                                 />
                                                                             </div>
-                                                                            <div className="flex items-center w-[15%]">
-                                                                                {sectionData.section_conditional_logic ? (
-                                                                                    <img
-                                                                                        src="/Images/condition-added.svg"
-                                                                                        alt="Condition Added"
-                                                                                        title="Condition Added"
-                                                                                        className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
-                                                                                        onClick={formStatus === 'Draft' ? () => {
-                                                                                            setSectionConditionLogicId(sectionData.section_id);
-                                                                                            dispatch(setSelectedQuestionId(''));
-                                                                                            dispatch(setSelectedComponent(null));
-                                                                                        } : null}
-                                                                                    />
-                                                                                ) : (
-                                                                                    // Setting icon to add conditional logic
-                                                                                    <img
-                                                                                        src="/Images/setting.svg"
-                                                                                        alt="setting"
-                                                                                        title="Add Conditional-logic"
-                                                                                        data-testid={`add-condition-section-${sectionIndex}`}
-                                                                                        className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
-                                                                                        onClick={formStatus === 'Draft' ? () => {
-                                                                                            setSectionConditionLogicId(sectionData.section_id);
-                                                                                            dispatch(setSelectedQuestionId(''));
-                                                                                            dispatch(setSelectedComponent(null));
-                                                                                        } : null}  // Use arrow function
-                                                                                    />
-                                                                                )}
+                                                                            <div className="flex items-center">
                                                                                 <img src="/Images/trash-black.svg"
                                                                                     alt="delete"
                                                                                     title='Delete'
@@ -1580,6 +1564,16 @@ const QuestionnaryForm = () => {
                                                                                     className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
                                                                                     onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
                                                                                 />
+                                                                                {/* <img
+                                                                            src="/Images/save.svg"
+                                                                            alt="save"
+                                                                            title="Save"
+                                                                            data-testid={`save-btn-${sectionIndex}`}
+                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
+                                                                            onClick={formStatus === 'Draft' ? () => {
+                                                                                handleSaveSection(sectionData?.section_id);
+                                                                            } : null}
+                                                                        /> */}
                                                                             </div>
                                                                         </div>
                                                                         <Sections
@@ -1602,8 +1596,6 @@ const QuestionnaryForm = () => {
                                                                             formStatus={formStatus}
                                                                             setDropdown={setDropdown}
                                                                             dropdownOpen={dropdownOpen}
-                                                                            setPageConditionLogicId={setPageConditionLogicId}
-                                                                            pageConditionLogicId={setPageConditionLogicId}
                                                                         />
                                                                     </li>
                                                                 )}
@@ -1616,13 +1608,13 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
-                                        <div>
-                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
-                                        </div>
-                                    )}
+                                )}
+                            {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
+                                <div>
+                                    <ComplanceLogicField addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                 </div>
                             )}
+                        </div>
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>

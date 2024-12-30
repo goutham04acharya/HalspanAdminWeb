@@ -24,6 +24,7 @@ function DateTimeField({
     setValue,
     dateValue,
     setConditionalValues,
+    conditionalValues,
     sections
 }) {
     const [dateVal, setDateVal] = useState('');
@@ -31,7 +32,6 @@ function DateTimeField({
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
     // const [date, setDate] = useState(questionValue[question?.question_id]?.split(' ')[0] ? new Date(questionValue[question?.question_id]?.split(' ')[0]) : '');
-
     const splitDate = (dateStr) => {
         if (!dateStr || typeof dateStr !== 'string') {
             return new Date().toISOString().split('T')[0];
@@ -96,6 +96,7 @@ function DateTimeField({
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
 
             // Update conditional values
+
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
@@ -147,6 +148,7 @@ function DateTimeField({
             const { hours, minutes, seconds } = splitTime(value);
             const currentDateTime = new Date();
             currentDateTime.setHours(hours, minutes, seconds, 0);
+            console.log(conditionalValues[section_name], 'ddd')
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
@@ -163,7 +165,8 @@ function DateTimeField({
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
-            const currentMilliSeconds = new Date().getMilliseconds() + 100;
+            const currentMilliSeconds = new Date().getMilliseconds();
+            console.log(currentMilliSeconds, 'current milliseconds', new Date().getMilliseconds())
             const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -175,11 +178,11 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: selectedDate // Add or update the label key with the selectedDate
+                        [label]: Math.round(selectedDate.getTime() / 1000) // Add or update the label key with the selectedDate
                     }
                 }
             }));
-
+            
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
 
             setValue((prev) => ({
@@ -217,29 +220,23 @@ function DateTimeField({
                         type="date"
                         id={textId}
                         value={questionValue?.[question?.question_id]}
-                        className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleFunction(e.target.value)}
                         pattern='\d{4}-\d{2}-\d{2}'
                         min="1000-01-01"
                         max="9999-12-31"
                         onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
-                        // onKeyDown={(e) => {
-                        //     e.preventDefault(); // This is preventing input, make sure it’s intentional
-                        // }}
+                    // onKeyDown={(e) => {
+                    //     e.preventDefault(); // This is preventing input, make sure it’s intentional
+                    // }}
                     />
                 )}
                 {preview && type === 'time' && (
                     <TimePicker
                         onChange={handleFunction}
                         format={question?.format}
-                        // setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
-                        //     ...prevErrors,
-                        //     preview_datetimefield: {
-                        //         ...prevErrors.preview_datetimefield,
-                        //         [question?.question_id]: errorMessage
-                        //     }
-                        // }))}
+                        validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
                         questionValue={questionValue?.[question?.question_id]}
                     />
                 )}
@@ -251,25 +248,19 @@ function DateTimeField({
                             type="date"
                             id={textId}
                             value={questionValue?.[question?.question_id]?.split(' ')[0]} // Use state to manage date value
-                            className={`w-full h-[40px] break-words border border-[#AEB3B7] rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                            className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
-                            onKeyDown={(e) => {
-                                // Prevent user from entering non-numeric values
-                                e.preventDefault();
-                            }}
+                            pattern='\d{4}-\d{2}-\d{2}'
+                            min="1000-01-01"
+                            max="9999-12-31"
+                            onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
                         />
-                    </div>
+                    </div>{console.log(question, 'question')}
                     <TimePicker
                         onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
                         format={question?.format}
-                        setErrorMessage={(errorMessage) => setValidationErrors((prevErrors) => ({
-                            ...prevErrors,
-                            preview_datetimefield: {
-                                ...prevErrors.preview_datetimefield,
-                                [question?.question_id]: errorMessage
-                            }
-                        }))}
+                        validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
                         questionValue={questionValue[question?.question_id]?.split(' ')[1]}
                     />
                 </div>}
