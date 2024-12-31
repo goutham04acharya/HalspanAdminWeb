@@ -547,6 +547,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         let question = getDetails(questionName.trim(), allSectionDetails.data)
                         let condition_logic = 'date is “X” date of set date'
                         const date = dayjs(dateKey, 'DD/MM/YYYY');
+                        console.log(value, 'valueuefuufeakjafkkvcknkvzdk')
                         return {
                             question_name: questionName.trim(),
                             condition_logic: condition_logic.trim(),
