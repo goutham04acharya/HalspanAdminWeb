@@ -852,6 +852,23 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
+    function isSameDate(question_id, setDate, value) {
+        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
+        const setDateObj = new Date(setDate * 1000);
+
+        // Add the specified number of days (value) to the set date
+        setDateObj.setDate(setDateObj.getDate() + value);
+
+        console.log(setDateObj, 'set date obj')
+        // Compare the year, month, and day
+        return (
+            selectedDate.getFullYear() === setDateObj.getFullYear() &&
+            selectedDate.getMonth() === setDateObj.getMonth() &&
+            selectedDate.getDate() === setDateObj.getDate()
+        );
+    }
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({
@@ -959,8 +976,17 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
-                                                const updatedLogic = list.conditional_logic.replace(/new Date\(\)/g, 'Math.round(new Date().getTime() / 1000)');
+                                                // Replace 'new Date()' with epoch value in seconds
+                                                let updatedLogic = list.conditional_logic.replace(/new Date\(\)/g, 'Math.round(new Date().getTime() / 1000)');
+
+                                                // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
+                                                updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
+                                                    return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                });
+
                                                 console.log(updatedLogic, 'Updated Logic');
+
+                                                // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {
                                                     return null;
                                                 }
@@ -969,9 +995,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 return null;
                                             }
                                         }
-
-
-
                                         else if (list?.conditional_logic.includes("getMonth(")) {
                                             const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
                                             try {

@@ -9,14 +9,14 @@ export  function formatDate(dateString) {
 export function reverseFormat(dateString) {
     const [day, month, year] = dateString.split('/');
     // const formattedDate = `${year}-${month}-${day}`;  // Convert to yyyy-mm-dd format
-    return new Date(year, month - 1, day);  // Ensure the ISO format with time
+    return new Date(year, month - 1, day).getTime() / 1000;  // Ensure the ISO format with time
     //  date.toISOString();  // Convert to ISO string
   
 }
 export function reversingFormat(dateString) {
     const [day, month, year] = dateString.split('/');
     // const formattedDate = `${year}-${month}-${day}`;  // Convert to yyyy-mm-dd format
-    return `new Date(${year}, ${month - 1}, ${day})`;  // Ensure the ISO format with time
+    return `new Date(${year}, ${month - 1}, ${day}).getTime() / 1000`;  // Ensure the ISO format with time
     //  date.toISOString();  // Convert to ISO string
   
 }
