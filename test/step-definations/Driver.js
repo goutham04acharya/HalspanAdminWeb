@@ -35,7 +35,7 @@ global.driver = new Builder()
 BeforeAll(async function () {
     await driver.manage();
     await new Promise(resolve => setTimeout(resolve, 3000));
-    await driver.get('http://localhost:3000/');
+    await driver.get('https://questionnaire-qa.halspantest.com/');
     await driver.wait(until.elementLocated(By.css('body')));
     await new Promise(resolve => setTimeout(resolve, 3000));
     global.current_process_name = faker.string.alpha({ count: 10, casing: 'upper' });
@@ -44,7 +44,7 @@ BeforeAll(async function () {
     console.log('Current process name:', global.current_process_name);
     try {
         const currentUrl = await driver.getCurrentUrl();
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('https://questionnaire-qa.halspantest.com/')) {
             global.__coverage__ = await driver.executeScript('return __coverage__;');
             global.coverageMap = createCoverageMap(__coverage__);
         } else {
@@ -80,7 +80,7 @@ AfterAll(async function () {
 
     try {
         const currentUrl = await driver.getCurrentUrl();
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('https://questionnaire-qa.halspantest.com/')) {
             global.__coverage__ = await driver.executeScript('return __coverage__;');
             global.coverageMap = createCoverageMap(__coverage__);
         } else {
@@ -107,7 +107,7 @@ AfterAll(async function () {
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
     try {
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('https://questionnaire-qa.halspantest.com/')) {
             const updatedCoverageData = await driver.executeScript('return __coverage__;');
             const updatedCoverageMap = createCoverageMap(updatedCoverageData);
 

@@ -505,10 +505,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'filefield':
                             if (!question?.options?.optional) {
-                                
+
                                 if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_filefield[question.question_id] = 'This is a mandatory field';
-                                }else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
                                     acc.preview_filefield[question.question_id] = `Upload minimum of ${question?.field_range?.min} files`;
                                 }
                             }
@@ -816,7 +816,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         if (default_conditional_logic) {
                             try {
                                 const result = eval(default_conditional_logic);
-                                if(component_type === "dateTimefield"){
+                                if (component_type === "dateTimefield") {
                                     const splitDate = (dateStr) => {
                                         if (!dateStr || typeof dateStr !== 'string') {
                                             return new Date().toISOString().split('T')[0];
@@ -825,7 +825,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         return `${year}-${month}-${day}`;
                                     }
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
-                                }else if(component_type === "numberfield"){
+                                } else if (component_type === "numberfield") {
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                 }
                                 // Evaluate the string expression
@@ -852,6 +852,23 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
+    function isSameDate(question_id, setDate, value) {
+        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
+        const setDateObj = new Date(setDate * 1000);
+
+        // Add the specified number of days (value) to the set date
+        setDateObj.setDate(setDateObj.getDate() + value);
+
+        console.log(setDateObj, 'set date obj')
+        // Compare the year, month, and day
+        return (
+            selectedDate.getFullYear() === setDateObj.getFullYear() &&
+            selectedDate.getMonth() === setDateObj.getMonth() &&
+            selectedDate.getDate() === setDateObj.getDate()
+        );
+    }
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({
@@ -954,20 +971,31 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-
+                                    console.log(list?.conditional_logic, 'list?.conditional_logic')
+                                    console.log(conditionalValues, 'dddaadf')
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
-                                                let result = eval(list?.conditional_logic)
-                                                if (!eval(list?.conditional_logic)) {
+                                                // Replace 'new Date()' with epoch value in seconds
+                                                let updatedLogic = list.conditional_logic.replace(/new Date\(\)/g, 'Math.round(new Date().getTime() / 1000)');
+
+                                                // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
+                                                updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
+                                                    return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                });
+
+                                                console.log(updatedLogic, 'Updated Logic');
+
+                                                // Evaluate the updated logic
+                                                if (!eval(updatedLogic)) {
                                                     return null;
                                                 }
                                             } catch (error) {
-                                                console.log(error, error)
+                                                console.error("Error evaluating expression:", error);
                                                 return null;
                                             }
-
-                                        } else if (list?.conditional_logic.includes("getMonth(")) {
+                                        }
+                                        else if (list?.conditional_logic.includes("getMonth(")) {
                                             const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
                                             try {
                                                 if (!eval(replacedLogic)) {
@@ -1028,9 +1056,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button 
-                    disabled={previewNavigation.current_page === 1} 
-                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
+                    {!showLabel ? <button
+                        disabled={previewNavigation.current_page === 1}
+                        type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
                     </button> :
