@@ -20,6 +20,8 @@ export default {
                 'customh14': 'calc(100vh - 250px)',
                 'customh15': 'calc(100vh - 135px)',
                 'customh16': 'calc(100vh - 524px)',
+                'customh17': 'calc(100vh - 200px)',
+
 
             },
             colors: {

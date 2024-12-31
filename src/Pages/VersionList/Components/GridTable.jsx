@@ -137,14 +137,19 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
         }
     };
 
-    // Function to filter options for a specific version
-    const filteredOptions = (versionList) => {
-        if (!versionInfo.is_question_exists) {
-            console.log(versionInfo, 'versionInfo.is_question_exists')
-            return options.filter(option => option !== 'Published'); // Remove "Published" only for `false`
-        }
-        return options; // Return all options otherwise
+    // Preparing `is_question_exists` mapping
+    const isQuestionExistsMapping = versionList?.data?.is_question_exists.reduce((acc, item) => {
+        const [version, exists] = Object.entries(item)[0]; // Extract key-value pair
+        acc[version.split(' ')[1]] = exists; // Store as { version_number: boolean }
+        return acc;
+    }, {});
+
+    // Function to filter options based on `is_question_exists` for a specific version
+    const filteredOptions = (versionInfo) => {
+        const isQuestionExists = isQuestionExistsMapping[versionInfo?.version_number]; // Check the mapping
+        return isQuestionExists ? options : options.filter(option => option !== 'Published'); // Filter options
     };
+
 
     return (
         <>
@@ -205,10 +210,11 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                     {dropdownsOpen[versionListInfo?.version_number] && (
                                                         <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] 
                                                         ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2)
-                                                                ? 'top-[-145px]'
+                                                                ? 'top-[-104px]'
                                                                 : 'top-[58px]')
                                                                 : 'top-[58px]'} z-10`}>
-                                                            {filteredOptions(versionListInfo).map((option) => (
+                                                            {/* {options.map(option => ( */}
+                                                                {filteredOptions(versionListInfo).map((option) => (
                                                                 <li key={option}
                                                                     data-testid={`${option}`}
                                                                     className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'

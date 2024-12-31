@@ -262,7 +262,6 @@ const LookupDataset = () => {
     }
 
     const handleImport = (event) => {
-        debugger
         // if (data?.choices.length !== 0 || data?.name !== '' || data?.choices !== '') {
         //     setShowLookupReplaceModal(true);
         //     setIsCreateModalOpen(false);
