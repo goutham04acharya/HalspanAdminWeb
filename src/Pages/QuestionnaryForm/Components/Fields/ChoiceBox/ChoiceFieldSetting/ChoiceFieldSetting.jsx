@@ -246,6 +246,8 @@ function ChoiceFieldSetting({
                         {fieldSettingParameters?.source === 'lookup' &&
                             <div className='w-full flex items-center mt-3'>
                                 <div className='w-[90%]'>
+                                    {console.log(fieldSettingParameters, 'fieldlsljsd')}
+                                    {console.log(optionData, 'option data')}
                                     <InfinateDropdown
                                         label=''
                                         id='lookup'
@@ -253,7 +255,7 @@ function ChoiceFieldSetting({
                                         className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                         testID='lookup-dropdown'
                                         labeltestID='lookup-list'
-                                        selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
+                                        selectedOption={optionData?.find(option => option?.label === fieldSettingParameters?.lookupValue)}
                                         handleRemoveLookup={formStatus === 'Draft' ? handleRemoveLookup : null}
                                         isDropdownOpen={formStatus === 'Draft' ? isLookupOpen : false}
                                         setDropdownOpen={formStatus === 'Draft' ? setIsLookupOpen : null}
