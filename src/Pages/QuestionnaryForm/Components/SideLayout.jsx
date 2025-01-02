@@ -30,7 +30,7 @@ function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, hand
             setSelectedSection(sections[0]?.section_id);
             setDropdown(sections[0]?.section_id);
         }
-    }, [sections]);
+    }, []);
     
     
     return (

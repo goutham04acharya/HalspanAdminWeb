@@ -237,7 +237,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
             .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-            .replaceAll('?', 'then') // Replace ? with then
+            .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
             .replaceAll('&&', 'and') // Replace && with and
             .replaceAll('||', 'or') // Replace || with or
             .replaceAll('.length', '.()')
@@ -308,9 +308,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
-            console.log(value[cursorPosition - 1], 'cursorPosition')
-            console.log(selectedFieldType, 'selectedFieldType')
-
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -379,7 +376,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        console.log(componentType, 'componentType ')
         const textarea = textareaRef.current;
         if (textarea) {
             const cursorPosition = textarea.selectionStart; // Get the current cursor position
@@ -412,6 +408,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
+    
         }
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
@@ -447,7 +444,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 default:
                     fieldType = []; // Handle any unexpected cases
             }
-            console.log(fieldType, 'fieldType')
             setSelectedFieldType(fieldType.join(', '));
         }
     };
@@ -544,7 +540,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         let question = getDetails(questionName.trim(), allSectionDetails.data)
                         let condition_logic = 'date is “X” date of set date'
                         const date = dayjs(dateKey, 'DD/MM/YYYY');
-                        console.log(value, 'valueuefuufeakjafkkvcknkvzdk')
                         return {
                             question_name: questionName.trim(),
                             condition_logic: condition_logic.trim(),
@@ -577,7 +572,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
-                        console.log(question, 'question')
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
                             value = 'new Date()';
@@ -757,13 +751,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
-            console.log(conditionalLogic, 'conditionalLogic')
 
             // Replace && with "and" and || with "or"
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
-            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+            // conditionalLogic = conditionalLogic.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/\.length\b/g, '()');
@@ -775,18 +768,24 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
                 '$1.SubtractDays($2)'
             );
-
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
-            setInputValue(conditionalLogic)
-            // parseLogicExpression(conditionalLogic)
-            // {
-            //     !isDefaultLogic &&
-            //         setConditions(parseLogicExpression(conditionalLogic));
-            // }
-            // if(sectionConditionLogicId || pageConditionLogicId){
-            //     setConditions(parseLogicExpression(conditionalLogic));
-            // }
+            // Conditional transformation for `?` and `:`, skipping valid question names
+            const questionRegex = /([a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\??)/g;
+            const parts = conditionalLogic.split(questionRegex);
+            //this function is for not to replace the special char in the question name
+            conditionalLogic = parts
+                .map(part => {
+                    // Transform only non-question parts
+                    if (!questionRegex.test(part)) {
+                        return part
+                            .replace(/\?/g, ' then ') // Replace "?" with "then"
+                            .replace(/\s:\s/g, ' else ') // Replace ":" with "else"
+                    }
+                    return part; // Leave question names unchanged
+                })
+                .join('');
 
+            setInputValue(conditionalLogic);
         };
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
@@ -794,7 +793,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
-        
+
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -809,13 +808,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
             };
-            // const modifyString = (input) => {
-            //     if (selectedType === 'array') {
-            //         // This regex looks for any ".()" in the string and replaces it with ".length"
-            //         return input.replace(/\.()\b/g, '.length');
-            //     }
-            //     return input;
-            // };
+
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
@@ -850,7 +843,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('}', ')')
             }
 
-
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
             evalInputValue = evalInputValue.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
             evalInputValue = evalInputValue.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
@@ -869,7 +861,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Check if a valid match was found
                 if (monthValueMatch) {
-                    console.log('here')
 
                     const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
                     const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
@@ -1066,7 +1057,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return;
             }
             if (isDefaultLogic || complianceState) {
-                // debugger
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', ' ');
@@ -1504,12 +1494,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             const condition_logic = buildConditionExpression(conditions)
             // setInputValue(condition_logic);
-
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                     .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                    .replaceAll('?', 'then') // Replace ? with then
+                    .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
                     .replaceAll('&&', 'and') // Replace && with and
                     .replaceAll('||', 'or') // Replace || with or
                     .replaceAll('.length', '.()')
@@ -1622,6 +1611,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         }
     }, [selectedQuestionId])
+
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
