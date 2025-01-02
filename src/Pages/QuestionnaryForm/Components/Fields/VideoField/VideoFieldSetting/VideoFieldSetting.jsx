@@ -4,6 +4,7 @@ import CommonComponents from '../../../CommonComponents/CommonComponents';
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
 
 function VideoFieldSetting({ handleInputChange,
     formParameters,
@@ -15,7 +16,7 @@ function VideoFieldSetting({ handleInputChange,
     setConditionalLogic,
     formStatus
 }) {
-
+    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>

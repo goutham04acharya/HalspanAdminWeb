@@ -59,18 +59,50 @@ function AdvancedEditor({
     };
 
 
-    const handleAddQuestion = (suggestion, sections) => {
-        let allSections = sections
-        const getVariableType = a => a.constructor.name.toLowerCase();
-        let valueType = getVariableType(eval(`sections.${suggestion}`))
-        setSelectedType(valueType);
+    // const handleAddQuestion = (suggestion, sections) => {
+    //     console.log(suggestion, 'suggestion');
 
+    //     // Dynamically access the property using bracket notation to handle special characters
+    //     const propertyValue = sections?.[suggestion];
+    //     console.log(sections, 'sections')
+
+    //     const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
+    //     const valueType = getVariableType(propertyValue);
+    //     // Set the selected type and perform further actions
+    //     setSelectedType(valueType);
+    //     console.log(valueType, 'valueType')
+    //     handleClickToInsert(suggestion, false, valueType);
+
+    //     // After selecting a suggestion, show suggestions list again and hide error
+    //     setShowMethodSuggestions(false);
+    //     setFilteredSuggestions(secDetailsForSearching);
+    // };
+
+    const handleAddQuestion = (suggestion, sections) => {
+        console.log(suggestion, 'suggestion');
+
+        // Split the suggestion string into keys for nested access
+        const keys = suggestion.split('.'); // Example: "Section_1.Page_1.Question_1?" -> ["Section_1", "Page_1", "Question_1?"]
+
+        // Use reduce to dynamically access the nested property
+        const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
+        console.log(propertyValue, 'propertyValue');
+
+        // Get the type of the value
+        const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
+        const valueType = getVariableType(propertyValue);
+
+        // Set the selected type and perform further actions
+        setSelectedType(valueType);
+        console.log(valueType, 'valueType');
         handleClickToInsert(suggestion, false, valueType);
 
         // After selecting a suggestion, show suggestions list again and hide error
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
-    }
+    };
+
+
 
     const handleKeyDown = (event) => {
         // Prevent single quote key (keyCode 222 is the code for single quote)

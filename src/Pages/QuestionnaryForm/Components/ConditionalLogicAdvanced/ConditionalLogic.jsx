@@ -308,6 +308,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
+            console.log(value[cursorPosition - 1], 'cursorPosition')
+            console.log(selectedFieldType, 'selectedFieldType')
+
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -376,6 +379,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        console.log(componentType, 'componentType ')
         const textarea = textareaRef.current;
         if (textarea) {
             const cursorPosition = textarea.selectionStart; // Get the current cursor position
@@ -408,14 +412,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
-            //this was commented i uncommeneted bczthe defualt value is not updating
-            // if (isDefaultLogic) {
-            //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
-            // } else {
-            //     dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
-            // }  // Update the inputValue state
         }
-
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
         } else {
@@ -450,7 +447,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 default:
                     fieldType = []; // Handle any unexpected cases
             }
-
+            console.log(fieldType, 'fieldType')
             setSelectedFieldType(fieldType.join(', '));
         }
     };
@@ -760,6 +757,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
+            console.log(conditionalLogic, 'conditionalLogic')
 
             // Replace && with "and" and || with "or"
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
@@ -796,7 +794,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
-
+        
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1046,11 +1044,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
-            const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+            // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+            const variableRegex = /^\w+\.\w+\.[^\.]+$/;
             const variableNames = payloadString.match(variableRegex) || [];
 
             // Validate if all variable names exist in secDetailsForSearching
-            const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+            // const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+            //this function is for considering the special char as a valid expression
+            const invalidVariables = variableNames.filter(variable => {
+                // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
+                const sanitizedVariable = variable.replace(/[^\w.]/g, ''); // Remove special characters except dots
+                return !secDetailsForSearching.some(item => {
+                    const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
+                    return sanitizedItem === sanitizedVariable;
+                });
+            });
+
 
             if (invalidVariables.length > 0) {
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
@@ -1195,10 +1204,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const errors = [];
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
-
-        // const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
-        // const validExpressionRegex = /^\((?:[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*(AND|OR)?\s*)+\)$/i;
-        const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?)*$/i;
+        // const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?)*$/i;
+        const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?)*$/i;
 
         // const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\) === "\d{2}\/\d{2}\/\d{4}"$/;
         const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\)\s*(==|!=|===|!==|<|>|<=|>=)\s*"\d{2}\/\d{2}\/\d{4}"$/;
@@ -1544,8 +1551,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                console.log(fieldSettingParams, 'conditions')
-                console.log(conditions, 'condiioiansns')
                 condition_logic = buildConditionExpression(conditions);
             } catch (error) {
             }
