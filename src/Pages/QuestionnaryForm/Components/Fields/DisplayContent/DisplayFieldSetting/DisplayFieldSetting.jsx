@@ -167,7 +167,6 @@ function DisplayFieldSetting({
         dispatch(setShouldAutoSave(true));
         setImageLoader(false);
     }
-    console.log(imageLoader, 'kodaer') 
 
     return (
         <>

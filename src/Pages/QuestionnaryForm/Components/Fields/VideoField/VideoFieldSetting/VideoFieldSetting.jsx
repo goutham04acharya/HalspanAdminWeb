@@ -5,7 +5,6 @@ import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setNewComponent } from '../../fieldSettingParamsSlice';
-import { setNewComponent } from '../../fieldSettingParamsSlice';
 
 function VideoFieldSetting({ handleInputChange,
     formParameters,

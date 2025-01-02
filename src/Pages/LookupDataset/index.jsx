@@ -17,7 +17,7 @@ import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal'
 
 
-const LookupDataset = () => {
+const LookupDataset = ({ isQuestionaryPage, showCreateModal}) => {
     const { getAPI, PostAPI, DeleteAPI, PatchAPI } = useApi();
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -108,34 +108,6 @@ const LookupDataset = () => {
             setData(id, value);
         }
     };
-    // const handleChange = (e, id, type) => {
-    //     // debugger
-    //     setErrors(id, '');
-    //     const value = e.target.value;
-
-    //     if (type === 'value') {
-    //         // Update a specific choice's value in the array
-    //         setData(prevData => ({
-    //             ...prevData,
-    //             choices: prevData.choices.map(choice => {
-    //                 if (choice.uuid === id) {
-    //                     // Split the input by commas and clean up the values
-    //                     const values = value.split(',').map(v => v.trim()).filter(v => v);
-    //                     return {
-    //                         ...choice,
-    //                         value: values.join(', ') // Join back with comma and space for display
-    //                     };
-    //                 }
-    //                 return choice;
-    //             })
-    //         }));
-    //     } else {
-    //         // Handle regular field updates (like name)
-    //         setData(id, value);
-    //     }
-
-
-    // };
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
@@ -377,88 +349,78 @@ const LookupDataset = () => {
         if (node) observer.current.observe(node);
     }, [loading, isFetchingMore]);
 
+    useEffect(() => {
+        if(showCreateModal){
+            setIsCreateModalOpen(true)
+        }
+    }, [showCreateModal])
+
     return (
         <>
-            <div className='bg-[#F4F6FA]'>
-                <div className='py-[33px] px-[25px]'>
-                    <div className='py-6 px-9 bg-white rounded-[10px] h-customh7'>
-                        <div className='flex w-full justify-between items-center mb-[26px]'>
-                            <h1 className='text-[#2B333B] text-[28px] font-medium'>Lookup Dataset</h1>
-                            <Button2
-                                testId='create-lookup-dataset'
-                                onClick={() => setIsCreateModalOpen(true)}
-                                className='w-[315px] h-[50px] font-semibold'
-                                text='Create Lookup Dataset' />
-                        </div>
-                        <div className='flex items-center justify-between w-full'>
-                            <div className='w-[75%] mr-[5%]'>
-                                <Search
-                                    setQueList={setLookupList}
-                                    testId='searchBox'
-                                    searchParams={searchParams}
-                                    setSearchValue={setSearchValue}
-                                    searchValue={searchValue}
-                                    setSearchParams={setSearchParams}
-                                    setLoading={setLoading}
-                                    placeholder='Search by Name'
-                                />
+            {!isQuestionaryPage &&
+                <>
+                    <div className='bg-[#F4F6FA]'>
+                        <div className='py-[33px] px-[25px]'>
+                            <div className='py-6 px-9 bg-white rounded-[10px] h-customh7'>
+                                <div className='flex w-full justify-between items-center mb-[26px]'>
+                                    <h1 className='text-[#2B333B] text-[28px] font-medium'>Lookup Dataset</h1>
+                                    <Button2
+                                        testId='create-lookup-dataset'
+                                        onClick={() => setIsCreateModalOpen(true)}
+                                        className='w-[315px] h-[50px] font-semibold'
+                                        text='Create Lookup Dataset' />
+                                </div>
+                                <div className='flex items-center justify-between w-full'>
+                                    <div className='w-[75%] mr-[5%]'>
+                                        <Search
+                                            setQueList={setLookupList}
+                                            testId='searchBox'
+                                            searchParams={searchParams}
+                                            setSearchValue={setSearchValue}
+                                            searchValue={searchValue}
+                                            setSearchParams={setSearchParams}
+                                            setLoading={setLoading}
+                                            placeholder='Search by Name'
+                                        />
+                                    </div>
+                                </div>
+                                {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
+                                    <ContentNotFound
+                                        src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
+                                        text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No lookup dataset available.'}
+                                        className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
+                                ) : (
+                                    <div className='bg-white mt-12'>
+                                        <LookupTable
+                                            loading={loading}
+                                            LookupList={LookupList}
+                                            lastElementRef={lastElementRef}
+                                            handleView={handleView}
+                                            setDeleteModal={setDeleteModal}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
-                            <ContentNotFound
-                                src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                                text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No lookup dataset available.'}
-                                className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
-                        ) : (
-                            <div className='bg-white mt-12'>
-                                <LookupTable
-                                    loading={loading}
-                                    LookupList={LookupList}
-                                    lastElementRef={lastElementRef}
-                                    handleView={handleView}
-                                    setDeleteModal={setDeleteModal}
-                                />
-                            </div>
-                        )}
                     </div>
-                </div>
-            </div>
-            <CreateModal
-                isModalOpen={isCreateModalOpen}
-                handleClose={handleClose}
-                data={data}
-                errors={errors}
-                handleChange={handleChange}
-                handleCreate={handleSubmit}
-                handleImport={isView?.open ? handleClose : handleImport}
-                isCreateLoading={isCreateLoading}
-                isImportLoading={isImportLoading}
-                isView={isView?.open}
-                title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
-                createLookup={!isView?.open}
-                // handleAddChoice={handleAddChoice}
-                handleRemoveChoice={handleRemoveChoice}
-                setData={setData}
-                activeInputs={activeInputs}
-                setActiveInputs={setActiveInputs}
-            />
-            <ConfirmModal
-                text='Delete Lookup Dataset'
-                subText={`Are you sure you want to delete the lookup dataset with ID ${deleteModal.id || '-'}?`}
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000] !w-[156px]'
-                button2Style='!w-[162px]'
-                Button1text='Delete'
-                Button2text='Cancel'
-                src='delete-gray'
-                // className
-                isModalOpen={deleteModal.open}
-                handleButton1={handleDelete}
-                handleButton2={() => setDeleteModal('open', false)}
-                testIDBtn1='confirm'
-                testIDBtn2='cancel'
-                handleClose={() => setDeleteModal('open', false)}
-                isLoading={isDeleteLoading}
-            />
+                    <ConfirmModal
+                        text='Delete Lookup Dataset'
+                        subText={`Are you sure you want to delete the lookup dataset with ID ${deleteModal.id || '-'}?`}
+                        button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000] !w-[156px]'
+                        button2Style='!w-[162px]'
+                        Button1text='Delete'
+                        Button2text='Cancel'
+                        src='delete-gray'
+                        // className
+                        isModalOpen={deleteModal.open}
+                        handleButton1={handleDelete}
+                        handleButton2={() => setDeleteModal('open', false)}
+                        testIDBtn1='confirm'
+                        testIDBtn2='cancel'
+                        handleClose={() => setDeleteModal('open', false)}
+                        isLoading={isDeleteLoading}
+                    />
+                </>}
             {/* {showlookupReplaceModal && (
                 <ConfirmationModal
                     text='Replace Lookup Dataset'
@@ -481,6 +443,25 @@ const LookupDataset = () => {
                     showLabel
                 />
             )} */}
+            <CreateModal
+                isModalOpen={isCreateModalOpen}
+                handleClose={handleClose}
+                data={data}
+                errors={errors}
+                handleChange={handleChange}
+                handleCreate={handleSubmit}
+                handleImport={isView?.open ? handleClose : handleImport}
+                isCreateLoading={isCreateLoading}
+                isImportLoading={isImportLoading}
+                isView={isView?.open}
+                title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
+                createLookup={!isView?.open}
+                // handleAddChoice={handleAddChoice}
+                handleRemoveChoice={handleRemoveChoice}
+                setData={setData}
+                activeInputs={activeInputs}
+                setActiveInputs={setActiveInputs}
+            />
         </>
     )
 }

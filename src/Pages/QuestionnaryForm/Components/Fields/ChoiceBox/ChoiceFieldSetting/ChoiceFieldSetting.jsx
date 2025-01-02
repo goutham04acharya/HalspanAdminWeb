@@ -246,8 +246,6 @@ function ChoiceFieldSetting({
                         {fieldSettingParameters?.source === 'lookup' &&
                             <div className='w-full flex items-center mt-3'>
                                 <div className='w-[90%]'>
-                                    {console.log(fieldSettingParameters, 'fieldlsljsd')}
-                                    {console.log(optionData, 'option data')}
                                     <InfinateDropdown
                                         label=''
                                         id='lookup'

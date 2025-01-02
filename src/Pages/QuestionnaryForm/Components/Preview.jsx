@@ -852,7 +852,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
     function isSameDate(question_id, setDate, value) {
-        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
         // Convert the epoch values (in seconds) to Date objects
         const selectedDate = new Date(question_id * 1000);
         const setDateObj = new Date(setDate * 1000);
@@ -860,7 +859,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         // Add the specified number of days (value) to the set date
         setDateObj.setDate(setDateObj.getDate() + value);
 
-        console.log(setDateObj, 'set date obj')
         // Compare the year, month, and day
         return (
             selectedDate.getFullYear() === setDateObj.getFullYear() &&
@@ -970,8 +968,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list?.conditional_logic, 'list?.conditional_logic')
-                                    console.log(conditionalValues, 'dddaadf')
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
