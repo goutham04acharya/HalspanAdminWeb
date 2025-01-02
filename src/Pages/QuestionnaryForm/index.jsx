@@ -650,6 +650,7 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        // if ( Section_1.Page_1.Question_1 === "No" ) then "19/12/2024" else "20/12/2024"
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
@@ -658,7 +659,9 @@ const QuestionnaryForm = () => {
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
                     index === complianceLogicId
-                        ? { ...item, default_content: payloadString }
+                        ? {
+                            ...item, default_content: payloadString
+                        }
                         : item
                 )
             );
@@ -1367,7 +1370,9 @@ const QuestionnaryForm = () => {
                                             question_id: question.question_id,
                                             question_name: fieldSettingParams[question.question_id].label,
                                             conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic']?.replaceAll('else', ':')
+                                                ?.replaceAll('then', '?')
+                                                ?.replaceAll('if', '') || '',
                                             component_type: fieldSettingParams[question.question_id].componentType,
                                             label: fieldSettingParams[question.question_id].label,
                                             help_text: fieldSettingParams[question.question_id].helptext,
@@ -1772,7 +1777,7 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.` 
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.`
                             : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
 
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'

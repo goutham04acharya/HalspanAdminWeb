@@ -49,7 +49,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [questionType, setQuestionType] = useState([])
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
     const selectedComponent = useSelector((state) => state?.questionnaryForm?.selectedComponent);
-
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
     const [isThreedotLoaderBlack, setIsThreedotLoaderBlack] = useState(false)
     const [selectedType, setSelectedType] = useState('');
@@ -60,6 +59,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
     const [logic, setLogic] = useState('')
     const [complianceCondition, setComplianceCondition] = useState('')
+    const [datetimefieldQuestions, setDatetimefieldQuestions] = useState([]);
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
@@ -102,11 +102,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
+    // console.log(combinedArray, 'cmmsdakc')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
-    // const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
-    // const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
+    const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
+    const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
 
     //this is my listing of types based on the component type
@@ -270,6 +271,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
+        // let tempArray = [];
         if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
             allSectionDetails?.data?.sections.forEach((section) => {
                 let sectionObject = {
@@ -279,6 +281,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
+                                // console.log(question, 'question')
+                                if (question?.component_type === 'dateTimefield') {
+                                    // debugger
+                                    datetimefieldQuestions.push(question); // Push to temporary array
+                                }
                                 const fieldType = getFieldType(question.component_type);
                                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
                                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
@@ -295,6 +302,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
                 setSections(result);
             });
+            // console.log(tempArray)
+            setDatetimefieldQuestions(datetimefieldQuestions);
         }
     }
 
@@ -304,6 +313,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
+        console.log(value, 'ajdjsadj')
+        let questionName = value.split('.')[2].replace('_', ' ');
+        console.log(questionName, 'questionName')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -315,9 +327,37 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
-                setSuggestions(dateTimeMethods);
-                setShowMethodSuggestions(true);
-            } else if (selectedFieldType.includes('photofield')) {
+                console.log(selectedQuestionId, 'selectedQuestionId');
+                console.log(datetimefieldQuestions, 'datetimefieldQuestions');
+
+                // Find the question with the matching ID
+                const matchedQuestion = datetimefieldQuestions.find(
+                    (question) => question?.question_name === questionName
+                );
+                console.log(matchedQuestion, 'masmcasd')
+                // Check the type and set suggestions accordingly
+                if (matchedQuestion) {
+                    switch (matchedQuestion.type) {
+                        case 'date':
+                            setSuggestions(dateMethods);
+                            break;
+                        case 'time':
+                            setSuggestions(timeMethods);
+                            break;
+                        case 'datetime':
+                            setSuggestions(dateTimeMethods);
+                            break;
+                        default:
+                            setSuggestions([]); // Default case if type is not recognized
+                            break;
+                    }
+                    setShowMethodSuggestions(true);
+                } else {
+                    console.warn('No matching question found for the selectedQuestionId.');
+                    setShowMethodSuggestions(false);
+                }
+            }
+            else if (selectedFieldType.includes('photofield')) {
                 setSuggestions(fileMethods);
                 setShowMethodSuggestions(true); // Reset method suggestions
             } else if (selectedFieldType.includes('videofield')) {
@@ -536,13 +576,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
-            console.log(timestamp, 'timestamp')
             const date = new Date(timestamp * 1000);
-            console.log(date, 'date')
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
-            console.log(day, month, year, 'ddmmyyyy')
             return `${day}/${month}/${year}`;
         };
 
@@ -550,15 +587,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseDateCondition = (condition) => {
             const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
             const match = condition?.match(pattern);
-            
+
             if (!match) {
                 return null;
             }
 
             const [_, question_name, timestamp, offsetDays] = match;
             const question = getDetails(question_name.trim(), allSectionDetails.data);
-            console.log((convertTimestampToDate(timestamp)), 'dayjs(convertTimestampToDate(timestamp)')
-            let passingDate =  convertTimestampToDate(timestamp);
+            let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
 
             return {
@@ -585,21 +621,26 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
+                    // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
-
+                    // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
+
                         question_name = question_name.replace('.length', '');
                     }
+                    let question = getDetails(question_name.trim(), allSectionDetails.data)
 
-                    const question = getDetails(question_name.trim(), allSectionDetails.data);
-
-                    // Date field adjustments
+                    //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
-                        if (value.includes('new Date()')) value = 'new Date()';
-                        if (condition_logic === '<') condition_logic = 'date is before today';
-                        else if (condition_logic === '>=') condition_logic = 'date is after or equal to today';
-                        else if (condition_logic === '<=') condition_logic = 'date is before or equal to today';
-                        else if (condition_logic === '>') condition_logic = 'date is after today';
+                        console.log(question, 'question')
+                        //assigning new Date() value
+                        if (value.includes('new Date()')) {
+                            value = 'new Date()';
+                        }
+                        if (condition_logic === '<') condition_logic = 'date is before today'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'date is after or equal to today';
+                        else if (condition_logic === '<=' || condition_logic === '=<') condition_logic = 'date is before or equal to today';
+                        else if (condition_logic === '>') condition_logic = 'date is after today'
 
                         return {
                             question_name: question_name.trim(),
@@ -611,21 +652,71 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         };
                     }
 
-                    // Negate logic adjustments
+                    if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
+                        if (value.startsWith("(") && value.endsWith(")")) {
+                            // If the value is enclosed in parentheses, treat it as a string
+                            value = value.slice(2, -2); // Remove parentheses
+                        } else if (value.startsWith("'") && value.endsWith("'")) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else if (value.startsWith('"') && value.endsWith('"')) {
+                            // If the value is a string in quotes, remove quotes
+                            value = value.slice(1, -1);
+                        } else {
+                            // Convert to a number if it's not a string
+                            value = Number(value);
+                        }
+                        if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
+                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
+                        else if (condition_logic === '===') condition_logic = 'number of file is';
+
+                        return {
+                            question_name: question_name.trim(),
+                            condition_logic: condition_logic.trim(),
+                            value: value,
+                            dropdown: false,
+                            condition_dropdown: false,
+                            condition_type: question?.component_type
+                        };
+
+                    }
                     if (negate) {
-                        if (condition_logic.includes('includes')) condition_logic = 'does not include';
-                        else if (condition_logic === '===') condition_logic = 'equals';
-                        else if (condition_logic === '!==') condition_logic = 'not equals to';
-                        else if (condition_logic === '<') condition_logic = 'smaller';
-                        else if (condition_logic === '>') condition_logic = 'larger';
+                        if (condition_logic.includes('includes')) {
+                            condition_logic = 'does not include';
+                        } else {
+                            // Convert logical operators to corresponding values in conditions
+                            if (condition_logic === '===') condition_logic = 'equals';
+                            else if (condition_logic === '!==') condition_logic = 'not equals to';
+                            else if (condition_logic === '<') condition_logic = 'smaller';
+                            else if (condition_logic === '>') condition_logic = 'larger';
+                            else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+                            else if (condition_logic === '>=') condition_logic = 'larger or equal';
+                        }
                     } else {
+                        // Convert logical operators to corresponding values in conditions
                         if (condition_logic === '===') condition_logic = 'equals';
                         else if (condition_logic === '!==') condition_logic = 'not equals to';
                         else if (condition_logic === '<') condition_logic = 'smaller';
                         else if (condition_logic === '>') condition_logic = 'larger';
+                        else if (condition_logic === '<=') condition_logic = 'smaller or equal';
+                        else if (condition_logic === '>=') condition_logic = 'larger or equal';
+                        else if (condition_logic.includes('includes')) condition_logic = 'includes';
                     }
 
-                    if (value.startsWith("'") || value.startsWith('"')) value = value.slice(1, -1);
+                    // Remove quotes if the value is a string
+                    if (value.startsWith("(") && value.endsWith(")")) {
+                        // If the value is enclosed in parentheses, treat it as a string
+                        value = value.slice(2, -2); // Remove parentheses
+                    } else if (value.startsWith("'") && value.endsWith("'")) {
+                        // If the value is a string in quotes, remove quotes
+                        value = value.slice(1, -1);
+                    } else if (value.startsWith('"') && value.endsWith('"')) {
+                        // If the value is a string in quotes, remove quotes
+                        value = value.slice(1, -1);
+                    } else {
+                        // Convert to a number if it's not a string
+                        value = Number(value);
+                    }
 
                     return {
                         question_name: question_name.trim(),
@@ -704,11 +795,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (isDefaultLogic) {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
             } else {
-                console.log(fieldSettingParams[selectedQuestionId]['conditional_logic'], `fieldSettingParams[selectedQuestionId]['conditional_logic']`)
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
-            console.log(conditionalLogic, 'condition logic ajdajsdjasd')
             // Replace && with "and" and || with "or"
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
@@ -716,7 +805,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
-            conditionalLogic = conditionalLogic.replace(/\.length\b/g, '()');
+            conditionalLogic = conditionalLogic.replace(/\.length\b/g, '.()');
             conditionalLogic = conditionalLogic.replaceAll(
                 /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) \+ (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
                 '$1.AddDays($2)'
@@ -725,7 +814,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
                 '$1.SubtractDays($2)'
             );
-            console.log(parseLogicExpression(conditionalLogic), 'conditionalLogic')
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
             // parseLogicExpression(conditionalLogic)
@@ -738,7 +826,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // }
 
         };
-        console.log(selectedQuestionId, 'selected question i')
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
@@ -1436,8 +1523,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         if (!complianceState) {
-            const condition_logic = buildConditionExpression(conditions)
-            // setInputValue(condition_logic);
+            let condition_logic = buildConditionExpression(conditions)
+            condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
+            setInputValue(condition_logic);
 
         } else {
             try {
@@ -1485,8 +1573,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                console.log(fieldSettingParams, 'conditions')
-                console.log(conditions, 'condiioiansns')
                 condition_logic = buildConditionExpression(conditions);
             } catch (error) {
             }
@@ -1550,7 +1636,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
 
             }
-            console.log(compliance_logic, 'compliance_logic')
             setConditions(compliance_logic)
         } else {
             if (complianceLogicCondition[0] !== undefined) {
