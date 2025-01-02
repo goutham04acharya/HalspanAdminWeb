@@ -365,6 +365,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>
                                         {conditions[index]?.conditions[i]?.condition_logic === 'date is “X” date of set date' && <div className='w-1/3 px-2 '>
                                             <p className='text-sm text-[#2B333B] mb-[11px]'>Set Date</p>
+                                            {console.log(conditions[index].conditions[i], 'adadaddadaddada')}
                                             <DatePicker
                                                 autoComplete='off'
                                                 label=''

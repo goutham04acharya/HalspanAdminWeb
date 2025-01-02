@@ -22,7 +22,10 @@ import { defaultContentConverter } from '../../../../CommonMethods/defaultConten
 import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/ComplianceBasicEditor';
 import { generateElseBlockString, generateTernaryOperation, generateThenActionString } from '../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
 import parseExpression from '../../../../CommonMethods/advancedToBasicLogic';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
+// Extend Day.js with the custom parse format plugin
+dayjs.extend(customParseFormat);
 
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
@@ -236,18 +239,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
-                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                    .replaceAll('?', 'then') // Replace ? with then
-                    .replaceAll('&&', 'and') // Replace && with and
-                    .replaceAll('||', 'or') // Replace || with or
-                    .replaceAll('.length', '.()')
+            .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+            .replaceAll('?', 'then') // Replace ? with then
+            .replaceAll('&&', 'and') // Replace && with and
+            .replaceAll('||', 'or') // Replace || with or
+            .replaceAll('.length', '.()')
 
-                if (condition_logic.includes(':')) {
-                    // Split by colon and rebuild with "else if" and "else" logic
-                    const parts = condition_logic.split(':');
-                    const lastPart = parts.pop(); // Remove the last part
-                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
-                }
+        if (condition_logic.includes(':')) {
+            // Split by colon and rebuild with "else if" and "else" logic
+            const parts = condition_logic.split(':');
+            const lastPart = parts.pop(); // Remove the last part
+            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+        }
         if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
@@ -508,6 +511,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
+        console.log(expression, 'expression');
+
+        // Default structure if no expression is provided
         if (!expression || expression === '') {
             return [{
                 'conditions': [
@@ -520,75 +526,80 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         'condition_type': 'textboxfield'
                     },
                 ]
-            },
-            ]
+            }];
         }
-        const conditionGroups = expression.split('||').map(group => trimParentheses(group));
 
-        const parsedConditions = conditionGroups.map(group => {
+        // Helper function to trim parentheses
+        const trimParentheses = (str) => {
+            return str.replace(/^\((.*)\)$/, '$1');
+        };
+
+        // Helper function to convert a timestamp into a date string
+        const convertTimestampToDate = (timestamp) => {
+            console.log(timestamp, 'timestamp')
+            const date = new Date(timestamp * 1000);
+            console.log(date, 'date')
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            console.log(day, month, year, 'ddmmyyyy')
+            return `${day}/${month}/${year}`;
+        };
+
+        // Helper function to parse date conditions
+        const parseDateCondition = (condition) => {
+            const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
+            const match = condition?.match(pattern);
+            
+            if (!match) {
+                return null;
+            }
+
+            const [_, question_name, timestamp, offsetDays] = match;
+            const question = getDetails(question_name.trim(), allSectionDetails.data);
+            console.log((convertTimestampToDate(timestamp)), 'dayjs(convertTimestampToDate(timestamp)')
+            let passingDate =  convertTimestampToDate(timestamp);
+            passingDate = dayjs(passingDate, 'DD/MM/YYYY');
+
+            return {
+                question_name: question_name.trim(),
+                condition_logic: 'date is “X” date of set date',
+                value: offsetDays,
+                dropdown: false,
+                condition_dropdown: false,
+                condition_type: question?.component_type,
+                date: passingDate
+            };
+        };
+
+        // Parse individual conditions in each group
+        const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                if (condition.includes('Math.abs')) {
-                    // const regex = /\s*\(\s*([^)]+)\s*-\s*(\d{2}\/\d{2}\/\d{4})\s*\)\s*==\s*(\d+)/;
-                    // const matching = condition.match(regex);
-                    const regex = /\s*\(\s*([^)]+)\s*-\s*new Date\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})\s*\)\s*\)\s*==\s*(\d+)/;
-                    const matching = condition.match(regex);
-                    if (matching) {
-                        // const questionName = matching[1];  // Captures everything inside the parentheses
-                        // const dateKey = matching[2];       // Captures the date in dd/mm/yyyy format
-                        // const value = matching[3];         // Captures the numeric value after ==
-                        const questionName = matching[1];   // Captures everything inside the parentheses
-                        const year = matching[2];           // Captures the year from new Date
-                        const month = String(parseInt(matching[3], 10) + 1).padStart(2, '0'); // Adjust 0-indexed month and pad
-                        const day = String(matching[4]).padStart(2, '0'); // Capture day and pad
-                        const value = matching[5];
-                        const dateKey = `${day}/${month}/${year}`;
 
-                        let question = getDetails(questionName.trim(), allSectionDetails.data)
-                        let condition_logic = 'date is “X” date of set date'
-                        const date = dayjs(dateKey, 'DD/MM/YYYY');
-                        console.log(value, 'valueuefuufeakjafkkvcknkvzdk')
-                        return {
-                            question_name: questionName.trim(),
-                            condition_logic: condition_logic.trim(),
-                            value: value / (24 * 60 * 60 * 1000),
-                            dropdown: false,
-                            condition_dropdown: false,
-                            condition_type: question?.component_type,
-                            date
+                // Try parsing as a date condition
+                const dateCondition = parseDateCondition(condition);
+                if (dateCondition) return dateCondition;
 
-                        };
-
-                    }
-                }
-                // Adjust regex to capture question name, logic, and value with optional spaces(dont remove these regex)
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']+')/);
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(includes|does not include|===|!==|<|>|<=|>=)\s*(\d+|'[^']*'|[^'"\s]+)/);
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*('([^']*)'|\(([^()]*)\)|\d+)/);
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+)/);
+                // Regex to match logical conditions
                 const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
-                    // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
-                    // If the negate flag is present, adjust the condition logic
-                    if (question_name.includes('.length')) {
 
+                    if (question_name.includes('.length')) {
                         question_name = question_name.replace('.length', '');
                     }
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
 
-                    //this if block is for dateTime only. returning value inside this if block to stop further execution
+                    const question = getDetails(question_name.trim(), allSectionDetails.data);
+
+                    // Date field adjustments
                     if (question?.component_type === 'dateTimefield') {
-                        console.log(question, 'question')
-                        //assigning new Date() value
-                        if (value.includes('new Date()')) {
-                            value = 'new Date()';
-                        }
-                        if (condition_logic === '<') condition_logic = 'date is before today'
-                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'date is after or equal to today';
-                        else if (condition_logic === '<=' || condition_logic === '=<') condition_logic = 'date is before or equal to today';
-                        else if (condition_logic === '>') condition_logic = 'date is after today'
+                        if (value.includes('new Date()')) value = 'new Date()';
+                        if (condition_logic === '<') condition_logic = 'date is before today';
+                        else if (condition_logic === '>=') condition_logic = 'date is after or equal to today';
+                        else if (condition_logic === '<=') condition_logic = 'date is before or equal to today';
+                        else if (condition_logic === '>') condition_logic = 'date is after today';
 
                         return {
                             question_name: question_name.trim(),
@@ -600,71 +611,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         };
                     }
 
-                    if (['photofield', 'videofield', 'filefield'].includes(question?.component_type)) {
-                        if (value.startsWith("(") && value.endsWith(")")) {
-                            // If the value is enclosed in parentheses, treat it as a string
-                            value = value.slice(2, -2); // Remove parentheses
-                        } else if (value.startsWith("'") && value.endsWith("'")) {
-                            // If the value is a string in quotes, remove quotes
-                            value = value.slice(1, -1);
-                        } else if (value.startsWith('"') && value.endsWith('"')) {
-                            // If the value is a string in quotes, remove quotes
-                            value = value.slice(1, -1);
-                        } else {
-                            // Convert to a number if it's not a string
-                            value = Number(value);
-                        }
-                        if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
-                        else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
-                        else if (condition_logic === '===') condition_logic = 'number of file is';
-
-                        return {
-                            question_name: question_name.trim(),
-                            condition_logic: condition_logic.trim(),
-                            value: value,
-                            dropdown: false,
-                            condition_dropdown: false,
-                            condition_type: question?.component_type
-                        };
-
-                    }
+                    // Negate logic adjustments
                     if (negate) {
-                        if (condition_logic.includes('includes')) {
-                            condition_logic = 'does not include';
-                        } else {
-                            // Convert logical operators to corresponding values in conditions
-                            if (condition_logic === '===') condition_logic = 'equals';
-                            else if (condition_logic === '!==') condition_logic = 'not equals to';
-                            else if (condition_logic === '<') condition_logic = 'smaller';
-                            else if (condition_logic === '>') condition_logic = 'larger';
-                            else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-                            else if (condition_logic === '>=') condition_logic = 'larger or equal';
-                        }
+                        if (condition_logic.includes('includes')) condition_logic = 'does not include';
+                        else if (condition_logic === '===') condition_logic = 'equals';
+                        else if (condition_logic === '!==') condition_logic = 'not equals to';
+                        else if (condition_logic === '<') condition_logic = 'smaller';
+                        else if (condition_logic === '>') condition_logic = 'larger';
                     } else {
-                        // Convert logical operators to corresponding values in conditions
                         if (condition_logic === '===') condition_logic = 'equals';
                         else if (condition_logic === '!==') condition_logic = 'not equals to';
                         else if (condition_logic === '<') condition_logic = 'smaller';
                         else if (condition_logic === '>') condition_logic = 'larger';
-                        else if (condition_logic === '<=') condition_logic = 'smaller or equal';
-                        else if (condition_logic === '>=') condition_logic = 'larger or equal';
-                        else if (condition_logic.includes('includes')) condition_logic = 'includes';
                     }
 
-                    // Remove quotes if the value is a string
-                    if (value.startsWith("(") && value.endsWith(")")) {
-                        // If the value is enclosed in parentheses, treat it as a string
-                        value = value.slice(2, -2); // Remove parentheses
-                    } else if (value.startsWith("'") && value.endsWith("'")) {
-                        // If the value is a string in quotes, remove quotes
-                        value = value.slice(1, -1);
-                    } else if (value.startsWith('"') && value.endsWith('"')) {
-                        // If the value is a string in quotes, remove quotes
-                        value = value.slice(1, -1);
-                    } else {
-                        // Convert to a number if it's not a string
-                        value = Number(value);
-                    }
+                    if (value.startsWith("'") || value.startsWith('"')) value = value.slice(1, -1);
 
                     return {
                         question_name: question_name.trim(),
@@ -676,41 +637,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     };
                 }
 
-                // Return null or handle errors if format doesn't match
                 return null;
             });
 
-            if (conditions.filter(cond => cond !== null).length > 0) {
-                return {
-                    conditions: conditions.filter(cond => cond !== null)
-                };
-            } else {
-                if (tab !== 'advance') {
-                    setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
-                }
-                return {
-                    conditions: [
-                        {
-                            'question_name': '',
-                            'condition_logic': '',
-                            'value': '',
-                            'dropdown': false,
-                            'condition_dropdown': false,
-                            'condition_type': 'textboxfield'
-                        },
-                    ]
-                };
-            }
-        });
+            return {
+                conditions: conditions.filter(c => c !== null)
+            };
+        };
 
-        // Check if the total number of conditions across all groups exceeds 10
+        const conditionGroups = expression.split('||').map(group => trimParentheses(group));
+
+        const parsedConditions = conditionGroups.map(group => parseConditions(group));
+
+        // Check if total conditions exceed the limit
         const totalConditions = parsedConditions.reduce((sum, group) => sum + group.conditions.length, 0);
-
         if (totalConditions > 10) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`);
         }
+
         return parsedConditions;
     };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -757,10 +704,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (isDefaultLogic) {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
             } else {
+                console.log(fieldSettingParams[selectedQuestionId]['conditional_logic'], `fieldSettingParams[selectedQuestionId]['conditional_logic']`)
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
             }
-
+            console.log(conditionalLogic, 'condition logic ajdajsdjasd')
             // Replace && with "and" and || with "or"
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
@@ -777,7 +725,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 /new Date\(new Date\((\w+\.\w+\.\w+)\)\.setDate\(new Date\(\1\)\.getDate\(\) - (\d+)\)\)\.toLocaleDateString\("en-GB"\)/g,
                 '$1.SubtractDays($2)'
             );
-
+            console.log(parseLogicExpression(conditionalLogic), 'conditionalLogic')
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
             setInputValue(conditionalLogic)
             // parseLogicExpression(conditionalLogic)
@@ -790,6 +738,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // }
 
         };
+        console.log(selectedQuestionId, 'selected question i')
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
@@ -1052,7 +1001,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return;
             }
             if (isDefaultLogic || complianceState) {
-                // debugger
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
                     .replaceAll('if', ' ');
@@ -1600,7 +1548,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             else {
                 // Default: Extract and parse the conditional logic from the selected question
                 compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+
             }
+            console.log(compliance_logic, 'compliance_logic')
             setConditions(compliance_logic)
         } else {
             if (complianceLogicCondition[0] !== undefined) {

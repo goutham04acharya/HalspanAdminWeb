@@ -120,51 +120,7 @@ const ChoiceBoxField = ({
             ...prev,
             [question?.question_id]: value,
         }));
-        // setSelectedValues(prev => {
-        //     let newSelected;
-        //     if (prev.includes(value?.value)) {
-        //         newSelected = prev.filter(item => item !== value?.value);
-        //     } else {
-        //         newSelected = [...prev, value.value];
-        //     }
-        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
-        //     setConditionalValues((prevValues) => ({
-        //         ...prevValues,
-        //         [section_name]: {
-        //             ...prevValues[section_name], // Preserve existing entries for this section
-        //             [page_name]: {
-        //                 ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-        //                 [label]: value.value // Add or update the label key with newValue
-        //             }
-        //         }
-        //     }))
-
-        //     // Update parent component state
-        //     if (newSelected.length === 0) {
-        //         dispatch(setQuestionValue({ question_id: question?.question_id, value: '' }))
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: '',
-        //         }));
-        //     } else {
-        //         dispatch(setQuestionValue({ question_id: question?.question_id, value: value.value }))
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: value.value,
-        //         }));
-        //     }
-
-        //     // Clear validation errors
-        //     setValidationErrors((prevErrors) => ({
-        //         ...prevErrors,
-        //         preview_choiceboxfield: {
-        //             ...prevErrors?.preview_choiceboxfield,
-        //             [question?.question_id]: null,
-        //         },
-        //     }));
-
-        //     return value.value;
-        // });
+        
     };
 
     const renderInputGroup = () => {

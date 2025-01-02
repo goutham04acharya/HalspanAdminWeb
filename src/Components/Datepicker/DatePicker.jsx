@@ -34,6 +34,7 @@ const DatePicker = ({
     return (
         <div className='w-full relative' ref={calederRef} >
             <div className='relative' onClick={() => setOpen(!open)}>
+                {console.log(value, 'value')}
                 <input
                     readOnly
                     autoComplete={autoComplete || 'off'}
