@@ -17,7 +17,7 @@ import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal'
 
 
-const LookupDataset = ({ isQuestionaryPage, showCreateModal}) => {
+const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}) => {
     const { getAPI, PostAPI, DeleteAPI, PatchAPI } = useApi();
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -111,6 +111,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal}) => {
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
+        setShowCreateModal(false);
         setActiveInputs('')
         setTimeout(() => {
             setErrors(initialErrorState);
@@ -257,6 +258,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal}) => {
         }
         // setIsImportLoading(true);
         setIsCreateModalOpen(false);
+        setShowCreateModal(false);
         Papa.parse(file, {
             header: false,
             complete: (results) => {

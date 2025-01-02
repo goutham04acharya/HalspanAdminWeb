@@ -102,7 +102,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
-    // console.log(combinedArray, 'cmmsdakc')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -287,9 +286,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
-                                // console.log(question, 'question')
                                 if (question?.component_type === 'dateTimefield') {
-                                    // debugger
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
                                 const fieldType = getFieldType(question.component_type);
@@ -316,12 +313,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
+        // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'ajdjsadj')
-        let questionName = value.split('.')[2].replace('_', ' ');
-        console.log(questionName, 'questionName')
+        let questionName = value.split('.')[2]?.replace('_', ' ');
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -333,14 +329,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
-                console.log(selectedQuestionId, 'selectedQuestionId');
-                console.log(datetimefieldQuestions, 'datetimefieldQuestions');
-
                 // Find the question with the matching ID
                 const matchedQuestion = datetimefieldQuestions.find(
                     (question) => question?.question_name === questionName
                 );
-                console.log(matchedQuestion, 'masmcasd')
                 // Check the type and set suggestions accordingly
                 if (matchedQuestion) {
                     switch (matchedQuestion.type) {
@@ -550,7 +542,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-        console.log(expression, 'expression');
 
         // Default structure if no expression is provided
         if (!expression || expression === '') {
@@ -746,7 +737,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         return parsedConditions;
     };
-
 
     useEffect(() => {
         const fetchData = async () => {
