@@ -7,7 +7,7 @@ const By = require('selenium-webdriver').By
 const Key = webdriver.Key
 
 Given('I am in questionnaire listing screen', async function(){
-    await driver.get('http://localhost:3000/questionnaries');
+    await driver.get('https://questionnaire-qa.halspantest.com/questionnaries');
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));
 });
