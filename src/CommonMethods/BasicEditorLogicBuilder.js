@@ -38,11 +38,8 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         case 'date is after or equal to today':
             return `${question_name} >= new Date()`;
         case 'date is “X” date of set date':
-            console.log(date, 'date')
             const formatteDate = formatDate(date);
             const actualFormat = reverseFormat(formatteDate)
-            console.log(formatteDate, 'formatteDate date')
-            console.log(actualFormat, 'actual date')
             return `new Date(${question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${value})).toDateString();`
         // return `isSameDate(${question_name}, ${actualFormat}, ${value})`
         // return `Math.abs(${question_name} - ${actualFormat} ) == ${value / 24 * 60 * 60 * 1000}`
