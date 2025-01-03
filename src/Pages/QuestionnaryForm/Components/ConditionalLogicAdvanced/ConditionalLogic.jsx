@@ -325,7 +325,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
-        console.log(questionName, 'questionName')
+        // console.log(questionName, 'questionName')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)

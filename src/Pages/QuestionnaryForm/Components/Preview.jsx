@@ -569,11 +569,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         // Get precomputed navigation details for next page/section
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
-        if(isLastSection )
-        if (isLastSection) {
-            setShowComplianceScreen(true);  // Show compliance screen if it's the last section
-            return;
-        }
+        if (isLastSection)
+            if (isLastSection) {
+                setShowComplianceScreen(true);  // Show compliance screen if it's the last section
+                return;
+            }
 
         // Move to the next section or page
         if (nextSection !== currentSection) {
@@ -888,6 +888,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
+    console.log(complianceLogic?.length, 'ssssssssssssssss')
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -903,9 +904,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     ) : showComplianceScreen ? (
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
+                            {complianceLogic?.length === 0 &&<h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
                                 <>
-                                    <div
+                                {/* {console.log(complianceLogic.length, 'complianceLogic.length')} */}
+                                    {complianceLogic.length !== 0 && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -919,8 +922,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             </span>
                                         </div>
 
-                                    </div>
-                                    {result?.STATUS === 'FAIL' && <div
+                                    </div>}
+                                    {(result?.STATUS === 'FAIL' && complianceLogic.length !== 0) && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -1059,7 +1062,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button
-                        disabled={previewNavigation.current_page === 1}
+                        disabled={previewNavigation.current_page === 1 && !showComplianceScreen}
                         type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
