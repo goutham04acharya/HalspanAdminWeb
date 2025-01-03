@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import Shimmer from '../../../Components/Shimmers/Shimmer';
 import useApi from '../../../services/CustomHook/useApi';
 import { useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../../../Components/Modals/ConfirmationModal/ConfirmationModal';
+import GlobalContext from '../../../Components/Context/GlobalContext';
 
 export function GridTable({ setVersionList, versionList, setLoading, loading, lastElemendivef, setSelectedVersion, selectedVersion, questionnaireId }) {
     const { PatchAPI } = useApi();
@@ -12,6 +13,8 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
     const [pendingStatusChange, setPendingStatusChange] = useState(null);
     const dropdownRefs = useRef([]);
     const navigate = useNavigate();
+    const { setToastError, setToastSuccess } = useContext(GlobalContext);
+
 
     const handleDropdownClick = (version_number) => {
         setDropdownsOpen({
@@ -52,8 +55,15 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
     const updateVersionStatus = async (status, questionnaire_id, version_number, previousPublishedVersion = null) => {
         setLoading(true);
         try {
+            // Update selected version's status
+            const response = await PatchAPI(
+                `questionnaires/status/${questionnaire_id}/${version_number}`,
+                { status }
+            );
+            console.log(response?.data?.data?.message, 'llll')
+            const statusError = response?.error
             // If publishing and there's a previous published version, retire it first
-            if (status === 'Published' && previousPublishedVersion) {
+            if ((status === 'Published' && !statusError) && previousPublishedVersion) {
                 await PatchAPI(
                     `questionnaires/status/${questionnaire_id}/${previousPublishedVersion.version_number}`,
                     { status: 'Retired' }
@@ -70,23 +80,20 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                     return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
                 });
             }
-
-            // Update selected version's status
-            await PatchAPI(
-                `questionnaires/status/${questionnaire_id}/${version_number}`,
-                { status }
-            );
-
-            // Update version list state for new status
-            setVersionList((prevVersionList) => {
-                const updatedVersions = prevVersionList.data.items.map((item) => {
-                    if (item.version_number === version_number) {
-                        return { ...item, status };
-                    }
-                    return item;
+            if (!statusError) {
+                // Update version list state for new status
+                setVersionList((prevVersionList) => {
+                    const updatedVersions = prevVersionList.data.items.map((item) => {
+                        if (item.version_number === version_number) {
+                            return { ...item, status };
+                        }
+                        return item;
+                    });
+                    return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
                 });
-                return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
-            });
+            }else{
+                setToastError(response?.data?.data?.message)
+            }
 
         } catch (error) {
             console.error('Error updating status:', error);
@@ -136,20 +143,6 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 return '-';
         }
     };
-
-    // Preparing `is_question_exists` mapping
-    const isQuestionExistsMapping = versionList?.data?.is_question_exists.reduce((acc, item) => {
-        const [version, exists] = Object.entries(item)[0]; // Extract key-value pair
-        acc[version.split(' ')[1]] = exists; // Store as { version_number: boolean }
-        return acc;
-    }, {});
-
-    // Function to filter options based on `is_question_exists` for a specific version
-    const filteredOptions = (versionInfo) => {
-        const isQuestionExists = isQuestionExistsMapping[versionInfo?.version_number]; // Check the mapping
-        return isQuestionExists ? options : options.filter(option => option !== 'Published'); // Filter options
-    };
-
 
     return (
         <>
@@ -214,7 +207,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                                 : 'top-[58px]')
                                                                 : 'top-[58px]'} z-10`}>
                                                             {/* {options.map(option => ( */}
-                                                                {filteredOptions(versionListInfo).map((option) => (
+                                                            {options.map((option) => (
                                                                 <li key={option}
                                                                     data-testid={`${option}`}
                                                                     className='py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]'
