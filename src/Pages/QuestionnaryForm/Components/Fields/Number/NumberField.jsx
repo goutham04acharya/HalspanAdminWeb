@@ -4,6 +4,7 @@ import { handleSliderValue } from '../RangeSliderDataSlice';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
 import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { setFieldEditable } from '../../defaultContentPreviewSlice';
 
 
 function NumberField({
@@ -134,6 +135,11 @@ function NumberField({
             ...prevErrors,
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
+        dispatch(setFieldEditable({
+            fieldId: question?.question_id,
+            isEditable: true
+        }
+        ))
     }
     return (
         <div>

@@ -808,7 +808,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         window[key] = value;
     });
 
-    useEffect(() => {
+    useEffect(() => { 
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
@@ -826,18 +826,20 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         const [day, month, year] = dateStr.split("/");
                                         return `${year}-${month}-${day}`;
                                     }
+                                    console.log(splitDate(result), 'result')
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
-                                } else if (component_type === "numberfield") {
+                                } else{
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                 }
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
-                                    const result = eval(default_conditional_logic);
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
                                     }))
                                 } else {
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
