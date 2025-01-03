@@ -58,26 +58,59 @@ function AdvancedEditor({
         }
     };
 
-
     const handleAddQuestion = (suggestion, sections) => {
-        let allSections = sections
-        const getVariableType = a => a.constructor.name.toLowerCase();
-        let valueType = getVariableType(eval(`sections.${suggestion}`))
-        setSelectedType(valueType);
 
+        // Split the suggestion string into keys for nested access
+        const keys = suggestion.split('.'); // Example: "Section_1.Page_1.Question_1?" -> ["Section_1", "Page_1", "Question_1?"]
+
+        // Use reduce to dynamically access the nested property
+        const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
+
+        // Get the type of the value
+        const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
+        const valueType = getVariableType(propertyValue);
+
+        // Set the selected type and perform further actions
+        setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
         // After selecting a suggestion, show suggestions list again and hide error
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
-    }
+    };
+
+
+
+    const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
 
     const handleKeyDown = (event) => {
-        // Prevent single quote key (keyCode 222 is the code for single quote)
-        if (event.key === "'") {
-            event.preventDefault(); // Stop the default behavior (inserting the single quote)
+        const { selectionStart } = textareaRef.current;
+        const value = inputValue;
+
+        // Check if the backspace key is pressed
+        if (event.key === "Backspace" && selectionStart > 0) {
+            // Find all regex matches in the input value
+            const matches = [...value.matchAll(regex)];
+
+            // Check if the cursor is at the end of any match
+            for (let match of matches) {
+                const start = match.index;
+                const end = match.index + match[0].length;
+
+                // If the cursor is at the end of the match, delete the entire match
+                if (selectionStart === end) {
+                    event.preventDefault(); // Prevent default backspace behavior
+
+                    // Remove the matched string
+                    const newValue =
+                        value.slice(0, start) + value.slice(end);
+                    handleInputField({ target: { value: newValue } }); // Update the value
+                    return;
+                }
+            }
         }
     };
+
 
     // Populate all items initially
     useEffect(() => {

@@ -172,6 +172,9 @@ const QuestionnaryForm = () => {
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
+        if (id === 'admin_field_notes') {
+            dispatch(setNewComponent({ id: 'admin_field_notes', value: admin_field_notes, questionId: selectedQuestionId }));
+        }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -362,8 +365,12 @@ const QuestionnaryForm = () => {
                     questions: []
                 }],
             };
+
             setSections((prevSections) => {
                 const updatedSections = prevSections.concat(newSection);
+                if (sections.length === 0) {
+                    setSelectedSection(updatedSections[0]?.section_id);
+                }
                 handleSectionSaveOrder(updatedSections); // Call handleSectionSaveOrder with the updated sections   
                 return updatedSections;
             })
@@ -571,6 +578,7 @@ const QuestionnaryForm = () => {
                     service_record_lfp: question?.service_record_lfp,
                     questionnaire_name_lfp: question?.questionnaire_name_lfp,
                     question_name_lfp: question?.question_name_lfp,
+                    admin_field_notes: question?.admin_field_notes
                 }))));
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
@@ -638,6 +646,7 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        // if ( Section_1.Page_1.Question_1 === "No" ) then "19/12/2024" else "20/12/2024"
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
@@ -646,7 +655,9 @@ const QuestionnaryForm = () => {
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
                     index === complianceLogicId
-                        ? { ...item, default_content: payloadString }
+                        ? {
+                            ...item, default_content: payloadString
+                        }
                         : item
                 )
             );
@@ -700,7 +711,7 @@ const QuestionnaryForm = () => {
                                 min: fieldSettingParams[question.question_id].min,
                                 max: fieldSettingParams[question.question_id].max,
                             },
-                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
@@ -1251,12 +1262,12 @@ const QuestionnaryForm = () => {
             console.log('Number of sections does not match');
             return false;
         }
-    
+
         // Compare each section in detail
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             const savedSection = compareSavedSections[i];
-    
+
             // Compare section-level properties
             if (
                 section.section_name !== savedSection.section_name ||
@@ -1266,17 +1277,17 @@ const QuestionnaryForm = () => {
                 console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
                 return false;
             }
-    
+
             // Compare pages within the section
             if (section.pages.length !== savedSection.pages.length) {
                 console.log(`Mismatch in the number of pages in section ${i + 1}`);
                 return false;
             }
-    
+
             for (let j = 0; j < section.pages.length; j++) {
                 const page = section.pages[j];
                 const savedPage = savedSection.pages[j];
-    
+
                 // Compare page-level properties
                 if (
                     page.page_name !== savedPage.page_name ||
@@ -1288,7 +1299,7 @@ const QuestionnaryForm = () => {
                     });
                     return false;
                 }
-    
+
                 // Compare questions within the page
                 if (page.questions.length !== savedPage.questions.length) {
                     console.log(
@@ -1296,11 +1307,11 @@ const QuestionnaryForm = () => {
                     );
                     return false;
                 }
-    
+
                 for (let k = 0; k < page.questions.length; k++) {
                     const question = page.questions[k];
                     const savedQuestion = savedPage.questions[k];
-    
+
                     // Compare question-level properties
                     if (
                         question.question_id !== savedQuestion.question_id ||
@@ -1315,10 +1326,10 @@ const QuestionnaryForm = () => {
                 }
             }
         }
-    
+
         return true; // Sections, pages, and questions are identical
     };
-    
+
     // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
     const hasUnsavedChanges = () => {
         return (
@@ -1390,7 +1401,9 @@ const QuestionnaryForm = () => {
                                             question_id: question.question_id,
                                             question_name: fieldSettingParams[question.question_id].label,
                                             conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic']?.replaceAll('else', ':')
+                                                ?.replaceAll('then', '?')
+                                                ?.replaceAll('if', '') || '',
                                             component_type: fieldSettingParams[question.question_id].componentType,
                                             label: fieldSettingParams[question.question_id].label,
                                             help_text: fieldSettingParams[question.question_id].helptext,
@@ -1404,7 +1417,7 @@ const QuestionnaryForm = () => {
                                                 min: fieldSettingParams[question.question_id].min,
                                                 max: fieldSettingParams[question.question_id].max,
                                             },
-                                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                                             source: fieldSettingParams[question.question_id].source,
                                             source_value:
                                                 fieldSettingParams[question.question_id].source === 'fixedList' ?

@@ -841,9 +841,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             });
             dropdownHandler('if', index, 'reason');
         }
-
     };
-
 
     //function to handle opening and closing of the dropdown in complinace basic editor
     const dropdownHandler = (type, index, dropdownType) => {

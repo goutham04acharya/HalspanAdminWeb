@@ -125,16 +125,16 @@ const ChoiceBoxField = ({
     };
 
     const renderInputGroup = () => {
-        const { source, type, fixedChoiceArray, lookupOptionChoice } = fieldSettingParameters;
+        const { source, type, fixedChoiceArray, lookupOptionChoice, source_value } = fieldSettingParameters;
         let values = [];
         if (preview) {
             values = (question?.source === 'fixedList')
                 ? question?.source_value?.map(choice => choice.value) || []
-                : lookupOptionChoice || [];
+                : lookupOptionChoice || source_value || [];
         } else {
             values = (source === 'fixedList')
                 ? fixedChoiceArray?.map(choice => choice.value) || []
-                : lookupOptionChoice || [];
+                : lookupOptionChoice || source_value || [];
         }
 
         if (type === 'single_choice') {
@@ -144,9 +144,9 @@ const ChoiceBoxField = ({
         }
     };
 
-    useEffect(() => {
-        setOptionSelected(choiceValue?.value);
-    }, [choiceValue]);
+    // useEffect(() => {
+    //     setOptionSelected(choiceValue?.value);
+    // }, [choiceValue]);
 
     useOnClickOutside(dropdownRef, () => {
         setIsDropdownOpen(false);

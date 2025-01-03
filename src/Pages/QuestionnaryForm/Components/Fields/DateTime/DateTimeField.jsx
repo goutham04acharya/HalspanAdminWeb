@@ -148,7 +148,6 @@ function DateTimeField({
             const { hours, minutes, seconds } = splitTime(value);
             const currentDateTime = new Date();
             currentDateTime.setHours(hours, minutes, seconds, 0);
-            console.log(conditionalValues[section_name], 'ddd')
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
@@ -166,7 +165,6 @@ function DateTimeField({
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
             const currentMilliSeconds = new Date().getMilliseconds();
-            console.log(currentMilliSeconds, 'current milliseconds', new Date().getMilliseconds())
             const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -256,7 +254,7 @@ function DateTimeField({
                             max="9999-12-31"
                             onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
                         />
-                    </div>{console.log(question, 'question')}
+                    </div>
                     <TimePicker
                         onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
                         format={question?.format}
