@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
-// import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
-import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
-import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
+import { complianceContentConverter } from '../../../../../../CommonMethods/complianceContentConverter';
 
 function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
@@ -57,7 +54,7 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                             <input type="text" id='Label'
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
                                 value={complianceLogic[complianceLogicId]?.default_content
-                                    ? defaultContentConverter(complianceLogic[complianceLogicId].default_content)
+                                    ? complianceContentConverter(complianceLogic[complianceLogicId].default_content)
                                     : ''}
                                 disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'

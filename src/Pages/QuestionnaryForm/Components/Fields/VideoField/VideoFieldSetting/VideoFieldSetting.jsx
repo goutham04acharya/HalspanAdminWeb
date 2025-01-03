@@ -4,6 +4,7 @@ import CommonComponents from '../../../CommonComponents/CommonComponents';
 import InputField from '../../../../../../Components/InputField/InputField';
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import { setNewComponent } from '../../fieldSettingParamsSlice';
 
 function VideoFieldSetting({ handleInputChange,
     formParameters,
@@ -15,7 +16,7 @@ function VideoFieldSetting({ handleInputChange,
     setConditionalLogic,
     formStatus
 }) {
-
+    const dispatch = useDispatch();
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -96,14 +97,14 @@ function VideoFieldSetting({ handleInputChange,
                         <InputField
                             autoComplete='off'
                             label='Admin Field Notes'
-                            id='note'
+                            id='admin_field_notes'
                             type='text'
-                            value={fieldSettingParameters?.note}
+                            value={fieldSettingParameters?.admin_field_notes}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
-                            htmlFor='note'
+                            htmlFor='admin_field_notes'
                             maxLength={500}
                             handleChange={handleInputChange}
                             handleBlur={handleBlur}

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Image from '../../../Components/Image/Image.jsx';
-import useOnClickOutside from '../../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx';
@@ -24,6 +23,7 @@ import {
 import { useSelector } from 'react-redux';
 import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
 import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
+import { list } from 'postcss';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -567,11 +567,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         // Get precomputed navigation details for next page/section
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
-
-        if (isLastSection) {
-            setShowComplianceScreen(true);  // Show compliance screen if it's the last section
-            return;
-        }
+        if (isLastSection)
+            if (isLastSection) {
+                setShowComplianceScreen(true);  // Show compliance screen if it's the last section
+                return;
+            }
 
         // Move to the next section or page
         if (nextSection !== currentSection) {
@@ -853,7 +853,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
     function isSameDate(question_id, setDate, value) {
-        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
         // Convert the epoch values (in seconds) to Date objects
         const selectedDate = new Date(question_id * 1000);
         const setDateObj = new Date(setDate * 1000);
@@ -861,7 +860,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         // Add the specified number of days (value) to the set date
         setDateObj.setDate(setDateObj.getDate() + value);
 
-        console.log(setDateObj, 'set date obj')
         // Compare the year, month, and day
         return (
             selectedDate.getFullYear() === setDateObj.getFullYear() &&
@@ -901,9 +899,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     ) : showComplianceScreen ? (
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
+                            {complianceLogic?.length === 0 &&<h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
                                 <>
-                                    <div
+                                    {complianceLogic.length !== 0 && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -917,8 +916,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             </span>
                                         </div>
 
-                                    </div>
-                                    {result?.STATUS === 'FAIL' && <div
+                                    </div>}
+                                    {(result?.STATUS === 'FAIL' && complianceLogic.length !== 0) && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -971,8 +970,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list?.conditional_logic, 'list?.conditional_logic')
-                                    console.log(conditionalValues, 'dddaadf')
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
@@ -983,8 +980,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
                                                     return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
                                                 });
-
-                                                console.log(updatedLogic, 'Updated Logic');
 
                                                 // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {
@@ -1057,7 +1052,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
                     {!showLabel ? <button
-                        disabled={previewNavigation.current_page === 1}
+                        disabled={previewNavigation.current_page === 1 && !showComplianceScreen}
                         type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back

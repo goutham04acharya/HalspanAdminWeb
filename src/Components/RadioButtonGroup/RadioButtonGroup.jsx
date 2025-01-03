@@ -37,18 +37,18 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
                         <div className="relative flex items-center">
                             <input
                                 type="radio"
-                                value={option}
-                                checked={questionValue[question?.question_id] === option}
+                                value={option?.value || option}
+                                // checked={questionValue[question?.question_id] === ( option?.value || option)}
                                 onClick={(e) => handleChange(e)}
                                 className="absolute w-0 h-0 opacity-0"
                             />
                             <div className="w-5 h-5 border-2 border-[#2B333B] rounded-full">
-                                {(preview ? questionValue[question?.question_id] : selectedValue) === option && (
+                                {(preview ? questionValue[question?.question_id] : selectedValue) === option.value && (
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#2B333B] rounded-full" />
                                 )}
                             </div>
                         </div>
-                        <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option}</span>
+                        <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value || option}</span>
                     </label>
                 ))}
             </div>

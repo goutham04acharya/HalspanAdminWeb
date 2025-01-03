@@ -161,7 +161,7 @@ const fieldSettingParamsSlice = createSlice({
                     format_error: item?.format_error,
                     min: item.field_range?.min,
                     max: item.field_range?.max,
-                    note: item.admin_field_notes,
+                    admin_field_notes: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
                     lookupValue: item.lookup_value,
