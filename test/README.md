@@ -126,7 +126,7 @@ global.driver = new Builder()
     .build();
 
 BeforeAll(async function () {
-    await driver.get('http://localhost:3000/');
+    await driver.get('https://questionnaire-qa.halspantest.com/');
     console.log('Test setup complete.');
 });
 ```
