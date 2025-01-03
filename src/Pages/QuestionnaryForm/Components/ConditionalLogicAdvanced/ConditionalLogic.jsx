@@ -238,7 +238,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
-        // console.log(first)
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
                 ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -307,7 +306,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
                 setSections(result);
             });
-            // console.log(tempArray)
             setDatetimefieldQuestions(datetimefieldQuestions);
         }
     }
@@ -319,17 +317,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'ajdjsadj')
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
         const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
         let questionMatches = value.match(regex);
-        console.log(questionMatches, 'hhhhhhhhhhhh')
         // [
         //     "Section_1.Page_1.Question_1",
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
-        console.log(questionName, 'questionName')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -398,7 +393,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 try {
                     valueType = getVariableType(eval(`allSections.${wordToSearch}`))
                 } catch (e) {
-
                 }
                 switch (valueType) {
                     case 'string':
@@ -454,7 +448,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
                 newText = textToKeep + textToInsert + textAfter;
             }
-
 
             // Update the textarea value
             textarea.value = newText;
@@ -627,7 +620,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
-
                         question_name = question_name.replace('.length', '');
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
@@ -1097,7 +1089,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 });
             });
 
-
             if (invalidVariables.length > 0) {
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
                 return;
@@ -1547,9 +1538,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // if (conditions[0]?.conditions[0]?.value !== '') {
             try {
                 //    debugger
-                console.log(conditions, 'conditions')
                 let condition_logic = getFinalComplianceLogic(conditions)
-                console.log(condition_logic, 'jnacasdjkas')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -1558,7 +1547,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
                 }
-                console.log(condition_logic, 'rrrrrrrrrrrr')
                 if (condition_logic.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic.split(':');

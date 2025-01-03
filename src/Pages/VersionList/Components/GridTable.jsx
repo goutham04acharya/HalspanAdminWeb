@@ -60,7 +60,6 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 `questionnaires/status/${questionnaire_id}/${version_number}`,
                 { status }
             );
-            console.log(response?.data?.data?.message, 'llll')
             const statusError = response?.error
             // If publishing and there's a previous published version, retire it first
             if ((status === 'Published' && !statusError) && previousPublishedVersion) {
