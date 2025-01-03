@@ -42,7 +42,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     const questionValue = useSelector(state => state?.questionValues?.questions);
-    console.log(complianceLogic, 'complianceLogic')
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -885,7 +884,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
-    console.log(complianceLogic?.length, 'ssssssssssssssss')
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -904,7 +902,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             {complianceLogic?.length === 0 &&<h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
                                 <>
-                                {/* {console.log(complianceLogic.length, 'complianceLogic.length')} */}
                                     {complianceLogic.length !== 0 && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -983,8 +980,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
                                                     return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
                                                 });
-
-                                                console.log(updatedLogic, 'Updated Logic');
 
                                                 // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {

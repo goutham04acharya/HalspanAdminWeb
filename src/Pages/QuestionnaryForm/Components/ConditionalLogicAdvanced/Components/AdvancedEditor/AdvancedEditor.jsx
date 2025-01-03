@@ -58,26 +58,6 @@ function AdvancedEditor({
         }
     };
 
-
-    // const handleAddQuestion = (suggestion, sections) => {
-    //     console.log(suggestion, 'suggestion');
-
-    //     // Dynamically access the property using bracket notation to handle special characters
-    //     const propertyValue = sections?.[suggestion];
-    //     console.log(sections, 'sections')
-
-    //     const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
-    //     const valueType = getVariableType(propertyValue);
-    //     // Set the selected type and perform further actions
-    //     setSelectedType(valueType);
-    //     console.log(valueType, 'valueType')
-    //     handleClickToInsert(suggestion, false, valueType);
-
-    //     // After selecting a suggestion, show suggestions list again and hide error
-    //     setShowMethodSuggestions(false);
-    //     setFilteredSuggestions(secDetailsForSearching);
-    // };
-
     const handleAddQuestion = (suggestion, sections) => {
 
         // Split the suggestion string into keys for nested access

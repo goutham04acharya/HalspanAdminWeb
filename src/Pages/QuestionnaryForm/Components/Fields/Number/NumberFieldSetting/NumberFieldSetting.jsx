@@ -263,7 +263,6 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                             <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
-                            {console.log(fieldSettingParameters?.max, 'max')}
                             <InputField
                                 autoComplete='off'
                                 label=''
