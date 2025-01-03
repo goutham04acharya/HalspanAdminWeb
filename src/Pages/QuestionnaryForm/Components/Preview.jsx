@@ -23,6 +23,7 @@ import {
 import { useSelector } from 'react-redux';
 import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
 import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
+import { list } from 'postcss';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -41,6 +42,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     const questionValue = useSelector(state => state?.questionValues?.questions);
+    console.log(complianceLogic, 'complianceLogic')
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -566,7 +568,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
         // Get precomputed navigation details for next page/section
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
-
+        if(isLastSection )
         if (isLastSection) {
             setShowComplianceScreen(true);  // Show compliance screen if it's the last section
             return;

@@ -84,12 +84,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     ]
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
-
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
-                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray;
+                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray || fieldSettingParams[question.question_id].lookupOptionChoice;
             }
         });
         setChoiceBoxOptions(choiceBoxOptionsObj);
@@ -239,19 +238,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
-            .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-            .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
-            .replaceAll('&&', 'and') // Replace && with and
-            .replaceAll('||', 'or') // Replace || with or
-            .replaceAll('.length', '.()')
-
+        // console.log(first)
+        if (condition_logic !== '' || condition_logic !== undefined) {
+            condition_logic
+                ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                ?.replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                ?.replaceAll('&&', 'and') // Replace && with and
+                ?.replaceAll('||', 'or') // Replace || with or
+                ?.replaceAll('.length', '.()')
+        }
         if (condition_logic.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
             const parts = condition_logic.split(':');
             const lastPart = parts.pop(); // Remove the last part
             condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
-        if (condition_logic.includes(':')) {
+        if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
             const parts = condition_logic.split(':');
             const lastPart = parts.pop(); // Remove the last part
@@ -260,7 +262,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
-    }, [])
+    }, [conditions])
 
     // useEffect(() => {
     //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
@@ -317,7 +319,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        let questionName = value.split('.')[2]?.replace('_', ' ');
+        console.log(value, 'ajdjsadj')
+        // let questionName = value?.split('.')[2]?.replace('_', ' ');
+        const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
+        let questionMatches = value.match(regex);
+        console.log(questionMatches, 'hhhhhhhhhhhh')
+        // [
+        //     "Section_1.Page_1.Question_1",
+        //     "Section_1.Page_1.Question_2",
+        //     "Section_1.Page_1.Question_4"
+        // ]
+        console.log(questionName, 'questionName')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -330,8 +342,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
                 // Find the question with the matching ID
-                const matchedQuestion = datetimefieldQuestions.find(
-                    (question) => question?.question_name === questionName
+                const matchedQuestion = datetimefieldQuestions.find((question) =>
+                    questionMatches?.some((match) => match?.split('.')[2]?.replace('_', ' ') === question.question_name)
                 );
                 // Check the type and set suggestions accordingly
                 if (matchedQuestion) {
@@ -1531,14 +1543,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(condition_logic);
 
         } else {
-            try {
-                let condition_logic = getFinalComplianceLogic(conditions)
-                    .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                    .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
-                    .replaceAll('&&', 'and') // Replace && with and
-                    .replaceAll('||', 'or') // Replace || with or
-                    .replaceAll('.length', '.()')
 
+            // if (conditions[0]?.conditions[0]?.value !== '') {
+            try {
+                //    debugger
+                console.log(conditions, 'conditions')
+                let condition_logic = getFinalComplianceLogic(conditions)
+                console.log(condition_logic, 'jnacasdjkas')
+                if (condition_logic !== '') {
+                    condition_logic
+                        .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                        .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                        .replaceAll('&&', 'and') // Replace && with and
+                        .replaceAll('||', 'or') // Replace || with or
+                        .replaceAll('.length', '.()')
+                }
+                console.log(condition_logic, 'rrrrrrrrrrrr')
                 if (condition_logic.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic.split(':');
@@ -1547,9 +1567,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
                 setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
 
+
             } catch (error) {
                 console.error('Error while converting', error);
             }
+            // }
 
 
         }
