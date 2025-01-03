@@ -31,7 +31,7 @@ Feature: Halspan - Admin- Lookup data set
         Then I should be redirected to the lookup dataset listing screen
         When I click the delete option for a lookup dataset
         Then I should see a confirmation prompt for deletion
-        When I click the close button
+        When I click the close button for the modal
         Then I should be redirected to the lookup dataset listing screen
 
     Scenario: Admin deletes the lookup dataset 
