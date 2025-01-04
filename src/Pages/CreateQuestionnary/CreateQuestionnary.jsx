@@ -50,6 +50,7 @@ function CreateQuestionnary() {
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
     services_type: null,
   });
+  
   const [validationErrors, setValidationErrors] = useState({});
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
@@ -88,6 +89,7 @@ function CreateQuestionnary() {
   const handleNavigateBack = () => {
     navigate('/questionnaries');
   };
+
   const handleCreateQuestionnary = async () => {
     const errors = {};
     const payload = {
@@ -133,6 +135,7 @@ function CreateQuestionnary() {
         'version_number': parseInt(response?.data?.data?.version_number),
         'logic': complianceInitialState
       }
+
       const complianceResponse = await PostAPI(`questionnaires/compliancelogic`, complianceState);
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
