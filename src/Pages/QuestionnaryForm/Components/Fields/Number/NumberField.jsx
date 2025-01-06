@@ -172,7 +172,6 @@ function NumberField({
                 onChange={() => handleChange(fieldSettingParameters)}
             /> : ((preview && question?.source === 'entryfield') || (preview && question?.source === 'both')) ?
                 <div className={`flex border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg items-center`}>
-                    {console.log(question?.field_texts, 'fff')}
                     {(question?.field_texts?.pre_field_text || fieldSettingParameters?.preField) && <p className={`w-1/5 max-w-[20%] break-all overflow-auto ml-2`}>{preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField}</p>}
                     <input
                         data-testid='input'

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Image from '../../../Components/Image/Image.jsx';
-import useOnClickOutside from '../../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx';
@@ -43,7 +42,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [isLastPage, setIsLastPage] = useState(false);
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     const questionValue = useSelector(state => state?.questionValues?.questions);
-    console.log(complianceLogic, 'complianceLogic')
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
@@ -857,7 +855,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
     function isSameDate(question_id, setDate, value) {
-        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
         // Convert the epoch values (in seconds) to Date objects
         const selectedDate = new Date(question_id * 1000);
         const setDateObj = new Date(setDate * 1000);
@@ -865,7 +862,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         // Add the specified number of days (value) to the set date
         setDateObj.setDate(setDateObj.getDate() + value);
 
-        console.log(setDateObj, 'set date obj')
         // Compare the year, month, and day
         return (
             selectedDate.getFullYear() === setDateObj.getFullYear() &&
@@ -890,7 +886,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
-    console.log(complianceLogic?.length, 'ssssssssssssssss')
     return (
         <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
             <div className='flex justify-end p-2'>
@@ -909,7 +904,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             {complianceLogic?.length === 0 &&<h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
                                 <>
-                                {/* {console.log(complianceLogic.length, 'complianceLogic.length')} */}
                                     {complianceLogic.length !== 0 && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
@@ -978,8 +972,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list?.conditional_logic, 'list?.conditional_logic')
-                                    console.log(conditionalValues, 'dddaadf')
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
@@ -990,8 +982,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                                 updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
                                                     return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
                                                 });
-
-                                                console.log(updatedLogic, 'Updated Logic');
 
                                                 // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {

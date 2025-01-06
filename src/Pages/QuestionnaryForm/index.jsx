@@ -172,6 +172,9 @@ const QuestionnaryForm = () => {
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
         }
+        if (id === 'admin_field_notes') {
+            dispatch(setNewComponent({ id: 'admin_field_notes', value: admin_field_notes, questionId: selectedQuestionId }));
+        }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
             if (updatedValue.length <= fieldSettingParams?.[selectedQuestionId].urlType.length) {
@@ -362,8 +365,12 @@ const QuestionnaryForm = () => {
                     questions: []
                 }],
             };
+
             setSections((prevSections) => {
                 const updatedSections = prevSections.concat(newSection);
+                if (sections.length === 0) {
+                    setSelectedSection(updatedSections[0]?.section_id);
+                }
                 handleSectionSaveOrder(updatedSections); // Call handleSectionSaveOrder with the updated sections   
                 return updatedSections;
             })
@@ -571,6 +578,7 @@ const QuestionnaryForm = () => {
                     service_record_lfp: question?.service_record_lfp,
                     questionnaire_name_lfp: question?.questionnaire_name_lfp,
                     question_name_lfp: question?.question_name_lfp,
+                    admin_field_notes: question?.admin_field_notes
                 }))));
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
@@ -582,20 +590,9 @@ const QuestionnaryForm = () => {
                     status: true,
                     time: response?.data?.time,
                 };
-                // console.log(sectionsData.map((section, index) => ({
-                //     index: index,
-                //     id: section.section_id
-                // })), 'ssssdxcscdm')
+
                 dispatch(setInitialData(transformedFieldSettingsData.data.items));
-                // const body = {
-                //     "public_name": response?.data?.data?.public_name,
-                //     "sections": sectionsData.map((section, index) => ({
-                //         index: index,
-                //         id: section.section_id
-                //     })),
-                //     'compliance_logic': complianceInitialState,
-                // }
-                // const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
+
                 const sectionOrder = await GetSectionOrder();
                 if (sectionOrder === 'no_data') {
                     setSections(sectionsData);
@@ -635,7 +632,6 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
-
                 // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
@@ -715,7 +711,7 @@ const QuestionnaryForm = () => {
                                 min: fieldSettingParams[question.question_id].min,
                                 max: fieldSettingParams[question.question_id].max,
                             },
-                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
@@ -1131,7 +1127,6 @@ const QuestionnaryForm = () => {
         }
     };
 
-
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
             "public_name": formDefaultInfo.public_name,
@@ -1262,58 +1257,99 @@ const QuestionnaryForm = () => {
 
     // Function to compare sections state with compareSavedSections to show the cancle modal or not
     const compareSections = (sections, compareSavedSections) => {
+        // Check if the number of sections matches
         if (sections.length !== compareSavedSections.length) {
-            return false; // Different number of sections
+            console.log('Number of sections does not match');
+            return false;
         }
 
-        // Compare each section in detail (excluding questions)
+        // Compare each section in detail
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             const savedSection = compareSavedSections[i];
 
-            // Compare section names and ids
-            if (section.section_name !== savedSection.section_name ||
-                section.section_id !== savedSection.section_id) {
-                return false; // Section names or ids are different
+            // Compare section-level properties
+            if (
+                section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id ||
+                section.updated_at !== savedSection.updated_at
+            ) {
+                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
+                return false;
             }
 
-            // Compare pages within each section (excluding questions)
+            // Compare pages within the section
             if (section.pages.length !== savedSection.pages.length) {
-                return false; // Different number of pages
+                console.log(`Mismatch in the number of pages in section ${i + 1}`);
+                return false;
             }
 
-            // Compare each page's details (without comparing questions)
             for (let j = 0; j < section.pages.length; j++) {
                 const page = section.pages[j];
                 const savedPage = savedSection.pages[j];
 
-                // Compare page names and page_ids
-                if (page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id) {
-                    return false; // Different page names or page_ids
+                // Compare page-level properties
+                if (
+                    page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id
+                ) {
+                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
+                        page,
+                        savedPage,
+                    });
+                    return false;
+                }
+
+                // Compare questions within the page
+                if (page.questions.length !== savedPage.questions.length) {
+                    console.log(
+                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
+                    );
+                    return false;
+                }
+
+                for (let k = 0; k < page.questions.length; k++) {
+                    const question = page.questions[k];
+                    const savedQuestion = savedPage.questions[k];
+
+                    // Compare question-level properties
+                    if (
+                        question.question_id !== savedQuestion.question_id ||
+                        question.question_name !== savedQuestion.question_name
+                    ) {
+                        console.log(
+                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
+                            { question, savedQuestion }
+                        );
+                        return false;
+                    }
                 }
             }
         }
 
-        return true; // Sections and pages match
+        return true; // Sections, pages, and questions are identical
     };
 
     // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
     const hasUnsavedChanges = () => {
-        // If sections have changed, or compareData is false, we show the modal
         return (
-            !compareSections(sections, compareSavedSections) ||
-            !compareData(fieldSettingParams, savedFieldSettingParams)
+            !compareSections(sections, compareSavedSections)
         );
     };
 
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges() && formStatus === 'Draft') {
-            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
+            dispatch(setShowCancelModal(true)); // Show confirmation modal
         } else {
             navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
+    };
+
+    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
+    const handleConfirmCancel = () => {
+        dispatch(setShowCancelModal(false));
+        navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
 
     const handleComplianceLogic = async () => {
@@ -1329,11 +1365,6 @@ const QuestionnaryForm = () => {
             console.log('Error updating API')
         }
     }
-    // Confirmation modal "Confirm" button action (related to showing the cancle modal)
-    const handleConfirmCancel = () => {
-        dispatch(setShowCancelModal(false));
-        navigate(`/questionnaries/version-list/${questionnaire_id}`);
-    };
 
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
@@ -1386,7 +1417,7 @@ const QuestionnaryForm = () => {
                                                 min: fieldSettingParams[question.question_id].min,
                                                 max: fieldSettingParams[question.question_id].max,
                                             },
-                                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                                             source: fieldSettingParams[question.question_id].source,
                                             source_value:
                                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
@@ -1462,6 +1493,8 @@ const QuestionnaryForm = () => {
             }
             cleanSections();
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+            // Sync compareSavedSections with the updated sections
+            setCompareSavedSections(sections);
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
             handleComplianceLogic()
@@ -1530,7 +1563,8 @@ const QuestionnaryForm = () => {
                                             <Droppable droppableId="droppable">
                                                 {(provided) => (
                                                     <ul
-                                                        {...provided.droppableProps} ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                        ref={provided.innerRef}
                                                     >
                                                         {sections.map((sectionData, sectionIndex) => (
                                                             <Draggable
@@ -1563,6 +1597,7 @@ const QuestionnaryForm = () => {
                                                                             </div>
                                                                             <div className="flex items-center w-[15%]">
                                                                                 {sectionData.section_conditional_logic ? (
+                                                                                    // Dummy icon to show if conditional logic is added
                                                                                     <img
                                                                                         src="/Images/condition-added.svg"
                                                                                         alt="Condition Added"
@@ -1632,7 +1667,7 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
+                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
                                         <div>
                                             <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                         </div>

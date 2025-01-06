@@ -138,14 +138,14 @@ function FileFieldSetting({ handleInputChange,
                         <InputField
                             autoComplete='off'
                             label='Admin Field Notes'
-                            id='note'
+                            id='admin_field_notes'
                             type='text'
-                            value={fieldSettingParameters?.note}
+                            value={fieldSettingParameters?.admin_field_notes}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
-                            htmlFor='note'
+                            htmlFor='admin_field_notes'
                             formStatus={formStatus}
                             maxLength={500}
                             handleChange={handleInputChange}

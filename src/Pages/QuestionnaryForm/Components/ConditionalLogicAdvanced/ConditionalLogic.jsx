@@ -101,7 +101,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
-    // console.log(combinedArray, 'cmmsdakc')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -239,14 +238,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
-        // console.log(first)
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
                 ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                ?.replaceAll('?', 'then') // Replace ? with then
+                ?.replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
                 ?.replaceAll('&&', 'and') // Replace && with and
                 ?.replaceAll('||', 'or') // Replace || with or
                 ?.replaceAll('.length', '.()')
+        }
+        if (condition_logic.includes(':')) {
+            // Split by colon and rebuild with "else if" and "else" logic
+            const parts = condition_logic.split(':');
+            const lastPart = parts.pop(); // Remove the last part
+            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
         if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
@@ -283,9 +287,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     section.pages.forEach((page) => {
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
-                                // console.log(question, 'question')
                                 if (question?.component_type === 'dateTimefield') {
-                                    // debugger
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
                                 const fieldType = getFieldType(question.component_type);
@@ -304,7 +306,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
                 setSections(result);
             });
-            // console.log(tempArray)
             setDatetimefieldQuestions(datetimefieldQuestions);
         }
     }
@@ -312,20 +313,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
         setError('');
+        // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
-        console.log(value, 'ajdjsadj')
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
         const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
         let questionMatches = value.match(regex);
-        console.log(questionMatches, 'hhhhhhhhhhhh')
         // [
         //     "Section_1.Page_1.Question_1",
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
-        // console.log(questionName, 'questionName')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -337,14 +336,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
             } else if (selectedFieldType === 'dateTimefield') {
-                console.log(selectedQuestionId, 'selectedQuestionId');
-                console.log(datetimefieldQuestions, 'datetimefieldQuestions');
-
                 // Find the question with the matching ID
                 const matchedQuestion = datetimefieldQuestions.find((question) =>
                     questionMatches?.some((match) => match?.split('.')[2]?.replace('_', ' ') === question.question_name)
                 );
-                console.log(matchedQuestion, 'masmcasd')
                 // Check the type and set suggestions accordingly
                 if (matchedQuestion) {
                     switch (matchedQuestion.type) {
@@ -398,7 +393,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 try {
                     valueType = getVariableType(eval(`allSections.${wordToSearch}`))
                 } catch (e) {
-
                 }
                 switch (valueType) {
                     case 'string':
@@ -455,20 +449,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 newText = textToKeep + textToInsert + textAfter;
             }
 
-
             // Update the textarea value
             textarea.value = newText;
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
-            //this was commented i uncommeneted bczthe defualt value is not updating
-            // if (isDefaultLogic) {
-            //     dispatch(setNewComponent({ id: 'default_conditional_logic', value: newText, questionId: selectedQuestionId }))
-            // } else {
-            //     dispatch(setNewComponent({ id: 'conditional_logic', value: newText, questionId: selectedQuestionId }))
-            // }  // Update the inputValue state
+    
         }
-
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
         } else {
@@ -503,7 +490,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 default:
                     fieldType = []; // Handle any unexpected cases
             }
-
             setSelectedFieldType(fieldType.join(', '));
         }
     };
@@ -561,7 +547,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-        console.log(expression, 'expression');
 
         // Default structure if no expression is provided
         if (!expression || expression === '') {
@@ -635,14 +620,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
-
                         question_name = question_name.replace('.length', '');
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
-                        console.log(question, 'question')
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
                             value = 'new Date()';
@@ -759,7 +742,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return parsedConditions;
     };
 
-
     useEffect(() => {
         const fetchData = async () => {
             if (complianceState) {
@@ -814,7 +796,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' and ').replace(/\s\|\|\s/g, ' or ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' AND ').replace(/\s\|\|\s/g, ' OR ');
             conditionalLogic = conditionalLogic.replace(/\s&&\s/g, ' And ').replace(/\s\|\|\s/g, ' Or ');
-            conditionalLogic = conditionalLogic.replace(/\?/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
+            // conditionalLogic = conditionalLogic.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ').replace(/\s:\s/g, ' else '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
             conditionalLogic = conditionalLogic.replace(/\.length\b/g, '.()');
@@ -827,16 +809,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 '$1.SubtractDays($2)'
             );
             // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }))
-            setInputValue(conditionalLogic)
-            // parseLogicExpression(conditionalLogic)
-            // {
-            //     !isDefaultLogic &&
-            //         setConditions(parseLogicExpression(conditionalLogic));
-            // }
-            // if(sectionConditionLogicId || pageConditionLogicId){
-            //     setConditions(parseLogicExpression(conditionalLogic));
-            // }
+            // Conditional transformation for `?` and `:`, skipping valid question names
+            const questionRegex = /([a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\??)/g;
+            const parts = conditionalLogic.split(questionRegex);
+            //this function is for not to replace the special char in the question name
+            conditionalLogic = parts
+                .map(part => {
+                    // Transform only non-question parts
+                    if (!questionRegex.test(part)) {
+                        return part
+                            .replace(/\?/g, ' then ') // Replace "?" with "then"
+                            .replace(/\s:\s/g, ' else ') // Replace ":" with "else"
+                    }
+                    return part; // Leave question names unchanged
+                })
+                .join('');
 
+            setInputValue(conditionalLogic);
         };
         if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId || isDefaultLogic) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
@@ -859,19 +848,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const addSectionPrefix = (input) => {
                 return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
             };
-            // const modifyString = (input) => {
-            //     if (selectedType === 'array') {
-            //         // This regex looks for any ".()" in the string and replaces it with ".length"
-            //         return input.replace(/\.()\b/g, '.length');
-            //     }
-            //     return input;
-            // };
+
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
             };
             setComplianceCondition(inputValue)
-            let evalInputValue = inputValue.replaceAll('()', 'length');
+            let evalInputValue = inputValue.replaceAll('.()', '.length');
 
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
@@ -900,7 +883,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     .replaceAll('}', ')')
             }
 
-
             // Replace "and" with "&&", ensuring it's a logical operator, not part of a string or identifier
             evalInputValue = evalInputValue.replaceAll(/\s+and\s+/g, " && ").replaceAll(/\s+or\s+/g, " || ");
             evalInputValue = evalInputValue.replaceAll(/\s+And\s+/g, " && ").replaceAll(/\s+Or\s+/g, " || ");
@@ -911,12 +893,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
+
             if (evalInputValue.includes('getMonth')) {
+
                 // Extract the value after `getMonth()` with any comparison operator using regex
                 const monthValueMatch = evalInputValue.match(/getMonth\(\)\s*(===|!==|>=|<=|>|<)\s*(\d+)/);
 
                 // Check if a valid match was found
                 if (monthValueMatch) {
+
                     const operator = monthValueMatch[1]; // Capture the operator (e.g., ===, !==, >=, etc.)
                     const monthValue = parseInt(monthValueMatch[2], 10); // Convert extracted value to a number
 
@@ -933,6 +918,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
+
             if (evalInputValue.includes('getDay')) {
                 // Extract the value after `getDay()` with any comparison operator using case-insensitive regex
                 const dayValueMatch = evalInputValue.match(/getDay\(\)\s*(===|!==|>=|<=|>|<)\s*"(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)"/i);
@@ -1089,11 +1075,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
-            const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+            // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
+            const variableRegex = /^\w+\.\w+\.[^\.]+$/;
             const variableNames = payloadString.match(variableRegex) || [];
 
             // Validate if all variable names exist in secDetailsForSearching
-            const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+            // const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
+            //this function is for considering the special char as a valid expression
+            const invalidVariables = variableNames.filter(variable => {
+                // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
+                const sanitizedVariable = variable.replace(/[^\w.]/g, ''); // Remove special characters except dots
+                return !secDetailsForSearching.some(item => {
+                    const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
+                    return sanitizedItem === sanitizedVariable;
+                });
+            });
 
             if (invalidVariables.length > 0) {
                 handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
@@ -1237,10 +1233,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const errors = [];
         // Define the list of methods that don't require an operator
         const typeMethods = ["includes()"];   // Update the regex to match valid expressions
-
-        // const validExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)$/;
-        // const validExpressionRegex = /^\((?:[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*(AND|OR)?\s*)+\)$/i;
-        const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?)*$/i;
+        // const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?)*$/i;
+        const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?)*$/i;
 
         // const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\) === "\d{2}\/\d{2}\/\d{4}"$/;
         const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\)\s*(==|!=|===|!==|<|>|<=|>=)\s*"\d{2}\/\d{2}\/\d{4}"$/;
@@ -1295,7 +1289,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             // Check if the part matches the valid expression pattern
             else if (!validExpressionRegex.test(part) && !addDaysValidator.test(part)) {
-                errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+                // errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+                errors.push(`Error in expression: The Expression format is incorrect.`);
+
             }
             // If the expression is correct, log that it's valid
             else {
@@ -1387,6 +1383,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return false;
         }
     };
+
     const getComplianceLogic = (condition) => {
 
         // to get the value expression
@@ -1543,18 +1540,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 //    debugger
-                console.log(conditions, 'conditions')
                 let condition_logic = getFinalComplianceLogic(conditions)
-                console.log(condition_logic, 'jnacasdjkas')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                        .replaceAll('?', 'then') // Replace ? with then
+                        .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
                         .replaceAll('&&', 'and') // Replace && with and
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
                 }
-                console.log(condition_logic, 'rrrrrrrrrrrr')
                 if (condition_logic.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic.split(':');
@@ -1666,6 +1660,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         }
     }, [selectedQuestionId])
+
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>

@@ -13,6 +13,7 @@ import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
+import LookupDataset from '../../../../../LookupDataset';
 
 function TestFieldSetting({
   handleInputChange,
@@ -31,6 +32,8 @@ function TestFieldSetting({
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [optionData, setOptionData] = useState([]);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
 
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -163,7 +166,7 @@ function TestFieldSetting({
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
-
+  
   return (
     <>
       <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -188,59 +191,59 @@ function TestFieldSetting({
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
             <div className='flex items-center justify-between w-full'>
               <div className='relative w-full'>
-                  <input
-                      type="text"
-                      id='Label'
-                      data-testid="default-value-input"
-                      disabled={formStatus !== 'Draft'}
-                      className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                      value={
-                          fieldSettingParameters?.default_conditional_logic
-                              ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
-                              : ''
-                      } // Prefill the input with `defaultString` if it exists, otherwise empty string
-                      onChange={(e) =>
-                          dispatch(
-                              setNewComponent({
-                                  id: 'default_conditional_logic',
-                                  value: e.target.value,
-                                  questionId: selectedQuestionId,
-                              })
-                          )
-                      }
-                      placeholder='Populates the content'
-                  />
-                  <img
-                      src="/Images/setting.svg"
-                      alt="setting"
-                      data-testid="default-value"
-                      onClick={() => {
-                          setIsDefaultLogic(true);
-                          setConditionalLogic(false);
-                      }}
-                      className='absolute top-5 right-3 cursor-pointer'
-                  />
+                <input
+                  type="text"
+                  id='Label'
+                  data-testid="default-value-input"
+                  disabled={formStatus !== 'Draft'}
+                  className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                  value={
+                    fieldSettingParameters?.default_conditional_logic
+                      ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                      : ''
+                  } // Prefill the input with `defaultString` if it exists, otherwise empty string
+                  onChange={(e) =>
+                    dispatch(
+                      setNewComponent({
+                        id: 'default_conditional_logic',
+                        value: e.target.value,
+                        questionId: selectedQuestionId,
+                      })
+                    )
+                  }
+                  placeholder='Populates the content'
+                />
+                <img
+                  src="/Images/setting.svg"
+                  alt="setting"
+                  data-testid="default-value"
+                  onClick={() => {
+                    setIsDefaultLogic(true);
+                    setConditionalLogic(false);
+                  }}
+                  className='absolute top-5 right-3 cursor-pointer'
+                />
               </div>
-              
+
               {/* Conditionally render the delete icon only if there's a default condition */}
               {fieldSettingParameters?.default_conditional_logic && (
-                  <img
-                      src="/Images/trash-black.svg"
-                      alt="delete"
-                      data-testid="delete-default-value"
-                      className='w-7 h-7 cursor-pointer ml-3 mt-2'
-                      onClick={() => {
-                          dispatch(
-                              setNewComponent({
-                                  id: 'default_conditional_logic',
-                                  value: '',
-                                  questionId: selectedQuestionId,
-                              })
-                          );
-                      }}
-                  />
+                <img
+                  src="/Images/trash-black.svg"
+                  alt="delete"
+                  data-testid="delete-default-value"
+                  className='w-7 h-7 cursor-pointer ml-3 mt-2'
+                  onClick={() => {
+                    dispatch(
+                      setNewComponent({
+                        id: 'default_conditional_logic',
+                        value: '',
+                        questionId: selectedQuestionId,
+                      })
+                    );
+                  }}
+                />
               )}
-          </div>
+            </div>
           </div>
           <div className='mt-7'>
             <p className='font-semibold text-base text-[#2B333B]'>Type</p>
@@ -316,7 +319,7 @@ function TestFieldSetting({
                       textFieldLookup
                     />
                   </div>
-                  <button onClick={formStatus === 'Draft' ? () => navigate('/lookup-dataset', { state: { create: true } }) : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
+                  <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}
@@ -426,14 +429,14 @@ function TestFieldSetting({
             <InputField
               autoComplete='off'
               label='Admin Field Notes'
-              id='note'
+              id='admin_field_notes'
               type='text'
-              value={fieldSettingParameters?.note}
+              value={fieldSettingParameters?.admin_field_notes}
               className='w-full mt-2.5'
               labelStyle='font-semibold text-base text-[#2B333B]'
               placeholder='Notes'
               testId='Notes'
-              htmlFor='note'
+              htmlFor='admin_field_notes'
               formStatus={formStatus}
               maxLength={formStatus === 'Draft' ? 500 : 0}
               handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} />
@@ -468,6 +471,8 @@ function TestFieldSetting({
           </div>
         </div>
       </div>
+      <LookupDataset isQuestionaryPage showCreateModal={showCreateModal} setShowCreateModal={setShowCreateModal} />
+
     </>
   )
 }

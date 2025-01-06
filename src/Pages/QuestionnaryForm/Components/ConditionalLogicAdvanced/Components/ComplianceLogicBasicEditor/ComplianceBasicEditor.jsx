@@ -252,7 +252,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         setSubmitSelected(false);
         const totalConditions = conditions.reduce((acc, curr) => acc + curr.conditions.length, 0);
         const totalElseIfConditions = conditions[0]?.elseIfBlocks?.reduce((acc, curr) => acc + curr.conditions.length, 0);
-        console.log(totalElseIfConditions, 'totalElseIfConditions')
 
         if (type === "delete") {
             setConditions(prevConditions =>
@@ -842,9 +841,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             });
             dropdownHandler('if', index, 'reason');
         }
-
     };
-
 
     //function to handle opening and closing of the dropdown in complinace basic editor
     const dropdownHandler = (type, index, dropdownType) => {
@@ -1053,11 +1050,11 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                 }>
 
                                                     <Image src="add" className="mx-auto w-8 h-8" data-testid="add" />
-                                                    <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
+                                                    <p className='w-fit text-center mx-auto text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                                                 </div>
                                             ) : (
                                                 <div className="cursor-pointer ">
-                                                    <p className="w-full text-center text-sm text-[#2B333B] pb-[10px] font-semibold">OR</p>
+                                                    <p className="w-fit text-center mx-auto text-sm text-[#2B333B] pb-[10px] font-semibold">OR</p>
                                                 </div>
                                             )}
 

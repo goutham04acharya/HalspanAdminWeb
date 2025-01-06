@@ -21,6 +21,7 @@ function AdvancedEditor({
     setSelectedType
 
 }) {
+
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -57,19 +58,28 @@ function AdvancedEditor({
         }
     };
 
-
     const handleAddQuestion = (suggestion, sections) => {
-        let allSections = sections
-        const getVariableType = a => a.constructor.name.toLowerCase();
-        let valueType = getVariableType(eval(`sections.${suggestion}`))
-        setSelectedType(valueType);
 
+        // Split the suggestion string into keys for nested access
+        const keys = suggestion.split('.'); // Example: "Section_1.Page_1.Question_1?" -> ["Section_1", "Page_1", "Question_1?"]
+
+        // Use reduce to dynamically access the nested property
+        const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
+
+        // Get the type of the value
+        const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
+        const valueType = getVariableType(propertyValue);
+
+        // Set the selected type and perform further actions
+        setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
         // After selecting a suggestion, show suggestions list again and hide error
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
-    }
+    };
+
+
 
     const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
 

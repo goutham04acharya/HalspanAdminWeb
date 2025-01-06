@@ -36,6 +36,7 @@ function NumberFieldSetting({
         }
     }, [fieldSettingParameters?.type, fieldSettingParameters?.source, dispatch, selectedQuestionId]);
 
+
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -262,7 +263,6 @@ function NumberFieldSetting({
                                 maxLength={10}
                                 handleChange={(e) => handleInputChange(e)} />
                             <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
-                            {console.log(fieldSettingParameters?.max, 'max')}
                             <InputField
                                 autoComplete='off'
                                 label=''
@@ -366,15 +366,15 @@ function NumberFieldSetting({
                         <InputField
                             autoComplete='off'
                             label='Admin Field Notes'
-                            id='note'
+                            id='admin_field_notes'
                             type='text'
                             formStatus={formStatus}
-                            value={fieldSettingParameters?.note || ''}
+                            value={fieldSettingParameters?.admin_field_notes || ''}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
-                            htmlFor='note'
+                            htmlFor='admin_field_notes'
                             maxLength={500}
                             handleChange={handleInputChange}
                             handleBlur={handleBlur}

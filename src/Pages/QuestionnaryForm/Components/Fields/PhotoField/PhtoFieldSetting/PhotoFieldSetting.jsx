@@ -169,15 +169,15 @@ function PhotoFieldSetting({
                             <InputField
                                 autoComplete='off'
                                 label='Admin Field Notes'
-                                id='note'
+                                id='admin_field_notes'
                                 type='text'
-                                value={fieldSettingParameters?.note}
+                                value={fieldSettingParameters?.admin_field_notes}
                                 className='w-full mt-2.5'
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
                                 testId='Notes'
                                 formStatus={formStatus}
-                                htmlFor='note'
+                                htmlFor='admin_field_notes'
                                 maxLength={formStatus === 'Draft' ? 500 : 0}
                                 handleChange={formStatus === 'Draft' ? handleInputChange : null}
                                 handleBlur={formStatus === 'Draft' ? handleBlur : null}
