@@ -15,7 +15,7 @@ Then('I should see the advanced editor for date\\/time field', async function ()
 When('I enter the correct conditional logic for date\\/time field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.setDate(20) === "20/11/2024"');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Date_or_time.setDate(20) === "20/11/2024" )');
 });
 
 When('I select the question from the suggestions for date\\/time field', async function () {
@@ -24,7 +24,7 @@ When('I select the question from the suggestions for date\\/time field', async f
     let i = 0;
 
     // eslint-disable-next-line max-len
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.setDate(20) AND ', Key.RETURN);
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Date_or_time.setDate(20) AND ', Key.RETURN);
 
     while (bool) {
         let suggestionElement = await driver.wait(until.elementLocated(By.css(`[data-testid="suggestion-${i}"]`)), 10000);
@@ -65,7 +65,7 @@ When('I select the question from the suggestions for date\\/time field', async f
         // }
         i++;
     }
-
+    console.log('All the conditions are verified.')
     await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0"]`)), 10000).click();
 
     const element = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
