@@ -21,7 +21,7 @@ function AdvancedEditor({
     setSelectedType
 
 }) {
-
+    console.log(inputValue, 'inputValue')
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);

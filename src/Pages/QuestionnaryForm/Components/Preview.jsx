@@ -734,14 +734,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        const commonProps = {
-            preview: true,
-            setValidationErrors,
-            validationErrors,
-            sections: sections[currentSection],
-            setConditionalValues,
-            conditionalValues,
-        };
 
         switch (question?.component_type) {
             case 'textboxfield':

@@ -200,6 +200,7 @@ const ChoiceBoxField = ({
                         validationError={validationErrors?.preview_choiceboxfield?.[question.question_id]}
                         type={question?.type}
                         dropdownRef={dropdownRef}
+                        readonly={question?.options?.read_only}
                     />}
                 </div>
             )}
