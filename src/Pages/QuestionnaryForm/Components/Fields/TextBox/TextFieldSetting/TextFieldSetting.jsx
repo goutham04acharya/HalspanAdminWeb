@@ -191,7 +191,6 @@ function TestFieldSetting({
           // Remove the matched string
           const newValue =
             value.slice(0, start) + value.slice(end);
-
           dispatch(setNewComponent({id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
           return;
         }
