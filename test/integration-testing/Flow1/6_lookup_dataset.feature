@@ -117,14 +117,11 @@ Feature: Halspan - Admin- Lookup data set
         Given I am on the lookup dataset listing screen
         Then I should see the table header containing '["ID", "NAME", "ACTION"]'
         When I search recently created lookup dataset by bddtest
-        # When I click on the view dataset
-        # When I click on cancel button
         When I click on the view dataset
         When I click on close button
         When I click on the view dataset
         Then I should see a popup window to view lookup dataset
         When I edit the lookup data set name
-        # When I edit the values in lookup dataset
         When I delete the values in lookup dataset
         When I add the values to lookup dataset
         When I click on update button
