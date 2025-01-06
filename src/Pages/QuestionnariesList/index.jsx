@@ -40,6 +40,7 @@ function Questionnaries() {
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState('')
   const [cloneLoading, setCloneLoading] = useState(false)
   const [options, setOptions] = useState([])
+  const [cloneDisable, setCloneDisable] = useState(false)
 
   const handleSelect = (option) => {
   };
@@ -96,6 +97,7 @@ function Questionnaries() {
     }
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
+      console.log(response, 'sfsrse')
       const newItems = response?.data?.data?.items || [];
       setQueList(prevItems => [...prevItems, ...newItems]);
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
@@ -127,10 +129,12 @@ function Questionnaries() {
   const handleVersionList = async (id) => {
     try {
       setSelectedVersion('')
+      setCloneDisable(true)
       const response = await getAPI(`questionnaires/versions/${id}`)
       setVersionList(response?.data)
       setSelectedQuestionnaireId(id)
       setCloneModal(true)
+      setCloneDisable(false)
     } catch (error) {
       console.log(error)
     }
@@ -237,6 +241,7 @@ function Questionnaries() {
                   lastElementRef={lastElementRef}
                   setCloneModal={setCloneModal}
                   handleVersionList={handleVersionList}
+                  cloneDisable={cloneDisable}
                 />
               </div>
             )
