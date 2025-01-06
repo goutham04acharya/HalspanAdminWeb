@@ -1535,12 +1535,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
-        else if(isDefaultLogic){
+        else if(isDefaultLogic && !complianceState){
             console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
         } else {
             try {
                 //    debugger
                 let condition_logic = getFinalComplianceLogic(conditions)
+                console.log(conditions, 'conditionsconditions')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
