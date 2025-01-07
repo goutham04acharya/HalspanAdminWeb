@@ -168,16 +168,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const questionDetailsArray = [];
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
-            const sectionName = section.section_name.replace(/\s+/g, '_');
+            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
 
             // Access pages within each section
             section.pages?.forEach((page) => {
-                const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
+                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
                     if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
-                        const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                        const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
                         questionDetailsArray.push({
                             'question_type': question?.component_type,
@@ -201,18 +201,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // Access the sections from the data object
         allSectionDetails?.data?.sections?.forEach((section) => {
-            const sectionName = section.section_name.replace(/\s+/g, '_');
+            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
             // sectionDetailsArray.push(sectionName); // Add the section name
 
             // Access pages within each section
             section.pages?.forEach((page) => {
-                const pageName = `${sectionName}.${page.page_name.replace(/\s+/g, '_')}`;
+                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
                 // sectionDetailsArray.push(pageName); // Add section.page
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
                     const questionId = question?.question_id;
-                    const questionName = `${pageName}.${question.question_name.replace(/\s+/g, '_')}`;
+                    const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
                     if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         sectionDetailsArray.push(questionName);
                     } else {
@@ -338,7 +338,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } else if (selectedFieldType === 'dateTimefield') {
                 // Find the question with the matching ID
                 const matchedQuestion = datetimefieldQuestions.find((question) =>
-                    questionMatches?.some((match) => match?.split('.')[2]?.replace('_', ' ') === question.question_name)
+                    questionMatches?.some((match) => match?.split('.')[2]?.replaceAll('_', ' ') === question.question_name)
                 );
                 // Check the type and set suggestions accordingly
                 if (matchedQuestion) {
@@ -499,9 +499,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const [sectionPart, pagePart, questionPart] = path.split('.');
 
         // Step 2: Replace underscores with spaces to match the actual names
-        const sectionName = sectionPart.replace(/_/g, ' ');
-        const pageName = pagePart.replace(/_/g, ' ');
-        const questionName = questionPart.replace(/_/g, ' ');
+        const sectionName = sectionPart.replaceAll(/_/g, ' ');
+        const pageName = pagePart.replaceAll(/_/g, ' ');
+        const questionName = questionPart.replaceAll(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.sections.find(section => section.section_name === sectionName);
@@ -620,7 +620,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     let [, negate, question_name, condition_logic, value] = matches;
                     // If the negate flag is present, adjust the condition logic
                     if (question_name.includes('.length')) {
-                        question_name = question_name.replace('.length', '');
+                        question_name = question_name.replaceAll('.length', '');
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.data)
 
@@ -818,8 +818,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Transform only non-question parts
                     if (!questionRegex.test(part)) {
                         return part
-                            .replace(/\?/g, ' then ') // Replace "?" with "then"
-                            .replace(/\s:\s/g, ' else ') // Replace ":" with "else"
+                            .replaceAll(/\?/g, ' then ') // Replace "?" with "then"
+                            .replaceAll(/\s:\s/g, ' else ') // Replace ":" with "else"
                     }
                     return part; // Leave question names unchanged
                 })
@@ -870,7 +870,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 'new Date(new Date($1).setDate(new Date($1).getDate() - $2)).toLocaleDateString("en-GB")'
             );
 
-            evalInputValue = evalInputValue.replace(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
+            evalInputValue = evalInputValue.replaceAll(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
                 .replaceAll('Today()', 'new Date()')
                 .replaceAll('if', '')
                 .replaceAll('if', ' ')
@@ -1084,7 +1084,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             //this function is for considering the special char as a valid expression
             const invalidVariables = variableNames.filter(variable => {
                 // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
-                const sanitizedVariable = variable.replace(/[^\w.]/g, ''); // Remove special characters except dots
+                const sanitizedVariable = variable.replaceAll(/[^\w.]/g, ''); // Remove special characters except dots
                 return !secDetailsForSearching.some(item => {
                     const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
                     return sanitizedItem === sanitizedVariable;
@@ -1247,14 +1247,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
         parts.forEach((part, index) => {
-            part = part.replace(/^\s+|\s+$/g, '');
+            part = part.replaceAll(/^\s+|\s+$/g, '');
 
             // Check for incomplete expressions
             part = trimParentheses(part)
 
             //trimming the conditions to avoid space issue
             part = part.trim();
-            const displayPart = part.replace(/sections\./g, '');
+            const displayPart = part.replaceAll(/sections\./g, '');
 
             // Check if the expression contains any method from the typeMethods list
             const containsTypeMethod = typeMethods.some(method => part.includes(method));
@@ -1277,7 +1277,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             else if (selectedType === 'date' && (expression.includes('setDate'))) {
                 const dateMatch = part.match(/===\s*(.*)$/);  // Capture the value after '==='
                 if (dateMatch) {
-                    const value = dateMatch[1].trim().replace(/"/g, ''); // Remove quotes
+                    const value = dateMatch[1].trim().replaceAll(/"/g, ''); // Remove quotes
 
                     // Validate date value (either "Today" or a valid date format)
                     if (value !== 'Today' && (expression.includes('setDate')) && !validDateRegex.test(value)) {
