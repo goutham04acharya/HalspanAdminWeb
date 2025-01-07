@@ -28,6 +28,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [replaceCancel, setReplaceCancel] = useState('false');
+    
     const initialState = {
         name: '',
         choices: []
@@ -111,7 +112,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
-        setShowCreateModal(false);
+        if(showCreateModal !== undefined){
+            setShowCreateModal(false);
+        }
         setActiveInputs('')
         setTimeout(() => {
             setErrors(initialErrorState);
@@ -258,7 +261,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         }
         // setIsImportLoading(true);
         setIsCreateModalOpen(false);
-        setShowCreateModal(false);
+        if(showCreateModal !== undefined){
+            setShowCreateModal(false);
+        }
         Papa.parse(file, {
             header: false,
             complete: (results) => {
