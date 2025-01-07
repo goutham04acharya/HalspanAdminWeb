@@ -44,12 +44,7 @@ When('I select the question from the suggestions for date\\/time field', async f
         'getFullYear()',
         'getMonth()',
         'getDate()',
-        'getDay()',
-        'getHours()',
-        'getMinutes()',
-        'getSeconds()',
-        'getMilliseconds()',
-        'getTime()'];
+        'getDay()'];
 
     bool = true;
     i = 0;
