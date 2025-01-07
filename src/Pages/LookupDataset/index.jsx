@@ -169,6 +169,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                 choicesArray = [];
             }
         } else {
+            setIsCreateLoading(true)
             // Handle create case with comma-separated string
             choicesArray = data.choices.split(',').map(choice => ({ value: choice.trim() }));
         }
@@ -260,7 +261,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
             return;
         }
         // setIsImportLoading(true);
-        setIsCreateModalOpen(false);
+        // setIsCreateModalOpen(false);
         if(showCreateModal !== undefined){
             setShowCreateModal(false);
         }
