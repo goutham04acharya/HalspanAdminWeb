@@ -28,6 +28,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [replaceCancel, setReplaceCancel] = useState('false');
+    
     const initialState = {
         name: '',
         choices: []
@@ -111,7 +112,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
 
     const handleClose = () => {
         setIsCreateModalOpen(false);
-        setShowCreateModal(false);
+        if(showCreateModal !== undefined){
+            setShowCreateModal(false);
+        }
         setActiveInputs('')
         setTimeout(() => {
             setErrors(initialErrorState);
@@ -166,6 +169,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                 choicesArray = [];
             }
         } else {
+            setIsCreateLoading(true)
             // Handle create case with comma-separated string
             choicesArray = data.choices.split(',').map(choice => ({ value: choice.trim() }));
         }
@@ -257,8 +261,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
             return;
         }
         // setIsImportLoading(true);
-        setIsCreateModalOpen(false);
-        setShowCreateModal(false);
+        // setIsCreateModalOpen(false);
+        if(showCreateModal !== undefined){
+            setShowCreateModal(false);
+        }
         Papa.parse(file, {
             header: false,
             complete: (results) => {
@@ -423,28 +429,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                         isLoading={isDeleteLoading}
                     />
                 </>}
-            {/* {showlookupReplaceModal && (
-                <ConfirmationModal
-                    text='Replace Lookup Dataset'
-                    subText='You are about to import new data into the lookup dataset. This action will replace the existing choices with the new ones.'
-                    button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    Button1text='Confirm'
-                    Button2text='Cancel'
-                    src='replace'
-                    testIDBtn1='confirm-delete'
-                    testIDBtn2='cancel-delete'
-                    setReplaceCancel={setReplaceCancel}
-                    isOpen={showlookupReplaceModal}
-                    handleButton1={handleImport}
-                    handleButton2={() => {
-                        setShowLookupReplaceModal(false)
-                    }}
-                    isOpenFileUpload={true}
-                    isImportLoading={isImportLoading}
-                    setModalOpen={setShowLookupReplaceModal}
-                    showLabel
-                />
-            )} */}
             <CreateModal
                 isModalOpen={isCreateModalOpen}
                 handleClose={handleClose}
