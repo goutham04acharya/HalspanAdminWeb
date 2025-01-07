@@ -613,7 +613,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (dateCondition) return dateCondition;
 
                 // Regex to match logical conditions
-                const matches = condition.match(/(!?)\s*([\w.]+)\s*(\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
@@ -1362,6 +1363,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             for (let i = 0; i < conditions.length; i++) {
                 for (let j = 0; j < conditions[i].conditions.length; j++) {
                     const condition = conditions[i].conditions[j];
+
                     if (showInputValue(condition.condition_logic)) {
 
                         if (condition.question_name === '' || condition.condition_logic === '') {
@@ -1505,7 +1507,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (conditions[0]?.conditions === undefined) {
             return
         }
-        finalString += conditions[0].conditions[0].question_name !== '' ? 'if (' + getComplianceLogic(conditions[0].conditions) + ')' : ''
+        finalString += conditions[0]?.conditions[0]?.question_name !== '' ? 'if (' + getComplianceLogic(conditions[0]?.conditions) + ')' : ''
         if (conditions[0].thenAction) {
             finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
         }
@@ -1537,9 +1539,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // if (conditions[0]?.conditions[0]?.value !== '') {
             try {
-                //    debugger
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic !== '') {
+                if (condition_logic!== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                         .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
@@ -1559,9 +1560,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             } catch (error) {
                 console.error('Error while converting', error);
             }
-            // }
-
-
         }
     }, [conditions])
 
@@ -1709,7 +1707,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             </div>) : (!isDefaultLogic && !complianceState) ? (
                                 <BasicEditor
                                     secDetailsForSearching={filterQuestions()}
-                                    questions={allSectionDetails.data}
+                                    questions={allSectionDetails?.data}
                                     sections={sections}
                                     setShowMethodSuggestions={setShowMethodSuggestions}
                                     isThreedotLoaderBlack={isThreedotLoaderBlack}

@@ -12,8 +12,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const dropdownRef = useRef();
     const dropdownRef2 = useRef();
 
-
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
+
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -145,7 +145,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         setSubmitSelected(false);
 
         setConditions(prevConditions => {
-            // Create a deep copy of the conditions array
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
             // Access the specific condition using mainIndex and subIndex
@@ -178,6 +177,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             });
             updateDropdown(type, mainIndex, subIndex)
             return; // Exit the function if type is 'conditional_dropdown'
+
         } else if (type === 'value') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
