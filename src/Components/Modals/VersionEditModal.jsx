@@ -5,7 +5,7 @@ import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import Button from '../Button/button.jsx';
 
-function VersionEditModal({ text, subText, setVersion, loading, setLoading,  version, setSelectedVersion, handleDropdownClick, handleOptionClick, selectedVersion, dropdownsOpen, setDropdownsOpen, Button1text, isOpen, versionListEdit, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, versionNumber, versionList, testIDBtn1, edit, duplicate, setDuplicate, setEdit, testIDBtn2, isImportLoading, showLabel,clone, setCloneModal }) {
+function VersionEditModal({ text, subText, setVersion, loading, setLoading,  version, setSelectedVersion, handleDropdownClick, handleOptionClick, selectedVersion, dropdownsOpen, setDropdownsOpen, Button1text, isOpen, versionListEdit, Button2text, src, className, setModalOpen, handleButton1, handleButton2, button1Style, versionNumber, versionList, testIDBtn1, edit, duplicate, setDuplicate, setEdit, testIDBtn2, isImportLoading, showLabel,clone, setCloneModal, buttonDisable }) {
 
     const modalRef = useRef();
 
@@ -79,7 +79,7 @@ function VersionEditModal({ text, subText, setVersion, loading, setLoading,  ver
                 </>
                 }
                 {!version && <div className='mt-10 flex items-center justify-between'>
-                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={() => handleButton1()}>
+                    {!showLabel ? <button type='button' data-testid={testIDBtn1} className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded`} onClick={!buttonDisable ? () => handleButton1() : null}>
                         {!loading ? Button1text : <BeatLoader color="#fff" size={'10px'} /> }
                     </button> :
                         <>

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 import DatePicker from 'react-date-picker';
+import { setFieldEditable } from '../../defaultContentPreviewSlice';
 
 function DateTimeField({
     label,
@@ -180,7 +181,7 @@ function DateTimeField({
                     }
                 }
             }));
-            
+
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
 
             setValue((prev) => ({
@@ -195,6 +196,11 @@ function DateTimeField({
                     [question?.question_id]: '' // Only clear the error message for the current question  
                 }
             }));
+            dispatch(setFieldEditable({
+                fieldId: question?.question_id,
+                isEditable: true
+            }
+            ))
         }
 
     }

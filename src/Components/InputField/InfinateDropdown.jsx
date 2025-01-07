@@ -30,12 +30,13 @@ function InfinateDropdown({
     textFieldLookup,
     assetLocation,
     failGrade,
-    mainDivStyle
+    mainDivStyle,
+    readonly
 }) {
 
     const [searchTerm, setSearchTerm] = useState(''); // Initialize searchTerm
     const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
-
+    console.log(readonly, 'readonly')
     // Update filteredOptions whenever options or searchTerm changes
     useEffect(() => {
         if (options) {
@@ -61,7 +62,7 @@ function InfinateDropdown({
                     placeholder={placeholder}
                     onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
                     data-testid={testID}
-                    disabled={formStatus !== 'Draft' && !choiceBox && !preview && !textFieldLookup && !assetLocation}
+                    disabled={!preview ? (formStatus !== 'Draft' && !choiceBox && !preview && !textFieldLookup && !assetLocation) : readonly}
                     value={preview ? selectedOption : (selectedOption ? selectedOption.label : '')}
                     className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly

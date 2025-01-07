@@ -734,14 +734,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        const commonProps = {
-            preview: true,
-            setValidationErrors,
-            validationErrors,
-            sections: sections[currentSection],
-            setConditionalValues,
-            conditionalValues,
-        };
 
         switch (question?.component_type) {
             case 'textboxfield':
@@ -806,7 +798,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         window[key] = value;
     });
 
-    useEffect(() => {
+    useEffect(() => { 
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
@@ -824,18 +816,20 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         const [day, month, year] = dateStr.split("/");
                                         return `${year}-${month}-${day}`;
                                     }
+                                    console.log(splitDate(result), 'result')
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
-                                } else if (component_type === "numberfield") {
+                                } else{
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                 }
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
-                                    const result = eval(default_conditional_logic);
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
                                     }))
                                 } else {
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
@@ -950,9 +944,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         </div>
                     ) : (
                         <div>
-                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-3 mb-3">
-                                {sections[currentSection]?.section_name}
-                            </p>
+                            <div className="text-center text-2xl text-[#2B333B] mx-auto px-5 overflow-hidden text-ellipsis line-clamp-3 break-words font-[500] mt-3 mb-3">
+                                <p className=''>{sections[currentSection]?.section_name}</p>
+                            </div>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                                 <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${(((previewNavigation.current_page - 1) / allPages.length) * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>

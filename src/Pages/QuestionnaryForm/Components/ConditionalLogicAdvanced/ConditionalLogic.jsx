@@ -769,6 +769,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [complianceState, questionnaire_id, version_number, complianceLogicId]);
 
     useEffect(() => {
+        console.log(selectedQuestionId, 'selectedQuestionId')
         // Assuming `allSectionDetails` contains the fetched data and 
         // you have a way to map `selectedQuestionId` to the relevant question
         const findSelectedQuestion = () => {
@@ -786,6 +787,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
             } else if (isDefaultLogic) {
+                console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'fieldSettingParams[selectedQuestionId')
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
             } else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
@@ -826,7 +828,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             setInputValue(conditionalLogic);
         };
-        if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId) {
+        if (selectedQuestionId || sectionConditionLogicId || pageConditionLogicId || isDefaultLogic) {
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
     }, [selectedQuestionId]);
@@ -1530,14 +1532,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     useEffect(() => {
-        if (!complianceState) {
+        if (!complianceState && !isDefaultLogic) {
             let condition_logic = buildConditionExpression(conditions)
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
-
+        }
+        else if(isDefaultLogic && !complianceState){
+            console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
         } else {
-
-            // if (conditions[0]?.conditions[0]?.value !== '') {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                 if (condition_logic!== '') {
