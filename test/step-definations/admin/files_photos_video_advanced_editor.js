@@ -8,7 +8,7 @@ const Key = webdriver.Key
 When('I enter the correct conditional logic for files or photos or videos', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     // eslint-disable-next-line 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Files_label_name > 0');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Files_label_name > 0 )');
 });
 
 Then('I should see the advanced editor for files or photos or videos', async function () {
