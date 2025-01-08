@@ -79,6 +79,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
             <label className="custom-file-label custom-file-input-wrapper w-fit h-auto mt-1 flex items-center bg-[#DFE0E2] border border-[#AEB3B7] p-0 rounded-md">
                 <input
                     type="file"
+                    data-testid="add-video"
                     multiple
                     onChange={handleFileChange}
                     accept="video/*"
@@ -101,7 +102,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                                         : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                 </span>
                                 <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveFile(index)}>
-                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" />
+                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" data-testid={`remove-video-${index}`}/>
                                 </button>
                             </div>
                         </li>
