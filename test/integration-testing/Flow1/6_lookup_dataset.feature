@@ -84,6 +84,16 @@ Feature: Halspan - Admin- Lookup data set
         When I click the confirm button
         Then I should read success message for delete user
 
+    Scenario: Admin tries to create the lookup dataset with empty fields
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        When I click the create button
+        Then I should read a message stating that "This field is mandatory"
+        When I enter the name of the lookup dataset
+        When I enter the invalid choices in csv format 
+        When I click the create button
+        Then I should read a message stating that "All values are mandatory"
+
     Scenario: Admin creates the lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button
@@ -107,14 +117,11 @@ Feature: Halspan - Admin- Lookup data set
         Given I am on the lookup dataset listing screen
         Then I should see the table header containing '["ID", "NAME", "ACTION"]'
         When I search recently created lookup dataset by bddtest
-        # When I click on the view dataset
-        # When I click on cancel button
         When I click on the view dataset
         When I click on close button
         When I click on the view dataset
         Then I should see a popup window to view lookup dataset
         When I edit the lookup data set name
-        # When I edit the values in lookup dataset
         When I delete the values in lookup dataset
         When I add the values to lookup dataset
         When I click on update button
