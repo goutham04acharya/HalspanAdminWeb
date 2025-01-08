@@ -17,10 +17,10 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         const currentFileCount = questionValue?.[question?.question_id]?.length || 0;
         const remainingSlots = max - currentFileCount;
         
-        if (remainingSlots <= 0) {
-            setError(`Maximum ${max} files allowed`);
-            return;
-        }
+        // if (remainingSlots <= 0) {
+        //     setError(`Maximum ${max} files allowed`);
+        //     return;
+        // }
 
         // Take only the first N files that would fit within the max limit
         const filesToProcess = uploadedFiles.slice(0, remainingSlots);
@@ -33,12 +33,16 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                 setError('Invalid file type. Only video files are allowed');
                 hasError = true;
                 break;
+            }else{
+                setError('')
             }
 
             if (file.size > maxSizeInBytes) {
                 setError(`File size exceeds ${fileSize}MB limit`);
                 hasError = true;
                 break;
+            }else{
+                setError('')
             }
 
             validFiles.push(file);
@@ -46,13 +50,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
 
         if (!hasError) {
             const newFiles = [...(questionValue?.[question?.question_id] || []), ...validFiles];
-            
-            if (newFiles.length < min) {
-                setError(`Minimum ${min} files required`);
-            } else {
-                setError('');
-            }
-
             dispatch(setQuestionValue({ 
                 question_id: question?.question_id, 
                 value: newFiles 
@@ -89,6 +86,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                     <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Video ({max})
                 </span>
             </label>
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
             {questionValue?.[question?.question_id] && (
                 <ul>
                     {questionValue?.[question?.question_id].map((file, index) => (
