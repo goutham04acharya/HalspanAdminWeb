@@ -9,7 +9,7 @@ const Keys = webdriver.Key;
 
 When('I enter the conditional logic for textbox field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_textbox_Label_Name.includes("Inspector")');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Sample_textbox_Label_Name.includes("Inspector") )');
 });
 
 When('I enter the text as {string} in textbox for section {int} page {int} question {int}', async function (text, sectionNumber, pageNumber, quesionNumber) {
@@ -44,7 +44,7 @@ Then('I should not see the choice field at section {int} page {int} question {in
 //------------------------------------------ This is not correct needs to be improved ------------------------------------------------
 When('I enter the conditional logic for date\\/time field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Date_or_time.AddDays(5) === "30/11/2024"');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Date_or_time.AddDays(5) === "30/11/2024" )');
 });
 
 When('I enter the date as {string} in date field for section {int} page {int} question {int}', async function (date, sectionNumber, pageNumber, quesionNumber) {
@@ -85,7 +85,7 @@ Then('I should see the advanced editor for choice field', async function () {
 
 When('I enter the conditional logic for choice field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_Choice_Label_Name.includes("PAN")');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Sample_Choice_Label_Name.includes("PAN") )');
 });
 
 When('I select the choice as {string} in choice field for section {int} page {int} question {int}', async function (choice, sectionNumber, pageNumber, quesionNumber) {
@@ -129,7 +129,7 @@ Then('I should not see the photo field at section {int} page {int} question {int
 
 When('I enter the conditional logic for number field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Sample_Number_Label_Name <= 10');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Sample_Number_Label_Name <= 10 )');
 });
 
 When('I enter the number as {string} in number field for section {int} page {int} question {int}', async function (number, sectionNumber, pageNumber, quesionNumber) {
@@ -142,7 +142,7 @@ When('I enter the number as {string} in number field for section {int} page {int
 
 When('I enter the conditional logic for photos field preview', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('Section_1.Page_1.Photo_label_name.() >= 3');
+    await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys('if ( Section_1.Page_1.Photo_label_name.() >= 3 )');
 });
 
 When('I remove the uploaded image from section {int} page {int} question {int}', async function(sectionNumber, pageNumber, quesionNumber){
