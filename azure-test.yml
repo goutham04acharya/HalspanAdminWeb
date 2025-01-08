@@ -373,8 +373,10 @@ stages:
           condition: always()
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/coverageData/ # Assuming logs are in working directory
           artifact: '1-coverageData'
+          condition: always()
         - publish: $(System.DefaultWorkingDirectory)/reports/ # Assuming logs are in working directory
           artifact: '1-living-documentation'
+          condition: always()
         - task: PublishTestResults@2
           condition: always()
           inputs:
