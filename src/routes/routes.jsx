@@ -20,6 +20,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
    * the token, base64 decoding it, and then parsing it as JSON. The decoded JSON payload is returned
    * as the output of the function.
    */
+
   function decodeJWT(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -73,7 +74,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           <Route path="/questionnaries/version-list/:questionnaire_id" element={<VersionList />} />
         </Route>
         {/* Wildcard route for 404 - MUST BE LAST */}
-        <Route path="*" element={<NotFound />} />
+        <Route path={``} element={<NotFound />} />
       </Routes>
     </>
   );

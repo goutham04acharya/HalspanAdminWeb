@@ -11,7 +11,7 @@ function Login() {
 
   return (
     <div>
-      Redirecting to login...
+      <img src='/halspan-loading.gif' alt='Redirecting to login...' />
     </div>
   );
 }

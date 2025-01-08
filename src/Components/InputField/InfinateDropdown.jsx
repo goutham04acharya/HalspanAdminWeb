@@ -36,7 +36,6 @@ function InfinateDropdown({
 
     const [searchTerm, setSearchTerm] = useState(''); // Initialize searchTerm
     const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
-    console.log(readonly, 'readonly')
     // Update filteredOptions whenever options or searchTerm changes
     useEffect(() => {
         if (options) {

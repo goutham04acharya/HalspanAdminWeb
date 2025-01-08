@@ -98,9 +98,7 @@ function Questionnaries() {
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
       const newItems = response?.data?.data?.items || [];
-      console.log(newItems, 'newItems')
       setQueList(newItems);
-      console.log(QueList, 'queslaifaifeij')
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);

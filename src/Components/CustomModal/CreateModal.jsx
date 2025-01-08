@@ -152,7 +152,6 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                 {!createLookup && <div className={`${getChoiceHeight()} w-full flex flex-wrap overflow-y-auto ${shimmerLoading ? 'scrollHide' : 'scrollBar'}`}>
                     {(Array.isArray(data.choices) ? data.choices : []).map((choice, index) => (
                         <div className={`${getChoiceWidth()}`}>
-                            {/* {console.log(choice, 'choice')} */}
                             <div className='flex flex-col'>
                                 <div key={choice.uuid || index}>
                                 {shimmerLoading ? <Shimmer column={getChoiceShimmerCol()} row={7} width={getChoiceShimmerWidth()} /> : 
