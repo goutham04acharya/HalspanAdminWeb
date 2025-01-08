@@ -13,6 +13,7 @@ import DraggableList from 'react-draggable-list';
 import FixedChoiceDraggable from './FixedChoiceDraggable';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
+import LookupDataset from '../../../../../LookupDataset';
 
 function ChoiceFieldSetting({
     handleInputChange,
@@ -32,6 +33,7 @@ function ChoiceFieldSetting({
     const [loading, setLoading] = useState(true);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
@@ -124,7 +126,8 @@ function ChoiceFieldSetting({
             .replaceAll('', 'if');
     }
     return (
-        <><div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
+        <>
+        <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
             <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
                 <CommonComponents
@@ -253,7 +256,7 @@ function ChoiceFieldSetting({
                                         className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                         testID='lookup-dropdown'
                                         labeltestID='lookup-list'
-                                        selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
+                                        selectedOption={optionData?.find(option => option?.label === fieldSettingParameters?.lookupValue)}
                                         handleRemoveLookup={formStatus === 'Draft' ? handleRemoveLookup : null}
                                         isDropdownOpen={formStatus === 'Draft' ? isLookupOpen : false}
                                         setDropdownOpen={formStatus === 'Draft' ? setIsLookupOpen : null}
@@ -265,7 +268,7 @@ function ChoiceFieldSetting({
                                         formStatus={formStatus}
                                     />
                                 </div>
-                                <button onClick={formStatus === 'Draft' ? () => navigate('/lookup-dataset', { state: { create: true } }) : null} className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ml-4`}>
+                                <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ml-4`}>
                                     <img src="/Images/plus.svg" alt="plus" />
                                 </button>
                             </div>}
@@ -278,14 +281,14 @@ function ChoiceFieldSetting({
                             <InputField
                                 autoComplete='off'
                                 label='Admin Field Notes'
-                                id='note'
+                                id='admin_field_notes'
                                 type='text'
-                                value={fieldSettingParameters?.note}
+                                value={fieldSettingParameters?.admin_field_notes}
                                 className='w-full mt-2.5'
                                 labelStyle='font-semibold text-base text-[#2B333B]'
                                 placeholder='Notes'
                                 testId='Notes'
-                                htmlFor='note'
+                                htmlFor='admin_field_notes'
                                 maxLength={formStatus === 'Draft' ? 500 : 0}
                                 handleChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
                                 handleBlur={handleBlur}
@@ -323,6 +326,7 @@ function ChoiceFieldSetting({
                 </div>
             </div>
         </div>
+        <LookupDataset isQuestionaryPage showCreateModal={showCreateModal} setShowCreateModal={setShowCreateModal} />
         </>
     )
 }

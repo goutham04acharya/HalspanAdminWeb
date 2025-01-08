@@ -23,7 +23,7 @@ body {
   padding: 36px !important;
 }
 .react-responsive-modal-modal:has(.importModalMd) {
-  min-width: 60% !important;
+  min-width: 80% !important;
   border-radius: 10px !important;
   padding: 36px !important;
 }

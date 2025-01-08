@@ -1,12 +1,17 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import InputField from '../../../../../../Components/InputField/InputField'
 import Image from '../../../../../../Components/Image/Image'
 import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
+import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
+import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray }) {
+    const dropdownRef = useRef();
+    const dropdownRef2 = useRef();
+
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
@@ -76,6 +81,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
             return;
         }
+
         if (type === 'AND') {
             // Create a new copy of the conditions array
             setConditions(prevConditions =>
@@ -301,6 +307,44 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             }))
         );
     };
+    // Custom handler function for clicks outside the dropdown
+    const handleOutsideClick = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    const handleOutsideClick2 = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                condition_dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    const handleOutsideClick3 = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                value_dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    // Use the hook with the dropdown ID
+    useOnClickOutsideById('condition_dropdown_inner', handleOutsideClick2);
+    useOnClickOutsideById('dropdown_inner', handleOutsideClick);
+    useOnClickOutsideById('value_inner', handleOutsideClick3);
 
     return (
         <div className='w-full h-customh14'>
@@ -332,6 +376,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     isDropdownOpen={conditions[index]['conditions'][i]['dropdown']}
                                                     mainIndex={index}
                                                     subIndex={i}
+                                                    dropdownRef={dropdownRef}
                                                     setDropdownOpen={updateDropdown}
                                                     options={secDetailsForSearching}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.question_name === ''}
@@ -355,6 +400,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     handleOptionClick={handleSelectDropdown}
                                                     mainIndex={index}
                                                     subIndex={i}
+                                                    dropdownRef={dropdownRef2}
                                                     isDropdownOpen={conditions[index]['conditions'][i]['condition_dropdown']}
                                                     setDropdownOpen={updateDropdown}
                                                     options={getConditions(conditions[index].conditions[i].condition_type)}
@@ -390,6 +436,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                             label=""
                                                             id="value"
                                                             top="20px"
+                                                            dropdownRef={dropdownRef}
                                                             placeholder="Select"
                                                             className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
                                                             testID={`value-dropdown-${index}-${i}`}
@@ -442,7 +489,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit'
                                         // onClick={() =>{conditions?.length !== 1 ? handleAdd("delete", index, i) : ''}}>
                                         onClick={() => {
-                                            if (conditions[0]?.conditions?.length === 1) {
+                                            if (conditions?.length === 1 && conditions[0]?.conditions?.length === 1) {
                                                 handleClearConditionValues(); // Clear values for the single condition
                                             } else {
                                                 handleAdd("delete", index, i); // Handle deletion for other cases
@@ -456,10 +503,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                         ))}
                         {conditions.length - 1 === index ? <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => handleAdd('OR')}>
                             <Image src="add" className="mx-auto w-8 h-8" data-testid="add" />
-                            <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
+                            <p className='w-fit text-center mx-auto text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                         </div> :
                             <div className='cursor-pointer'>
-                                <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
+                                <p className='w-fit  mx-auto text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                             </div>
                         }
 

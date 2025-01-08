@@ -46,6 +46,7 @@ function VersionList() {
         internal_name: '',
         description: '',
     });
+    const [buttonDisable, setButtonDisable] = useState(false)
     const [selectedVersion, setSelectedVersion] = useState('');
     const handleOptionClick = (versionNumber) => {
         setSelectedVersion(versionNumber); // Set the clicked version as the selected version
@@ -76,6 +77,7 @@ function VersionList() {
             (version) => version.version_number === selectedVersion
         );
         setLoading(true)
+        setButtonDisable(true)
         if (selectedVersionObj) {
             try {
                 const payload = {
@@ -105,6 +107,7 @@ function VersionList() {
             setToastError('No version found with the selected version number.');
         }
         setLoading(false)
+        setButtonDisable(false)
     };
 
     const handleEditClick = () => {
@@ -112,6 +115,7 @@ function VersionList() {
             (version) => version.version_number === selectedVersion
         );
         setLoading(true)
+        setButtonDisable(true)
         if (selectedVersionObj) {
             setSelectedStatus(selectedVersionObj); // Set the selected version object to state
             if (selectedVersionObj.status === 'Draft') {
@@ -124,6 +128,7 @@ function VersionList() {
         } else {
         }
         setLoading(false)
+        setButtonDisable(false)
     };
 
     const handleVersionList = async () => {
@@ -133,9 +138,6 @@ function VersionList() {
         setVersionList(response?.data)
         setLoading(false);
     }
-    useEffect(() => {
-        handleVersionList();
-    }, []);
 
     const handleQuestionnariesSetting = async () => {
         setLoading(true);
@@ -223,6 +225,7 @@ function VersionList() {
                 </div>
 
             </div>
+            
             {isCreateModalOpen && <VersionEditModal
                 text={`${version ? 'This question can’t be edited' : duplicate ? 'Select Version' : edit ? 'Edit Questionnaire' : ''}`}
                 subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : edit ? 'Please select the version you want to edit.' : duplicate ? 'Please select the version you want to duplicate.' : ''}`}
@@ -253,6 +256,7 @@ function VersionList() {
                 edit={edit}
                 duplicate={duplicate}
                 questionnaireId={questionnaire_id}
+                buttonDisable={buttonDisable}
             />}
         </>
     )

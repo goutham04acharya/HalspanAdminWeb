@@ -42,7 +42,7 @@ function InputWithDropDown({
     }
 
     return (
-        <div className='cursor-pointer w-full relative' ref={dropdownRef}>
+        <div id={`${id}_outer`} className='cursor-pointer w-full relative' ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>{label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
             <div>
                 <input
@@ -66,7 +66,7 @@ function InputWithDropDown({
                 }
             </div>
             {isDropdownOpen && (
-                <ul className="absolute bg-white border h-fit  overflow-x-auto scrollBar border-[#AEB3B7] mt-1 w-full z-10">
+                <ul id={`${id}_inner`} className="absolute bg-white border h-fit  overflow-x-auto scrollBar border-[#AEB3B7] mt-1 w-full z-10">
                     {options.map((option, index) => (
                         <li key={option}
                             data-testid={`${labeltestID}-${index}`}

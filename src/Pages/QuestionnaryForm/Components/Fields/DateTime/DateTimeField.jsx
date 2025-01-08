@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 import DatePicker from 'react-date-picker';
+import { setFieldEditable } from '../../defaultContentPreviewSlice';
 
 function DateTimeField({
     label,
@@ -148,7 +149,6 @@ function DateTimeField({
             const { hours, minutes, seconds } = splitTime(value);
             const currentDateTime = new Date();
             currentDateTime.setHours(hours, minutes, seconds, 0);
-            console.log(conditionalValues[section_name], 'ddd')
             setConditionalValues((prevValues) => ({
                 ...prevValues,
                 [section_name]: {
@@ -161,20 +161,14 @@ function DateTimeField({
             }))
         } else if (type === 'date') {
             const value = e;
-            console.log(value, 'value') // 24-10-2024
-            console.log(fieldSettingParameters, 'fieldSettingParameters')
-            // console.log(eval(obj.Section_1.Page_1.Question_1 < new Date())) // true
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
             const currentMilliSeconds = new Date().getMilliseconds();
-            console.log(currentMilliSeconds, 'current milliseconds', new Date().getMilliseconds())
             const selectedDate = new Date(value);
             selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
-            // console.log(selectedDate, currentMilliSeconds, 'current date time');
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            // console.log(systemTimeZone, 'system time zone');
 
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
@@ -187,7 +181,7 @@ function DateTimeField({
                     }
                 }
             }));
-            
+
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
 
             setValue((prev) => ({
@@ -202,6 +196,11 @@ function DateTimeField({
                     [question?.question_id]: '' // Only clear the error message for the current question  
                 }
             }));
+            dispatch(setFieldEditable({
+                fieldId: question?.question_id,
+                isEditable: true
+            }
+            ))
         }
 
     }
@@ -236,9 +235,6 @@ function DateTimeField({
                     //     e.preventDefault(); // This is preventing input, make sure it’s intentional
                     // }}
                     />
-
-
-
                 )}
                 {preview && type === 'time' && (
                     <TimePicker
@@ -264,7 +260,7 @@ function DateTimeField({
                             max="9999-12-31"
                             onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
                         />
-                    </div>{console.log(question, 'question')}
+                    </div>
                     <TimePicker
                         onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
                         format={question?.format}
@@ -272,9 +268,6 @@ function DateTimeField({
                         questionValue={questionValue[question?.question_id]?.split(' ')[1]}
                     />
                 </div>}
-
-
-
 
                 {!preview && (
                     <input

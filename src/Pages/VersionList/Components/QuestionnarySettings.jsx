@@ -14,7 +14,7 @@ function QuestionnarySettings({
     editedDetails,
     dataLoading,
 }) {
-
+console.log(editedDetails, 'editedDetails')
     const { PatchAPI } = useApi();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)

@@ -211,3 +211,12 @@ Then('I should read a message stating that the lookup dataset has been updated',
     }
     throw new Error('Failed');
 });
+
+When('I enter the invalid choices in csv format', async function () {
+    await driver.wait(until.elementLocated(By.css('[data-testid="choices"]'))).sendKeys('india, '); 
+});
+
+When('I click the close button for the modal', async function() {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css('[data-testid="close"]'))).click();
+});
