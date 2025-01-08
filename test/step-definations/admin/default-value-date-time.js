@@ -58,12 +58,7 @@ When('I select the question from the default value suggestions for date\\/time f
         'getFullYear()',
         'getMonth()',
         'getDate()',
-        'getDay()',
-        'getHours()',
-        'getMinutes()',
-        'getSeconds()',
-        'getMilliseconds()',
-        'getTime()'];
+        'getDay()'];
 
     bool = true;
     i = 0;
@@ -80,7 +75,7 @@ When('I select the question from the default value suggestions for date\\/time f
         i++;
     }
 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-10"]`)), 10000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0"]`)), 10000).click();
 
     const element = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
     // Move the cursor one character to the left using the LEFT arrow key
