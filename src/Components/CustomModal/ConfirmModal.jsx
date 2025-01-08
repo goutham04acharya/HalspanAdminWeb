@@ -7,7 +7,7 @@ const ConfirmModal = ({ text, subText, Button1text, Button2text, src, className,
   return (
     <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
       <div className='confirmModal w-[476px] mx-auto bg-white rounded-[14px] relative'>
-        <Image src="close" className="absolute -top-[22px] right-0 cursor-pointer" data-testid="cancel" onClick={() => handleClose()} />
+        <Image src="close" className="absolute -top-[22px] right-0 cursor-pointer" onClick={() => handleClose()} testId="close"/>
         <Image src={src} className={`${className} mx-auto`} />
         <p className='text-center text-lg text-[#2B333B] font-semibold mt-5'>{text}</p>
         <p className='font-normal text-base text-[#2B333B] mt-2 text-center'>{subText}</p>

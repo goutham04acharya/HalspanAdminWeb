@@ -12,7 +12,7 @@ const Toast = ({ message, type, setToastmessage, bottom}) => {
     empty dependency array `[]` ensures that this effect runs only once when the component mounts. */
     useEffect(() => {
         let delay
-        if(message.length > 100){
+        if(message?.length > 100){
             delay = 5000
         }
         const timer = setTimeout(() => {

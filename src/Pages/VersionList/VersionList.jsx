@@ -66,7 +66,7 @@ function VersionList() {
     }
     let selectedVersionObj = {};
     const handleDuplicateClick = async () => {
-        
+
         if (!selectedVersion) {
             setToastError('Please select a version to duplicate.');
             return;
@@ -87,18 +87,10 @@ function VersionList() {
                 };
 
                 const response = await PatchAPI('questionnaires/duplicate', payload);
-                if (response.status === 204) {
-                    setToastSuccess('Version duplicated successfully.');
-                    handleClose(); // Close the modal
-
-                    // Fetch the updated version list after duplicating
-                    await handleVersionList();
-                    window.location.reload()
-                    
-                } else {
-                    setToastError('Failed to duplicate the version.');
-                    window.location.reload()
-                }
+                setToastSuccess('Version duplicated successfully.');
+                handleClose(); // Close the modal
+                // Fetch the updated version list after duplicating
+                await handleVersionList();
             } catch (error) {
                 setToastError('An error occurred while duplicating the version.');
                 console.error(error);
@@ -225,7 +217,7 @@ function VersionList() {
                 </div>
 
             </div>
-            
+
             {isCreateModalOpen && <VersionEditModal
                 text={`${version ? 'This question can’t be edited' : duplicate ? 'Select Version' : edit ? 'Edit Questionnaire' : ''}`}
                 subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : edit ? 'Please select the version you want to edit.' : duplicate ? 'Please select the version you want to duplicate.' : ''}`}

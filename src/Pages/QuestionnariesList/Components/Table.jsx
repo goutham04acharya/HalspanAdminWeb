@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Shimmer from '../../../Components/Shimmers/Shimmer';
 import { useNavigate } from 'react-router-dom';
 
-function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionList, cloneDisable }) {
+function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionList, cloneDisable, cloneLoading }) {
     const navigate = useNavigate();
 
     const getStatusStyles = (status) => {
@@ -51,7 +51,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                     <th className='min-w-[300px] text-start py-6 font-medium text-base text-[#2B333B]'>DESCRIPTION</th>
                     <th className='min-w-[100px]  py-6 font-medium text-base text-[#2B333B] text-center sticky right-0 bg-white'>ACTION</th>
                 </thead>
-                {loading
+                {(loading || cloneLoading)
                     ? <Shimmer column={7} row={10} firstIndex />
                     : <tbody className='bg-white'>
                         {QueList && QueList.map((QueInfo, index) => (

@@ -17,10 +17,10 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         const currentFileCount = questionValue?.[question?.question_id]?.length || 0;
         const remainingSlots = max - currentFileCount;
         
-        if (remainingSlots <= 0) {
-            setError(`Maximum ${max} files allowed`);
-            return;
-        }
+        // if (remainingSlots <= 0) {
+        //     setError(`Maximum ${max} files allowed`);
+        //     return;
+        // }
 
         // Take only the first N files that would fit within the max limit
         const filesToProcess = uploadedFiles.slice(0, remainingSlots);
@@ -33,12 +33,16 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                 setError('Invalid file type. Only video files are allowed');
                 hasError = true;
                 break;
+            }else{
+                setError('')
             }
 
             if (file.size > maxSizeInBytes) {
                 setError(`File size exceeds ${fileSize}MB limit`);
                 hasError = true;
                 break;
+            }else{
+                setError('')
             }
 
             validFiles.push(file);
@@ -46,13 +50,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
 
         if (!hasError) {
             const newFiles = [...(questionValue?.[question?.question_id] || []), ...validFiles];
-            
-            if (newFiles.length < min) {
-                setError(`Minimum ${min} files required`);
-            } else {
-                setError('');
-            }
-
             dispatch(setQuestionValue({ 
                 question_id: question?.question_id, 
                 value: newFiles 
@@ -79,6 +76,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
             <label className="custom-file-label custom-file-input-wrapper w-fit h-auto mt-1 flex items-center bg-[#DFE0E2] border border-[#AEB3B7] p-0 rounded-md">
                 <input
                     type="file"
+                    data-testid="add-video"
                     multiple
                     onChange={handleFileChange}
                     accept="video/*"
@@ -89,6 +87,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                     <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Video ({max})
                 </span>
             </label>
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
             {questionValue?.[question?.question_id] && (
                 <ul>
                     {questionValue?.[question?.question_id].map((file, index) => (
@@ -101,7 +100,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                                         : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                 </span>
                                 <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveFile(index)}>
-                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" />
+                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" data-testid={`remove-video-${index}`}/>
                                 </button>
                             </div>
                         </li>
