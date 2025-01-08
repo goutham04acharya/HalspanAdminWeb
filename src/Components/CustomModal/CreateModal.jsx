@@ -8,6 +8,7 @@ import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 
 const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice, activeInputs, setActiveInputs }) => {
+
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
             ...prev,
@@ -97,23 +98,23 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                         <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
                     </div>
                 </div>}
-                {(!createLookup && (choicesLength > 6 && choicesLength < 11)) && 
-                <div className='flex mt-5 mb-1.5 w-full'
-                >
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                </div>}
-                {(!createLookup && (choicesLength === 4 || choicesLength === 5 || choicesLength === 6 )) && <div className='flex gap-[195px] mt-5 mb-1.5'>
+                {(!createLookup && (choicesLength > 6 && choicesLength < 11)) &&
+                    <div className='flex mt-5 mb-1.5 w-full'
+                    >
+                        <div className='flex items-center w-1/3'>
+                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
+                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                        </div>
+                        <div className='flex items-center w-1/3'>
+                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
+                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                        </div>
+                        <div className='flex items-center w-1/3'>
+                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
+                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                        </div>
+                    </div>}
+                {(!createLookup && (choicesLength === 4 || choicesLength === 5 || choicesLength === 6)) && <div className='flex gap-[195px] mt-5 mb-1.5'>
                     <div className='flex items-center'>
                         <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
                         <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
@@ -230,7 +231,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                         isThreedotLoading={isCreateLoading}
                     />
                     <>
-                        <input
+                        {!isView ? <><input
                             data-testid="import-file"
                             type="file"
                             accept=".csv"
@@ -238,20 +239,33 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                             disabled={isImportLoading}
                             id="file-upload"
                             style={{ display: 'none' }} // Hide the actual input field
-                        />
-                        <label
+                        /><label
                             htmlFor="file-upload"
                             className={`bg-[#fff] hover:bg-[#EFF1F8] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
                             leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center`}>
-                            {isImportLoading ? (
-                                <BeatLoader color="#2B333B" size='10px' />
-                            ) : (
-                                <>
-                                    {isView ? 'Cancel' : 'Import'}
-                                </>
-                            )}
-                        </label> 
-                        
+                                {isImportLoading ? (
+                                    <BeatLoader color="#2B333B" size='10px' />
+                                ) : (
+                                    <>
+                                        {isView ? 'Cancel' : 'Import'}
+                                    </>
+                                )}
+                            </label></>
+
+                            :
+                            <button
+                                onClick={handleClose}
+                                data-testid="import-btn"
+                                className={`bg-[#fff] hover:bg-[#EFF1F8] h-[50px] border border-[#2B333B] text-base ${isImportLoading ? 'cursor-not-allowed' : 'cursor-pointer'}
+                            leading-[24px] py-2 rounded w-[156px] font-[600] flex justify-center items-center`}>
+                                {isImportLoading ? (
+                                    <BeatLoader color="#2B333B" size='10px' />
+                                ) : (
+                                    <>
+                                        {isView ? 'Cancel' : 'Import'}
+                                    </>
+                                )}
+                            </button>}
                     </>
                 </div>
             </div>

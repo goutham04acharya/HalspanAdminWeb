@@ -34,7 +34,6 @@ function ChoiceFieldSetting({
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const [showCreateModal, setShowCreateModal] = useState(false);
-
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
 
