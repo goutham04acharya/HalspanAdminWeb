@@ -24,12 +24,18 @@ When('I click the clone button', async function () {
 });
 
 Then('I should see the new duplicated questionnaire created', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await searchBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
-    await searchBox.sendKeys(global.questionPublicName, " ", "copy1");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await searchBox.sendKeys(global.questionPublicName + " copy1");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     let publicName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]`)), 10000).getText();
-    assert.equal(publicName, global.questionPublicName, " ", "copy1");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log(publicName, " === ", global.questionPublicName + " copy1");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    assert.equal(publicName, global.questionPublicName + " copy1");
 });
 
 Then('I should see exact duplication of the selected version of a questionnaire', async function () {
