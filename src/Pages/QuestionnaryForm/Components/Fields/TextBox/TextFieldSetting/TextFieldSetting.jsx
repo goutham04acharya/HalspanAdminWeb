@@ -165,25 +165,17 @@ function TestFieldSetting({
   const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
 
   const handleKeyDown = (event) => {
-    // debugger
-    console.log(textareaRef.current.value, 'textareaRef.current')
     const textarea = textareaRef.current;
-    console.log(textarea.selectionStart, 'selectionStart')
     const value = textareaRef.current.value;
-    console.log(value, 'value')
-    // Check if the backspace key is pressed
-    console.log(event.key, 'event.key')
-    
+
     if (event.key === "Backspace" && textarea.selectionStart > 0) {
       
       // Find all regex matches in the input value
       const matches = [...value.matchAll(regex)];
-      console.log(matches, 'matches')
       // Check if the cursor is at the end of any match
       for (let match of matches) {
         const start = match.index;
         const end = match.index + match[0].length;
-        console.log(start, end, 'start and end')
         // If the cursor is at the end of the match, delete the entire match
         if (textarea.selectionStart === end) {
           event.preventDefault(); // Prevent default backspace behavior

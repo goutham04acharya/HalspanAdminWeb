@@ -17,18 +17,18 @@ import ConfirmModal from '../../Components/CustomModal/ConfirmModal'
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal'
 
 
-const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}) => {
+const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal }) => {
     const { getAPI, PostAPI, DeleteAPI, PatchAPI } = useApi();
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
-
+    console.log(LookupList, 'LookupList')
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [replaceCancel, setReplaceCancel] = useState('false');
-    
+    const [shimmerLoading, setShimmerLoading] = useState(false);
     const initialState = {
         name: '',
         choices: []
@@ -76,6 +76,17 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
+            // console.log(data, 'data')
+            // console.log(newItems, 'newItems')
+
+            // // Find the item in newItems that matches the name of the data object  
+            // const matchingItem = newItems.find(item => item?.name === data?.name);
+
+            // // If a matching item is found, set the choices property of the data object  
+            // if (matchingItem) {
+            //     setData("choices", matchingItem?.choices);
+            // }
+            // console.log(data, 'after data')
             setLookupList(prevItems => [...prevItems, ...newItems]);
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
@@ -85,6 +96,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         setLoading(false);
         setIsFetchingMore(false);
     }, [searchParams]);
+
 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
@@ -111,8 +123,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
     };
 
     const handleClose = () => {
+        // debugger
         setIsCreateModalOpen(false);
-        if(showCreateModal !== undefined){
+        if (showCreateModal !== undefined) {
             setShowCreateModal(false);
         }
         setActiveInputs('')
@@ -126,9 +139,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                 open: false,
                 id: ''
             });
+            // setData({})
         }, 200);
     }
-
+    // console.log(data, 'data')
     const handleSubmit = async (file) => {
         // debugger
         const isUpdate = isView?.open;
@@ -145,8 +159,8 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
             choicesArray = file.choices.map(choice => ({ value: choice }));
 
         } else if (isUpdate) {
-            // debugger
             setIsCreateLoading(true)
+            setShimmerLoading(true)
             try {
                 // Ensure data.choices is an array
                 choicesArray = Array.isArray(data.choices) ? [...data.choices] : [];
@@ -203,12 +217,15 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
                 fetchLookupList(); // Refetch the lookup list after success
-
                 const successMessage = isUpdate
                     ? `Updated lookup dataset ID ${isView?.id} successfully.`
                     : 'Created new lookup dataset successfully.';
                 setToastSuccess(successMessage); // Display success toast
-                handleClose(); // Close the modal or dialog
+                setShimmerLoading(false)
+                if (!isUpdate) {
+                    handleClose(); // Close the modal or dialog
+                }
+                setIsCreateLoading(false)
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;
                 if (!file) {
@@ -239,21 +256,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
     }
 
     const handleImport = (event) => {
-        // if (data?.choices.length !== 0 || data?.name !== '' || data?.choices !== '') {
-        //     setShowLookupReplaceModal(true);
-        //     setIsCreateModalOpen(false);
-        //     setData(initialImportState)
-        //     return; // 7348873888
-        // } else {
-        // setShowLookupReplaceModal(false);
-        // setIsCreateModalOpen(true);
         setData(initialState)
-        // return;
-        // }
-        // if(replaceCancel){
-        //     setShowLookupReplaceModal(false);
-        //     setIsCreateModalOpen(true);
-        // }
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
@@ -262,7 +265,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
         }
         // setIsImportLoading(true);
         // setIsCreateModalOpen(false);
-        if(showCreateModal !== undefined){
+        if (showCreateModal !== undefined) {
             setShowCreateModal(false);
         }
         Papa.parse(file, {
@@ -358,7 +361,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
     }, [loading, isFetchingMore]);
 
     useEffect(() => {
-        if(showCreateModal){
+        if (showCreateModal) {
             setIsCreateModalOpen(true)
         }
     }, [showCreateModal])
@@ -443,10 +446,13 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal}
                 title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
                 createLookup={!isView?.open}
                 // handleAddChoice={handleAddChoice}
+                shimmerLoading={shimmerLoading}
                 handleRemoveChoice={handleRemoveChoice}
                 setData={setData}
                 activeInputs={activeInputs}
                 setActiveInputs={setActiveInputs}
+                initialState={initialState}
+            // handleView={handleView}
             />
         </>
     )

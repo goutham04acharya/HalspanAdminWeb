@@ -443,20 +443,25 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
 
     const handleNextClick = () => {
-        // Reset previous validation errors before proceeding
+        // Reset previous validation errors before proceeding  
         setValidationErrors({});
 
-        // Function to validate mandatory fields
+        // Function to validate mandatory fields  
         const validateMandatoryFields = () => {
             const errors = sections[currentSection]?.pages[currentPage]?.questions.reduce((acc, question) => {
-                const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible
+                const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible  
                 if (isVisible) {
-                    // Initialize the field error accumulator for each component type
-                    if (!acc[`preview_${question.component_type}`]) {
-                        acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type
+                    // Check if the question is visible  
+                    if (question.conditional_logic && !evaluateLogic(question.conditional_logic)) {
+                        return acc; // Skip hidden questions  
                     }
 
-                    // Validate based on component type
+                    // Initialize the field error accumulator for each component type  
+                    if (!acc[`preview_${question.component_type}`]) {
+                        acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type  
+                    }
+
+                    // Validate based on component type  
                     switch (question.component_type) {
                         case 'textboxfield':
                             if (!question.options?.optional) {
@@ -498,7 +503,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                 if (value[question?.question_id] === false || value[question?.question_id] === undefined || questionValue[question?.question_id].length === 0) {
                                     acc.preview_photofield[question.question_id] = 'This is a mandatory field';
                                 } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
-                                    acc.preview_photofield[question?.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
+                                    acc.preview_photofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
                                 }
                             }
                             break;
@@ -540,40 +545,39 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             return errors;
         };
 
-        // Get the errors after validating
+        // Get the errors after validating  
         const errors = validateMandatoryFields();
 
-        // If there are validation errors, update the state and return early
+        // If there are validation errors, update the state and return early  
         if (Object.keys(errors).length > 0) {
             const filteredErrors = {};
 
-            // Loop through errors and keep only those with actual error messages (non-empty objects)
+            // Loop through errors and keep only those with actual error messages (non-empty objects)  
             Object.keys(errors).forEach((key) => {
                 if (Object.keys(errors[key]).length > 0) {
                     filteredErrors[key] = errors[key];
                 }
             });
 
-            // If there are any filtered errors (i.e., non-empty error objects), set validation errors
+            // If there are any filtered errors (i.e., non-empty error objects), set validation errors  
             if (Object.keys(filteredErrors).length > 0) {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
-                    ...filteredErrors,  // Merge the filtered errors into the existing validation errors
+                    ...filteredErrors,  // Merge the filtered errors into the existing validation errors  
                 }));
-                return; // Don't proceed to next page or section if there are errors
+                return; // Don't proceed to next page or section if there are errors  
             }
         }
 
-
-        // Get precomputed navigation details for next page/section
+        // Get precomputed navigation details for next page/section  
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
         if (isLastSection)
             if (isLastSection) {
-                setShowComplianceScreen(true);  // Show compliance screen if it's the last section
+                setShowComplianceScreen(true);  // Show compliance screen if it's the last section  
                 return;
             }
 
-        // Move to the next section or page
+        // Move to the next section or page  
         if (nextSection !== currentSection) {
             setCurrentSection(nextSection);
             setCurrentPage(nextPage);
@@ -588,6 +592,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     };
 
+    const resetHiddenQuestionValues = (questionId) => {
+        setValue((prev) => ({
+            ...prev,
+            [questionId]: undefined,
+        }));
+        dispatch(setQuestionValue({ question_id: questionId, value: undefined }));
+    };
     const handleBackClick = () => {
         // If on compliance screen, return to last page
         if (showComplianceScreen) {
@@ -798,7 +809,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         window[key] = value;
     });
 
-    useEffect(() => { 
+    useEffect(() => {
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
@@ -816,9 +827,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         const [day, month, year] = dateStr.split("/");
                                         return `${year}-${month}-${day}`;
                                     }
-                                    console.log(splitDate(result), 'result')
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
-                                } else{
+                                } else {
                                     dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                 }
                                 // Evaluate the string expression
@@ -846,21 +856,21 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
-    function isSameDate(question_id, setDate, value) {
-        // Convert the epoch values (in seconds) to Date objects
-        const selectedDate = new Date(question_id * 1000);
-        const setDateObj = new Date(setDate * 1000);
+    useEffect(() => {
+        sections.forEach((section) => {
+            section.pages.forEach((page) => {
+                page.questions.forEach((question) => {
+                    if (question.conditional_logic) {
+                        const isVisible = evaluateLogic(question.conditional_logic);
+                        if (!isVisible) {
+                            resetHiddenQuestionValues(question.question_id);
+                        }
+                    }
+                });
+            });
+        });
+    }, [value]);
 
-        // Add the specified number of days (value) to the set date
-        setDateObj.setDate(setDateObj.getDate() + value);
-
-        // Compare the year, month, and day
-        return (
-            selectedDate.getFullYear() === setDateObj.getFullYear() &&
-            selectedDate.getMonth() === setDateObj.getMonth() &&
-            selectedDate.getDate() === setDateObj.getDate()
-        );
-    }
     const handleClose = () => {
         setModalOpen(false)
         setValidationErrors((prevErrors) => ({
@@ -878,13 +888,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
+
     return (
-        <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
+        <div className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}>
+            
             <div className='flex justify-end p-2'>
                 <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
-                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
+                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-10 mb-3'>{formDefaultInfo?.internal_name}</p>
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollHide w-full bg-slate-100 rounded-md'>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
@@ -893,7 +905,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     ) : showComplianceScreen ? (
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
-                            {complianceLogic?.length === 0 &&<h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
+                            {complianceLogic?.length === 0 && <h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
                                 <>
                                     {complianceLogic.length !== 0 && <div
@@ -1086,6 +1098,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
             </div>
         </div>
+
+
     )
 }
 

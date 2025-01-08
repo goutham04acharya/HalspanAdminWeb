@@ -6,8 +6,9 @@ import InputTextarea from '../InputField/InputTextarea';
 import Button2 from '../Button2/ButtonLight';
 import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
+import Shimmer from '../Shimmers/Shimmer';
 
-const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, handleRemoveChoice, activeInputs, setActiveInputs }) => {
+const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, initialState, handleRemoveChoice, activeInputs, setActiveInputs, shimmerLoading }) => {
 
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
@@ -40,6 +41,12 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
         if (choicesLength <= 10) return 'w-1/3';
         return 'w-1/3';
     };
+    const getChoiceShimmerWidth = () => {
+
+        if (choicesLength < 4) return 'w-[350px]';
+        if (choicesLength <= 6) return 'w-[150px]';
+         return 'w-[120px]';
+    };
     const getChoiceHeight = () => {
 
         if (choicesLength <= 4) return 'h-[calc(100vh-693px)] ';
@@ -47,6 +54,16 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
         if (choicesLength < 10) return 'h-[calc(100vh-580px)] ';
         return 'h-[calc(100vh-480px)] ';
     };
+    const getChoiceShimmerCol = () => {
+
+        if (choicesLength <= 4) return 2;
+        if (choicesLength <= 6) return 2;
+        if (choicesLength < 10) return 5;
+        return 3;
+    };
+    // useEffect(()=>{
+    //     handleView()
+    // },[])
     return (
         <Modal center open={isModalOpen} onClose={handleClose} closeIcon={<div style={{ color: 'white' }} disabled></div>}>
             <div className={`flex flex-col relative overflow-x-auto scrollBar ${getModalWidth()}`}>
@@ -84,6 +101,8 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                     handleChange={(e) => handleChange(e, e.target.id, 'choices')}
                     validationError={errors?.choices}
                 />}
+                {
+                <div>
                 {(!createLookup && (choicesLength >= 11)) && <div className='flex w-full mt-5 mb-1.5'>
                     <div className='flex items-center w-1/3'>
                         <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
@@ -130,11 +149,13 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                         <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
                     </div>
                 </div>}
-                {!createLookup && <div className={`${getChoiceHeight()} w-full flex flex-wrap overflow-y-auto scrollBar`}>
+                {!createLookup && <div className={`${getChoiceHeight()} w-full flex flex-wrap overflow-y-auto ${shimmerLoading ? 'scrollHide' : 'scrollBar'}`}>
                     {(Array.isArray(data.choices) ? data.choices : []).map((choice, index) => (
                         <div className={`${getChoiceWidth()}`}>
+                            {/* {console.log(choice, 'choice')} */}
                             <div className='flex flex-col'>
                                 <div key={choice.uuid || index}>
+                                {shimmerLoading ? <Shimmer column={getChoiceShimmerCol()} row={7} width={getChoiceShimmerWidth()} /> : 
                                     <div className={`flex py-1 gap-4 ${choicesLength >= 11 ? 'mr-10' : 'mr-3'}`}>
                                         <InputField
                                             autoComplete="off"
@@ -177,7 +198,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                             className="pl-1 cursor-pointer w-14 p-2 rounded-full hover:bg-[#FFFFFF]"
                                             onClick={() => handleAddInput(choice.uuid)}
                                         />
-                                    </div>
+                                    </div>}
 
                                 </div>
                                 {activeInputs[choice.uuid] && (
@@ -216,7 +237,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                         </div>
                     ))}
                 </div>}
-
+                </div>}
                 {/* <div className='flex gap-5'> */}
                 {/* </div> */}
                 <div className='flex justify-between mt-5'>
