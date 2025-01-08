@@ -22,12 +22,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [isContentNotFound, setContentNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
-    console.log(LookupList, 'LookupList')
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
-    const [replaceCancel, setReplaceCancel] = useState('false');
     const [shimmerLoading, setShimmerLoading] = useState(false);
     const initialState = {
         name: '',
@@ -76,17 +74,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            // console.log(data, 'data')
-            // console.log(newItems, 'newItems')
-
-            // // Find the item in newItems that matches the name of the data object  
-            // const matchingItem = newItems.find(item => item?.name === data?.name);
-
-            // // If a matching item is found, set the choices property of the data object  
-            // if (matchingItem) {
-            //     setData("choices", matchingItem?.choices);
-            // }
-            // console.log(data, 'after data')
             setLookupList(prevItems => [...prevItems, ...newItems]);
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
@@ -217,6 +204,12 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
                 fetchLookupList(); // Refetch the lookup list after success
+                if (isUpdate) {
+                    // Fetch the updated lookup dataset from the API  
+                    const updatedResponse = await getAPI(`lookup-data/${isView?.id}`);
+                    const updatedData = updatedResponse?.data?.data;
+                    setData(updatedData); // Update the data state with the new choices  
+                }
                 const successMessage = isUpdate
                     ? `Updated lookup dataset ID ${isView?.id} successfully.`
                     : 'Created new lookup dataset successfully.';
@@ -225,6 +218,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 if (!isUpdate) {
                     handleClose(); // Close the modal or dialog
                 }
+
                 setIsCreateLoading(false)
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;

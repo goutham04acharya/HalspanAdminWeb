@@ -98,7 +98,9 @@ function Questionnaries() {
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
       const newItems = response?.data?.data?.items || [];
-      setQueList(prevItems => [...prevItems, ...newItems]);
+      console.log(newItems, 'newItems')
+      setQueList(newItems);
+      console.log(QueList, 'queslaifaifeij')
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
@@ -157,6 +159,7 @@ function Questionnaries() {
       const response = await PostAPI(`questionnaires/clone`, body);
       if (!response?.error) {
         setToastSuccess(response?.data?.message)
+        await fetchQuestionnaryList();
       } else {
         setToastError(response?.data?.data?.message)
       }
@@ -241,6 +244,7 @@ function Questionnaries() {
                   setCloneModal={setCloneModal}
                   handleVersionList={handleVersionList}
                   cloneDisable={cloneDisable}
+                  cloneLoading={cloneLoading}
                 />
               </div>
             )
