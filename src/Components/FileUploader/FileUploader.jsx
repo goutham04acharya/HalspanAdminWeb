@@ -88,6 +88,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             <label className="custom-file-label custom-file-input-wrapper w-fit h-auto mt-1 flex items-center bg-[#DFE0E2] border border-[#AEB3B7] p-0 rounded-md">
                 <input
                     type="file"
+                    data-testid="add-file"
                     multiple
                     onChange={handleFileChange}
                     accept={fileType ? fileType : '*'}
@@ -102,7 +103,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             {questionValue?.[question?.question_id] && (
                 <ul>
                     {questionValue?.[question?.question_id].map((file, index) => (
-                        <li key={index} className='bg-[#DFE0E2] my-2 p-2 rounded flex justify-between'>
+                        <li key={index} className='bg-[#DFE0E2] my-2 p-2 rounded flex justify-between' data-testid={`file-${index}`}>
                             <span className='truncate w-[190px]'>{file.name}</span>
                             <div className='flex gap-2'>
                                 <span className='text-[#2B333B]'>
@@ -111,7 +112,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                                         : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                 </span>
                                 <button className='text-red-500 hover:text-red-700' onClick={() => handleRemoveFile(index)}>
-                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" />
+                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" data-testid={`remove-file-${index}`}/>
                                 </button>
                             </div>
                         </li>
