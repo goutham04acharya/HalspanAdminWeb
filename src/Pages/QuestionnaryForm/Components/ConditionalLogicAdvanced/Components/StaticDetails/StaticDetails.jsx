@@ -7,7 +7,8 @@ function StaticDetails({
     handleTabClick,
     isDefaultLogic,
     setIsOperatorModal,
-    setIsStringMethodModal
+    setIsStringMethodModal,
+    complianceState
 }) {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);

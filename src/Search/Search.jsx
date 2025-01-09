@@ -28,7 +28,6 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
     } else {
       params[key] = value;
     }
-    console.log(params, 'params')
     setQueList([]);
     setSearchParams({ ...params });
   };

@@ -21,7 +21,6 @@ function AdvancedEditor({
     setSelectedType
 
 }) {
-    console.log(inputValue, 'inputValue')
     // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -125,7 +124,7 @@ function AdvancedEditor({
                     name="editor"
                     id="editor"
                     data-testid="conditional-logic-text"
-                    className='resize-none border border-[#AEB3B7] h-[230px] w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
+                    className='resize-none border border-[#AEB3B7] h-[230px] scrollBar w-full py-[14px] pr-[14px] pl-[4%] rounded outline-0 text-xl'
                     onChange={(event) => {
                         handleInputField(event, sections); handleSearchChange(event);
                     }}

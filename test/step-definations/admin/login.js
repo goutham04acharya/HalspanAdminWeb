@@ -6,13 +6,13 @@ const By = require('selenium-webdriver').By
 const keys = webdriver.Key
 
 Given('I am on the login page', async function () {
-    await driver.get('https://questionnaire-qa.halspantest.com/');
+    await driver.get('http://localhost:3000/');
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Welcome"]')));
 });
 
 Given('I am on the dashboard screen', async function(){
-    await driver.get('https://questionnaire-qa.halspantest.com/questionnaries');
+    await driver.get('http://localhost:3000/questionnaries');
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.xpath('//p[text()="Questionnaries"]')));
 });
