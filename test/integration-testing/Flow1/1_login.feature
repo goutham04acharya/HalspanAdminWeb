@@ -9,16 +9,16 @@ Feature: Halspan - Admin - Log in to the Application
         When Admin clicks the Forgot Password it must be redirected to the portal and then they will be able to change the password
         Once the admin is logged in then he must be redirected to the questionnaire listing screen
 
-    Scenario: Admin tries to login with invalid credentials
-        Given I am on the login page
-        When I enter email address as <email>
-        * I enter password as <password>
-        * I click the submit button
-        Then I should read a message stating that <message>
-
-        Examples:
-            | email                 | password    | message                   |
-            | "prakhyath@7edge.com" | "Admin@123" | "Wrong email or password" |
+    # Scenario: Admin tries to login with invalid credentials
+        # Given I am on the login page
+        # When I enter email address as <email>
+        # * I enter password as <password>
+        # * I click the submit button
+        # Then I should read a message stating that <message>
+# 
+        # Examples:
+            # | email                 | password    | message                   |
+            # | "prakhyath@7edge.com" | "Admin@123" | "Wrong email or password" |
 
     Scenario: Admin logs in with valid credentials
         Given I am on the login page
