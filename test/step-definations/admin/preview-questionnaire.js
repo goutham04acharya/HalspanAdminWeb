@@ -711,10 +711,10 @@ When('I select the location in asset location for section {int} page {int} quest
     await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="site"]`)), 5000).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="site-0"]`))).click();
     // Uncomment this later ===================================================== !!!!important
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="location"]`)), 5000).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="buidling-0"]`))).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="level"]`)), 5000).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="floor-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="location"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="buidling-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="level"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="floor-0"]`))).click();
 });
 
 When('I see the display for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {

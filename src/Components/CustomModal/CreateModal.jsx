@@ -177,7 +177,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                             htmlFor={`value-${index}`}
                                             maxLength={40}
                                             handleChange={(e) => handleChange(e, choice.uuid, 'value')}
-                                            className="w-full mt-2.5"
+                                            className="w-full mt-2.5 p-2"
                                             validationError={errors?.choices?.[index]?.value}
                                             // lookupDataset
                                             placeholder="Enter values separated by commas"
@@ -186,7 +186,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                         <img
                                             src="/Images/trash-black.svg"
                                             alt="delete"
-                                            className="pl-1 cursor-pointer w-9 p-2 rounded-full hover:bg-[#FFFFFF]"
+                                            className="cursor-pointer mt-2 h-10 p-2 rounded-full hover:bg-[#EFF1F8]"
                                             data-testid={`delete-choice-${index + 1}`}
                                             onClick={() => handleRemoveChoice(choice.uuid)}
                                         />
@@ -194,7 +194,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                             src="/Images/add.svg"
                                             alt="add"
                                             data-testid={`add-choice-${index + 2}`}
-                                            className="pl-1 cursor-pointer w-14 p-2 rounded-full hover:bg-[#FFFFFF]"
+                                            className="cursor-pointer h-10 mt-2 p-0.5 rounded-full hover:bg-[#EFF1F8]"
                                             onClick={() => handleAddInput(choice.uuid)}
                                         />
                                     </div>}
