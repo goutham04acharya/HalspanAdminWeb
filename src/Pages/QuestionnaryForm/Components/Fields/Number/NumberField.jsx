@@ -151,17 +151,6 @@ function NumberField({
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%]  ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
-            {/* {((preview ? question?.source ==='entryfield' :fieldSettingParameters?.source === 'entryfield') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
-                <input
-                    data-testid='input'
-                    type={type}
-                    id={textId}
-                    value={`${fieldSettingParameters?.preField ? fieldSettingParameters.preField : ''}${fieldSettingParameters?.postField ? ` ${fieldSettingParameters.postField}` : ''}`}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    placeholder={fieldSettingParameters?.placeholderContent}
-                    onChange={() => handleChange(fieldSettingParameters)}
-                />
-            } */}
             {((!preview && fieldSettingParameters?.source === 'entryfield') || (!preview && fieldSettingParameters?.source === 'both')) ? <input
                 data-testid='input'
                 type={type}
@@ -180,10 +169,22 @@ function NumberField({
                                 question?.type === 'rating' ? 'range' :
                                     'text'}
                         step={question?.type === 'float' ? 'any' : ''}
+                        min={preview ? question?.field_range?.min : minRange}
+                        max={preview ? question?.field_range?.max : maxRange}
                         value={questionValue[question?.question_id]}
                         className={`w-full h-auto break-words  bg-white py-3 px-4 mt-1 mb-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
-                        onChange={(e) => handleInputChange(e)}
+                        // onChange={(e) => handleInputChange(e)}
                         placeholder={question?.placeholder_content}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            const numValue = parseFloat(value);
+                            const min = preview ? question?.field_range?.min : minRange;
+                            const max = preview ? question?.field_range?.max : maxRange;
+                        
+                            if (value === '' || (numValue >= min && numValue <= max)) {
+                                handleInputChange(e);
+                            }
+                        }}
                         onKeyDown={(e) => {
                             if (e.key === 'e' || e.key === 'E') e.preventDefault();
                         }} />

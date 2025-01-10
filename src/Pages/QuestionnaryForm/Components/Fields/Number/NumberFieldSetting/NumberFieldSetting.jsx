@@ -56,6 +56,8 @@ function NumberFieldSetting({
                         formParameters={formParameters}
                         handleBlur={handleBlur}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
                         <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>

@@ -1,4 +1,5 @@
 import React from 'react'
+import ErrorMessage from '../../../../Components/ErrorMessage/ErrorMessage';
 
 function CommonComponents({
     labelID,
@@ -17,7 +18,10 @@ function CommonComponents({
     assetLocation,
     formStatus,
     fieldSettingParameters,
+    validationErrors,
+    selectedQuestionId
 }) {
+    console.log(validationErrors?.label, 'validationErrors?.label')
     return (
         <div>
             <div className='flex flex-col justify-start'>
@@ -30,7 +34,7 @@ function CommonComponents({
                     // id={labelID}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
-                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
+                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} 
                     value={formParameters?.label || ''}
                     id='label'
                     onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
@@ -43,6 +47,9 @@ function CommonComponents({
                         }
                     } : null}
                 />
+                {validationErrors?.label?.[selectedQuestionId] && (
+              <ErrorMessage error={validationErrors?.label?.[selectedQuestionId]} />
+            )}
             </div>
             <div className='flex flex-col justify-start mt-7'>
                 <label

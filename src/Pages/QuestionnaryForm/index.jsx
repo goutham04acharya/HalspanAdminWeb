@@ -103,6 +103,7 @@ const QuestionnaryForm = () => {
     const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
+    const [prevLabelValue, setPrevLabelValue] = useState('')
     // const [sectionWarningShown, setSectionWarningShown] = useState(false);
     const [conditions, setConditions] = useState([{
         'conditions': [
@@ -140,7 +141,31 @@ const QuestionnaryForm = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
+        console.log(selectedQuestionId, 'fieldSettingParams[selectedQuestionId]')
         // Restrict numeric input if the id is 'fileType'
+        if(id === 'label'){
+            console.log(value)
+            setPrevLabelValue(updatedValue)
+            if(updatedValue === ''){
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    label: {
+                        ...prevErrors.label,
+                        [selectedQuestionId]: 'This is a mandatory field',
+                    },
+                }));
+            }else{  
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    label: {
+                        ...prevErrors.label,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+        console.log(updatedValue, 'updatedvalue')
+        console.log(prevLabelValue, 'prevlabelvalue')
         if (id === 'fileType') {
             // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
@@ -155,7 +180,6 @@ const QuestionnaryForm = () => {
         //     // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
         //     // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
         //     // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
-
         // Update the state dynamically
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         if (id === 'regular_expression') {
@@ -670,6 +694,7 @@ const QuestionnaryForm = () => {
             setSaveClick(false);
         }
 
+        
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -1368,6 +1393,7 @@ const QuestionnaryForm = () => {
 
     const globalSaveHandler = async () => {
         setGlobalSaveLoading(true)
+        
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
@@ -1492,6 +1518,11 @@ const QuestionnaryForm = () => {
                 }
             }
             cleanSections();
+            if(validationErrors?.label !== ''){
+                setToastError('Label is a mandatory field');
+                setGlobalSaveLoading(false)
+                return;
+            }
             let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
             // Sync compareSavedSections with the updated sections
             setCompareSavedSections(sections);

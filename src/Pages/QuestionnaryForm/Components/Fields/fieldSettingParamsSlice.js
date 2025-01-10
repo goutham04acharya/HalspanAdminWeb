@@ -156,7 +156,7 @@ const fieldSettingParamsSlice = createSlice({
                     placeholderContent: item.placeholder_content,
                     default_content: item.default_content,
                     type: item.type,
-                    format: item.format,
+                    format: item.format || '24',
                     regular_expression: item?.regular_expression,
                     format_error: item?.format_error,
                     min: item.field_range?.min,
