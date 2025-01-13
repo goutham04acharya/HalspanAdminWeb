@@ -543,13 +543,13 @@ const QuestionnaryForm = () => {
                 return section;
             });
         }
-        setValidationErrors((prevErrors) => ({
-            ...prevErrors,
-            label: {
-                ...prevErrors.label,
-                [selectedQuestionId]: '',
-            },
-        }));
+        // setValidationErrors((prevErrors) => ({
+        //     ...prevErrors,
+        //     label: {
+        //         ...prevErrors.label,
+        //         [selectedQuestionId]: '',
+        //     },
+        // }));
         // Reset the selected component
         dispatch(setSelectedComponent(false));
 

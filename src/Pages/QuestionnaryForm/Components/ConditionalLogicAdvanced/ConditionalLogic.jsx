@@ -246,12 +246,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 ?.replaceAll('||', 'or') // Replace || with or
                 ?.replaceAll('.length', '.()')
         }
-        if (condition_logic.includes(':')) {
-            // Split by colon and rebuild with "else if" and "else" logic
-            const parts = condition_logic.split(':');
-            const lastPart = parts.pop(); // Remove the last part
-            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
-        }
         if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
             const parts = condition_logic.split(':');
@@ -1509,16 +1503,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         finalString += conditions[0]?.conditions[0]?.question_name !== '' ? 'if (' + getComplianceLogic(conditions[0]?.conditions) + ')' : ''
         if (conditions[0].thenAction) {
-            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
+            finalString += ' ? ' + generateThenActionString(conditions[0]?.thenAction) + `${conditions[0]?.elseIfBlocks ? '' : ' : '}`;
         }
-        if (conditions[0].elseIfBlocks) {
+        if (conditions[0]?.elseIfBlocks) {
             finalString += ' : '
-            conditions[0].elseIfBlocks.map((outerItem) => {
+            conditions[0]?.elseIfBlocks?.map((outerItem) => {
                 if (outerItem.conditions.length > 0) {
-                    finalString += '(' + getComplianceLogic(outerItem.conditions) + ')';
+                    finalString += '(' + getComplianceLogic(outerItem?.conditions) + ')';
                 }
-                if (outerItem.thenActions) {
-                    finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
+                if (outerItem?.thenActions) {
+                    finalString += ' ? ' + generateThenActionString(outerItem?.thenActions[0]) + ' : ';
                 }
             })
 
@@ -1548,9 +1542,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
                 }
-                if (condition_logic.includes(':')) {
+                if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
-                    const parts = condition_logic.split(':');
+                    const parts = condition_logic?.split(':');
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
