@@ -18,8 +18,6 @@ import { dataService } from '../../services/data.services.js';
 
 function Questionnaries() {
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
-  const dispatch = useDispatch();
-  const { logout } = useAuth0();
   const { getAPI, PostAPI } = useApi();
   const [isContentNotFound, setContentNotFound] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -28,7 +26,7 @@ function Questionnaries() {
   const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ? encodeURIComponent(searchParams.get('search')) : '');
+  const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
   const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
@@ -94,6 +92,8 @@ function Questionnaries() {
     }
     if (searchValue !== '') {
       delete params.start_key
+      params.search = encodeURIComponent(searchValue.trim());
+
     }
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
@@ -143,10 +143,12 @@ function Questionnaries() {
     setDropdownsOpen(!dropdownsOpen)
     // setIsCreateModalOpen(false)
   }
+
   const handleOptionClick = (versionNumber) => {
     setSelectedVersion(versionNumber); // Set the clicked version as the selected version
     setDropdownsOpen(false); // Close the dropdown after selecting an option
   };
+
   const handleClone = async () => {
     setCloneLoading(true)
     try {
@@ -169,6 +171,7 @@ function Questionnaries() {
       setCloneLoading(false)
     }
   }
+
   const getAssetTypes = async () => {
     try {
       let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)
