@@ -27,6 +27,7 @@ function InputWithDropDown({
     compliance,
     ifcompliance,
     dropDownClassName,
+    disableDropdownClick,
     complinace //added this to only use in the complinace basic editor for the dropdown selector
 
 }) {
@@ -40,7 +41,6 @@ function InputWithDropDown({
         setDropdownOpen(false);
 
     }
-
     return (
         <div id={`${id}_outer`} className='cursor-pointer w-full relative' ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>{label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}</label>
@@ -60,21 +60,23 @@ function InputWithDropDown({
                 {(selectedOption && close) ?
                     <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[22px]`} onClick={() => handleRemove()} />
                     : (ifcompliance || compliance) ? <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute top-[43px] right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`} />
-                    :
-                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
-                        style={{ top }} />
+                        :
+                        <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                            style={{ top }} />
                 }
             </div>
             {isDropdownOpen && (
                 <ul id={`${id}_inner`} className="absolute bg-white border h-fit  overflow-x-auto scrollBar border-[#AEB3B7] mt-1 w-full z-10">
-                    {options.map((option, index) => (
-                        <li key={option}
-                            data-testid={`${labeltestID}-${index}`}
-                            className={`py-2 px-4 cursor-pointer hover:bg-[#F4F6FA] ${dropDownClassName}`}
-                            onClick={(e) => complinace && !ifcompliance ? handleOptionClick(e) : handleOptionClick(option, mainIndex, subIndex, id)}>
-                            {option}
-                        </li>
-                    ))}
+                    {options.length > 0 ? <>
+                        {options.map((option, index) => (
+                            <li key={option}
+                                data-testid={`${labeltestID}-${index}`}
+                                className={`py-2 px-4 ${disableDropdownClick ? '' : 'hover:bg-[#F4F6FA]'} cursor-pointer  ${dropDownClassName}`}
+                                onClick={(e) => complinace && !ifcompliance ? handleOptionClick(e) : disableDropdownClick ? '' : handleOptionClick(option, mainIndex, subIndex, id)}>
+                                {option}
+                            </li>
+                        ))}</> : <div className=' p-3'>No questions available</div>}
+
                 </ul>
             )}
         </div>

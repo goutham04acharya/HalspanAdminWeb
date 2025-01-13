@@ -35,7 +35,7 @@ const TextBoxField = ({
 }) => {
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-
+    console.log(sections, 'sections')
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -121,9 +121,7 @@ const TextBoxField = ({
         if (['Backspace', 'Tab', 'Enter', 'Shift', 'Control', 'Alt', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'CapsLock'].includes(keyValue)) {
             return;
         }
-        console.log('Key Pressed:', keyValue); // This will now log the key pressed
     };
-
     return (
         <div className=''>
             <label

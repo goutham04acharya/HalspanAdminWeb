@@ -26,7 +26,6 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
         // dispatch(setShouldAutoSave(true));
     };
     const handleInputChange = (id, field, value) => {
-        console.log(value,'dsfsd')
         if(value === ''){
             setValidationErrors(prevErrors => ({
                 ...prevErrors,

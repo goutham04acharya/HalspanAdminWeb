@@ -34,6 +34,37 @@ const Sections = ({
     dispatch(setPageToDelete({ sectionIndex, pageIndex }));
     dispatch(setSelectedSectionData(pageData));
   };
+  const onDragUpdate = (result) => {
+    const { destination, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    // Get the dragged element
+    const draggedElement = document.querySelector(`[data-rbd-draggable-id='${draggableId}']`);
+
+    if (draggedElement) {
+      // Scroll the container if the dragged element is near the top or bottom
+      const container = draggedElement.closest("[data-rbd-droppable-id]");
+      if (container) {
+        const { top, bottom } = draggedElement.getBoundingClientRect();
+        const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
+
+        const buffer = 50; // Buffer distance in pixels
+
+        // Scroll up if the dragged element is near the top
+        if (top < containerTop + buffer) {
+          container.scrollBy(0, -10);
+        }
+
+        // Scroll down if the dragged element is near the bottom
+        if (bottom > containerBottom - buffer) {
+          container.scrollBy(0, 10);
+        }
+      }
+    }
+  };
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -77,7 +108,7 @@ const Sections = ({
       className={"pb-0 mt-[10px] mb-0"}
     >
       <>
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
           <Droppable droppableId="droppable">
             {(provided) => (
               <ul {...provided.droppableProps} ref={provided.innerRef}>

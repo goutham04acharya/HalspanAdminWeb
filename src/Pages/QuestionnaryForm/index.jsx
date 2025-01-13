@@ -141,10 +141,8 @@ const QuestionnaryForm = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
-        console.log(selectedQuestionId, 'fieldSettingParams[selectedQuestionId]')
         // Restrict numeric input if the id is 'fileType'
         if(id === 'label'){
-            console.log(value)
             setPrevLabelValue(updatedValue)
             if(updatedValue === ''){
                 setValidationErrors((prevErrors) => ({
@@ -164,8 +162,6 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
-        console.log(updatedValue, 'updatedvalue')
-        console.log(prevLabelValue, 'prevlabelvalue')
         if (id === 'fileType') {
             // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
@@ -547,7 +543,13 @@ const QuestionnaryForm = () => {
                 return section;
             });
         }
-
+        setValidationErrors((prevErrors) => ({
+            ...prevErrors,
+            label: {
+                ...prevErrors.label,
+                [selectedQuestionId]: '',
+            },
+        }));
         // Reset the selected component
         dispatch(setSelectedComponent(false));
 
@@ -1392,21 +1394,32 @@ const QuestionnaryForm = () => {
     }
 
     const globalSaveHandler = async () => {
-        setGlobalSaveLoading(true)
-        
+        setGlobalSaveLoading(true);
+    
+        // Check if there are any validation errors
+        // console.log(validationErrors)
+        const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
+    
+        if (hasValidationErrors) {
+            setToastError('Please fix the validation errors before saving.');
+            setGlobalSaveLoading(false);
+            return;
+        }
+    
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
+    
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
                 let pageKey = '';
                 let questionKey = '';
-
+    
                 if (keys.length > 3) {
-                    // replaciing as bdd records will have aditional key as bddtest# which will bot be there in the  normal user journey
+                    // replacing as bdd records will have additional key as bddtest# which will not be there in the normal user journey
                     sectionKey = keys[1].replace('bddtest#', '');
                     pageKey = keys[2];
                     questionKey = keys[3];
@@ -1415,6 +1428,7 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
+    
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1448,8 +1462,7 @@ const QuestionnaryForm = () => {
                                             source_value:
                                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
                                                     fieldSettingParams[question.question_id].fixedChoiceArray :
-                                                    fieldSettingParams[question.question_id].lookupOptionChoice
-                                            ,
+                                                    fieldSettingParams[question.question_id].lookupOptionChoice,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
                                             lookup_value: fieldSettingParams[question.question_id].lookupValue,
                                             options: fieldSettingParams[question.question_id].options,
@@ -1490,7 +1503,7 @@ const QuestionnaryForm = () => {
                                                         return {}; // Return an empty object if componentType doesn't match any case  
                                                 }
                                             })(),
-                                        }
+                                        };
                                     }
                                 });
                             }
@@ -1498,7 +1511,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
-
+    
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1517,22 +1530,20 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
+    
             cleanSections();
-            if(validationErrors?.label !== ''){
-                setToastError('Label is a mandatory field');
-                setGlobalSaveLoading(false)
-                return;
-            }
-            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+    
+            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
+    
             // Sync compareSavedSections with the updated sections
             setCompareSavedSections(sections);
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
-            handleComplianceLogic()
-            setGlobalSaveLoading(false)
+            handleComplianceLogic();
+            setGlobalSaveLoading(false);
         } catch (error) {
             console.log(error);
-            setGlobalSaveLoading(false)
+            setGlobalSaveLoading(false);
         }
     };
 

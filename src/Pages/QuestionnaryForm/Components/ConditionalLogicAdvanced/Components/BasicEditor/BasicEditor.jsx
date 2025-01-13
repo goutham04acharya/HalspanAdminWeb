@@ -13,7 +13,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const dropdownRef2 = useRef();
 
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
-
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
         'numeric': ['equals', 'not equal to', 'smaller', 'larger', 'smaller or equal', 'larger or equal'],
@@ -220,26 +219,30 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
     }
     const getConditions = (key) => {
-        let arr = []
-        switch (key) {
-            case "textboxfield":
-            case "choiceboxfield":
-            case "assetLocationfield":
-            case "signaturefield":
-            case "gpsfield":
-            case "displayfield":
-                return conditionObj['text'];
-            case "numberfield":
-                return conditionObj['numeric'];
-            case "photofield":
-            case "videofield":
-            case "filefield":
-            case "floorPlanfield":
-                return conditionObj['file'];
-            case "dateTimefield":
-                return conditionObj['date'];
-            default:
-                return arr; // This is the fallback if none of the cases match
+        let arr = ['No conditions available'];
+        if(secDetailsForSearching.length > 0){
+            switch (key) {
+                case "textboxfield":
+                case "choiceboxfield":
+                case "assetLocationfield":
+                case "signaturefield":
+                case "gpsfield":
+                case "displayfield":
+                    return conditionObj['text'];
+                case "numberfield":
+                    return conditionObj['numeric'];
+                case "photofield":
+                case "videofield":
+                case "filefield":
+                case "floorPlanfield":
+                    return conditionObj['file'];
+                case "dateTimefield":
+                    return conditionObj['date'];
+                default:
+                    return arr; // This is the fallback if none of the cases match
+            }
+        }else{
+            return arr;
         }
     }
     const validateConditions = () => {
@@ -396,7 +399,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                                     testID={`condition-${index}-${i}`}
                                                     labeltestID={`condition-dropdown-${index}-${i}`}
-                                                    selectedOption={conditions[index]?.conditions[i]?.condition_logic}
+                                                    selectedOption={secDetailsForSearching.length > 0 ? conditions[index]?.conditions[i]?.condition_logic : ''}
                                                     handleOptionClick={handleSelectDropdown}
                                                     mainIndex={index}
                                                     subIndex={i}
@@ -405,6 +408,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     setDropdownOpen={updateDropdown}
                                                     options={getConditions(conditions[index].conditions[i].condition_type)}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.condition_logic === ''}
+                                                    disableDropdownClick={secDetailsForSearching.length === 0}
                                                 />
                                                 {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
                                             </div>

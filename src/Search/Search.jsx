@@ -41,24 +41,17 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
 
   const changeHandler = (e) => {
     let value = e.target.value;
-  
-    // Update the input value (allow spaces)
-    setSearchValue(value);
-  
-    // Trim the value only when checking for empty input or updating the URL
-    const trimmedValue = value.trim();
-  
-    if (!trimmedValue) {
-      // If input is cleared, immediately remove the search parameter from the URL
-      let params = Object.fromEntries(searchParams);
-      delete params.search; // Remove the search parameter
-      setSearchParams({ ...params });
-    } else {
-      // Update the search parameter in real-time
-      let params = Object.fromEntries(searchParams);
-      params.search = trimmedValue; // Use trimmed value for the URL
-      setSearchParams({ ...params });
+    value = value.replace(/^\s+/, ''); // Remove leading spaces
+    if (!value.trim()) {
+      // If the value is empty or contains only spaces, do not proceed
+      setSearchValue('');
+      return;
     }
+
+    let params = Object.fromEntries(searchParams);
+    delete params.start_key;
+    setSearchValue(value);
+    optimizedFn(e, value); // This should call handleSearch with the current value
   };
   
   
@@ -71,15 +64,6 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
     setSearchValue('');
     setLoading(false);
   };
-
-  // Decode search value from the URL
-  // useEffect(() => {
-  //   const params = Object.fromEntries(searchParams);
-  //   if (params.search) {
-  //     const decodedSearch = decodeURIComponent(params.search.replace(/\+/g, ' '));
-  //     setSearchValue(decodedSearch);
-  //   }
-  // }, [searchParams, setSearchValue]);
 
   return (
     <div className='w-full border border-[#AEB3B7] rounded px-5 py-3'>

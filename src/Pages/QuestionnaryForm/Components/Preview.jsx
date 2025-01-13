@@ -24,6 +24,7 @@ import { useSelector } from 'react-redux';
 import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
 import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 import { list } from 'postcss';
+import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -54,7 +55,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
-
+    console.log(conditionalValues, 'conditionalValues')
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -275,7 +276,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
-    const evaluateLogic = (logic) => {
+    const evaluateLogic = React.useCallback((logic) => {
         try {
             if (logic.includes("new Date(")) {
                 return eval(logic);
@@ -294,7 +295,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 };
                 const replacedLogic = logic.replace(
                     /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
-                    (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+                    (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`
                 );
                 return eval(replacedLogic);
             } else {
@@ -304,7 +305,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             console.error("Error evaluating conditional logic:", error);
             return false;
         }
-    };
+    }, []);
 
     const isPageVisible = (sectionIndex, pageIndex) => {
         const pageData = sections[sectionIndex]?.pages[pageIndex];
@@ -483,6 +484,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'numberfield':
                             if (!question.options?.optional) {
+
                                 if (questionValue[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
                                     acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
                                 }
@@ -491,9 +493,16 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'dateTimefield':
                             if (!question.options?.optional) {
-                                if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
-                                    acc.preview_datetimefield = acc.preview_datetimefield || {};
-                                    acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                if (question?.type === 'datetime') {
+                                    if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined || questionValue?.[question?.question_id]?.split(' ')?.length === 1) {
+                                        acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                        acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                    }
+                                } else {
+                                    if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                        acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                        acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                    }
                                 }
                             }
                             break;
@@ -510,7 +519,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                         case 'filefield':
                             if (!question?.options?.optional) {
-
                                 if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_filefield[question.question_id] = 'This is a mandatory field';
                                 } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
@@ -530,7 +538,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             break;
 
                         case 'gpsfield':
-                            if (!question?.options?.optional && (value[question?.question_id] === false || value[question?.question_id] === undefined)) {
+                            if (!question?.options?.optional && (questionValue[question?.question_id] === false || questionValue[question?.question_id] === undefined)) {
                                 acc.preview_gpsfield[question.question_id] = 'This is a mandatory field';
                             }
                             break;
@@ -592,13 +600,31 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     };
 
-    const resetHiddenQuestionValues = (questionId) => {
-        setValue((prev) => ({
-            ...prev,
-            [questionId]: undefined,
-        }));
-        dispatch(setQuestionValue({ question_id: questionId, value: undefined }));
-    };
+    // const resetHiddenQuestionValues = (questionId) => {
+    //     // Reset the question value in the Redux store
+    //     dispatch(setQuestionValue({ question_id: questionId, value: '' }));
+
+    //     // Reset the question value in local state
+    //     setValue((prev) => ({
+    //         ...prev,
+    //         [questionId]: '',
+    //     }));
+
+    //     // Find the section, page, and label for the question
+    //     const { section_name, page_name, label } = findSectionAndPageName(sections[currentSection], questionId);
+
+    //     // Update conditionalValues to set the label's value to empty
+    //     setConditionalValues((prevValues) => ({
+    //         ...prevValues,
+    //         [section_name]: {
+    //             ...prevValues[section_name], // Preserve existing entries for this section
+    //             [page_name]: {
+    //                 ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+    //                 [label]: '' // Set the value of the label key to empty
+    //             }
+    //         }
+    //     }));
+    // };
     const handleBackClick = () => {
         // If on compliance screen, return to last page
         if (showComplianceScreen) {
@@ -856,20 +882,24 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
-    useEffect(() => {
-        sections.forEach((section) => {
-            section.pages.forEach((page) => {
-                page.questions.forEach((question) => {
-                    if (question.conditional_logic) {
-                        const isVisible = evaluateLogic(question.conditional_logic);
-                        if (!isVisible) {
-                            resetHiddenQuestionValues(question.question_id);
-                        }
-                    }
-                });
-            });
-        });
-    }, [value]);
+    // useEffect(() => {
+    //     const resetValues = () => {
+    //         sections.forEach((section) => {
+    //             section.pages.forEach((page) => {
+    //                 page.questions.forEach((question) => {
+    //                     if (question.conditional_logic) {
+    //                         const isVisible = evaluateLogic(question.conditional_logic);
+    //                         if (!isVisible) {
+    //                             resetHiddenQuestionValues(question.question_id);
+    //                         }
+    //                     }
+    //                 });
+    //             });
+    //         });
+    //     };
+
+    //     resetValues();
+    // }, [sections, evaluateLogic]);
 
     const handleClose = () => {
         setModalOpen(false)
@@ -882,16 +912,17 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_photofield: '',
             preview_filefield: '',
             preview_videofield: '',
-            preview_gpsfield: '',
+            preview_gpsfield: false,
         }));
         dispatch(clearQuestions())
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
+    
 
     return (
         <div className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}>
-            
+
             <div className='flex justify-end p-2'>
                 <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
@@ -989,7 +1020,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                                 // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {
-                                                    return null;
+                                                    
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
                                                 console.error("Error evaluating expression:", error);
@@ -997,10 +1029,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             }
                                         }
                                         else if (list?.conditional_logic.includes("getMonth(")) {
-                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
+                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1");
                                             try {
                                                 if (!eval(replacedLogic)) {
-                                                    return null;
+                                                    
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
                                                 return null;
@@ -1025,7 +1058,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             try {
                                                 let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                 if (!result) {
-                                                    return null; // If the logic evaluates to false, return null
+                        
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
                                                 console.error(error, 'Error evaluating getDay logic');
@@ -1033,11 +1067,23 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             }
                                         } else {
                                             try {
-                                                // debugger
                                                 if (!eval(list?.conditional_logic)) {
-                                                    return null;
+                                                    // Update conditionalValues for this question's label
+                                                    const { section_name, page_name, label } = findSectionAndPageName(sections[currentSection], list?.question_id);
+                                                    setConditionalValues((prevValues) => ({
+                                                        ...prevValues,
+                                                        [section_name]: {
+                                                            ...prevValues[section_name], // Preserve existing entries for this section
+                                                            [page_name]: {
+                                                                ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+                                                                [label]: '' // Set the value of the label key to empty
+                                                            }
+                                                        }
+                                                    }));
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
+                                                console.warn('Error evaluating conditional logic:', error);
                                                 return null;
                                             }
                                         }

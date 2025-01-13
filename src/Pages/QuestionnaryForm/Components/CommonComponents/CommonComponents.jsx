@@ -21,7 +21,6 @@ function CommonComponents({
     validationErrors,
     selectedQuestionId
 }) {
-    console.log(validationErrors?.label, 'validationErrors?.label')
     return (
         <div>
             <div className='flex flex-col justify-start'>
