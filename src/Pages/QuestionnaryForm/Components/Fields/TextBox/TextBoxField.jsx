@@ -32,6 +32,8 @@ const TextBoxField = ({
     // setFieldEditable,
     setFieldValue,
     values,
+    setIsModified,
+    isModified
 }) => {
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
@@ -80,6 +82,7 @@ const TextBoxField = ({
             'fieldId': question_id,
             isEditable: true
         }
+        setIsModified(!isModified);
         dispatch(setFieldEditable(obj));
         dispatch(setQuestionValue({ question_id: question_id, value: newValue }))
         setValue((prev) => ({

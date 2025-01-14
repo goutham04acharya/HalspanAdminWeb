@@ -16,6 +16,7 @@ import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
 import useApi from '../../../services/CustomHook/useApi.js';
 import TagScanField from './Fields/TagScan/TagScanField.jsx';
+import {produce} from 'immer';
 import {
     resetFields,
     setFieldEditable,
@@ -41,6 +42,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
+    const [isModified, setIsModified] = useState(false)
+    const previousSectionsRef = useRef();
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
     const questionValue = useSelector(state => state?.questionValues?.questions);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
@@ -276,7 +279,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
-    const evaluateLogic = React.useCallback((logic) => {
+    const evaluateLogic = ((logic) => {
         try {
             if (logic.includes("new Date(")) {
                 return eval(logic);
@@ -305,7 +308,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             console.error("Error evaluating conditional logic:", error);
             return false;
         }
-    }, []);
+    });
 
     const isPageVisible = (sectionIndex, pageIndex) => {
         const pageData = sections[sectionIndex]?.pages[pageIndex];
@@ -787,6 +790,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     testId="preview"
                     setValue={setValue}
                     values={value[question?.question_id]}
+                    setIsModified={setIsModified}
+                    isModified={isModified}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -795,7 +800,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             case 'signaturefield':
                 return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
-                return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'choiceboxfield':
                 return <ChoiceBoxField
                     sections={sections[currentSection]}
@@ -811,17 +816,19 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     setValue={setValue}
                     choiceValue={value[question?.question_id]}
                     fieldSettingParameters={question}
+                    setIsModified={setIsModified}
+                    isModified={isModified}
                 />
             case 'dateTimefield':
-                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} setIsModified={setIsModified} isModified={isModified} />;
             case 'numberfield':
-                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
+                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'assetLocationfield':
                 return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
                 return <FloorPlanField preview setValidationErrors={setValidationErrors} setValue={setValue} question={question} validationErrors={validationErrors} />;
             case 'photofield':
-                return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'videofield':
                 return <VideoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'tagScanfield':
@@ -882,24 +889,42 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
     }, [sections, setValue, questionValue, setQuestionValue, dispatch])
-    // useEffect(() => {
-    //     const resetValues = () => {
-    //         sections.forEach((section) => {
-    //             section.pages.forEach((page) => {
-    //                 page.questions.forEach((question) => {
-    //                     if (question.conditional_logic) {
-    //                         const isVisible = evaluateLogic(question.conditional_logic);
-    //                         if (!isVisible) {
-    //                             resetHiddenQuestionValues(question.question_id);
-    //                         }
-    //                     }
-    //                 });
-    //             });
-    //         });
-    //     };
+    useEffect(() => {
+        if (sections) {
+            const updateConditionalValues = () => {
+                const newConditionalValues = produce(conditionalValues, (draft) => {
+                    sections.forEach((section) => {
+                        const sectionKey = section.section_name.replace(/\s+/g, '_');
+                        section.pages.forEach((page) => {
+                            const pageKey = page.page_name.replace(/\s+/g, '_');
+                            page.questions.forEach((question) => {
+                                if (question.conditional_logic) {
+                                    try {
+                                        const isVisible = evaluateLogic(question.conditional_logic);
+                                        if (!isVisible) {
+                                            const labelKey = question.label.replace(/\s+/g, '_');
+                                            draft[sectionKey] = draft[sectionKey] || {};
+                                            draft[sectionKey][pageKey] = draft[sectionKey][pageKey] || {};
+                                            draft[sectionKey][pageKey][labelKey] = '';
+                                            dispatch(setQuestionValue({ question_id: question?.question_id, value: '' }))
+                                        }
+                                    } catch (error) {
+                                        console.error('Error evaluating conditional logic:', error);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                });
+                
+                setConditionalValues(newConditionalValues);
+            };
 
-    //     resetValues();
-    // }, [sections, evaluateLogic]);
+            updateConditionalValues();
+        }
+    }, [sections, evaluateLogic, isModified]);
+
+
 
     const handleClose = () => {
         setModalOpen(false)
@@ -918,7 +943,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         dispatch(resetFields())
         dispatch(clearAllSignatures());
     }
-    
+
 
     return (
         <div className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}>
@@ -1020,7 +1045,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
                                                 // Evaluate the updated logic
                                                 if (!eval(updatedLogic)) {
-                                                    
+
                                                     return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
@@ -1032,7 +1057,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1");
                                             try {
                                                 if (!eval(replacedLogic)) {
-                                                    
+
                                                     return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
@@ -1058,7 +1083,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             try {
                                                 let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                 if (!result) {
-                        
+
                                                     return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
@@ -1068,18 +1093,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                         } else {
                                             try {
                                                 if (!eval(list?.conditional_logic)) {
-                                                    // Update conditionalValues for this question's label
-                                                    const { section_name, page_name, label } = findSectionAndPageName(sections[currentSection], list?.question_id);
-                                                    setConditionalValues((prevValues) => ({
-                                                        ...prevValues,
-                                                        [section_name]: {
-                                                            ...prevValues[section_name], // Preserve existing entries for this section
-                                                            [page_name]: {
-                                                                ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                                                                [label]: '' // Set the value of the label key to empty
-                                                            }
-                                                        }
-                                                    }));
                                                     return null; // Skip rendering this question
                                                 }
                                             } catch (error) {

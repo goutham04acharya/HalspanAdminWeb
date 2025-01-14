@@ -87,8 +87,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
+            console.log(fieldSettingParams[question.question_id], 'fieldSettingParams[question.question_id]')
+            console.log(combinedArray, 'combinedArray')
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
-                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray || fieldSettingParams[question.question_id].lookupOptionChoice;
+                if(fieldSettingParams[question?.question_id]?.source === 'fixedList'){
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                }else{
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                }
+                
             }
         });
         setChoiceBoxOptions(choiceBoxOptionsObj);

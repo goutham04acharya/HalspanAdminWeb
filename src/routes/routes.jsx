@@ -60,7 +60,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
         </Route>
 
         {/* 404 Not Found Route */}
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </>
   );
