@@ -66,7 +66,7 @@ function InputWithDropDown({
                 }
             </div>
             {isDropdownOpen && (
-                <ul id={`${id}_inner`} className="absolute bg-white border h-fit  overflow-x-auto scrollBar border-[#AEB3B7] mt-1 w-full z-10">
+                <ul id={`${id}_inner`} className="absolute bg-white border max-h-[200px] overflow-y-scroll overflow-x-auto scrollBar border-[#AEB3B7] mt-1 w-full z-10">
                     {options.length > 0 ? <>
                         {options.map((option, index) => (
                             <li key={option}
