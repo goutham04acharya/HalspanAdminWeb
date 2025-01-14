@@ -12,6 +12,7 @@ function FloorPlanSettings({ handleInputChange,
     handleBlur,
     handleRadiobtn,
     fieldSettingParameters,
+    validationErrors,
     selectedQuestionId,
     setConditionalLogic,
     formStatus
@@ -37,6 +38,8 @@ function FloorPlanSettings({ handleInputChange,
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Pin Drop</p>

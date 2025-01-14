@@ -158,6 +158,43 @@ When('I select the condition from basic editor', async function () {
     await new Promise(resolve => setTimeout(resolve, 250));
     await driver.wait(until.elementLocated(By.css(`[data-testid="grade-0"]`))).sendKeys('A');
     console.log('pass 9');
+    // Add else if condition
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="else-if"]`))).click();
+    console.log('pass else if 1');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="elseif-select-0-0-0"]`))).click();
+    console.log('pass else if 2');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="select-dropdown-0-0-0"]`))).click();
+    console.log('pass else if 3');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="elseif-condition-0-0-0"]`))).click();
+    console.log('pass else if 4');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-dropdown-0-0-0"]`))).click();
+    console.log('pass else if 5');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="elseif-value-dropdown-0-0-0"]`))).click();
+    console.log('pass else if 6');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="value-dropdown-2"]`))).click();
+    console.log('pass else if 7');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="elseif-status-dropdown-0"]`))).click();
+    console.log('pass else if 8');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="status-dropdown-label-1"]`))).click();
+    console.log('pass else if 9');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="reason-dropdown"]`))).click();
+    console.log('pass else if 10');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="reason-dropdown-label-0"]`))).click();
+    console.log('pass else if 11');
+    await new Promise(resolve => setTimeout(resolve, 250));
+    await driver.wait(until.elementLocated(By.css(`[data-testid="elseif-action"]`))).sendKeys('A');
+    console.log('pass else if 12');
     await new Promise(resolve => setTimeout(resolve, 250));
     await driver.wait(until.elementLocated(By.css(`[data-testid="else-status-dropdown"]`))).click();
     console.log('pass 10');
@@ -184,7 +221,7 @@ When('I click add default value button for compliance logic', async function () 
 Then('I should see the basic editor compliance logic in default value field', async function () {
     await new Promise(resolve => setTimeout(resolve, 950));
     // eslint-disable-next-line max-len
-    let condition = `if (Section_1.Page_1.Sample_Choice_Label_Name.includes("Yes")) then (STATUS = 'PASS', GRADE = 'A') else (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "Replace")`;
+    let condition = `if (Section_1.Page_1.Sample_Choice_Label_Name.includes("Yes")) then (STATUS = 'PASS', GRADE = 'A') else (Section_1.Page_1.Sample_Choice_Label_Name.includes("Maybe")) then (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "A") else (STATUS = 'FAIL', REASON = 'NO_ACCESS', ACTIONS += "Replace")`;
     // eslint-disable-next-line max-len
     const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
     assert.equal(default_value, condition);

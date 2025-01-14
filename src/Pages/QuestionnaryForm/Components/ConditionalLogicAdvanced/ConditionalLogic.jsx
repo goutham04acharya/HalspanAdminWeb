@@ -57,6 +57,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
+    const [showChoiceValues, setShowChoiceValues] = useState(false)
     const [logic, setLogic] = useState('')
     const [complianceCondition, setComplianceCondition] = useState('')
     const [datetimefieldQuestions, setDatetimefieldQuestions] = useState([]);
@@ -87,8 +88,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
+            console.log(fieldSettingParams[question.question_id], 'fieldSettingParams[question.question_id]')
+            console.log(combinedArray, 'combinedArray')
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
-                choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray || fieldSettingParams[question.question_id].lookupOptionChoice;
+                if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                } else {
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                }
+
             }
         });
         setChoiceBoxOptions(choiceBoxOptionsObj);
@@ -101,6 +109,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
+    console.log(combinedArray, 'combined array')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -246,12 +255,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 ?.replaceAll('||', 'or') // Replace || with or
                 ?.replaceAll('.length', '.()')
         }
-        if (condition_logic.includes(':')) {
-            // Split by colon and rebuild with "else if" and "else" logic
-            const parts = condition_logic.split(':');
-            const lastPart = parts.pop(); // Remove the last part
-            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
-        }
         if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
             const parts = condition_logic.split(':');
@@ -312,6 +315,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
+        // debugger
         setError('');
         // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
@@ -325,6 +329,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
+        console.log(secDetailsForSearching, 'secDetailsForSearching')
+        console.log(questionMatches, 'question matches')
+        console.log(combinedArray, 'combined array')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -424,21 +431,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
+        // console.log(textToInsert, 'textToInsert');
+        // console.log(textarea.value, 'selectedType')
         if (textarea) {
             const cursorPosition = textarea.selectionStart; // Get the current cursor position
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-
+    
             // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-
+    
             // Check if there's a space or if the input is empty
-            // const lastChar = textBefore.slice(-1);
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-
+    
             let newText;
-
+    
             if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
                 // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
@@ -448,16 +456,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
                 newText = textToKeep + textToInsert + textAfter;
             }
-
+    
             // Update the textarea value
             textarea.value = newText;
-            setShowSectionList(false);
-            setInputValue(newText)
-            setLogic(newText)
     
+            // If the textToInsert is "includes()", place the cursor inside the parentheses and add `""`
+            if (textToInsert === 'includes()') {
+                // Find the position of "includes()" in the new text
+                const includesIndex = newText.indexOf('includes()');
+                if (includesIndex !== -1) {
+                    // Replace "includes()" with 'includes("")'
+                    const updatedText = newText.replace('includes()', 'includes("")');
+                    textarea.value = updatedText;
+    
+                    // Calculate the cursor position: right after `includes("`
+                    const cursorPosition = includesIndex + 'includes("'.length;
+    
+                    // Use setTimeout to ensure the DOM updates before setting the cursor position
+                    setTimeout(() => {
+                        textarea.setSelectionRange(cursorPosition, cursorPosition);
+                        textarea.focus(); // Ensure the textarea is focused
+                    }, 0);
+                }
+            }
+            setShowSectionList(false);
+            setInputValue(textarea.value);
+            setLogic(textarea.value);
+            console.log(showSectionList, 'show method')
         }
+        console.log(inputValue, 'input value')
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
+            setShowChoiceValues(true);
         } else {
             let fieldType = '';
             switch (componentType) {
@@ -493,7 +523,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setSelectedFieldType(fieldType.join(', '));
         }
     };
-
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -1509,16 +1538,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         finalString += conditions[0]?.conditions[0]?.question_name !== '' ? 'if (' + getComplianceLogic(conditions[0]?.conditions) + ')' : ''
         if (conditions[0].thenAction) {
-            finalString += ' ? ' + generateThenActionString(conditions[0].thenAction) + `${conditions[0].elseIfBlocks ? '' : ' : '}`;
+            finalString += ' ? ' + generateThenActionString(conditions[0]?.thenAction) + `${conditions[0]?.elseIfBlocks ? '' : ' : '}`;
         }
-        if (conditions[0].elseIfBlocks) {
+        if (conditions[0]?.elseIfBlocks) {
             finalString += ' : '
-            conditions[0].elseIfBlocks.map((outerItem) => {
+            conditions[0]?.elseIfBlocks?.map((outerItem) => {
                 if (outerItem.conditions.length > 0) {
-                    finalString += '(' + getComplianceLogic(outerItem.conditions) + ')';
+                    finalString += '(' + getComplianceLogic(outerItem?.conditions) + ')';
                 }
-                if (outerItem.thenActions) {
-                    finalString += ' ? ' + generateThenActionString(outerItem.thenActions[0]) + ' : ';
+                if (outerItem?.thenActions) {
+                    finalString += ' ? ' + generateThenActionString(outerItem?.thenActions[0]) + ' : ';
                 }
             })
 
@@ -1535,12 +1564,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
-        else if(isDefaultLogic && !complianceState){
+        else if (isDefaultLogic && !complianceState) {
             console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic!== '') {
+                if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                         .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
@@ -1548,9 +1577,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
                 }
-                if (condition_logic.includes(':')) {
+                if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
-                    const parts = condition_logic.split(':');
+                    const parts = condition_logic?.split(':');
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
@@ -1671,7 +1700,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     ) : (
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
                                     )}
-
+                                    {console.log(suggestions, 'suggestions')}
                                     <AdvancedEditor
                                         handleListSectionDetails={handleListSectionDetails}
                                         showSectionList={showSectionList}
@@ -1689,6 +1718,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         selectedFieldType={selectedFieldType}
                                         setSelectedType={setSelectedType}
                                         isDefaultLogic={isDefaultLogic}
+                                        combinedArray={combinedArray}
                                     />
                                 </div>
                                 <div className='w-[40%]'>

@@ -32,10 +32,12 @@ const TextBoxField = ({
     // setFieldEditable,
     setFieldValue,
     values,
+    setIsModified,
+    isModified
 }) => {
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-
+    console.log(sections, 'sections')
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -80,6 +82,7 @@ const TextBoxField = ({
             'fieldId': question_id,
             isEditable: true
         }
+        setIsModified(!isModified);
         dispatch(setFieldEditable(obj));
         dispatch(setQuestionValue({ question_id: question_id, value: newValue }))
         setValue((prev) => ({
@@ -121,9 +124,7 @@ const TextBoxField = ({
         if (['Backspace', 'Tab', 'Enter', 'Shift', 'Control', 'Alt', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'CapsLock'].includes(keyValue)) {
             return;
         }
-        console.log('Key Pressed:', keyValue); // This will now log the key pressed
     };
-
     return (
         <div className=''>
             <label

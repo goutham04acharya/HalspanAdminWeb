@@ -37,6 +37,8 @@ function VideoFieldSetting({ handleInputChange,
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='mt-7'>
                         <InputField

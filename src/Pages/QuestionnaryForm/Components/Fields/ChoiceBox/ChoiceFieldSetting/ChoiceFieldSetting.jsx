@@ -26,7 +26,8 @@ function ChoiceFieldSetting({
     isDefaultLogic,
     setIsDefaultLogic,
     defaultString,
-    formStatus
+    formStatus,
+    validationErrors
 }) {
     const [isLookupOpen, setIsLookupOpen] = useState(false);
     const [optionData, setOptionData] = useState([]);
@@ -145,6 +146,8 @@ function ChoiceFieldSetting({
                     formStatus={formStatus}
                     fieldSettingParameters={fieldSettingParameters}
                     assetLocation={true}
+                    validationErrors={validationErrors}
+                    selectedQuestionId={selectedQuestionId}
                 />
                 <div className='mt-7'>
                     <p className='font-semibold text-base text-[#2B333B]'>Type</p>

@@ -84,6 +84,7 @@ function Questionnaries() {
   };
 
   const fetchQuestionnaryList = useCallback(async () => {
+
     setLoading(true);
     const params = Object.fromEntries(searchParams);
     if (lastEvaluatedKeyRef.current) {
@@ -109,6 +110,7 @@ function Questionnaries() {
   }, [searchParams]);
 
   const lastElementRef = useCallback(node => {
+    
     if (loading || isFetchingMore) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {

@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { useDispatch } from 'react-redux';
 
 function GPSField({
     type,
@@ -19,7 +21,7 @@ function GPSField({
     const [location, setLocation] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true); // Add loading states
-
+    const dispatch = useDispatch()
     useEffect(() => {
         const fetchLocation = () => {
             if (navigator.geolocation) {
@@ -31,28 +33,23 @@ function GPSField({
                         );
                         setLocation(formattedLocation);
                         setLoading(false); // Stop loading once location is fetched
-                        setValue((prev) => ({
-                            ...prev,
-                            [question?.question_id]: true
-                        }))
-                        setValidationErrors((prevErrors) => ({
-                            ...prevErrors,
-                            preview_gpsfield: '', // Or remove the key if you prefer     
-                        }))
+                        dispatch(setQuestionValue({ question_id: question?.question_id, value: true }))
                     },
                     (err) => {
                         setError(err.message);
                         setLoading(false); // Stop loading once location is fetched
                     }
-                );
 
+                );
+                
             } else {
                 setError("Geolocation is not supported by this browser.");
                 setLoading(false); // Stop loading once location is fetched
-                setValue((prev) => ({
-                    ...prev,
-                    [question?.question_id]: false
-                }))
+                dispatch(setQuestionValue({ question_id: question?.question_id, value: false }))
+                // setValue((prev) => ({
+                //     ...prev,
+                //     [question?.question_id]: false
+                // }))
             }
         };
 
@@ -71,6 +68,11 @@ function GPSField({
 
         return `${formattedLat}, ${formattedLon}`;
     };
+    // if (loading) {
+
+    // } else {
+    //     dispatch(setQuestionValue({ question_id: question?.question_id, value: false }))
+    // }
 
     return (
         <div>

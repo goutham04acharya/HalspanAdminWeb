@@ -38,6 +38,7 @@ function FileFieldSetting({ handleInputChange,
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
                     />
                     <div className='mt-7'>
                         <InputField

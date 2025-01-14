@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import Debounce from '../CommonMethods/debounce';
 
 function Search({ className, onChange, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder }) {
 
   // Search related functions
   const handleChange = (e, value) => {
+    console.log(value,'value')
     handleSearch(e, "search", value);
   };
 
@@ -27,6 +28,7 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
       }
     } else {
       params[key] = value;
+      console.log(value, 'value')
     }
     setQueList([]);
     setSearchParams({ ...params });
@@ -51,8 +53,8 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
     setSearchValue(value);
     optimizedFn(e, value); // This should call handleSearch with the current value
   };
-
-
+  
+  
   const handleSearchClose = () => {
     setLoading(true);
     let params = Object.fromEntries(searchParams);

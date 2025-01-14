@@ -3,7 +3,7 @@ import React from 'react';
 
 function Shimmer ({ column, row, firstIndex, hight, version, updateLookup, width, modalWidth }) {
     return (
-        <tbody className={`h-customh4 overflow-x-hidden scrollHide relative z-[9] ${modalWidth || ''}`}>
+        <tbody className={`h-customh4 !overflow-hidden scrollHide relative z-[9] ${modalWidth || ''}`}>
             {[...Array(row)].map((_, index) => (
                 <tr className="animate-pulse z-0" key={index}>
                     {[...Array(column)].map((_, ind) => (

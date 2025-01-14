@@ -9,6 +9,7 @@ function GPSFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
+    validationErrors,
     selectedQuestionId,
     setConditionalLogic,
     formStatus
@@ -30,6 +31,8 @@ function GPSFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
                     <div className='mt-7'>

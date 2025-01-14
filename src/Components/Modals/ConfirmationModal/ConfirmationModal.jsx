@@ -5,7 +5,7 @@ import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 
 
-function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus }) {
+function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus, complianceLoader }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();

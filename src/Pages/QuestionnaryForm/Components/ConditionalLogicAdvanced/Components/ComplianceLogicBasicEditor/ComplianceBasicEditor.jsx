@@ -239,6 +239,58 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             return updatedConditions;
         });
     };
+    const handleClearConditionValues = () => {
+        setConditions((prevConditions) =>
+            prevConditions.map((conditionGroup) => ({
+                ...conditionGroup,
+                conditions: conditionGroup.conditions.map((condition) => ({
+                    ...condition,
+                    question_name: "",
+                    condition_logic: "",
+                    value: "",
+                    dropdown: false,
+                    condition_dropdown: false,
+                    condition_type: condition.condition_type, // Preserve type if needed
+                })),
+            }))
+        );
+    };
+    const handleClearElseIfConditionValues = (blockId, elseIfIndex) => {
+        setConditions((prevConditions) =>
+            prevConditions.map((conditionGroup, index) => {
+                if (index === blockId) {
+                    // Check if the elseIfBlock exists and has only one condition
+                    if (
+                        conditionGroup.elseIfBlocks &&
+                        conditionGroup.elseIfBlocks[elseIfIndex] &&
+                        conditionGroup.elseIfBlocks[elseIfIndex].conditions.length === 1
+                    ) {
+                        return {
+                            ...conditionGroup,
+                            elseIfBlocks: conditionGroup.elseIfBlocks.map((elseIfBlock, i) => {
+                                if (i === elseIfIndex) {
+                                    return {
+                                        ...elseIfBlock,
+                                        conditions: elseIfBlock.conditions.map((condition) => ({
+                                            ...condition,
+                                            question_name: "",
+                                            condition_logic: "",
+                                            value: "",
+                                            dropdown: false,
+                                            condition_dropdown: false,
+                                            condition_type: condition.condition_type, // Preserve type
+                                        })),
+                                    };
+                                }
+                                return elseIfBlock;
+                            }),
+                        };
+                    }
+                }
+                return conditionGroup;
+            })
+        );
+    };
 
     useEffect(() => {
         const totalConditions = conditions.reduce((acc, curr) => acc + curr.conditions.length, 0);
@@ -621,18 +673,35 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                 prevConditions.map((item, index) => {
                     if (index === blockId) {
                         const updatedElseIfBlocks = [...item.elseIfBlocks];
-                        updatedElseIfBlocks[elseIfIndex] = {
-                            ...updatedElseIfBlocks[elseIfIndex],
-                            conditions: updatedElseIfBlocks[elseIfIndex].conditions.filter((_, i) => i !== innerIndex)
-                        };
-                        // Update the previous condition to reset the operator click   
-                        if (innerIndex > 0) {
-                            updatedElseIfBlocks[elseIfIndex].conditions[innerIndex - 1] = {
-                                ...updatedElseIfBlocks[elseIfIndex].conditions[innerIndex - 1],
+                        const elseIfBlock = updatedElseIfBlocks[elseIfIndex];
+
+                        // Check if it's the first condition
+                        if (elseIfBlock.conditions.length === 1 && innerIndex === 0) {
+                            // Reset the fields of the first condition
+                            elseIfBlock.conditions[0] = {
+                                ...elseIfBlock.conditions[0],
+                                question_name: '',
+                                condition_logic: '',
+                                value: '',
+                                dropdown: false,
+                                condition_dropdown: false,
+                                condition_type: 'textboxfield',
                                 andClicked: false,
                                 orClicked: false
                             };
+                        } else {
+                            // Remove the condition if it's not the first one
+                            elseIfBlock.conditions = elseIfBlock.conditions.filter((_, i) => i !== innerIndex);
+                            // Update the previous condition to reset the operator click
+                            if (innerIndex > 0) {
+                                elseIfBlock.conditions[innerIndex - 1] = {
+                                    ...elseIfBlock.conditions[innerIndex - 1],
+                                    andClicked: false,
+                                    orClicked: false
+                                };
+                            }
                         }
+
                         return {
                             ...item,
                             elseIfBlocks: updatedElseIfBlocks
@@ -646,20 +715,20 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                 prevConditions
                     .map((item, index) => {
                         if (index === blockId) {
-                            // Remove the element at innerIndex from the inner conditions array    
+                            // Remove the element at innerIndex from the inner conditions array
                             const updatedConditions = item.conditions.filter((_, i) => i !== innerIndex);
 
-                            // If the updated conditions array is empty, return null (mark for removal)    
+                            // If the updated conditions array is empty, return null (mark for removal)
                             return updatedConditions.length > 0
                                 ? { ...item, conditions: updatedConditions }
-                                : null; // Return null to indicate the entire object should be removed    
+                                : null; // Return null to indicate the entire object should be removed
                         }
                         return item;
                     })
-                    .filter(item => item !== null) // Remove objects where conditions array is empty    
+                    .filter(item => item !== null) // Remove objects where conditions array is empty
             );
         }
-    }
+    };
 
     const statusDropdownHandler = (option, index, subIndex, id, type) => {
         if (type == 'elseIfIndex') {
@@ -988,7 +1057,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                         subIndex={i}
                                                                                         isDropdownOpen={conditions[index].conditions[i].value_dropdown}
                                                                                         setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                                                        options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                        options={combinedArray.length > 0 ? combinedArray?.find((item) => item?.question_detail === conditions[index]?.conditions[i]?.question_name)?.choice_values.map((choice) => choice?.value) : []}
                                                                                         validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
                                                                                     />
                                                                                     {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
@@ -1035,15 +1104,21 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                             </div>}
                                                         </div>
                                                         <div className='w-[3%] flex justify-end'>
-                                                            <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
-                                                                <Image src="trash-black" className="" data-testid="delete" />
+                                                            <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {
+                                                                if (conditions[0]?.conditions?.length === 1 && conditions[0]?.conditions?.length === 1) {
+                                                                    handleClearConditionValues(); // Clear values for the single condition
+                                                                } else {
+                                                                    handleAdd("delete", index, i)
+                                                                }
+                                                            }}>
+                                                                <Image src="trash-black" className="" testId={`delete-${i}`} />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </React.Fragment>
                                             ))}
                                             {conditions.length - 1 === index ? (
-                                                <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => {
+                                                <div className='cursor-pointer' data-testid={`OR`} onClick={() => {
                                                     handleAddCondition(index, false, null, true, false)
                                                     handleAdd('OR')
                                                 }
@@ -1163,9 +1238,10 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                     label=''
                                                                                     id='dropdown'
                                                                                     top='30px'
+                                                                                    labeltestID={`select-dropdown-${index}-${i}`}
                                                                                     placeholder='Select'
                                                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                                                    testID={`select-${index}-${i}`}
+                                                                                    testID={`elseif-select-${elseIfIndex}-${index}-${i}`}
                                                                                     selectedOption={conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i]?.question_name}
                                                                                     handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'dropdown', true, elseIfIndex)}
                                                                                     isDropdownOpen={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].dropdown}
@@ -1189,7 +1265,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                     top='30px'
                                                                                     placeholder='Select'
                                                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                                                    testID={`condition-${index}-${i}`}
+                                                                                    labeltestID={`condition-dropdown-${index}-${i}`}
+                                                                                    testID={`elseif-condition-${elseIfIndex}-${index}-${i}`}
                                                                                     selectedOption={conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i]?.condition_logic}
                                                                                     handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'condition_dropdown', true, elseIfIndex)}
                                                                                     mainIndex={index}
@@ -1235,14 +1312,15 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                             top="20px"
                                                                                             placeholder="Select"
                                                                                             className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
-                                                                                            testID={`value-dropdown-${index}-${i}`}
+                                                                                            labeltestID='value-dropdown'
+                                                                                            testID={`elseif-value-dropdown-${elseIfIndex}-${index}-${i}`}
                                                                                             selectedOption={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value}
                                                                                             handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', true, elseIfIndex)}
                                                                                             mainIndex={index}
                                                                                             subIndex={i}
                                                                                             isDropdownOpen={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value_dropdown}
                                                                                             setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, true, elseIfIndex)}
-                                                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].elseIfBlocks[elseIfIndex].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                            options={combinedArray?.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions[i]?.question_name)?.choice_values?.map((choice) => choice?.value) : []}
                                                                                         />
                                                                                     ) : (
                                                                                         <InputField
@@ -1254,14 +1332,14 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                             className='w-full'
                                                                                             labelStyle=''
                                                                                             placeholder=''
-                                                                                            testId={`value-input-${index}-${i}`}
+                                                                                            testId={`elseif-value-input-${elseIfIndex}-${index}-${i}`}
                                                                                             htmlFor=''
                                                                                             maxLength={32}
                                                                                             mainIndex={index}
                                                                                             subIndex={i}
                                                                                             handleChange={(e) => handleInputChange(e, '', '', index, i, true, elseIfIndex, i)}
-                                                                                            onInput={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'dateTimefield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'numberfield' || conditions[index].elseIfBlocks[elseIfIndex].conditions[i].condition_type === 'photofield'}
-                                                                                            validationError={submitSelected && conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value === '' && 'This field  is mandatory'}
+                                                                                            onInput={conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions[i]?.condition_type === 'dateTimefield' || conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions[i]?.condition_type === 'numberfield' || conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions[i]?.condition_type === 'photofield'}
+                                                                                            validationError={submitSelected && conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions[i]?.value === '' && 'This field  is mandatory'}
                                                                                             basicEditor
                                                                                         />
                                                                                     )}
@@ -1271,7 +1349,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
                                                                     </div>
                                                                     {elseIfBlock.conditions.length - 1 === i ? (
-                                                                        <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => {handleAddCondition(index, true, elseIfIndex, false, true)
+                                                                        <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => {
+                                                                            handleAddCondition(index, true, elseIfIndex, false, true)
                                                                             handleAdd('AND')
                                                                         }}>
                                                                             <Image src="add" className="cursor-pointer" data-testid="add" />
@@ -1284,8 +1363,13 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                     )}
                                                                 </div>
                                                                 <div className='w-[3%] flex justify-end'>
-                                                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {handleDeleteCondition(index, i, true, elseIfIndex)
-                                                                        handleAdd('OR')
+                                                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {
+                                                                         if (conditions[index]?.elseIfBlocks[elseIfIndex]?.conditions.length === 1) {
+                                                                            handleClearElseIfConditionValues(index, elseIfIndex); // Reset fields if only one condition
+                                                                        } else {
+                                                                            handleDeleteCondition(index, i, true, elseIfIndex); // Delete condition otherwise
+                                                                            handleAdd('OR')
+                                                                        }
                                                                     }}>
                                                                         <Image src="trash-black" className="" data-testid="delete" />
                                                                     </div>
@@ -1316,7 +1400,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                                                    testID={`status-dropdown`}
+                                                    testID={`elseif-status-dropdown-${elseIfIndex}`}
                                                     labeltestID={`status-dropdown-label`}
                                                     selectedOption={condition.elseIfBlocks[elseIfIndex].thenActions[0].status}
                                                     handleOptionClick={(e) => statusDropdownHandler(e, index, elseIfIndex, 'status', 'elseIfIndex')}
@@ -1362,6 +1446,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                         <InputField
                                                             label="Action"
                                                             className="w-full"
+                                                            testId="elseif-action"
                                                             placeholder="Enter action"
                                                             value={condition.elseIfBlocks[elseIfIndex].thenActions[0].action || ''}
                                                             handleChange={(e) => handleThenActionChange(index, 'action', e.target.value, false, true, elseIfIndex)}
@@ -1387,6 +1472,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
                             <button
                                 className='w-fit px-4 py-2 text-[#2B333B] font-semibold rounded-md'
+                                data-testid="else-if"
                                 onClick={() => addElseIf(index)}
                             >
                                 + Add Else If

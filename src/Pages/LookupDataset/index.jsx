@@ -27,6 +27,8 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         encodeURIComponent(searchParams.get('search')) : '');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [shimmerLoading, setShimmerLoading] = useState(false);
+    const [maxLengthError, setMaxLengthError] = useState(false)
+    const [disableDelete, setDisableDelete] = useState(false)
     const initialState = {
         name: '',
         choices: []
@@ -87,27 +89,47 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
+        console.log(data, 'data')
+        if(data.choices.length === 1){
+            setDisableDelete(true)
+        }else{
+            setDisableDelete(false)
+        }
     };
 
     // Create Functions
     const handleChange = (e, id, type) => {
         setErrors(id, '');
         const value = e.target.value;
+
         if (type === 'value') {
+
             const updatedChoices = data.choices.map(choice =>
                 choice.uuid === id
                     ? { ...choice, value: value }
                     : choice
             );
             setData("choices", updatedChoices);
+            setMaxLengthError(false)
         } else if (type === 'Name' || type === 'New Choice') {
-            // For other fields like name
             setData(id, value);
         } else {
-            // For other fields like name
-            setData(id, value);
+            // Split input by commas and trim spaces
+            const valuesArray = value.split(',').map(item => item.trim());
+
+            // Validate each value does not exceed 100 characters
+            const isValid = valuesArray.every(item => item.length <= 100);
+            if (isValid) {
+                setData(id, value);
+                setMaxLengthError(false)
+            } else {
+                // Optional: Set an error message or prevent input
+                // setToastError("Invalid Choices");
+                setMaxLengthError(true)
+            }
         }
     };
+
 
     const handleClose = () => {
         // debugger
@@ -197,10 +219,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
             const response = await apiFunction(endpoint, payload);
 
             if (!response?.error) {
-                // setIsView({
-                //     open: true,
-                //     id: isView?.id
-                // });
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
                 fetchLookupList(); // Refetch the lookup list after success
@@ -230,11 +248,17 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                     setToastError(errorMessage); // Show error toast if file import fails
                     handleClose();
                     setIsImportLoading(false);
+                    setShimmerLoading(false)
                     setIsCreateLoading(false)
                 }
+            } else if (response?.data?.status === 400) {
+                setToastError("Invalid Choices");
+                setIsCreateLoading(false)
+                setShimmerLoading(false)
             } else {
                 setToastError(response?.data?.data?.message); // Show generic error toast
-                handleClose();
+                setIsCreateLoading(false);
+                setShimmerLoading(false)
             }
         } catch (error) {
             handleClose(); // Close modal in case of error
@@ -446,6 +470,8 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 activeInputs={activeInputs}
                 setActiveInputs={setActiveInputs}
                 initialState={initialState}
+                maxLengthError={maxLengthError}
+                disableDelete={disableDelete}
             // handleView={handleView}
             />
         </>
