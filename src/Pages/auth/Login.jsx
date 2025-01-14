@@ -11,7 +11,7 @@ function Login() {
 
   return (
     <div>
-      <img alt='Redirecting to login...' />
+      <h1>Redirecting to login...</h1> 
     </div>
   );
 }
