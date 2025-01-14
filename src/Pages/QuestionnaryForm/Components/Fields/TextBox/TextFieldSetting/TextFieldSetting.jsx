@@ -33,8 +33,6 @@ function TestFieldSetting({
   const [optionData, setOptionData] = useState([]);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -213,6 +211,8 @@ function TestFieldSetting({
             formParameters={formParameters}
             handleBlur={handleBlur}
             formStatus={formStatus}
+            validationErrors={validationErrors}
+            selectedQuestionId={selectedQuestionId}
           />
           <div className='flex flex-col justify-start mt-7 w-full relative'>
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>

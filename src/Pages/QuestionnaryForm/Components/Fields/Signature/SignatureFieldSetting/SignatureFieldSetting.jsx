@@ -7,6 +7,7 @@ function SignatureFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
+    validationErrors,
     setConditionalLogic,
     formStatus
 }) {
@@ -27,6 +28,8 @@ function SignatureFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='mt-7'>
                         <InputField

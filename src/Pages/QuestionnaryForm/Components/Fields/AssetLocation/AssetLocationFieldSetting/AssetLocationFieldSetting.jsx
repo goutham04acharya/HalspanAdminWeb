@@ -8,6 +8,7 @@ function AssetLocationFieldSetting({
     handleBlur,
     fieldSettingParameters,
     setConditionalLogic,
+    validationErrors,
     formStatus
 }) {
     return (
@@ -27,6 +28,7 @@ function AssetLocationFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
                     />
                     <div className='mt-7'>
                         <InputField

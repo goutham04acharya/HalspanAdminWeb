@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
 
 
-function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFileChange, setConditionalValues, setValue, handleRemoveImage, question, setFileState , handleBlur}) {
+function ImageUploader({ maxImages, drawOnImage, sections, minImages, setIsModified, isModified, handleFileChange, setConditionalValues, setValue, handleRemoveImage, question, setFileState , handleBlur}) {
     const [images, setImages] = useState([]);
     const [currentImage, setCurrentImage] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
@@ -58,6 +58,7 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, handleFile
                 }
             }
         }));
+        setIsModified(!isModified)
         
     
         // Optional: Set value for parent component

@@ -40,6 +40,8 @@ function PhotoFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Number of Photos</p>

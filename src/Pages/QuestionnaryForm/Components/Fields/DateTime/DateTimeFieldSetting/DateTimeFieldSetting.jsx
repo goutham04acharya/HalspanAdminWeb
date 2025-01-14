@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
 import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent'
@@ -14,6 +14,7 @@ function DateTimeFieldSetting({
   handleBlur,
   handleRadiobtn,
   fieldSettingParameters,
+  validationErrors,
   selectedQuestionId,
   setConditionalLogic,
   setIsDefaultLogic,
@@ -30,6 +31,10 @@ function DateTimeFieldSetting({
     dispatch(setNewComponent({ id: 'format', value: '24', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
+
+  useEffect(() => {
+    dispatch(setNewComponent({ id: 'format', value: fieldSettingParameters?.format || '24', questionId: selectedQuestionId }));
+  }, [])
 
   return (
     <>
@@ -50,6 +55,8 @@ function DateTimeFieldSetting({
             formParameters={formParameters}
             handleBlur={handleBlur}
             formStatus={formStatus}
+            validationErrors={validationErrors}
+            selectedQuestionId={selectedQuestionId}
           />
           <div className='flex flex-col justify-start mt-7 w-full relative'>
             <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
@@ -68,13 +75,13 @@ function DateTimeFieldSetting({
                   onChange={
                     formStatus === 'Draft'
                       ? (e) =>
-                          dispatch(
-                            setNewComponent({
-                              id: 'default_conditional_logic',
-                              value: e.target.value,
-                              questionId: selectedQuestionId,
-                            })
-                          )
+                        dispatch(
+                          setNewComponent({
+                            id: 'default_conditional_logic',
+                            value: e.target.value,
+                            questionId: selectedQuestionId,
+                          })
+                        )
                       : null
                   }
                   className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
@@ -84,15 +91,14 @@ function DateTimeFieldSetting({
                   src="/Images/setting.svg"
                   alt="setting"
                   data-testid="default-value"
-                  className={`absolute top-5 right-3 ${
-                    formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'
-                  }`}
+                  className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'
+                    }`}
                   onClick={
                     formStatus === 'Draft'
                       ? () => {
-                          setIsDefaultLogic(true);
-                          setConditionalLogic(false);
-                        }
+                        setIsDefaultLogic(true);
+                        setConditionalLogic(false);
+                      }
                       : null
                   }
                 />
@@ -174,7 +180,7 @@ function DateTimeFieldSetting({
               </div>
             </div>
           </div>
-          {((fieldSettingParameters?.type === 'time') || (fieldSettingParameters?.type === 'datetime')) &&
+          {(fieldSettingParameters?.type !== 'date') &&
             <div className='mt-7'>
               <p className='font-semibold text-base text-[#2B333B]'>Format</p>
               <div className="relative custom-radioBlue flex items-center mt-3" data-testid='yes'>

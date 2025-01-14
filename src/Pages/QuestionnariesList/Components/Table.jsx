@@ -55,7 +55,7 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                     ? <Shimmer column={7} row={10} firstIndex />
                     : <tbody className='bg-white'>
                         {QueList && QueList.map((QueInfo, index) => (
-                            <React.Fragment key={index}>
+                            <React.Fragment key={QueInfo?.questionnaire_id}>
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-6 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{QueInfo?.questionnaire_id}</td>
                                     <td className=' py-6 text-start font-semibold truncate max-w-[100px] text-base text-[#2B333B] pr-6 cursor-pointer bg-[#F4F6FA]'

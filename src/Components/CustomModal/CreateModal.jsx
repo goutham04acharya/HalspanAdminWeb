@@ -8,7 +8,7 @@ import Image from '../Image/Image';
 import { BeatLoader } from 'react-spinners';
 import Shimmer from '../Shimmers/Shimmer';
 
-const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, initialState, handleRemoveChoice, activeInputs, setActiveInputs, shimmerLoading }) => {
+const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleChange, handleCreate, isCreateLoading, handleImport, isView, isImportLoading, title, createLookup, handleAddChoice, initialState, handleRemoveChoice, activeInputs, setActiveInputs, shimmerLoading, maxLengthError, disableDelete }) => {
 
     const handleAddInput = (uuid) => {
         setActiveInputs(prev => ({
@@ -45,7 +45,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
 
         if (choicesLength < 4) return 'w-[350px]';
         if (choicesLength <= 6) return 'w-[150px]';
-         return 'w-[120px]';
+        return 'w-[120px]';
     };
     const getChoiceHeight = () => {
 
@@ -102,141 +102,142 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                     validationError={errors?.choices}
                 />}
                 {
-                <div>
-                {(!createLookup && (choicesLength >= 11)) && <div className='flex w-full mt-5 mb-1.5'>
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                    <div className='flex items-center w-1/3'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                </div>}
-                {(!createLookup && (choicesLength > 6 && choicesLength < 11)) &&
-                    <div className='flex mt-5 mb-1.5 w-full'
-                    >
-                        <div className='flex items-center w-1/3'>
-                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                        </div>
-                        <div className='flex items-center w-1/3'>
-                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                        </div>
-                        <div className='flex items-center w-1/3'>
-                            <h1 className='font-[600] text-[#2B333B] w-[60%]'>Id</h1>
-                            <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                        </div>
-                    </div>}
-                {(!createLookup && (choicesLength === 4 || choicesLength === 5 || choicesLength === 6)) && <div className='flex gap-[195px] mt-5 mb-1.5'>
-                    <div className='flex items-center'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                    <div className='flex items-center'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                </div>}
-                {(!createLookup && (choicesLength < 4)) && <div className='flex mt-5 mb-1.5'>
-                    <div className='flex items-center'>
-                        <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
-                        <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
-                    </div>
-                </div>}
-                {!createLookup && <div className={`${getChoiceHeight()} w-full flex flex-wrap overflow-y-auto ${shimmerLoading ? 'scrollHide' : 'scrollBar'}`}>
-                    {(Array.isArray(data.choices) ? data.choices : []).map((choice, index) => (
-                        <div className={`${getChoiceWidth()}`}>
-                            <div className='flex flex-col'>
-                                <div key={choice.uuid || index}>
-                                {shimmerLoading ? <Shimmer column={getChoiceShimmerCol()} row={7} width={getChoiceShimmerWidth()} /> : 
-                                    <div className={`flex py-1 gap-4 ${choicesLength >= 11 ? 'mr-10' : 'mr-3'}`}>
-                                        <InputField
-                                            autoComplete="off"
-                                            id={`uuid-${index}`}
-                                            type="text"
-                                            value={choice.uuid}
-                                            testId={`uuid-${index}`}
-                                            htmlFor={`uuid-${index}`}
-                                            maxLength={40}
-                                            className="w-full mt-2.5"
-                                            validationError={errors?.choices?.[index]?.uuid}
-                                            disabled
-                                        />
-                                        <InputField
-                                            autoComplete="off"
-                                            id={`value-${index}`}
-                                            type="text"
-                                            value={choice.value}
-                                            testId={`value-${index}`}
-                                            htmlFor={`value-${index}`}
-                                            maxLength={40}
-                                            handleChange={(e) => handleChange(e, choice.uuid, 'value')}
-                                            className="w-full mt-2.5"
-                                            validationError={errors?.choices?.[index]?.value}
-                                            // lookupDataset
-                                            placeholder="Enter values separated by commas"
-                                            disabled
-                                        />
-                                        <img
-                                            src="/Images/trash-black.svg"
-                                            alt="delete"
-                                            className="pl-1 cursor-pointer w-9 p-2 rounded-full hover:bg-[#FFFFFF]"
-                                            data-testid={`delete-choice-${index + 1}`}
-                                            onClick={() => handleRemoveChoice(choice.uuid)}
-                                        />
-                                        <img
-                                            src="/Images/add.svg"
-                                            alt="add"
-                                            data-testid={`add-choice-${index + 2}`}
-                                            className="pl-1 cursor-pointer w-14 p-2 rounded-full hover:bg-[#FFFFFF]"
-                                            onClick={() => handleAddInput(choice.uuid)}
-                                        />
-                                    </div>}
-
-                                </div>
-                                {activeInputs[choice.uuid] && (
-                                    <div className='flex gap-3 w-full'>
-                                        <div className="flex w-[98%]">
-                                            <InputField
-                                                autoComplete="off"
-                                                id={`additional-value-${index}`}
-                                                type="text"
-                                                lookupDataset
-                                                placeholder="Enter Choices"
-                                                testId={`additional-value-${index}`}
-                                                htmlFor={`additional-value-${index}`}
-                                                maxLength={40}
-                                                handleChange={(e) => handleChange(e, e.target.id, `additional-value-${index}`)}
-                                                className="w-full mt-2.5"
-                                                onBlur={() => {
-                                                    // Remove the additional input field when it loses focus
-                                                    setTimeout(() => {
-                                                        setActiveInputs(prev => ({
-                                                            ...prev,
-                                                            [choice.uuid]: false
-                                                        }));
-                                                    }, 200);
-                                                }} />
-                                        </div>
-                                        <img
-                                            src="/Images/close.svg"
-                                            alt="close"
-                                            onClick={() => handleClearAdditionalInput(choice.uuid, index)}
-                                            className="w-[22px] h-[22px] my-auto cursor-pointer mr-[14px]"
-                                        />
-                                    </div>
-                                )}
+                    <div>
+                        {(!createLookup && (choicesLength >= 11)) && <div className='flex w-full mt-5 mb-1.5'>
+                            <div className='flex items-center w-1/3'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
                             </div>
-                        </div>
-                    ))}
-                </div>}
-                </div>}
+                            <div className='flex items-center w-1/3'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                            </div>
+                            <div className='flex items-center w-1/3'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                            </div>
+                        </div>}
+                        {(!createLookup && (choicesLength > 6 && choicesLength < 11)) &&
+                            <div className='flex mt-5 mb-1.5'
+                            >
+                                <div className='flex justify-start w-full gap-[11%] items-center'>
+                                    <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                    <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                                </div>
+                                <div className='flex justify-start gap-[11%] items-center w-full'>
+                                    <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                    <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                                </div>
+                                <div className='flex justify-start gap-[11%] items-center w-full'>
+                                    <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                    <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                                </div>
+                            </div>}
+                        {(!createLookup && (choicesLength === 4 || choicesLength === 5 || choicesLength === 6)) && <div className='flex mt-5 mb-1.5'>
+                            <div className='flex justify-start w-full gap-[7%] items-center'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                            </div>
+                            <div className='flex justify-start gap-[7%] items-center w-full'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                            </div>
+                        </div>}
+                        {(!createLookup && (choicesLength < 4)) && <div className='flex mt-5 mb-1.5'>
+                            <div className='flex items-center justify-start gap-[13%] w-full'>
+                                <h1 className='font-[600] text-[#2B333B] w-[30%]'>Id</h1>
+                                <h1 className='font-[600] text-[#2B333B] w-[40%]'>Value</h1>
+                            </div>
+                        </div>}
+                        {!createLookup && <div className={`${getChoiceHeight()} w-full flex flex-wrap overflow-y-auto ${shimmerLoading ? 'scrollHide' : 'scrollBar'}`}>
+                            {(Array.isArray(data.choices) ? data.choices : []).map((choice, index) => (
+                                <div className={`${getChoiceWidth()}`}>
+                                    <div className='flex flex-col'>
+                                        <div key={choice.uuid || index}>
+                                            {shimmerLoading ? <Shimmer column={getChoiceShimmerCol()} row={7} width={getChoiceShimmerWidth()} /> :
+                                                <div className={`flex py-1 gap-4 ${choicesLength >= 11 ? 'mr-10' : 'mr-3'}`}>
+                                                    <InputField
+                                                        autoComplete="off"
+                                                        id={`uuid-${index}`}
+                                                        type="text"
+                                                        value={choice.uuid}
+                                                        testId={`uuid-${index}`}
+                                                        htmlFor={`uuid-${index}`}
+                                                        maxLength={40}
+                                                        className="w-full mt-2.5"
+                                                        validationError={errors?.choices?.[index]?.uuid}
+                                                        disabled
+                                                    />
+                                                    <InputField
+                                                        autoComplete="off"
+                                                        id={`value-${index}`}
+                                                        type="text"
+                                                        value={choice.value}
+                                                        testId={`value-${index}`}
+                                                        htmlFor={`value-${index}`}
+                                                        maxLength={40}
+                                                        handleChange={(e) => handleChange(e, choice.uuid, 'value')}
+                                                        className="w-full mt-2.5"
+                                                        validationError={errors?.choices?.[index]?.value}
+                                                        // lookupDataset
+                                                        placeholder="Enter values separated by commas"
+                                                        disabled
+                                                    />
+                                                    {choicesLength !== 1 &&<img
+                                                        src="/Images/trash-black.svg"
+                                                        alt="delete"
+                                                        className="pl-1 cursor-pointer w-9 p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                        data-testid={`delete-choice-${index + 1}`}
+                                                        onClick={() => handleRemoveChoice(choice.uuid)}
+                                                    />}
+                                                    <img
+                                                        src="/Images/add.svg"
+                                                        alt="add"
+                                                        data-testid={`add-choice-${index + 2}`}
+                                                        className="pl-1 cursor-pointer w-14 p-2 rounded-full hover:bg-[#FFFFFF]"
+                                                        onClick={() => handleAddInput(choice.uuid)}
+                                                    />
+                                                </div>}
+
+                                        </div>
+                                        {activeInputs[choice.uuid] && (
+                                            <div className='flex gap-3 w-full'>
+                                                <div className="flex w-[98%]">
+                                                    <InputField
+                                                        autoComplete="off"
+                                                        id={`additional-value-${index}`}
+                                                        type="text"
+                                                        lookupDataset
+                                                        placeholder="Enter Choices"
+                                                        testId={`additional-value-${index}`}
+                                                        htmlFor={`additional-value-${index}`}
+                                                        // maxLength={100}
+                                                        handleChange={(e) => handleChange(e, e.target.id, `additional-value-${index}`)}
+                                                        className="w-full mt-2.5"
+                                                        onBlur={() => {
+                                                            // Remove the additional input field when it loses focus
+                                                            setTimeout(() => {
+                                                                setActiveInputs(prev => ({
+                                                                    ...prev,
+                                                                    [choice.uuid]: false
+                                                                }));
+                                                            }, 200);
+                                                        }}
+                                                        validationError={maxLengthError && 'Each choice must not exceed 100 characters'} />
+                                                </div>
+                                                <img
+                                                    src="/Images/close.svg"
+                                                    alt="close"
+                                                    onClick={() => handleClearAdditionalInput(choice.uuid, index)}
+                                                    className="w-[22px] h-[22px] my-auto cursor-pointer mr-[14px]"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>}
+                    </div>}
                 {/* <div className='flex gap-5'> */}
                 {/* </div> */}
                 <div className='flex justify-between mt-5'>

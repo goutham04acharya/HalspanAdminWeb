@@ -146,6 +146,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                     value={time || questionValue || (format === "24" ? "hh:mm:ss" : "hh:mm:ss AM/PM")}
                     // readOnly // Prevent direct editing
                     onChange={handleTimeChange}
+                    data-testid='time-field'
                     onKeyDown={handleKeyDown}
                     onClick={() => setIsDropdown(!isDropdownOpen)}
                     placeholder={format === "24" ? "hh:mm:ss" : "hh:mm:ss AM/PM"}
@@ -166,6 +167,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                                     onClick={() => handleHourChange(h)}
                                     className={`px-4 py-2 cursor-pointer hover:bg-gray-300 
                                         ${h === hour ? 'bg-gray-200 text-[#2B333B]' : 'text-[#2B333B]'}`}
+                                        data-testid={`h-${h}`}
                                 >
                                     {h}
                                 </div>
@@ -178,6 +180,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                                     onClick={() => handleMinuteChange(m)}
                                     className={`px-4 py-2 cursor-pointer hover:bg-gray-300
                                         ${m === minute ? 'bg-gray-200 text-[#2B333B]' : 'text-[#2B333B]'}`}
+                                        data-testid={`m-${m}`}
                                 >
                                     {m}
                                 </div>
@@ -190,6 +193,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                                     onClick={() => handleSecondChange(s)}
                                     className={`px-4 py-2 cursor-pointer hover:bg-gray-300 
                                         ${s === second ? 'bg-gray-200 text-[#2B333B]' : 'text-[#2B333B]'}`}
+                                        data-testid={`s-${s}`}
                                 >
                                     {s}
                                 </div>
@@ -203,6 +207,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                                         onClick={() => handleMeridianChange(m)}
                                         className={`px-4 py-2 cursor-pointer hover:bg-gray-300 
                                             ${m === meridian ? 'bg-gray-200 text-[#2B333B]' : 'text-[#2B333B]'}`}
+                                            data-testid={`${m}`}
                                     >
                                         {m}
                                     </div>

@@ -18,7 +18,7 @@ Then('I should be redirected to the lookup dataset listing screen', async functi
 });
 
 Given('I am on the lookup dataset listing screen', async function () {
-    await driver.get('https://questionnaire-qa.halspantest.com/lookup-dataset');
+    await driver.get('http://localhost:3000/lookup-dataset');
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Lookup Dataset"]')));
 });

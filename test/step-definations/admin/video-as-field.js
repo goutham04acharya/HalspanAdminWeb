@@ -55,5 +55,7 @@ When('I enter the minimum and maximum number of videos', async function () {
 
 When('I enter the file size', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css('[data-testid="file-size"]'))).sendKeys('10');
+    const size = await driver.wait(until.elementLocated(By.css('[data-testid="file-size"]')));
+    await size.sendKeys(Keys.chord(Keys.CONTROL, 'a', Keys.DELETE));
+    await size.sendKeys('4');
 });
