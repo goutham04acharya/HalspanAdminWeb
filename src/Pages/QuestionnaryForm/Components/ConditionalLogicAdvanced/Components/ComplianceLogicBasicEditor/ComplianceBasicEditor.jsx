@@ -1036,14 +1036,14 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                         </div>
                                                         <div className='w-[3%] flex justify-end'>
                                                             <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
-                                                                <Image src="trash-black" className="" data-testid="delete" />
+                                                                <Image src="trash-black" className="" testId={`delete-${i}`} />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </React.Fragment>
                                             ))}
                                             {conditions.length - 1 === index ? (
-                                                <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => {
+                                                <div className='cursor-pointer' data-testid={`OR`} onClick={() => {
                                                     handleAddCondition(index, false, null, true, false)
                                                     handleAdd('OR')
                                                 }
@@ -1163,9 +1163,10 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                     label=''
                                                                                     id='dropdown'
                                                                                     top='30px'
+                                                                                    labeltestID={`select-dropdown-${index}-${i}`}
                                                                                     placeholder='Select'
                                                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                                                    testID={`select-${index}-${i}`}
+                                                                                    testID={`elseif-select-${elseIfIndex}-${index}-${i}`}
                                                                                     selectedOption={conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i]?.question_name}
                                                                                     handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'dropdown', true, elseIfIndex)}
                                                                                     isDropdownOpen={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].dropdown}
@@ -1189,7 +1190,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                     top='30px'
                                                                                     placeholder='Select'
                                                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
-                                                                                    testID={`condition-${index}-${i}`}
+                                                                                    labeltestID={`condition-dropdown-${index}-${i}`}
+                                                                                    testID={`elseif-condition-${elseIfIndex}-${index}-${i}`}
                                                                                     selectedOption={conditions[index]?.elseIfBlocks[elseIfIndex].conditions[i]?.condition_logic}
                                                                                     handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'condition_dropdown', true, elseIfIndex)}
                                                                                     mainIndex={index}
@@ -1235,7 +1237,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                             top="20px"
                                                                                             placeholder="Select"
                                                                                             className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
-                                                                                            testID={`value-dropdown-${index}-${i}`}
+                                                                                            labeltestID='value-dropdown'
+                                                                                            testID={`elseif-value-dropdown-${elseIfIndex}-${index}-${i}`}
                                                                                             selectedOption={conditions[index].elseIfBlocks[elseIfIndex].conditions[i].value}
                                                                                             handleOptionClick={(key) => handleSelectDropdown(key, index, i, 'value', true, elseIfIndex)}
                                                                                             mainIndex={index}
@@ -1254,7 +1257,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                             className='w-full'
                                                                                             labelStyle=''
                                                                                             placeholder=''
-                                                                                            testId={`value-input-${index}-${i}`}
+                                                                                            testId={`elseif-value-input-${elseIfIndex}-${index}-${i}`}
                                                                                             htmlFor=''
                                                                                             maxLength={32}
                                                                                             mainIndex={index}
@@ -1316,7 +1319,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                     top='30px'
                                                     placeholder='Select'
                                                     className='w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
-                                                    testID={`status-dropdown`}
+                                                    testID={`elseif-status-dropdown-${elseIfIndex}`}
                                                     labeltestID={`status-dropdown-label`}
                                                     selectedOption={condition.elseIfBlocks[elseIfIndex].thenActions[0].status}
                                                     handleOptionClick={(e) => statusDropdownHandler(e, index, elseIfIndex, 'status', 'elseIfIndex')}
@@ -1362,6 +1365,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                         <InputField
                                                             label="Action"
                                                             className="w-full"
+                                                            testId="elseif-action"
                                                             placeholder="Enter action"
                                                             value={condition.elseIfBlocks[elseIfIndex].thenActions[0].action || ''}
                                                             handleChange={(e) => handleThenActionChange(index, 'action', e.target.value, false, true, elseIfIndex)}
@@ -1387,6 +1391,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
                             <button
                                 className='w-fit px-4 py-2 text-[#2B333B] font-semibold rounded-md'
+                                data-testid="else-if"
                                 onClick={() => addElseIf(index)}
                             >
                                 + Add Else If
