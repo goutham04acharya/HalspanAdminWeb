@@ -21,7 +21,9 @@ function NumberField({
     validationErrors,
     setValidationErrors,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 
 }) {
     const dispatch = useDispatch();
@@ -107,6 +109,7 @@ function NumberField({
         }
     };
     const handleInputChange = (e) => {
+        // debugger
         const newValue = e.target.value
         const invalidKeys = ['e'];
         if (invalidKeys.includes(e.key)) {
@@ -127,6 +130,7 @@ function NumberField({
             question_id: question?.question_id,
             value: newValue
         }));
+        setIsModified(!isModified)
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: newValue
@@ -180,8 +184,9 @@ function NumberField({
                             const numValue = parseFloat(value);
                             const min = preview ? question?.field_range?.min : minRange;
                             const max = preview ? question?.field_range?.max : maxRange;
-                        
-                            if (value === '' || (numValue >= min && numValue <= max)) {
+                            console.log(numValue, value, min, max, numValue >= min && numValue <= max)
+                            if ((min === undefined || max === undefined) ||(numValue >= min && numValue <= max)) {
+                                
                                 handleInputChange(e);
                             }
                         }}

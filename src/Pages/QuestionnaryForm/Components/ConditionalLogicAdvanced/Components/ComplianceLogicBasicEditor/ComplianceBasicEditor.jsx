@@ -239,6 +239,22 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
             return updatedConditions;
         });
     };
+    const handleClearConditionValues = () => {
+        setConditions((prevConditions) =>
+            prevConditions.map((conditionGroup) => ({
+                ...conditionGroup,
+                conditions: conditionGroup.conditions.map((condition) => ({
+                    ...condition,
+                    question_name: "",
+                    condition_logic: "",
+                    value: "",
+                    dropdown: false,
+                    condition_dropdown: false,
+                    condition_type: condition.condition_type, // Preserve type if needed
+                })),
+            }))
+        );
+    };
 
     useEffect(() => {
         const totalConditions = conditions.reduce((acc, curr) => acc + curr.conditions.length, 0);
@@ -988,7 +1004,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                                         subIndex={i}
                                                                                         isDropdownOpen={conditions[index].conditions[i].value_dropdown}
                                                                                         setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                                                        options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                                                        options={combinedArray.length > 0 ? combinedArray?.find((item) => item?.question_detail === conditions[index]?.conditions[i]?.question_name)?.choice_values.map((choice) => choice?.value) : []}
                                                                                         validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
                                                                                     />
                                                                                     {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
@@ -1035,7 +1051,13 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                             </div>}
                                                         </div>
                                                         <div className='w-[3%] flex justify-end'>
-                                                            <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
+                                                            <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {
+                                                                if (conditions[0]?.conditions?.length === 1 && conditions[0]?.conditions?.length === 1) {
+                                                                    handleClearConditionValues(); // Clear values for the single condition
+                                                                } else { 
+                                                                    handleAdd("delete", index, i) 
+                                                                }
+                                                            }}>
                                                                 <Image src="trash-black" className="" data-testid="delete" />
                                                             </div>
                                                         </div>
@@ -1271,7 +1293,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
 
                                                                     </div>
                                                                     {elseIfBlock.conditions.length - 1 === i ? (
-                                                                        <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => {handleAddCondition(index, true, elseIfIndex, false, true)
+                                                                        <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => {
+                                                                            handleAddCondition(index, true, elseIfIndex, false, true)
                                                                             handleAdd('AND')
                                                                         }}>
                                                                             <Image src="add" className="cursor-pointer" data-testid="add" />
@@ -1284,7 +1307,8 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                     )}
                                                                 </div>
                                                                 <div className='w-[3%] flex justify-end'>
-                                                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {handleDeleteCondition(index, i, true, elseIfIndex)
+                                                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => {
+                                                                        handleDeleteCondition(index, i, true, elseIfIndex)
                                                                         handleAdd('OR')
                                                                     }}>
                                                                         <Image src="trash-black" className="" data-testid="delete" />

@@ -57,6 +57,7 @@ const QuestionnaryForm = () => {
 
     }]);
 
+
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -103,6 +104,7 @@ const QuestionnaryForm = () => {
     const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
+    const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
     // const [sectionWarningShown, setSectionWarningShown] = useState(false);
     const [conditions, setConditions] = useState([{
@@ -1268,6 +1270,7 @@ const QuestionnaryForm = () => {
     }
     //this is the function called when you click on delete of compliance logic
     const handleDeleteComplianceLogic = async () => {
+        setComplianceLoader(true)
         const body = {
             compliance_logic: []
         };
@@ -1275,6 +1278,7 @@ const QuestionnaryForm = () => {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             setComplianceLogic([]);
             setIsDeleteComplianceLogic(false);
+            setComplianceLoader(false)
             dispatch(setSelectedComponent(null));
             setToastSuccess('Compliance Logic deleted Successfully')
         } catch (error) {
@@ -1822,6 +1826,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setIsDeleteComplianceLogic}
                         handleButton1={handleDeleteComplianceLogic} // Call confirmDeleteSection on confirmation
                         handleButton2={() => (setIsDeleteComplianceLogic(false))} // Handle cancel button
+                        loading={complianceLoader}
                     />
                 )
             }
