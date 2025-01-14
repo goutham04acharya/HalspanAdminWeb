@@ -9,7 +9,8 @@ function SignatureFieldSetting({
     fieldSettingParameters,
     validationErrors,
     setConditionalLogic,
-    formStatus
+    formStatus,
+    selectedQuestionId
 }) {
     return (
         <>
