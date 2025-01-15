@@ -238,7 +238,7 @@ function CreateQuestionnary() {
 
   return (
     <div className='bg-[#F4F6FA] p-7 h-customh2'>
-      <div className='bg-white py-10 px-9 rounded-[10px] h-customh3'>
+      <div className='bg-white py-10 px-9 rounded-[10px] h-customh3 overflow-auto scrollBar'>
         <p className='font-medium text-[#2B333B] text-[28px]'>Create Questionnaire</p>
         <div className='flex items-start'>
           <div className='w-[70%]'>
