@@ -177,7 +177,7 @@ const CreateModal = ({ isModalOpen, setData, handleClose, data, errors, handleCh
                                                         htmlFor={`value-${index}`}
                                                         maxLength={40}
                                                         handleChange={(e) => handleChange(e, choice.uuid, 'value')}
-                                                        className="w-full mt-2.5"
+                                                        className="w-full mt-2.5 p-2 overflow-x"
                                                         validationError={errors?.choices?.[index]?.value}
                                                         // lookupDataset
                                                         placeholder="Enter values separated by commas"
