@@ -11,7 +11,7 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     Once I apply the conditional logic, I must be able to preview the same so that i will be able to view all my responses in advance.
 
   @create_question
-  Scenario: Admin adds the conditional logic for textfield
+  Scenario: Admin adds textbox from the add field section
     Given I am on the questionnaire management section
     Then I should see an add field section
     When I add a new question to the page 1 in section 1
@@ -41,6 +41,29 @@ Feature: Halspan- Admin- Show/Hide for entire Section/Pages for Text Fields(Adva
     When I click the add conditional logic button
     Then I should see the advanced editor for textfield
     Then I should see the suggestions for questions
+    When I enter the incorrect conditional logic
+    Then I should read a message stating that "No items found"
+    Then I click the save button for conditional logic
+    Then I should read a error message
+    When I click the cancel button
+    Then I should see field settings
+    
+    When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
+    When I select the question from the suggestions
+    When I click the cancel button
+    Then I should see field settings
+
+    When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
+    When I enter the incorrect conditional logic with then and else
+    Then I click the save button for conditional logic
+    And I should read a message stating that "Unexpected identifier 'then'"
+    When I click the cancel button
+    Then I should see field settings
+
+    When I click the add conditional logic button
+    Then I should see the advanced editor for textfield
     When I enter the correct conditional logic 
     Then I click the save button for conditional logic
     And I should read a message stating that "Conditional Logic Added"

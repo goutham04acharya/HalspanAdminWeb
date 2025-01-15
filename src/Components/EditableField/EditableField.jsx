@@ -16,9 +16,9 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId, 
 
     const handleClick = () => {
         setInputValue(name);
-        if(formStatus === 'Draft'){
+        if (formStatus === 'Draft') {
             setIsEditing(true);
-        }else{
+        } else {
             setIsEditing(false);
         }
     };
@@ -35,6 +35,11 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId, 
     };
 
     const handleKeyDown = (e) => {
+        // Prevent typing a dot (.)
+        if (e.key === ".") {
+            e.preventDefault();
+            return; // Exit early to avoid processing further
+        }
         if (e.key === 'Enter') {
             if (!inputValue || inputValue?.trim() === '') {
                 setToastError('Field required. Please enter a value');

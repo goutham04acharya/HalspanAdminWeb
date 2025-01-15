@@ -40,6 +40,11 @@ Feature: Halspan - Admin - Show/hide sections and page
 
         When I click the preview button
         Then I should see the mobile preview
+        # Then I validate the data entered exists in the mobile preview for section 1 page 1
+        # When I enter the text as "random" in textbox for section 1 page 1 question 1
+        # When I click the next button
+        # Then I should not see the page 2 at section 1
+        # When I click the back button
         When I enter the text as "Inspector" in textbox for section 1 page 1 question 1
         When I click the next button
         Then I should see the page 2 at section 1
@@ -67,6 +72,10 @@ Feature: Halspan - Admin - Show/hide sections and page
 
         When I click the preview button
         Then I should see the mobile preview
+        # When I enter the text as "random" in textbox for section 1 page 1 question 1
+        # When I click the next button
+        # Then I should not see the page 2 at section 1
+        # When I click the back button
         When I enter the text as "Inspector" in textbox for section 1 page 1 question 1
         When I click the next button
         Then I should see the page 2 at section 1

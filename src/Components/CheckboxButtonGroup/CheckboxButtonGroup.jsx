@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const CustomCheckboxGroup = ({ values, onChange }) => {
+const CustomCheckboxGroup = ({ values, onChange, questionValue, question }) => {
     // Initialize with the first value selected by default
     const [selectedValues, setSelectedValues] = useState([]);
+
+    useEffect(() => {
+        // Set initial values from the provided questionValue
+        if (questionValue && question?.question_id) {
+            const initialValues = questionValue[question?.question_id] || [];
+            setSelectedValues(initialValues);
+        }
+    }, [questionValue, question?.question_id]);
     const handleCheckboxChange = (value) => {
-        setSelectedValues(prev => {
-            if (prev.includes(value)) {
-                return prev.filter(item => item !== value);
+        let updatedValues;
+            if (selectedValues.includes(value)) {
+                updatedValues =  selectedValues.filter(item => item !== value);
             } else {
-                return [...prev, value];
+                updatedValues = [...selectedValues, value];
             }
-        });
+        setSelectedValues(updatedValues);
         if(selectedValues){
-            onChange(value)
+            onChange(updatedValues)
         }
     };
 
@@ -46,7 +54,7 @@ const CustomCheckboxGroup = ({ values, onChange }) => {
                             )}
                         </div>
                     </div>
-                    <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{value}</span>
+                    <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{value?.value || value}</span>
                 </label>
             ))}
         </div>

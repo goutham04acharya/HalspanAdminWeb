@@ -1,18 +1,16 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
-// import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
-import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
-import InfinateDropdown from '../../../../../../Components/InputField/InfinateDropdown';
+import { complianceContentConverter } from '../../../../../../CommonMethods/complianceContentConverter';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 
-function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus }) {
+function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus, validationErrors, setValidationErrors }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [failGradeValue, setFailGradeValue] = useState('')
     const dispatch = useDispatch();
-    
+
     const options = [
         { value: 'NO_ACCESS', label: 'NO_ACCESS' },
         { value: 'MISSING', label: 'MISSING' },
@@ -28,6 +26,17 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
         // dispatch(setShouldAutoSave(true));
     };
     const handleInputChange = (id, field, value) => {
+        if(value === ''){
+            setValidationErrors(prevErrors => ({
+                ...prevErrors,
+                label: `This is a mandatory field`,
+            }));
+        }else{
+            setValidationErrors(prevErrors => ({
+                ...prevErrors,
+                label: '',
+            }));
+        }
         let arr = [...complianceLogic];
         arr[id][field] = value; // Dynamically update field
         setComplianceLogic(arr);
@@ -50,14 +59,17 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                             onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
                         />
+                        {validationErrors?.label && (
+                            <ErrorMessage error={validationErrors.label} />)}
                     </div>
+
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
                         <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
                         <div className='relative w-full'>
                             <input type="text" id='Label'
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
                                 value={complianceLogic[complianceLogicId]?.default_content
-                                    ? defaultContentConverter(complianceLogic[complianceLogicId].default_content)
+                                    ? complianceContentConverter(complianceLogic[complianceLogicId].default_content)
                                     : ''}
                                 disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'

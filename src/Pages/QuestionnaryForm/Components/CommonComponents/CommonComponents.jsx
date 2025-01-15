@@ -1,4 +1,5 @@
 import React from 'react'
+import ErrorMessage from '../../../../Components/ErrorMessage/ErrorMessage';
 
 function CommonComponents({
     labelID,
@@ -17,6 +18,8 @@ function CommonComponents({
     assetLocation,
     formStatus,
     fieldSettingParameters,
+    validationErrors,
+    selectedQuestionId
 }) {
     return (
         <div>
@@ -30,8 +33,8 @@ function CommonComponents({
                     // id={labelID}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
-                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
-                    value={formParameters?.label}
+                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} 
+                    value={formParameters?.label || ''}
                     id='label'
                     onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
                     data-testid="label-name-input"
@@ -43,6 +46,9 @@ function CommonComponents({
                         }
                     } : null}
                 />
+                {validationErrors?.label?.[selectedQuestionId] && (
+              <ErrorMessage error={validationErrors?.label?.[selectedQuestionId]} />
+            )}
             </div>
             <div className='flex flex-col justify-start mt-7'>
                 <label
@@ -55,7 +61,7 @@ function CommonComponents({
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={helpTextPlaceholder}
                     onChange={(e) => handleInputChange(e)}
-                    value={formParameters?.helptext}
+                    value={formParameters?.helptext || ''}
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
                     data-testid="help-text-input"
@@ -83,7 +89,7 @@ function CommonComponents({
                         // id={placeholderContentId}
                         className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                         placeholder={placeholderContent}
-                        value={formParameters?.placeholderContent}
+                        value={formParameters?.placeholderContent || ''}
                         onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
                         id='placeholderContent'
                         disabled={formStatus !== 'Draft'}

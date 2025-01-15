@@ -32,7 +32,7 @@ function DIsplayContentField({
             }
             {(preview && (question?.type === 'image')) &&<div>
                 {/* <MyImageMarker imageSrc={question?.display_type?.image} /> */}
-                <ImageZoomPin imageSrc={question?.display_type?.image}  />
+                <ImageZoomPin imageSrc={question?.display_type?.image} isPin={question?.asset_extras?.pin_drop} isDraw={question?.asset_extras?.draw_image} />
                 
             </div>}
             {(preview ? question?.type === 'url' : fieldSettingParameters?.type === 'url' )&&

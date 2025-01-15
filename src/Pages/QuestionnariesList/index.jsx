@@ -40,9 +40,7 @@ function Questionnaries() {
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState('')
   const [cloneLoading, setCloneLoading] = useState(false)
   const [options, setOptions] = useState([])
-  // const options = [
-  //   { value: 'Door', label: 'Door' },
-  // ];
+  const [cloneDisable, setCloneDisable] = useState(false)
 
   const handleSelect = (option) => {
   };
@@ -53,9 +51,9 @@ function Questionnaries() {
   };
 
   const handleFilter = (option) => {
-    setSelectedOption(option);
+    setSelectedOption(option?.name);
     let params = Object.fromEntries(searchParams);
-    if (params.asset_type === option?.name) {
+    if (params.asset_type === option?.id) {
       setDropdownOpen(false);
       return;
     } else {
@@ -63,9 +61,11 @@ function Questionnaries() {
       setQueList([])
     }
     if (option) {
-      params['asset_type'] = option.name;
+      params['asset_type'] = option.id;
+      params['asset_name'] = option.name
     } else {
       delete params.asset_type;
+      delete params.asset_name;
     }
     setDropdownOpen(false);
     setSearchParams({ ...params });
@@ -75,6 +75,7 @@ function Questionnaries() {
     let params = Object.fromEntries(searchParams);
     delete params?.start_key;
     delete params?.asset_type;
+    delete params?.asset_name;
     lastEvaluatedKeyRef.current = null
     setQueList([])
     setDropdownOpen(false);
@@ -83,13 +84,14 @@ function Questionnaries() {
   };
 
   const fetchQuestionnaryList = useCallback(async () => {
+
     setLoading(true);
     const params = Object.fromEntries(searchParams);
     if (lastEvaluatedKeyRef.current) {
       params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
-    if (params.asset_type !== '') {
-      setSelectedOption(params.asset_type)
+    if (params.asset_name !== '') {
+      setSelectedOption(params.asset_name)
     }
     if (searchValue !== '') {
       delete params.start_key
@@ -108,6 +110,7 @@ function Questionnaries() {
   }, [searchParams]);
 
   const lastElementRef = useCallback(node => {
+    
     if (loading || isFetchingMore) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
@@ -127,10 +130,12 @@ function Questionnaries() {
   const handleVersionList = async (id) => {
     try {
       setSelectedVersion('')
+      setCloneDisable(true)
       const response = await getAPI(`questionnaires/versions/${id}`)
       setVersionList(response?.data)
       setSelectedQuestionnaireId(id)
       setCloneModal(true)
+      setCloneDisable(false)
     } catch (error) {
       console.log(error)
     }
@@ -154,9 +159,11 @@ function Questionnaries() {
       const response = await PostAPI(`questionnaires/clone`, body);
       if (!response?.error) {
         setToastSuccess(response?.data?.message)
+        
       } else {
         setToastError(response?.data?.data?.message)
       }
+      window.location.reload();
       setCloneLoading(false)
       setCloneModal(false)
     } catch (error) {
@@ -237,6 +244,8 @@ function Questionnaries() {
                   lastElementRef={lastElementRef}
                   setCloneModal={setCloneModal}
                   handleVersionList={handleVersionList}
+                  cloneDisable={cloneDisable}
+                  cloneLoading={cloneLoading}
                 />
               </div>
             )

@@ -2,7 +2,7 @@ import React from 'react'
 
 const AddFields = ({ buttons, testId , handleClick, formStatus}) => {
     return (
-        <div className="p-[34px] w-full">
+        <div className="p-[34px] w-full h-customh15 overflow-auto default-sidebar">
             <p data-testid="add-field" className='font-semibold text-[22px] text-[#2B333B] pb-[26px]'>Add Field</p>
             <div className='-mx-4 flex flex-wrap'>
                 {buttons.map((button, index) => (

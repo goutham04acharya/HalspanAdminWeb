@@ -582,6 +582,7 @@ When('I enter the date\\/time for section {int} page {int} question {int}', asyn
     await driver.wait(until.elementIsVisible(date_area), 2000);
     await date_area.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
     await date_area.sendKeys('31/10/2024');
+    // await date_area.click();
 });
 
 When('I click the next button', async function () {
@@ -622,7 +623,7 @@ When('I see the floorplan for section {int} page {int} question {int}', async fu
 
 When('I place the pin and draw on the floorplan', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-pin"]`)), 5000).click();
+    // await driver.wait(until.elementLocated(By.css(`[data-testid="floorplan-pin"]`)), 5000).click();
     const floorplanImage = await driver.wait(until.elementLocated(By.css('[data-testid="floorplan"]')), 5000);
     // const floorplanSize = await floorplanImage.getRect(); // get the dimensions and location of the floorplan
 
@@ -710,10 +711,10 @@ When('I select the location in asset location for section {int} page {int} quest
     await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="site"]`)), 5000).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="site-0"]`))).click();
     // Uncomment this later ===================================================== !!!!important
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="location"]`)), 5000).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="buidling-0"]`))).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="level"]`)), 5000).click();
-    // await driver.wait(until.elementLocated(By.css(`[data-testid="floor-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="location"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="buidling-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="level"]`)), 5000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="floor-0"]`))).click();
 });
 
 When('I see the display for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {

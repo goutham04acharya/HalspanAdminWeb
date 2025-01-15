@@ -9,6 +9,7 @@ Given('I am on the questionnaire management section', async function () {
     const versionNumber = global.response?.data?.data?.version_number;
 
     if (questionnaireId && versionNumber) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
         await driver.get(`http://localhost:3000/questionnaries/create-questionnary/questionnary-form/${questionnaireId}/${versionNumber}`); // Replace with actual URL
         await new Promise((resolve) => setTimeout(resolve, 500));
         const pageSource = await driver.getPageSource();

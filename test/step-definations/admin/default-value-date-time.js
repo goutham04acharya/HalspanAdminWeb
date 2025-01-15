@@ -58,13 +58,7 @@ When('I select the question from the default value suggestions for date\\/time f
         'getFullYear()',
         'getMonth()',
         'getDate()',
-        'getDay()',
-        'getHours()',
-        'getMinutes()',
-        'getSeconds()',
-        'getMilliseconds()',
-        'getTime()',
-        'Date()'];
+        'getDay()'];
 
     bool = true;
     i = 0;
@@ -81,7 +75,7 @@ When('I select the question from the default value suggestions for date\\/time f
         i++;
     }
 
-    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-11"]`)), 10000).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="condition-0"]`)), 10000).click();
 
     const element = await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`)));
     // Move the cursor one character to the left using the LEFT arrow key
@@ -111,4 +105,16 @@ Then('I should see the conditional logic in default value field for date\\/time'
     // eslint-disable-next-line max-len
     const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
     assert.equal(default_value, this.default_value);
+});
+
+When('I delete the default value condition', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="delete-default-value"]'))).click();
+});
+
+Then('I should not see the condition', async function () {
+    await new Promise(resolve => setTimeout(resolve, 950));
+    // eslint-disable-next-line max-len
+    const default_value = await driver.wait(until.elementLocated(By.css('[data-testid="default-value-input"]'))).getAttribute('value');
+    assert.equal(default_value, '');
 });

@@ -22,6 +22,9 @@ options.addArguments('--disable-gpu');
 options.addArguments('--disable-extensions');
 options.addArguments('--dns-prefetch-disable');
 options.addArguments('enable-features=NetworkServiceInProcess');
+options.addArguments('--start-fullscreen')
+options.addArguments('--force-device-scale-factor=0.75');
+options.addArguments('--high-dpi-support=1');
 setDefaultTimeout(34000);
 
 global.driver = new Builder()
@@ -41,7 +44,7 @@ BeforeAll(async function () {
     console.log('Current process name:', global.current_process_name);
     try {
         const currentUrl = await driver.getCurrentUrl();
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('http://localhost:3000/')) {
             global.__coverage__ = await driver.executeScript('return __coverage__;');
             global.coverageMap = createCoverageMap(__coverage__);
         } else {
@@ -77,7 +80,7 @@ AfterAll(async function () {
 
     try {
         const currentUrl = await driver.getCurrentUrl();
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('http://localhost:3000/')) {
             global.__coverage__ = await driver.executeScript('return __coverage__;');
             global.coverageMap = createCoverageMap(__coverage__);
         } else {
@@ -104,7 +107,7 @@ AfterAll(async function () {
 AfterStep(async function () {
     const currentUrl = await driver.getCurrentUrl();
     try {
-        if (currentUrl.includes('localhost:3000')) {
+        if (currentUrl.includes('http://localhost:3000/')) {
             const updatedCoverageData = await driver.executeScript('return __coverage__;');
             const updatedCoverageMap = createCoverageMap(updatedCoverageData);
 

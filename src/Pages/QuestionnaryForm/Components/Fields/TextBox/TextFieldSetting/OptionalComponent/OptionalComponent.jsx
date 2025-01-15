@@ -102,12 +102,66 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         if (!questionList || !componentType) {
             return [];
         }
+    
         const filteredList = questionList.filter((item) => item.component_type === componentType);
-        return filteredList.map((item) => ({
-            label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentType})`,
-            value: item.question_id,
-        }));
+    
+        return filteredList.map((item) => {
+            let componentTypeLabel;
+    
+            switch (componentType) {
+                case "textboxfield":
+                    componentTypeLabel = "Text-Box field";
+                    break;
+                case "choiceboxfield":
+                    componentTypeLabel = "Choice-Box field";
+                    break;
+                case "dateTimefield":
+                    componentTypeLabel = "Date-Time field";
+                    break;
+                case "assetLocationfield":
+                    componentTypeLabel = "Asset-Location field";
+                    break;
+                case "numberfield":
+                    componentTypeLabel = "Number field";
+                    break;
+                case "floorPlanfield":
+                    componentTypeLabel = "Floor-Plan field";
+                    break;
+                case "photofield":
+                    componentTypeLabel = "Photo field";
+                    break;
+                case "videofield":
+                    componentTypeLabel = "Video field";
+                    break;
+                case "filefield":
+                    componentTypeLabel = "File field";
+                    break;
+                case "signaturefield":
+                    componentTypeLabel = "Signature field";
+                    break;
+                case "gpsfield":
+                    componentTypeLabel = "GPS field";
+                    break;
+                case "displayfield":
+                    componentTypeLabel = "Display field";
+                    break;
+                case "compliancelogic":
+                    componentTypeLabel = "Compliance Logic";
+                    break;
+                case "tagScanfield":
+                    componentTypeLabel = "Tag-Scan field";
+                    break;
+                default:
+                    componentTypeLabel = "Unknown Component";
+            }
+    
+            return {
+                label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentTypeLabel})`,
+                value: item.question_id,
+            };
+        });
     };
+    
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
@@ -328,7 +382,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                     id='serviceRecord'
                                     top='50px'
                                     placeholder='Select'
-                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
                                     testID='select-field-list'
                                     labeltestID='service-record'
                                     selectedOption={handleQuesList(questionList, fieldSettingParameters?.componentType).find(option => option.label === fieldSettingParameters.question_name_lfp)}

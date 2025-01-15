@@ -1,13 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import useApi from '../../services/CustomHook/useApi';
 import { useNavigate, useParams } from 'react-router-dom';
-import Table from '../../Pages/VersionList/Components/Table.jsx'
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import QuestionnarySettings from './Components/QuestionnarySettings.jsx';
-import CreateModal from '../../Components/CustomModal/CreateModal.jsx';
-import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
 import { useDispatch } from 'react-redux';
-import { setInitialData } from '../QuestionnaryForm/Components/Fields/fieldSettingParamsSlice.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import VersionEditModal from '../../Components/Modals/VersionEditModal.jsx';
@@ -50,6 +46,7 @@ function VersionList() {
         internal_name: '',
         description: '',
     });
+    const [buttonDisable, setButtonDisable] = useState(false)
     const [selectedVersion, setSelectedVersion] = useState('');
     const handleOptionClick = (versionNumber) => {
         setSelectedVersion(versionNumber); // Set the clicked version as the selected version
@@ -69,7 +66,7 @@ function VersionList() {
     }
     let selectedVersionObj = {};
     const handleDuplicateClick = async () => {
-        
+
         if (!selectedVersion) {
             setToastError('Please select a version to duplicate.');
             return;
@@ -80,6 +77,7 @@ function VersionList() {
             (version) => version.version_number === selectedVersion
         );
         setLoading(true)
+        setButtonDisable(true)
         if (selectedVersionObj) {
             try {
                 const payload = {
@@ -89,18 +87,10 @@ function VersionList() {
                 };
 
                 const response = await PatchAPI('questionnaires/duplicate', payload);
-                if (response.status === 204) {
-                    setToastSuccess('Version duplicated successfully.');
-                    handleClose(); // Close the modal
-
-                    // Fetch the updated version list after duplicating
-                    await handleVersionList();
-                    window.location.reload()
-                    
-                } else {
-                    setToastError('Failed to duplicate the version.');
-                    window.location.reload()
-                }
+                setToastSuccess('Version duplicated successfully.');
+                handleClose(); // Close the modal
+                // Fetch the updated version list after duplicating
+                await handleVersionList();
             } catch (error) {
                 setToastError('An error occurred while duplicating the version.');
                 console.error(error);
@@ -109,6 +99,7 @@ function VersionList() {
             setToastError('No version found with the selected version number.');
         }
         setLoading(false)
+        setButtonDisable(false)
     };
 
     const handleEditClick = () => {
@@ -116,6 +107,7 @@ function VersionList() {
             (version) => version.version_number === selectedVersion
         );
         setLoading(true)
+        setButtonDisable(true)
         if (selectedVersionObj) {
             setSelectedStatus(selectedVersionObj); // Set the selected version object to state
             if (selectedVersionObj.status === 'Draft') {
@@ -128,6 +120,7 @@ function VersionList() {
         } else {
         }
         setLoading(false)
+        setButtonDisable(false)
     };
 
     const handleVersionList = async () => {
@@ -137,9 +130,6 @@ function VersionList() {
         setVersionList(response?.data)
         setLoading(false);
     }
-    useEffect(() => {
-        handleVersionList();
-    }, []);
 
     const handleQuestionnariesSetting = async () => {
         setLoading(true);
@@ -227,6 +217,7 @@ function VersionList() {
                 </div>
 
             </div>
+
             {isCreateModalOpen && <VersionEditModal
                 text={`${version ? 'This question can’t be edited' : duplicate ? 'Select Version' : edit ? 'Edit Questionnaire' : ''}`}
                 subText={`${version ? 'Version ' + selectedVersion + ' is in ' + selectedStatus.status + ' state, therefore can’t be edited.' : edit ? 'Please select the version you want to edit.' : duplicate ? 'Please select the version you want to duplicate.' : ''}`}
@@ -257,6 +248,7 @@ function VersionList() {
                 edit={edit}
                 duplicate={duplicate}
                 questionnaireId={questionnaire_id}
+                buttonDisable={buttonDisable}
             />}
         </>
     )
