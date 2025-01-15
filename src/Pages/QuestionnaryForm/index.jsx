@@ -24,7 +24,7 @@ import SignatureFieldSetting from './Components/Fields/Signature/SignatureFieldS
 import GPSFieldSetting from './Components/Fields/GPS/GPSFieldSetting/GPSFieldSetting.jsx';
 import DisplayFieldSetting from './Components/Fields/DisplayContent/DisplayFieldSetting/DisplayFieldSetting.jsx';
 import Sections from './Components/DraggableItem/Sections/Sections.jsx';
-import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType } from './Components/QuestionnaryFormSlice.js'
+import { setSelectedAddQuestion, setSelectedQuestionId, setShouldAutoSave, setSelectedSectionData, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal, setModalOpen, setShowCancelModal, setAssetType, setPageToDelete, setQuestionToDelete } from './Components/QuestionnaryFormSlice.js'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import EditableField from '../../Components/EditableField/EditableField.jsx';
 import PreviewModal from './Components/Preview.jsx';
@@ -57,6 +57,7 @@ const QuestionnaryForm = () => {
 
     }]);
 
+
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -73,7 +74,6 @@ const QuestionnaryForm = () => {
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
-    const shouldAutoSave = useSelector((state) => state?.questionnaryForm?.shouldAutoSave);
     const selectedSectionData = useSelector((state) => state?.questionnaryForm?.selectedSectionData);
     const dataIsSame = useSelector((state) => state?.questionnaryForm?.dataIsSame);
     const formDefaultInfo = useSelector((state) => state?.questionnaryForm?.formDefaultInfo);
@@ -90,7 +90,6 @@ const QuestionnaryForm = () => {
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
-    const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const debounceTimerRef = useRef(null); // Use useRef to store the debounce timer  
     const [saveClick, setSaveClick] = useState(false)
     const [sectionName, setSectionName] = useState('')
@@ -98,14 +97,16 @@ const QuestionnaryForm = () => {
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [complianceState, setCompliancestate] = useState(false)
     const [isDeleteComplianceLogic, setIsDeleteComplianceLogic] = useState(false);
-    const [selectedSection, setSelectedSection] = useState(sections[0].section_id);
+    const [selectedSection, setSelectedSection] = useState(sections[0]?.section_id);
     const [selectedPage, setSelectedPage] = useState(null);
     const [formStatus, setFormStatus] = useState();
     const [globalSaveLoading, setGlobalSaveLoading] = useState(false)
     const [sectionConditionLogicId, setSectionConditionLogicId] = useState('');
     const [pageConditionLogicId, setPageConditionLogicId] = useState('');
-    // Create the initial dropdown state
-    const [dropdownOpen, setDropdown] = useState(sections[0].section_id);
+    const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
+    const [complianceLoader, setComplianceLoader] = useState(false)
+    const [prevLabelValue, setPrevLabelValue] = useState('')
+    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -143,6 +144,26 @@ const QuestionnaryForm = () => {
         const { id, value } = e.target;
         let updatedValue = value;
         // Restrict numeric input if the id is 'fileType'
+        if(id === 'label'){
+            setPrevLabelValue(updatedValue)
+            if(updatedValue === ''){
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    label: {
+                        ...prevErrors.label,
+                        [selectedQuestionId]: 'This is a mandatory field',
+                    },
+                }));
+            }else{  
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    label: {
+                        ...prevErrors.label,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
         if (id === 'fileType') {
             // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
@@ -157,7 +178,6 @@ const QuestionnaryForm = () => {
         //     // replace(/[^0-9.]/g, ''): Removes anything that is not a number or decimal point.
         //     // replace(/(\..*)\./g, '$1'): Ensures that only one decimal point is allowed by removing any additional decimal points.
         //     // replace(/(\.\d{2})\d+/, '$1'): Restricts the decimal part to exactly two digits by trimming anything beyond two decimal places.
-
         // Update the state dynamically
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
         if (id === 'regular_expression') {
@@ -173,6 +193,9 @@ const QuestionnaryForm = () => {
 
         if (id === 'format_error') {
             dispatch(setNewComponent({ id: 'format_error', value: updatedValue, questionId: selectedQuestionId }));
+        }
+        if (id === 'admin_field_notes') {
+            dispatch(setNewComponent({ id: 'admin_field_notes', value: admin_field_notes, questionId: selectedQuestionId }));
         }
         // Check if the input field's id is the one you want to manage with inputValue
         if (id === 'urlValue') {
@@ -230,6 +253,7 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
+
 
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
@@ -335,16 +359,16 @@ const QuestionnaryForm = () => {
     };
 
     const fetchComplianceLogic = async () => {
-        try{
+        try {
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
-            if(response?.data?.data[0]?.logic){
+            if (response?.data?.data[0]?.logic) {
                 // setConditions(response?.data?.data[0]?.logic);
                 dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
-            }else{
+            } else {
                 // setConditions(complianceInitialState);
                 dispatch(setComplianceLogicCondition(complianceInitialState));
             }
-        }catch{
+        } catch {
             console.log('error while getting ')
         }
     }
@@ -363,8 +387,12 @@ const QuestionnaryForm = () => {
                     questions: []
                 }],
             };
+
             setSections((prevSections) => {
                 const updatedSections = prevSections.concat(newSection);
+                if (sections.length === 0) {
+                    setSelectedSection(updatedSections[0]?.section_id);
+                }
                 handleSectionSaveOrder(updatedSections); // Call handleSectionSaveOrder with the updated sections   
                 return updatedSections;
             })
@@ -517,7 +545,13 @@ const QuestionnaryForm = () => {
                 return section;
             });
         }
-
+        // setValidationErrors((prevErrors) => ({
+        //     ...prevErrors,
+        //     label: {
+        //         ...prevErrors.label,
+        //         [selectedQuestionId]: '',
+        //     },
+        // }));
         // Reset the selected component
         dispatch(setSelectedComponent(false));
 
@@ -543,7 +577,6 @@ const QuestionnaryForm = () => {
                 setFormStatus(response?.data?.data?.status);
                 const sectionsData = response?.data?.data?.sections || [];
                 dispatch(setAssetType({ asset_type: response?.data?.data?.asset_type }))
-
                 // Extract field settings data from sections  
                 const fieldSettingsData = sectionsData.flatMap(section => section.pages.flatMap(page => page.questions.map(question => ({
                     updated_at: question?.updated_at,
@@ -558,6 +591,8 @@ const QuestionnaryForm = () => {
                     type: question?.type,
                     source_value: question?.source_value,
                     source: question?.source,
+                    lookup_value: question?.lookup_value,
+                    lookup_id: question?.lookup_id,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
                     format: question?.format,
@@ -571,6 +606,7 @@ const QuestionnaryForm = () => {
                     service_record_lfp: question?.service_record_lfp,
                     questionnaire_name_lfp: question?.questionnaire_name_lfp,
                     question_name_lfp: question?.question_name_lfp,
+                    admin_field_notes: question?.admin_field_notes
                 }))));
                 // Transform field settings data into the desired structure  
                 const transformedFieldSettingsData = {
@@ -605,6 +641,7 @@ const QuestionnaryForm = () => {
                     setSections(sectionsData);
                     setCompareSavedSections(sectionsData)
                 }
+
             } else {
                 setToastError('Something went wrong fetching form details');
             }
@@ -623,7 +660,6 @@ const QuestionnaryForm = () => {
                 // Update the sections array by removing the deleted section  
                 const updatedSections = sections.filter(section => section.section_id !== sectionId);
                 setSections(updatedSections);
-
                 // setAssetType()
                 // Call handleSectionSaveOrder to update the layout  
                 handleSectionSaveOrder(updatedSections);
@@ -638,16 +674,18 @@ const QuestionnaryForm = () => {
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
+        // if ( Section_1.Page_1.Question_1 === "No" ) then "19/12/2024" else "20/12/2024"
         sectionId = sectionId?.replace('bddtest#', '')
         if (compliance) {
             let compliance = [...complianceLogic]
-
             compliance[complianceLogicId].default_content = payloadString;
 
             setComplianceLogic((prev) =>
                 prev.map((item, index) =>
                     index === complianceLogicId
-                        ? { ...item, default_content: payloadString }
+                        ? {
+                            ...item, default_content: payloadString
+                        }
                         : item
                 )
             );
@@ -660,6 +698,7 @@ const QuestionnaryForm = () => {
             setSaveClick(false);
         }
 
+        
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -701,7 +740,7 @@ const QuestionnaryForm = () => {
                                 min: fieldSettingParams[question.question_id].min,
                                 max: fieldSettingParams[question.question_id].max,
                             },
-                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                             source: fieldSettingParams[question.question_id].source,
                             source_value:
                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
@@ -709,6 +748,7 @@ const QuestionnaryForm = () => {
                                     fieldSettingParams[question.question_id].lookupOptionChoice
                             ,
                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                             options: fieldSettingParams[question.question_id].options,
                             default_value: fieldSettingParams[question.question_id].defaultValue,
                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1079,23 +1119,42 @@ const QuestionnaryForm = () => {
         dispatch(setModalOpen(true));
     }
 
+    // const confirmDeleteSection = () => {
+    //     if (sectionToDelete !== null) {
+    //         handleDeleteSection(sections[sectionToDelete].section_id);
+    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
+    //         dispatch(setModalOpen(false)); // Close the modal  
+    //     }
+    // }
+
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
             handleDeleteSection(sections[sectionToDelete].section_id);
-            handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
-            dispatch(setModalOpen(false)); // Close the modal  
+
+            // Determine the next section to select
+            const updatedSections = sections.filter((_, index) => index !== sectionToDelete);
+            if (updatedSections.length > 0) {
+                const nextSectionIndex = sectionToDelete < updatedSections.length
+                    ? sectionToDelete // Select the next section
+                    : updatedSections.length - 1; // Select the last section if the deleted one was the last
+                const nextSectionId = updatedSections[nextSectionIndex]?.section_id;
+
+                // Update selection
+                setSelectedSection(nextSectionId);
+                setDropdown(nextSectionId);
+            } else {
+                // No sections left
+                setSelectedSection(null);
+                setDropdown(null);
+            }
+
+            // Reflect deletion in the parent state
+            handleAddRemoveSection('remove', sectionToDelete);
+
+            // Close the modal
+            dispatch(setModalOpen(false));
         }
-    }
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         const updatedSections = sections.filter((section) => section.section_id !== selectedSectionData.section_id);
-    //         setSections(updatedSections); // Assuming setSections updates the state
-    //         // Update sections state
-    //         setSectionToDelete(null);  // Reset sectionToDelete
-    //         dispatch(setModalOpen(false));  // Close modal
-    //         // globalSaveHandler(updatedSections);
-    //     }
-    // };
+    };
 
     const handleSectionSaveOrder = async (updatedSection, compliance, payloadString) => {
         const body = {
@@ -1111,11 +1170,9 @@ const QuestionnaryForm = () => {
             if (!(response?.data?.error)) {
                 // Success
             } else {
-                console.error('error')
                 setToastError('Something went wrong');
             }
         } catch (error) {
-            console.error(error)
             setToastError('Something went wrong');
         }
     }
@@ -1141,9 +1198,18 @@ const QuestionnaryForm = () => {
         }
     };
 
-    const onDragEnd = (result) => {
-        if (!result.destination) return;
+    // const handleDragStart = (start, provided) => {
+    //     setSectionWarningShown(false);
+    //     const section = sections[start.source.index];
 
+    //     if (section.section_conditional_logic && !sectionWarningShown) {
+    //       setSectionWarningShown(true);
+    //     }
+    //   };
+
+    const onDragEnd = (result) => {
+        // setSectionWarningShown(false); // Reset warning state
+        if (!result.destination) return;
         const reorderedItems = Array.from(sections || []);
         const [removed] = reorderedItems.splice(result.source.index, 1);
         reorderedItems.splice(result.destination.index, 0, removed);
@@ -1196,16 +1262,15 @@ const QuestionnaryForm = () => {
             if (!(response?.data?.error)) {
                 setToastSuccess('Compliance Logic Saved Successfully')
             } else {
-                console.error('error here')
                 setToastError('Something went wrong');
             }
         } catch (error) {
-            console.error(error)
             setToastError('Something went wrong');
         }
     }
     //this is the function called when you click on delete of compliance logic
     const handleDeleteComplianceLogic = async () => {
+        setComplianceLoader(true)
         const body = {
             compliance_logic: []
         };
@@ -1213,6 +1278,7 @@ const QuestionnaryForm = () => {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             setComplianceLogic([]);
             setIsDeleteComplianceLogic(false);
+            setComplianceLoader(false)
             dispatch(setSelectedComponent(null));
             setToastSuccess('Compliance Logic deleted Successfully')
         } catch (error) {
@@ -1222,91 +1288,142 @@ const QuestionnaryForm = () => {
 
     // Function to compare sections state with compareSavedSections to show the cancle modal or not
     const compareSections = (sections, compareSavedSections) => {
+        // Check if the number of sections matches
         if (sections.length !== compareSavedSections.length) {
-            return false; // Different number of sections
+            console.log('Number of sections does not match');
+            return false;
         }
 
-        // Compare each section in detail (excluding questions)
+        // Compare each section in detail
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             const savedSection = compareSavedSections[i];
 
-            // Compare section names and ids
-            if (section.section_name !== savedSection.section_name || 
-                section.section_id !== savedSection.section_id) {
-                return false; // Section names or ids are different
+            // Compare section-level properties
+            if (
+                section.section_name !== savedSection.section_name ||
+                section.section_id !== savedSection.section_id ||
+                section.updated_at !== savedSection.updated_at
+            ) {
+                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
+                return false;
             }
 
-            // Compare pages within each section (excluding questions)
+            // Compare pages within the section
             if (section.pages.length !== savedSection.pages.length) {
-                return false; // Different number of pages
+                console.log(`Mismatch in the number of pages in section ${i + 1}`);
+                return false;
             }
 
-            // Compare each page's details (without comparing questions)
             for (let j = 0; j < section.pages.length; j++) {
                 const page = section.pages[j];
                 const savedPage = savedSection.pages[j];
 
-                // Compare page names and page_ids
-                if (page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id) {
-                    return false; // Different page names or page_ids
+                // Compare page-level properties
+                if (
+                    page.page_name !== savedPage.page_name ||
+                    page.page_id !== savedPage.page_id
+                ) {
+                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
+                        page,
+                        savedPage,
+                    });
+                    return false;
+                }
+
+                // Compare questions within the page
+                if (page.questions.length !== savedPage.questions.length) {
+                    console.log(
+                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
+                    );
+                    return false;
+                }
+
+                for (let k = 0; k < page.questions.length; k++) {
+                    const question = page.questions[k];
+                    const savedQuestion = savedPage.questions[k];
+
+                    // Compare question-level properties
+                    if (
+                        question.question_id !== savedQuestion.question_id ||
+                        question.question_name !== savedQuestion.question_name
+                    ) {
+                        console.log(
+                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
+                            { question, savedQuestion }
+                        );
+                        return false;
+                    }
                 }
             }
         }
 
-        return true; // Sections and pages match
+        return true; // Sections, pages, and questions are identical
     };
 
     // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
     const hasUnsavedChanges = () => {
-        // If sections have changed, or compareData is false, we show the modal
         return (
-            !compareSections(sections, compareSavedSections) ||
-            !compareData(fieldSettingParams, savedFieldSettingParams)
+            !compareSections(sections, compareSavedSections)
         );
     };
+
     // Cancel button click handler (related to showing the cancle modal)
     const handleDataChanges = () => {
         if (hasUnsavedChanges() && formStatus === 'Draft') {
-            dispatch(setShowCancelModal(true)); // Show confirmation modal if there are unsaved changes
+            dispatch(setShowCancelModal(true)); // Show confirmation modal
         } else {
             navigate(`/questionnaries/version-list/${questionnaire_id}`);
         }
     };
-    const handleComplianceLogic = async () => {
-        const payload = {
-            'questionnaire_id': parseInt(questionnaire_id),
-            'version_number': parseInt(version_number),
-            'logic' : conditions.length !== 0 ? conditions : complianceInitialState
-        }
-        try {
-            const response = await PostAPI(`questionnaires/compliancelogic`, payload);
-            
-        } catch {
-            console.log('Error updating API')
-        }
-    }
+
     // Confirmation modal "Confirm" button action (related to showing the cancle modal)
     const handleConfirmCancel = () => {
         dispatch(setShowCancelModal(false));
         navigate(`/questionnaries/version-list/${questionnaire_id}`);
     };
+
+    const handleComplianceLogic = async () => {
+        const payload = {
+            'questionnaire_id': parseInt(questionnaire_id),
+            'version_number': parseInt(version_number),
+            'logic': conditions.length !== 0 ? conditions : complianceInitialState
+        }
+        try {
+            const response = await PostAPI(`questionnaires/compliancelogic`, payload);
+
+        } catch {
+            console.log('Error updating API')
+        }
+    }
+
     const globalSaveHandler = async () => {
-        setGlobalSaveLoading(true)
+        setGlobalSaveLoading(true);
+    
+        // Check if there are any validation errors
+        // console.log(validationErrors)
+        const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
+    
+        if (hasValidationErrors) {
+            setToastError('Please fix the validation errors before saving.');
+            setGlobalSaveLoading(false);
+            return;
+        }
+    
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
+    
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
                 let pageKey = '';
                 let questionKey = '';
-
+    
                 if (keys.length > 3) {
-                    // replaciing as bdd records will have aditional key as bddtest# which will bot be there in the  normal user journey
+                    // replacing as bdd records will have additional key as bddtest# which will not be there in the normal user journey
                     sectionKey = keys[1].replace('bddtest#', '');
                     pageKey = keys[2];
                     questionKey = keys[3];
@@ -1315,6 +1432,7 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
+    
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1327,7 +1445,9 @@ const QuestionnaryForm = () => {
                                             question_id: question.question_id,
                                             question_name: fieldSettingParams[question.question_id].label,
                                             conditional_logic: fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+                                            default_conditional_logic: fieldSettingParams[question.question_id]['default_conditional_logic']?.replaceAll('else', ':')
+                                                ?.replaceAll('then', '?')
+                                                ?.replaceAll('if', '') || '',
                                             component_type: fieldSettingParams[question.question_id].componentType,
                                             label: fieldSettingParams[question.question_id].label,
                                             help_text: fieldSettingParams[question.question_id].helptext,
@@ -1341,14 +1461,14 @@ const QuestionnaryForm = () => {
                                                 min: fieldSettingParams[question.question_id].min,
                                                 max: fieldSettingParams[question.question_id].max,
                                             },
-                                            admin_field_notes: fieldSettingParams[question.question_id].note,
+                                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
                                             source: fieldSettingParams[question.question_id].source,
                                             source_value:
                                                 fieldSettingParams[question.question_id].source === 'fixedList' ?
                                                     fieldSettingParams[question.question_id].fixedChoiceArray :
-                                                    fieldSettingParams[question.question_id].lookupOptionChoice
-                                            ,
+                                                    fieldSettingParams[question.question_id].lookupOptionChoice,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
+                                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
                                             options: fieldSettingParams[question.question_id].options,
                                             default_value: fieldSettingParams[question.question_id].defaultValue,
                                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1387,7 +1507,7 @@ const QuestionnaryForm = () => {
                                                         return {}; // Return an empty object if componentType doesn't match any case  
                                                 }
                                             })(),
-                                        }
+                                        };
                                     }
                                 });
                             }
@@ -1395,6 +1515,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
+    
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1404,23 +1525,37 @@ const QuestionnaryForm = () => {
                         delete section.questionnaire_id;
                         delete section.version_number;
                         delete section['ttl'];
+                        section.pages.forEach(page => {
+                            delete page.index;
+                            delete page.sectionIndex;
+                        });
                     });
                 } else {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
-
+    
             cleanSections();
-
-            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody)
+    
+            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
+    
+            // Sync compareSavedSections with the updated sections
+            setCompareSavedSections(sections);
             handleSectionSaveOrder(sections);
             setToastSuccess(response?.data?.message);
-            handleComplianceLogic()
-            setGlobalSaveLoading(false)
+            handleComplianceLogic();
+            setGlobalSaveLoading(false);
         } catch (error) {
             console.log(error);
-            setGlobalSaveLoading(false)
+            setGlobalSaveLoading(false);
         }
+    };
+
+    const truncateText = (text, maxLength) => {
+        if (!text || text.length <= maxLength) {
+            return text;
+        }
+        return `${text.slice(0, maxLength)}...`;
     };
 
     return (
@@ -1442,6 +1577,7 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
+                            // handleDragStart={handleDragStart}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1452,131 +1588,146 @@ const QuestionnaryForm = () => {
                     <div className='w-[50%] '>
                         <div className='flex justify-between items-center w-full border-b border-[#DCE0EC] py-[13px] px-[26px]'>
                             <div className='flex items-center'>
-                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_type} - Version {formDefaultInfo?.version_number}</p>
+                                <p className='font-normal text-base text-[#2B333B]'>ID {formDefaultInfo?.questionnaire_id} - {formDefaultInfo?.asset_name} - Version {formDefaultInfo?.version_number}</p>
                                 <button className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ml-[30px] cursor-default ${getStatusStyles(formDefaultInfo?.status)} `} title={`${getStatusText(formDefaultInfo?.status)}`}>
                                     {getStatusText(formDefaultInfo?.status)}
                                 </button>
                             </div>
                             {formStatus !== 'Draft' && <p className='font-normal pl-2 italic text-base text-[#fcb91e]'>* {formStatus} questionnaires cannot be edited</p>}
                         </div>
-                        <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
-                            <p
-                                title={formDefaultInfo?.internal_name}
-                                className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
-                                data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
-                            </p>
-                            <div>
-                                <DragDropContext onDragEnd={onDragEnd}>
-                                    <Droppable droppableId="droppable">
-                                        {(provided) => (
-                                            <ul
-                                                {...provided.droppableProps} ref={provided.innerRef}
-                                            >
-                                                {sections.map((sectionData, sectionIndex) => (
-                                                    <Draggable
-                                                        key={sectionData.section_id}
-                                                        draggableId={sectionData.section_id}
-                                                        index={sectionIndex}
+                        {sections.length === 0 ?
+                            (<p className='flex items-center justify-center h-customh6 text-lg font-semibold bg-[#EFF1F8] w-full'>No Sections available for this Questionnaire</p>)
+                            : (
+                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                                    <p
+                                        title={formDefaultInfo?.internal_name}
+                                        className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
+                                        data-testid="questionnaire-management-section">{formDefaultInfo?.internal_name}
+                                    </p>
+                                    <div>
+                                        <DragDropContext onDragEnd={onDragEnd}>
+                                            <Droppable droppableId="droppable">
+                                                {(provided) => (
+                                                    <ul
+                                                        {...provided.droppableProps}
+                                                        ref={provided.innerRef}
                                                     >
-                                                        {(provided) => (
-                                                            <li
-                                                                className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
-                                                                    ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
-                                                                    border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                        {sections.map((sectionData, sectionIndex) => (
+                                                            <Draggable
+                                                                key={sectionData.section_id}
+                                                                draggableId={sectionData.section_id}
+                                                                index={sectionIndex}
                                                             >
-                                                                <div className="flex justify-between w-full"
-                                                                    id={`${sectionData.section_id}-scroll`}
-                                                                >
-                                                                    <div className='flex items-center w-[90%]' style={{ width: '-webkit-fill-available' }}>
-                                                                        <EditableField
-                                                                            name={sectionData?.section_name}
-                                                                            index={sectionIndex}
-                                                                            handleSave={handleSaveSectionName}
-                                                                            section={true}
-                                                                            testId={`section-${sectionIndex}-name`}
-                                                                            saveClick={saveClick}
-                                                                            setSaveClick={setSaveClick}
-                                                                            setSectionName={setSectionName}
-                                                                            sectionName={sectionName}
+                                                                {(provided) => (
+                                                                    <li
+                                                                        className={`disable-select select-none w-full rounded-[10px] p-[6px] my-4 
+                                                                        ${(selectedSection === sectionData.section_id || selectedSection === null) ? '' : 'hidden'} 
+                                                                        border hover:border-[#2B333B] border-transparent mb-2.5`}
+                                                                    >
+                                                                        <div className="flex justify-between w-full"
+                                                                            id={`${sectionData.section_id}-scroll`}
+                                                                        >
+                                                                            <div className='flex items-center' style={{ width: '-webkit-fill-available' }}>
+                                                                                <EditableField
+                                                                                    name={sectionData?.section_name}
+                                                                                    index={sectionIndex}
+                                                                                    handleSave={handleSaveSectionName}
+                                                                                    section={true}
+                                                                                    testId={`section-${sectionIndex}-name`}
+                                                                                    saveClick={saveClick}
+                                                                                    setSaveClick={setSaveClick}
+                                                                                    setSectionName={setSectionName}
+                                                                                    sectionName={sectionName}
+                                                                                    formStatus={formStatus}
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex items-center w-[15%]">
+                                                                                {sectionData.section_conditional_logic ? (
+                                                                                    // Dummy icon to show if conditional logic is added
+                                                                                    <img
+                                                                                        src="/Images/condition-added.svg"
+                                                                                        alt="Condition Added"
+                                                                                        title="Condition Added"
+                                                                                        className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}
+                                                                                    />
+                                                                                ) : (
+                                                                                    // Setting icon to add conditional logic
+                                                                                    <img
+                                                                                        src="/Images/setting.svg"
+                                                                                        alt="setting"
+                                                                                        title="Add Conditional-logic"
+                                                                                        data-testid={`add-condition-section-${sectionIndex}`}
+                                                                                        className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full`}
+                                                                                        onClick={formStatus === 'Draft' ? () => {
+                                                                                            setSectionConditionLogicId(sectionData.section_id);
+                                                                                            dispatch(setSelectedQuestionId(''));
+                                                                                            dispatch(setSelectedComponent(null));
+                                                                                        } : null}  // Use arrow function
+                                                                                    />
+                                                                                )}
+                                                                                <img src="/Images/trash-black.svg"
+                                                                                    alt="delete"
+                                                                                    title='Delete'
+                                                                                    data-testid={`delete-btn-${sectionIndex}`}
+                                                                                    className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
+                                                                                    onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <Sections
+                                                                            sectionData={sectionData}
+                                                                            sectionIndex={sectionIndex}
+                                                                            selectedQuestionId={selectedQuestionId}
+                                                                            handleAddRemoveQuestion={handleAddRemoveQuestion}
+                                                                            handleSaveSectionName={handleSaveSectionName}
+                                                                            dataIsSame={dataIsSame}
+                                                                            setSections={setSections}
+                                                                            sections={sections}
+                                                                            handleAddRemovePage={handleAddRemovePage}
+                                                                            handleSaveSection={handleSaveSection}
+                                                                            handleAutoSave={handleSaveSection}
+                                                                            handleDeleteModal={handleDeleteModal}
+                                                                            selectedSection={selectedSection}
+                                                                            setSelectedSection={setSelectedSection}
+                                                                            selectedPage={selectedPage}
+                                                                            setSelectedPage={setSelectedPage}
                                                                             formStatus={formStatus}
+                                                                            setDropdown={setDropdown}
+                                                                            dropdownOpen={dropdownOpen}
+                                                                            setPageConditionLogicId={setPageConditionLogicId}
+                                                                            pageConditionLogicId={setPageConditionLogicId}
                                                                         />
-                                                                    </div>
-                                                                    <div className="flex items-center">
-                                                                        <img src="/Images/setting.svg"
-                                                                            alt="setting"
-                                                                            title='Add Conditional-logic'
-                                                                            data-testid={`add-condition-section-${sectionIndex}`}
-                                                                            className={`pl-2.5 w-16 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                            onClick={formStatus === 'Draft' ? () =>{ 
-                                                                                setSectionConditionLogicId(sectionData.section_id)
-                                                                                dispatch(setSelectedQuestionId(''))
-                                                                                dispatch(setSelectedComponent(null))}
-                                                                             : null}  // Use arrow function
-                                                                        />
-                                                                        <img src="/Images/trash-black.svg"
-                                                                            alt="delete"
-                                                                            title='Delete'
-                                                                            data-testid={`delete-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 rounded-full  `}
-                                                                            onClick={formStatus === 'Draft' ? () => handleDeleteModal(sectionIndex, sectionData) : null}
-                                                                        />
-                                                                        {/* <img
-                                                                            src="/Images/save.svg"
-                                                                            alt="save"
-                                                                            title="Save"
-                                                                            data-testid={`save-btn-${sectionIndex}`}
-                                                                            className={`pl-2.5 p-2 rounded-full mr-6 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'}`}
-                                                                            onClick={formStatus === 'Draft' ? () => {
-                                                                                handleSaveSection(sectionData?.section_id);
-                                                                            } : null}
-                                                                        /> */}
-                                                                    </div>
-                                                                </div>
-                                                                <Sections
-                                                                    sectionData={sectionData}
-                                                                    sectionIndex={sectionIndex}
-                                                                    selectedQuestionId={selectedQuestionId}
-                                                                    handleAddRemoveQuestion={handleAddRemoveQuestion}
-                                                                    handleSaveSectionName={handleSaveSectionName}
-                                                                    dataIsSame={dataIsSame}
-                                                                    setSections={setSections}
-                                                                    sections={sections}
-                                                                    handleAddRemovePage={handleAddRemovePage}
-                                                                    handleSaveSection={handleSaveSection}
-                                                                    handleAutoSave={handleSaveSection}
-                                                                    handleDeleteModal={handleDeleteModal}
-                                                                    selectedSection={selectedSection}
-                                                                    setSelectedSection={setSelectedSection}
-                                                                    selectedPage={selectedPage}
-                                                                    setSelectedPage={setSelectedPage}
-                                                                    formStatus={formStatus}
-                                                                    setDropdown={setDropdown}
-                                                                    dropdownOpen={dropdownOpen}
-                                                                    setPageConditionLogicId={setPageConditionLogicId}
-                                                                    pageConditionLogicId={setPageConditionLogicId}
-                                                                />
-                                                            </li>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </ul>
-                                        )}
-                                    </Droppable>
-                                </DragDropContext>
-                                {/* //add section buttion was there here */}
-                            </div>
-                            {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0) && (
-                                <div>
-                                    <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                                                    </li>
+                                                                )}
+                                                            </Draggable>
+                                                        ))}
+                                                        {provided.placeholder}
+                                                    </ul>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
+                                        {/* //add section buttion was there here */}
+                                    </div>
+                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
+                                        <div>
+                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                        </div>
                     </div>
                     <div className='w-[30%]'>
                         <div className='border-b border-[#DCE0EC] flex items-center w-full'>
                             <button className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]'
-                                onClick={() => handleDataChanges()}>
+                                onClick={() => {
+                                    handleDataChanges()
+                                    dispatch(setSelectedComponent(false))
+                                }}>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
@@ -1646,7 +1797,7 @@ const QuestionnaryForm = () => {
                 isModalOpen && (
                     <ConfirmationModal
                         text='Delete Section'
-                        subText={`You are about to delete the "${selectedSectionData?.section_name}" section, which may contain multiple pages. This action cannot be undone.`}
+                        subText={`${selectedSectionData?.section_conditional_logic ? `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages and this includes conditional logic, This action cannot be undone.` : `You are about to delete the "${truncateText(selectedSectionData?.section_name, 50)}" section, which may contain multiple pages. This action cannot be undone.`}`}
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1675,6 +1826,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setIsDeleteComplianceLogic}
                         handleButton1={handleDeleteComplianceLogic} // Call confirmDeleteSection on confirmation
                         handleButton2={() => (setIsDeleteComplianceLogic(false))} // Handle cancel button
+                        loading={complianceLoader}
                     />
                 )
             }
@@ -1682,7 +1834,14 @@ const QuestionnaryForm = () => {
                 showPageDeleteModal && (
                     <ConfirmationModal
                         text='Delete Page'
-                        subText={`${selectedSectionData?.['questions'].length > 0 ? `You are about to delete the "${selectedSectionData?.page_name}" page, which may contain multiple questions. This action cannot be undone.` : 'Are you sure you want to delete this page?'}`}
+                        subText={
+                            selectedSectionData?.page_conditional_logic && selectedSectionData?.['questions'].length > 0
+                                ? 'This page includes conditional logic and multiple questions, Are you sure you want to delete it?'
+                                : selectedSectionData?.['questions'].length > 0
+                                    ? `You are about to delete the "${truncateText(selectedSectionData?.page_name, 50)}" page, which may contain multiple questions${selectedSectionData?.page_conditional_logic ? ' and which includes conditional logic' : ''
+                                    }. This action cannot be undone.`
+                                    : 'Are you sure you want to delete this page?'
+                        }
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1700,7 +1859,9 @@ const QuestionnaryForm = () => {
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
-                        subText={`You are about to delete the "${selectedSectionData?.label}" question. This action cannot be undone.`}
+                        subText={`${fieldSettingParams[selectedQuestionId]?.conditional_logic ? `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question and this conatins conditional logic This action cannot be undone.`
+                            : `You are about to delete the "${truncateText(questionToDelete?.questionName, 50)}" question. This action cannot be undone.`}`}
+
                         button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
                         Button1text='Delete'
                         Button2text='Cancel'
@@ -1790,6 +1951,16 @@ const QuestionnaryForm = () => {
                     fieldSettingParameters={fieldSettingParams}
                 />
             }
+            {/* {sectionWarningShown && <ConfirmationModal
+                setModalOpen={setModalOpen}
+                isOpen={isModalOpen}
+                text="This Section can’t be moved here"
+                subText="It is connected to another Section, and can’t be placed before it."
+                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
+                src={`testing-error`}
+                sectionWarningShown={sectionWarningShown}
+                setSectionWarningShown={setSectionWarningShown}
+            />} */}
         </>
     );
 }

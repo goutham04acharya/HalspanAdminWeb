@@ -41,6 +41,15 @@ Feature: Halspan- Admin-Show/Hide entire Sections/Pages for Files,Video,Photo (A
     Then I should see the label name for files updated in the section 2
     When I enter the help text for files
     Then I should see the help text for files updated in the section 2
+    When I click the add conditional logic button
+    Then I should see the advanced editor for files or photos or videos
+    Then I should see the suggestions for questions
+    When I enter the incorrect conditional logic for files or photos or videos
+    Then I should read a message stating that "No items found"
+    Then I click the save button for conditional logic
+    Then I should read a error message 
+    When I click the cancel button
+    Then I should see field settings
     
     When I click the add conditional logic button
     Then I should see the advanced editor for files or photos or videos

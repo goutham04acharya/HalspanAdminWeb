@@ -1,7 +1,5 @@
 /* eslint-disable complexity */
 export default function isNotEmptyValidation(formData, setErrors) {
-    // debugger
-    console.log(formData, 'form datatdtatdtajwdknwadm cajnca')
     let isValid = true;
 
     // Validate main fields in formData

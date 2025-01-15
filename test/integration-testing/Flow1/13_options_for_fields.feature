@@ -1,3 +1,4 @@
+@1.0
 Feature: Halspan - Admin - Variety of options available for each Field Type
     As an Admin, I want to have a variety of options available for each field type when creating questionnaires.
     Conditions of Satisfaction

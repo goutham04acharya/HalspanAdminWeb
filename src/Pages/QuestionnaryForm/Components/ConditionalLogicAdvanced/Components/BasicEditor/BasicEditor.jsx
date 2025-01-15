@@ -1,18 +1,17 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import InputField from '../../../../../../Components/InputField/InputField'
 import Image from '../../../../../../Components/Image/Image'
 import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
-import { useDispatch } from 'react-redux';
-import { setNewLogic } from '../../../Fields/fieldSettingParamsSlice';
-import { useSelector } from 'react-redux';
+import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
+import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, combinedArray }) {
-    const [dropdown, setDropdown] = useState(false)
-    const dispatch = useDispatch();
-    const basicEditorLogic = useSelector(state => state.fieldSettingParams.currentData)
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray }) {
+    const dropdownRef = useRef();
+    const dropdownRef2 = useRef();
+
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const conditionObj = {
         'text': ['includes', 'does not include', 'equals', 'not equal to'],
@@ -81,6 +80,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
             return;
         }
+
         if (type === 'AND') {
             // Create a new copy of the conditions array
             setConditions(prevConditions =>
@@ -144,7 +144,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         setSubmitSelected(false);
 
         setConditions(prevConditions => {
-            // Create a deep copy of the conditions array
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
             // Access the specific condition using mainIndex and subIndex
@@ -154,6 +153,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             conditionToUpdate.value = e.target.value;
             return updatedConditions;
         });
+
     };
 
     //function to set the value from the selection dropdown for selecting the question
@@ -176,6 +176,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             });
             updateDropdown(type, mainIndex, subIndex)
             return; // Exit the function if type is 'conditional_dropdown'
+
         } else if (type === 'value') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
@@ -218,26 +219,30 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
     }
     const getConditions = (key) => {
-        let arr = []
-        switch (key) {
-            case "textboxfield":
-            case "choiceboxfield":
-            case "assetLocationfield":
-            case "signaturefield":
-            case "gpsfield":
-            case "displayfield":
-                return conditionObj['text'];
-            case "numberfield":
-                return conditionObj['numeric'];
-            case "photofield":
-            case "videofield":
-            case "filefield":
-            case "floorPlanfield":
-                return conditionObj['file'];
-            case "dateTimefield":
-                return conditionObj['date'];
-            default:
-                return arr; // This is the fallback if none of the cases match
+        let arr = ['No conditions available'];
+        if(secDetailsForSearching.length > 0){
+            switch (key) {
+                case "textboxfield":
+                case "choiceboxfield":
+                case "assetLocationfield":
+                case "signaturefield":
+                case "gpsfield":
+                case "displayfield":
+                    return conditionObj['text'];
+                case "numberfield":
+                    return conditionObj['numeric'];
+                case "photofield":
+                case "videofield":
+                case "filefield":
+                case "floorPlanfield":
+                    return conditionObj['file'];
+                case "dateTimefield":
+                    return conditionObj['date'];
+                default:
+                    return arr; // This is the fallback if none of the cases match
+            }
+        }else{
+            return arr;
         }
     }
     const validateConditions = () => {
@@ -289,12 +294,69 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return updatedConditions;
         });
     }
+    const handleClearConditionValues = () => {
+        setConditions((prevConditions) =>
+            prevConditions.map((conditionGroup) => ({
+                ...conditionGroup,
+                conditions: conditionGroup.conditions.map((condition) => ({
+                    ...condition,
+                    question_name: "",
+                    condition_logic: "",
+                    value: "",
+                    dropdown: false,
+                    condition_dropdown: false,
+                    condition_type: condition.condition_type, // Preserve type if needed
+                })),
+            }))
+        );
+    };
+    // Custom handler function for clicks outside the dropdown
+    const handleOutsideClick = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    const handleOutsideClick2 = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                condition_dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    const handleOutsideClick3 = () => {
+        const updatedConditions = conditions.map(item => ({
+            ...item,
+            conditions: item.conditions.map(condition => ({
+                ...condition,
+                value_dropdown: false,
+            })),
+        }));
+        setConditions(updatedConditions); // Close the dropdown
+    };
+
+    // Use the hook with the dropdown ID
+    useOnClickOutsideById('condition_dropdown_inner', handleOutsideClick2);
+    useOnClickOutsideById('dropdown_inner', handleOutsideClick);
+    useOnClickOutsideById('value_inner', handleOutsideClick3);
+
     return (
         <div className='w-full h-customh14'>
-            <p className='font-semibold text-[22px]'>Conditional Fields</p>
+            {sectionConditionLogicId || pageConditionLogicId ? (
+                <p className='font-semibold text-[22px]'>Shows when ...</p>) : (
+                <p className='font-semibold text-[22px]'>Conditional Fields</p>
+            )}
             <div className='h-customh13 overflow-y-auto mb-6 scrollBar mt-5'>
                 {conditions?.map((condition, index) => (
-
                     <div key={index} className='mb-6'>
                         {condition['conditions']?.map((sub_cond, i) => (
                             <div className='flex gap-4 items-start justify-between mb-6'>
@@ -302,7 +364,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     <div className='w-[97%] -mx-2 flex'>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Select</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Select</p>
                                                 <InputWithDropDown
                                                     label=''
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -317,6 +379,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     isDropdownOpen={conditions[index]['conditions'][i]['dropdown']}
                                                     mainIndex={index}
                                                     subIndex={i}
+                                                    dropdownRef={dropdownRef}
                                                     setDropdownOpen={updateDropdown}
                                                     options={secDetailsForSearching}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.question_name === ''}
@@ -326,7 +389,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>
                                         <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] font-semibold'>Condition</p>
+                                                <p className='text-sm text-[#2B333B] font-medium'>Condition</p>
                                                 <InputWithDropDown
                                                     // label='Format'
                                                     labelStyle='font-semibold text-[#2B333B] text-base'
@@ -336,14 +399,16 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-3'
                                                     testID={`condition-${index}-${i}`}
                                                     labeltestID={`condition-dropdown-${index}-${i}`}
-                                                    selectedOption={conditions[index]?.conditions[i]?.condition_logic}
+                                                    selectedOption={secDetailsForSearching.length > 0 ? conditions[index]?.conditions[i]?.condition_logic : ''}
                                                     handleOptionClick={handleSelectDropdown}
                                                     mainIndex={index}
                                                     subIndex={i}
+                                                    dropdownRef={dropdownRef2}
                                                     isDropdownOpen={conditions[index]['conditions'][i]['condition_dropdown']}
                                                     setDropdownOpen={updateDropdown}
                                                     options={getConditions(conditions[index].conditions[i].condition_type)}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.condition_logic === ''}
+                                                    disableDropdownClick={secDetailsForSearching.length === 0}
                                                 />
                                                 {submitSelected && conditions[index]?.conditions[i]?.condition_logic === '' && <ErrorMessage error={'This field is mandatory'} />}
                                             </div>
@@ -368,13 +433,14 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                         </div>}
                                         {showInputValue(conditions[index]?.conditions[i]?.condition_logic, conditions[index]?.conditions[i]?.condition_type, 'choicefield') && <div className='w-1/3 px-2 '>
                                             <div className=''>
-                                                <p className='text-sm text-[#2B333B] mb-3 font-semibold'>Value</p>
+                                                <p className='text-sm text-[#2B333B] mb-3 font-medium'>Value</p>
                                                 {conditions[index]?.conditions[i]?.condition_type === 'choiceboxfield' ?
                                                     <>
                                                         <InputWithDropDown
                                                             label=""
                                                             id="value"
                                                             top="20px"
+                                                            dropdownRef={dropdownRef}
                                                             placeholder="Select"
                                                             className="w-full text-sm cursor-pointer placeholder:text-[#9FACB9] h-[45px]"
                                                             testID={`value-dropdown-${index}-${i}`}
@@ -386,10 +452,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                             subIndex={i}
                                                             isDropdownOpen={conditions[index].conditions[i].value_dropdown}
                                                             setDropdownOpen={(dropdown) => updateDropdown('value_dropdown', index, i, false, null)}
-                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item.question_detail === conditions[index].conditions[i].question_name).choice_values.map((choice) => choice.value) : []}
+                                                            options={combinedArray.length > 0 ? combinedArray?.find((item) => item?.question_detail === conditions[index]?.conditions[i]?.question_name)?.choice_values.map((choice) => choice?.value) : []}
                                                             validationError={submitSelected && conditions[index]?.conditions[i]?.value === ''}
                                                         />
-                                                        {submitSelected && conditions[index]?.conditions[i]?.value=== '' && <ErrorMessage error={'This field is mandatory'} />}
+                                                        {submitSelected && conditions[index]?.conditions[i]?.value === '' && <ErrorMessage error={'This field is mandatory'} />}
                                                     </>
                                                     :
                                                     <InputField
@@ -413,11 +479,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     />
                                                 }
                                             </div>
-
                                         </div>}
-
                                     </div>
-
                                     {condition['conditions'].length - 1 === i ? <div className='w-[3%] flex flex-col items-center' data-testid={`AND-${index}`} onClick={() => handleAdd('AND', index)}>
                                         <Image src="add" className="cursor-pointer" data-testid="add" />
                                         <p className='text-sm text-[#2B333B] -mt-2 font-semibold cursor-pointer'>AND</p>
@@ -427,7 +490,15 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                     </div>}
                                 </div>
                                 <div className='w-[3%] flex justify-end'>
-                                    <div className='p-2 bg-[#ffffff] cursor-pointer rounded-lg w-fit hover:bg-[#EFF1F8]' onClick={() => handleAdd("delete", index, i)}>
+                                    <div className='p-2 bg-[#EFF1F8] cursor-pointer rounded w-fit'
+                                        // onClick={() =>{conditions?.length !== 1 ? handleAdd("delete", index, i) : ''}}>
+                                        onClick={() => {
+                                            if (conditions?.length === 1 && conditions[0]?.conditions?.length === 1) {
+                                                handleClearConditionValues(); // Clear values for the single condition
+                                            } else {
+                                                handleAdd("delete", index, i); // Handle deletion for other cases
+                                            }
+                                        }}>
                                         <Image src="trash-black" className="" data-testid="delete" />
                                     </div>
                                 </div>
@@ -436,10 +507,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                         ))}
                         {conditions.length - 1 === index ? <div className='cursor-pointer' data-testid={`OR-${index}`} onClick={() => handleAdd('OR')}>
                             <Image src="add" className="mx-auto w-8 h-8" data-testid="add" />
-                            <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
+                            <p className='w-fit text-center mx-auto text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                         </div> :
                             <div className='cursor-pointer'>
-                                <p className='w-full text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
+                                <p className='w-fit  mx-auto text-center text-sm text-[#2B333B] -mt-2 font-semibold'>OR</p>
                             </div>
                         }
 

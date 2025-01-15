@@ -27,7 +27,7 @@ function FloorPlanField({
             </label>
             <div className='mt-2'>
                 {/* <img src="/Images/HalspanGrayLogo.svg" alt="image" /> */}
-                {preview && <ImageZoomPin floorPlan setValidationErrors={setValidationErrors} setValue={setValue} />}
+                {preview && <ImageZoomPin floorPlan setValidationErrors={setValidationErrors} setValue={setValue} isPin={question?.asset_extras?.pin_drop} isDraw={question?.asset_extras?.draw_image}/>}
             </div>
             <p
                 data-testid="help-text"

@@ -3,6 +3,7 @@ module.exports = {
         import: ['test'],
         paths: [
             'test/integration-testing/Flow2/1_login.feature',
+            'test/integration-testing/Flow2/47_cloning_questionnaire.feature',
             'test/integration-testing/Flow2/24_view_questionnaire.feature',
             'test/integration-testing/Flow2/26_change_status.feature',
             'test/integration-testing/Flow2/27_duplicate_questionnaire.feature',
@@ -17,15 +18,15 @@ module.exports = {
             'test/integration-testing/Flow2/35_date_time_basic_editor.feature',
             'test/integration-testing/Flow2/38_preview_questionnaire.feature',
             // 'test/integration-testing/Flow2/39_default_value_choice.feature',
-            // 'test/integration-testing/Flow2/40_compliance_status.feature',
+            'test/integration-testing/Flow2/40_compliance_status.feature',
             'test/integration-testing/Flow2/41_default_value_date_time.feature',
             'test/integration-testing/Flow2/41_default_value_textbox.feature',
             'test/integration-testing/Flow2/42_default_value_number.feature',
             'test/integration-testing/Flow2/44_preview_response.feature',
             'test/integration-testing/Flow2/46_load_from_previous.feature',
             'test/integration-testing/Flow2/48_asset_type.feature',
-            'test/integration-testing/Flow2/47_cloning_questionnaire.feature',
             'test/integration-testing/Flow2/49_section_page_show_hide.feature',
+            'test/integration-testing/Flow2/50_my_account.feature',
             'test/integration-testing/Flow2/2_logout.feature'
         ]
     }

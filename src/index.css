@@ -23,7 +23,7 @@ body {
   padding: 36px !important;
 }
 .react-responsive-modal-modal:has(.importModalMd) {
-  min-width: 60% !important;
+  min-width: 80% !important;
   border-radius: 10px !important;
   padding: 36px !important;
 }
@@ -469,7 +469,7 @@ custom-toggle-switch input:checked+.slider::before {
 
 .custom-radioBlue input[type="radio"]:disabled+label {
   cursor: not-allowed !important;
-  color: #DDDDDD;
+  color: #2B333B;
 }
 
 .custom-radioBlue input[type="radio"]:disabled {
@@ -609,4 +609,3 @@ custom-toggle-switch input:checked+.slider::before {
       transform: rotate(360deg);
   }
 }
-

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from '../Image/Image';
 
-const Toast = ({ message, type, setToastmessage, bottom }) => {
+const Toast = ({ message, type, setToastmessage, bottom}) => {
     const [showToast, setShowToast] = useState(true);
 
     /* This `useEffect` hook is setting a timer using `setTimeout` function to hide the toast message
@@ -11,10 +11,14 @@ const Toast = ({ message, type, setToastmessage, bottom }) => {
     string. The `clearTimeout` function is used to clear the timer when the component unmounts. The
     empty dependency array `[]` ensures that this effect runs only once when the component mounts. */
     useEffect(() => {
+        let delay
+        if(message?.length > 100){
+            delay = 5000
+        }
         const timer = setTimeout(() => {
             setShowToast(false);
             setToastmessage('');
-        }, 3000);
+        }, delay || 3000);
 
         return () => {
             clearTimeout(timer);

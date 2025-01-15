@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Image from '../../../Components/Image/Image.jsx';
-import useOnClickOutside from '../../../CommonMethods/outSideClick.js';
 import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import DIsplayContentField from './Fields/DisplayContent/DIsplayContentField.jsx';
@@ -17,11 +16,16 @@ import PhotoField from './Fields/PhotoField/PhotoFIeld.jsx';
 import VideoField from './Fields/VideoField/VideoField.jsx';
 import useApi from '../../../services/CustomHook/useApi.js';
 import TagScanField from './Fields/TagScan/TagScanField.jsx';
+import {produce} from 'immer';
 import {
     resetFields,
     setFieldEditable,
 } from './defaultContentPreviewSlice.js';
 import { useSelector } from 'react-redux';
+import { clearQuestions, setQuestionValue } from './previewQuestionnaireValuesSlice.js';
+import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
+import { list } from 'postcss';
+import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters }) {
     const modalRef = useRef();
@@ -38,9 +42,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const [complianceLogic, setComplianceLogic] = useState([]);
     const [showComplianceScreen, setShowComplianceScreen] = useState(false);
     const [isLastPage, setIsLastPage] = useState(false);
+    const [isModified, setIsModified] = useState(false)
+    const previousSectionsRef = useRef();
     const fieldStatus = useSelector(state => state?.defaultContent?.fieldStatus);
+    const questionValue = useSelector(state => state?.questionValues?.questions);
     // const fieldValues = useSelector(state => state?.fields?.fieldValues);
-    const [isvalidExpression, setIsValidExpression] = useState(false);
     const [precomputedNavigation, setPrecomputedNavigation] = useState({
         nextPage: 0,
         nextSection: 0,
@@ -52,6 +58,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
+    console.log(conditionalValues, 'conditionalValues')
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -69,8 +76,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             });
         });
         return result;
-
-
     }
 
     const updateConditionalValues = async (data) => {
@@ -175,6 +180,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             try {
                 // Preprocess the rule's default_content
                 let processedContent = preprocessLogic(rule.default_content);
+                processedContent = processedContent?.replace('if', '')
                 // Define variables that will be set in eval
                 let STATUS = '';
                 let REASON = '';
@@ -211,12 +217,12 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Initial State: Exclude sections with non-empty `section_conditional_logic`
     const initialAllPages = sections
-        .filter((section) => !section.section_conditional_logic || section.section_conditional_logic.trim() === '')
+        .filter((section) => !section?.section_conditional_logic || section?.section_conditional_logic.trim() === '')
         .filter((section) => {
-            if (section.section_conditional_logic) {
+            if (section?.section_conditional_logic) {
                 try {
                     // Evaluate the section's conditional logic
-                    return eval(section.section_conditional_logic);
+                    return eval(section?.section_conditional_logic);
                 } catch (err) {
                     console.error('Error evaluating section conditional logic:', err);
                     return false; // Exclude the section if evaluation fails
@@ -235,10 +241,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const getEvaluatedAllPages = () => {
         return sections
             .filter((section) => {
-                if (section.section_conditional_logic) {
+                if (section?.section_conditional_logic) {
                     try {
                         // Evaluate the section's conditional logic
-                        return eval(section.section_conditional_logic);
+                        return eval(section?.section_conditional_logic);
                     } catch (err) {
                         console.error('Error evaluating section conditional logic:', err);
                         return false; // Exclude the section if evaluation fails
@@ -258,7 +264,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     // Simulate user interaction or dynamic evaluation
     const allPages = getEvaluatedAllPages();
-
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':
@@ -274,7 +279,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         }
     };
 
-    const evaluateLogic = (logic) => {
+    const evaluateLogic = ((logic) => {
         try {
             if (logic.includes("new Date(")) {
                 return eval(logic);
@@ -293,7 +298,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 };
                 const replacedLogic = logic.replace(
                     /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
-                    (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+                    (match, operator, day) => `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`
                 );
                 return eval(replacedLogic);
             } else {
@@ -303,7 +308,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             console.error("Error evaluating conditional logic:", error);
             return false;
         }
-    };
+    });
 
     const isPageVisible = (sectionIndex, pageIndex) => {
         const pageData = sections[sectionIndex]?.pages[pageIndex];
@@ -442,20 +447,25 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
 
     const handleNextClick = () => {
-        // Reset previous validation errors before proceeding
+        // Reset previous validation errors before proceeding  
         setValidationErrors({});
 
-        // Function to validate mandatory fields
+        // Function to validate mandatory fields  
         const validateMandatoryFields = () => {
             const errors = sections[currentSection]?.pages[currentPage]?.questions.reduce((acc, question) => {
-                const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible
+                const isVisible = isPageVisible(currentSection, currentPage);  // Check if the page is visible  
                 if (isVisible) {
-                    // Initialize the field error accumulator for each component type
-                    if (!acc[`preview_${question.component_type}`]) {
-                        acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type
+                    // Check if the question is visible  
+                    if (question.conditional_logic && !evaluateLogic(question.conditional_logic)) {
+                        return acc; // Skip hidden questions  
                     }
 
-                    // Validate based on component type
+                    // Initialize the field error accumulator for each component type  
+                    if (!acc[`preview_${question.component_type}`]) {
+                        acc[`preview_${question.component_type}`] = {};  // Create an empty object for each component type  
+                    }
+
+                    // Validate based on component type  
                     switch (question.component_type) {
                         case 'textboxfield':
                             if (!question.options?.optional) {
@@ -476,43 +486,62 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             break;
 
                         case 'numberfield':
-                            if (!question.options?.optional && (value[question.question_id] === '' || value[question.question_id] === undefined)) {
-                                acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+
+                                if (questionValue[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                    acc.preview_numberfield[question.question_id] = 'This is a mandatory field';
+                                }
                             }
                             break;
 
                         case 'dateTimefield':
-                            if (!question.options?.optional && (!value[question.question_id] || value[question.question_id] === undefined)) {
-                                acc.preview_datetimefield[question.question_id] = 'This is a mandatory field';
+                            if (!question.options?.optional) {
+                                if (question?.type === 'datetime') {
+                                    if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined || questionValue?.[question?.question_id]?.split(' ')?.length === 1) {
+                                        acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                        acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                    }
+                                } else {
+                                    if (questionValue?.[question?.question_id] === '' || questionValue?.[question?.question_id] === undefined) {
+                                        acc.preview_datetimefield = acc.preview_datetimefield || {};
+                                        acc.preview_datetimefield[question?.question_id] = 'This is a mandatory field';
+                                    }
+                                }
                             }
                             break;
 
                         case 'photofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (value[question?.question_id] === false || value[question?.question_id] === undefined || questionValue[question?.question_id].length === 0) {
                                     acc.preview_photofield[question.question_id] = 'This is a mandatory field';
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_photofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} images`;
                                 }
                             }
                             break;
 
                         case 'filefield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_filefield[question.question_id] = 'This is a mandatory field';
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_filefield[question.question_id] = `Upload minimum of ${question?.field_range?.min} files`;
                                 }
                             }
                             break;
 
                         case 'videofield':
                             if (!question?.options?.optional) {
-                                if (value[question?.question_id] === false || value[question?.question_id] === undefined) {
+                                if (questionValue?.[question?.question_id]?.length === 0 || !questionValue?.[question?.question_id]) {
                                     acc.preview_videofield[question.question_id] = 'This is a mandatory field';
+                                } else if (questionValue[question?.question_id].length < question?.field_range?.min) {
+                                    acc.preview_videofield[question.question_id] = `Upload minimum of ${question?.field_range?.min} videos`;
                                 }
                             }
                             break;
 
                         case 'gpsfield':
-                            if (!question?.options?.optional && (value[question?.question_id] === false || value[question?.question_id] === undefined)) {
+                            if (!question?.options?.optional && (questionValue[question?.question_id] === false || questionValue[question?.question_id] === undefined)) {
                                 acc.preview_gpsfield[question.question_id] = 'This is a mandatory field';
                             }
                             break;
@@ -527,40 +556,39 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             return errors;
         };
 
-        // Get the errors after validating
+        // Get the errors after validating  
         const errors = validateMandatoryFields();
 
-        // If there are validation errors, update the state and return early
+        // If there are validation errors, update the state and return early  
         if (Object.keys(errors).length > 0) {
             const filteredErrors = {};
 
-            // Loop through errors and keep only those with actual error messages (non-empty objects)
+            // Loop through errors and keep only those with actual error messages (non-empty objects)  
             Object.keys(errors).forEach((key) => {
                 if (Object.keys(errors[key]).length > 0) {
                     filteredErrors[key] = errors[key];
                 }
             });
 
-            // If there are any filtered errors (i.e., non-empty error objects), set validation errors
+            // If there are any filtered errors (i.e., non-empty error objects), set validation errors  
             if (Object.keys(filteredErrors).length > 0) {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
-                    ...filteredErrors,  // Merge the filtered errors into the existing validation errors
+                    ...filteredErrors,  // Merge the filtered errors into the existing validation errors  
                 }));
-                return; // Don't proceed to next page or section if there are errors
+                return; // Don't proceed to next page or section if there are errors  
             }
         }
 
-
-        // Get precomputed navigation details for next page/section
+        // Get precomputed navigation details for next page/section  
         const { nextPage, nextSection, isLastPageInSection, isLastSection } = precomputedNavigation;
+        if (isLastSection)
+            if (isLastSection) {
+                setShowComplianceScreen(true);  // Show compliance screen if it's the last section  
+                return;
+            }
 
-        if (isLastSection) {
-            setShowComplianceScreen(true);  // Show compliance screen if it's the last section
-            return;
-        }
-
-        // Move to the next section or page
+        // Move to the next section or page  
         if (nextSection !== currentSection) {
             setCurrentSection(nextSection);
             setCurrentPage(nextPage);
@@ -575,6 +603,31 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
 
     };
 
+    // const resetHiddenQuestionValues = (questionId) => {
+    //     // Reset the question value in the Redux store
+    //     dispatch(setQuestionValue({ question_id: questionId, value: '' }));
+
+    //     // Reset the question value in local state
+    //     setValue((prev) => ({
+    //         ...prev,
+    //         [questionId]: '',
+    //     }));
+
+    //     // Find the section, page, and label for the question
+    //     const { section_name, page_name, label } = findSectionAndPageName(sections[currentSection], questionId);
+
+    //     // Update conditionalValues to set the label's value to empty
+    //     setConditionalValues((prevValues) => ({
+    //         ...prevValues,
+    //         [section_name]: {
+    //             ...prevValues[section_name], // Preserve existing entries for this section
+    //             [page_name]: {
+    //                 ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
+    //                 [label]: '' // Set the value of the label key to empty
+    //             }
+    //         }
+    //     }));
+    // };
     const handleBackClick = () => {
         // If on compliance screen, return to last page
         if (showComplianceScreen) {
@@ -721,14 +774,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        const commonProps = {
-            preview: true,
-            setValidationErrors,
-            validationErrors,
-            sections: sections[currentSection],
-            setConditionalValues,
-            conditionalValues,
-        };
 
         switch (question?.component_type) {
             case 'textboxfield':
@@ -745,8 +790,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     testId="preview"
                     setValue={setValue}
                     values={value[question?.question_id]}
-                // setFieldEditable={setFieldEditable}
-                // setFieldValue={setFieldValue}
+                    setIsModified={setIsModified}
+                    isModified={isModified}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -755,7 +800,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             case 'signaturefield':
                 return <SignatureField preview choiceValue={value[question?.question_id]} setValue={setValue} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'filefield':
-                return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <FileField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} value={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'choiceboxfield':
                 return <ChoiceBoxField
                     sections={sections[currentSection]}
@@ -771,17 +816,19 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     setValue={setValue}
                     choiceValue={value[question?.question_id]}
                     fieldSettingParameters={question}
+                    setIsModified={setIsModified}
+                    isModified={isModified}
                 />
             case 'dateTimefield':
-                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} />;
+                return <DateTimeField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} dateValue={value} setValidationErrors={setValidationErrors} validationErrors={validationErrors} helpText={question?.help_text} question={question} fieldSettingParameters={question} label={question?.label} place type={question?.type} handleChange={''} setIsModified={setIsModified} isModified={isModified} />;
             case 'numberfield':
-                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} />;
+                return <NumberField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} setValidationErrors={setValidationErrors} fieldValue={value[question?.question_id]} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'assetLocationfield':
                 return <AssetLocationField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'floorPlanfield':
                 return <FloorPlanField preview setValidationErrors={setValidationErrors} setValue={setValue} question={question} validationErrors={validationErrors} />;
             case 'photofield':
-                return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
+                return <PhotoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} setIsModified={setIsModified} isModified={isModified}/>;
             case 'videofield':
                 return <VideoField preview sections={sections[currentSection]} setConditionalValues={setConditionalValues} conditionalValues={conditionalValues} setValue={setValue} photoValue={value} setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
             case 'tagScanfield':
@@ -795,58 +842,43 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         window[key] = value;
     });
 
-    const isLastSectionAndPage = () => {
-        // Check if we are on the last section and last page
-        const isLastPageInSection = currentPage === sections[currentSection]?.pages.length - 1;
-        const isLastSection = currentSection === sections.length - 1;
-
-        if (isLastSection && isLastPageInSection) {
-            return true; // If on the last section and page, it's a "Submit" button
-        }
-
-        // Otherwise, evaluate the next section's conditional logic
-        const nextSectionData = sections[currentSection + 1];
-        if (nextSectionData?.section_conditional_logic) {
-            try {
-                const isSectionEval = eval(nextSectionData.section_conditional_logic);
-                return !isSectionEval; // If the next section logic is invalid, it becomes a "Submit" button
-            } catch (err) {
-                console.error("Error evaluating section conditional logic:", err);
-                return true; // On error, assume "Submit"
-            }
-        }
-
-        return false; // Default: "Next"
-    };
-
-
-
     useEffect(() => {
         sections.forEach(section => {
             section.pages.forEach(page => {
                 page.questions.forEach(question => {
-                    const { default_conditional_logic, default_content } = question;
-
+                    const { default_conditional_logic, default_content, component_type } = question;
                     // Check if default_conditional_logic is not empty
                     if (!fieldStatus[question?.question_id]) {
                         if (default_conditional_logic) {
                             try {
+                                const result = eval(default_conditional_logic);
+                                if (component_type === "dateTimefield") {
+                                    const splitDate = (dateStr) => {
+                                        if (!dateStr || typeof dateStr !== 'string') {
+                                            return new Date().toISOString().split('T')[0];
+                                        }
+                                        const [day, month, year] = dateStr.split("/");
+                                        return `${year}-${month}-${day}`;
+                                    }
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: splitDate(result) }))
+                                } else {
+                                    dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
+                                }
                                 // Evaluate the string expression
                                 if (default_content === "advance") {
-                                    const result = eval(default_conditional_logic);
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
+                                    setValue((prev) => ({
+                                        ...prev,
+                                        [question.question_id]: result
+                                    }))
+                                } else {
+                                    // dispatch(setQuestionValue({ question_id: question?.question_id, value: result }))
                                     setValue((prev) => ({
                                         ...prev,
                                         [question.question_id]: result
 
                                     }))
-                                } else {
-                                    setValue((prev) => ({
-                                        ...prev,
-                                        [question.question_id]: default_conditional_logic
-
-                                    }))
                                 }
-
                             } catch (error) {
                                 // Log the error if eval fails
                                 console.error(`Failed to evaluate "${default_conditional_logic}":`, error);
@@ -856,7 +888,43 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 });
             });
         });
-    }, [conditionalValues])
+    }, [sections, setValue, questionValue, setQuestionValue, dispatch])
+    useEffect(() => {
+        if (sections) {
+            const updateConditionalValues = () => {
+                const newConditionalValues = produce(conditionalValues, (draft) => {
+                    sections.forEach((section) => {
+                        const sectionKey = section.section_name.replace(/\s+/g, '_');
+                        section.pages.forEach((page) => {
+                            const pageKey = page.page_name.replace(/\s+/g, '_');
+                            page.questions.forEach((question) => {
+                                if (question.conditional_logic) {
+                                    try {
+                                        const isVisible = evaluateLogic(question.conditional_logic);
+                                        if (!isVisible) {
+                                            const labelKey = question.label.replace(/\s+/g, '_');
+                                            draft[sectionKey] = draft[sectionKey] || {};
+                                            draft[sectionKey][pageKey] = draft[sectionKey][pageKey] || {};
+                                            draft[sectionKey][pageKey][labelKey] = '';
+                                            dispatch(setQuestionValue({ question_id: question?.question_id, value: '' }))
+                                        }
+                                    } catch (error) {
+                                        console.error('Error evaluating conditional logic:', error);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                });
+                
+                setConditionalValues(newConditionalValues);
+            };
+
+            updateConditionalValues();
+        }
+    }, [sections, evaluateLogic, isModified]);
+
+
 
     const handleClose = () => {
         setModalOpen(false)
@@ -869,25 +937,22 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
             preview_photofield: '',
             preview_filefield: '',
             preview_videofield: '',
-            preview_gpsfield: '',
+            preview_gpsfield: false,
         }));
+        dispatch(clearQuestions())
         dispatch(resetFields())
+        dispatch(clearAllSignatures());
     }
-    function addDays(date) {
-        if (date) {
-            let result = date;
-            result.setDate(result.getDate() + 1);
-            // return result
-        }
 
-    }
+
     return (
-        <div className='bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[999]'>
+        <div className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}>
+
             <div className='flex justify-end p-2'>
                 <img src='/Images/close-preview.svg' data-testid='preview-close' className=' relative hover:bg-[#0e0d0d71] p-2 rounded-lg shadow-md hover:cursor-pointer' onClick={() => handleClose()}></img>
             </div>
             <div ref={modalRef} data-testid="mobile-preview" className='h-[740px] flex justify-between mt-[50px] flex-col border-[5px] border-[#2B333B] w-[367px] mx-auto bg-slate-100 rounded-[55px] relative pb-6 '>
-                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-7 mb-3'>{formDefaultInfo?.internal_name}</p>
+                <p className='text-center text-3xl text-[#2B333B] font-semibold mt-10 mb-3'>{formDefaultInfo?.internal_name}</p>
                 <div className='h-[calc(100vh-280px)] overflow-y-scroll overflow-x-hidden scrollHide w-full bg-slate-100 rounded-md'>
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
@@ -896,10 +961,10 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     ) : showComplianceScreen ? (
                         <div className="p-4">
                             <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">Compliance Results</h2>
+                            {complianceLogic?.length === 0 && <h3 className="font-semibold text-[#2B333B] text-center">This Questionnaire doesn't contain compliance logic.</h3>}
                             {evaluateComplianceLogic().map((result, index) => (
-
                                 <>
-                                    <div
+                                    {complianceLogic.length !== 0 && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -908,13 +973,13 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             <span
                                                 className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === 'PASS' ? 'bg-green-500' : 'bg-red-500 text-white'}`}
                                             >
-                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} />
+                                                <img src={`${result?.STATUS === 'PASS' ? '/Images/compliant.svg' : '/Images/non-compliant.svg'}`} width={12} data-testid={result?.STATUS === 'PASS' ? 'compliant' : 'non-compliant'} />
                                                 {result?.STATUS === 'PASS' ? 'Compliant' : 'Non-Compliant'}
                                             </span>
                                         </div>
 
-                                    </div>
-                                    {result?.STATUS === 'FAIL' && <div
+                                    </div>}
+                                    {(result?.STATUS === 'FAIL' && complianceLogic.length !== 0) && <div
                                         key={index}
                                         className={`mb-4 p-4 rounded-lg shadow transition-all duration-200 bg-white`}
                                     >
@@ -947,9 +1012,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         </div>
                     ) : (
                         <div>
-                            <p className="text-center text-2xl text-[#2B333B] font-[500] mt-3 mb-3">
-                                {sections[currentSection]?.section_name}
-                            </p>
+                            <div className="text-center text-2xl text-[#2B333B] mx-auto px-5 overflow-hidden text-ellipsis line-clamp-3 break-words font-[500] mt-3 mb-3">
+                                <p className=''>{sections[currentSection]?.section_name}</p>
+                            </div>
                             <div className="w-[305px] relative bg-gray-200 mx-auto rounded-full h-2.5 ">
                                 <div className="bg-[#2B333B] absolute h-2.5 rounded-l" style={{ width: `${(((previewNavigation.current_page - 1) / allPages.length) * 100).toFixed(0)}%` }}></div>
                                 <div className='flex justify-between pt-5'>
@@ -967,24 +1032,33 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-
                                     if (list?.conditional_logic !== '') {
                                         if (list?.conditional_logic.includes("new Date(")) {
                                             try {
-                                                let result = eval(list?.conditional_logic)
-                                                if (!eval(list?.conditional_logic)) {
-                                                    return null;
+                                                // Replace 'new Date()' with epoch value in seconds
+                                                let updatedLogic = list.conditional_logic.replace(/new Date\(\)/g, 'Math.round(new Date().getTime() / 1000)');
+
+                                                // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
+                                                updatedLogic = updatedLogic.replace(/new Date\((\d+),\s*(\d+),\s*(\d+)\)/g, (_, year, month, day) => {
+                                                    return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                });
+
+                                                // Evaluate the updated logic
+                                                if (!eval(updatedLogic)) {
+
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
-                                                console.log(error, error)
+                                                console.error("Error evaluating expression:", error);
                                                 return null;
                                             }
-
-                                        } else if (list?.conditional_logic.includes("getMonth(")) {
-                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1")
+                                        }
+                                        else if (list?.conditional_logic.includes("getMonth(")) {
+                                            const replacedLogic = list?.conditional_logic.replace("getMonth()", "getMonth() + 1");
                                             try {
                                                 if (!eval(replacedLogic)) {
-                                                    return null;
+
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
                                                 return null;
@@ -1009,7 +1083,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             try {
                                                 let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                 if (!result) {
-                                                    return null; // If the logic evaluates to false, return null
+
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
                                                 console.error(error, 'Error evaluating getDay logic');
@@ -1017,11 +1092,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                                             }
                                         } else {
                                             try {
-                                                // debugger
                                                 if (!eval(list?.conditional_logic)) {
-                                                    return null;
+                                                    return null; // Skip rendering this question
                                                 }
                                             } catch (error) {
+                                                console.warn('Error evaluating conditional logic:', error);
                                                 return null;
                                             }
                                         }
@@ -1041,9 +1116,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     )}
                 </div>
                 <div className='mt-5 flex items-center px-2 justify-between'>
-                    {!showLabel ? <button 
-                    // disabled={previewNavigation.current_page === 1} 
-                    type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} text-white font-semibold text-sm rounded-full
+                    {!showLabel ? <button
+                        disabled={previewNavigation.current_page === 1 && !showComplianceScreen}
+                        type='button' data-testid="back" className={`w-[100px] h-[45px] ${button1Style} disabled:opacity-40 text-white font-semibold text-sm rounded-full
                     `} onClick={handleBackClick}>
                         Back
                     </button> :
@@ -1082,6 +1157,8 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                 </div>
             </div>
         </div>
+
+
     )
 }
 

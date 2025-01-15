@@ -29,6 +29,7 @@ Feature: Halspan - Admin- Lookup data set
         Deleting an item will not remove it from a previously completed Questionnaires data but will remove it as an option in the future. (It will only remove from offline when the next sync is performed)
         Lookup dataset is applicable for Single line, Multi line and Dropdown.
         There must be an option to view and select the previously added lookup dataset.
+        
         Information to display
         Lookup Dataset ID
         Lookup Dataset Name
@@ -52,6 +53,22 @@ Feature: Halspan - Admin- Lookup data set
         Given I am on the lookup dataset listing screen
         Then I should see the table header containing '["ID", "NAME", "ACTION"]'
 
+    Scenario: Admin cancels the create lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I enter the name of the lookup dataset
+        * I enter the choices in csv format
+        * I click the close button
+        Then I should be redirected to the lookup dataset listing screen
+
+    Scenario: Import Invalid file with 600 data for lookup dataset
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        Then I should see a popup window to create lookup dataset
+        When I upload the valid file csv as "600.csv"
+        Then I should read a message stating that "Only 500 data entries are accepted."
+
     Scenario: Import the valid lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button
@@ -67,6 +84,16 @@ Feature: Halspan - Admin- Lookup data set
         When I click the confirm button
         Then I should read success message for delete user
 
+    Scenario: Admin tries to create the lookup dataset with empty fields
+        Given I am on the lookup dataset listing screen
+        When I click the create lookup dataset button
+        When I click the create button
+        Then I should read a message stating that "This field is mandatory"
+        When I enter the name of the lookup dataset
+        When I enter the invalid choices in csv format 
+        When I click the create button
+        Then I should read a message stating that "All values are mandatory"
+
     Scenario: Admin creates the lookup dataset
         Given I am on the lookup dataset listing screen
         When I click the create lookup dataset button
@@ -76,22 +103,26 @@ Feature: Halspan - Admin- Lookup data set
         * I click the create button
         Then I should read a message stating that "Created new lookup dataset successfully"
 
+    Scenario: Invalid search attempt
+        Given I am on the lookup dataset listing screen
+        When I search by the name "random12321"
+        Then I should read a message stating that "We're sorry, but we couldn't find any results matching your search query."
+
     Scenario: Searching by lookup dataset name
         Given I am on the lookup dataset listing screen
         When I search by the name
         Then The results should display lookup dataset matching the name
 
-    # Scenario: Confirm replacing the lookup dataset with existing dataset
-    #     Given I am on the lookup dataset listing screen
-    #     When I search by the name
-    #     * I click on the view dataset
-    #     Then I should see a popup window to view lookup dataset
-    #     When I click the import button
-    #     Then I should see a confirmation model to replacing existing dataset
-    #     When I upload the valid file csv as "bddtest-lookup-data.csv"
-    #     Then I should read success message for updating dataset by importing the dataset
-    #     When I search by the name "bddtest-lookup-data"
-    #     When I click the delete option for a searched lookup dataset
-    #     Then I should see a confirmation prompt for deletion
-    #     When I click the confirm button
-    #     Then I should read success message for delete user
+    Scenario: View and edit the lookup dataset
+        Given I am on the lookup dataset listing screen
+        Then I should see the table header containing '["ID", "NAME", "ACTION"]'
+        When I search recently created lookup dataset by bddtest
+        When I click on the view dataset
+        When I click on close button
+        When I click on the view dataset
+        Then I should see a popup window to view lookup dataset
+        When I edit the lookup data set name
+        When I delete the values in lookup dataset
+        When I add the values to lookup dataset
+        When I click on update button
+        Then I should read a message stating that the lookup dataset has been updated

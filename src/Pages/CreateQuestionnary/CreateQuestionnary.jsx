@@ -23,19 +23,34 @@ function CreateQuestionnary() {
     public_name: '',
     internal_name: '',
     description: '',
-    asset_type: '',
+    asset_name: '',
     services_type: '',
     language: 'UK- English',  // Default language set here
     is_adhoc: 'No',
   });
 
+  const complianceInitialState = [
+    {
+      'conditions': [
+        {
+          'question_name': '',
+          'condition_logic': '',
+          'value': '',
+          'dropdown': false,
+          'condition_dropdown': false,
+          'condition_type': 'textboxfield',
+        },
+      ]
+    }
+  ]
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const [selectedOption, setSelectedOption] = useState({
-    asset_type: null,
+    asset_name: null,
     language: { value: 'UK- English', label: 'UK- English' },  // Set default selection for language
     services_type: null,
   });
+  
   const [validationErrors, setValidationErrors] = useState({});
   const assetDropdownRef = useRef(null);
   const languageDropdownRef = useRef(null);
@@ -49,7 +64,7 @@ function CreateQuestionnary() {
     { value: 'INSPECTION', label: 'INSPECTION' },
     { value: 'MAINTENANCE', label: 'MAINTENANCE' }
   ];
-  
+
 
   const handleChange = (e, id) => {
     const { value } = e.target;
@@ -81,7 +96,8 @@ function CreateQuestionnary() {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_type?.name,
+      asset_type: selectedOption?.asset_name?.id.toString(),
+      asset_name: selectedOption?.asset_name?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
@@ -93,8 +109,8 @@ function CreateQuestionnary() {
     if (!createDetails.internal_name.trim()) {
       errors.internal_name = 'This field is mandatory';
     }
-    if (!selectedOption.asset_type) {
-      errors.asset_type = 'This field is mandatory';
+    if (!selectedOption.asset_name) {
+      errors.asset_name = 'This field is mandatory';
     }
     if (!selectedOption.language) {
       errors.language = 'This field is mandatory';
@@ -114,6 +130,13 @@ function CreateQuestionnary() {
     try {
       setIsThreedotLoader(true)
       const response = await PostAPI("questionnaires", payload);
+      const complianceState = {
+        'questionnaire_id': parseInt(response?.data?.data?.questionnaire_id),
+        'version_number': parseInt(response?.data?.data?.version_number),
+        'logic': complianceInitialState
+      }
+
+      const complianceResponse = await PostAPI(`questionnaires/compliancelogic`, complianceState);
       if (response?.data?.status === true) {
         setToastSuccess(response?.data?.message);
         navigate(`/questionnaries/create-questionnary/questionnary-form/${response?.data?.data?.questionnaire_id}/${response?.data?.data?.version_number}`)
@@ -137,7 +160,6 @@ function CreateQuestionnary() {
 
         setIsThreedotLoader(false);
       } else if (response?.data?.status === 409) {
-        // setToastError(response?.data?.data?.message);
         setValidationErrors({ ...errors, public_name: 'This public name already exists' });
         setIsThreedotLoader(false)
       } else if (response?.data?.status >= 500) {
@@ -175,7 +197,7 @@ function CreateQuestionnary() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        openDropdown === 'asset_type' &&
+        openDropdown === 'asset_name' &&
         assetDropdownRef.current &&
         !assetDropdownRef.current.contains(event.target)
       ) {
@@ -274,16 +296,16 @@ function CreateQuestionnary() {
                     testID='drop-btn'
                     labeltestID='asset'
                     options={options}
-                    isDropdownOpen={openDropdown === 'asset_type'}
-                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_type' ? null : 'asset_type')}
-                    selectedOption={selectedOption?.asset_type}
-                    handleOptionClick={(option) => handleOptionClick(option, 'asset_type')}
+                    isDropdownOpen={openDropdown === 'asset_name'}
+                    setDropdownOpen={() => setOpenDropdown(openDropdown === 'asset_name' ? null : 'asset_name')}
+                    selectedOption={selectedOption?.asset_name}
+                    handleOptionClick={(option) => handleOptionClick(option, 'asset_name')}
                     dropdownRef={assetDropdownRef}
-                    validationError={validationErrors?.asset_type}
+                    validationError={validationErrors?.asset_name}
                     assetType
                   />
                 </div>
-                {validationErrors?.asset_type && <ErrorMessage error={validationErrors?.asset_type} />}
+                {validationErrors?.asset_name && <ErrorMessage error={validationErrors?.asset_name} />}
               </div>
               <div className='w-1/2'>
                 <InputWithDropDown
@@ -341,7 +363,8 @@ function CreateQuestionnary() {
               options={services_type_list}
               isDropdownOpen={openDropdown === 'services_type'}
               setDropdownOpen={() => {
-                setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')}}
+                setOpenDropdown(openDropdown === 'services_type' ? null : 'services_type')
+              }}
               selectedOption={selectedOption?.services_type}
               handleOptionClick={(option) => handleOptionClick(option, 'services_type')}
               dropdownRef={serviceDropdownRef}

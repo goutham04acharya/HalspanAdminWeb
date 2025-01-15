@@ -22,15 +22,10 @@ const Sections = ({
   sections,
   setSections,
   handleAutoSave,
-  selectedSection,
-  setSelectedSection,
-  selectedPage,
   setSelectedPage,
   formStatus,
   setDropdown,
-  dropdownOpen,
   setPageConditionLogicId,
-  pageConditionLogicId
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
@@ -38,6 +33,37 @@ const Sections = ({
   const handleDeletePageModal = (sectionIndex, pageIndex, pageData) => {
     dispatch(setPageToDelete({ sectionIndex, pageIndex }));
     dispatch(setSelectedSectionData(pageData));
+  };
+  const onDragUpdate = (result) => {
+    const { destination, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    // Get the dragged element
+    const draggedElement = document.querySelector(`[data-rbd-draggable-id='${draggableId}']`);
+
+    if (draggedElement) {
+      // Scroll the container if the dragged element is near the top or bottom
+      const container = draggedElement.closest("[data-rbd-droppable-id]");
+      if (container) {
+        const { top, bottom } = draggedElement.getBoundingClientRect();
+        const { top: containerTop, bottom: containerBottom } = container.getBoundingClientRect();
+
+        const buffer = 50; // Buffer distance in pixels
+
+        // Scroll up if the dragged element is near the top
+        if (top < containerTop + buffer) {
+          container.scrollBy(0, -10);
+        }
+
+        // Scroll down if the dragged element is near the bottom
+        if (bottom > containerBottom - buffer) {
+          container.scrollBy(0, 10);
+        }
+      }
+    }
   };
 
   const onDragEnd = (result) => {
@@ -72,7 +98,7 @@ const Sections = ({
   useEffect(() => {
     const initialDropdownState = sections.reduce((acc, _, i) => ({ ...acc, [i]: false }), {});
     setDropdown(initialDropdownState);
-  }, [sections]);
+  }, []);
 
   return (
     <div
@@ -82,7 +108,7 @@ const Sections = ({
       className={"pb-0 mt-[10px] mb-0"}
     >
       <>
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
           <Droppable droppableId="droppable">
             {(provided) => (
               <ul {...provided.droppableProps} ref={provided.innerRef}>
@@ -121,24 +147,42 @@ const Sections = ({
                             />
                           </div>
                           <div className="flex items-center ">
-                            {/* Page Condition Logic Button */}
-                            <img
-                              src="/Images/setting.svg"
-                              title="page-condition-logic"
-                              alt="page-condition-logic"
-                              // data-testid={`delete-page-sec-${sectionIndex}-${pageIndex}`}
-                              data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
-                              className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'} p-2 rounded-full w-[80px]`}
-                              onClick={
-                                formStatus === 'Draft'
-                                  ? () => {setPageConditionLogicId(pageData?.page_id)
-                                    dispatch(setSelectedQuestionId(''))
-                                    dispatch(setSelectedComponent(null));}
-                                  : null
-                              }
-                            />
-
-                            {/* Drag Button */}
+                            {pageData.page_conditional_logic ? (
+                              <img
+                                src="/Images/condition-added.svg"
+                                alt="Condition Added"
+                                title="Condition Added"
+                                className={`pl-2.5 w-12 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            ) : (
+                              <img
+                                src="/Images/setting.svg"
+                                title="page-condition-logic"
+                                alt="page-condition-logic"
+                                data-testid={`add-condition-section-${sectionIndex}-page-${pageIndex}`}
+                                className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#EFF1F8]' : 'cursor-not-allowed'
+                                  } p-2 rounded-full w-[80px]`}
+                                onClick={
+                                  formStatus === 'Draft'
+                                    ? () => {
+                                      setPageConditionLogicId(pageData?.page_id);
+                                      dispatch(setSelectedQuestionId(''));
+                                      dispatch(setSelectedComponent(null));
+                                    }
+                                    : null
+                                }
+                              />
+                            )}
                             {formStatus === 'Draft' ? (
                               <img
                                 className="cursor-grab p-2 rounded-full hover:bg-[#EFF1F8]"

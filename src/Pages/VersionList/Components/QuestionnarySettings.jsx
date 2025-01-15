@@ -14,7 +14,6 @@ function QuestionnarySettings({
     editedDetails,
     dataLoading,
 }) {
-
     const { PatchAPI } = useApi();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isThreedotLoader, setIsThreedotLoader] = useState(false)
@@ -190,7 +189,7 @@ function QuestionnarySettings({
                         <button
                             data-testId='assetType'
                             className='text-[#6F7579] bg-[#F5F5F5] p-4 rounded h-[45px] w-full cursor-not-allowed flex justify-between items-center text-base font-normal border border-[#AEB3B7]'>
-                            <p>{queSettingDetails?.data?.asset_type}</p>
+                            <p>{queSettingDetails?.data?.asset_name}</p>
                             <img src="/Images/open-Filter.svg" alt="" />
                         </button>
                     </div>

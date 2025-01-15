@@ -149,7 +149,6 @@ const fieldSettingParamsSlice = createSlice({
             data.forEach(item => {
                 const questionId = item.question_id;
                 const displayType = item.display_type || {}; // Ensure displayType is defined
-
                 const customizedData = {
                     componentType: item.component_type,
                     label: item.label,
@@ -157,14 +156,15 @@ const fieldSettingParamsSlice = createSlice({
                     placeholderContent: item.placeholder_content,
                     default_content: item.default_content,
                     type: item.type,
-                    format: item.format,
+                    format: item.format || '24',
                     regular_expression: item?.regular_expression,
                     format_error: item?.format_error,
                     min: item.field_range?.min,
                     max: item.field_range?.max,
-                    note: item.admin_field_notes,
+                    admin_field_notes: item.admin_field_notes,
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
+                    lookupValue: item.lookup_value,
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,

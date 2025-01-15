@@ -7,6 +7,7 @@ function SignatureFieldSetting({
     formParameters,
     handleBlur,
     fieldSettingParameters,
+    validationErrors,
     setConditionalLogic,
     formStatus
 }) {
@@ -27,33 +28,48 @@ function SignatureFieldSetting({
                         handleBlur={handleBlur}
                         assetLocation={true}
                         formStatus={formStatus}
+                        validationErrors={validationErrors}
+                        selectedQuestionId={selectedQuestionId}
                     />
                     <div className='mt-7'>
                         <InputField
                             autoComplete='off'
                             label='Admin Field Notes'
-                            id='note'
+                            id='admin_field_notes'
                             type='text'
-                            value={fieldSettingParameters?.note}
+                            value={fieldSettingParameters?.admin_field_notes}
                             className='w-full mt-2.5'
                             labelStyle='font-semibold text-base text-[#2B333B]'
                             placeholder='Notes'
                             testId='Notes'
-                            htmlFor='note'
+                            htmlFor='admin_field_notes'
                             formStatus={formStatus}
                             maxLength={500}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
                     <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-                        <button
-                            type='button'
-                            disabled={formStatus !== 'Draft'}
-                            data-testid="add-conditional-logic"
-                            className={`w-[80%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base px-[52px]`}
-                            onClick={() => setConditionalLogic(true)}  // Use arrow function
-                        >
-                            Add Conditional Logic
-                        </button>
+                        <div className='flex items-center w-full'>
+                            <button
+                                type='button'
+                                data-testid="add-conditional-logic"
+                                className={`mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? 'px-[40px] w-[50%] ' : 'px-[52px] w-[80%]'}`}
+                                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
+                            >
+                                Add Conditional Logic
+                            </button>
+                            {fieldSettingParameters?.conditional_logic &&
+                                <button
+                                    type='button'
+                                    data-testid="remove-conditional-logic"
+                                    className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
+                                    onClick={() => {
+                                        dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                    }}
+                                >
+                                    Remove Conditional Logic
+                                </button>
+                            }
+                        </div>
                         {fieldSettingParameters?.conditional_logic &&
                             <p className='text-center italic mt-1'>Conditional Logic Added</p>
                         }

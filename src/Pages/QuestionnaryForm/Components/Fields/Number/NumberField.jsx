@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleSliderValue } from '../RangeSliderDataSlice';
 import ErrorMessage from '../../../../../Components/ErrorMessage/ErrorMessage';
 import { findSectionAndPageName } from '../../../../../CommonMethods/SectionPageFinder';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
+import { setFieldEditable } from '../../defaultContentPreviewSlice';
 
 
 function NumberField({
@@ -19,15 +21,17 @@ function NumberField({
     validationErrors,
     setValidationErrors,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 
 }) {
     const dispatch = useDispatch();
     const [localSliderValue, setLocalSliderValue] = useState(0);
-
+    const [sliderPercentage, setSliderPercentage] = useState('')
+    const questionValue = useSelector(state => state.questionValues.questions);
     // Get slider value from Redux store
     const sliderValue = useSelector((state) => state.sliderConfig.sliderValue);
-
     // Get increment_by value from fieldSettingParameters with a fallback to 1
     const incrementByValue = fieldSettingParameters?.incrementby || 1;
 
@@ -36,17 +40,40 @@ function NumberField({
     const maxRange = parseInt(fieldSettingParameters?.max) || 100;
 
     // Calculate percentage for slider fill (relative to min/max range)
-    const sliderPercentage = preview
-        ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) / ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
-        : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
-
+    // const sliderPercentage = preview
+    //     ? ((localSliderValue - (preview ? question?.field_range?.min : minRange)) / ((preview ? question?.field_range?.max : maxRange) - (preview ? question?.field_range?.min : minRange))) * 100
+    //     : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+    // if (preview) {
+    //     setValue((prev) => ({
+    //         ...prev,
+    //         [question?.question_id]: sliderPercentage
+    //     }))
+    // }
 
     // Sync the fieldSettingParameters value with slider value
     useEffect(() => {
         if (fieldSettingParameters?.value !== undefined && fieldSettingParameters.value !== sliderValue) {
             dispatch(handleSliderValue({ sliderValue: fieldSettingParameters.value }));
+            dispatch(setQuestionValue({
+                question_id: question?.question_id,
+                value: fieldSettingParameters.value,
+            }));
+            setLocalSliderValue(questionValue[question?.question_id])
         }
-    }, [fieldSettingParameters?.value, sliderValue, dispatch]);
+        const percentage = preview
+            ? ((localSliderValue - (question?.field_range?.min || 0)) /
+                ((question?.field_range?.max || 100) - (question?.field_range?.min || 0))) * 100
+            : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
+        setSliderPercentage(percentage);
+
+        if (preview) {
+            setValue((prev) => ({
+                ...prev,
+                [question?.question_id]: percentage
+            }));
+        }
+    }, [fieldSettingParameters?.value, sliderValue, localSliderValue, minRange, maxRange, preview, question?.field_range, question?.question_id, dispatch, setValue]);
+
 
     // Handle range slider changes and snap to the nearest multiple of incrementByValue
     const handleRange = (event) => {
@@ -68,6 +95,10 @@ function NumberField({
         // dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
         if (preview) {
             setLocalSliderValue(newValue);
+            dispatch(setQuestionValue({
+                question_id: question?.question_id,
+                value: nearestMultiple
+            }));
         } else {
             dispatch(handleSliderValue({ sliderValue: nearestMultiple }));
         }
@@ -78,7 +109,12 @@ function NumberField({
         }
     };
     const handleInputChange = (e) => {
+        // debugger
         const newValue = e.target.value
+        const invalidKeys = ['e'];
+        if (invalidKeys.includes(e.key)) {
+            e.preventDefault();
+        }
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -90,6 +126,11 @@ function NumberField({
                 }
             }
         }));
+        dispatch(setQuestionValue({
+            question_id: question?.question_id,
+            value: newValue
+        }));
+        setIsModified(!isModified)
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: newValue
@@ -98,8 +139,12 @@ function NumberField({
             ...prevErrors,
             preview_numberfield: '', // Or remove the key if you prefer  
         }))
+        dispatch(setFieldEditable({
+            fieldId: question?.question_id,
+            isEditable: true
+        }
+        ))
     }
-
     return (
         <div>
             <label
@@ -110,17 +155,6 @@ function NumberField({
                 className={`font-medium text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%]  ${fieldSettingParameters?.label === '' ? 'h-[20px]' : 'h-auto'}`}>
                 {preview ? question?.label : fieldSettingParameters?.label}{(!question?.options?.optional && preview) && <span className='text-red-500'>*</span>}
             </label>
-            {/* {((preview ? question?.source ==='entryfield' :fieldSettingParameters?.source === 'entryfield') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
-                <input
-                    data-testid='input'
-                    type={type}
-                    id={textId}
-                    value={`${fieldSettingParameters?.preField ? fieldSettingParameters.preField : ''}${fieldSettingParameters?.postField ? ` ${fieldSettingParameters.postField}` : ''}`}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
-                    placeholder={fieldSettingParameters?.placeholderContent}
-                    onChange={() => handleChange(fieldSettingParameters)}
-                />
-            } */}
             {((!preview && fieldSettingParameters?.source === 'entryfield') || (!preview && fieldSettingParameters?.source === 'both')) ? <input
                 data-testid='input'
                 type={type}
@@ -130,20 +164,37 @@ function NumberField({
                 placeholder={fieldSettingParameters?.placeholderContent}
                 onChange={() => handleChange(fieldSettingParameters)}
             /> : ((preview && question?.source === 'entryfield') || (preview && question?.source === 'both')) ?
-                <input
-                    data-testid='input'
-                    type={
-                        question?.type === 'integer' ? 'number' :
+                <div className={`flex border ${validationErrors?.preview_numberfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg items-center`}>
+                    {(question?.field_texts?.pre_field_text || fieldSettingParameters?.preField) && <p className={`w-1/5 max-w-[20%] break-all overflow-auto ml-2`}>{preview ? question?.field_texts?.pre_field_text : fieldSettingParameters?.preField}</p>}
+                    <input
+                        data-testid='input'
+                        type={question?.type === 'integer' ? 'number' :
                             question?.type === 'float' ? 'number' :
                                 question?.type === 'rating' ? 'range' :
-                                    'text'
-                    }
-                    step={question?.type === 'float' ? 'any' : ''}
-                    value={value}
-                    className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
-                    onChange={(e) => handleInputChange(e)}
-                    placeholder={question?.placeholder_content}
-                /> : ''}
+                                    'text'}
+                        step={question?.type === 'float' ? 'any' : ''}
+                        min={preview ? question?.field_range?.min : minRange}
+                        max={preview ? question?.field_range?.max : maxRange}
+                        value={questionValue[question?.question_id]}
+                        className={`w-full h-auto break-words  bg-white py-3 px-4 mt-1 mb-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
+                        // onChange={(e) => handleInputChange(e)}
+                        placeholder={question?.placeholder_content}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            const numValue = parseFloat(value);
+                            const min = preview ? question?.field_range?.min : minRange;
+                            const max = preview ? question?.field_range?.max : maxRange;
+                            console.log(numValue, value, min, max, numValue >= min && numValue <= max)
+                            if ((min === undefined || max === undefined) ||(numValue >= min && numValue <= max)) {
+                                
+                                handleInputChange(e);
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'e' || e.key === 'E') e.preventDefault();
+                        }} />
+                    {(question?.field_texts?.post_field_text || fieldSettingParameters?.postField) && <p className={`w-1/5 max-w-[20%] break-all overflow-auto mr-2`}>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>}
+                </div> : ''}
             {((preview ? question?.source === 'slider' : fieldSettingParameters?.source === 'slider') || (preview ? question?.source === 'both' : fieldSettingParameters?.source === 'both')) &&
                 <div data-testid="slider" className=''>
                     <div className='flex items-center w-full'>
@@ -161,14 +212,16 @@ function NumberField({
                                 onChange={handleRange}
                                 maxLength={50}
                                 style={{
-                                    '--percent': `${sliderPercentage}%`
+                                    '--percent': `${sliderPercentage}%`,
+                                    // 'backgroundColor' : ''
                                 }}
-                                className='mt-6 custom-slider w-full'
+                                className='mt-6  w-full'
                                 data-testid="number-slider"
                             />
                         </div>
                         <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_range?.max : fieldSettingParameters?.max}</p>
                         <p className={`w-auto max-w-[20%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_texts?.post_field_text : fieldSettingParameters?.postField}</p>
+
                     </div>
                     {!preview ? <p className='font-normal text-sm text-[#2B333B] italic mt-4'>
                         Select Value: {fieldSettingParameters?.type === 'float' ? sliderValue.toFixed(2) : sliderValue}
