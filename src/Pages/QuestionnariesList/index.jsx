@@ -26,8 +26,11 @@ function Questionnaries() {
   const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
-  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState(() => {
+    const searchParam = searchParams.get('search');
+    return searchParam ? decodeURIComponent(searchParam) : '';
+  });
+    const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
   const [cloneModal, setCloneModal] = useState(false)

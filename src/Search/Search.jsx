@@ -6,10 +6,10 @@ function Search({ className, searchValue, testId, setSearchValue, searchParams, 
     const value = e.target.value.trim();
     let params = Object.fromEntries(searchParams);
     
-    // Keep the old list until new data arrives
     if (!value) {
       delete params.search;
     } else {
+      // Encode for URL but keep original value in state
       params.search = encodeURIComponent(value);
     }
     delete params.start_key;
@@ -17,6 +17,7 @@ function Search({ className, searchValue, testId, setSearchValue, searchParams, 
   }, 300);
 
   const handleInputChange = (e) => {
+    // Keep unencoded value in state
     const value = e.target.value;
     setSearchValue(value);
     handleChange(e);
@@ -37,7 +38,7 @@ function Search({ className, searchValue, testId, setSearchValue, searchParams, 
         <input
           data-testid={testId}
           type="text"
-          value={searchValue}
+          value={searchValue} // This will now always show decoded value
           placeholder={placeholder}
           onChange={handleInputChange}
           className={`w-full outline-0 ${className} pr-10 placeholder:text-[#2B333B] placeholder:text-base placeholder:font-normal`}
