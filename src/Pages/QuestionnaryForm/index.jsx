@@ -106,7 +106,8 @@ const QuestionnaryForm = () => {
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
-    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
+    const [hasSectionData, setHasSectionData] = useState([]);
+
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -120,6 +121,7 @@ const QuestionnaryForm = () => {
         ]
     },
     ])
+
     const complianceInitialState = [
         {
             'conditions': [
@@ -134,6 +136,7 @@ const QuestionnaryForm = () => {
             ]
         }
     ]
+
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
@@ -372,6 +375,7 @@ const QuestionnaryForm = () => {
             console.log('error while getting ')
         }
     }
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const sectionId = `SEC-${uuidv4()}`;
@@ -671,233 +675,233 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
-        // handleSectionSaveOrder(sections, compliance, payloadString)
-        // Find the section to save  
-        // if ( Section_1.Page_1.Question_1 === "No" ) then "19/12/2024" else "20/12/2024"
-        sectionId = sectionId?.replace('bddtest#', '')
-        if (compliance) {
-            let compliance = [...complianceLogic]
-            compliance[complianceLogicId].default_content = payloadString;
+    // const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
+    //     // handleSectionSaveOrder(sections, compliance, payloadString)
+    //     // Find the section to save  
+    //     // if ( Section_1.Page_1.Question_1 === "No" ) then "19/12/2024" else "20/12/2024"
+    //     sectionId = sectionId?.replace('bddtest#', '')
+    //     if (compliance) {
+    //         let compliance = [...complianceLogic]
+    //         compliance[complianceLogicId].default_content = payloadString;
 
-            setComplianceLogic((prev) =>
-                prev.map((item, index) =>
-                    index === complianceLogicId
-                        ? {
-                            ...item, default_content: payloadString
-                        }
-                        : item
-                )
-            );
-            setIsThreedotLoader(false);
-            setConditionalLogic(false);
-            setSectionConditionLogicId('');
-            setPageConditionLogicId('')
-            setIsDefaultLogic(false);
-            setCompliancestate(false);
-            setSaveClick(false);
-        }
+    //         setComplianceLogic((prev) =>
+    //             prev.map((item, index) =>
+    //                 index === complianceLogicId
+    //                     ? {
+    //                         ...item, default_content: payloadString
+    //                     }
+    //                     : item
+    //             )
+    //         );
+    //         setIsThreedotLoader(false);
+    //         setConditionalLogic(false);
+    //         setSectionConditionLogicId('');
+    //         setPageConditionLogicId('')
+    //         setIsDefaultLogic(false);
+    //         setCompliancestate(false);
+    //         setSaveClick(false);
+    //     }
 
         
-        const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
-        const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
-        if (sectionToSave) {
-            const isDataSame = dataIsSame[sectionId];
-            if (isDataSame && !payloadString) {
-                setIsThreedotLoader(false);
-                setConditionalLogic(false)
-                setSectionConditionLogicId('');
-                setPageConditionLogicId('')
-                // If data is the same, return early and don't call the API  
-                return;
-            }
-            // Create a new object containing only the selected section's necessary fields  
+    //     const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
+    //     const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
+    //     if (sectionToSave) {
+    //         const isDataSame = dataIsSame[sectionId];
+    //         if (isDataSame && !payloadString) {
+    //             setIsThreedotLoader(false);
+    //             setConditionalLogic(false)
+    //             setSectionConditionLogicId('');
+    //             setPageConditionLogicId('')
+    //             // If data is the same, return early and don't call the API  
+    //             return;
+    //         }
+    //         // Create a new object containing only the selected section's necessary fields  
 
-            let body = {
-                section_id: sectionToSave.section_id,
-                section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
-                section_conditional_logic: sectionToSave?.section_conditional_logic,
-                pages: sectionToSave.pages.map(page => (
-                    {
-                        page_id: page.page_id,
-                        page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
-                        page_conditional_logic: page?.page_conditional_logic,
-                        questions: page.questions.map(question => ({
-                            question_id: question.question_id,
-                            question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
-                            conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
-                            default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
-                            component_type: fieldSettingParams[question.question_id].componentType,
-                            label: fieldSettingParams[question.question_id].label,
-                            help_text: fieldSettingParams[question.question_id].helptext,
-                            placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
-                            default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
-                            type: fieldSettingParams[question.question_id].type,
-                            format: fieldSettingParams[question.question_id].format,
-                            regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
-                            format_error: fieldSettingParams[question?.question_id]?.format_error,
-                            field_range: {
-                                min: fieldSettingParams[question.question_id].min,
-                                max: fieldSettingParams[question.question_id].max,
-                            },
-                            admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
-                            source: fieldSettingParams[question.question_id].source,
-                            source_value:
-                                fieldSettingParams[question.question_id].source === 'fixedList' ?
-                                    fieldSettingParams[question.question_id].fixedChoiceArray :
-                                    fieldSettingParams[question.question_id].lookupOptionChoice
-                            ,
-                            lookup_id: fieldSettingParams[question.question_id].lookupOption,
-                            lookup_value: fieldSettingParams[question.question_id].lookupValue,
-                            options: fieldSettingParams[question.question_id].options,
-                            default_value: fieldSettingParams[question.question_id].defaultValue,
-                            increment_by: fieldSettingParams[question.question_id].incrementby,
-                            field_texts: {
-                                pre_field_text: fieldSettingParams[question.question_id].preField,
-                                post_field_text: fieldSettingParams[question.question_id].postField
-                            },
-                            asset_extras: {
-                                draw_image: fieldSettingParams[question.question_id].draw_image,
-                                pin_drop: fieldSettingParams[question.question_id].pin_drop,
-                                include_metadata: fieldSettingParams[question.question_id].include_metadata,
-                                file_size: fieldSettingParams[question.question_id].file_size,
-                                file_type: fieldSettingParams[question.question_id].file_type,
-                            },
-                            attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
-                            service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
-                            questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
-                            question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
-                            display_type: (() => {
-                                switch (fieldSettingParams[question.question_id].type) {
-                                    case 'heading':
-                                        return { heading: fieldSettingParams[question.question_id].heading };
-                                    case 'text':
-                                        return { text: fieldSettingParams[question.question_id].text };
-                                    case 'image':
-                                        return { image: fieldSettingParams[question.question_id].image };
-                                    case 'url':
-                                        return {
-                                            url: {
-                                                type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
-                                                value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
-                                            }
-                                        };
-                                    default:
-                                        return {}; // Return an empty object if componentType doesn't match any case  
-                                }
-                            })(),
-                        }))
-                    }))
-            };
-            // Recursive function to remove specified keys  
-            const removeKeys = (obj) => {
-                if (Array.isArray(obj)) {
-                    obj.forEach(removeKeys);
-                } else if (typeof obj === 'object' && obj !== null) {
-                    delete obj.created_at;
-                    delete obj.updated_at;
-                    delete obj.questionnaire_id;
-                    delete obj.version_number;
-                    Object.values(obj).forEach(removeKeys);
-                }
-            };
+    //         let body = {
+    //             section_id: sectionToSave.section_id,
+    //             section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
+    //             section_conditional_logic: sectionToSave?.section_conditional_logic,
+    //             pages: sectionToSave.pages.map(page => (
+    //                 {
+    //                     page_id: page.page_id,
+    //                     page_name: page.page_name.replace(/^\s+|\s+$/g, ''),
+    //                     page_conditional_logic: page?.page_conditional_logic,
+    //                     questions: page.questions.map(question => ({
+    //                         question_id: question.question_id,
+    //                         question_name: fieldSettingParams[question.question_id].label.replace(/^\s+|\s+$/g, ''),
+    //                         conditional_logic: (!defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['conditional_logic'] || '',
+    //                         default_conditional_logic: (defaultString && payloadString && selectedQuestionId === question.question_id) ? payloadString : fieldSettingParams[question.question_id]['default_conditional_logic'] || '',
+    //                         component_type: fieldSettingParams[question.question_id].componentType,
+    //                         label: fieldSettingParams[question.question_id].label,
+    //                         help_text: fieldSettingParams[question.question_id].helptext,
+    //                         placeholder_content: fieldSettingParams[question.question_id].placeholderContent,
+    //                         default_content: payloadString && selectedQuestionId === question.question_id ? 'advance' : savedFieldSettingParams?.[question.question_id]?.['default_conditional_logic'] !== fieldSettingParams?.[question.question_id]?.['default_conditional_logic'] ? 'direct' : fieldSettingParams[question.question_id].default_content || '',
+    //                         type: fieldSettingParams[question.question_id].type,
+    //                         format: fieldSettingParams[question.question_id].format,
+    //                         regular_expression: fieldSettingParams[question?.question_id]?.regular_expression,
+    //                         format_error: fieldSettingParams[question?.question_id]?.format_error,
+    //                         field_range: {
+    //                             min: fieldSettingParams[question.question_id].min,
+    //                             max: fieldSettingParams[question.question_id].max,
+    //                         },
+    //                         admin_field_notes: fieldSettingParams[question.question_id].admin_field_notes,
+    //                         source: fieldSettingParams[question.question_id].source,
+    //                         source_value:
+    //                             fieldSettingParams[question.question_id].source === 'fixedList' ?
+    //                                 fieldSettingParams[question.question_id].fixedChoiceArray :
+    //                                 fieldSettingParams[question.question_id].lookupOptionChoice
+    //                         ,
+    //                         lookup_id: fieldSettingParams[question.question_id].lookupOption,
+    //                         lookup_value: fieldSettingParams[question.question_id].lookupValue,
+    //                         options: fieldSettingParams[question.question_id].options,
+    //                         default_value: fieldSettingParams[question.question_id].defaultValue,
+    //                         increment_by: fieldSettingParams[question.question_id].incrementby,
+    //                         field_texts: {
+    //                             pre_field_text: fieldSettingParams[question.question_id].preField,
+    //                             post_field_text: fieldSettingParams[question.question_id].postField
+    //                         },
+    //                         asset_extras: {
+    //                             draw_image: fieldSettingParams[question.question_id].draw_image,
+    //                             pin_drop: fieldSettingParams[question.question_id].pin_drop,
+    //                             include_metadata: fieldSettingParams[question.question_id].include_metadata,
+    //                             file_size: fieldSettingParams[question.question_id].file_size,
+    //                             file_type: fieldSettingParams[question.question_id].file_type,
+    //                         },
+    //                         attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
+    //                         service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
+    //                         questionnaire_name_lfp: fieldSettingParams[question.question_id].questionnaire_name_lfp,
+    //                         question_name_lfp: fieldSettingParams[question.question_id].question_name_lfp,
+    //                         display_type: (() => {
+    //                             switch (fieldSettingParams[question.question_id].type) {
+    //                                 case 'heading':
+    //                                     return { heading: fieldSettingParams[question.question_id].heading };
+    //                                 case 'text':
+    //                                     return { text: fieldSettingParams[question.question_id].text };
+    //                                 case 'image':
+    //                                     return { image: fieldSettingParams[question.question_id].image };
+    //                                 case 'url':
+    //                                     return {
+    //                                         url: {
+    //                                             type: fieldSettingParams[question.question_id].urlType,  // Assuming urlType is a field in fieldSettingParams  
+    //                                             value: fieldSettingParams[question.question_id].urlValue // Assuming urlValue is a field in fieldSettingParams  
+    //                                         }
+    //                                     };
+    //                                 default:
+    //                                     return {}; // Return an empty object if componentType doesn't match any case  
+    //                             }
+    //                         })(),
+    //                     }))
+    //                 }))
+    //         };
+    //         // Recursive function to remove specified keys  
+    //         const removeKeys = (obj) => {
+    //             if (Array.isArray(obj)) {
+    //                 obj.forEach(removeKeys);
+    //             } else if (typeof obj === 'object' && obj !== null) {
+    //                 delete obj.created_at;
+    //                 delete obj.updated_at;
+    //                 delete obj.questionnaire_id;
+    //                 delete obj.version_number;
+    //                 Object.values(obj).forEach(removeKeys);
+    //             }
+    //         };
 
-            // Remove keys from the cloned body  
-            removeKeys(body);
-            try {
-                if (isSaving) {
-                    // ... call the API ...  
-                    // const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
-                    // setSaveClick(true)
-                    // if (!(response?.error)) {
-                    // setToastSuccess(response?.data?.message);
-                    // setCompareSavedSections(sections);
+    //         // Remove keys from the cloned body  
+    //         removeKeys(body);
+    //         try {
+    //             if (isSaving) {
+    //                 // ... call the API ...  
+    //                 // const response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, body);
+    //                 // setSaveClick(true)
+    //                 // if (!(response?.error)) {
+    //                 // setToastSuccess(response?.data?.message);
+    //                 // setCompareSavedSections(sections);
 
-                    if (defaultString) {
-                        dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                    } else if (sectionConditionLogicId) {
-                        const sectionIndex = sections.findIndex(section => section.section_id === sectionConditionLogicId);
-                        // Get the section_condition_logic if it exists
-                        if (sectionIndex !== -1) {
-                            // Create a shallow copy of the specific section
-                            const updatedSection = {
-                                ...sections[sectionIndex],
-                                section_conditional_logic: payloadString, // Add or update the property
-                            };
+    //                 if (defaultString) {
+    //                     dispatch(setNewComponent({ id: 'default_conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+    //                 } else if (sectionConditionLogicId) {
+    //                     const sectionIndex = sections.findIndex(section => section.section_id === sectionConditionLogicId);
+    //                     // Get the section_condition_logic if it exists
+    //                     if (sectionIndex !== -1) {
+    //                         // Create a shallow copy of the specific section
+    //                         const updatedSection = {
+    //                             ...sections[sectionIndex],
+    //                             section_conditional_logic: payloadString, // Add or update the property
+    //                         };
 
-                            // Create a new array with the updated section
-                            const updatedSections = [
-                                ...sections.slice(0, sectionIndex),  // Keep sections before the updated section
-                                updatedSection,                     // Add the updated section
-                                ...sections.slice(sectionIndex + 1) // Keep sections after the updated section
-                            ];
+    //                         // Create a new array with the updated section
+    //                         const updatedSections = [
+    //                             ...sections.slice(0, sectionIndex),  // Keep sections before the updated section
+    //                             updatedSection,                     // Add the updated section
+    //                             ...sections.slice(sectionIndex + 1) // Keep sections after the updated section
+    //                         ];
 
-                            // Update state
-                            setSections(updatedSections);
-                        } else {
-                            console.error('Section not found for the given sectionConditionLogicId');
-                        }
-                    } else if (pageConditionLogicId) {
-                        // Iterate through sections to find the page with the given pageConditionLogicId
-                        let pageFound = false;
-                        const updatedSections = sections.map(section => {
-                            const pageIndex = section?.pages.findIndex(page => page.page_id === pageConditionLogicId);
+    //                         // Update state
+    //                         setSections(updatedSections);
+    //                     } else {
+    //                         console.error('Section not found for the given sectionConditionLogicId');
+    //                     }
+    //                 } else if (pageConditionLogicId) {
+    //                     // Iterate through sections to find the page with the given pageConditionLogicId
+    //                     let pageFound = false;
+    //                     const updatedSections = sections.map(section => {
+    //                         const pageIndex = section?.pages.findIndex(page => page.page_id === pageConditionLogicId);
 
-                            if (pageIndex !== -1) {
-                                pageFound = true;
-                                // Create a shallow copy of the specific page
-                                const updatedPage = {
-                                    ...section.pages[pageIndex],
-                                    page_conditional_logic: payloadString, // Add or update the property
-                                };
+    //                         if (pageIndex !== -1) {
+    //                             pageFound = true;
+    //                             // Create a shallow copy of the specific page
+    //                             const updatedPage = {
+    //                                 ...section.pages[pageIndex],
+    //                                 page_conditional_logic: payloadString, // Add or update the property
+    //                             };
 
-                                // Update the pages array
-                                const updatedPages = [
-                                    ...section.pages.slice(0, pageIndex),
-                                    updatedPage,
-                                    ...section.pages.slice(pageIndex + 1),
-                                ];
+    //                             // Update the pages array
+    //                             const updatedPages = [
+    //                                 ...section.pages.slice(0, pageIndex),
+    //                                 updatedPage,
+    //                                 ...section.pages.slice(pageIndex + 1),
+    //                             ];
 
-                                // Return the updated section with updated pages
-                                return {
-                                    ...section,
-                                    pages: updatedPages,
-                                };
-                            }
-                            return section; // Return the original section if no changes
-                        });
+    //                             // Return the updated section with updated pages
+    //                             return {
+    //                                 ...section,
+    //                                 pages: updatedPages,
+    //                             };
+    //                         }
+    //                         return section; // Return the original section if no changes
+    //                     });
 
-                        if (pageFound) {
-                            setSections(updatedSections);
-                        } else {
-                            console.error('Page not found for the given pageConditionLogicId');
-                        }
-                    } else {
-                        dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                    }
-                } else {
-                    // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
-                }
-                dispatch(saveCurrentData());
-                setIsThreedotLoader(false);
-                setConditionalLogic(false);
-                setSectionConditionLogicId('');
-                setPageConditionLogicId('')
-                setIsDefaultLogic(false);
-                setCompliancestate(false)
-                // Update the saved status  
-                const update = { ...dataIsSame };
-                update[sections[sectionIndex].section_id] = true;
+    //                     if (pageFound) {
+    //                         setSections(updatedSections);
+    //                     } else {
+    //                         console.error('Page not found for the given pageConditionLogicId');
+    //                     }
+    //                 } else {
+    //                     dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+    //                 }
+    //             } else {
+    //                 // dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
+    //             }
+    //             dispatch(saveCurrentData());
+    //             setIsThreedotLoader(false);
+    //             setConditionalLogic(false);
+    //             setSectionConditionLogicId('');
+    //             setPageConditionLogicId('')
+    //             setIsDefaultLogic(false);
+    //             setCompliancestate(false)
+    //             // Update the saved status  
+    //             const update = { ...dataIsSame };
+    //             update[sections[sectionIndex].section_id] = true;
 
-                dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
-                setSaveClick(false)
-            }
-            catch (error) {
-                setToastError('Something went wrong!!');
-            }
-        }
+    //             dispatch(setDataIsSame((prevState) => ({ ...prevState, [sectionId]: true })));
+    //             setSaveClick(false)
+    //         }
+    //         catch (error) {
+    //             setToastError('Something went wrong!!');
+    //         }
+    //     }
 
-    }
+    // }
 
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
@@ -1110,7 +1114,7 @@ const QuestionnaryForm = () => {
             }
         });
         // Auto-save the settings
-        handleSaveSection();
+        // handleSaveSection();
     };
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
@@ -1221,8 +1225,8 @@ const QuestionnaryForm = () => {
     }
 
     const handleBlur = (e) => {
-        const sectionId = selectedQuestionId.split('_')[0]
-        handleSaveSection(sectionId, false);
+        // const sectionId = selectedQuestionId.split('_')[0]
+        // handleSaveSection(sectionId, false);
     }
     //this is for diplay content field replace modal function
     const handleConfirmReplace = () => {
@@ -1557,6 +1561,7 @@ const QuestionnaryForm = () => {
         }
         return `${text.slice(0, maxLength)}...`;
     };
+    console.log(fieldSettingParams, 'hhhhhhhhhhh')
 
     return (
         <>
@@ -1689,8 +1694,8 @@ const QuestionnaryForm = () => {
                                                                             setSections={setSections}
                                                                             sections={sections}
                                                                             handleAddRemovePage={handleAddRemovePage}
-                                                                            handleSaveSection={handleSaveSection}
-                                                                            handleAutoSave={handleSaveSection}
+                                                                            // handleSaveSection={handleSaveSection}
+                                                                            // handleAutoSave={handleSaveSection}
                                                                             handleDeleteModal={handleDeleteModal}
                                                                             selectedSection={selectedSection}
                                                                             setSelectedSection={setSelectedSection}
@@ -1916,7 +1921,7 @@ const QuestionnaryForm = () => {
                     <ConditionalLogic
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
-                        handleSaveSection={handleSaveSection}
+                        // handleSaveSection={handleSaveSection}
                         isDefaultLogic={isDefaultLogic}
                         setIsDefaultLogic={setIsDefaultLogic}
                         setDefaultString={setDefaultString}

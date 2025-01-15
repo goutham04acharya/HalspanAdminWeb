@@ -90,12 +90,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             console.log(fieldSettingParams[question.question_id], 'fieldSettingParams[question.question_id]')
             console.log(combinedArray, 'combinedArray')
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
-                if(fieldSettingParams[question?.question_id]?.source === 'fixedList'){
+                if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                }else{
+                } else {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
                 }
-                
+
             }
         });
         setChoiceBoxOptions(choiceBoxOptionsObj);
@@ -455,7 +455,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(newText)
             setLogic(newText)
-    
+
         }
         if (isMethod) {
             setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
@@ -1208,7 +1208,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
                 }
-                handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
+                // handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -1536,12 +1536,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
-        else if(isDefaultLogic && !complianceState){
+        else if (isDefaultLogic && !complianceState) {
             console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic!== '') {
+                if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                         .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
@@ -1600,7 +1600,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
 
-        handleSaveSection(sectionId, true, condition_logic);
+        // handleSaveSection(sectionId, true, condition_logic);
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1660,115 +1660,183 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-                <div ref={modalRef} className='!w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
-                    <div className='w-full'>
+                <div ref={modalRef} className='!w-[80%] h-[90%] mx-auto bg-white rounded-[14px] relative p-[18px] overflow-hidden'>
+                    <div className='w-full h-full'>
                         {(tab === 'advance' || isDefaultLogic) ? (
-                            <div className='flex h-customh14'>
-                                <div className='w-[60%]'>
-                                    {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
-                                    ) : complianceState ? (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>
-                                    ) : (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
-                                    )}
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex flex-1 overflow-auto '>
+                                    <div className='w-[60%]'>
+                                        {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
+                                        ) : complianceState ? (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>
+                                        ) : (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                        )}
 
-                                    <AdvancedEditor
-                                        handleListSectionDetails={handleListSectionDetails}
-                                        showSectionList={showSectionList}
-                                        inputValue={inputValue}
-                                        error={error}
-                                        showMethodSuggestions={showMethodSuggestions}
-                                        suggestions={suggestions}
-                                        handleClickToInsert={handleClickToInsert}
-                                        textareaRef={textareaRef}
-                                        handleInputField={handleInputField}
-                                        secDetailsForSearching={secDetailsForSearching}
+                                        <AdvancedEditor
+                                            handleListSectionDetails={handleListSectionDetails}
+                                            showSectionList={showSectionList}
+                                            inputValue={inputValue}
+                                            error={error}
+                                            showMethodSuggestions={showMethodSuggestions}
+                                            suggestions={suggestions}
+                                            handleClickToInsert={handleClickToInsert}
+                                            textareaRef={textareaRef}
+                                            handleInputField={handleInputField}
+                                            secDetailsForSearching={secDetailsForSearching}
+                                            sections={sections}
+                                            setShowMethodSuggestions={setShowMethodSuggestions}
+                                            isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                            selectedFieldType={selectedFieldType}
+                                            setSelectedType={setSelectedType}
+                                            isDefaultLogic={isDefaultLogic}
+                                        />
+                                    </div>
+                                    <div className='w-[40%]'>
+                                        <StaticDetails
+                                            handleTabClick={handleTabClick}
+                                            activeTab={activeTab}
+                                            setActiveTab={setActiveTab}
+                                            isDefaultLogic={isDefaultLogic}
+                                            selectedFieldType={selectedFieldType}
+                                            isOperatorModal={isOperatorModal}
+                                            setIsOperatorModal={setIsOperatorModal}
+                                            setIsStringMethodModal={setIsStringMethodModal}
+                                            complianceState={complianceState}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='mt-4 pt-2'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (!isDefaultLogic && !complianceState) ? (
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex-1 overflow-auto default-sidebar'>
+                                    <BasicEditor
+                                        secDetailsForSearching={filterQuestions()}
+                                        questions={allSectionDetails?.data}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                        selectedFieldType={selectedFieldType}
-                                        setSelectedType={setSelectedType}
-                                        isDefaultLogic={isDefaultLogic}
+                                        conditions={conditions}
+                                        setConditions={setConditions}
+                                        submitSelected={submitSelected}
+                                        setSubmitSelected={setSubmitSelected}
+                                        selectedQuestionId={selectedQuestionId}
+                                        conditionalLogicData={conditionalLogicData}
+                                        sectionConditionLogicId={sectionConditionLogicId}
+                                        pageConditionLogicId={pageConditionLogicId}
+                                        combinedArray={combinedArray}
                                     />
                                 </div>
-                                <div className='w-[40%]'>
-                                    <StaticDetails
-                                        handleTabClick={handleTabClick}
-                                        activeTab={activeTab}
-                                        setActiveTab={setActiveTab}
-                                        isDefaultLogic={isDefaultLogic}
-                                        selectedFieldType={selectedFieldType}
-                                        isOperatorModal={isOperatorModal}
-                                        setIsOperatorModal={setIsOperatorModal}
-                                        setIsStringMethodModal={setIsStringMethodModal}
-                                        complianceState={complianceState}
-                                    />
+                                <div className='mt-4 pt-2'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>) : (!isDefaultLogic && !complianceState) ? (
-                                <BasicEditor
-                                    secDetailsForSearching={filterQuestions()}
-                                    questions={allSectionDetails?.data}
-                                    sections={sections}
-                                    setShowMethodSuggestions={setShowMethodSuggestions}
-                                    isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                    conditions={conditions}
-                                    setConditions={setConditions}
-                                    submitSelected={submitSelected}
-                                    setSubmitSelected={setSubmitSelected}
-                                    selectedQuestionId={selectedQuestionId}
-                                    conditionalLogicData={conditionalLogicData}
-                                    sectionConditionLogicId={sectionConditionLogicId}
-                                    pageConditionLogicId={pageConditionLogicId}
-                                    combinedArray={combinedArray}
-                                />
-                            ) : (complianceState) &&
-                        <ComplianceBasicEditor
-                            secDetailsForSearching={filterQuestions()}
-                            questions={allSectionDetails.data}
-                            sections={sections}
-                            setShowMethodSuggestions={setShowMethodSuggestions}
-                            isThreedotLoaderBlack={isThreedotLoaderBlack}
-                            conditions={conditions}
-                            setConditions={setConditions}
-                            submitSelected={submitSelected}
-                            setSubmitSelected={setSubmitSelected}
-                            setUserInput={setUserInput}
-                            combinedArray={combinedArray}
-                        />
-                        }
-                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic &&
-                                <div className='flex gap-5 items-end'>
-                                    <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
-                                    <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                                </div>
-                            }
-                            <div>
-                                <Button2
-                                    text='Cancel'
-                                    type='button'
-                                    testId='cancel'
-                                    data-testid='button1'
-                                    className='w-[162px] h-[50px] text-black font-semibold text-base'
-                                    onClick={() => handleClose()}
-                                >
-                                </Button2>
-                                <Button
-                                    testID={'save-conditional-logic'}
-                                    text='Save'
-                                    onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
-                                    type='button'
-                                    data-testid='cancel'
-                                    className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
-                                    isThreedotLoading={isThreedotLoader}
-                                >
-                                </Button>
                             </div>
-                        </div>
+                        ) : (complianceState) && (
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex-1 overflow-auto default-sidebar'>
+                                    <ComplianceBasicEditor
+                                        secDetailsForSearching={filterQuestions()}
+                                        questions={allSectionDetails.data}
+                                        sections={sections}
+                                        setShowMethodSuggestions={setShowMethodSuggestions}
+                                        isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                        conditions={conditions}
+                                        setConditions={setConditions}
+                                        submitSelected={submitSelected}
+                                        setSubmitSelected={setSubmitSelected}
+                                        setUserInput={setUserInput}
+                                        combinedArray={combinedArray}
+                                    />
+                                </div>
+                                <div className='mt-4 pt-2 border-t'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
             </div>
             {(isOperatorModal || isStringMethodModal) &&
                 <OperatorsModal
