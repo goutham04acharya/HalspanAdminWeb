@@ -21,7 +21,9 @@ function PhotoField({ label,
     setValue,
     photoValue,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename
@@ -88,6 +90,7 @@ function PhotoField({ label,
                 }
             }
         }));
+        setIsModified(!isModified)
     };
 
     const handleImageRemove = (newImages, fileNameToRemove) => {
@@ -114,7 +117,7 @@ function PhotoField({ label,
                 preview_photofield: 'Minimum file requirement not met'
             }));
         }
-        
+
 
         // Update conditional values to reflect the new file count
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
@@ -128,6 +131,7 @@ function PhotoField({ label,
                 }
             }
         }));
+        setIsModified(!isModified)
     };
 
     function handleFunction(e) {
@@ -158,9 +162,9 @@ function PhotoField({ label,
     //         preview_videofield: 'This is a mandatory field' // Clear the validation error
     //     }));
     //   }
-      
+
     // }, [questionValue, setValidationErrors])
-    
+
 
     return (
         <div>
@@ -193,7 +197,7 @@ function PhotoField({ label,
                     {fileName || (fieldSettingParameters?.placeholderContent) || 'No file chosen'}
                 </span>
             </div> : <div className={``}>
-                <ImageUploader handleBlur={handleBlur} setConditionalValues={setConditionalValues} setFileState={setFileState} setValidationErrors={setValidationErrors} sections={sections} setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} />
+                <ImageUploader handleBlur={handleBlur} setConditionalValues={setConditionalValues} setFileState={setFileState} setValidationErrors={setValidationErrors} sections={sections} setValue={setValue} handleFileChange={handleFileChange} handleRemoveImage={handleImageRemove} minImages={question?.field_range?.min} maxImages={question?.field_range?.max} drawOnImage={question?.asset_extras?.draw_image === 'yes' ? true : false} question={question} setIsModified={setIsModified} isModified={isModified}/>
             </div>}
             {(question?.question_id && validationErrors?.preview_photofield && validationErrors.preview_photofield[question.question_id]) && (
                 <ErrorMessage error={validationErrors.preview_photofield[question.question_id]} />

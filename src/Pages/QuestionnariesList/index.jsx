@@ -120,6 +120,7 @@ function Questionnaries() {
   }, [searchParams, setSelectedOption]);
 
   const lastElementRef = useCallback(node => {
+    
     if (loading || isFetchingMore) return;
     if (observer.current) observer.current.disconnect();
     

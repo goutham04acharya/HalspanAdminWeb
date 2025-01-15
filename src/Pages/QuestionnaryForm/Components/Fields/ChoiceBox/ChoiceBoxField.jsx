@@ -27,7 +27,9 @@ const ChoiceBoxField = ({
     setValue,
     choiceValue,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [optionSelected, setOptionSelected] = useState('');
@@ -47,6 +49,7 @@ const ChoiceBoxField = ({
                 }
             }
         }))
+        
         // Update the selected value in the parent state for the specific question
         dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }))
         setValue((prev) => ({
@@ -65,6 +68,7 @@ const ChoiceBoxField = ({
 
         // Set the selected value locally for dropdown purposes or other UI updates
         setOptionSelected(questionValue[question?.question_id]);
+        setIsModified(!isModified)
     };
     const handleDropdownChange = (value) => {
         setChoiceSelected(questionValue[question?.question_id]);
@@ -93,6 +97,7 @@ const ChoiceBoxField = ({
                 [question?.question_id]: null,
             },
         }));
+        setIsModified(!isModified)
 
     }
     const handleCheckboxChange = (value) => {
@@ -122,6 +127,7 @@ const ChoiceBoxField = ({
             ...prev,
             [question?.question_id]: value,
         }));
+        setIsModified(!isModified)
     };
 
     const renderInputGroup = () => {
@@ -143,10 +149,6 @@ const ChoiceBoxField = ({
             return <CheckboxButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
         }
     };
-
-    // useEffect(() => {
-    //     setOptionSelected(choiceValue?.value);
-    // }, [choiceValue]);
 
     useOnClickOutside(dropdownRef, () => {
         setIsDropdownOpen(false);

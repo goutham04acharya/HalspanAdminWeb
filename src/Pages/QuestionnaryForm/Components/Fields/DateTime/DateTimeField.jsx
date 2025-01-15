@@ -61,13 +61,19 @@ function DateTimeField({
         };
     };
     const handleDateTime = (date, time) => {
-        // Update states when inputs change
         if (date) {
             setDateVal(date)
             dispatch(setQuestionValue({ question_id: question?.question_id, value: date }))
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: date, // Ensure this stores the correct string value
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_datetimefield: {
+                    ...prevErrors.preview_datetimefield,
+                    [question?.question_id]: '', // Clear errors for this field
+                },
             }));
         }
         if (time) {
@@ -76,6 +82,13 @@ function DateTimeField({
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: time, // Ensure this stores the correct string value
+            }));
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                preview_datetimefield: {
+                    ...prevErrors.preview_datetimefield,
+                    [question?.question_id]: '', // Clear errors for this field
+                },
             }));
         };
 

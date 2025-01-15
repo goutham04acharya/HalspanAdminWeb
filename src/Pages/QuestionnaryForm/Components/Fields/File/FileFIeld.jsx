@@ -15,7 +15,9 @@ function FileField({
     setValidationErrors,
     validationErrors,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 }) {
 
     const [fileName, setFileName] = useState('');
@@ -67,7 +69,7 @@ function FileField({
                 }
             }
         }));
-
+        setIsModified(!isModified);
     };
 
     const handleFileRemove = (newFiles, fileNameToRemove) => {
@@ -147,6 +149,7 @@ function FileField({
                 }
             }
         }));
+        setIsModified(!isModified);
     };
 
     return (

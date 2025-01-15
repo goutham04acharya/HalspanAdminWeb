@@ -33,8 +33,6 @@ function TestFieldSetting({
   const [optionData, setOptionData] = useState([]);
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-// console.log(fieldSettingParameters, 'fieldadkkad')
   const [loading, setLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -193,7 +191,6 @@ function TestFieldSetting({
   useEffect(() => {
     fetchLookupList();
   }, [fetchLookupList]);
-  console.log(selectedQuestionId, 'selectedQuestionId')
 
   return (
     <>
