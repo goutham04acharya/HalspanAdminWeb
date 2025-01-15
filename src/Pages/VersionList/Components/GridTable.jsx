@@ -148,11 +148,11 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
             <div className='overflow-auto scrollbar_gray h-customh11'>
                 <div className='flex flex-col'>
                     <div className='sticky top-0 bg-white z-[99]'>
-                        <div className='flex'>
-                            <div className='min-w-[300px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>NAME</div>
-                            <div className='min-w-[300px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>LAST EDITED</div>
-                            <div className='min-w-[300px] bg-white text-start px-10 py-6 font-medium text-base text-[#2B333B]'>EDITED BY</div>
-                            <div className='min-w-[300px] bg-white text-start px-10 py-6 font-medium text-base text-[#2B333B]'>STATUS</div>
+                        <div className='flex justify-between w-full'>
+                            <div className='min-w-1/4 text-start px-10 py-6 font-medium text-base text-[#2B333B]'>NAME</div>
+                            <div className='min-w-1/4 text-start ml-[30px] px-10 py-6 font-medium text-base text-[#2B333B]'>LAST EDITED</div>
+                            <div className='min-w-1/4 bg-white mr-[27px] text-start px-10 py-6 font-medium text-base text-[#2B333B]'>EDITED BY</div>
+                            <div className='min-w-1/4 bg-white mr-[2rem] px-10 py-6 font-medium text-base text-[#2B333B]'>STATUS</div>
                         </div>
                     </div>
                     {loading
@@ -160,25 +160,25 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                         : <div className='bg-white'>
                             {versionList?.data?.items.sort((a, b) => b.version_number - a.version_number).map((versionListInfo, index) => (
                                 <React.Fragment key={index}>
-                                    <div className='rounded-[10px] mt-[10px] flex w-full relative' ref={el => dropdownRefs.current[index] = el}>
-                                        <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
+                                    <div className='rounded-[10px] mt-[10px] flex justify-between bg-[#F4F6FA] w-full relative' ref={el => dropdownRefs.current[index] = el}>
+                                        <div className='py-6 text-start truncate min-w-1/4 bg-[#F4F6FA] px-10 rounded-tl-[10px] rounded-bl-[10px] font-semibold text-base text-[#2B333B] cursor-pointer underline'>
                                             <a data-testid={`version-${index}`} onClick={() => navigate(`/questionnaries/create-questionnary/questionnary-form/${versionListInfo?.questionnaire_id}/${versionListInfo?.version_number}`)}>Version {versionListInfo?.version_number}</a>
                                         </div>
-                                        <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
+                                        <div className='py-6 text-start truncate min-w-1/4 bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
                                             {new Date(versionListInfo?.updated_at * 1000).toLocaleDateString('default', {
                                                 day: 'numeric',
                                                 month: 'short',
                                                 year: 'numeric',
                                             })}
                                         </div>
-                                        <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
+                                        <div className='py-6 text-start truncate min-w-1/4 bg-[#F4F6FA] px-10 font-normal text-base text-[#2B333B] flex flex-col justify-center'>
                                             {versionListInfo?.updated_by?.name || '-'}
                                         </div>
-                                        <div className='py-6 text-start truncate min-w-[300px] bg-[#F4F6FA] px-10 rounded-tr-[10px] rounded-br-[10px] font-normal text-base text-[#2B333B]'>
+                                        <div className='py-6 text-start items-center truncate min-w-1/4 bg-[#F4F6FA] px-10 rounded-tr-[10px] rounded-br-[10px] font-normal text-base text-[#2B333B]'>
                                             {versionListInfo?.status ? (
                                                 <div>
                                                     {(versionListInfo?.status === 'Draft' || versionListInfo?.status === 'Testing') ? (
-                                                        <div className='flex w-[164px] h-[36px] border border-[#AEB3B7] rounded px-[18px] bg-white items-center cursor-pointer'
+                                                        <div className='flex w-[124px] h-[36px] border border-[#AEB3B7] rounded px-[18px] bg-white items-center cursor-pointer'
                                                             onClick={() => handleDropdownClick(versionListInfo?.version_number)}>
                                                             {loading ? <Shimmer column={1} row={1} dropdown /> : <input
                                                                 type="text"
@@ -195,12 +195,12 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                             />
                                                         </div>
                                                     ) : (
-                                                        <span className={`py-2 px-4 rounded-[15px] ${getStatusStyles(versionListInfo?.status)}`}>
+                                                        <span className={`py-2 ${versionListInfo?.status === 'Published' ? 'px-6 ' : 'px-8 '} rounded-[15px] ${getStatusStyles(versionListInfo?.status)}`}>
                                                             {versionListInfo?.status}
                                                         </span>
                                                     )}
                                                     {dropdownsOpen[versionListInfo?.version_number] && (
-                                                        <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[164px] 
+                                                        <ul className={`absolute bg-white border border-[#AEB3B7] mt-1 w-[124px] 
                                                         ${versionList?.data?.items.length > 2 ? ((index >= versionList?.data?.items.length - 2)
                                                                 ? 'top-[-104px]'
                                                                 : 'top-[58px]')

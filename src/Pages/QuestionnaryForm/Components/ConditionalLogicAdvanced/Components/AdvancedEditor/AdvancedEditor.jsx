@@ -18,103 +18,105 @@ function AdvancedEditor({
     setShowMethodSuggestions,
     isThreedotLoaderBlack,
     smallLoader,
-    setSelectedType
-
+    setSelectedType,
+    combinedArray,
+    setSelectedQuestion
 }) {
-    // State to track the user's input
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+    const [choiceValues, setChoiceValues] = useState([]);
+    const [showChoiceValues, setShowChoiceValues] = useState(false);
 
-    // Handle user input change and filter suggestions
     const handleSearchChange = (event) => {
         const value = event.target.value;
-        const cursorPosition = event.target.selectionStart; // Get the cursor position
+        const cursorPosition = event.target.selectionStart;
         setSearchInput(value);
 
-        // Find the word around the cursor
         const leftPart = value.slice(0, cursorPosition);
         const rightPart = value.slice(cursorPosition);
 
-        // Find the index of the last space before the cursor and the next space after the cursor
         const startOfWord = leftPart.lastIndexOf(' ') + 1;
         const endOfWord = rightPart.indexOf(' ') === -1 ? rightPart.length : rightPart.indexOf(' ');
 
-
         const wordToSearch = value.slice(startOfWord, cursorPosition + endOfWord).trim();
-        // Check for specific characters and prevent showing the error
         const specialCharacters = ['(', '{', '!', '[', ']', '}', ')'];
 
         if (specialCharacters.some(char => wordToSearch.startsWith(char))) {
-            setFilteredSuggestions(secDetailsForSearching); // Show all suggestions
-        } else if (wordToSearch !== '') { // Only filter if the word is not empty
+            setFilteredSuggestions(secDetailsForSearching);
+        } else if (wordToSearch !== '') {
             const filteredData = secDetailsForSearching.filter((item) =>
                 item.includes(wordToSearch)
             );
-            setFilteredSuggestions(filteredData.length > 0 ? filteredData : []); // Update suggestions or set to empty array
+            setFilteredSuggestions(filteredData.length > 0 ? filteredData : []);
         } else {
-            // If input is cleared or no word to search, show all suggestions
             setFilteredSuggestions(secDetailsForSearching);
         }
     };
 
-    const handleAddQuestion = (suggestion, sections) => {
-
-        // Split the suggestion string into keys for nested access
-        const keys = suggestion.split('.'); // Example: "Section_1.Page_1.Question_1?" -> ["Section_1", "Page_1", "Question_1?"]
-
-        // Use reduce to dynamically access the nested property
+    const handleAddQuestion = (suggestion, sections, e) => {
+        console.log(e.target, 'e target')
+        const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
-
-        // Get the type of the value
-        const getVariableType = (a) => a?.constructor?.name?.toLowerCase(); // Handle cases where a is undefined
+        const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-
-        // Set the selected type and perform further actions
+        console.log(suggestion, 'suggestion')
+        setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
-        // After selecting a suggestion, show suggestions list again and hide error
+        if (valueType === 'choiceboxfield') {
+            const questionDetail = suggestion.split('.')[2];
+            const question = combinedArray.find(q => q.question_detail === questionDetail);
+            if (question && question.choice_values) {
+                setShowChoiceValues(true);
+                setChoiceValues(question.choice_values);
+            }
+        }
+
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
     };
 
+    const handleChoiceValueClick = (value) => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            const cursorPosition = textarea.selectionStart;
+            const textBefore = textarea.value.substring(0, cursorPosition);
+            const textAfter = textarea.value.substring(cursorPosition);
 
+            const newText = textBefore + `"${value}"` + textAfter;
+            textarea.value = newText;
 
-    const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
+            handleInputField({ target: { value: newText } });
+            setShowChoiceValues(false);
+        }
+    };
 
     const handleKeyDown = (event) => {
         const { selectionStart } = textareaRef.current;
         const value = inputValue;
 
-        // Check if the backspace key is pressed
         if (event.key === "Backspace" && selectionStart > 0) {
-            // Find all regex matches in the input value
             const matches = [...value.matchAll(regex)];
 
-            // Check if the cursor is at the end of any match
             for (let match of matches) {
                 const start = match.index;
                 const end = match.index + match[0].length;
 
-                // If the cursor is at the end of the match, delete the entire match
                 if (selectionStart === end) {
-                    event.preventDefault(); // Prevent default backspace behavior
+                    event.preventDefault();
 
-                    // Remove the matched string
-                    const newValue =
-                        value.slice(0, start) + value.slice(end);
-                    handleInputField({ target: { value: newValue } }); // Update the value
+                    const newValue = value.slice(0, start) + value.slice(end);
+                    handleInputField({ target: { value: newValue } });
                     return;
                 }
             }
         }
     };
 
-
-    // Populate all items initially
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
-    }, [secDetailsForSearching]); // This will run whenever secDetailsForSearching changes
+    }, [secDetailsForSearching]);
 
     return (
         <div className='mr-[18px] mt-[4%]'>
@@ -128,13 +130,12 @@ function AdvancedEditor({
                     onChange={(event) => {
                         handleInputField(event, sections); handleSearchChange(event);
                     }}
-                    onKeyDown={handleKeyDown} // Intercept key presses
+                    onKeyDown={handleKeyDown}
                     ref={textareaRef}
                     value={inputValue}
                 ></textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
-            {/* Error message if no matching results */}
             {error ? (
                 <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-all">
                     <span data-testid="error-message" className='w-[4%] mr-2'><img src="/Images/alert-icon.svg" alt="" className='min-w-6' /></span>
@@ -146,7 +147,6 @@ function AdvancedEditor({
                     showSectionList && Object.keys(sections).length > 0 && (
                         <div className='pl-2.5 py-2.5 pr-1.5 h-[260px] w-[60%] overflow-y-auto scrollbar_gray border-l border-b border-r border-[#AEB3B7]'>
                             <div className="pr-1">
-                                {/* Conditionally show method suggestions or the normal question list */}
                                 {showMethodSuggestions ? (
                                     <div className="suggestions-box">
                                         {suggestions.map((method, index) => (
@@ -154,7 +154,7 @@ function AdvancedEditor({
                                                 key={index}
                                                 data-testid={`condition-${index}`}
                                                 className="suggestion-item cursor-pointer"
-                                                onClick={() => handleClickToInsert(method, true)} // Pass true for method
+                                                onClick={() => handleClickToInsert(method, true)}
                                             >
                                                 {method}
                                             </div>
@@ -166,21 +166,18 @@ function AdvancedEditor({
                                             key={index}
                                             data-testid={`suggestion-${index}`}
                                             className="cursor-pointer"
-                                            onClick={() => handleAddQuestion(suggestion, sections)}
+                                            onClick={(e) => handleAddQuestion(suggestion, sections, e)}
                                         >
-                                            
                                             {suggestion}
                                         </div>
                                     ))
-                                ) : ( searchInput.trim() !== '' && filteredSuggestions.length === 0 ) ? (
-                                     (
-                                        <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
-                                            <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
-                                            No items found
-                                        </div>
-                                    )
+                                ) : (searchInput.trim() !== '' && filteredSuggestions.length === 0) ? (
+                                    <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
+                                        <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
+                                        No items found
+                                    </div>
                                 ) : (
-                                    (filteredSuggestions.length === 0 &&  searchInput.trim() === '' ) && <div>
+                                    (filteredSuggestions.length === 0 && searchInput.trim() === '') && <div>
                                         No questions available for the current questionnaire
                                     </div>
                                 )}
@@ -188,6 +185,19 @@ function AdvancedEditor({
                         </div>
                     )
                 )
+            )}
+            {showChoiceValues && (
+                <div className="choice-values-dropdown">
+                    {choiceValues.map((choice) => (
+                        <div
+                            key={choice.uuid}
+                            onClick={() => handleChoiceValueClick(choice.value)}
+                            className="choice-value-item"
+                        >
+                            {choice.value}
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );

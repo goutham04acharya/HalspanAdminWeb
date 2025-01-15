@@ -14,6 +14,7 @@ import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import LookupDataset from '../../../../../LookupDataset';
+import DropdownWithSearch from '../../../../../../Components/InputField/DropdownWithSearch';
 
 function TestFieldSetting({
   handleInputChange,
@@ -37,6 +38,7 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('');
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
@@ -111,25 +113,34 @@ function TestFieldSetting({
   };
 
   const handleRemoveLookup = () => {
+    setSearchTerm('')
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
+    
   }
 
   // List Functions
   const fetchLookupList = useCallback(async () => {
     setLoading(true);
     const params = Object.fromEntries(searchParams);
-    if (lastEvaluatedKeyRef.current) {
+    if (searchTerm) {
+      params.search = searchTerm
+    } else {
       params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+      console.log(response, 'response')
       // Transform the items array
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
         label: item.name
       }));
-      setOptionData(prevState => [...prevState, ...transformedArray]);
+      if (searchTerm) {
+        setOptionData(transformedArray)
+      } else {
+        setOptionData(prevState => [...prevState, ...transformedArray]);
+      }
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
@@ -137,7 +148,7 @@ function TestFieldSetting({
 
     setLoading(false);
     setIsFetchingMore(false);
-  }, [searchParams]);
+  }, [searchParams, searchTerm]);
 
   //funtion for infinate scrooling of dropdown
   const lastElementRef = useCallback(node => {
@@ -167,7 +178,7 @@ function TestFieldSetting({
     const value = textareaRef.current.value;
 
     if (event.key === "Backspace" && textarea.selectionStart > 0) {
-      
+
       // Find all regex matches in the input value
       const matches = [...value.matchAll(regex)];
       // Check if the cursor is at the end of any match
@@ -181,7 +192,7 @@ function TestFieldSetting({
           // Remove the matched string
           const newValue =
             value.slice(0, start) + value.slice(end);
-          dispatch(setNewComponent({id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
+          dispatch(setNewComponent({ id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
           return;
         }
       }
@@ -328,6 +339,7 @@ function TestFieldSetting({
               {fieldSettingParameters?.type === 'lookup' &&
                 <div className='w-full flex items-center mt-3'>
                   <div className='w-[90%]'>
+                    {console.log(optionData, 'optionData')}
                     <InfinateDropdown
                       label=''
                       id='lookup'
@@ -346,9 +358,34 @@ function TestFieldSetting({
                       options={optionData}
                       lastElementRef={lastElementRef}
                       textFieldLookup
+                      setSearchTerm={setSearchTerm}
+                      searchTerm={searchTerm}
                     />
+                    {/* <DropdownWithSearch
+                      label=''
+                      id='lookup'
+                      placeholder='Select the lookup list'
+                      className={`w-full ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px]`}
+                      testID='lookup-dropdown'
+                      labeltestID='lookup-list'
+                      selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
+                      isDropdownOpen={isLookupOpen}
+                      setDropdownOpen={setIsLookupOpen}
+                      handleOptionClick={handleLookupOption}
+                      formStatus={formStatus}
+                      top='20px'
+                      close='true'
+                      options={optionData}
+                      handleRemoveLookup={handleRemoveLookup} // Pass the remove handler
+                      textFieldLookup={true} // Enable search functionality
+                    /> */}
                   </div>
-                  <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
+                  <button onClick={formStatus === 'Draft' ? () => {
+                    setShowCreateModal(true)
+                    const params = Object.fromEntries(searchParams);
+                    delete params.search
+                    setSearchTerm(null)
+                  } : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}

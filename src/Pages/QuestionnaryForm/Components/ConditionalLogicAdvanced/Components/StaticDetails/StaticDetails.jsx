@@ -25,7 +25,7 @@ function StaticDetails({
         <div className=''>
             {isDefaultLogic
                 ?
-                <div>
+                <div className=' overflow-y-scroll scrollBar bg-[#EFF1F8]'>
                     {['choiceboxfield', 'textboxfield'].includes(fieldSettingParams[selectedQuestionId].componentType) &&
                         <div className='p-[18px] bg-[#EFF1F8] h-customh12 overflow-auto scrollBar'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Text Calculations</p>

@@ -10,7 +10,8 @@ function SignatureFieldSetting({
     fieldSettingParameters,
     validationErrors,
     setConditionalLogic,
-    formStatus
+    formStatus,
+    selectedQuestionId
 }) {
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
 

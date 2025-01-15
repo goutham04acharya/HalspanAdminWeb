@@ -1563,6 +1563,8 @@ const QuestionnaryForm = () => {
     };
     console.log(fieldSettingParams, 'hhhhhhhhhhh')
 
+    console.log(sections, 'sections')
+
     return (
         <>
             {pageLoading ? (
@@ -1947,7 +1949,7 @@ const QuestionnaryForm = () => {
                     Button1text={'Back'}
                     Button2text={'Next'}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    sections={sections}
+                    sectionsData={sections}
                     setValidationErrors={setValidationErrors}
                     validationErrors={validationErrors}
                     formDefaultInfo={formDefaultInfo}
