@@ -59,8 +59,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
     const [showChoiceValues, setShowChoiceValues] = useState(false)
     const [logic, setLogic] = useState('')
+    const [isChoiceboxField, setIsChoiceboxField] = useState(false);
+    const [choiceboxValues, setChoiceboxValues] = useState([])
     const [complianceCondition, setComplianceCondition] = useState('')
     const [datetimefieldQuestions, setDatetimefieldQuestions] = useState([]);
+    const [selectedQuestion, setSelectedQuestion] = useState('')
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
@@ -88,8 +91,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
-            console.log(fieldSettingParams[question.question_id], 'fieldSettingParams[question.question_id]')
-            console.log(combinedArray, 'combinedArray')
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
@@ -431,98 +432,98 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
-        // console.log(textToInsert, 'textToInsert');
-        // console.log(textarea.value, 'selectedType')
+    
         if (textarea) {
-            const cursorPosition = textarea.selectionStart; // Get the current cursor position
+            const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
     
-            // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
     
-            // Check if there's a space or if the input is empty
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
     
             let newText;
     
             if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
-                // Append the text if there's a space or the input is empty
                 newText = textBefore + textToInsert + textAfter;
             } else {
-                // Replace the last word if there's no space
                 const lastSpaceIndex = textBefore.lastIndexOf(' ');
-                const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
+                const textToKeep = textBefore.slice(0, lastSpaceIndex + 1);
                 newText = textToKeep + textToInsert + textAfter;
             }
     
-            // Update the textarea value
             textarea.value = newText;
     
-            // If the textToInsert is "includes()", place the cursor inside the parentheses and add `""`
+            // Handle includes()
             if (textToInsert === 'includes()') {
-                // Find the position of "includes()" in the new text
                 const includesIndex = newText.indexOf('includes()');
                 if (includesIndex !== -1) {
-                    // Replace "includes()" with 'includes("")'
                     const updatedText = newText.replace('includes()', 'includes("")');
                     textarea.value = updatedText;
     
-                    // Calculate the cursor position: right after `includes("`
                     const cursorPosition = includesIndex + 'includes("'.length;
-    
-                    // Use setTimeout to ensure the DOM updates before setting the cursor position
                     setTimeout(() => {
                         textarea.setSelectionRange(cursorPosition, cursorPosition);
-                        textarea.focus(); // Ensure the textarea is focused
+                        textarea.focus();
                     }, 0);
                 }
             }
+    
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-            console.log(showSectionList, 'show method')
-        }
-        console.log(inputValue, 'input value')
-        if (isMethod) {
-            setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
-            setShowChoiceValues(true);
-        } else {
-            let fieldType = '';
-            switch (componentType) {
-                case 'string':
-                    fieldType = [
-                        'textboxfield',
-                        'choiceboxfield',
-                        'assetLocationfield',
-                        'floorPlanfield',
-                        'signaturefield',
-                        'gpsfield',
-                        'displayfield'
-                    ];
-                    break;
-                case 'number':
-                    fieldType = [
-                        'numberfield',
-                    ];
-                    break;
-                case 'array':
-                    fieldType = [
-                        'photofield',
-                        'videofield',
-                        'filefield'
-                    ];
-                    break;
-                case 'date':
-                    fieldType = ['dateTimefield'];
-                    break;
-                default:
-                    fieldType = []; // Handle any unexpected cases
+    
+            // 🔎 Check if selectedQuestion is a 'choiceboxfield'
+            const matchedQuestion = combinedArray.find(
+                (item) =>
+                    item.question_detail === selectedQuestion &&
+                    item.question_type === 'choiceboxfield'
+            );
+    
+            if (matchedQuestion) {
+                // Set state to true if matched
+                setIsChoiceboxField(true);  // New state for 'choiceboxfield'
+                setChoiceboxValues(matchedQuestion.choice_values);  // New state for choice values
+            } else {
+                setIsChoiceboxField(false);
+                setChoiceboxValues([]);
             }
-            setSelectedFieldType(fieldType.join(', '));
+    
+            if (isMethod) {
+                setShowMethodSuggestions(false);
+                setShowChoiceValues(true);
+            } else {
+                let fieldType = '';
+                switch (componentType) {
+                    case 'string':
+                        fieldType = [
+                            'textboxfield',
+                            'choiceboxfield',
+                            'assetLocationfield',
+                            'floorPlanfield',
+                            'signaturefield',
+                            'gpsfield',
+                            'displayfield'
+                        ];
+                        break;
+                    case 'number':
+                        fieldType = ['numberfield'];
+                        break;
+                    case 'array':
+                        fieldType = ['photofield', 'videofield', 'filefield'];
+                        break;
+                    case 'date':
+                        fieldType = ['dateTimefield'];
+                        break;
+                    default:
+                        fieldType = [];
+                }
+                setSelectedFieldType(fieldType.join(', '));
+            }
         }
     };
+    
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -1565,7 +1566,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(condition_logic);
         }
         else if (isDefaultLogic && !complianceState) {
-            console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
+            console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'default_conditional_logic')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
@@ -1719,6 +1720,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         setSelectedType={setSelectedType}
                                         isDefaultLogic={isDefaultLogic}
                                         combinedArray={combinedArray}
+                                        setSelectedQuestion={setSelectedQuestion}
                                     />
                                 </div>
                                 <div className='w-[40%]'>

@@ -184,7 +184,6 @@ function NumberField({
                             const numValue = parseFloat(value);
                             const min = preview ? question?.field_range?.min : minRange;
                             const max = preview ? question?.field_range?.max : maxRange;
-                            console.log(numValue, value, min, max, numValue >= min && numValue <= max)
                             if ((min === undefined || max === undefined) ||(numValue >= min && numValue <= max)) {
                                 
                                 handleInputChange(e);

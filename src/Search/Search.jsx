@@ -5,7 +5,6 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
 
   // Search related functions
   const handleChange = (e, value) => {
-    console.log(value,'value')
     handleSearch(e, "search", value);
   };
 
@@ -28,7 +27,6 @@ function Search({ className, onChange, searchValue, testId, setSearchValue, sear
       }
     } else {
       params[key] = value;
-      console.log(value, 'value')
     }
     setQueList([]);
     setSearchParams({ ...params });

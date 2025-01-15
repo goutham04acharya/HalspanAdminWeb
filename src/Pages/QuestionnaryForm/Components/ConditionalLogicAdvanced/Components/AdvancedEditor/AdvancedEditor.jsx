@@ -19,7 +19,8 @@ function AdvancedEditor({
     isThreedotLoaderBlack,
     smallLoader,
     setSelectedType,
-    combinedArray
+    combinedArray,
+    setSelectedQuestion
 }) {
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -52,12 +53,14 @@ function AdvancedEditor({
         }
     };
 
-    const handleAddQuestion = (suggestion, sections) => {
+    const handleAddQuestion = (suggestion, sections, e) => {
+        console.log(e.target, 'e target')
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-
+        console.log(suggestion, 'suggestion')
+        setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
@@ -163,7 +166,7 @@ function AdvancedEditor({
                                             key={index}
                                             data-testid={`suggestion-${index}`}
                                             className="cursor-pointer"
-                                            onClick={() => handleAddQuestion(suggestion, sections)}
+                                            onClick={(e) => handleAddQuestion(suggestion, sections, e)}
                                         >
                                             {suggestion}
                                         </div>

@@ -25,9 +25,9 @@ function StaticDetails({
         <div className=''>
             {isDefaultLogic
                 ?
-                <div>
+                <div className=' overflow-y-scroll scrollBar bg-[#EFF1F8]'>
                     {['choiceboxfield', 'textboxfield'].includes(fieldSettingParams[selectedQuestionId].componentType) &&
-                        <div className='p-[18px] bg-[#EFF1F8] h-customh12'>
+                        <div className='p-[18px]  h-customh12'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Text Calculations</p>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Constant Values</p>
@@ -156,7 +156,7 @@ function StaticDetails({
                     </div>
                     {/* Display the Pre-field input if preField is active */}
                     {activeTab === 'text' && (
-                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
+                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12 overflow-y-scroll scrollBar'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Equals</p>
@@ -181,7 +181,7 @@ function StaticDetails({
                         </div>
                     )}
                     {activeTab === 'number' && (
-                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
+                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12 overflow-y-scroll scrollBar'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                             <div className='mt-4'>
                                 <p className='font-semibold text-base text-[#000000]'>Equals</p>
@@ -214,7 +214,7 @@ function StaticDetails({
                         </div>
                     )}
                     {activeTab === 'date' && (
-                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
+                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12 overflow-y-scroll scrollBar'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                             <div className='mt-3'>
                                 <p className='font-semibold text-base text-[#000000]'>Date is before Today</p>
@@ -244,7 +244,7 @@ function StaticDetails({
                     )}
                     {/* Display the Post-field input if postField is active */}
                     {activeTab === 'file' && (
-                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12'>
+                        <div className='mt-3 p-[18px] bg-[#EFF1F8] h-customh12 overflow-y-scroll scrollBar'>
                             <p className='font-semibold text-lg text-[#2B333B]'>Common Yes/No Calculations</p>
                             <div className='mt-3'>
                                 <p className='font-semibold text-base text-[#000000]'>Has Atleast One File</p>

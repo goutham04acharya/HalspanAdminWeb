@@ -37,7 +37,6 @@ const TextBoxField = ({
 }) => {
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-    console.log(sections, 'sections')
     const validateFormat = (value, format, regex) => {
         switch (format) {
             case 'Alpha':

@@ -31,23 +31,26 @@ function InfinateDropdown({
     assetLocation,
     failGrade,
     mainDivStyle,
-    readonly
+    readonly,
+    setSearchTerm,
+    searchTerm
 }) {
 
-    const [searchTerm, setSearchTerm] = useState(''); // Initialize searchTerm
-    const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
+     // Initialize searchTerm
+    // const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
     // Update filteredOptions whenever options or searchTerm changes
-    useEffect(() => {
-        if (options) {
-            setFilteredOptions(
-                options.filter(option =>
-                    (preview ? option.value : option.label)
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())
-                )
-            );
-        }
-    }, [options, searchTerm, preview]);
+    // useEffect(() => {
+    //     if (options) {
+    //         setFilteredOptions(
+    //             options.filter(option =>
+    //                 (preview ? option.value : option.label)
+    //                     .toLowerCase()
+    //                     .includes(searchTerm.toLowerCase())
+    //             )
+    //         );
+    //     }
+    // }, [options, searchTerm, preview]);
+    console.log(options, 'options')
 
     return (
         <div className={`cursor-pointer w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
@@ -76,7 +79,7 @@ function InfinateDropdown({
             {isDropdownOpen && (
                 <div className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
                     {/* Search bar - Fixed at top */}
-                    <div className="p-2 bg-white">
+                    {/* <div className="p-2 bg-white">
                         <input
                             type="text"
                             placeholder="Search..."
@@ -85,13 +88,13 @@ function InfinateDropdown({
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                    </div>
+                    </div> */}
                     
                     {/* Scrollable options container */}
                     <div className="max-h-[250px] overflow-auto scrollBar">
                         <ul>
-                            {filteredOptions.length > 0 ? (
-                                filteredOptions.map((option, index) => (
+                            {options.length > 0 ? (
+                                options.map((option, index) => (
                                     <li
                                         key={preview ? option.id : option.value}
                                         data-testid={`${labeltestID}-${index}`}

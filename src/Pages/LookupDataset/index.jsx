@@ -217,7 +217,8 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
         try {
             const response = await apiFunction(endpoint, payload);
-
+            console.log(response?.data?.data?.message?.includes('Value requires at least 1'), 'Value requires at least 1')
+            console.log(response?.data?.data?.message?.includes('Choices item limit exceed for'), 'Choices item limit exceed for')
             if (!response?.error) {
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
@@ -251,8 +252,12 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                     setShimmerLoading(false)
                     setIsCreateLoading(false)
                 }
-            } else if (response?.data?.status === 400) {
-                setToastError("Invalid Choices");
+            } else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Value requires at least 1')) {
+                setToastError("Choice requires at least 1 character");
+                setIsCreateLoading(false)
+                setShimmerLoading(false)
+            }else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
+                setToastError("Choices item limit exceeded");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
             } else {
