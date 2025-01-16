@@ -116,7 +116,7 @@ function TestFieldSetting({
     setSearchTerm('')
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
-    
+
   }
 
   // List Functions
@@ -136,11 +136,20 @@ function TestFieldSetting({
         value: item.lookup_id,
         label: item.name
       }));
-      if (searchTerm) {
-        setOptionData(transformedArray)
-      } else {
-        setOptionData(prevState => [...prevState, ...transformedArray]);
-      }
+      // if (searchTerm) {
+      //   setOptionData(transformedArray)
+      // } else {
+        // setOptionData(prevState => [...prevState, ...transformedArray]);
+        setOptionData(prevItems => {
+          if (searchTerm !== '') {
+            // New search: return only new items
+            return [...transformedArray];
+          } else {
+            // Pagination: append new items
+            return [...prevItems, ...transformedArray];
+          }
+        });
+      // }
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
@@ -360,6 +369,7 @@ function TestFieldSetting({
                       textFieldLookup
                       setSearchTerm={setSearchTerm}
                       searchTerm={searchTerm}
+                      setOptionData={setOptionData}
                     />
                     {/* <DropdownWithSearch
                       label=''
