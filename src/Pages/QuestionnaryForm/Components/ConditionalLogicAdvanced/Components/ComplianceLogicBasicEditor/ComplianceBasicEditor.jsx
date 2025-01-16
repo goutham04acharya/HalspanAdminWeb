@@ -402,7 +402,6 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                             })
                         };
                     } else if (isElseBlock) {
-                        // debugger
                         // Update the userInput state  
                         setUserInput(prevInput => {
                             const updatedInput = { ...prevInput };

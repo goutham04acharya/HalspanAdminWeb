@@ -78,7 +78,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            console.log(newItems, 'dadadada')
             setLookupList(prevItems => {
                 if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
                     // New search: return only new items
@@ -97,68 +96,8 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         setIsFetchingMore(false);
     }, [searchParams]);
 
-    // const fetchLookupList = useCallback(async () => {
-    //     setLoading(true);
-    //     const params = Object.fromEntries(searchParams);
-
-    //     try {
-    //         // Clear existing list if it's a new search
-    //         if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
-    //             setLookupList([]);
-    //         }
-
-    //         // Handle search and pagination parameters
-    //         if (searchValue !== '') {
-    //             params.search = searchValue;
-    //             // Only include lastKey if we're paginating within search results
-    //             if (lastEvaluatedKeyRef.current && LookupList.length > 0) {
-    //                 params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-    //             }
-    //         } else {
-    //             // Normal pagination without search
-    //             if (lastEvaluatedKeyRef.current) {
-    //                 params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-    //             }
-    //         }
-
-    //         const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-    //         const newItems = response?.data?.data?.items || [];
-
-    //         // Update list based on whether it's a search or normal fetch
-    //         setLookupList(prevItems => {
-    //             if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
-    //                 // New search: return only new items
-    //                 return [...newItems];
-    //             } else {
-    //                 // Pagination: append new items
-    //                 return [...prevItems, ...newItems];
-    //             }
-    //         });
-
-    //         // Update last evaluated key
-    //         lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
-
-    //         // Handle no results
-    //         if (newItems.length === 0) {
-    //             setContentNotFound(true);
-    //         } else {
-    //             setContentNotFound(false);
-    //         }
-
-    //     } catch (error) {
-    //         console.error('Error fetching lookup data:', error);
-    //         setToastError('Error fetching lookup data');
-    //         setContentNotFound(true);
-    //     }
-
-    //     setLoading(false);
-    //     setIsFetchingMore(false);
-    // }, [searchParams, searchValue]);
-
-
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
-        console.log(data, 'data')
         if (data.choices.length === 1) {
             setDisableDelete(true)
         } else {
@@ -201,7 +140,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
 
     const handleClose = () => {
-        // debugger
         setIsCreateModalOpen(false);
         if (showCreateModal !== undefined) {
             setShowCreateModal(false);
@@ -217,12 +155,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 open: false,
                 id: ''
             });
-            // setData({})
         }, 200);
     }
-    // console.log(data, 'data')
     const handleSubmit = async (file) => {
-        // debugger
         const isUpdate = isView?.open;
         setErrors(initialErrorState);
 
@@ -286,8 +221,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
         try {
             const response = await apiFunction(endpoint, payload);
-            console.log(response?.data?.data?.message?.includes('Value requires at least 1'), 'Value requires at least 1')
-            console.log(response?.data?.data?.message?.includes('Choices item limit exceed for'), 'Choices item limit exceed for')
             if (!response?.error) {
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
@@ -311,7 +244,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;
                 if (!file) {
-                    // debugger
                     setErrors('name', errorMessage); // Set error for name if there's a conflict
                     setIsCreateLoading(false);
                 } else {
@@ -371,7 +303,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                     setShowLookupReplaceModal(false);
                     setToastError('Only 500 data entries are accepted.');
                 } else {
-                    // debugger
                     const fileName = file.name.replace('.csv', '');
                     const payload = {
                         name: fileName,
@@ -391,7 +322,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
     // View Functions
     const handleView = (id, name, choices) => {
-        // debugger
         setIsView({
             open: true,
             id: id

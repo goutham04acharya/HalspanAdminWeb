@@ -109,7 +109,6 @@ function NumberField({
         }
     };
     const handleInputChange = (e) => {
-        // debugger
         const newValue = e.target.value
         const invalidKeys = ['e'];
         if (invalidKeys.includes(e.key)) {

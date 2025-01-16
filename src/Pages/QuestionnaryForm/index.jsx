@@ -168,7 +168,6 @@ const QuestionnaryForm = () => {
             }
         }
         if (id === 'fileType') {
-            // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
