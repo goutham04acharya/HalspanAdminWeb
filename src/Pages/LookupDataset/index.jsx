@@ -66,57 +66,19 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [activeInputs, setActiveInputs] = useState({});
     // Functions
     // List Functions
-    // const fetchLookupList = useCallback(async () => {
-    //     setLoading(true);
-    //     const params = Object.fromEntries(searchParams);
-    //     if (lastEvaluatedKeyRef.current) {
-    //         params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-    //     }
-    //     if (searchValue !== '') {
-    //         delete params.start_key
-    //     }
-    //     try {
-    //         const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-    //         const newItems = response?.data?.data?.items || [];
-    //         console.log(newItems, 'dadadada')
-    //         setLookupList(prevItems => [...prevItems, ...newItems]);
-    //         lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
-    //     } catch (error) {
-    //         console.error('Error fetching questionnaires:', error);
-    //     }
-
-    //     setLoading(false);
-    //     setIsFetchingMore(false);
-    // }, [searchParams]);
-
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
         const params = Object.fromEntries(searchParams);
-
+        if (lastEvaluatedKeyRef.current) {
+            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+        }
+        if (searchValue !== '') {
+            delete params.start_key
+        }
         try {
-            // Clear existing list if it's a new search
-            if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
-                setLookupList([]);
-            }
-
-            // Handle search and pagination parameters
-            if (searchValue !== '') {
-                params.search = searchValue;
-                // Only include lastKey if we're paginating within search results
-                if (lastEvaluatedKeyRef.current && LookupList.length > 0) {
-                    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-                }
-            } else {
-                // Normal pagination without search
-                if (lastEvaluatedKeyRef.current) {
-                    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-                }
-            }
-
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-
-            // Update list based on whether it's a search or normal fetch
+            console.log(newItems, 'dadadada')
             setLookupList(prevItems => {
                 if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
                     // New search: return only new items
@@ -126,26 +88,72 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                     return [...prevItems, ...newItems];
                 }
             });
-
-            // Update last evaluated key
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
-
-            // Handle no results
-            if (newItems.length === 0) {
-                setContentNotFound(true);
-            } else {
-                setContentNotFound(false);
-            }
-
         } catch (error) {
-            console.error('Error fetching lookup data:', error);
-            setToastError('Error fetching lookup data');
-            setContentNotFound(true);
+            console.error('Error fetching questionnaires:', error);
         }
 
         setLoading(false);
         setIsFetchingMore(false);
-    }, [searchParams, searchValue]);
+    }, [searchParams]);
+
+    // const fetchLookupList = useCallback(async () => {
+    //     setLoading(true);
+    //     const params = Object.fromEntries(searchParams);
+
+    //     try {
+    //         // Clear existing list if it's a new search
+    //         if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+    //             setLookupList([]);
+    //         }
+
+    //         // Handle search and pagination parameters
+    //         if (searchValue !== '') {
+    //             params.search = searchValue;
+    //             // Only include lastKey if we're paginating within search results
+    //             if (lastEvaluatedKeyRef.current && LookupList.length > 0) {
+    //                 params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+    //             }
+    //         } else {
+    //             // Normal pagination without search
+    //             if (lastEvaluatedKeyRef.current) {
+    //                 params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+    //             }
+    //         }
+
+    //         const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+    //         const newItems = response?.data?.data?.items || [];
+
+    //         // Update list based on whether it's a search or normal fetch
+    //         setLookupList(prevItems => {
+    //             if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+    //                 // New search: return only new items
+    //                 return [...newItems];
+    //             } else {
+    //                 // Pagination: append new items
+    //                 return [...prevItems, ...newItems];
+    //             }
+    //         });
+
+    //         // Update last evaluated key
+    //         lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+
+    //         // Handle no results
+    //         if (newItems.length === 0) {
+    //             setContentNotFound(true);
+    //         } else {
+    //             setContentNotFound(false);
+    //         }
+
+    //     } catch (error) {
+    //         console.error('Error fetching lookup data:', error);
+    //         setToastError('Error fetching lookup data');
+    //         setContentNotFound(true);
+    //     }
+
+    //     setLoading(false);
+    //     setIsFetchingMore(false);
+    // }, [searchParams, searchValue]);
 
 
     const handleRemoveChoice = (uuidToRemove) => {
@@ -476,6 +484,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                             setSearchParams={setSearchParams}
                                             setLoading={setLoading}
                                             placeholder='Search by Name'
+                                            setLookupList={setLookupList}
                                         />
                                     </div>
                                 </div>

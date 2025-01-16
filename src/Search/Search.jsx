@@ -1,7 +1,7 @@
 import React from 'react'
 import Debounce from '../CommonMethods/debounce';
 
-function Search({ className, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder }) {
+function Search({ className, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder,setLookupList }) {
   
   const handleChange = Debounce((e) => {
     const value = e.target.value.trim();
@@ -9,6 +9,7 @@ function Search({ className, searchValue, testId, setSearchValue, searchParams, 
     
     if (!value) {
       delete params.search;
+      setQueList([])
     } else {
       // Encode for URL but keep original value in state
       params.search = encodeURIComponent(value);
@@ -30,6 +31,7 @@ function Search({ className, searchValue, testId, setSearchValue, searchParams, 
     delete params.start_key;
     setSearchValue('');
     setSearchParams(params);
+    setQueList([])
   };
 
   return (
