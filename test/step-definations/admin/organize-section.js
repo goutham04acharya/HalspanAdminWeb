@@ -190,6 +190,8 @@ When('I click the save button for the questionnaire version', async function(){
     await new Promise((resolve) => setTimeout(resolve, 500));
     // await driver.wait(until.elementLocated(By.css(`[data-testid="save-btn-0"]`))).click();
     await driver.wait(until.elementLocated(By.css(`[data-testid="save"]`))).click();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await driver.navigate().refresh();
 });
 
 Then('I should see confirmation prompt for delete page', async function () {
