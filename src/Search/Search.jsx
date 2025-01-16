@@ -2,6 +2,7 @@ import React from 'react'
 import Debounce from '../CommonMethods/debounce';
 
 function Search({ className, searchValue, testId, setSearchValue, searchParams, setQueList, setSearchParams, setLoading, placeholder }) {
+  
   const handleChange = Debounce((e) => {
     const value = e.target.value.trim();
     let params = Object.fromEntries(searchParams);

@@ -23,8 +23,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
-        encodeURIComponent(searchParams.get('search')) : '');
+    const [searchValue, setSearchValue] = useState(() => {
+        const searchParam = searchParams.get('search');
+        return searchParam ? decodeURIComponent(searchParam) : '';
+    });
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [shimmerLoading, setShimmerLoading] = useState(false);
     const [maxLengthError, setMaxLengthError] = useState(false)
@@ -64,35 +66,94 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [activeInputs, setActiveInputs] = useState({});
     // Functions
     // List Functions
+    // const fetchLookupList = useCallback(async () => {
+    //     setLoading(true);
+    //     const params = Object.fromEntries(searchParams);
+    //     if (lastEvaluatedKeyRef.current) {
+    //         params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+    //     }
+    //     if (searchValue !== '') {
+    //         delete params.start_key
+    //     }
+    //     try {
+    //         const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+    //         const newItems = response?.data?.data?.items || [];
+    //         console.log(newItems, 'dadadada')
+    //         setLookupList(prevItems => [...prevItems, ...newItems]);
+    //         lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+    //     } catch (error) {
+    //         console.error('Error fetching questionnaires:', error);
+    //     }
+
+    //     setLoading(false);
+    //     setIsFetchingMore(false);
+    // }, [searchParams]);
+
     const fetchLookupList = useCallback(async () => {
         setLoading(true);
         const params = Object.fromEntries(searchParams);
-        if (lastEvaluatedKeyRef.current) {
-            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
-        }
-        if (searchValue !== '') {
-            delete params.start_key
-        }
+
         try {
+            // Clear existing list if it's a new search
+            if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+                setLookupList([]);
+            }
+
+            // Handle search and pagination parameters
+            if (searchValue !== '') {
+                params.search = searchValue;
+                // Only include lastKey if we're paginating within search results
+                if (lastEvaluatedKeyRef.current && LookupList.length > 0) {
+                    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+                }
+            } else {
+                // Normal pagination without search
+                if (lastEvaluatedKeyRef.current) {
+                    params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+                }
+            }
+
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            setLookupList(prevItems => [...prevItems, ...newItems]);
+
+            // Update list based on whether it's a search or normal fetch
+            setLookupList(prevItems => {
+                if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+                    // New search: return only new items
+                    return [...newItems];
+                } else {
+                    // Pagination: append new items
+                    return [...prevItems, ...newItems];
+                }
+            });
+
+            // Update last evaluated key
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+
+            // Handle no results
+            if (newItems.length === 0) {
+                setContentNotFound(true);
+            } else {
+                setContentNotFound(false);
+            }
+
         } catch (error) {
-            console.error('Error fetching questionnaires:', error);
+            console.error('Error fetching lookup data:', error);
+            setToastError('Error fetching lookup data');
+            setContentNotFound(true);
         }
 
         setLoading(false);
         setIsFetchingMore(false);
-    }, [searchParams]);
+    }, [searchParams, searchValue]);
 
 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
         console.log(data, 'data')
-        if(data.choices.length === 1){
+        if (data.choices.length === 1) {
             setDisableDelete(true)
-        }else{
+        } else {
             setDisableDelete(false)
         }
     };
@@ -256,7 +317,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 setToastError("Choice requires at least 1 character");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
-            }else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
+            } else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
                 setToastError("Choices item limit exceeded");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
@@ -407,9 +468,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                 <div className='flex items-center justify-between w-full'>
                                     <div className='w-[75%] mr-[5%]'>
                                         <Search
-                                            setQueList={setLookupList}
                                             testId='searchBox'
                                             searchParams={searchParams}
+                                            setQueList={setLookupList}
                                             setSearchValue={setSearchValue}
                                             searchValue={searchValue}
                                             setSearchParams={setSearchParams}
