@@ -73,6 +73,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseIfStatements: [],
         elseStatement: {}
     });
+
     const complianceInitialState = [
         {
             'conditions': [
@@ -87,6 +88,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
         }
     ]
+
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     useEffect(() => {
         const choiceBoxOptionsObj = {};
@@ -111,7 +113,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
-    console.log(combinedArray, 'combined array')
+    
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -331,9 +333,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
-        console.log(secDetailsForSearching, 'secDetailsForSearching')
-        console.log(questionMatches, 'question matches')
-        console.log(combinedArray, 'combined array')
+
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -433,19 +433,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
-    
+
         if (textarea) {
             const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-    
+
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-    
+
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-    
+
             let newText;
-    
+
             if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
                 newText = textBefore + textToInsert + textAfter;
             } else {
@@ -453,16 +453,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const textToKeep = textBefore.slice(0, lastSpaceIndex + 1);
                 newText = textToKeep + textToInsert + textAfter;
             }
-    
+
             textarea.value = newText;
-    
+
             // Handle includes()
             if (textToInsert === 'includes()') {
                 const includesIndex = newText.indexOf('includes()');
                 if (includesIndex !== -1) {
                     const updatedText = newText.replace('includes()', 'includes("")');
                     textarea.value = updatedText;
-    
+
                     const cursorPosition = includesIndex + 'includes("'.length;
                     setTimeout(() => {
                         textarea.setSelectionRange(cursorPosition, cursorPosition);
@@ -470,18 +470,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }, 0);
                 }
             }
-    
+
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-    
+
             // 🔎 Check if selectedQuestion is a 'choiceboxfield'
             const matchedQuestion = combinedArray.find(
                 (item) =>
                     item.question_detail === selectedQuestion &&
                     item.question_type === 'choiceboxfield'
             );
-    
+
             if (matchedQuestion) {
                 // Set state to true if matched
                 setIsChoiceboxField(true);  // New state for 'choiceboxfield'
@@ -490,7 +490,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setIsChoiceboxField(false);
                 setChoiceboxValues([]);
             }
-    
+
             if (isMethod) {
                 setShowMethodSuggestions(false);
                 setShowChoiceValues(true);
@@ -524,7 +524,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
         }
     };
-    
+
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
@@ -1567,7 +1567,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(condition_logic);
         }
         else if (isDefaultLogic && !complianceState) {
-            console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'default_conditional_logic')
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
@@ -1694,7 +1693,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     <div className='w-full h-full'>
                         {(tab === 'advance' || isDefaultLogic) ? (
                             <div className='flex flex-col h-[calc(100%-20px)]'>
-                                <div className='flex flex-1 overflow-auto '>
+                                <div className='flex flex-1 overflow-auto default-sidebar'>
                                     <div className='w-[60%]'>
                                         {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
                                             <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
@@ -1745,13 +1744,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }
-                                        <div>
+                                        <div className='w-[40%]'>
                                             <Button2
                                                 text='Cancel'
                                                 type='button'
                                                 testId='cancel'
                                                 data-testid='button1'
-                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
                                                 onClick={() => handleClose()}
                                             />
                                             <Button
@@ -1760,7 +1759,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                                 type='button'
                                                 data-testid='cancel'
-                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
                                                 isThreedotLoading={isThreedotLoader}
                                             />
                                         </div>
@@ -1795,13 +1794,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }
-                                        <div>
+                                        <div className='w-[40%]'>
                                             <Button2
                                                 text='Cancel'
                                                 type='button'
                                                 testId='cancel'
                                                 data-testid='button1'
-                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
                                                 onClick={() => handleClose()}
                                             />
                                             <Button
@@ -1810,7 +1809,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                                 type='button'
                                                 data-testid='cancel'
-                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
                                                 isThreedotLoading={isThreedotLoader}
                                             />
                                         </div>
@@ -1834,7 +1833,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         combinedArray={combinedArray}
                                     />
                                 </div>
-                                <div className='mt-4 pt-2 border-t'>
+                                <div className='mt-4 pt-2'>
                                     <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                                         {!isDefaultLogic &&
                                             <div className='flex gap-5 items-end'>
@@ -1842,13 +1841,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }
-                                        <div>
+                                        <div className='w-[40%]'>
                                             <Button2
                                                 text='Cancel'
                                                 type='button'
                                                 testId='cancel'
                                                 data-testid='button1'
-                                                className='w-[162px] h-[50px] text-black font-semibold text-base'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
                                                 onClick={() => handleClose()}
                                             />
                                             <Button
@@ -1857,7 +1856,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                                 onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
                                                 type='button'
                                                 data-testid='cancel'
-                                                className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
                                                 isThreedotLoading={isThreedotLoader}
                                             />
                                         </div>
