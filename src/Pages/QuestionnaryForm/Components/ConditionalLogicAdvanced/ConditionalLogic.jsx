@@ -96,13 +96,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
                 } else {
-                } else {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
                 }
-
-
             }
-        });
+        }}
+    );
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
     const combinedArray = questionType.map((question) => {
