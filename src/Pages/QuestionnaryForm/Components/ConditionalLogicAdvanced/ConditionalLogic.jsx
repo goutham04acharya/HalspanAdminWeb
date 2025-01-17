@@ -432,7 +432,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
-    
+        
         if (textarea) {
             const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
@@ -474,25 +474,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setInputValue(textarea.value);
             setLogic(textarea.value);
     
-            // 🔎 Check if selectedQuestion is a 'choiceboxfield'
+            // Check if selectedQuestion is a 'choiceboxfield'
             const matchedQuestion = combinedArray.find(
                 (item) =>
                     item.question_detail === selectedQuestion &&
-                    item.question_type === 'choiceboxfield'
+                    item.question_type === "choiceboxfield"
             );
     
             if (matchedQuestion) {
-                // Set state to true if matched
-                setIsChoiceboxField(true);  // New state for 'choiceboxfield'
-                setChoiceboxValues(matchedQuestion.choice_values);  // New state for choice values
+                setChoiceboxValues(matchedQuestion.choice_values);
             } else {
-                setIsChoiceboxField(false);
                 setChoiceboxValues([]);
             }
     
             if (isMethod) {
                 setShowMethodSuggestions(false);
-                setShowChoiceValues(true);
+                setShowChoiceValues(true); // Automatically show choice values
+                setIsChoiceboxField(true);
             } else {
                 let fieldType = '';
                 switch (componentType) {
@@ -1721,6 +1719,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         isDefaultLogic={isDefaultLogic}
                                         combinedArray={combinedArray}
                                         setSelectedQuestion={setSelectedQuestion}
+                                        isChoiceboxField={isChoiceboxField}
+                                        choiceboxValues={choiceboxValues}
                                     />
                                 </div>
                                 <div className='w-[40%]'>

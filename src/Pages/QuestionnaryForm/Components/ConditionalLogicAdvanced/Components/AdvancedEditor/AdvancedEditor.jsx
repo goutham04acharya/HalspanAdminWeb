@@ -20,7 +20,9 @@ function AdvancedEditor({
     smallLoader,
     setSelectedType,
     combinedArray,
-    setSelectedQuestion
+    setSelectedQuestion,
+    isChoiceboxField,
+    choiceboxValues
 }) {
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -54,24 +56,13 @@ function AdvancedEditor({
     };
 
     const handleAddQuestion = (suggestion, sections, e) => {
-        console.log(e.target, 'e target')
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-        console.log(suggestion, 'suggestion')
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
-
-        if (valueType === 'choiceboxfield') {
-            const questionDetail = suggestion.split('.')[2];
-            const question = combinedArray.find(q => q.question_detail === questionDetail);
-            if (question && question.choice_values) {
-                setShowChoiceValues(true);
-                setChoiceValues(question.choice_values);
-            }
-        }
 
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
@@ -171,6 +162,17 @@ function AdvancedEditor({
                                             {suggestion}
                                         </div>
                                     ))
+                                ) : (isChoiceboxField === true) ? (
+                                    choiceboxValues.map((values, index) => (
+                                        <div
+                                            key={index}
+                                            data-testid={`choicevalues-${index}`}
+                                            className="cursor-pointer"
+                                            onClick={(e) => handleClickToInsert(values.value, false)}
+                                        >
+                                            {values.value}
+                                        </div>
+                                    ))
                                 ) : (searchInput.trim() !== '' && filteredSuggestions.length === 0) ? (
                                     <div className="text-[#000000] bg-[#FFA318] font-normal text-base px-4 py-2  mt-1 w-full justify-start flex items-center break-words">
                                         <span className='mr-4'><img src="/Images/alert-icon.svg" alt="" /></span>
@@ -202,5 +204,7 @@ function AdvancedEditor({
         </div>
     );
 }
+
+// export default AdvancedEditor;
 
 export default AdvancedEditor;
