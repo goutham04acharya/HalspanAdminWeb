@@ -53,6 +53,7 @@ function InfinateDropdown({
                 fetchFunc(e.target.value);
             }, 500);
             setTimer(newTimer)
+            //loader
         }
     }
 

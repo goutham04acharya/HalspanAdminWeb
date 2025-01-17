@@ -142,7 +142,6 @@ const QuestionnaryForm = () => {
         setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-console.log(fieldSettingParams[selectedQuestionId], 'ghh')
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
