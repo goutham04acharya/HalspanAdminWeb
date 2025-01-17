@@ -478,21 +478,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const matchedQuestion = combinedArray.find(
                 (item) =>
                     item.question_detail === selectedQuestion &&
-                    item.question_type === 'choiceboxfield'
+                    item.question_type === "choiceboxfield"
             );
 
             if (matchedQuestion) {
-                // Set state to true if matched
-                setIsChoiceboxField(true);  // New state for 'choiceboxfield'
-                setChoiceboxValues(matchedQuestion.choice_values);  // New state for choice values
+                setChoiceboxValues(matchedQuestion.choice_values);
             } else {
-                setIsChoiceboxField(false);
                 setChoiceboxValues([]);
             }
 
             if (isMethod) {
                 setShowMethodSuggestions(false);
-                setShowChoiceValues(true);
+                setShowChoiceValues(true); // Automatically show choice values
+                setIsChoiceboxField(true);
             } else {
                 let fieldType = '';
                 switch (componentType) {
