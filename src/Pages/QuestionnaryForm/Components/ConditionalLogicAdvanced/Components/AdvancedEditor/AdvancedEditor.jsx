@@ -69,7 +69,6 @@ function AdvancedEditor({
         if(matchedQuestion.question_type === 'choiceboxfield'){
             
         }
-        console.log(matchedQuestion, 'matched aaskdakf')
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
@@ -118,7 +117,6 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
-    {console.log(showMethodSuggestions, filteredSuggestions, isChoiceboxField,showSectionList, 'isChoiceboxField isChoiceboxField' )}
     return (
         <div className='mr-[18px] mt-[4%]'>
             <div className='relative h-[230px]'>

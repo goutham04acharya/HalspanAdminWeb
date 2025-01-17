@@ -72,7 +72,6 @@ const QuestionnaryForm = () => {
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [isSaveClick, setIsSaveClick] = useState(false);
     const [sectionDetails, setSectionDetails] = useState({})
-    console.log(isSaveClick, 'isSaveClick')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -141,7 +140,6 @@ const QuestionnaryForm = () => {
         setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-    console.log(sectionDetails, 'sectionDetails')
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -1569,8 +1567,6 @@ const QuestionnaryForm = () => {
         }
         return `${text.slice(0, maxLength)}...`;
     };
-
-    console.log(sections, 'sections')
 
     return (
         <>

@@ -130,7 +130,6 @@ function TestFieldSetting({
     }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-      console.log(response, 'response')
       // Transform the items array
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
@@ -339,7 +338,6 @@ function TestFieldSetting({
               {fieldSettingParameters?.type === 'lookup' &&
                 <div className='w-full flex items-center mt-3'>
                   <div className='w-[90%]'>
-                    {console.log(optionData, 'optionData')}
                     <InfinateDropdown
                       label=''
                       id='lookup'

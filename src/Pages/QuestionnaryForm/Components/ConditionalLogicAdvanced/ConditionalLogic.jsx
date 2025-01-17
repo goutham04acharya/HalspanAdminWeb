@@ -88,7 +88,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     ]
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
-    console.log(allSectionDetails, 'allSectionDetails')
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
@@ -104,7 +103,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
     const combinedArray = questionType.map((question) => {
-        console.log(questionType, 'question type')
         const choiceValues = choiceBoxOptions[question.question_id] || [];
         return {
             question_detail: question.question_detail,
@@ -437,13 +435,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-            console.log(cursorPosition, start, end, 'curr, start, end')
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-            console.log(textBefore, textAfter, 'before after')
-            console.log(textarea.value[cursorPosition - 1], 'textarea.value[cursorPosition - 1]')
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-            console.log(charBeforeCursor, 'char before cursor')
             let newText;
     
             if ((charBeforeCursor === ' ' || charBeforeCursor === '.' || charBeforeCursor === `'`) || cursorPosition === 0) {
@@ -577,8 +571,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-
-        console.log(expression, 'expression')
         // Default structure if no expression is provided
         if (!expression || expression === '') {
             return [{
@@ -650,9 +642,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
-                    console.log(matches, 'matches')
                     // If the negate flag is present, adjust the condition logic
-                    console.log(value, 'value')
                     if (question_name.includes('.length')) {
                         question_name = question_name.replaceAll('.length', '');
                     }
@@ -744,8 +734,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         // Convert to a number if it's not a string
                         value = Number(value);
                     }
-
-                    console.log(value, 'value')
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -1705,7 +1693,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     ) : (
                                         <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
                                     )}
-                                    {console.log(suggestions, 'suggestions')}
                                     <AdvancedEditor
                                         handleListSectionDetails={handleListSectionDetails}
                                         showSectionList={showSectionList}

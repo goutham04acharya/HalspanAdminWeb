@@ -105,7 +105,6 @@ const ChoiceBoxField = ({
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
         setIsDropdownOpen(false)
-        console.log(value)
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,

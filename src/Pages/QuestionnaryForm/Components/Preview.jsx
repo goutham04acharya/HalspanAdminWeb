@@ -112,8 +112,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     .filter((section) =>
                         section?.pages?.some((page) => page?.questions?.length > 0) // Only include sections with pages having questions
                     );
-                console.log(reorganizedSections, 'reorganized section')
-                console.log(sectionDetails?.sections, 'section details')
                 setSections(sectionDetails?.sections);
 
                 setPreviewNavigation((prev) => ({
@@ -129,7 +127,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
-    console.log(conditionalValues, 'conditional values')
     const evaluateComplianceLogic = () => {
 
         let results = [];

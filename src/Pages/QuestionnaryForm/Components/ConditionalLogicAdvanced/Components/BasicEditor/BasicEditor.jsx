@@ -114,9 +114,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         // const path = "Section_1.Page_1.Question_1.";
         const [sectionPart, pagePart, questionPart] = path.split('.', 3);
         const fullQuestionPart = path.split('.').slice(2).join('.');  // To include everything after the second dot
-
-        console.log(sectionPart, pagePart, fullQuestionPart, 'parts of the question');
-
         // Step 2: Replace underscores with spaces to match the actual names
         const sectionName = sectionPart?.replace(/_/g, ' ');
         const pageName = pagePart?.replace(/_/g, ' ');
@@ -139,8 +136,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         if (!matchingQuestion) {
             return null; // No matching question found
         }
-
-        console.log(matchingQuestion, 'ajsd')
         // Step 6: Return the matching question details
         return matchingQuestion;
     }
@@ -165,7 +160,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
         let selectedQuestion = getDetails(key, questions);
-        console.log(type, 'selected question type')
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions

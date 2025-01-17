@@ -217,8 +217,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
         try {
             const response = await apiFunction(endpoint, payload);
-            console.log(response?.data?.data?.message?.includes('Value requires at least 1'), 'Value requires at least 1')
-            console.log(response?.data?.data?.message?.includes('Choices item limit exceed for'), 'Choices item limit exceed for')
             if (!response?.error) {
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
