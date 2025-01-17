@@ -70,7 +70,9 @@ const QuestionnaryForm = () => {
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
-
+    const [isSaveClick, setIsSaveClick] = useState(false);
+    const [sectionDetails, setSectionDetails] = useState({})
+    console.log(sectionDetails, 'section details')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -584,6 +586,8 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            setSectionDetails(response?.data?.data);
+            console.log(response?.data?.data?.sections, 'response')
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -723,8 +727,8 @@ const QuestionnaryForm = () => {
                 // If data is the same, return early and don't call the API  
                 return;
             }
-            // Create a new object containing only the selected section's necessary fields  
 
+            // Create a new object containing only the selected section's necessary fields  
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
@@ -1409,9 +1413,14 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const globalSaveHandler = async () => {
-        setGlobalSaveLoading(true);
-
+    const globalSaveHandler = async (key) => {
+        if(isSaveClick && !key){
+            setGlobalSaveLoading(true);
+        }else{
+            setGlobalSaveLoading(false)
+        }
+        
+    
         // Check if there are any validation errors
         // console.log(validationErrors)
         const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
@@ -1546,31 +1555,34 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
-
+            setSectionDetails(sectionBody);
             cleanSections();
-
-            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
-
-            // Sync compareSavedSections with the updated sections
-            setCompareSavedSections(sections);
-            handleSectionSaveOrder(sections);
-            setToastSuccess(response?.data?.message);
-            handleComplianceLogic();
-            setGlobalSaveLoading(false);
+            if(isSaveClick && !key){
+                let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
+                // Sync compareSavedSections with the updated sections
+                setCompareSavedSections(sections);
+                handleSectionSaveOrder(sections);
+                setToastSuccess(response?.data?.message);
+                handleComplianceLogic();
+                setGlobalSaveLoading(false);
+                setSaveClick(false)
+            }
+            
         } catch (error) {
             console.log(error);
             setGlobalSaveLoading(false);
         }
+       
     };
-
+    useEffect(() => {
+        globalSaveHandler('localsave');
+    }, [fieldSettingParams, sections])
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) {
             return text;
         }
         return `${text.slice(0, maxLength)}...`;
     };
-
-    console.log(sections, 'sections will i get all the data')
 
     return (
         <>
@@ -1756,7 +1768,9 @@ const QuestionnaryForm = () => {
                                 isThreedotLoading={globalSaveLoading}
                                 text='Save'
                                 className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                                disabled={formStatus !== 'Draft'} onClick={() => {
+                                disabled={formStatus !== 'Draft'} 
+                                onClick={() => {
+                                    setIsSaveClick(true)
                                     globalSaveHandler();
                                 }}
                             />
@@ -1963,6 +1977,7 @@ const QuestionnaryForm = () => {
                     questionnaire_id={questionnaire_id}
                     version_number={version_number}
                     fieldSettingParameters={fieldSettingParams}
+                    sectionDetails={sectionDetails}
                 />
             }
             {/* {sectionWarningShown && <ConfirmationModal

@@ -61,6 +61,14 @@ function AdvancedEditor({
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
         setSelectedQuestion(suggestion)
+        const matchedQuestion = combinedArray.find(
+            (item) =>
+                item.question_detail === suggestion &&
+                item.question_type === "choiceboxfield"
+        );
+        if(matchedQuestion.question_type === 'choiceboxfield'){
+            
+        }
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
@@ -88,6 +96,7 @@ function AdvancedEditor({
         const value = inputValue;
 
         if (event.key === "Backspace" && selectionStart > 0) {
+            const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
             const matches = [...value.matchAll(regex)];
 
             for (let match of matches) {
@@ -108,7 +117,6 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
-
     return (
         <div className='mr-[18px] mt-[4%]'>
             <div className='relative h-[230px]'>
@@ -138,6 +146,7 @@ function AdvancedEditor({
                     showSectionList && Object.keys(sections).length > 0 && (
                         <div className='pl-2.5 py-2.5 pr-1.5 h-[260px] w-[60%] overflow-y-auto scrollbar_gray border-l border-b border-r border-[#AEB3B7]'>
                             <div className="pr-1">
+                                
                                 {showMethodSuggestions ? (
                                     <div className="suggestions-box">
                                         {suggestions.map((method, index) => (
