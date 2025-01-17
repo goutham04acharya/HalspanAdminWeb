@@ -72,6 +72,7 @@ const QuestionnaryForm = () => {
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [isSaveClick, setIsSaveClick] = useState(false);
     const [sectionDetails, setSectionDetails] = useState({})
+    console.log(sectionDetails, 'section details')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -572,6 +573,8 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            setSectionDetails(response?.data?.data);
+            console.log(response?.data?.data?.sections, 'response')
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -1560,7 +1563,7 @@ const QuestionnaryForm = () => {
     };
     useEffect(() => {
         globalSaveHandler('localsave');
-    }, [fieldSettingParams])
+    }, [fieldSettingParams, sections])
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) {
             return text;

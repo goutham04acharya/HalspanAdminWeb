@@ -241,6 +241,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setIsThreedotLoaderBlack(true);
         setShowSectionList(true)
         const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
+        console.log(response, 'response')
         dispatch(setAllSectionDetails(response.data));
         handleQuestionnaryObject(response.data);
         setIsThreedotLoaderBlack(false);
