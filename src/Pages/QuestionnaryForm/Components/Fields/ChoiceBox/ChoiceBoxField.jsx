@@ -105,6 +105,7 @@ const ChoiceBoxField = ({
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
         setIsDropdownOpen(false)
+        console.log(value)
         const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
@@ -112,10 +113,10 @@ const ChoiceBoxField = ({
                 ...prevValues[section_name], // Preserve existing entries for this section
                 [page_name]: {
                     ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: value // Add or update the label key with newValue
+                    [label]: value.toString() // Add or update the label key with newValue
                 }
             }
-        }))
+        })) 
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_choiceboxfield: {

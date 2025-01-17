@@ -111,12 +111,16 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     };
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
-        const [sectionPart, pagePart, questionPart] = path.split('.');
+        // const path = "Section_1.Page_1.Question_1.";
+        const [sectionPart, pagePart, questionPart] = path.split('.', 3);
+        const fullQuestionPart = path.split('.').slice(2).join('.');  // To include everything after the second dot
+
+        console.log(sectionPart, pagePart, fullQuestionPart, 'parts of the question');
 
         // Step 2: Replace underscores with spaces to match the actual names
         const sectionName = sectionPart?.replace(/_/g, ' ');
         const pageName = pagePart?.replace(/_/g, ' ');
-        const questionName = questionPart?.replace(/_/g, ' ');
+        const questionName = fullQuestionPart?.replace(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.sections.find(section => section.section_name === sectionName);
@@ -136,6 +140,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return null; // No matching question found
         }
 
+        console.log(matchingQuestion, 'ajsd')
         // Step 6: Return the matching question details
         return matchingQuestion;
     }
@@ -160,6 +165,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
         let selectedQuestion = getDetails(key, questions);
+        console.log(type, 'selected question type')
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
@@ -220,7 +226,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
     const getConditions = (key) => {
         let arr = ['No conditions available'];
-        if(secDetailsForSearching.length > 0){
+        if (secDetailsForSearching.length > 0) {
             switch (key) {
                 case "textboxfield":
                 case "choiceboxfield":
@@ -241,7 +247,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 default:
                     return arr; // This is the fallback if none of the cases match
             }
-        }else{
+        } else {
             return arr;
         }
     }

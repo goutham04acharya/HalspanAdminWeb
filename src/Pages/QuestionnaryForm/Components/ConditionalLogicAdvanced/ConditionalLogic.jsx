@@ -88,6 +88,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     ]
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
+    console.log(allSectionDetails, 'allSectionDetails')
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
@@ -103,14 +104,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
     const combinedArray = questionType.map((question) => {
+        console.log(questionType, 'question type')
         const choiceValues = choiceBoxOptions[question.question_id] || [];
         return {
             question_detail: question.question_detail,
             question_type: question.question_type,
             choice_values: choiceValues,
+            type: question.type
         };
     });
-    console.log(combinedArray, 'combined array')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -194,6 +196,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             'question_id': question?.question_id,
                             'question_name': question?.question_name,
                             'question_detail': questionName,
+                            'type': question?.type
                         });
                     }
                 });
@@ -330,9 +333,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         //     "Section_1.Page_1.Question_2",
         //     "Section_1.Page_1.Question_4"
         // ]
-        console.log(secDetailsForSearching, 'secDetailsForSearching')
-        console.log(questionMatches, 'question matches')
-        console.log(combinedArray, 'combined array')
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -437,15 +437,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-    
+            console.log(cursorPosition, start, end, 'curr, start, end')
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-    
+            console.log(textBefore, textAfter, 'before after')
+            console.log(textarea.value[cursorPosition - 1], 'textarea.value[cursorPosition - 1]')
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-    
+            console.log(charBeforeCursor, 'char before cursor')
             let newText;
     
-            if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
+            if ((charBeforeCursor === ' ' || charBeforeCursor === '.' || charBeforeCursor === `'`) || cursorPosition === 0) {
                 newText = textBefore + textToInsert + textAfter;
             } else {
                 const lastSpaceIndex = textBefore.lastIndexOf(' ');
@@ -459,7 +460,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (textToInsert === 'includes()') {
                 const includesIndex = newText.indexOf('includes()');
                 if (includesIndex !== -1) {
-                    const updatedText = newText.replace('includes()', 'includes("")');
+                    const updatedText = newText.replace('includes()', `includes('')`);
                     textarea.value = updatedText;
     
                     const cursorPosition = includesIndex + 'includes("'.length;
@@ -491,6 +492,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setShowMethodSuggestions(false);
                 setShowChoiceValues(true); // Automatically show choice values
                 setIsChoiceboxField(true);
+                setShowSectionList(true)
             } else {
                 let fieldType = '';
                 switch (componentType) {
@@ -576,6 +578,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     const parseLogicExpression = (expression) => {
 
+        console.log(expression, 'expression')
         // Default structure if no expression is provided
         if (!expression || expression === '') {
             return [{
@@ -642,12 +645,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Regex to match logical conditions
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                const matches = condition.match(/(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
+                    console.log(matches, 'matches')
                     // If the negate flag is present, adjust the condition logic
+                    console.log(value, 'value')
                     if (question_name.includes('.length')) {
                         question_name = question_name.replaceAll('.length', '');
                     }
@@ -740,6 +745,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         value = Number(value);
                     }
 
+                    console.log(value, 'value')
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -1559,7 +1565,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
-            let condition_logic = buildConditionExpression(conditions)
+            let condition_logic = buildConditionExpression(conditions, combinedArray)
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
@@ -1612,7 +1618,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                condition_logic = buildConditionExpression(conditions);
+                condition_logic = buildConditionExpression(conditions, combinedArray);
             } catch (error) {
             }
         } else {
