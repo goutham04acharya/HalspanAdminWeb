@@ -45,6 +45,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed'];
         }
     };
+    
     const attributes = [
         { value: 'Height', label: 'Height' },
         { value: 'Width', label: 'Width' },
@@ -110,46 +111,46 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     
             switch (componentType) {
                 case "textboxfield":
-                    componentTypeLabel = "Text-Box field";
+                    componentTypeLabel = "Text-Box Field";
                     break;
                 case "choiceboxfield":
-                    componentTypeLabel = "Choice-Box field";
+                    componentTypeLabel = "Choice-Box Field";
                     break;
                 case "dateTimefield":
-                    componentTypeLabel = "Date-Time field";
+                    componentTypeLabel = "Date-Time Field";
                     break;
                 case "assetLocationfield":
-                    componentTypeLabel = "Asset-Location field";
+                    componentTypeLabel = "Asset-Location Field";
                     break;
                 case "numberfield":
-                    componentTypeLabel = "Number field";
+                    componentTypeLabel = "Number Field";
                     break;
                 case "floorPlanfield":
-                    componentTypeLabel = "Floor-Plan field";
+                    componentTypeLabel = "Floor-Plan Field";
                     break;
                 case "photofield":
-                    componentTypeLabel = "Photo field";
+                    componentTypeLabel = "Photo Field";
                     break;
                 case "videofield":
-                    componentTypeLabel = "Video field";
+                    componentTypeLabel = "Video Field";
                     break;
                 case "filefield":
-                    componentTypeLabel = "File field";
+                    componentTypeLabel = "File Field";
                     break;
                 case "signaturefield":
-                    componentTypeLabel = "Signature field";
+                    componentTypeLabel = "Signature Field";
                     break;
                 case "gpsfield":
-                    componentTypeLabel = "GPS field";
+                    componentTypeLabel = "GPS Field";
                     break;
                 case "displayfield":
-                    componentTypeLabel = "Display field";
+                    componentTypeLabel = "Display Field";
                     break;
                 case "compliancelogic":
                     componentTypeLabel = "Compliance Logic";
                     break;
                 case "tagScanfield":
-                    componentTypeLabel = "Tag-Scan field";
+                    componentTypeLabel = "Tag-Scan Field";
                     break;
                 default:
                     componentTypeLabel = "Unknown Component";

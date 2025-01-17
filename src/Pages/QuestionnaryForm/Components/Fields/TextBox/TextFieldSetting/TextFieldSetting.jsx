@@ -45,6 +45,11 @@ function TestFieldSetting({
   const textareaRef = useRef();
   const navigate = useNavigate();
   const { getAPI } = useApi();
+  const optionDataRef = useRef();
+  // to keep sync
+  useEffect(() => {
+    optionDataRef.current = optionData;
+  }, [optionData]);
 
   const dispatch = useDispatch();
   const options = [
@@ -85,8 +90,6 @@ function TestFieldSetting({
     }
   };
 
-
-
   const handleRegularExpression = (event) => {
     const value = event.target.value;
 
@@ -106,6 +109,7 @@ function TestFieldSetting({
     dispatch(setNewComponent({ id: 'format_error', value, questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   };
+
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
@@ -116,17 +120,18 @@ function TestFieldSetting({
     setSearchTerm('')
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
-
   }
 
   // List Functions
+
   const fetchLookupList = useCallback(async (searchTerm) => {
     setLoading(true);
     const params = Object.fromEntries(searchParams);
+    if (lastEvaluatedKeyRef.current) {
+      params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+    }
     if (searchTerm) {
       params.search = searchTerm
-    } else {
-      params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
@@ -135,20 +140,13 @@ function TestFieldSetting({
         value: item.lookup_id,
         label: item.name
       }));
-      // if (searchTerm) {
-      //   setOptionData(transformedArray)
-      // } else {
-        // setOptionData(prevState => [...prevState, ...transformedArray]);
-        setOptionData(prevItems => {
-          if (searchTerm !== '') {
-            // New search: return only new items
-            return [...transformedArray];
-          } else {
-            // Pagination: append new items
-            return [...prevItems, ...transformedArray];
-          }
-        });
-      // }
+      let updateOptions;
+      if (params.start_key) {
+        updateOptions = [...optionDataRef.current, ...transformedArray]
+      } else {
+        updateOptions = [...transformedArray]
+      }
+      setOptionData(updateOptions);
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
@@ -157,6 +155,7 @@ function TestFieldSetting({
     setLoading(false);
     setIsFetchingMore(false);
   }, []);
+
 
   //funtion for infinate scrooling of dropdown
   const lastElementRef = useCallback(node => {
@@ -369,6 +368,8 @@ function TestFieldSetting({
                       searchTerm={searchTerm}
                       setOptionData={setOptionData}
                       fetchFunc={fetchLookupList}
+                      lookup={true}
+                      lastEvaluatedKeyRef={lastEvaluatedKeyRef}
                     />
                     {/* <DropdownWithSearch
                       label=''

@@ -36,18 +36,18 @@ function InfinateDropdown({
     setSearchTerm,
     searchTerm,
     setOptionData,
-    fetchFunc
+    fetchFunc,
+    lookup,
+    lastEvaluatedKeyRef
 }) {
 
     const [timer, setTimer] = useState();
 
-     // Initialize searchTerm
-    const handleSearchInputChange =  (e) => {
-        if(searchTerm === ''){
-            setOptionData([])
-        }
+    // Initialize searchTerm
+    const handleSearchInputChange = (e) => {
         setSearchTerm(e.target.value)
-        if(fetchFunc){
+        if (fetchFunc) {
+            lastEvaluatedKeyRef.current = null
             clearTimeout(timer);
             const newTimer = setTimeout(() => {
                 fetchFunc(e.target.value);
@@ -82,18 +82,18 @@ function InfinateDropdown({
             </div>
             {isDropdownOpen && (
                 <div className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
-                    {/* Search bar - Fixed at top */}
-                    <div className="p-2 bg-white">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full p-2 border rounded outline-0"
-                            data-testid='search-lookup-data'
-                            value={searchTerm}
-                            onChange={(e) => handleSearchInputChange(e)}
-                        />
-                    </div>
-                    
+                    {lookup &&
+                        <div className="p-2 bg-white">
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-full p-2 border rounded outline-0"
+                                data-testid='search-lookup-data'
+                                value={searchTerm}
+                                onChange={(e) => handleSearchInputChange(e)}
+                            />
+                        </div>
+                    }
                     {/* Scrollable options container */}
                     <div className="max-h-[250px] overflow-auto scrollBar">
                         <ul>

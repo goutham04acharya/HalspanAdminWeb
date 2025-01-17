@@ -38,6 +38,11 @@ function ChoiceFieldSetting({
     const [searchTerm, setSearchTerm] = useState('');
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
+    const optionDataRef = useRef();
+    // to keep sync
+    useEffect(() => {
+        optionDataRef.current = optionData;
+    }, [optionData]);
 
     const navigate = useNavigate();
     const { getAPI } = useApi();
@@ -64,40 +69,41 @@ function ChoiceFieldSetting({
     const fetchLookupList = useCallback(async (searchTerm) => {
         setLoading(true);
         const params = Object.fromEntries(searchParams);
+        if (lastEvaluatedKeyRef.current) {
+          params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+        }
         if (searchTerm) {
-            params.search = searchTerm
-        } else {
-            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+          params.search = searchTerm
         }
         try {
-            const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-            // Transform the items array
-            const transformedArray = response?.data?.data?.items.map(item => ({
-                value: item.lookup_id,
-                label: item.name,
-                choices: item.choices
-            }));
-            if (searchTerm) {
-                setOptionData(transformedArray)
-            } else {
-                setOptionData(prevItems => {
-                    if (searchTerm !== '') {
-                        // New search: return only new items
-                        return [...transformedArray];
-                    } else {
-                        // Pagination: append new items
-                        return [...prevItems, ...transformedArray];
-                    }
-                });
-            }
-            lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+          const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+          // Transform the items array
+          const transformedArray = response.data.data.items.map(item => ({
+            value: item.lookup_id,
+            label: item.name
+          }));
+          console.log(lastEvaluatedKeyRef.current, 'current')
+          console.log(searchTerm, 'searchTerm')
+          console.log(params.start_key, 'params.start_key')
+          let updateOptions;
+          if (params.start_key) {
+            console.log('first', optionDataRef.current)
+            updateOptions = [...optionDataRef.current, ...transformedArray]
+            console.log('updateOptions', updateOptions)
+          } else {
+            console.log('second')
+            updateOptions = [...transformedArray]
+          }
+          setOptionData(updateOptions);
+          lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
-            console.error('Error fetching questionnaires:', error);
+          console.error('Error fetching questionnaires:', error);
         }
-
+    
         setLoading(false);
         setIsFetchingMore(false);
-    }, []);
+      }, []);
+    
 
     //funtion for infinate scrooling of dropdown
     const lastElementRef = useCallback(node => {
@@ -287,6 +293,9 @@ function ChoiceFieldSetting({
                                             searchTerm={searchTerm}
                                             setOptionData={setOptionData}
                                             fetchFunc={fetchLookupList}
+                                            lookup={true}
+                                            lastEvaluatedKeyRef={lastEvaluatedKeyRef}
+
                                         />
                                     </div>
                                     <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ml-4`}>

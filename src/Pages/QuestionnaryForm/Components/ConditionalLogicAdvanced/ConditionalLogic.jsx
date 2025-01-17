@@ -27,15 +27,15 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 // Extend Day.js with the custom parse format plugin
 dayjs.extend(customParseFormat);
 
-
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
     setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions }) {
+    console.log(sectionsData, 'sectionsData')
+
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
     const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const [showSectionList, setShowSectionList] = useState(false)
-    const { PostAPI } = useApi();
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
     const [inputValue, setInputValue] = useState(''); // Track input value
@@ -68,6 +68,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
+    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -89,22 +90,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     ]
 
-    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                } else {
-                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                    if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
+                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                    } else {
+                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                    }
                 }
             }
-        }}
-    );
+        }
+        );
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
+
     const combinedArray = questionType.map((question) => {
         const choiceValues = choiceBoxOptions[question.question_id] || [];
         return {
@@ -113,7 +115,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             choice_values: choiceValues,
         };
     });
-    
+
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -201,6 +203,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                 });
             });
+            console.log(sectionDetailsArray, 'sectionDetailsArray')
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
@@ -249,7 +252,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
 
     useEffect(() => {
-        handleListSectionDetails();
+        // handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
@@ -269,12 +272,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
     }, [conditions])
-
-    // useEffect(() => {
-    //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
-    //     setConditions(parseLogicExpression(transformedContent));
-    //     setInputValue(transformedContent);
-    // }, [])
 
     useEffect(() => {
         if (allSectionDetails) {
@@ -1235,7 +1232,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
                 }
-                // handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
+                handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -1626,7 +1623,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
 
-        // handleSaveSection(sectionId, true, condition_logic);
+        handleSaveSection(sectionId, true, condition_logic);
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
