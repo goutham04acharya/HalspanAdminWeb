@@ -1719,6 +1719,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             selectedFieldType={selectedFieldType}
                                             setSelectedType={setSelectedType}
                                             isDefaultLogic={isDefaultLogic}
+                                            setSelectedQuestion={setSelectedQuestion}
                                         />
                                     </div>
                                     <div className='w-[40%]'>

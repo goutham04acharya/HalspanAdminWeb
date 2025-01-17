@@ -54,12 +54,10 @@ function AdvancedEditor({
     };
 
     const handleAddQuestion = (suggestion, sections, e) => {
-        console.log(e.target, 'e target')
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-        console.log(suggestion, 'suggestion')
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
