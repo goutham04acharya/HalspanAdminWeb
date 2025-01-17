@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Debounce from '../../CommonMethods/debounce';
 
 function InfinateDropdown({
     className,
@@ -34,8 +35,11 @@ function InfinateDropdown({
     readonly,
     setSearchTerm,
     searchTerm,
-    setOptionData
+    setOptionData,
+    fetchFunc
 }) {
+
+    const [timer, setTimer] = useState();
 
      // Initialize searchTerm
     const handleSearchInputChange =  (e) => {
@@ -43,6 +47,13 @@ function InfinateDropdown({
             setOptionData([])
         }
         setSearchTerm(e.target.value)
+        if(fetchFunc){
+            clearTimeout(timer);
+            const newTimer = setTimeout(() => {
+                fetchFunc(e.target.value);
+            }, 500);
+            setTimer(newTimer)
+        }
     }
 
     return (

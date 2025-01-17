@@ -120,7 +120,7 @@ function TestFieldSetting({
   }
 
   // List Functions
-  const fetchLookupList = useCallback(async () => {
+  const fetchLookupList = useCallback(async (searchTerm) => {
     setLoading(true);
     const params = Object.fromEntries(searchParams);
     if (searchTerm) {
@@ -130,7 +130,6 @@ function TestFieldSetting({
     }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-      console.log(response, 'response')
       // Transform the items array
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
@@ -157,7 +156,7 @@ function TestFieldSetting({
 
     setLoading(false);
     setIsFetchingMore(false);
-  }, [searchParams, searchTerm]);
+  }, []);
 
   //funtion for infinate scrooling of dropdown
   const lastElementRef = useCallback(node => {
@@ -166,11 +165,11 @@ function TestFieldSetting({
     observer.current = new IntersectionObserver(entries => {
       if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
         setIsFetchingMore(true);
-        fetchLookupList();
+        fetchLookupList(searchTerm);
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading, isFetchingMore, fieldSettingParameters?.type]);
+  }, [loading, isFetchingMore,]);
 
   function isValidRegex(pattern) {
     try {
@@ -209,7 +208,7 @@ function TestFieldSetting({
   };
 
   useEffect(() => {
-    fetchLookupList();
+    fetchLookupList(searchTerm);
   }, [fetchLookupList]);
 
   return (
@@ -348,7 +347,6 @@ function TestFieldSetting({
               {fieldSettingParameters?.type === 'lookup' &&
                 <div className='w-full flex items-center mt-3'>
                   <div className='w-[90%]'>
-                    {console.log(optionData, 'optionData')}
                     <InfinateDropdown
                       label=''
                       id='lookup'
@@ -370,6 +368,7 @@ function TestFieldSetting({
                       setSearchTerm={setSearchTerm}
                       searchTerm={searchTerm}
                       setOptionData={setOptionData}
+                      fetchFunc={fetchLookupList}
                     />
                     {/* <DropdownWithSearch
                       label=''

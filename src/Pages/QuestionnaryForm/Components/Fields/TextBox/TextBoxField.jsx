@@ -107,7 +107,6 @@ const TextBoxField = ({
 
     }
 
-
     const displayValidationError = (message) => {
         setValidationErrors((prevErrors) => ({
             ...prevErrors,

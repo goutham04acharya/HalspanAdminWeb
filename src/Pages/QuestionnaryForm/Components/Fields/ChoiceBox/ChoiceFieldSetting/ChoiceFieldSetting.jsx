@@ -61,7 +61,7 @@ function ChoiceFieldSetting({
         dispatch(setShouldAutoSave(true));
     }
     // List Functions
-    const fetchLookupList = useCallback(async () => {
+    const fetchLookupList = useCallback(async (searchTerm) => {
         setLoading(true);
         const params = Object.fromEntries(searchParams);
         if (searchTerm) {
@@ -97,7 +97,7 @@ function ChoiceFieldSetting({
 
         setLoading(false);
         setIsFetchingMore(false);
-    }, [searchParams, searchTerm]);
+    }, []);
 
     //funtion for infinate scrooling of dropdown
     const lastElementRef = useCallback(node => {
@@ -286,6 +286,7 @@ function ChoiceFieldSetting({
                                             setSearchTerm={setSearchTerm}
                                             searchTerm={searchTerm}
                                             setOptionData={setOptionData}
+                                            fetchFunc={fetchLookupList}
                                         />
                                     </div>
                                     <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ml-4`}>

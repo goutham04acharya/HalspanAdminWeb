@@ -10,6 +10,7 @@ import LookupDataset from '../Pages/LookupDataset/index.jsx';
 import VersionList from '../Pages/VersionList/VersionList.jsx';
 import { useAuth0 } from '@auth0/auth0-react';
 import NotFound from '../Components/NotFoundPage/NotFound.jsx';
+import { BeatLoader } from 'react-spinners';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   const { logout, getAccessTokenSilently, getIdTokenClaims } = useAuth0();
@@ -60,7 +61,7 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   // Conditionally render based on the `code` query parameter
   const HandleRoute = () => {
     if (code) {
-      return <div>Loading...</div>; // Show loading when `code` is present
+      return <div className='flex justify-center items-center h-screen'> <BeatLoader color="#000" size={'40px'} /></div>; // Show loading when `code` is present
     } else {
       return <NotFound />; // Show 404 if `code` is not present
     }
