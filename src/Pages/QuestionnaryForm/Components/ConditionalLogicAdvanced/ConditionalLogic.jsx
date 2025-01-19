@@ -28,8 +28,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions }) {
-    console.log(sectionsData, 'sectionsData')
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
+    console.log(sectionDetails, 'sectionDetails')
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -74,7 +74,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseIfStatements: [],
         elseStatement: {}
     });
-    console.log(typeof allSectionDetails, 'gfgfggf')
 
 
     const complianceInitialState = [
@@ -245,43 +244,43 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return sectionDetailsArray;
     };
 
-    function getSectionPageQuestionNames(sectionData) {
-        const result = [];
+    // function getSectionPageQuestionNames(sectionData) {
+    //     const result = [];
 
-        sectionData.forEach((section) => {
-            const sectionName = section.section_name.replace(/ /g, '_');
+    //     sectionData.forEach((section) => {
+    //         const sectionName = section.section_name.replace(/ /g, '_');
 
-            section.pages.forEach((page) => {
-                const pageName = page.page_name.replace(/ /g, '_');
+    //         section.pages.forEach((page) => {
+    //             const pageName = page.page_name.replace(/ /g, '_');
 
-                page.questions.forEach((question) => {
-                    const questionName = question.question_name.replace(/ /g, '_');
-                    const fieldType = getFieldType(question.component_type);
-                    sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                        ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                        [(question.question_name).replaceAll(' ', '_')]: fieldType
-                    }
+    //             page.questions.forEach((question) => {
+    //                 const questionName = question.question_name.replace(/ /g, '_');
+    //                 const fieldType = getFieldType(question.component_type);
+    //                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+    //                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+    //                     [(question.question_name).replaceAll(' ', '_')]: fieldType
+    //                 }
 
-                    // Combine sectionName, pageName, and questionName
-                    result.push(`${sectionName}.${pageName}.${questionName}`);
-                });
-            });
-        });
-        dispatch(setAllSectionDetails(result));
-        handleQuestionnaryObject(result);
+    //                 // Combine sectionName, pageName, and questionName
+    //                 result.push(`${sectionName}.${pageName}.${questionName}`);
+    //             });
+    //         });
+    //     });
+    //     dispatch(setAllSectionDetails(result));
+    //     handleQuestionnaryObject(result);
 
-        console.log(result, 'ttttttt')
-        return result;
-    }
+    //     console.log(result, 'ttttttt')
+    //     return result;
+    // }
 
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
-        getSectionPageQuestionNames(sectionsData);
+        // getSectionPageQuestionNames(sectionsData);
         setShowSectionList(true)
-        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
-        console.log(response, 'response')
-        dispatch(setAllSectionDetails(response.data));
-        handleQuestionnaryObject(response.data);
+        // const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
+        // console.log(response, 'response')
+        dispatch(setAllSectionDetails(sectionDetails));
+        handleQuestionnaryObject(sectionDetails);
         setIsThreedotLoaderBlack(false);
     }
 
@@ -313,93 +312,93 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [allSectionDetails]);
 
-    // function handleQuestionnaryObject(allSectionDetails) {
-    //     console.log(allSectionDetails, 'allSectionDetails')
-    //     let result = {};
-    //     // let tempArray = [];
-    //     if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
-    //         allSectionDetails?.data?.sections.forEach((section) => {
-    //             let sectionObject = {
-    //                 [(section.section_name).replaceAll(' ', '_')]: {}
-    //             };
-    //             if (section.pages && section.pages.length > 0) {
-    //                 section.pages.forEach((page) => {
-    //                     if (page.questions && page.questions.length > 0) {
-    //                         page.questions.forEach((question) => {
-    //                             if (question?.component_type === 'dateTimefield') {
-    //                                 datetimefieldQuestions.push(question); // Push to temporary array
-    //                             }
-    //                             const fieldType = getFieldType(question.component_type);
-    //                             sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-    //                                 ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-    //                                 [(question.question_name).replaceAll(' ', '_')]: fieldType
-    //                             }
-
-    //                         });
-    //                     }
-    //                 });
-    //             }
-    //             result = {
-    //                 ...result,
-    //                 ...sectionObject
-    //             }
-    //             setSections(result);
-    //             console.log(result, 'hererererr')
-    //         });
-    //         setDatetimefieldQuestions(datetimefieldQuestions);
-    //     }
-    // }
-
     function handleQuestionnaryObject(allSectionDetails) {
-        console.log(allSectionDetails, 'allSectionDetails');
-
-        let result = {}; // Final object to store sections
-        let datetimefieldQuestions = []; // To store datetimefield questions
-
-        // Ensure `sections` data exists and has length
-        if (allSectionDetails?.data?.sections?.length > 0) {
-            allSectionDetails.data.sections.forEach((section) => {
-                // Add section as a key in the result object
-                const sectionKey = (section.section_name).replaceAll(' ', '_');
-                if (!result[sectionKey]) {
-                    result[sectionKey] = {};
-                }
-
-                // Iterate over pages
-                if (section.pages?.length > 0) {
+        console.log(allSectionDetails, 'check now')
+        let result = {};
+        // let tempArray = [];
+        if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
+            allSectionDetails?.data?.sections.forEach((section) => {
+                let sectionObject = {
+                    [(section.section_name).replaceAll(' ', '_')]: {}
+                };
+                if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
-                        const pageKey = (page.page_name).replaceAll(' ', '_');
-                        if (!result[sectionKey][pageKey]) {
-                            result[sectionKey][pageKey] = {};
-                        }
-
-                        // Iterate over questions
-                        if (page.questions?.length > 0) {
+                        if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
-                                const questionKey = (question.question_name).replaceAll(' ', '_');
-                                const fieldType = getFieldType(question.component_type);
-
-                                // Add the question to the page object
-                                result[sectionKey][pageKey][questionKey] = fieldType;
-
-                                // Handle datetimefield questions
-                                if (question.component_type === 'dateTimefield') {
-                                    datetimefieldQuestions.push(question);
+                                if (question?.component_type === 'dateTimefield') {
+                                    datetimefieldQuestions.push(question); // Push to temporary array
                                 }
+                                const fieldType = getFieldType(question.component_type);
+                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
+                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
+                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
+                                }
+
                             });
                         }
                     });
                 }
+                result = {
+                    ...result,
+                    ...sectionObject
+                }
+                setSections(result);
+                console.log(result, 'hererererr')
             });
-
-            // Update states with results
-            setSections(result);
             setDatetimefieldQuestions(datetimefieldQuestions);
-
-            console.log(result, 'Processed Result');
-            console.log(datetimefieldQuestions, 'DateTimeField Questions');
         }
     }
+
+    // function handleQuestionnaryObject(allSectionDetails) {
+    //     console.log(allSectionDetails, 'allSectionDetails');
+
+    //     let result = {}; // Final object to store sections
+    //     let datetimefieldQuestions = []; // To store datetimefield questions
+
+    //     // Ensure `sections` data exists and has length
+    //     if (allSectionDetails?.data?.sections?.length > 0) {
+    //         allSectionDetails.data.sections.forEach((section) => {
+    //             // Add section as a key in the result object
+    //             const sectionKey = (section.section_name).replaceAll(' ', '_');
+    //             if (!result[sectionKey]) {
+    //                 result[sectionKey] = {};
+    //             }
+
+    //             // Iterate over pages
+    //             if (section.pages?.length > 0) {
+    //                 section.pages.forEach((page) => {
+    //                     const pageKey = (page.page_name).replaceAll(' ', '_');
+    //                     if (!result[sectionKey][pageKey]) {
+    //                         result[sectionKey][pageKey] = {};
+    //                     }
+
+    //                     // Iterate over questions
+    //                     if (page.questions?.length > 0) {
+    //                         page.questions.forEach((question) => {
+    //                             const questionKey = (question.question_name).replaceAll(' ', '_');
+    //                             const fieldType = getFieldType(question.component_type);
+
+    //                             // Add the question to the page object
+    //                             result[sectionKey][pageKey][questionKey] = fieldType;
+
+    //                             // Handle datetimefield questions
+    //                             if (question.component_type === 'dateTimefield') {
+    //                                 datetimefieldQuestions.push(question);
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //         });
+
+    //         // Update states with results
+    //         setSections(result);
+    //         setDatetimefieldQuestions(datetimefieldQuestions);
+
+    //         console.log(result, 'Processed Result');
+    //         console.log(datetimefieldQuestions, 'DateTimeField Questions');
+    //     }
+    // }
 
 
     // Handle input change and check for matches

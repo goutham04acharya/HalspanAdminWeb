@@ -1960,6 +1960,8 @@ const QuestionnaryForm = () => {
                         sectionsData={sections}
                         setConditions={setConditions}
                         conditions={conditions}
+                        setSectionDetails={setSectionDetails}
+                        sectionDetails={sectionDetails}
                     />
                 )
             }
