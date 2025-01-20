@@ -207,7 +207,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
-        console.log(secDetailsForSearching, 'secDetailsForSearching');
         setQuestionType(questionDetailsArray);
     };
 
@@ -239,21 +238,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 });
             });
         });
-        console.log(sectionDetailsArray, 'sectionDetailsArrayhere');
         // Return the array containing all the details
         return sectionDetailsArray;
     };
 
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
-        // getSectionPageQuestionNames(sectionsData);
         setShowSectionList(true)
-        // const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
         dispatch(setAllSectionDetails(sectionDetails));
         handleQuestionnaryObject(sectionDetails);
         setIsThreedotLoaderBlack(false);
     }
-
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
@@ -307,14 +302,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                     });
                 }
-                console.log(sectionObject, 'sectionObject');
 
                 result = {
                     ...result,
                     ...sectionObject
                 }
                 setSections(result);
-                console.log(sections, 'sections');
             });
             setDatetimefieldQuestions(datetimefieldQuestions);
         }
@@ -330,12 +323,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
         const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
         let questionMatches = value.match(regex);
-        // [
-        //     "Section_1.Page_1.Question_1",
-        //     "Section_1.Page_1.Question_2",
-        //     "Section_1.Page_1.Question_4"
-        // ]
-
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -473,12 +460,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-
+            
             // 🔎 Check if selectedQuestion is a 'choiceboxfield'
-            const matchedQuestion = combinedArray.find(
+            const matchedQuestion = combinedArray?.find(
                 (item) =>
-                    item.question_detail === selectedQuestion &&
-                    item.question_type === "choiceboxfield"
+                    item?.question_detail === selectedQuestion &&
+                    item?.question_type === "choiceboxfield"
             );
 
             if (matchedQuestion) {
@@ -1716,6 +1703,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             setSelectedType={setSelectedType}
                                             isDefaultLogic={isDefaultLogic}
                                             setSelectedQuestion={setSelectedQuestion}
+                                            isChoiceboxField={isChoiceboxField}
+                                            choiceboxValues={choiceboxValues}
                                         />
                                     </div>
                                     <div className='w-[40%]'>
@@ -1767,7 +1756,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <div className='flex-1 overflow-auto default-sidebar'>
                                     <BasicEditor
                                         secDetailsForSearching={filterQuestions()}
-                                        questions={allSectionDetails?.data}
+                                        questions={allSectionDetails}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
@@ -1817,7 +1806,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <div className='flex-1 overflow-auto default-sidebar'>
                                     <ComplianceBasicEditor
                                         secDetailsForSearching={filterQuestions()}
-                                        questions={allSectionDetails.data}
+                                        questions={allSectionDetails.sections}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}

@@ -277,7 +277,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         return true;
     }
 
-
     //handler for datepicker
     const handleDatePicker = (dateString, mainIndex, subIndex) => {
 
@@ -294,6 +293,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return updatedConditions;
         });
     }
+
     const handleClearConditionValues = () => {
         setConditions((prevConditions) =>
             prevConditions.map((conditionGroup) => ({
@@ -310,6 +310,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             }))
         );
     };
+
+
     // Custom handler function for clicks outside the dropdown
     const handleOutsideClick = () => {
         const updatedConditions = conditions.map(item => ({
@@ -348,7 +350,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     useOnClickOutsideById('condition_dropdown_inner', handleOutsideClick2);
     useOnClickOutsideById('dropdown_inner', handleOutsideClick);
     useOnClickOutsideById('value_inner', handleOutsideClick3);
-
     return (
         <div className='w-full h-customh14'>
             {sectionConditionLogicId || pageConditionLogicId ? (

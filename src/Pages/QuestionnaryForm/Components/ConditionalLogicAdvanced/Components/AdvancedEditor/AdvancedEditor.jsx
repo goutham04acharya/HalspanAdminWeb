@@ -24,6 +24,8 @@ function AdvancedEditor({
     isChoiceboxField,
     choiceboxValues
 }) {
+    console.log(isChoiceboxField, 'isChoiceboxField')
+    const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [choiceValues, setChoiceValues] = useState([]);
@@ -60,15 +62,8 @@ function AdvancedEditor({
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
+
         setSelectedQuestion(suggestion)
-        const matchedQuestion = combinedArray.find(
-            (item) =>
-                item.question_detail === suggestion &&
-                item.question_type === "choiceboxfield"
-        );
-        if(matchedQuestion.question_type === 'choiceboxfield'){
-            
-        }
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
@@ -117,6 +112,7 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
+    console.log(showSectionList,showMethodSuggestions,filteredSuggestions,isChoiceboxField, 'filteredSuggestions')
 
     return (
         <div className='mr-[18px] mt-[4%]'>
