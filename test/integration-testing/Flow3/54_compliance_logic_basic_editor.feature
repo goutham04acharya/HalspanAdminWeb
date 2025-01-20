@@ -2,6 +2,13 @@
 Feature: Halspan - Admin adds the condition in basic editor
     As a admin I want to test the compliance logic basic editor
 
+       Scenario: Admin logs in with valid credentials
+        Given I am on the login page
+        When I enter valid email address as "nayana.sk@7edge.com"
+        * I enter valid password as "dApje7-nepnig-vibqyc"
+        * I click the submit button
+        Then I should be redirected to the questionnaire listing screen
+
    @create_question
     Scenario Outline: Admin views all types of field and adds choice field from the add field section
         Given I am on the questionnaire management section
@@ -52,7 +59,7 @@ Feature: Halspan - Admin adds the condition in basic editor
         When I select the condition from basic editor
         Then I click the save button for default value
         And I should see the basic editor compliance logic in default value field
-        When I click the save button
+        When I click the save button for the questionnaire version
 
         When I click the preview button
         Then I should see the mobile preview
