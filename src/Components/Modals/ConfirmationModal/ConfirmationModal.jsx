@@ -5,7 +5,7 @@ import { BeatLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 
 
-function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus, complianceLoader }) {
+function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, setModalOpen, loading, publishedStatus, complianceLoader, questionnaireForm }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -67,7 +67,7 @@ function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Butto
                         </>}
                     <button type='button' data-testid={testIDBtn2} className='w-[200px] h-[50px] border border-[#2B333B] rounded text-[#2B333B] hover:bg-[#EFF1F8] text-base font-semibold' onClick={() => {
                         handleButton2()
-                        setReplaceCancel(true)
+                        questionnaireForm ? '': setReplaceCancel(true)
                     }}>
                         {Button2text}
                     </button>

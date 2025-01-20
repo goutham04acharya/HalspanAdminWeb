@@ -38,25 +38,25 @@ const ChoiceBoxField = ({
     const dispatch = useDispatch()
     const questionValue = useSelector(state => state.questionValues.questions);
     const handleRadioChange = (selectedValue) => {
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
+        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
             [section_name]: {
-                ...prevValues[section_name], // Preserve existing entries for this section
+                ...prevValues[section_name],
                 [page_name]: {
-                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: selectedValue // Add or update the label key with newValue
-                }
-            }
-        }))
-        
+                    ...prevValues[section_name]?.[page_name],
+                    [label]: selectedValue.value,
+                },
+            },
+        }));
+    
         // Update the selected value in the parent state for the specific question
-        dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }))
+        dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }));
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: selectedValue,
         }));
-
+    
         // Optionally reset validation errors for this question
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
@@ -65,11 +65,8 @@ const ChoiceBoxField = ({
                 [question.question_id]: null,
             },
         }));
-
-        // Set the selected value locally for dropdown purposes or other UI updates
-        setOptionSelected(questionValue[question?.question_id]);
-        setIsModified(!isModified)
     };
+    
     const handleDropdownChange = (value) => {
         setChoiceSelected(questionValue[question?.question_id]);
         setOptionSelected(questionValue[question?.question_id]);
@@ -134,9 +131,7 @@ const ChoiceBoxField = ({
         const { source, type, fixedChoiceArray, lookupOptionChoice, source_value } = fieldSettingParameters;
         let values = [];
         if (preview) {
-            values = (question?.source === 'fixedList')
-                ? question?.source_value?.map(choice => choice.value) || []
-                : lookupOptionChoice || source_value || [];
+            values = question?.source_value
         } else {
             values = (source === 'fixedList')
                 ? fixedChoiceArray?.map(choice => choice.value) || []
