@@ -20,8 +20,12 @@ function AdvancedEditor({
     smallLoader,
     setSelectedType,
     combinedArray,
-    setSelectedQuestion
+    setSelectedQuestion,
+    isChoiceboxField,
+    choiceboxValues
 }) {
+    console.log(isChoiceboxField, 'isChoiceboxField')
+    const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [choiceValues, setChoiceValues] = useState([]);
@@ -54,24 +58,14 @@ function AdvancedEditor({
     };
 
     const handleAddQuestion = (suggestion, sections, e) => {
-        console.log(e.target, 'e target')
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-        console.log(suggestion, 'suggestion')
+
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
-
-        if (valueType === 'choiceboxfield') {
-            const questionDetail = suggestion.split('.')[2];
-            const question = combinedArray.find(q => q.question_detail === questionDetail);
-            if (question && question.choice_values) {
-                setShowChoiceValues(true);
-                setChoiceValues(question.choice_values);
-            }
-        }
 
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
@@ -97,6 +91,7 @@ function AdvancedEditor({
         const value = inputValue;
 
         if (event.key === "Backspace" && selectionStart > 0) {
+            const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
             const matches = [...value.matchAll(regex)];
 
             for (let match of matches) {
@@ -117,6 +112,7 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
+    console.log(showSectionList,showMethodSuggestions,filteredSuggestions,isChoiceboxField, 'filteredSuggestions')
 
     return (
         <div className='mr-[18px] mt-[4%]'>
@@ -133,7 +129,8 @@ function AdvancedEditor({
                     onKeyDown={handleKeyDown}
                     ref={textareaRef}
                     value={inputValue}
-                ></textarea>
+                >
+                </textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
             {error ? (
@@ -147,6 +144,7 @@ function AdvancedEditor({
                     showSectionList && Object.keys(sections).length > 0 && (
                         <div className='pl-2.5 py-2.5 pr-1.5 h-[260px] w-[60%] overflow-y-auto scrollbar_gray border-l border-b border-r border-[#AEB3B7]'>
                             <div className="pr-1">
+                                
                                 {showMethodSuggestions ? (
                                     <div className="suggestions-box">
                                         {suggestions.map((method, index) => (
@@ -169,6 +167,17 @@ function AdvancedEditor({
                                             onClick={(e) => handleAddQuestion(suggestion, sections, e)}
                                         >
                                             {suggestion}
+                                        </div>
+                                    ))
+                                ) : (isChoiceboxField === true) ? (
+                                    choiceboxValues.map((values, index) => (
+                                        <div
+                                            key={index}
+                                            data-testid={`choicevalues-${index}`}
+                                            className="cursor-pointer"
+                                            onClick={(e) => handleClickToInsert(values.value, false)}
+                                        >
+                                            {values.value}
                                         </div>
                                     ))
                                 ) : (searchInput.trim() !== '' && filteredSuggestions.length === 0) ? (
@@ -202,5 +211,7 @@ function AdvancedEditor({
         </div>
     );
 }
+
+// export default AdvancedEditor;
 
 export default AdvancedEditor;

@@ -237,16 +237,14 @@ function DateTimeField({
                         type="date"
                         id={textId}
                         value={questionValue?.[question?.question_id]}
-                        className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                        className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleFunction(e.target.value)}
                         pattern='\d{4}-\d{2}-\d{2}'
                         min="1000-01-01"
                         max="9999-12-31"
                         onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
-                    // onKeyDown={(e) => {
-                    //     e.preventDefault(); // This is preventing input, make sure it’s intentional
-                    // }}
+                        disabled={question?.options?.read_only}
                     />
                 )}
                 {preview && type === 'time' && (
@@ -265,12 +263,13 @@ function DateTimeField({
                             type="date"
                             id={textId}
                             value={questionValue?.[question?.question_id]?.split(' ')[0]} // Use state to manage date value
-                            className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 bg-white py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                            className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
                             pattern='\d{4}-\d{2}-\d{2}'
                             min="1000-01-01"
                             max="9999-12-31"
+                            disabled={question?.options?.read_only}
                             onMouseDown={(e) => e.target.showPicker?.()} // Ensures the date picker appears on focus
                         />
                     </div>
@@ -279,6 +278,7 @@ function DateTimeField({
                         format={question?.format}
                         validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
                         questionValue={questionValue[question?.question_id]?.split(' ')[1]}
+                        readOnly={question?.options?.read_only}
                     />
                 </div>}
 

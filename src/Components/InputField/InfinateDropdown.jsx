@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Debounce from '../../CommonMethods/debounce';
 
 function InfinateDropdown({
     className,
@@ -33,24 +34,28 @@ function InfinateDropdown({
     mainDivStyle,
     readonly,
     setSearchTerm,
-    searchTerm
+    searchTerm,
+    setOptionData,
+    fetchFunc,
+    lookup,
+    lastEvaluatedKeyRef
 }) {
 
-     // Initialize searchTerm
-    // const [filteredOptions, setFilteredOptions] = useState(options || []); // Initialize filteredOptions
-    // Update filteredOptions whenever options or searchTerm changes
-    // useEffect(() => {
-    //     if (options) {
-    //         setFilteredOptions(
-    //             options.filter(option =>
-    //                 (preview ? option.value : option.label)
-    //                     .toLowerCase()
-    //                     .includes(searchTerm.toLowerCase())
-    //             )
-    //         );
-    //     }
-    // }, [options, searchTerm, preview]);
-    console.log(options, 'options')
+    const [timer, setTimer] = useState();
+
+    // Initialize searchTerm
+    const handleSearchInputChange = (e) => {
+        setSearchTerm(e.target.value)
+        if (fetchFunc) {
+            lastEvaluatedKeyRef.current = null
+            clearTimeout(timer);
+            const newTimer = setTimeout(() => {
+                fetchFunc(e.target.value);
+            }, 500);
+            setTimer(newTimer)
+            //loader
+        }
+    }
 
     return (
         <div className={`cursor-pointer w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
@@ -78,18 +83,18 @@ function InfinateDropdown({
             </div>
             {isDropdownOpen && (
                 <div className="absolute bg-white border border-[#AEB3B7] mt-1 w-full z-10">
-                    {/* Search bar - Fixed at top */}
-                    {/* <div className="p-2 bg-white">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="w-full p-2 border rounded outline-0"
-                            data-testid='search-lookup-data'
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div> */}
-                    
+                    {lookup &&
+                        <div className="p-2 bg-white">
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-full p-2 border rounded outline-0"
+                                data-testid='search-lookup-data'
+                                value={searchTerm}
+                                onChange={(e) => handleSearchInputChange(e)}
+                            />
+                        </div>
+                    }
                     {/* Scrollable options container */}
                     <div className="max-h-[250px] overflow-auto scrollBar">
                         <ul>

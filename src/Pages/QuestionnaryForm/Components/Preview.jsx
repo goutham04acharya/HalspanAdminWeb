@@ -27,7 +27,7 @@ import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 import { list } from 'postcss';
 import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
-function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData }) {
+function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails }) {
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
@@ -58,7 +58,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         current_section: 1,
         total_pages: 0
     })
-    console.log(sections, 'sections preview')
     const handleConditionalLogic = async (data) => {
         let result = {};
         data.forEach((section, sectionIndex) => {
@@ -113,9 +112,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     .filter((section) =>
                         section?.pages?.some((page) => page?.questions?.length > 0) // Only include sections with pages having questions
                     );
-                console.log(reorganizedSections, 're organized sections')
-                console.log(sectionsData, 'sectionsData')
-                setSections(reorganizedSections);
+                setSections(sectionDetails?.sections);
 
                 setPreviewNavigation((prev) => ({
                     ...prev,
@@ -130,7 +127,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
-
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -462,6 +458,14 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         return acc; // Skip hidden questions  
                     }
 
+                    if(question?.options?.read_only){
+                        return acc;
+                    }
+
+                    if(!question?.options?.visible){
+                        return acc;
+                    }
+
                     // Initialize the field error accumulator for each component type  
                     if (!acc[`preview_${question?.component_type}`]) {
                         acc[`preview_${question?.component_type}`] = {};  // Create an empty object for each component type  
@@ -750,7 +754,6 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     };
 
     const renderQuestion = (question) => {
-        console.log(question, 'question')
         switch (question?.component_type) {
             case 'textboxfield':
                 return <TextBoxField
@@ -768,6 +771,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     values={value[question?.question_id]}
                     setIsModified={setIsModified}
                     isModified={isModified}
+                    handleChange={''}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -1008,7 +1012,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    console.log(list, 'list')
+                                    if(!list?.options?.visible){
+                                        return null;
+                                    }
                                     if (list?.conditional_logic) {
                                         if (list?.conditional_logic?.includes("new Date(")) {
                                             try {

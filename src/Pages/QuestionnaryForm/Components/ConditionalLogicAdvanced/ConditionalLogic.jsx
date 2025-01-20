@@ -27,15 +27,14 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 // Extend Day.js with the custom parse format plugin
 dayjs.extend(customParseFormat);
 
-
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
+
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
     const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const [showSectionList, setShowSectionList] = useState(false)
-    const { PostAPI } = useApi();
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
     const [inputValue, setInputValue] = useState(''); // Track input value
@@ -68,11 +67,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
+    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
         elseStatement: {}
     });
+
 
     const complianceInitialState = [
         {
@@ -89,31 +90,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     ]
 
-    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                } else {
-                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                    if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
+                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                    } else {
+                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
+                    }
                 }
             }
-        }}
-    );
+        }
+        );
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
+
     const combinedArray = questionType.map((question) => {
         const choiceValues = choiceBoxOptions[question.question_id] || [];
         return {
             question_detail: question.question_detail,
             question_type: question.question_type,
             choice_values: choiceValues,
+            type: question.type
         };
     });
-    
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -180,7 +182,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
         const questionDetailsArray = [];
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
 
             // Access pages within each section
@@ -197,6 +199,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             'question_id': question?.question_id,
                             'question_name': question?.question_name,
                             'question_detail': questionName,
+                            'type': question?.type
                         });
                     }
                 });
@@ -213,7 +216,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
 
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
             // sectionDetailsArray.push(sectionName); // Add the section name
 
@@ -242,12 +245,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
         setShowSectionList(true)
-        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
-        dispatch(setAllSectionDetails(response.data));
-        handleQuestionnaryObject(response.data);
+        dispatch(setAllSectionDetails(sectionDetails));
+        handleQuestionnaryObject(sectionDetails);
         setIsThreedotLoaderBlack(false);
     }
-
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
@@ -270,12 +271,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [conditions])
 
-    // useEffect(() => {
-    //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
-    //     setConditions(parseLogicExpression(transformedContent));
-    //     setInputValue(transformedContent);
-    // }, [])
-
     useEffect(() => {
         if (allSectionDetails) {
             filterSectionDetails(); // Call this when the state is updated
@@ -284,29 +279,30 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
-        // let tempArray = [];
-        if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
-            allSectionDetails?.data?.sections.forEach((section) => {
+        if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
+            allSectionDetails.sections.forEach((section) => {
+                const sectionKey = section.section_name.replaceAll(' ', '_');
                 let sectionObject = {
-                    [(section.section_name).replaceAll(' ', '_')]: {}
+                    [sectionKey]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
+                        const pageKey = page.page_name.replaceAll(' ', '_');
+                        sectionObject[sectionKey][pageKey] = {};
+
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 if (question?.component_type === 'dateTimefield') {
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
+                                const questionKey = question.question_name.replaceAll(' ', '_');
                                 const fieldType = getFieldType(question.component_type);
-                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
-                                }
-
+                                sectionObject[sectionKey][pageKey][questionKey] = fieldType;
                             });
                         }
                     });
                 }
+
                 result = {
                     ...result,
                     ...sectionObject
@@ -319,7 +315,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
-        // debugger
         setError('');
         // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
@@ -328,12 +323,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
         const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
         let questionMatches = value.match(regex);
-        // [
-        //     "Section_1.Page_1.Question_1",
-        //     "Section_1.Page_1.Question_2",
-        //     "Section_1.Page_1.Question_4"
-        // ]
-
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -438,15 +427,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-
             let newText;
 
-            if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
+            if ((charBeforeCursor === ' ' || charBeforeCursor === '.' || charBeforeCursor === `'`) || cursorPosition === 0) {
                 newText = textBefore + textToInsert + textAfter;
             } else {
                 const lastSpaceIndex = textBefore.lastIndexOf(' ');
@@ -460,7 +446,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (textToInsert === 'includes()') {
                 const includesIndex = newText.indexOf('includes()');
                 if (includesIndex !== -1) {
-                    const updatedText = newText.replace('includes()', 'includes("")');
+                    const updatedText = newText.replace('includes()', `includes('')`);
                     textarea.value = updatedText;
 
                     const cursorPosition = includesIndex + 'includes("'.length;
@@ -474,26 +460,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-
+            
             // 🔎 Check if selectedQuestion is a 'choiceboxfield'
-            const matchedQuestion = combinedArray.find(
+            const matchedQuestion = combinedArray?.find(
                 (item) =>
-                    item.question_detail === selectedQuestion &&
-                    item.question_type === 'choiceboxfield'
+                    item?.question_detail === selectedQuestion &&
+                    item?.question_type === "choiceboxfield"
             );
 
             if (matchedQuestion) {
-                // Set state to true if matched
-                setIsChoiceboxField(true);  // New state for 'choiceboxfield'
-                setChoiceboxValues(matchedQuestion.choice_values);  // New state for choice values
+                setChoiceboxValues(matchedQuestion.choice_values);
             } else {
-                setIsChoiceboxField(false);
                 setChoiceboxValues([]);
             }
 
             if (isMethod) {
                 setShowMethodSuggestions(false);
-                setShowChoiceValues(true);
+                setShowChoiceValues(true); // Automatically show choice values
+                setIsChoiceboxField(true);
+                setShowSectionList(true)
             } else {
                 let fieldType = '';
                 switch (componentType) {
@@ -578,7 +563,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-
         // Default structure if no expression is provided
         if (!expression || expression === '') {
             return [{
@@ -619,7 +603,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             const [_, question_name, timestamp, offsetDays] = match;
-            const question = getDetails(question_name.trim(), allSectionDetails.data);
+            const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
 
@@ -645,7 +629,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Regex to match logical conditions
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                const matches = condition.match(/(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
@@ -654,7 +638,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (question_name.includes('.length')) {
                         question_name = question_name.replaceAll('.length', '');
                     }
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+                    let question = getDetails(question_name.trim(), allSectionDetails.sections);
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
@@ -742,7 +726,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         // Convert to a number if it's not a string
                         value = Number(value);
                     }
-
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -863,7 +846,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
-
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1238,7 +1220,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
                 }
-                // handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
+                handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -1562,7 +1544,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
-            let condition_logic = buildConditionExpression(conditions)
+            let condition_logic = buildConditionExpression(conditions, combinedArray)
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
@@ -1614,7 +1596,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                condition_logic = buildConditionExpression(conditions);
+                condition_logic = buildConditionExpression(conditions, combinedArray);
             } catch (error) {
             }
         } else {
@@ -1629,7 +1611,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
 
-        // handleSaveSection(sectionId, true, condition_logic);
+        handleSaveSection(sectionId, true, condition_logic);
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1721,6 +1703,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             setSelectedType={setSelectedType}
                                             isDefaultLogic={isDefaultLogic}
                                             setSelectedQuestion={setSelectedQuestion}
+<<<<<<< HEAD
+=======
+                                            isChoiceboxField={isChoiceboxField}
+                                            choiceboxValues={choiceboxValues}
+>>>>>>> 8037d8b479c2a1eeb0f6eae4a72f736d1eddabf9
                                         />
                                     </div>
                                     <div className='w-[40%]'>
@@ -1772,7 +1759,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <div className='flex-1 overflow-auto default-sidebar'>
                                     <BasicEditor
                                         secDetailsForSearching={filterQuestions()}
-                                        questions={allSectionDetails?.data}
+                                        questions={allSectionDetails}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
@@ -1822,7 +1809,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <div className='flex-1 overflow-auto default-sidebar'>
                                     <ComplianceBasicEditor
                                         secDetailsForSearching={filterQuestions()}
-                                        questions={allSectionDetails.data}
+                                        questions={allSectionDetails.sections}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
