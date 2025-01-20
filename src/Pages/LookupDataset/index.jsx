@@ -90,9 +90,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
         console.log(data, 'data')
-        if(data.choices.length === 1){
+        if (data.choices.length === 1) {
             setDisableDelete(true)
-        }else{
+        } else {
             setDisableDelete(false)
         }
     };
@@ -254,7 +254,7 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 setToastError("Choice requires at least 1 character");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
-            }else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
+            } else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
                 setToastError("Choices item limit exceeded");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
@@ -277,46 +277,59 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     }
 
     const handleImport = (event) => {
-        setData(initialState)
+        setData(initialState);
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
             setToastError('Please upload a CSV file.');
             return;
         }
-        // setIsImportLoading(true);
-        // setIsCreateModalOpen(false);
         if (showCreateModal !== undefined) {
             setShowCreateModal(false);
         }
+
         Papa.parse(file, {
             header: false,
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
+                console.log(flatData, 'data');
 
+                // Check for item length exceeding 100 characters
+                const isItemTooLong = flatData.some(item => item.length > 100);
+                if (isItemTooLong) {
+                    handleClose();
+                    setIsImportLoading(false);
+                    setShowLookupReplaceModal(false);
+                    setToastError('Choices item limit exceeded.');
+                    return;
+                }
+
+                // Check for total data entries exceeding 500
                 if (flatData.length > 500) {
                     handleClose();
                     setIsImportLoading(false);
                     setShowLookupReplaceModal(false);
                     setToastError('Only 500 data entries are accepted.');
-                } else {
-                    // debugger
-                    const fileName = file.name.replace('.csv', '');
-                    const payload = {
-                        name: fileName,
-                        choices: flatData
-                    }
-
-                    handleSubmit(payload);
+                    return;
                 }
+
+                const fileName = file.name.replace('.csv', '');
+                const payload = {
+                    name: fileName,
+                    choices: flatData
+                };
+
+                handleSubmit(payload);
             },
             error: (error) => {
                 setToastError('Something went wrong.');
                 console.error('Error parsing CSV:', error);
             }
         });
+
         event.target.value = ''; // Reset the input to allow re-uploading the same file
     };
+
 
     // View Functions
     const handleView = (id, name, choices) => {

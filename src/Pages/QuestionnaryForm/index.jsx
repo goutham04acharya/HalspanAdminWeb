@@ -1117,6 +1117,7 @@ const QuestionnaryForm = () => {
     };
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
+
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete  
         dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
@@ -1862,7 +1863,9 @@ const QuestionnaryForm = () => {
                     />
                 )
             }
+            {console.log(questionToDelete,selectedQuestionId, 'questionToDelete')}
             {
+
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
@@ -1879,6 +1882,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setShowquestionDeleteModal}
                         handleButton1={confirmDeleteQuestion}
                         handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
+                        questionnaireForm
                     />
                 )
             }
@@ -1897,6 +1901,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setShowCancelModal}
                         handleButton1={handleConfirmCancel}
                         handleButton2={() => dispatch(setShowCancelModal(false))}
+                        questionnaireForm
                     />
                 )
             }

@@ -61,14 +61,6 @@ function AdvancedEditor({
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
         setSelectedQuestion(suggestion)
-        const matchedQuestion = combinedArray.find(
-            (item) =>
-                item.question_detail === suggestion &&
-                item.question_type === "choiceboxfield"
-        );
-        if(matchedQuestion.question_type === 'choiceboxfield'){
-            
-        }
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
 
