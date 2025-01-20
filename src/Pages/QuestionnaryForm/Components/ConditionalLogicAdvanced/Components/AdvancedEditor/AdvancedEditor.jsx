@@ -109,7 +109,6 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
-    console.log(showSectionList,showMethodSuggestions,filteredSuggestions,isChoiceboxField, 'filteredSuggestions')
 
     return (
         <div className='mr-[18px] mt-[4%]'>

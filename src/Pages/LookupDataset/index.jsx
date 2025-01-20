@@ -294,7 +294,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
             header: false,
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
-                console.log(flatData, 'data');
 
                 // Check for item length exceeding 100 characters
                 const isItemTooLong = flatData.some(item => item.length > 100);
