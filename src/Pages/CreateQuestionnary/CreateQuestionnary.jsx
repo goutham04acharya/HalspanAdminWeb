@@ -68,15 +68,9 @@ function CreateQuestionnary() {
 
   const handleChange = (e, id) => {
     const { value } = e.target;
-    // console.log(value.length, 'value')
     // Define a regular expression to allow only alphanumeric characters and spaces
     const regex = /^[^?/&]*$/;
-    // if(value.length < 2){
-    //   setValidationErrors((prevErrors) => ({
-    //     ...prevErrors,
-    //     [id]: value,
-    //   }));
-    // }
+    
     if (regex.test(value)) {
       setCreateDetails((prevState) => ({
         ...prevState,

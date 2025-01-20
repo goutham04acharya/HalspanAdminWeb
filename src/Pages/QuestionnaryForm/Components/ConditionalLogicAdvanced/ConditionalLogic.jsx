@@ -1705,7 +1705,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             setSelectedQuestion={setSelectedQuestion}
                                             isChoiceboxField={isChoiceboxField}
                                             choiceboxValues={choiceboxValues}
-                                        />
+                                        ></AdvancedEditor>
                                     </div>
                                     <div className='w-[40%]'>
                                         <StaticDetails
@@ -1806,7 +1806,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 <div className='flex-1 overflow-auto default-sidebar'>
                                     <ComplianceBasicEditor
                                         secDetailsForSearching={filterQuestions()}
-                                        questions={allSectionDetails.sections}
+                                        questions={allSectionDetails}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
