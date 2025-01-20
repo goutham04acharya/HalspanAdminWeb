@@ -52,11 +52,9 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
 
 // Main function to build the overall condition expression
 export const buildConditionExpression = (conditionsArray, combinedArray) => {
-    console.log(combinedArray, 'combinedArray')
     return conditionsArray?.map((conditionGroup) => {
         const expressions = conditionGroup.conditions.map((cond) => {
             const { question_name, condition_logic, value, date } = cond;
-            console.log(question_name, 'question name') // "Section_1.Page_1.Question_1"
             const matchedQuestion = combinedArray.find(q => q.question_detail === question_name);
             if (matchedQuestion && matchedQuestion.type === 'multi_choice') {
                 isMultiChoice = true;

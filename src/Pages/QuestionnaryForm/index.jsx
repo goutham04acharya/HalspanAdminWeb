@@ -108,7 +108,8 @@ const QuestionnaryForm = () => {
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
-    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
+    const [hasSectionData, setHasSectionData] = useState([]);
+
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -122,6 +123,7 @@ const QuestionnaryForm = () => {
         ]
     },
     ])
+
     const complianceInitialState = [
         {
             'conditions': [
@@ -136,6 +138,7 @@ const QuestionnaryForm = () => {
             ]
         }
     ]
+
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
@@ -145,9 +148,9 @@ const QuestionnaryForm = () => {
         const { id, value } = e.target;
         let updatedValue = value;
         // Restrict numeric input if the id is 'fileType'
-        if(id === 'label'){
+        if (id === 'label') {
             setPrevLabelValue(updatedValue)
-            if(updatedValue === ''){
+            if (updatedValue === '') {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     label: {
@@ -155,7 +158,7 @@ const QuestionnaryForm = () => {
                         [selectedQuestionId]: 'This is a mandatory field',
                     },
                 }));
-            }else{  
+            } else {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     label: {
@@ -166,7 +169,6 @@ const QuestionnaryForm = () => {
             }
         }
         if (id === 'fileType') {
-            // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
@@ -237,6 +239,18 @@ const QuestionnaryForm = () => {
             }
         }
 
+        if (fieldSettingParams[selectedQuestionId]?.fileSize) {
+            // Restrict input to values between 1 and 10
+            const numericValue = parseInt(updatedValue, 10); // Convert to a number
+            if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 10) {
+                updatedValue = numericValue.toString(); // Valid input
+            } else {
+                updatedValue = ""; // Reset the input if invalid
+            }
+        }
+        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+
+
         // Validate incrementby value against the max range
         if (id === 'incrementby') {
             const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
@@ -255,12 +269,10 @@ const QuestionnaryForm = () => {
             }
         }
 
-
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
         update[data[0]] = false;
         setDataIsSame(update);
-
 
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {
@@ -373,6 +385,7 @@ const QuestionnaryForm = () => {
             console.log('error while getting ')
         }
     }
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const sectionId = `SEC-${uuidv4()}`;
@@ -701,7 +714,7 @@ const QuestionnaryForm = () => {
             setSaveClick(false);
         }
 
-        
+
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -1404,25 +1417,25 @@ const QuestionnaryForm = () => {
         // Check if there are any validation errors
         // console.log(validationErrors)
         const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
-    
+
         if (hasValidationErrors) {
             setToastError('Please fix the validation errors before saving.');
             setGlobalSaveLoading(false);
             return;
         }
-    
+
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-    
+
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
                 let pageKey = '';
                 let questionKey = '';
-    
+
                 if (keys.length > 3) {
                     // replacing as bdd records will have additional key as bddtest# which will not be there in the normal user journey
                     sectionKey = keys[1].replace('bddtest#', '');
@@ -1433,7 +1446,7 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-    
+
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1516,7 +1529,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
-    
+
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1944,6 +1957,8 @@ const QuestionnaryForm = () => {
                         sectionsData={sections}
                         setConditions={setConditions}
                         conditions={conditions}
+                        setSectionDetails={setSectionDetails}
+                        sectionDetails={sectionDetails}
                     />
                 )
             }

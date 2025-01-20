@@ -24,6 +24,8 @@ function AdvancedEditor({
     isChoiceboxField,
     choiceboxValues
 }) {
+    console.log(isChoiceboxField, 'isChoiceboxField')
+    const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [choiceValues, setChoiceValues] = useState([]);
@@ -60,6 +62,7 @@ function AdvancedEditor({
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
+
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
@@ -109,6 +112,8 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
+    console.log(showSectionList,showMethodSuggestions,filteredSuggestions,isChoiceboxField, 'filteredSuggestions')
+
     return (
         <div className='mr-[18px] mt-[4%]'>
             <div className='relative h-[230px]'>
@@ -124,7 +129,8 @@ function AdvancedEditor({
                     onKeyDown={handleKeyDown}
                     ref={textareaRef}
                     value={inputValue}
-                ></textarea>
+                >
+                </textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
             {error ? (
