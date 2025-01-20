@@ -77,7 +77,6 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                                                 </span>
                                             )}
                                     </td>
-                                    {/* <td className={`py-6 text-start bg-[#F4F6FA]  px-6 ${getStatusStyles(QueInfo?.status)}`} title={`${getStatusText(QueInfo?.status)}`}>{getStatusText(QueInfo?.status) || '-'}</td> */}
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6'>{QueInfo?.asset_name || '-' }</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] pr-6 max-w-[200px] truncate whitespace-break-spaces'>{QueInfo?.description}</td>
                                     <td className=' py-6 text-start bg-[#F4F6FA] min-w-[120px]  flex justify-center sticky right-0 rounded-tr-[10px] rounded-br-[10px]'>

@@ -132,7 +132,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 setMaxLengthError(false)
             } else {
                 // Optional: Set an error message or prevent input
-                // setToastError("Invalid Choices");
                 setMaxLengthError(true)
             }
         }
@@ -482,7 +481,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 isView={isView?.open}
                 title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
                 createLookup={!isView?.open}
-                // handleAddChoice={handleAddChoice}
                 shimmerLoading={shimmerLoading}
                 handleRemoveChoice={handleRemoveChoice}
                 setData={setData}
@@ -491,7 +489,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 initialState={initialState}
                 maxLengthError={maxLengthError}
                 disableDelete={disableDelete}
-            // handleView={handleView}
             />
         </>
     )

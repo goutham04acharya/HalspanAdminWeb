@@ -214,9 +214,7 @@ function VersionList() {
                             setDataLoading={setDataLoading}
                             dataLoading={dataLoading} />
                     </div>
-
                 </div>
-
             </div>
 
             {isCreateModalOpen && <VersionEditModal

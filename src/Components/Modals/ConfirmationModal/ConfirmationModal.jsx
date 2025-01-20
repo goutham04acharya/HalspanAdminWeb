@@ -15,10 +15,6 @@ function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Butto
         setSectionWarningShown(false);
     };
 
-    // useOnClickOutside(modalRef, () => {
-    //     dispatch(setModalOpen(false));
-    // });
-
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (modalRef.current && !modalRef.current.contains(event.target)) {
