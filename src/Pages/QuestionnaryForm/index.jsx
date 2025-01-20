@@ -70,7 +70,6 @@ const QuestionnaryForm = () => {
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
-    const [isSaveClick, setIsSaveClick] = useState(false);
     const [sectionDetails, setSectionDetails] = useState({})
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
@@ -1405,7 +1404,7 @@ const QuestionnaryForm = () => {
     }
 
     const globalSaveHandler = async (key) => {
-        if(isSaveClick && !key){
+        if(!key){
             setGlobalSaveLoading(true);
         }else{
             setGlobalSaveLoading(false)
@@ -1547,7 +1546,7 @@ const QuestionnaryForm = () => {
             }
             setSectionDetails(sectionBody);
             cleanSections();
-            if(isSaveClick && !key){
+            if(!key){
                 let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
                 // Sync compareSavedSections with the updated sections
                 setCompareSavedSections(sections);
@@ -1760,7 +1759,6 @@ const QuestionnaryForm = () => {
                                 className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
                                 disabled={formStatus !== 'Draft'} 
                                 onClick={() => {
-                                    setIsSaveClick(true)
                                     globalSaveHandler();
                                 }}
                             />
