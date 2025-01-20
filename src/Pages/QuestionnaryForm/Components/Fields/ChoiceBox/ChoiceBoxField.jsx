@@ -45,7 +45,7 @@ const ChoiceBoxField = ({
                 ...prevValues[section_name],
                 [page_name]: {
                     ...prevValues[section_name]?.[page_name],
-                    [label]: selectedValue,
+                    [label]: selectedValue.value,
                 },
             },
         }));
