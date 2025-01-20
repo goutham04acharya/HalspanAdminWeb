@@ -72,7 +72,6 @@ const QuestionnaryForm = () => {
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [isSaveClick, setIsSaveClick] = useState(false);
     const [sectionDetails, setSectionDetails] = useState({})
-    console.log(sectionDetails, 'section details')
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -587,7 +586,6 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             setSectionDetails(response?.data?.data);
-            console.log(response?.data?.data, 'response')
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -1415,7 +1413,6 @@ const QuestionnaryForm = () => {
         
     
         // Check if there are any validation errors
-        // console.log(validationErrors)
         const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
 
         if (hasValidationErrors) {
@@ -1876,7 +1873,6 @@ const QuestionnaryForm = () => {
                     />
                 )
             }
-            {console.log(questionToDelete,selectedQuestionId, 'questionToDelete')}
             {
 
                 showquestionDeleteModal && (

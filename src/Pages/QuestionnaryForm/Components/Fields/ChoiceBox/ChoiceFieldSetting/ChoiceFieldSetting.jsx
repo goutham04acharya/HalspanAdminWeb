@@ -82,16 +82,10 @@ function ChoiceFieldSetting({
             value: item.lookup_id,
             label: item.name
           }));
-          console.log(lastEvaluatedKeyRef.current, 'current')
-          console.log(searchTerm, 'searchTerm')
-          console.log(params.start_key, 'params.start_key')
           let updateOptions;
           if (params.start_key) {
-            console.log('first', optionDataRef.current)
             updateOptions = [...optionDataRef.current, ...transformedArray]
-            console.log('updateOptions', updateOptions)
           } else {
-            console.log('second')
             updateOptions = [...transformedArray]
           }
           setOptionData(updateOptions);

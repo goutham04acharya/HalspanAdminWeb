@@ -90,8 +90,6 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
         }
     };
 
-
-
     const handleKeyDown = (e) => {
         // Allow control keys, numbers, and colon only
         const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab', ':'];
@@ -100,7 +98,6 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
             e.preventDefault();
         }
     };
-
 
     useOnClickOutside(dropdownRef, () => {
         setIsDropdown(false);

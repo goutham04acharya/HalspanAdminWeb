@@ -53,12 +53,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
         }
     };
 
-
-    const handlePinMouseDown = (index, event) => {
-        event.stopPropagation();
-        setActivePinIndex(index);
-    };
-
     const handlePinMouseMove = (event) => {
         if (activePinIndex !== null && imageRef.current) {
             const rect = imageRef.current.getBoundingClientRect();
@@ -82,7 +76,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
 
     const handleZoom = (ref) => {
         setCurrentZoom(ref.state.scale);
-
     };
 
     const handleRemovePin = (id) => {
@@ -94,7 +87,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
         setIsDrawMode(false);
         setEraserClick(false)
         setResetClick(false)
-        // setColorPicker(false)
     };
 
     const toggleDrawMode = () => {
@@ -111,8 +103,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
         setResetClick(false)
         setIsPinMode(false);
         setIsDrawMode(false);
-        // setColorPicker(false)
-
     };
 
     const handleResetClick = () => {
@@ -120,7 +110,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
         setResetClick(!resetClick)
         setIsPinMode(false);
         setIsDrawMode(false);
-        // setColorPicker(false)
         setEraserClick(false)
     };
 
@@ -160,12 +149,10 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
                         width: '358px',
                         borderRadius: '52px'
                     }}
-                // className="mx-auto"
                 >
                     <div
                         style={{
                             backgroundColor: "transparent",
-                            // padding: "20px",
                             borderRadius: "10px",
                             maxWidth: "90vw",
                             maxHeight: "90vh",
@@ -267,8 +254,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
                                             </div>
                                         </React.Fragment>
                                     ))}
-
-
                                 </div>
                             </TransformComponent>
                         </TransformWrapper>
@@ -312,7 +297,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
                                         type='color'
                                         onChange={(e) => setStrokeColor(e.target.value)}
                                         value={strokeColor}
-                                        // style={{ display: 'none' }}
                                         className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent ' />
                                 </span>}
                             </div><button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button><button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button></>}
