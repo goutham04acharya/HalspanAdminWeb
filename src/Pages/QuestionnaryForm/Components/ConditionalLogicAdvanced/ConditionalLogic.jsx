@@ -1703,11 +1703,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             setSelectedType={setSelectedType}
                                             isDefaultLogic={isDefaultLogic}
                                             setSelectedQuestion={setSelectedQuestion}
-<<<<<<< HEAD
-=======
                                             isChoiceboxField={isChoiceboxField}
                                             choiceboxValues={choiceboxValues}
->>>>>>> 8037d8b479c2a1eeb0f6eae4a72f736d1eddabf9
                                         />
                                     </div>
                                     <div className='w-[40%]'>
