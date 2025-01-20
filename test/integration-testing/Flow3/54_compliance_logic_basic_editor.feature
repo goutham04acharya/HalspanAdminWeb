@@ -2,13 +2,6 @@
 Feature: Halspan - Admin adds the condition in basic editor
     As a admin I want to test the compliance logic basic editor
 
-       Scenario: Admin logs in with valid credentials
-        Given I am on the login page
-        When I enter valid email address as "nayana.sk@7edge.com"
-        * I enter valid password as "dApje7-nepnig-vibqyc"
-        * I click the submit button
-        Then I should be redirected to the questionnaire listing screen
-
    @create_question
     Scenario Outline: Admin views all types of field and adds choice field from the add field section
         Given I am on the questionnaire management section
