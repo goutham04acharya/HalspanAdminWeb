@@ -117,6 +117,7 @@ function AdvancedEditor({
     useEffect(() => {
         setFilteredSuggestions(secDetailsForSearching);
     }, [secDetailsForSearching]);
+
     return (
         <div className='mr-[18px] mt-[4%]'>
             <div className='relative h-[230px]'>
@@ -132,7 +133,8 @@ function AdvancedEditor({
                     onKeyDown={handleKeyDown}
                     ref={textareaRef}
                     value={inputValue}
-                ></textarea>
+                >
+                </textarea>
                 <span className="absolute left-[2%] top-[6.9%] cursor-pointer">=</span>
             </div>
             {error ? (

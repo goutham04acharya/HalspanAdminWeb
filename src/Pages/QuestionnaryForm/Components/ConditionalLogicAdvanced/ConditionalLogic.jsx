@@ -29,7 +29,6 @@ dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
     setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
-    console.log(sectionDetails, 'sectionDetails')
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -183,7 +182,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
         const questionDetailsArray = [];
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
 
             // Access pages within each section
@@ -205,10 +204,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                 });
             });
-            console.log(sectionDetailsArray, 'sectionDetailsArray')
         });
         // Return the array containing all the details
         setSecDetailsForSearching(sectionDetailsArray);
+        console.log(secDetailsForSearching, 'secDetailsForSearching');
         setQuestionType(questionDetailsArray);
     };
 
@@ -218,7 +217,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
 
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
             // sectionDetailsArray.push(sectionName); // Add the section name
 
@@ -240,45 +239,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 });
             });
         });
+        console.log(sectionDetailsArray, 'sectionDetailsArrayhere');
         // Return the array containing all the details
         return sectionDetailsArray;
     };
-
-    // function getSectionPageQuestionNames(sectionData) {
-    //     const result = [];
-
-    //     sectionData.forEach((section) => {
-    //         const sectionName = section.section_name.replace(/ /g, '_');
-
-    //         section.pages.forEach((page) => {
-    //             const pageName = page.page_name.replace(/ /g, '_');
-
-    //             page.questions.forEach((question) => {
-    //                 const questionName = question.question_name.replace(/ /g, '_');
-    //                 const fieldType = getFieldType(question.component_type);
-    //                 sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-    //                     ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-    //                     [(question.question_name).replaceAll(' ', '_')]: fieldType
-    //                 }
-
-    //                 // Combine sectionName, pageName, and questionName
-    //                 result.push(`${sectionName}.${pageName}.${questionName}`);
-    //             });
-    //         });
-    //     });
-    //     dispatch(setAllSectionDetails(result));
-    //     handleQuestionnaryObject(result);
-
-    //     console.log(result, 'ttttttt')
-    //     return result;
-    // }
 
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
         // getSectionPageQuestionNames(sectionsData);
         setShowSectionList(true)
         // const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
-        // console.log(response, 'response')
         dispatch(setAllSectionDetails(sectionDetails));
         handleQuestionnaryObject(sectionDetails);
         setIsThreedotLoaderBlack(false);
@@ -313,93 +283,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [allSectionDetails]);
 
     function handleQuestionnaryObject(allSectionDetails) {
-        console.log(allSectionDetails, 'check now')
         let result = {};
-        // let tempArray = [];
-        if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
-            allSectionDetails?.data?.sections.forEach((section) => {
+        if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
+            allSectionDetails.sections.forEach((section) => {
+                const sectionKey = section.section_name.replaceAll(' ', '_');
                 let sectionObject = {
-                    [(section.section_name).replaceAll(' ', '_')]: {}
+                    [sectionKey]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
+                        const pageKey = page.page_name.replaceAll(' ', '_');
+                        sectionObject[sectionKey][pageKey] = {};
+
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 if (question?.component_type === 'dateTimefield') {
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
+                                const questionKey = question.question_name.replaceAll(' ', '_');
                                 const fieldType = getFieldType(question.component_type);
-                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
-                                }
-
+                                sectionObject[sectionKey][pageKey][questionKey] = fieldType;
                             });
                         }
                     });
                 }
+                console.log(sectionObject, 'sectionObject');
+
                 result = {
                     ...result,
                     ...sectionObject
                 }
                 setSections(result);
-                console.log(result, 'hererererr')
+                console.log(sections, 'sections');
             });
             setDatetimefieldQuestions(datetimefieldQuestions);
         }
     }
-
-    // function handleQuestionnaryObject(allSectionDetails) {
-    //     console.log(allSectionDetails, 'allSectionDetails');
-
-    //     let result = {}; // Final object to store sections
-    //     let datetimefieldQuestions = []; // To store datetimefield questions
-
-    //     // Ensure `sections` data exists and has length
-    //     if (allSectionDetails?.data?.sections?.length > 0) {
-    //         allSectionDetails.data.sections.forEach((section) => {
-    //             // Add section as a key in the result object
-    //             const sectionKey = (section.section_name).replaceAll(' ', '_');
-    //             if (!result[sectionKey]) {
-    //                 result[sectionKey] = {};
-    //             }
-
-    //             // Iterate over pages
-    //             if (section.pages?.length > 0) {
-    //                 section.pages.forEach((page) => {
-    //                     const pageKey = (page.page_name).replaceAll(' ', '_');
-    //                     if (!result[sectionKey][pageKey]) {
-    //                         result[sectionKey][pageKey] = {};
-    //                     }
-
-    //                     // Iterate over questions
-    //                     if (page.questions?.length > 0) {
-    //                         page.questions.forEach((question) => {
-    //                             const questionKey = (question.question_name).replaceAll(' ', '_');
-    //                             const fieldType = getFieldType(question.component_type);
-
-    //                             // Add the question to the page object
-    //                             result[sectionKey][pageKey][questionKey] = fieldType;
-
-    //                             // Handle datetimefield questions
-    //                             if (question.component_type === 'dateTimefield') {
-    //                                 datetimefieldQuestions.push(question);
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //             }
-    //         });
-
-    //         // Update states with results
-    //         setSections(result);
-    //         setDatetimefieldQuestions(datetimefieldQuestions);
-
-    //         console.log(result, 'Processed Result');
-    //         console.log(datetimefieldQuestions, 'DateTimeField Questions');
-    //     }
-    // }
-
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
@@ -525,7 +444,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const textAfter = textarea.value.substring(end);
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
             let newText;
-    
+
             if ((charBeforeCursor === ' ' || charBeforeCursor === '.' || charBeforeCursor === `'`) || cursorPosition === 0) {
                 newText = textBefore + textToInsert + textAfter;
             } else {
@@ -697,7 +616,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
 
             const [_, question_name, timestamp, offsetDays] = match;
-            const question = getDetails(question_name.trim(), allSectionDetails.data);
+            const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
 
@@ -732,7 +651,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (question_name.includes('.length')) {
                         question_name = question_name.replaceAll('.length', '');
                     }
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
+                    let question = getDetails(question_name.trim(), allSectionDetails.sections);
 
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
@@ -940,7 +859,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
-
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
