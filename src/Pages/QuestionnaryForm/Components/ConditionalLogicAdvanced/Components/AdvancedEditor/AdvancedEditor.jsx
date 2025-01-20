@@ -19,13 +19,10 @@ function AdvancedEditor({
     isThreedotLoaderBlack,
     smallLoader,
     setSelectedType,
-    combinedArray,
     setSelectedQuestion,
     isChoiceboxField,
     choiceboxValues
 }) {
-    console.log(isChoiceboxField, 'isChoiceboxField')
-    const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [choiceValues, setChoiceValues] = useState([]);
