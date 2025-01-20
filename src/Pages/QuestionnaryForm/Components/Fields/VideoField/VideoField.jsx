@@ -19,7 +19,9 @@ function VideoField({ label,
     setValidationErrors,
     setValue,
     setConditionalValues,
-    sections
+    sections,
+    setIsModified,
+    isModified
 }) {
     const [fileName, setFileName] = useState('');
     const [fileState, setFileState] = useState({}); // Create a state to store the filename   
@@ -77,6 +79,7 @@ function VideoField({ label,
                 }
             }
         }));
+        setIsModified(!isModified)
     };
 
     const handleVideoRemove = (fileList, fileNameToRemove) => {
@@ -117,6 +120,7 @@ function VideoField({ label,
                 }
             }
         }));
+        setIsModified(!isModified)
     };
 
 

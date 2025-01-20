@@ -17,7 +17,7 @@ export default {
                 'customh11': 'calc(100vh - 460px)',
                 'customh12': 'calc(100vh - 353px)',
                 'customh13': 'calc(100vh - 315px)',
-                'customh14': 'calc(100vh - 250px)',
+                'customh14': 'calc(100% - 20px)',
                 'customh15': 'calc(100vh - 135px)',
                 'customh16': 'calc(100vh - 524px)',
                 'customh17': 'calc(100vh - 200px)',

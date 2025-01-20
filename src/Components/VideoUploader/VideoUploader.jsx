@@ -16,11 +16,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
         // Calculate how many more files we can add
         const currentFileCount = questionValue?.[question?.question_id]?.length || 0;
         const remainingSlots = max - currentFileCount;
-        
-        // if (remainingSlots <= 0) {
-        //     setError(`Maximum ${max} files allowed`);
-        //     return;
-        // }
 
         // Take only the first N files that would fit within the max limit
         const filesToProcess = uploadedFiles.slice(0, remainingSlots);

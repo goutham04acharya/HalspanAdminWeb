@@ -65,9 +65,6 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, setIsModif
         setValue((prev) => ({ ...prev, [question?.question_id]: true }));
     };
     
-    
-    
-
     const handleImageRemove = (index) => {
         const newImages = [...questionValue?.[question?.question_id] ];
         newImages.splice(index, 1);

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
+const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -53,12 +53,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
         }
     };
 
-
-    const handlePinMouseDown = (index, event) => {
-        event.stopPropagation();
-        setActivePinIndex(index);
-    };
-
     const handlePinMouseMove = (event) => {
         if (activePinIndex !== null && imageRef.current) {
             const rect = imageRef.current.getBoundingClientRect();
@@ -82,7 +76,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
 
     const handleZoom = (ref) => {
         setCurrentZoom(ref.state.scale);
-
     };
 
     const handleRemovePin = (id) => {
@@ -94,7 +87,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
         setIsDrawMode(false);
         setEraserClick(false)
         setResetClick(false)
-        // setColorPicker(false)
     };
 
     const toggleDrawMode = () => {
@@ -111,8 +103,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
         setResetClick(false)
         setIsPinMode(false);
         setIsDrawMode(false);
-        // setColorPicker(false)
-
     };
 
     const handleResetClick = () => {
@@ -120,15 +110,14 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
         setResetClick(!resetClick)
         setIsPinMode(false);
         setIsDrawMode(false);
-        // setColorPicker(false)
         setEraserClick(false)
     };
 
     return (
         <div>
             <div
-                style={{ width: "100px", height: "100px", position: "relative", cursor: "pointer" }}
-                onClick={handleImageClick}
+                className={`w-[100px] h-[100px] relative ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
+                onClick={!readOnly && handleImageClick}
                 data-testid="floorplan-image"
             >
                 <img
@@ -160,12 +149,10 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
                         width: '358px',
                         borderRadius: '52px'
                     }}
-                // className="mx-auto"
                 >
                     <div
                         style={{
                             backgroundColor: "transparent",
-                            // padding: "20px",
                             borderRadius: "10px",
                             maxWidth: "90vw",
                             maxHeight: "90vh",
@@ -267,8 +254,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
                                             </div>
                                         </React.Fragment>
                                     ))}
-
-
                                 </div>
                             </TransformComponent>
                         </TransformWrapper>
@@ -312,7 +297,6 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
                                         type='color'
                                         onChange={(e) => setStrokeColor(e.target.value)}
                                         value={strokeColor}
-                                        // style={{ display: 'none' }}
                                         className=' top-[25%] w-[40px] h-[40px] left-0 bg-transparent ' />
                                 </span>}
                             </div><button onClick={handleEraserClick} className='pb-[2px] px-3 text-white rounded-lg cursor-pointer'><img className={`${eraserClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/eraser.svg" alt="" /></button><button onClick={handleResetClick} className='pb-3 px-3 text-white rounded-lg cursor-pointer'><img className={`${resetClick ? 'border border-white rounded-sm' : ' border border-transparent'}`} src="/Images/reset.svg" alt="" /></button></>}

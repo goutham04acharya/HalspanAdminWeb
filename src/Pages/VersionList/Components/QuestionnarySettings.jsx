@@ -13,6 +13,7 @@ function QuestionnarySettings({
     validationErrors,
     editedDetails,
     dataLoading,
+    setDataLoading,
 }) {
     const { PatchAPI } = useApi();
     const { setToastError, setToastSuccess } = useContext(GlobalContext);

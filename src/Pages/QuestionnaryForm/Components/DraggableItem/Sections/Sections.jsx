@@ -21,7 +21,7 @@ const Sections = ({
   handleAddRemoveQuestion,
   sections,
   setSections,
-  handleAutoSave,
+  // handleAutoSave,
   setSelectedPage,
   formStatus,
   setDropdown,
@@ -92,7 +92,7 @@ const Sections = ({
     const updatedDataIsSame = { ...dataIsSame };
     updatedDataIsSame[sectionId] = false;
     dispatch(setDataIsSame(updatedDataIsSame));
-    handleAutoSave(sectionId, updatedSections);
+    // handleAutoSave(sectionId, updatedSections);
   };
 
   useEffect(() => {
@@ -225,7 +225,7 @@ const Sections = ({
                           sectionIndex={sectionIndex}
                           handleAddRemoveQuestion={handleAddRemoveQuestion}
                           sections={sections}
-                          handleAutoSave={handleAutoSave}
+                          // handleAutoSave={handleAutoSave}
                           setSections={setSections}
                           formStatus={formStatus}
                         />

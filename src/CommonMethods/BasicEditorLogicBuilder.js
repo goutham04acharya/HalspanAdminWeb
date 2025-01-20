@@ -4,13 +4,14 @@
 
 import { formatDate, reverseFormat, reversingFormat } from "./FormatDate";
 
+let isMultiChoice = false;
 // Function to handle logic transformation
-export const buildLogicExpression = (question_name, condition_logic, value, date) => {
+export const buildLogicExpression = (question_name, condition_logic, value, date, isMultiChoice) => {
     switch (condition_logic) {
         case 'equals':
-            return `${question_name} === "${value}"`;
+            return `${question_name} === "${isMultiChoice ? value.toString() : value}"`;
         case 'not equal to':
-            return `${question_name} !== "${value}"`;
+            return `${question_name} !== "${isMultiChoice ? value.toString() : value}"`;
         case 'includes':
             return `${question_name}.includes("${value}")`;
         case 'does not include':
@@ -50,12 +51,16 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
 };
 
 // Main function to build the overall condition expression
-export const buildConditionExpression = (conditionsArray) => {
+export const buildConditionExpression = (conditionsArray, combinedArray) => {
     return conditionsArray?.map((conditionGroup) => {
         const expressions = conditionGroup.conditions.map((cond) => {
             const { question_name, condition_logic, value, date } = cond;
+            const matchedQuestion = combinedArray.find(q => q.question_detail === question_name);
+            if (matchedQuestion && matchedQuestion.type === 'multi_choice') {
+                isMultiChoice = true;
+            }
             // Use the buildLogicExpression function for each condition
-            return `${buildLogicExpression(question_name, condition_logic, value, date)}`;
+            return `${buildLogicExpression(question_name, condition_logic, value, date, isMultiChoice)}`;
         });
 
         // Join expressions with " && " and wrap the entire expression in parentheses
