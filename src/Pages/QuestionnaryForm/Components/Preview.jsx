@@ -458,6 +458,14 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         return acc; // Skip hidden questions  
                     }
 
+                    if(question?.options?.read_only){
+                        return acc;
+                    }
+
+                    if(!question?.options?.visible){
+                        return acc;
+                    }
+
                     // Initialize the field error accumulator for each component type  
                     if (!acc[`preview_${question?.component_type}`]) {
                         acc[`preview_${question?.component_type}`] = {};  // Create an empty object for each component type  
@@ -763,6 +771,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     values={value[question?.question_id]}
                     setIsModified={setIsModified}
                     isModified={isModified}
+                    handleChange={''}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -1003,6 +1012,9 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
+                                    if(!list?.options?.visible){
+                                        return null;
+                                    }
                                     if (list?.conditional_logic) {
                                         if (list?.conditional_logic?.includes("new Date(")) {
                                             try {

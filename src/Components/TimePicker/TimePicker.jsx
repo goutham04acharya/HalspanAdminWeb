@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import useOnClickOutside from '../../CommonMethods/outSideClick';
 
-const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validationErrors }) => {
+const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validationErrors, readOnly }) => {
     const [time, setTime] = useState('');
     const [isDropdownOpen, setIsDropdown] = useState(false);
     const [hour, setHour] = useState('');
@@ -142,7 +142,7 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
             <div className="relative w-full">
                 <input
                     type="text"
-                    className={`custom-time-input py-2 px-[18px] text-[#2B333B]`}
+                    className={`custom-time-input py-2 px-[18px] text-[#2B333B] ${readOnly ? 'bg-gray-50' : ''}`}
                     value={time || questionValue || (format === "24" ? "hh:mm:ss" : "hh:mm:ss AM/PM")}
                     // readOnly // Prevent direct editing
                     onChange={handleTimeChange}
@@ -150,12 +150,13 @@ const TimePicker = ({ onChange, format, setErrorMessage, questionValue, validati
                     onKeyDown={handleKeyDown}
                     onClick={() => setIsDropdown(!isDropdownOpen)}
                     placeholder={format === "24" ? "hh:mm:ss" : "hh:mm:ss AM/PM"}
+                    disabled={readOnly}
                 />
-                <img
+                {!readOnly && <img
                     src="/Images/clock-primary.svg"
                     alt="clock"
                     className="time-icon"
-                />
+                />}
             </div>
             {isDropdownOpen && (
                 <div ref={dropdownRef} className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-[99]">

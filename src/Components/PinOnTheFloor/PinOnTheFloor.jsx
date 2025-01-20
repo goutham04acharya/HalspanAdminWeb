@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
+const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw, readOnly }) => {
     const [pins, setPins] = useState([]);
     const imageRef = useRef(null);
     const [activePinIndex, setActivePinIndex] = useState(null);
@@ -127,8 +127,8 @@ const ImageZoomPin = ({ imageSrc, floorPlan, isPin, isDraw }) => {
     return (
         <div>
             <div
-                style={{ width: "100px", height: "100px", position: "relative", cursor: "pointer" }}
-                onClick={handleImageClick}
+                className={`w-[100px] h-[100px] relative ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
+                onClick={!readOnly && handleImageClick}
                 data-testid="floorplan-image"
             >
                 <img
