@@ -587,7 +587,7 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             setSectionDetails(response?.data?.data);
-            console.log(response?.data?.data?.sections, 'response')
+            console.log(response?.data?.data, 'response')
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -1134,14 +1134,6 @@ const QuestionnaryForm = () => {
         dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
     }
-
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         handleDeleteSection(sections[sectionToDelete].section_id);
-    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
-    //         dispatch(setModalOpen(false)); // Close the modal  
-    //     }
-    // }
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
@@ -1982,16 +1974,6 @@ const QuestionnaryForm = () => {
                     sectionDetails={sectionDetails}
                 />
             }
-            {/* {sectionWarningShown && <ConfirmationModal
-                setModalOpen={setModalOpen}
-                isOpen={isModalOpen}
-                text="This Section can’t be moved here"
-                subText="It is connected to another Section, and can’t be placed before it."
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                src={`testing-error`}
-                sectionWarningShown={sectionWarningShown}
-                setSectionWarningShown={setSectionWarningShown}
-            />} */}
         </>
     );
 }
