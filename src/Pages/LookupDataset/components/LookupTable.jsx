@@ -18,7 +18,7 @@ function LookupTable({ loading, LookupList, lastElementRef, handleView, setDelet
                     ? <Shimmer column={3} row={10} firstIndex />
                     : <tbody className='bg-white'>
                         {LookupList && LookupList.map((LookupInfo, index) => (
-                            <React.Fragment key={LookupInfo?.lookup_id}>
+                            <React.Fragment key={index}>
                                 <tr className='rounded-[10px] mt-[18px]'>
                                     <td className='pl-10 py-5 text-start bg-[#F4F6FA] rounded-tl-[10px] rounded-bl-[10px]'>{LookupInfo?.lookup_id}</td>
                                     <td className='py-5 text-start font-semibold max-w-[100px] text-base text-[#2B333B] pr-6 bg-[#F4F6FA]' title={LookupInfo?.name}>{LookupInfo?.name}</td>

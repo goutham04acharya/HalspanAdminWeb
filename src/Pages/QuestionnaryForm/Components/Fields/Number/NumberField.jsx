@@ -109,7 +109,6 @@ function NumberField({
         }
     };
     const handleInputChange = (e) => {
-        // debugger
         const newValue = e.target.value
         const invalidKeys = ['e'];
         if (invalidKeys.includes(e.key)) {
@@ -160,7 +159,7 @@ function NumberField({
                 type={type}
                 id={textId}
                 value={`${fieldSettingParameters?.preField ? fieldSettingParameters.preField : ''}${fieldSettingParameters?.postField ? ` ${fieldSettingParameters.postField}` : ''}`}
-                className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                 placeholder={fieldSettingParameters?.placeholderContent}
                 onChange={() => handleChange(fieldSettingParameters)}
             /> : ((preview && question?.source === 'entryfield') || (preview && question?.source === 'both')) ?
@@ -176,15 +175,15 @@ function NumberField({
                         min={preview ? question?.field_range?.min : minRange}
                         max={preview ? question?.field_range?.max : maxRange}
                         value={questionValue[question?.question_id]}
-                        className={`w-full h-auto break-words  bg-white py-3 px-4 mt-1 mb-1 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
+                        className={`w-full h-auto break-words  ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 rounded-lg outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9]`}
                         // onChange={(e) => handleInputChange(e)}
                         placeholder={question?.placeholder_content}
+                        disabled={question?.options?.read_only}
                         onChange={(e) => {
                             const value = e.target.value;
                             const numValue = parseFloat(value);
                             const min = preview ? question?.field_range?.min : minRange;
                             const max = preview ? question?.field_range?.max : maxRange;
-                            console.log(numValue, value, min, max, numValue >= min && numValue <= max)
                             if ((min === undefined || max === undefined) ||(numValue >= min && numValue <= max)) {
                                 
                                 handleInputChange(e);
@@ -217,6 +216,7 @@ function NumberField({
                                 }}
                                 className='mt-6  w-full'
                                 data-testid="number-slider"
+                                disabled={question?.options?.read_only}
                             />
                         </div>
                         <p className={`w-auto max-w-[10%] break-all overflow-auto mt-5 ml-2`}>{preview ? question?.field_range?.max : fieldSettingParameters?.max}</p>

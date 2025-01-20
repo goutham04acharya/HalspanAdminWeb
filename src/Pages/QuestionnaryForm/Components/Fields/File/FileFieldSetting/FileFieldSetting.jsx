@@ -54,7 +54,7 @@ function FileFieldSetting({ handleInputChange,
                             testId='file-size'
                             formStatus={formStatus}
                             htmlFor='fileSize'
-                            maxLength={10}
+                            maxLength={2}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
                     <div className='flex flex-col justify-start mt-7'>

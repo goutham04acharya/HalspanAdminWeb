@@ -68,10 +68,15 @@ function CreateQuestionnary() {
 
   const handleChange = (e, id) => {
     const { value } = e.target;
-
+    // console.log(value.length, 'value')
     // Define a regular expression to allow only alphanumeric characters and spaces
     const regex = /^[^?/&]*$/;
-
+    // if(value.length < 2){
+    //   setValidationErrors((prevErrors) => ({
+    //     ...prevErrors,
+    //     [id]: value,
+    //   }));
+    // }
     if (regex.test(value)) {
       setCreateDetails((prevState) => ({
         ...prevState,
@@ -102,12 +107,15 @@ function CreateQuestionnary() {
       services_type: selectedOption?.services_type?.value,
       is_adhoc: createDetails?.is_adhoc,
     };
-
     if (!createDetails.public_name.trim()) {
       errors.public_name = 'This field is mandatory';
+    }else if(createDetails.public_name.trim().length < 2){
+      errors.public_name = 'Public name requires at least 2 characters';
     }
     if (!createDetails.internal_name.trim()) {
       errors.internal_name = 'This field is mandatory';
+    } else if(createDetails.internal_name.trim().length < 2){
+      errors.internal_name = 'Internal name requires at least 2 characters';
     }
     if (!selectedOption.asset_name) {
       errors.asset_name = 'This field is mandatory';
@@ -120,6 +128,8 @@ function CreateQuestionnary() {
     }
     if (!createDetails.description.trim()) {
       errors.description = 'This field is mandatory';
+    } else if(createDetails.description.trim().length < 2){
+      errors.description = 'Description requires at least 2 characters';
     }
 
     setValidationErrors(errors);
@@ -238,7 +248,7 @@ function CreateQuestionnary() {
 
   return (
     <div className='bg-[#F4F6FA] p-7 h-customh2'>
-      <div className='bg-white py-10 px-9 rounded-[10px] h-customh3'>
+      <div className='bg-white py-10 px-9 rounded-[10px] h-customh3 overflow-auto scrollBar'>
         <p className='font-medium text-[#2B333B] text-[28px]'>Create Questionnaire</p>
         <div className='flex items-start'>
           <div className='w-[70%]'>

@@ -129,6 +129,7 @@ function VersionList() {
         const response = await getAPI(`questionnaires/versions/${questionnaire_id}`)
         setVersionList(response?.data)
         setLoading(false);
+        setDataLoading(false)
     }
 
     const handleQuestionnariesSetting = async () => {

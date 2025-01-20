@@ -111,12 +111,13 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     };
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
-        const [sectionPart, pagePart, questionPart] = path.split('.');
-
+        // const path = "Section_1.Page_1.Question_1.";
+        const [sectionPart, pagePart, questionPart] = path.split('.', 3);
+        const fullQuestionPart = path.split('.').slice(2).join('.');  // To include everything after the second dot
         // Step 2: Replace underscores with spaces to match the actual names
         const sectionName = sectionPart?.replace(/_/g, ' ');
         const pageName = pagePart?.replace(/_/g, ' ');
-        const questionName = questionPart?.replace(/_/g, ' ');
+        const questionName = fullQuestionPart?.replace(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.sections.find(section => section.section_name === sectionName);
@@ -135,7 +136,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         if (!matchingQuestion) {
             return null; // No matching question found
         }
-
         // Step 6: Return the matching question details
         return matchingQuestion;
     }
@@ -220,7 +220,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
     const getConditions = (key) => {
         let arr = ['No conditions available'];
-        if(secDetailsForSearching.length > 0){
+        if (secDetailsForSearching.length > 0) {
             switch (key) {
                 case "textboxfield":
                 case "choiceboxfield":
@@ -241,7 +241,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 default:
                     return arr; // This is the fallback if none of the cases match
             }
-        }else{
+        } else {
             return arr;
         }
     }
@@ -277,7 +277,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         return true;
     }
 
-
     //handler for datepicker
     const handleDatePicker = (dateString, mainIndex, subIndex) => {
 
@@ -294,6 +293,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return updatedConditions;
         });
     }
+
     const handleClearConditionValues = () => {
         setConditions((prevConditions) =>
             prevConditions.map((conditionGroup) => ({
@@ -310,6 +310,8 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             }))
         );
     };
+
+
     // Custom handler function for clicks outside the dropdown
     const handleOutsideClick = () => {
         const updatedConditions = conditions.map(item => ({
@@ -348,7 +350,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     useOnClickOutsideById('condition_dropdown_inner', handleOutsideClick2);
     useOnClickOutsideById('dropdown_inner', handleOutsideClick);
     useOnClickOutsideById('value_inner', handleOutsideClick3);
-
     return (
         <div className='w-full h-customh14'>
             {sectionConditionLogicId || pageConditionLogicId ? (
