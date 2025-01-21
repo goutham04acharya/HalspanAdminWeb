@@ -27,7 +27,7 @@ import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 import { list } from 'postcss';
 import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
-function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails }) {
+function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails, questionnaireComplianceLogic }) {
     const modalRef = useRef();
     const { getAPI } = useApi();
     const dispatch = useDispatch();
@@ -86,39 +86,15 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         const fetchSections = async () => {
             setLoading(true);
             try {
-                const [layoutResponse, questionnaireResponse] = await Promise.all([
-                    getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`),
-                    getAPI(`questionnaires/${questionnaire_id}/${version_number}`)
-                ]);
-
-                const questionnaireSections = questionnaireResponse?.data?.data?.sections;
-                const layoutSections = layoutResponse?.data?.data?.sections;
-                const complianceRules = layoutResponse?.data?.data?.compliance_logic;
-
                 // Store compliance logic
-                setComplianceLogic(complianceRules || []);
-
-                // ... rest of the section organization logic remains the same
-                const sectionIdMap = {};
-                layoutSections.forEach((section) => {
-                    sectionIdMap[section.id] = section.index;
-                });
-
-                // let reorganizedSections = questionnaireSections.sort((a, b) => {
-                //     return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
-                // });
-                const reorganizedSections = questionnaireSections
-                    .sort((a, b) => sectionIdMap[a.section_id] - sectionIdMap[b.section_id]) // Sorting sections
-                    .filter((section) =>
-                        section?.pages?.some((page) => page?.questions?.length > 0) // Only include sections with pages having questions
-                    );
+                setComplianceLogic(questionnaireComplianceLogic || []);
                 setSections(sectionDetails?.sections);
 
                 setPreviewNavigation((prev) => ({
                     ...prev,
-                    total_pages: reorganizedSections.reduce((total, section) => total + section.pages.length, 0)
+                    total_pages: sectionDetails?.sections.reduce((total, section) => total + section.pages.length, 0)
                 }))
-                updateConditionalValues(reorganizedSections);
+                updateConditionalValues(sectionDetails?.sections);
             } catch (error) {
                 console.error(error);
             } finally {
