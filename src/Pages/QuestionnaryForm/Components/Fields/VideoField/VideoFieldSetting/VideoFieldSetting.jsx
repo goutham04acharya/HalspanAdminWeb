@@ -54,7 +54,7 @@ function VideoFieldSetting({ handleInputChange,
                             placeholder='e.g. 5'
                             testId='file-size'
                             htmlFor='fileSize'
-                            maxLength={10}
+                            maxLength={2}
                             handleChange={(e) => handleInputChange(e)} />
                     </div>
                     <div className='mt-7'>

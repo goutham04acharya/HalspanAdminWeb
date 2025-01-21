@@ -213,6 +213,11 @@ const QuestionnaryForm = () => {
         if (id === 'max') {
             dispatch(setNewComponent({ id: 'max', value: updatedValue, questionId: selectedQuestionId }));
         }
+
+        if (id === 'helptext') {
+            dispatch(setNewComponent({ id: 'helptext', value: updatedValue, questionId: selectedQuestionId }));
+        }
+
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
         if (id === 'min') {
@@ -238,7 +243,7 @@ const QuestionnaryForm = () => {
             }
         }
 
-        if (fieldSettingParams[selectedQuestionId]?.fileSize) {
+        if (id === 'fileSize') {
             // Restrict input to values between 1 and 10
             const numericValue = parseInt(updatedValue, 10); // Convert to a number
             if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 10) {
@@ -246,9 +251,9 @@ const QuestionnaryForm = () => {
             } else {
                 updatedValue = ""; // Reset the input if invalid
             }
-        }
-        dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
+            dispatch(setNewComponent({ id:'fileSize', value: updatedValue, questionId: selectedQuestionId }));
 
+        }
 
         // Validate incrementby value against the max range
         if (id === 'incrementby') {
@@ -558,14 +563,6 @@ const QuestionnaryForm = () => {
                 return section;
             });
         }
-        // setValidationErrors((prevErrors) => ({
-        //     ...prevErrors,
-        //     label: {
-        //         ...prevErrors.label,
-        //         [selectedQuestionId]: '',
-        //     },
-        // }));
-        // Reset the selected component
         dispatch(setSelectedComponent(false));
 
         // Update the sections state by setting a new array (deep copy)
