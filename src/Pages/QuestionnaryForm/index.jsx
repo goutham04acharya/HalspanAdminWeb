@@ -70,7 +70,7 @@ const QuestionnaryForm = () => {
     const [isDefaultLogic, setIsDefaultLogic] = useState(false);
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
-
+    const [sectionDetails, setSectionDetails] = useState({})
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -106,7 +106,8 @@ const QuestionnaryForm = () => {
     const [dropdownOpen, setDropdown] = useState(sections[0]?.section_id);
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
-    // const [sectionWarningShown, setSectionWarningShown] = useState(false);
+    const [hasSectionData, setHasSectionData] = useState([]);
+
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -120,6 +121,7 @@ const QuestionnaryForm = () => {
         ]
     },
     ])
+
     const complianceInitialState = [
         {
             'conditions': [
@@ -134,19 +136,19 @@ const QuestionnaryForm = () => {
             ]
         }
     ]
+
     const handleCancel = () => {
         dispatch(setModalOpen(false));
         setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
         // Restrict numeric input if the id is 'fileType'
-        if(id === 'label'){
+        if (id === 'label') {
             setPrevLabelValue(updatedValue)
-            if(updatedValue === ''){
+            if (updatedValue === '') {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     label: {
@@ -154,7 +156,7 @@ const QuestionnaryForm = () => {
                         [selectedQuestionId]: 'This is a mandatory field',
                     },
                 }));
-            }else{  
+            } else {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     label: {
@@ -165,7 +167,6 @@ const QuestionnaryForm = () => {
             }
         }
         if (id === 'fileType') {
-            // debugger
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
                 .replace(/\s*,\s*/g, ',')   // Remove spaces around commas
@@ -211,6 +212,11 @@ const QuestionnaryForm = () => {
         if (id === 'max') {
             dispatch(setNewComponent({ id: 'max', value: updatedValue, questionId: selectedQuestionId }));
         }
+
+        if (id === 'helptext') {
+            dispatch(setNewComponent({ id: 'helptext', value: updatedValue, questionId: selectedQuestionId }));
+        }
+
         dispatch(setNewComponent({ id, value: updatedValue, questionId: selectedQuestionId }));
 
         if (id === 'min') {
@@ -236,6 +242,18 @@ const QuestionnaryForm = () => {
             }
         }
 
+        if (id === 'fileSize') {
+            // Restrict input to values between 1 and 10
+            const numericValue = parseInt(updatedValue, 10); // Convert to a number
+            if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 10) {
+                updatedValue = numericValue.toString(); // Valid input
+            } else {
+                updatedValue = ""; // Reset the input if invalid
+            }
+            dispatch(setNewComponent({ id:'fileSize', value: updatedValue, questionId: selectedQuestionId }));
+
+        }
+
         // Validate incrementby value against the max range
         if (id === 'incrementby') {
             const maxRange = Number(fieldSettingParams?.[selectedQuestionId]?.max);
@@ -254,12 +272,10 @@ const QuestionnaryForm = () => {
             }
         }
 
-
         const data = selectedQuestionId?.split('_');
         const update = { ...dataIsSame };
         update[data[0]] = false;
         setDataIsSame(update);
-
 
         // Clear any existing debounce timer
         if (debounceTimerRef.current) {
@@ -372,6 +388,7 @@ const QuestionnaryForm = () => {
             console.log('error while getting ')
         }
     }
+
     const handleAddRemoveSection = (event, sectionIndex) => {
         if (event === 'add') {
             const sectionId = `SEC-${uuidv4()}`;
@@ -545,14 +562,6 @@ const QuestionnaryForm = () => {
                 return section;
             });
         }
-        // setValidationErrors((prevErrors) => ({
-        //     ...prevErrors,
-        //     label: {
-        //         ...prevErrors.label,
-        //         [selectedQuestionId]: '',
-        //     },
-        // }));
-        // Reset the selected component
         dispatch(setSelectedComponent(false));
 
         // Update the sections state by setting a new array (deep copy)
@@ -572,6 +581,7 @@ const QuestionnaryForm = () => {
         setPageLoading(true);
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
+            setSectionDetails(response?.data?.data);
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -698,7 +708,7 @@ const QuestionnaryForm = () => {
             setSaveClick(false);
         }
 
-        
+
         const sectionToSave = sections.find(section => section.section_id.includes(sectionId));
         const sectionIndex = sections.findIndex(section => section.section_id.includes(sectionId));
         if (sectionToSave) {
@@ -711,8 +721,8 @@ const QuestionnaryForm = () => {
                 // If data is the same, return early and don't call the API  
                 return;
             }
-            // Create a new object containing only the selected section's necessary fields  
 
+            // Create a new object containing only the selected section's necessary fields  
             let body = {
                 section_id: sectionToSave.section_id,
                 section_name: sectionToSave.section_name.replace(/^\s+|\s+$/g, ''),
@@ -1114,18 +1124,11 @@ const QuestionnaryForm = () => {
     };
 
     const handleDeleteModal = (sectionIndex, sectionData) => {
+
         dispatch(setSectionToDelete(sectionIndex)); // Set the section to delete  
         dispatch(setSelectedSectionData(sectionData));
         dispatch(setModalOpen(true));
     }
-
-    // const confirmDeleteSection = () => {
-    //     if (sectionToDelete !== null) {
-    //         handleDeleteSection(sections[sectionToDelete].section_id);
-    //         handleAddRemoveSection('remove', sectionToDelete); // Remove the section from the sections state  
-    //         dispatch(setModalOpen(false)); // Close the modal  
-    //     }
-    // }
 
     const confirmDeleteSection = () => {
         if (sectionToDelete !== null) {
@@ -1397,31 +1400,35 @@ const QuestionnaryForm = () => {
         }
     }
 
-    const globalSaveHandler = async () => {
-        setGlobalSaveLoading(true);
+    const globalSaveHandler = async (key) => {
+        if(!key){
+            setGlobalSaveLoading(true);
+        }else{
+            setGlobalSaveLoading(false)
+        }
+        
     
         // Check if there are any validation errors
-        // console.log(validationErrors)
         const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
-    
+
         if (hasValidationErrors) {
             setToastError('Please fix the validation errors before saving.');
             setGlobalSaveLoading(false);
             return;
         }
-    
+
         try {
             // Deep clone sections to avoid direct state mutation
             let sectionBody = {
                 sections: JSON.parse(JSON.stringify(sections))
             };
-    
+
             for (const key in fieldSettingParams) {
                 const keys = key.split("_");
                 let sectionKey = '';
                 let pageKey = '';
                 let questionKey = '';
-    
+
                 if (keys.length > 3) {
                     // replacing as bdd records will have additional key as bddtest# which will not be there in the normal user journey
                     sectionKey = keys[1].replace('bddtest#', '');
@@ -1432,7 +1439,7 @@ const QuestionnaryForm = () => {
                     pageKey = keys[1];
                     questionKey = keys[2];
                 }
-    
+
                 // Traverse sectionBody to find matching keys and update values
                 sectionBody.sections.forEach(section => {
                     if (section.section_id.includes(sectionKey)) {
@@ -1515,7 +1522,7 @@ const QuestionnaryForm = () => {
                     }
                 });
             }
-    
+
             function cleanSections() {
                 // Ensure sectionBody is an array before proceeding
                 if (Array.isArray(sectionBody['sections'])) {
@@ -1534,23 +1541,28 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
-    
+            setSectionDetails(sectionBody);
             cleanSections();
-    
-            let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
-    
-            // Sync compareSavedSections with the updated sections
-            setCompareSavedSections(sections);
-            handleSectionSaveOrder(sections);
-            setToastSuccess(response?.data?.message);
-            handleComplianceLogic();
-            setGlobalSaveLoading(false);
+            if(!key){
+                let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
+                // Sync compareSavedSections with the updated sections
+                setCompareSavedSections(sections);
+                handleSectionSaveOrder(sections);
+                setToastSuccess(response?.data?.message);
+                handleComplianceLogic();
+                setGlobalSaveLoading(false);
+                setSaveClick(false)
+            }
+            
         } catch (error) {
             console.log(error);
             setGlobalSaveLoading(false);
         }
+       
     };
-
+    useEffect(() => {
+        globalSaveHandler('localsave');
+    }, [fieldSettingParams, sections])
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) {
             return text;
@@ -1742,7 +1754,8 @@ const QuestionnaryForm = () => {
                                 isThreedotLoading={globalSaveLoading}
                                 text='Save'
                                 className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                                disabled={formStatus !== 'Draft'} onClick={() => {
+                                disabled={formStatus !== 'Draft'} 
+                                onClick={() => {
                                     globalSaveHandler();
                                 }}
                             />
@@ -1856,6 +1869,7 @@ const QuestionnaryForm = () => {
                 )
             }
             {
+
                 showquestionDeleteModal && (
                     <ConfirmationModal
                         text='Delete Question'
@@ -1872,6 +1886,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setShowquestionDeleteModal}
                         handleButton1={confirmDeleteQuestion}
                         handleButton2={() => dispatch(setShowquestionDeleteModal(false))}
+                        questionnaireForm
                     />
                 )
             }
@@ -1890,6 +1905,7 @@ const QuestionnaryForm = () => {
                         setModalOpen={setShowCancelModal}
                         handleButton1={handleConfirmCancel}
                         handleButton2={() => dispatch(setShowCancelModal(false))}
+                        questionnaireForm
                     />
                 )
             }
@@ -1932,6 +1948,8 @@ const QuestionnaryForm = () => {
                         sectionsData={sections}
                         setConditions={setConditions}
                         conditions={conditions}
+                        setSectionDetails={setSectionDetails}
+                        sectionDetails={sectionDetails}
                     />
                 )
             }
@@ -1942,25 +1960,16 @@ const QuestionnaryForm = () => {
                     Button1text={'Back'}
                     Button2text={'Next'}
                     button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                    sections={sections}
+                    sectionsData={sections}
                     setValidationErrors={setValidationErrors}
                     validationErrors={validationErrors}
                     formDefaultInfo={formDefaultInfo}
                     questionnaire_id={questionnaire_id}
                     version_number={version_number}
                     fieldSettingParameters={fieldSettingParams}
+                    sectionDetails={sectionDetails}
                 />
             }
-            {/* {sectionWarningShown && <ConfirmationModal
-                setModalOpen={setModalOpen}
-                isOpen={isModalOpen}
-                text="This Section can’t be moved here"
-                subText="It is connected to another Section, and can’t be placed before it."
-                button1Style='border border-[#2B333B] bg-[#2B333B] hover:bg-[#000000]'
-                src={`testing-error`}
-                sectionWarningShown={sectionWarningShown}
-                setSectionWarningShown={setSectionWarningShown}
-            />} */}
         </>
     );
 }

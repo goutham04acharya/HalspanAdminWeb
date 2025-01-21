@@ -30,7 +30,7 @@ const Questions = ({
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
 
     const handleDeletequestionModal = (sectionIndex, pageIndex, item) => {
-        setSelectedQuestionId(null)
+        dispatch(setSelectedQuestionId(item?.question_id))
         dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: item.index , questionName: fieldSettingParams[item.question_id].label}));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
         dispatch(setShowquestionDeleteModal(true));

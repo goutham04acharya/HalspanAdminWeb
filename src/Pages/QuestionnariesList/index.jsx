@@ -18,8 +18,6 @@ import { dataService } from '../../services/data.services.js';
 
 function Questionnaries() {
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
-  const dispatch = useDispatch();
-  const { logout } = useAuth0();
   const { getAPI, PostAPI } = useApi();
   const [isContentNotFound, setContentNotFound] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -28,8 +26,11 @@ function Questionnaries() {
   const [loading, setLoading] = useState(true);
   const [QueList, setQueList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ? encodeURIComponent(searchParams.get('search')) : '');
-  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState(() => {
+    const searchParam = searchParams.get('search');
+    return searchParam ? decodeURIComponent(searchParam) : '';
+  });
+    const navigate = useNavigate();
   let observer = useRef();
   const lastEvaluatedKeyRef = useRef(null);
   const [cloneModal, setCloneModal] = useState(false)
@@ -84,46 +85,72 @@ function Questionnaries() {
   };
 
   const fetchQuestionnaryList = useCallback(async () => {
-
-    setLoading(true);
     const params = Object.fromEntries(searchParams);
+    
+    // Only set loading true if it's the first fetch (no start_key)
+    if (!params.start_key) {
+      setLoading(true);
+    }
+  
     if (lastEvaluatedKeyRef.current) {
       params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
+  
     if (params.asset_name !== '') {
       setSelectedOption(params.asset_name)
     }
-    if (searchValue !== '') {
-      delete params.start_key
-    }
+  
     try {
       const response = await getAPI(`questionnaires${objectToQueryString(params)}`);
       const newItems = response?.data?.data?.items || [];
-      setQueList(prevItems => [...prevItems, ...newItems]);
+      
+      // If this is a new fetch (no start_key), replace the list
+      // Otherwise, append to the existing list
+      if (!params.start_key) {
+        setQueList(newItems);
+      } else {
+        setQueList(prevItems => [...prevItems, ...newItems]);
+      }
+      
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
+      lastEvaluatedKeyRef.current = null;
     }
-
+  
     setLoading(false);
     setIsFetchingMore(false);
-  }, [searchParams]);
+  }, [searchParams, setSelectedOption]);
 
   const lastElementRef = useCallback(node => {
     
     if (loading || isFetchingMore) return;
     if (observer.current) observer.current.disconnect();
+    
     observer.current = new IntersectionObserver(entries => {
       if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
         setIsFetchingMore(true);
         fetchQuestionnaryList();
       }
     });
+    
     if (node) observer.current.observe(node);
-  }, [loading, isFetchingMore]);
+  }, [loading, isFetchingMore, fetchQuestionnaryList]);
+
 
   useEffect(() => {
-    getAssetTypes()
+    const params = Object.fromEntries(searchParams);
+    const currentSearch = params.search;
+    
+    // Reset lastEvaluatedKey when search value changes
+    if (currentSearch !== undefined) {
+      lastEvaluatedKeyRef.current = null;
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    getAssetTypes();
+    // Don't clear the list immediately
     fetchQuestionnaryList();
   }, [fetchQuestionnaryList]);
 
@@ -145,10 +172,12 @@ function Questionnaries() {
     setDropdownsOpen(!dropdownsOpen)
     // setIsCreateModalOpen(false)
   }
+
   const handleOptionClick = (versionNumber) => {
     setSelectedVersion(versionNumber); // Set the clicked version as the selected version
     setDropdownsOpen(false); // Close the dropdown after selecting an option
   };
+
   const handleClone = async () => {
     setCloneLoading(true)
     try {
@@ -171,6 +200,7 @@ function Questionnaries() {
       setCloneLoading(false)
     }
   }
+
   const getAssetTypes = async () => {
     try {
       let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types`, null, true)

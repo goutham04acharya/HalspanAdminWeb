@@ -23,8 +23,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [loading, setLoading] = useState(true);
     const [LookupList, setLookupList] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [searchValue, setSearchValue] = useState(searchParams.get('search') !== null ?
-        encodeURIComponent(searchParams.get('search')) : '');
+    const [searchValue, setSearchValue] = useState(() => {
+        const searchParam = searchParams.get('search');
+        return searchParam ? decodeURIComponent(searchParam) : '';
+    });
     const [isCreateModalOpen, setIsCreateModalOpen] = useState();
     const [shimmerLoading, setShimmerLoading] = useState(false);
     const [maxLengthError, setMaxLengthError] = useState(false)
@@ -76,7 +78,15 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            setLookupList(prevItems => [...prevItems, ...newItems]);
+            setLookupList(prevItems => {
+                if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+                    // New search: return only new items
+                    return [...newItems];
+                } else {
+                    // Pagination: append new items
+                    return [...prevItems, ...newItems];
+                }
+            });
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
             console.error('Error fetching questionnaires:', error);
@@ -86,13 +96,11 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         setIsFetchingMore(false);
     }, [searchParams]);
 
-
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
-        console.log(data, 'data')
-        if(data.choices.length === 1){
+        if (data.choices.length === 1) {
             setDisableDelete(true)
-        }else{
+        } else {
             setDisableDelete(false)
         }
     };
@@ -124,7 +132,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 setMaxLengthError(false)
             } else {
                 // Optional: Set an error message or prevent input
-                // setToastError("Invalid Choices");
                 setMaxLengthError(true)
             }
         }
@@ -132,7 +139,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
 
     const handleClose = () => {
-        // debugger
         setIsCreateModalOpen(false);
         if (showCreateModal !== undefined) {
             setShowCreateModal(false);
@@ -148,12 +154,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 open: false,
                 id: ''
             });
-            // setData({})
         }, 200);
     }
-    // console.log(data, 'data')
     const handleSubmit = async (file) => {
-        // debugger
         const isUpdate = isView?.open;
         setErrors(initialErrorState);
 
@@ -217,7 +220,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
 
         try {
             const response = await apiFunction(endpoint, payload);
-
             if (!response?.error) {
                 setLookupList([]); // Clear lookup list
                 lastEvaluatedKeyRef.current = null
@@ -241,7 +243,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
             } else if (response?.data?.status === 409) {
                 const errorMessage = response?.data?.data?.message;
                 if (!file) {
-                    // debugger
                     setErrors('name', errorMessage); // Set error for name if there's a conflict
                     setIsCreateLoading(false);
                 } else {
@@ -251,8 +252,12 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                     setShimmerLoading(false)
                     setIsCreateLoading(false)
                 }
-            } else if (response?.data?.status === 400) {
-                setToastError("Invalid Choices");
+            } else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Value requires at least 1')) {
+                setToastError("Choice requires at least 1 character");
+                setIsCreateLoading(false)
+                setShimmerLoading(false)
+            } else if (response?.data?.status === 400 && response?.data?.data?.message?.includes('Choices item limit exceed for')) {
+                setToastError("Choices item limit exceeded");
                 setIsCreateLoading(false)
                 setShimmerLoading(false)
             } else {
@@ -274,50 +279,62 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     }
 
     const handleImport = (event) => {
-        setData(initialState)
+        setData(initialState);
         const file = event.target.files[0];
         if (!file || !file.name.endsWith('.csv')) {
             handleClose();
             setToastError('Please upload a CSV file.');
             return;
         }
-        // setIsImportLoading(true);
-        // setIsCreateModalOpen(false);
         if (showCreateModal !== undefined) {
             setShowCreateModal(false);
         }
+
         Papa.parse(file, {
             header: false,
             complete: (results) => {
                 const flatData = results.data.flat().filter(value => value.trim() !== '');
+                console.log(flatData, 'data');
 
+                // Check for item length exceeding 100 characters
+                const isItemTooLong = flatData.some(item => item.length > 100);
+                if (isItemTooLong) {
+                    handleClose();
+                    setIsImportLoading(false);
+                    setShowLookupReplaceModal(false);
+                    setToastError('Choices item limit exceeded.');
+                    return;
+                }
+
+                // Check for total data entries exceeding 500
                 if (flatData.length > 500) {
                     handleClose();
                     setIsImportLoading(false);
                     setShowLookupReplaceModal(false);
                     setToastError('Only 500 data entries are accepted.');
-                } else {
-                    // debugger
-                    const fileName = file.name.replace('.csv', '');
-                    const payload = {
-                        name: fileName,
-                        choices: flatData
-                    }
-
-                    handleSubmit(payload);
+                    return;
                 }
+
+                const fileName = file.name.replace('.csv', '');
+                const payload = {
+                    name: fileName,
+                    choices: flatData
+                };
+
+                handleSubmit(payload);
             },
             error: (error) => {
                 setToastError('Something went wrong.');
                 console.error('Error parsing CSV:', error);
             }
         });
+
         event.target.value = ''; // Reset the input to allow re-uploading the same file
     };
 
+
     // View Functions
     const handleView = (id, name, choices) => {
-        // debugger
         setIsView({
             open: true,
             id: id
@@ -402,14 +419,15 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                 <div className='flex items-center justify-between w-full'>
                                     <div className='w-[75%] mr-[5%]'>
                                         <Search
-                                            setQueList={setLookupList}
                                             testId='searchBox'
                                             searchParams={searchParams}
+                                            setQueList={setLookupList}
                                             setSearchValue={setSearchValue}
                                             searchValue={searchValue}
                                             setSearchParams={setSearchParams}
                                             setLoading={setLoading}
                                             placeholder='Search by Name'
+                                            setLookupList={setLookupList}
                                         />
                                     </div>
                                 </div>
@@ -463,7 +481,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 isView={isView?.open}
                 title={isView?.open ? 'View Lookup Dataset' : 'Create Lookup Dataset'}
                 createLookup={!isView?.open}
-                // handleAddChoice={handleAddChoice}
                 shimmerLoading={shimmerLoading}
                 handleRemoveChoice={handleRemoveChoice}
                 setData={setData}
@@ -472,7 +489,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                 initialState={initialState}
                 maxLengthError={maxLengthError}
                 disableDelete={disableDelete}
-            // handleView={handleView}
             />
         </>
     )

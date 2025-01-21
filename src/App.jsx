@@ -11,32 +11,6 @@ function App(props) {
   const { isAuthenticated, isLoading } = useAuth0();
   const [ToastSuccess, setToastSuccess] = useState('');
   const [ToastError, setToastError] = useState('');
-  // const [showLoading, setShowLoading] = useState(false);
-
-  // useEffect(() => {
-  //   let timer;
-
-  //   if (isLoading) {
-  //     // Set a timer to delay the loading display
-  //     timer = setTimeout(() => {
-  //       setShowLoading(true);
-  //     }, 400);
-  //   } else {
-  //     // Clear the loading state immediately if no longer loading
-  //     setShowLoading(false);
-  //   }
-
-  //   // Clean up the timer
-  //   return () => clearTimeout(timer);
-  // }, [isLoading]);
-
-  // if (showLoading) {
-  //   return (
-  //     <div>
-  //       <img src='/halspan-loading.gif' alt='Loading...' />
-  //     </div>
-  //   );
-  // }
 
   return (
     <div>
