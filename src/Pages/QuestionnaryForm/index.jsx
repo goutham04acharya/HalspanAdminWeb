@@ -143,7 +143,6 @@ const QuestionnaryForm = () => {
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
     const handleInputChange = (e) => {
-        debugger
         const { id, value } = e.target;
         let updatedValue = value;
         // Restrict numeric input if the id is 'fileType'
@@ -1225,7 +1224,6 @@ const QuestionnaryForm = () => {
     }
 
     const handleBlur = (e) => {
-        console.log(selectedQuestionId, 'selected question id')
         const sectionId = selectedQuestionId.split('_')[0]
         handleSaveSection(sectionId, false);
     }
@@ -1273,7 +1271,6 @@ const QuestionnaryForm = () => {
             setToastError('Something went wrong');
         }
     }
-    console.log(complianceLogic, 'compliance logic 1')
     //this is the function called when you click on delete of compliance logic
     const handleDeleteComplianceLogic = async () => {
         setComplianceLoader(true)
