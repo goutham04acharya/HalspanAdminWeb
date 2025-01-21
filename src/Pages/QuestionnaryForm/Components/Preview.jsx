@@ -27,7 +27,7 @@ import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 import { list } from 'postcss';
 import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
-function PreviewModal({ setModalOpen, Button1text, handleButton1, button1Style, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, sectionDetails, questionnaireComplianceLogic }) {
+function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails, questionnaireComplianceLogic }) {
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [currentSection, setCurrentSection] = useState(0);
@@ -85,7 +85,6 @@ function PreviewModal({ setModalOpen, Button1text, handleButton1, button1Style, 
         const fetchSections = async () => {
             setLoading(true);
             try {
-
                 // Store compliance logic
                 setComplianceLogic(questionnaireComplianceLogic || []);
                 setSections(sectionDetails?.sections);
