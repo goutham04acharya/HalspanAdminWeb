@@ -135,7 +135,6 @@ function TestFieldSetting({
     }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-      // Transform the items array
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
         label: item.name

@@ -29,7 +29,6 @@ import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder
 
 function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails, questionnaireComplianceLogic }) {
     const modalRef = useRef();
-    const { getAPI } = useApi();
     const dispatch = useDispatch();
     const [currentSection, setCurrentSection] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
@@ -434,11 +433,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         return acc; // Skip hidden questions  
                     }
 
-                    if(question?.options?.read_only){
+                    if (question?.options?.read_only) {
                         return acc;
                     }
 
-                    if(!question?.options?.visible){
+                    if (!question?.options?.visible) {
                         return acc;
                     }
 
@@ -732,22 +731,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const renderQuestion = (question) => {
         switch (question?.component_type) {
             case 'textboxfield':
-                return <TextBoxField
-                    sections={sections[currentSection]}
-                    validationErrors={validationErrors}
-                    setValidationErrors={setValidationErrors}
-                    question={question}
-                    preview
-                    setConditionalValues={setConditionalValues}
-                    conditionalValues={setConditionalValues}
-                    setIsFormatError={setIsFormatError}
-                    question_id={question?.question_id}
-                    testId="preview"
-                    setValue={setValue}
-                    values={value[question?.question_id]}
-                    setIsModified={setIsModified}
-                    isModified={isModified}
-                    handleChange={''}
+                return <TextBoxField sections={sections[currentSection]} validationErrors={validationErrors} setValidationErrors={setValidationErrors} question={question} preview setConditionalValues={setConditionalValues} conditionalValues={setConditionalValues} setIsFormatError={setIsFormatError} question_id={question?.question_id} testId="preview" setValue={setValue} values={value[question?.question_id]} setIsModified={setIsModified} isModified={isModified} handleChange={''}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -765,7 +749,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     question={question}
                     preview
                     setConditionalValues={setConditionalValues}
-                    conditionalValues={setConditionalValues}
+                    conditionalValues={conditionalValues}
                     setIsFormatError={setIsFormatError}
                     question_id={question?.question_id}
                     testId="preview"
@@ -988,7 +972,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    if(!list?.options?.visible){
+                                    if (!list?.options?.visible) {
                                         return null;
                                     }
                                     if (list?.conditional_logic) {
