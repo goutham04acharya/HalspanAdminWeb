@@ -1756,6 +1756,7 @@ const QuestionnaryForm = () => {
                                 className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
                                 disabled={formStatus !== 'Draft'} 
                                 onClick={() => {
+                                    // setIsSaveClick(true)
                                     globalSaveHandler();
                                 }}
                             />
@@ -1968,6 +1969,7 @@ const QuestionnaryForm = () => {
                     version_number={version_number}
                     fieldSettingParameters={fieldSettingParams}
                     sectionDetails={sectionDetails}
+                    questionnaireComplianceLogic={complianceLogic}
                 />
             }
         </>

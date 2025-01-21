@@ -66,7 +66,6 @@ const TextBoxField = ({
         const format = question?.format;
         const regex = question?.regular_expression;
         const { section_name, page_name, label } = findSectionAndPageName(sections, question_id)
-
         setConditionalValues((prevValues) => ({
             ...prevValues,
             [section_name]: {
@@ -136,7 +135,7 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={questionValue[question?.question_id] !== 'true' ? questionValue[question?.question_id] : ''}
+                    value={questionValue[question?.question_id] !== true ? questionValue[question?.question_id] : ''}
                     className={`h-[156px] resize-none w-full break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-lg ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} ${preview ? 'mt-1' : 'mt-5'} py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
                     // onClick={preview ? () => handleFunction() : () => handleChange(fieldSettingParameters)}
@@ -152,7 +151,7 @@ const TextBoxField = ({
                     data-testid='input'
                     type={type}
                     id={textId}
-                    value={questionValue[question?.question_id] !== 'true' ? questionValue[question?.question_id] : ''}
+                    value={questionValue[question?.question_id] !== true ? questionValue[question?.question_id] : ''}
                     disabled={question?.options?.read_only}
                     className={`w-full h-auto break-words border ${validationErrors?.preview_textboxfield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'}  rounded-lg ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 ${preview ? 'mt-1' : 'mt-5'} outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                     placeholder={preview ? question?.placeholder_content : fieldSettingParameters?.placeholderContent}
