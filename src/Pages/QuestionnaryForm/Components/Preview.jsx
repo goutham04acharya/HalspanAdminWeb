@@ -749,7 +749,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                     question={question}
                     preview
                     setConditionalValues={setConditionalValues}
-                    conditionalValues={setConditionalValues}
+                    conditionalValues={conditionalValues}
                     setIsFormatError={setIsFormatError}
                     question_id={question?.question_id}
                     testId="preview"

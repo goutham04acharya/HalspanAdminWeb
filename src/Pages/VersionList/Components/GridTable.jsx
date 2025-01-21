@@ -91,7 +91,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                     return { ...prevVersionList, data: { ...prevVersionList.data, items: updatedVersions } };
                 });
             }else{
-                setToastError('Please add questions to the questionnaire before publishing.')
+                setToastError(response?.data?.data?.message)
             }
 
         } catch (error) {

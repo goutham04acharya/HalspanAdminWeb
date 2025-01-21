@@ -77,8 +77,6 @@ function ChoiceFieldSetting({
         }
         try {
           const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-          // Transform the items array
-         
           const transformedArray = response.data.data.items.map(item => ({
             value: item.lookup_id,
             label: item.name,
@@ -90,7 +88,6 @@ function ChoiceFieldSetting({
           } else {
             updateOptions = [...transformedArray]
           }
-          console.log(updateOptions, 'updateOptions')
           setOptionData(updateOptions);
           lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {

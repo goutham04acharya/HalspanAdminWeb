@@ -1415,7 +1415,7 @@ const QuestionnaryForm = () => {
 
         return hasQuestions; // Return the flag
     };
-    console.log(checkForQuestions(), 'checkForQuestions')
+
     const globalSaveHandler = async (key) => {
         if (!key) {
             setGlobalSaveLoading(true);
@@ -1582,7 +1582,12 @@ const QuestionnaryForm = () => {
 
     };
     useEffect(() => {
-        globalSaveHandler('localsave');
+        try { 
+            globalSaveHandler('localsave'); 
+        } catch { 
+            console.log('error while calling save function');
+        }
+
     }, [fieldSettingParams, sections])
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) {
