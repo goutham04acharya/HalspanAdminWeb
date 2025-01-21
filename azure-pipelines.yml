@@ -19,7 +19,7 @@ variables:
     - name: ENV
       value: 'Production'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}:
-    - group: qa
+    - group: managed-qa-mobile
     - name: ENV
       value: 'Testing'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/pre-production') }}:
@@ -31,9 +31,21 @@ variables:
 stages:
 - stage: CodeQuality
   jobs:
+    - job: "pr_review"
+      displayName: "GPT Pull Request Review"
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      pool:
+          vmImage: "ubuntu-latest"
+      steps:
+        - checkout: self
+          persistCredentials: true
+        - task: GPTPullRequestReview@0
+          inputs:
+            api_key: $(OPENAI_TOKEN)
+            aoi_endpoint: $(AOI_ENDPOINT)
     - job: "lint"
       displayName: "Code Quality"
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -90,7 +102,7 @@ stages:
         #   displayName: 'Lint'
     - job: "secret"
       displayName: "Secret Checking"
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -112,7 +124,7 @@ stages:
           displayName: 'License Compliance'
     - job: "sast"
       displayName: 'Static Application Security Testing (SAST)'
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -122,7 +134,7 @@ stages:
           displayName: 'Static Application Security Testing (SAST)'
     - job: "DependencyScanning"
       displayName: "Dependency Scanning"
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
           vmImage: "ubuntu-latest"
       steps:
@@ -381,7 +393,7 @@ stages:
           
     - job: BrowserPerformanceTesting
       displayName: "Browser Performance Testing"
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
@@ -457,7 +469,7 @@ stages:
                 displayName: 'Deployment'
     - job: DAST
       displayName: "Dynamic Application Security Testing (DAST)"
-      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
+      condition: and(or(contains(variables['System.PullRequest.SourceBranch'], 'feature'), contains(variables['System.PullRequest.SourceBranch'], 'ci'), contains(variables['System.PullRequest.SourceBranch'], 'bugfix'), contains(variables['System.PullRequest.SourceBranch'], 'hotfix')), succeeded())
       pool:
         vmImage: "ubuntu-latest"
       steps:
