@@ -72,15 +72,17 @@ function ChoiceFieldSetting({
         if (lastEvaluatedKeyRef.current) {
           params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        if (searchTerm) {
+        if (searchTerm) { 
           params.search = searchTerm
         }
         try {
           const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
           // Transform the items array
+         
           const transformedArray = response.data.data.items.map(item => ({
             value: item.lookup_id,
-            label: item.name
+            label: item.name,
+            choices: item.choices,
           }));
           let updateOptions;
           if (params.start_key) {
@@ -88,6 +90,7 @@ function ChoiceFieldSetting({
           } else {
             updateOptions = [...transformedArray]
           }
+          console.log(updateOptions, 'updateOptions')
           setOptionData(updateOptions);
           lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {

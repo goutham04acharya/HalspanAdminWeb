@@ -520,7 +520,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const questionName = questionPart.replaceAll(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
-        const matchingSection = data?.sections.find(section => section.section_name === sectionName);
+        const matchingSection = data?.sections?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
             return null; // No matching section found
         }

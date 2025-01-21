@@ -27,9 +27,8 @@ import { clearAllSignatures } from './Fields/Signature/signatureSlice.js';
 import { list } from 'postcss';
 import { findSectionAndPageName } from '../../../CommonMethods/SectionPageFinder.js';
 
-function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, src, className, handleButton1, handleButton2, button1Style, testIDBtn1, testIDBtn2, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, fieldSettingParameters, sectionsData, sectionDetails }) {
+function PreviewModal({ setModalOpen, Button1text, handleButton1, button1Style, isImportLoading, showLabel, questionnaire_id, version_number, setValidationErrors, validationErrors, formDefaultInfo, sectionDetails, questionnaireComplianceLogic }) {
     const modalRef = useRef();
-    const { getAPI } = useApi();
     const dispatch = useDispatch();
     const [currentSection, setCurrentSection] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
@@ -86,39 +85,16 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
         const fetchSections = async () => {
             setLoading(true);
             try {
-                const [layoutResponse, questionnaireResponse] = await Promise.all([
-                    getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`),
-                    getAPI(`questionnaires/${questionnaire_id}/${version_number}`)
-                ]);
-
-                const questionnaireSections = questionnaireResponse?.data?.data?.sections;
-                const layoutSections = layoutResponse?.data?.data?.sections;
-                const complianceRules = layoutResponse?.data?.data?.compliance_logic;
 
                 // Store compliance logic
-                setComplianceLogic(complianceRules || []);
-
-                // ... rest of the section organization logic remains the same
-                const sectionIdMap = {};
-                layoutSections.forEach((section) => {
-                    sectionIdMap[section.id] = section.index;
-                });
-
-                // let reorganizedSections = questionnaireSections.sort((a, b) => {
-                //     return sectionIdMap[a.section_id] - sectionIdMap[b.section_id];
-                // });
-                const reorganizedSections = questionnaireSections
-                    .sort((a, b) => sectionIdMap[a.section_id] - sectionIdMap[b.section_id]) // Sorting sections
-                    .filter((section) =>
-                        section?.pages?.some((page) => page?.questions?.length > 0) // Only include sections with pages having questions
-                    );
+                setComplianceLogic(questionnaireComplianceLogic || []);
                 setSections(sectionDetails?.sections);
 
                 setPreviewNavigation((prev) => ({
                     ...prev,
-                    total_pages: reorganizedSections.reduce((total, section) => total + section.pages.length, 0)
+                    total_pages: sectionDetails?.sections.reduce((total, section) => total + section.pages.length, 0)
                 }))
-                updateConditionalValues(reorganizedSections);
+                updateConditionalValues(sectionDetails?.sections);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -458,11 +434,11 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                         return acc; // Skip hidden questions  
                     }
 
-                    if(question?.options?.read_only){
+                    if (question?.options?.read_only) {
                         return acc;
                     }
 
-                    if(!question?.options?.visible){
+                    if (!question?.options?.visible) {
                         return acc;
                     }
 
@@ -756,22 +732,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
     const renderQuestion = (question) => {
         switch (question?.component_type) {
             case 'textboxfield':
-                return <TextBoxField
-                    sections={sections[currentSection]}
-                    validationErrors={validationErrors}
-                    setValidationErrors={setValidationErrors}
-                    question={question}
-                    preview
-                    setConditionalValues={setConditionalValues}
-                    conditionalValues={setConditionalValues}
-                    setIsFormatError={setIsFormatError}
-                    question_id={question?.question_id}
-                    testId="preview"
-                    setValue={setValue}
-                    values={value[question?.question_id]}
-                    setIsModified={setIsModified}
-                    isModified={isModified}
-                    handleChange={''}
+                return <TextBoxField sections={sections[currentSection]} validationErrors={validationErrors} setValidationErrors={setValidationErrors} question={question} preview setConditionalValues={setConditionalValues} conditionalValues={setConditionalValues} setIsFormatError={setIsFormatError} question_id={question?.question_id} testId="preview" setValue={setValue} values={value[question?.question_id]} setIsModified={setIsModified} isModified={isModified} handleChange={''}
                 />
             case 'displayfield':
                 return <DIsplayContentField preview setValidationErrors={setValidationErrors} question={question} validationErrors={validationErrors} />;
@@ -1012,7 +973,7 @@ function PreviewModal({ text, subText, setModalOpen, Button1text, Button2text, s
                             <div className='flex flex-col justify-between'>
 
                                 {sections[currentSection]?.pages[currentPage]?.questions?.map((list, index) => {
-                                    if(!list?.options?.visible){
+                                    if (!list?.options?.visible) {
                                         return null;
                                     }
                                     if (list?.conditional_logic) {
