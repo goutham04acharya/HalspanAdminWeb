@@ -11,3 +11,4 @@ const Debounce = (func) => {
 };
   
 export default Debounce;
+

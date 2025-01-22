@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import Login from '../Pages/auth/Login.jsx';
 import CreateQuestionnary from '../Pages/CreateQuestionnary/CreateQuestionnary.jsx';
 import AuthRedirect from '../Pages/auth/AuthRedirect.jsx';
@@ -10,6 +10,7 @@ import LookupDataset from '../Pages/LookupDataset/index.jsx';
 import VersionList from '../Pages/VersionList/VersionList.jsx';
 import { useAuth0 } from '@auth0/auth0-react';
 import NotFound from '../Components/NotFoundPage/NotFound.jsx';
+import { BeatLoader } from 'react-spinners';
 
 function NavigationRoutes({ isAuthenticated, isLoading, props }) {
   const { logout, getAccessTokenSilently, getIdTokenClaims } = useAuth0();
@@ -46,6 +47,26 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
     checkAuthentication();
   }, [isAuthenticated, getAccessTokenSilently, logout]);
 
+
+
+  // Parse query parameters from the URL
+  const useQuery = () => {
+    return new URLSearchParams(useLocation().search);
+  };
+
+  const query = useQuery();
+  const code = query.get('code');
+
+
+  // Conditionally render based on the `code` query parameter
+  const HandleRoute = () => {
+    if (code) {
+      return <div className='flex justify-center items-center h-screen'> <BeatLoader color="#000" size={'40px'} /></div>; // Show loading when `code` is present
+    } else {
+      return <NotFound />; // Show 404 if `code` is not present
+    }
+  };
+
   return (
     <>
       <AuthRedirect isAuthenticated={isAuthenticated} isLoading={isLoading} />
@@ -59,8 +80,12 @@ function NavigationRoutes({ isAuthenticated, isLoading, props }) {
           <Route path="/questionnaries/version-list/:questionnaire_id" element={<VersionList />} />
         </Route>
 
+
+        {/* Handle route with `code` query parameter */}
+        <Route path="/" element={<HandleRoute />} />
+
         {/* 404 Not Found Route */}
-        {/* <Route path="*" element={<NotFound />} /> */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

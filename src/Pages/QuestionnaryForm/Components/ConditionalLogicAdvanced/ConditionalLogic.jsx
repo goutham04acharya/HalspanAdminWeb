@@ -27,15 +27,14 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 // Extend Day.js with the custom parse format plugin
 dayjs.extend(customParseFormat);
 
-
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
+
     const modalRef = useRef();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('text'); // default is 'preField'
     const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
     const [showSectionList, setShowSectionList] = useState(false)
-    const { PostAPI } = useApi();
     const { getAPI } = useApi();
     const { questionnaire_id, version_number } = useParams();
     const [inputValue, setInputValue] = useState(''); // Track input value
@@ -57,18 +56,25 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [isOperatorModal, setIsOperatorModal] = useState(false);
     const [isStringMethodModal, setIsStringMethodModal] = useState(false)
+    const [showChoiceValues, setShowChoiceValues] = useState(false)
     const [logic, setLogic] = useState('')
+    const [isChoiceboxField, setIsChoiceboxField] = useState(false);
+    const [choiceboxValues, setChoiceboxValues] = useState([])
     const [complianceCondition, setComplianceCondition] = useState('')
     const [datetimefieldQuestions, setDatetimefieldQuestions] = useState([]);
+    const [selectedQuestion, setSelectedQuestion] = useState('')
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const complianceLogicCondition = useSelector(state => state.fieldSettingParams.conditions);
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
+    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
         elseStatement: {}
     });
+
+
     const complianceInitialState = [
         {
             'conditions': [
@@ -83,29 +89,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             ]
         }
     ]
-    const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
+
     useEffect(() => {
         const choiceBoxOptionsObj = {};
         questionType.forEach((question) => {
-            console.log(fieldSettingParams[question.question_id], 'fieldSettingParams[question.question_id]')
-            console.log(combinedArray, 'combinedArray')
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
-                if(fieldSettingParams[question?.question_id]?.source === 'fixedList'){
+                if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                }else{
+                } else {
                     choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
                 }
-                
             }
-        });
+        }
+        );
         setChoiceBoxOptions(choiceBoxOptionsObj);
     }, [questionType, fieldSettingParams]);
+
     const combinedArray = questionType.map((question) => {
         const choiceValues = choiceBoxOptions[question.question_id] || [];
         return {
             question_detail: question.question_detail,
             question_type: question.question_type,
             choice_values: choiceValues,
+            type: question.type
         };
     });
     // Define string and date methods
@@ -174,7 +180,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
         const questionDetailsArray = [];
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
 
             // Access pages within each section
@@ -191,6 +197,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             'question_id': question?.question_id,
                             'question_name': question?.question_name,
                             'question_detail': questionName,
+                            'type': question?.type
                         });
                     }
                 });
@@ -207,7 +214,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const sectionDetailsArray = [];
 
         // Access the sections from the data object
-        allSectionDetails?.data?.sections?.forEach((section) => {
+        allSectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name.replaceAll(/\s+/g, '_');
             // sectionDetailsArray.push(sectionName); // Add the section name
 
@@ -236,12 +243,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const handleListSectionDetails = async () => {
         setIsThreedotLoaderBlack(true);
         setShowSectionList(true)
-        const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}?suggestion=true`);
-        dispatch(setAllSectionDetails(response.data));
-        handleQuestionnaryObject(response.data);
+        dispatch(setAllSectionDetails(sectionDetails));
+        handleQuestionnaryObject(sectionDetails);
         setIsThreedotLoaderBlack(false);
     }
-
     useEffect(() => {
         handleListSectionDetails();
         let condition_logic = getFinalComplianceLogic(conditions)
@@ -264,12 +269,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [conditions])
 
-    // useEffect(() => {
-    //     const transformedContent = defaultContentConverter(selectedLogic.default_content);
-    //     setConditions(parseLogicExpression(transformedContent));
-    //     setInputValue(transformedContent);
-    // }, [])
-
     useEffect(() => {
         if (allSectionDetails) {
             filterSectionDetails(); // Call this when the state is updated
@@ -278,29 +277,30 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
-        // let tempArray = [];
-        if (allSectionDetails?.data?.sections && allSectionDetails?.data?.sections.length > 0) {
-            allSectionDetails?.data?.sections.forEach((section) => {
+        if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
+            allSectionDetails.sections.forEach((section) => {
+                const sectionKey = section.section_name.replaceAll(' ', '_');
                 let sectionObject = {
-                    [(section.section_name).replaceAll(' ', '_')]: {}
+                    [sectionKey]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
+                        const pageKey = page.page_name.replaceAll(' ', '_');
+                        sectionObject[sectionKey][pageKey] = {};
+
                         if (page.questions && page.questions.length > 0) {
                             page.questions.forEach((question) => {
                                 if (question?.component_type === 'dateTimefield') {
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
+                                const questionKey = question.question_name.replaceAll(' ', '_');
                                 const fieldType = getFieldType(question.component_type);
-                                sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')] = {
-                                    ...sectionObject[(section.section_name).replaceAll(' ', '_')][(page.page_name).replaceAll(' ', '_')],
-                                    [(question.question_name).replaceAll(' ', '_')]: fieldType
-                                }
-
+                                sectionObject[sectionKey][pageKey][questionKey] = fieldType;
                             });
                         }
                     });
                 }
+
                 result = {
                     ...result,
                     ...sectionObject
@@ -321,11 +321,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
         const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
         let questionMatches = value.match(regex);
-        // [
-        //     "Section_1.Page_1.Question_1",
-        //     "Section_1.Page_1.Question_2",
-        //     "Section_1.Page_1.Question_4"
-        // ]
         setLogic(value);
         setInputValue(value)
         const updatedLogic = parseExpression(value)
@@ -425,73 +420,91 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
+
         if (textarea) {
-            const cursorPosition = textarea.selectionStart; // Get the current cursor position
+            const cursorPosition = textarea.selectionStart;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-
-            // Get the value before and after the current selection
             const textBefore = textarea.value.substring(0, start);
             const textAfter = textarea.value.substring(end);
-
-            // Check if there's a space or if the input is empty
-            // const lastChar = textBefore.slice(-1);
             const charBeforeCursor = cursorPosition > 0 ? textarea.value[cursorPosition - 1] : '';
-
             let newText;
 
-            if ((charBeforeCursor === ' ' || charBeforeCursor === '.') || cursorPosition === 0) {
-                // Append the text if there's a space or the input is empty
+            if ((charBeforeCursor === ' ' || charBeforeCursor === '.' || charBeforeCursor === `'`) || cursorPosition === 0) {
                 newText = textBefore + textToInsert + textAfter;
             } else {
-                // Replace the last word if there's no space
                 const lastSpaceIndex = textBefore.lastIndexOf(' ');
-                const textToKeep = textBefore.slice(0, lastSpaceIndex + 1); // Include the space
+                const textToKeep = textBefore.slice(0, lastSpaceIndex + 1);
                 newText = textToKeep + textToInsert + textAfter;
             }
 
-            // Update the textarea value
             textarea.value = newText;
-            setShowSectionList(false);
-            setInputValue(newText)
-            setLogic(newText)
-    
-        }
-        if (isMethod) {
-            setShowMethodSuggestions(false); // Hide method suggestions if a method was inserted
-        } else {
-            let fieldType = '';
-            switch (componentType) {
-                case 'string':
-                    fieldType = [
-                        'textboxfield',
-                        'choiceboxfield',
-                        'assetLocationfield',
-                        'floorPlanfield',
-                        'signaturefield',
-                        'gpsfield',
-                        'displayfield'
-                    ];
-                    break;
-                case 'number':
-                    fieldType = [
-                        'numberfield',
-                    ];
-                    break;
-                case 'array':
-                    fieldType = [
-                        'photofield',
-                        'videofield',
-                        'filefield'
-                    ];
-                    break;
-                case 'date':
-                    fieldType = ['dateTimefield'];
-                    break;
-                default:
-                    fieldType = []; // Handle any unexpected cases
+
+            // Handle includes()
+            if (textToInsert === 'includes()') {
+                const includesIndex = newText.indexOf('includes()');
+                if (includesIndex !== -1) {
+                    const updatedText = newText.replace('includes()', `includes('')`);
+                    textarea.value = updatedText;
+
+                    const cursorPosition = includesIndex + 'includes("'.length;
+                    setTimeout(() => {
+                        textarea.setSelectionRange(cursorPosition, cursorPosition);
+                        textarea.focus();
+                    }, 0);
+                }
             }
-            setSelectedFieldType(fieldType.join(', '));
+
+            setShowSectionList(false);
+            setInputValue(textarea.value);
+            setLogic(textarea.value);
+
+            // 🔎 Check if selectedQuestion is a 'choiceboxfield'
+            const matchedQuestion = combinedArray?.find(
+                (item) =>
+                    item?.question_detail === selectedQuestion &&
+                    item?.question_type === "choiceboxfield"
+            );
+
+            if (matchedQuestion) {
+                setChoiceboxValues(matchedQuestion.choice_values);
+            } else {
+                setChoiceboxValues([]);
+            }
+
+            if (isMethod) {
+                setShowMethodSuggestions(false);
+                setShowChoiceValues(true); // Automatically show choice values
+                setIsChoiceboxField(true);
+                setShowSectionList(true)
+            } else {
+                let fieldType = '';
+                switch (componentType) {
+                    case 'string':
+                        fieldType = [
+                            'textboxfield',
+                            'choiceboxfield',
+                            'assetLocationfield',
+                            'floorPlanfield',
+                            'signaturefield',
+                            'gpsfield',
+                            'displayfield'
+                        ];
+                        break;
+                    case 'number':
+                        fieldType = ['numberfield'];
+                        break;
+                    case 'array':
+                        fieldType = ['photofield', 'videofield', 'filefield'];
+                        break;
+                    case 'date':
+                        fieldType = ['dateTimefield'];
+                        break;
+                    default:
+                        fieldType = [];
+                }
+                setSelectedFieldType(fieldType.join(', '));
+            }
         }
     };
 
@@ -505,7 +518,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const questionName = questionPart.replaceAll(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
-        const matchingSection = data?.sections.find(section => section.section_name === sectionName);
+        const matchingSection = data?.sections?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
             return null; // No matching section found
         }
@@ -548,7 +561,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
 
     const parseLogicExpression = (expression) => {
-
         // Default structure if no expression is provided
         if (!expression || expression === '') {
             return [{
@@ -566,10 +578,36 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         // Helper function to trim parentheses
-        const trimParentheses = (str) => {
-            return str.replace(/^\((.*)\)$/, '$1');
-        };
+        const trimParentheses = (expression) => {
+            let trimmedExpression = expression.trim();
 
+            // Remove outer parentheses if they exist
+            while (trimmedExpression.startsWith('(') && trimmedExpression.endsWith(')')) {
+                // Check if these are matching outer parentheses
+                let count = 0;
+                let isMatchingPair = true;
+
+                for (let i = 0; i < trimmedExpression.length; i++) {
+                    if (trimmedExpression[i] === '(') count++;
+                    if (trimmedExpression[i] === ')') count--;
+
+                    // If count goes negative before the end, these aren't matching outer parentheses
+                    if (count < 0 && i < trimmedExpression.length - 1) {
+                        isMatchingPair = false;
+                        break;
+                    }
+                }
+
+                // Only trim if we found matching outer parentheses
+                if (isMatchingPair && count === 0) {
+                    trimmedExpression = trimmedExpression.slice(1, -1).trim();
+                } else {
+                    break;
+                }
+            }
+
+            return trimmedExpression;
+        };
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
             const date = new Date(timestamp * 1000);
@@ -578,21 +616,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         };
-
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
             const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
             const match = condition?.match(pattern);
-
             if (!match) {
                 return null;
             }
-
             const [_, question_name, timestamp, offsetDays] = match;
-            const question = getDetails(question_name.trim(), allSectionDetails.data);
+            const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
-
             return {
                 question_name: question_name.trim(),
                 condition_logic: 'date is “X” date of set date',
@@ -608,15 +642,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-
                 // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
-
                 // Regex to match logical conditions
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                const matches = condition.match(/(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-
+                const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -624,8 +654,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (question_name.includes('.length')) {
                         question_name = question_name.replaceAll('.length', '');
                     }
-                    let question = getDetails(question_name.trim(), allSectionDetails.data)
-
+                    let question = getDetails(question_name.trim(), allSectionDetails.sections);
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
@@ -712,7 +741,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         // Convert to a number if it's not a string
                         value = Number(value);
                     }
-
                     return {
                         question_name: question_name.trim(),
                         condition_logic: condition_logic.trim(),
@@ -748,9 +776,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const fetchData = async () => {
             if (complianceState) {
                 try {
-                    // const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-                    // Extract default_content based on selected index
-                    // const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
                     const selectedLogic = complianceLogic[complianceLogicId];
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
@@ -833,7 +858,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
-
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1532,16 +1556,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
-            let condition_logic = buildConditionExpression(conditions)
+            let condition_logic = buildConditionExpression(conditions, combinedArray)
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
-        else if(isDefaultLogic && !complianceState){
-            console.log(fieldSettingParams[selectedQuestionId]['default_conditional_logic'], 'dddd')
+        else if (isDefaultLogic && !complianceState) {
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic!== '') {
+                if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
                         .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
@@ -1585,7 +1608,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic;
         if (!complianceState) {
             try {
-                condition_logic = buildConditionExpression(conditions);
+                condition_logic = buildConditionExpression(conditions, combinedArray);
             } catch (error) {
             }
         } else {
@@ -1660,115 +1683,186 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     return (
         <>
             <div className='bg-[#3931313b] w-full h-screen absolute top-0 flex flex-col items-center justify-center z-[999]'>
-                <div ref={modalRef} className='!w-[80%] h-[83%] mx-auto bg-white rounded-[14px] relative p-[18px] '>
-                    <div className='w-full'>
+                <div ref={modalRef} className='!w-[80%] h-[90%] mx-auto bg-white rounded-[14px] relative p-[18px] overflow-hidden'>
+                    <div className='w-full h-full'>
                         {(tab === 'advance' || isDefaultLogic) ? (
-                            <div className='flex h-customh14'>
-                                <div className='w-[60%]'>
-                                    {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
-                                    ) : complianceState ? (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>
-                                    ) : (
-                                        <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
-                                    )}
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex flex-1 overflow-auto default-sidebar'>
+                                    <div className='w-[60%]'>
+                                        {conditionalLogic || sectionConditionLogicId || pageConditionLogicId ? (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Shows when...</p>
+                                        ) : complianceState ? (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Compliance Logic</p>
+                                        ) : (
+                                            <p className='text-start text-[22px] text-[#2B333B] font-semibold'>Default Value</p>
+                                        )}
 
-                                    <AdvancedEditor
-                                        handleListSectionDetails={handleListSectionDetails}
-                                        showSectionList={showSectionList}
-                                        inputValue={inputValue}
-                                        error={error}
-                                        showMethodSuggestions={showMethodSuggestions}
-                                        suggestions={suggestions}
-                                        handleClickToInsert={handleClickToInsert}
-                                        textareaRef={textareaRef}
-                                        handleInputField={handleInputField}
-                                        secDetailsForSearching={secDetailsForSearching}
+                                        <AdvancedEditor
+                                            handleListSectionDetails={handleListSectionDetails}
+                                            showSectionList={showSectionList}
+                                            inputValue={inputValue}
+                                            error={error}
+                                            showMethodSuggestions={showMethodSuggestions}
+                                            suggestions={suggestions}
+                                            handleClickToInsert={handleClickToInsert}
+                                            textareaRef={textareaRef}
+                                            handleInputField={handleInputField}
+                                            secDetailsForSearching={secDetailsForSearching}
+                                            sections={sections}
+                                            setShowMethodSuggestions={setShowMethodSuggestions}
+                                            isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                            selectedFieldType={selectedFieldType}
+                                            setSelectedType={setSelectedType}
+                                            isDefaultLogic={isDefaultLogic}
+                                            setSelectedQuestion={setSelectedQuestion}
+                                            isChoiceboxField={isChoiceboxField}
+                                            choiceboxValues={choiceboxValues}
+                                        ></AdvancedEditor>
+                                    </div>
+                                    <div className='w-[40%]'>
+                                        <StaticDetails
+                                            handleTabClick={handleTabClick}
+                                            activeTab={activeTab}
+                                            setActiveTab={setActiveTab}
+                                            isDefaultLogic={isDefaultLogic}
+                                            selectedFieldType={selectedFieldType}
+                                            isOperatorModal={isOperatorModal}
+                                            setIsOperatorModal={setIsOperatorModal}
+                                            setIsStringMethodModal={setIsStringMethodModal}
+                                            complianceState={complianceState}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='mt-4 pt-2'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div className='w-[40%]'>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (!isDefaultLogic && !complianceState) ? (
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex-1 overflow-auto default-sidebar'>
+                                    <BasicEditor
+                                        secDetailsForSearching={filterQuestions()}
+                                        questions={allSectionDetails}
                                         sections={sections}
                                         setShowMethodSuggestions={setShowMethodSuggestions}
                                         isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                        selectedFieldType={selectedFieldType}
-                                        setSelectedType={setSelectedType}
-                                        isDefaultLogic={isDefaultLogic}
+                                        conditions={conditions}
+                                        setConditions={setConditions}
+                                        submitSelected={submitSelected}
+                                        setSubmitSelected={setSubmitSelected}
+                                        selectedQuestionId={selectedQuestionId}
+                                        conditionalLogicData={conditionalLogicData}
+                                        sectionConditionLogicId={sectionConditionLogicId}
+                                        pageConditionLogicId={pageConditionLogicId}
+                                        combinedArray={combinedArray}
                                     />
                                 </div>
-                                <div className='w-[40%]'>
-                                    <StaticDetails
-                                        handleTabClick={handleTabClick}
-                                        activeTab={activeTab}
-                                        setActiveTab={setActiveTab}
-                                        isDefaultLogic={isDefaultLogic}
-                                        selectedFieldType={selectedFieldType}
-                                        isOperatorModal={isOperatorModal}
-                                        setIsOperatorModal={setIsOperatorModal}
-                                        setIsStringMethodModal={setIsStringMethodModal}
-                                        complianceState={complianceState}
-                                    />
+                                <div className='mt-4 pt-2'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div className='w-[40%]'>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>) : (!isDefaultLogic && !complianceState) ? (
-                                <BasicEditor
-                                    secDetailsForSearching={filterQuestions()}
-                                    questions={allSectionDetails?.data}
-                                    sections={sections}
-                                    setShowMethodSuggestions={setShowMethodSuggestions}
-                                    isThreedotLoaderBlack={isThreedotLoaderBlack}
-                                    conditions={conditions}
-                                    setConditions={setConditions}
-                                    submitSelected={submitSelected}
-                                    setSubmitSelected={setSubmitSelected}
-                                    selectedQuestionId={selectedQuestionId}
-                                    conditionalLogicData={conditionalLogicData}
-                                    sectionConditionLogicId={sectionConditionLogicId}
-                                    pageConditionLogicId={pageConditionLogicId}
-                                    combinedArray={combinedArray}
-                                />
-                            ) : (complianceState) &&
-                        <ComplianceBasicEditor
-                            secDetailsForSearching={filterQuestions()}
-                            questions={allSectionDetails.data}
-                            sections={sections}
-                            setShowMethodSuggestions={setShowMethodSuggestions}
-                            isThreedotLoaderBlack={isThreedotLoaderBlack}
-                            conditions={conditions}
-                            setConditions={setConditions}
-                            submitSelected={submitSelected}
-                            setSubmitSelected={setSubmitSelected}
-                            setUserInput={setUserInput}
-                            combinedArray={combinedArray}
-                        />
-                        }
-                        <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
-                            {!isDefaultLogic &&
-                                <div className='flex gap-5 items-end'>
-                                    <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
-                                    <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
-                                </div>
-                            }
-                            <div>
-                                <Button2
-                                    text='Cancel'
-                                    type='button'
-                                    testId='cancel'
-                                    data-testid='button1'
-                                    className='w-[162px] h-[50px] text-black font-semibold text-base'
-                                    onClick={() => handleClose()}
-                                >
-                                </Button2>
-                                <Button
-                                    testID={'save-conditional-logic'}
-                                    text='Save'
-                                    onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
-                                    type='button'
-                                    data-testid='cancel'
-                                    className='w-[139px] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold ml-[28px]'
-                                    isThreedotLoading={isThreedotLoader}
-                                >
-                                </Button>
                             </div>
-                        </div>
+                        ) : (complianceState) && (
+                            <div className='flex flex-col h-[calc(100%-20px)]'>
+                                <div className='flex-1 overflow-auto default-sidebar'>
+                                    <ComplianceBasicEditor
+                                        secDetailsForSearching={filterQuestions()}
+                                        questions={allSectionDetails}
+                                        sections={sections}
+                                        setShowMethodSuggestions={setShowMethodSuggestions}
+                                        isThreedotLoaderBlack={isThreedotLoaderBlack}
+                                        conditions={conditions}
+                                        setConditions={setConditions}
+                                        submitSelected={submitSelected}
+                                        setSubmitSelected={setSubmitSelected}
+                                        setUserInput={setUserInput}
+                                        combinedArray={combinedArray}
+                                    />
+                                </div>
+                                <div className='mt-4 pt-2'>
+                                    <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
+                                        {!isDefaultLogic &&
+                                            <div className='flex gap-5 items-end'>
+                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
+                                            </div>
+                                        }
+                                        <div className='w-[40%]'>
+                                            <Button2
+                                                text='Cancel'
+                                                type='button'
+                                                testId='cancel'
+                                                data-testid='button1'
+                                                className='w-[48%] h-[50px] text-black font-semibold text-base mr-[4%]'
+                                                onClick={() => handleClose()}
+                                            />
+                                            <Button
+                                                testID={'save-conditional-logic'}
+                                                text='Save'
+                                                onClick={(tab == 'advance' || isDefaultLogic) ? handleSave : handleSaveBasicEditor}
+                                                type='button'
+                                                data-testid='cancel'
+                                                className='w-[48%] h-[50px] border text-white border-[#2B333B] bg-[#2B333B] hover:bg-black text-base font-semibold'
+                                                isThreedotLoading={isThreedotLoader}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-
             </div>
             {(isOperatorModal || isStringMethodModal) &&
                 <OperatorsModal
