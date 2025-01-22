@@ -648,7 +648,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
 
             const conditions = group.split('&&').map(condition => {
-                debugger
                 condition = trimParentheses(condition);
 
                 // Try parsing as a date condition
