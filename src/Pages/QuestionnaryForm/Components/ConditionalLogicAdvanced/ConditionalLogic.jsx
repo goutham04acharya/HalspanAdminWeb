@@ -92,14 +92,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         const choiceBoxOptionsObj = {};
+        console.log(fieldSettingParams, 'fieldSettingParams')
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                    if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                    } else {
-                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
-                    }
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                } else {
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
                 }
             }
         }
@@ -116,6 +115,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             type: question.type
         };
     });
+    console.log(choiceBoxOptions, 'choiceBoxOptions')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
@@ -460,7 +460,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-            
+
             // 🔎 Check if selectedQuestion is a 'choiceboxfield'
             const matchedQuestion = combinedArray?.find(
                 (item) =>
@@ -580,9 +580,37 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         // Helper function to trim parentheses
-        const trimParentheses = (str) => {
-            return str.replace(/^\((.*)\)$/, '$1');
+        const trimParentheses = (expression) => {
+            let trimmedExpression = expression.trim();
+
+            // Remove outer parentheses if they exist
+            while (trimmedExpression.startsWith('(') && trimmedExpression.endsWith(')')) {
+                // Check if these are matching outer parentheses
+                let count = 0;
+                let isMatchingPair = true;
+
+                for (let i = 0; i < trimmedExpression.length; i++) {
+                    if (trimmedExpression[i] === '(') count++;
+                    if (trimmedExpression[i] === ')') count--;
+
+                    // If count goes negative before the end, these aren't matching outer parentheses
+                    if (count < 0 && i < trimmedExpression.length - 1) {
+                        isMatchingPair = false;
+                        break;
+                    }
+                }
+
+                // Only trim if we found matching outer parentheses
+                if (isMatchingPair && count === 0) {
+                    trimmedExpression = trimmedExpression.slice(1, -1).trim();
+                } else {
+                    break;
+                }
+            }
+
+            return trimmedExpression;
         };
+
 
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
@@ -620,7 +648,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // Parse individual conditions in each group
         const parseConditions = (group) => {
+
             const conditions = group.split('&&').map(condition => {
+                debugger
                 condition = trimParentheses(condition);
 
                 // Try parsing as a date condition
@@ -629,6 +659,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 // Regex to match logical conditions
                 // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                // condition = "( Section_1.Page_1.Question_1.includes("yes") )"
                 const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
