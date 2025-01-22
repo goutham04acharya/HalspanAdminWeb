@@ -92,7 +92,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     useEffect(() => {
         const choiceBoxOptionsObj = {};
-        console.log(fieldSettingParams, 'fieldSettingParams')
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
@@ -115,7 +114,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             type: question.type
         };
     });
-    console.log(choiceBoxOptions, 'choiceBoxOptions')
     // Define string and date methods
     const stringMethods = ["toUpperCase()", "toLowerCase()", "trim()", "includes()"];
     const dateTimeMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()", "getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"];
