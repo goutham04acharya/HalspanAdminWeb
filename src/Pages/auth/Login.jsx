@@ -1,6 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
+import { BeatLoader } from 'react-spinners';
 
 function Login() {
   const { loginWithRedirect } = useAuth0();
@@ -11,7 +12,7 @@ function Login() {
 
   return (
     <div>
-      <h1>Redirecting to login...</h1> 
+      <h1><div className='flex justify-center items-center h-screen'> <BeatLoader color="#000" size={'40px'} /></div></h1> 
     </div>
   );
 }

@@ -30,7 +30,6 @@ function CommonComponents({
                 </label>
                 <input
                     type="text"
-                    // id={labelID}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
                     onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} 
@@ -57,7 +56,6 @@ function CommonComponents({
                 </label>
                 <input
                     type="text"
-                    // id={helpTextId}
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={helpTextPlaceholder}
                     onChange={(e) => handleInputChange(e)}
@@ -86,7 +84,6 @@ function CommonComponents({
                     </label>
                     <input
                         type="text"
-                        // id={placeholderContentId}
                         className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                         placeholder={placeholderContent}
                         value={formParameters?.placeholderContent || ''}

@@ -1,6 +1,7 @@
 import React from 'react'
 import CommonComponents from '../../../CommonComponents/CommonComponents'
 import InputField from '../../../../../../Components/InputField/InputField'
+import { useSelector } from 'react-redux';
 
 function SignatureFieldSetting({
     handleInputChange,
@@ -11,6 +12,8 @@ function SignatureFieldSetting({
     setConditionalLogic,
     formStatus
 }) {
+    const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
+
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>

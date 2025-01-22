@@ -14,6 +14,7 @@ import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import LookupDataset from '../../../../../LookupDataset';
+import DropdownWithSearch from '../../../../../../Components/InputField/DropdownWithSearch';
 
 function TestFieldSetting({
   handleInputChange,
@@ -37,12 +38,18 @@ function TestFieldSetting({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('');
 
   const lastEvaluatedKeyRef = useRef(null);
   const observer = useRef();
   const textareaRef = useRef();
   const navigate = useNavigate();
   const { getAPI } = useApi();
+  const optionDataRef = useRef();
+  // to keep sync
+  useEffect(() => {
+    optionDataRef.current = optionData;
+  }, [optionData]);
 
   const dispatch = useDispatch();
   const options = [
@@ -83,8 +90,6 @@ function TestFieldSetting({
     }
   };
 
-
-
   const handleRegularExpression = (event) => {
     const value = event.target.value;
 
@@ -104,6 +109,7 @@ function TestFieldSetting({
     dispatch(setNewComponent({ id: 'format_error', value, questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   };
+
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
@@ -111,25 +117,35 @@ function TestFieldSetting({
   };
 
   const handleRemoveLookup = () => {
+    setSearchTerm('')
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
 
   // List Functions
-  const fetchLookupList = useCallback(async () => {
+
+  const fetchLookupList = useCallback(async (searchTerm) => {
     setLoading(true);
     const params = Object.fromEntries(searchParams);
     if (lastEvaluatedKeyRef.current) {
       params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
     }
+    if (searchTerm) {
+      params.search = searchTerm
+    }
     try {
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-      // Transform the items array
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
         label: item.name
       }));
-      setOptionData(prevState => [...prevState, ...transformedArray]);
+      let updateOptions;
+      if (params.start_key) {
+        updateOptions = [...optionDataRef.current, ...transformedArray]
+      } else {
+        updateOptions = [...transformedArray]
+      }
+      setOptionData(updateOptions);
       lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
     } catch (error) {
       console.error('Error fetching questionnaires:', error);
@@ -137,7 +153,8 @@ function TestFieldSetting({
 
     setLoading(false);
     setIsFetchingMore(false);
-  }, [searchParams]);
+  }, []);
+
 
   //funtion for infinate scrooling of dropdown
   const lastElementRef = useCallback(node => {
@@ -146,11 +163,11 @@ function TestFieldSetting({
     observer.current = new IntersectionObserver(entries => {
       if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
         setIsFetchingMore(true);
-        fetchLookupList();
+        fetchLookupList(searchTerm);
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading, isFetchingMore, fieldSettingParameters?.type]);
+  }, [loading, isFetchingMore,]);
 
   function isValidRegex(pattern) {
     try {
@@ -167,7 +184,7 @@ function TestFieldSetting({
     const value = textareaRef.current.value;
 
     if (event.key === "Backspace" && textarea.selectionStart > 0) {
-      
+
       // Find all regex matches in the input value
       const matches = [...value.matchAll(regex)];
       // Check if the cursor is at the end of any match
@@ -181,7 +198,7 @@ function TestFieldSetting({
           // Remove the matched string
           const newValue =
             value.slice(0, start) + value.slice(end);
-          dispatch(setNewComponent({id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
+          dispatch(setNewComponent({ id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
           return;
         }
       }
@@ -189,7 +206,7 @@ function TestFieldSetting({
   };
 
   useEffect(() => {
-    fetchLookupList();
+    fetchLookupList(searchTerm);
   }, [fetchLookupList]);
 
   return (
@@ -346,9 +363,38 @@ function TestFieldSetting({
                       options={optionData}
                       lastElementRef={lastElementRef}
                       textFieldLookup
+                      setSearchTerm={setSearchTerm}
+                      searchTerm={searchTerm}
+                      setOptionData={setOptionData}
+                      fetchFunc={fetchLookupList}
+                      lookup={true}
+                      lastEvaluatedKeyRef={lastEvaluatedKeyRef}
                     />
+                    {/* <DropdownWithSearch
+                      label=''
+                      id='lookup'
+                      placeholder='Select the lookup list'
+                      className={`w-full ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px]`}
+                      testID='lookup-dropdown'
+                      labeltestID='lookup-list'
+                      selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
+                      isDropdownOpen={isLookupOpen}
+                      setDropdownOpen={setIsLookupOpen}
+                      handleOptionClick={handleLookupOption}
+                      formStatus={formStatus}
+                      top='20px'
+                      close='true'
+                      options={optionData}
+                      handleRemoveLookup={handleRemoveLookup} // Pass the remove handler
+                      textFieldLookup={true} // Enable search functionality
+                    /> */}
                   </div>
-                  <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
+                  <button onClick={formStatus === 'Draft' ? () => {
+                    setShowCreateModal(true)
+                    const params = Object.fromEntries(searchParams);
+                    delete params.search
+                    setSearchTerm(null)
+                  } : null} className={`ml-4 ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'}`}>
                     <img src="/Images/plus.svg" alt="plus" />
                   </button>
                 </div>}

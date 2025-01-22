@@ -12,7 +12,7 @@ function Pages({ pageIndex,
   handleAddRemoveQuestion,
   handleDeletequestionModal,
   sections,
-  handleAutoSave,
+  // handleAutoSave,
   setSections,
   formStatus,
 }) {
@@ -60,7 +60,7 @@ function Pages({ pageIndex,
     dispatch(setDataIsSame(update));
 
     // Call handleAutoSave with the correct sectionId and updated sections
-    handleAutoSave(sectionId, updatedSections);
+    // handleAutoSave(sectionId, updatedSections);
   };
   return (
     <div>
