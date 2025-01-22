@@ -95,11 +95,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         questionType.forEach((question) => {
             if (fieldSettingParams[question.question_id] && fieldSettingParams[question.question_id].componentType === 'choiceboxfield') {
                 if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                    if (fieldSettingParams[question?.question_id]?.source === 'fixedList') {
-                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
-                    } else {
-                        choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
-                    }
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].fixedChoiceArray
+                } else {
+                    choiceBoxOptionsObj[question.question_id] = fieldSettingParams[question.question_id].lookupOptionChoice;
                 }
             }
         }
@@ -460,7 +458,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowSectionList(false);
             setInputValue(textarea.value);
             setLogic(textarea.value);
-            
+
             // 🔎 Check if selectedQuestion is a 'choiceboxfield'
             const matchedQuestion = combinedArray?.find(
                 (item) =>
@@ -520,7 +518,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const questionName = questionPart.replaceAll(/_/g, ' ');
 
         // Step 3: Search for the matching section in the data
-        const matchingSection = data?.sections.find(section => section.section_name === sectionName);
+        const matchingSection = data?.sections?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
             return null; // No matching section found
         }
@@ -580,10 +578,36 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         // Helper function to trim parentheses
-        const trimParentheses = (str) => {
-            return str.replace(/^\((.*)\)$/, '$1');
-        };
+        const trimParentheses = (expression) => {
+            let trimmedExpression = expression.trim();
 
+            // Remove outer parentheses if they exist
+            while (trimmedExpression.startsWith('(') && trimmedExpression.endsWith(')')) {
+                // Check if these are matching outer parentheses
+                let count = 0;
+                let isMatchingPair = true;
+
+                for (let i = 0; i < trimmedExpression.length; i++) {
+                    if (trimmedExpression[i] === '(') count++;
+                    if (trimmedExpression[i] === ')') count--;
+
+                    // If count goes negative before the end, these aren't matching outer parentheses
+                    if (count < 0 && i < trimmedExpression.length - 1) {
+                        isMatchingPair = false;
+                        break;
+                    }
+                }
+
+                // Only trim if we found matching outer parentheses
+                if (isMatchingPair && count === 0) {
+                    trimmedExpression = trimmedExpression.slice(1, -1).trim();
+                } else {
+                    break;
+                }
+            }
+
+            return trimmedExpression;
+        };
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
             const date = new Date(timestamp * 1000);
@@ -592,21 +616,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         };
-
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
             const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
             const match = condition?.match(pattern);
-
             if (!match) {
                 return null;
             }
-
             const [_, question_name, timestamp, offsetDays] = match;
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
-
             return {
                 question_name: question_name.trim(),
                 condition_logic: 'date is “X” date of set date',
@@ -622,15 +642,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-
                 // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
-
                 // Regex to match logical conditions
-                // const matches = condition.match(/(!?)\s*([\w.]+)\s*(\?.includes|\.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
                 const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -639,7 +655,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         question_name = question_name.replaceAll('.length', '');
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.sections);
-
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
                     if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
@@ -761,9 +776,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const fetchData = async () => {
             if (complianceState) {
                 try {
-                    // const response = await getAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`);
-                    // Extract default_content based on selected index
-                    // const selectedLogic = response?.data?.data?.compliance_logic[complianceLogicId];
                     const selectedLogic = complianceLogic[complianceLogicId];
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {

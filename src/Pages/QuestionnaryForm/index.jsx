@@ -250,7 +250,7 @@ const QuestionnaryForm = () => {
             } else {
                 updatedValue = ""; // Reset the input if invalid
             }
-            dispatch(setNewComponent({ id:'fileSize', value: updatedValue, questionId: selectedQuestionId }));
+            dispatch(setNewComponent({ id: 'fileSize', value: updatedValue, questionId: selectedQuestionId }));
 
         }
 
@@ -1399,15 +1399,31 @@ const QuestionnaryForm = () => {
             console.log('Error updating API')
         }
     }
+    const checkForQuestions = () => {
+        let hasQuestions = false; // Initialize flag as false
+
+        // Iterate through sections
+        sectionDetails?.sections?.forEach((section) => {
+            // Iterate through pages in each section
+            section.pages.forEach((page) => {
+                // Check if the page has at least one question
+                if (page.questions && page.questions.length > 0) {
+                    hasQuestions = true; // Set flag to true if a question is found
+                }
+            });
+        });
+
+        return hasQuestions; // Return the flag
+    };
 
     const globalSaveHandler = async (key) => {
-        if(!key){
+        if (!key) {
             setGlobalSaveLoading(true);
-        }else{
+        } else {
             setGlobalSaveLoading(false)
         }
-        
-    
+
+
         // Check if there are any validation errors
         const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
 
@@ -1543,7 +1559,12 @@ const QuestionnaryForm = () => {
             }
             setSectionDetails(sectionBody);
             cleanSections();
-            if(!key){
+            let hasQuestion = checkForQuestions();
+            if (!key && !hasQuestion) {
+                setToastError('Please add questions to the questionnaire.')
+                setGlobalSaveLoading(false);
+            }
+            else if (!key && hasQuestion) {
                 let response = await PatchAPI(`questionnaires/${questionnaire_id}/${version_number}`, sectionBody);
                 // Sync compareSavedSections with the updated sections
                 setCompareSavedSections(sections);
@@ -1553,15 +1574,20 @@ const QuestionnaryForm = () => {
                 setGlobalSaveLoading(false);
                 setSaveClick(false)
             }
-            
+
         } catch (error) {
             console.log(error);
             setGlobalSaveLoading(false);
         }
-       
+
     };
     useEffect(() => {
-        globalSaveHandler('localsave');
+        try { 
+            globalSaveHandler('localsave'); 
+        } catch { 
+            console.log('error while calling save function');
+        }
+
     }, [fieldSettingParams, sections])
     const truncateText = (text, maxLength) => {
         if (!text || text.length <= maxLength) {
@@ -1754,8 +1780,9 @@ const QuestionnaryForm = () => {
                                 isThreedotLoading={globalSaveLoading}
                                 text='Save'
                                 className='w-1/3 h-[60px] py-[17px] px-[29px] rounded-none font-semibold text-base text-[#FFFFFF] bg-[#2B333B] hover:bg-[#000000] border-l border-r border-[#EFF1F8]'
-                                disabled={formStatus !== 'Draft'} 
+                                disabled={formStatus !== 'Draft'}
                                 onClick={() => {
+                                    // setIsSaveClick(true)
                                     globalSaveHandler();
                                 }}
                             />
@@ -1968,6 +1995,7 @@ const QuestionnaryForm = () => {
                     version_number={version_number}
                     fieldSettingParameters={fieldSettingParams}
                     sectionDetails={sectionDetails}
+                    questionnaireComplianceLogic={complianceLogic}
                 />
             }
         </>
