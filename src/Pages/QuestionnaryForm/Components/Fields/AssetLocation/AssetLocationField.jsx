@@ -173,9 +173,11 @@
 // };
 
 // export default AssetLocationField;
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from '../../../../../Components/Image/Image';
 import InfinateDropdown from '../../../../../Components/InputField/InfinateDropdown';
+import useApi from '../../../../../services/CustomHook/useApi';
+import { useCallback } from 'react';
 
 const AssetLocationField = ({
     label,
@@ -190,6 +192,7 @@ const AssetLocationField = ({
     preview,
     question
 }) => {
+    const { getAPI } = useApi();
     const [isSiteDropdownOpen, setIsSiteDropdownOpen] = useState(false);
     const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
     const [isLevelDropdownOpen, setIsLevelDropdownOpen] = useState(false);
@@ -198,29 +201,128 @@ const AssetLocationField = ({
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedLevel, setSelectedLevel] = useState(null);
 
-    const siteOptions = [
-        { label: '17 Alexander ridge', value: 1 },
-        { label: 'Belper Campus', value: 2 },
-        { label: 'Blackpool Campus', value: 3 },
-        { label: 'Lymington Campus', value: 4 },
-        { label: 'Mexborough Campus', value: 5 }
-    ];
+    const [optionsData, setOptionsData] = useState({
+        sites: [],
+        locations: [],
+        levels: []
+    });
 
-    const locationOptions = [
-        { label: '049 Nicola flat', value: 1, site: 1 },
-        { label: '139 Mark street', value: 2, site: 1 },
-        { label: '2223new york buildin', value: 3, site: 2 },
-        { label: '26 Wilkinson dam', value: 4, site: 2 },
-        { label: "3 Rowley road", value: 5, site: 3 }
-    ];
+    const [isLoading, setIsLoading] = useState({
+        sites: false,
+        locations: false,
+        levels: false
+    });
 
-    const levelOptions = [
-        { label: 'building in site', value: 1, location: 1 },
-        { label: '2 Alexander ridge', value: 2, location: 1 },
-        { label: '70 Nicola flat', value: 3, location: 2 },
-        { label: '951 Mark street', value: 4, location: 3 },
-        { label: 'Empire Building', value: 5, location: 4 }
-    ];
+    const fetchSiteOptionList = useCallback(async () => {
+        try {
+            setIsLoading(prev => ({ ...prev, sites: true }));
+            const response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}sites`, null, true)
+            const responseItem = response?.data?.results || [];
+
+            const newItems = responseItem.map(site => ({
+                label: site.name,
+                value: site.id
+            }));
+
+            setOptionsData(prev => ({
+                ...prev,
+                sites: newItems
+            }));
+
+        } catch (error) {
+            setErrors(prev => ({ ...prev, 'site': error }));
+            console.error('Error fetching SiteOptionList:', error);
+        } finally {
+            setIsLoading(prev => ({ ...prev, sites: false }));
+        }
+    }, []);
+
+
+    const fetchLocationOptionList = useCallback(async (siteId) => {
+        try {
+            setIsLoading(prev => ({ ...prev, locations: true }));
+            const response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}locations?site=${siteId}`, null, true)
+            const responseItem = response?.data?.results || [];
+
+            const newItems = responseItem.map(location => ({
+                label: location.name,
+                value: location.id,
+                site: location.id,
+            }));
+
+            setOptionsData(prev => ({
+                ...prev,
+                locations: newItems
+            }));
+        } catch (error) {
+            console.error('Error fetching SiteOptionList:', error);
+        } finally {
+            setIsLoading(prev => ({ ...prev, locations: false }));
+        }
+    }, [selectedSite]);
+
+    const fetchLevelOptionList = useCallback(async (locationId) => {
+        try {
+            setIsLoading(prev => ({ ...prev, levels: true }));
+            const response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}levels?location=${locationId}`, null, true)
+            const responseItem = response?.data?.results || [];
+
+            const newItems = responseItem.map(level => ({
+                label: level.name,
+                value: level.id,
+                location: level.id,
+            }));
+
+            setOptionsData(prev => ({
+                ...prev,
+                levels: newItems
+            }));
+        } catch (error) {
+            console.error('Error fetching SiteOptionList:', error);
+        } finally {
+            setIsLoading(prev => ({ ...prev, levels: false }));
+        }
+    }, [selectedLocation]);
+
+
+    useEffect(() => {
+        fetchSiteOptionList()
+    }, [])
+
+    useEffect(() => {
+        if (selectedSite)
+            fetchLocationOptionList(selectedSite?.value)
+    }, [selectedSite])
+
+    useEffect(() => {
+        if (selectedLocation) {
+            fetchLevelOptionList(selectedLocation?.value)
+        }
+    }, [selectedLocation])
+
+    // const siteOptions = [
+    //     { label: '17 Alexander ridge', value: 1 },
+    //     { label: 'Belper Campus', value: 2 },
+    //     { label: 'Blackpool Campus', value: 3 },
+    //     { label: 'Lymington Campus', value: 4 },
+    //     { label: 'Mexborough Campus', value: 5 }
+    // ];
+
+    // const locationOptions = [
+    //     { label: '049 Nicola flat', value: 1, site: 1 },
+    //     { label: '139 Mark street', value: 2, site: 1 },
+    //     { label: '2223new york buildin', value: 3, site: 2 },
+    //     { label: '26 Wilkinson dam', value: 4, site: 2 },
+    //     { label: "3 Rowley road", value: 5, site: 3 }
+    // ];
+
+    // const levelOptions = [
+    //     { label: 'building in site', value: 1, location: 1 },
+    //     { label: '2 Alexander ridge', value: 2, location: 1 },
+    //     { label: '70 Nicola flat', value: 3, location: 2 },
+    //     { label: '951 Mark street', value: 4, location: 3 },
+    //     { label: 'Empire Building', value: 5, location: 4 }
+    // ];
 
     const handleSiteChange = (siteId) => {
         setSelectedSite(prev => {
@@ -279,13 +381,19 @@ const AssetLocationField = ({
                         labeltestID='site'
                         id='Site'
                         isDropdownOpen={isSiteDropdownOpen}
-                        setDropdownOpen={setIsSiteDropdownOpen}
+                        setDropdownOpen={!isLoading.sites && setIsSiteDropdownOpen}
                         selectedOption={selectedSite}
-                        options={siteOptions}
+                        options={optionsData.sites}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                        placeholder='Site'
+                        placeholder={isLoading.sites ? 'Loading...' : 'Site'}
                         handleOptionClick={(siteId) => handleSiteChange(siteId)}
                         assetLocation
+                        handleInputFieldClick={() => {
+                            setIsLocationDropdownOpen(false);
+                            setIsLevelDropdownOpen(false);
+                        }}
+                        disabled={isLoading.sites}
+                        cursor={isLoading.sites ? 'cursor-not-allowed' : 'cursor-pointer'}
                     />
                 </div>
             )}
@@ -296,11 +404,12 @@ const AssetLocationField = ({
                     type={type}
                     id={textId}
                     value={value}
+                    disabled={!selectedSite}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                    placeholder='Select'
+                    placeholder={'Select'}
                     onClick={handleChange} />
                 <div className='absolute right-4 top-[74%] -translate-y-1/2'>
-                    <Image src='down' />
+                    <Image src='open-Filter' className={`${!selectedSite} && opacity-[50%]`} />
                 </div>
             </div>}
             {(preview && selectedSite) && (
@@ -308,19 +417,26 @@ const AssetLocationField = ({
                     {/* <label htmlFor={textId} className='font-medium text-base text-black'>Location</label> */}
                     <InfinateDropdown
                         assets
-                        label='Building'
+                        label={'Building'}
                         testID='location'
                         labeltestID='building'
                         type={type}
                         id='Location'
                         isDropdownOpen={isLocationDropdownOpen}
-                        setDropdownOpen={setIsLocationDropdownOpen}
+                        setDropdownOpen={!isLoading.locations && setIsLocationDropdownOpen}
                         selectedOption={selectedLocation}
-                        options={locationOptions.filter(location => location.site === selectedSite.value)}
+                        options={optionsData.locations}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                        placeholder='Building'
+                        placeholder={isLoading.locations ? 'Loading...' : 'Building'}
                         handleOptionClick={(locationId) => handleLocationChange(locationId)}
                         assetLocation
+                        handleInputFieldClick={
+                            () => {
+                                setIsSiteDropdownOpen(false);
+                                setIsLevelDropdownOpen(false);
+                            }}
+                        disabled={isLoading.locations}
+                        cursor={isLoading.locations ? 'cursor-not-allowed' : 'cursor-pointer'}
                     />
                 </div>
             )}
@@ -332,10 +448,11 @@ const AssetLocationField = ({
                     id={textId}
                     value={value}
                     className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                    placeholder='Select'
+                    placeholder={'Select'}
+                    disabled={!selectedLocation}
                     onClick={handleChange} />
                 <div className='absolute right-4 top-[74%] -translate-y-1/2'>
-                    <Image src='down' />
+                    <Image src='open-Filter' className={`${!selectedSite} && opacity-[50%]`} />
                 </div>
             </div>}
             {(preview && selectedLocation) && (
@@ -349,13 +466,20 @@ const AssetLocationField = ({
                         type={type}
                         id='Level'
                         isDropdownOpen={isLevelDropdownOpen}
-                        setDropdownOpen={setIsLevelDropdownOpen}
+                        setDropdownOpen={!isLoading.levels && setIsLevelDropdownOpen}
                         selectedOption={selectedLevel}
-                        options={levelOptions.filter(level => level.location === selectedLocation.value)}
+                        options={optionsData.levels}
                         className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] mt-5 ${className}`}
-                        placeholder='Floor'
+                        placeholder={isLoading.levels ? 'Loading...' : 'Floor'}
                         handleOptionClick={(levelId) => handleLevelChange(levelId)}
                         assetLocation
+                        handleInputFieldClick={
+                            () => {
+                                setIsLocationDropdownOpen(false);
+                                setIsSiteDropdownOpen(false);
+                            }}
+                        disabled={isLoading.levels}
+                        cursor={isLoading.levels ? 'cursor-not-allowed' : 'cursor-pointer'}
                     />
                 </div>
             )}
