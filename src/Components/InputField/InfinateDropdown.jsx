@@ -41,7 +41,8 @@ function InfinateDropdown({
     lastEvaluatedKeyRef,
     handleInputFieldClick,
     disabled,
-    cursor
+    cursor,
+    noDataMessage
 }) {
 
     const [timer, setTimer] = useState();
@@ -60,7 +61,7 @@ function InfinateDropdown({
         }
     }
     return (
-        <div className={`cursor-pointer w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
+        <div className={`w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>
                 {label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}
             </label>
@@ -71,7 +72,7 @@ function InfinateDropdown({
                     placeholder={placeholder}
                     onClick={() => {
                         if (!disabled) {
-                            handleInputFieldClick();
+                            handleInputFieldClick && handleInputFieldClick();
                             setDropdownOpen(isDropdownOpen ? null : id);
                         }
                     }}
@@ -140,8 +141,9 @@ function InfinateDropdown({
                                     </li>
                                 ))
                             ) : (
-                                <p className="p-5">No search results found</p>
-                            )}
+                                <p className="p-5">
+                                    {noDataMessage ? noDataMessage : "No search results found"}
+                                </p>)}
                             <li ref={lastElementRef} className="h-1"></li>
                         </ul>
                     </div>
