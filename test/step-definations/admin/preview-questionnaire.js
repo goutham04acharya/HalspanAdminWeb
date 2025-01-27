@@ -725,7 +725,7 @@ When('I select the location in asset location for section {int} page {int} quest
     await driver.wait(until.elementIsVisible(assetLocation), 2000);
     await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="site"]`)), 5000).click();
     await new Promise(resolve => setTimeout(resolve, 250));
-    await driver.wait(until.elementLocated(By.css(`[data-testid="site-0"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="site-1"]`))).click();
     console.log('Site 1');
     // Uncomment this later ===================================================== !!!!important
     try {
