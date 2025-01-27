@@ -730,11 +730,11 @@ When('I select the location in asset location for section {int} page {int} quest
     // Uncomment this later ===================================================== !!!!important
     try {
         await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="location"]`)), 5000).click();
-        await new Promise(resolve => setTimeout(resolve, 250));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await driver.wait(until.elementLocated(By.css(`[data-testid="building-0"]`))).click();
         console.log('Building 1');
         await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"] [data-testid="level"]`)), 5000).click();
-        await new Promise(resolve => setTimeout(resolve, 250));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await driver.wait(until.elementLocated(By.css(`[data-testid="floor-0"]`))).click();
         console.log('Floor 1');
     } catch (error) {
