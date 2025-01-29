@@ -1765,8 +1765,9 @@ const QuestionnaryForm = () => {
                                 onClick={() => {
                                     handleDataChanges()
                                     dispatch(setSelectedComponent(false))
-                                }}>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
+                                }}
+                                data-testid='cancel'>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle"/>
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
