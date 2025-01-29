@@ -1,3 +1,4 @@
+@1.0
 Feature: Halspan - Admin - Organizing into Multiple Section, Pages
     As an Admin, I want to create a questionnaire form by organizing it into multiple sections, pages
     Conditions of Satisfaction
@@ -26,6 +27,8 @@ Feature: Halspan - Admin - Organizing into Multiple Section, Pages
   @create_question
   Scenario: Admin saves added section
     Given I am on the questionnaire management section
+    When I add a new question to the page 1 in section 1
+    When I click the textbox button
     When I click on add new section
     When I click on save button for section 2
     Then I should read a message stating that "2 sections saved successfully"
