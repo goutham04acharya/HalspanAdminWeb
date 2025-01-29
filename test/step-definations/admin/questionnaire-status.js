@@ -41,3 +41,8 @@ When('I click the publish button', async function () {
     await driver.wait(until.elementLocated(By.css('[data-testid="publish"]')), 10000).click();
     await new Promise(resolve => setTimeout(resolve, 2000));
 });
+
+When('I click the cancel button for questionnaire', async function () {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    await driver.wait(until.elementLocated(By.css('[data-testid="cancel-qsn"]')), 10000).click();
+})

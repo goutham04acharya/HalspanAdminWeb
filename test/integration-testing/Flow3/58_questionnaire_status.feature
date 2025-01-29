@@ -26,7 +26,7 @@ Feature: Halspan Admin Web Published Questionnaire to be in list
         When I click the textbox button
         When I click on save button for section 1
         Then I should read a message stating that "1 sections saved successfully"
-        When I click the cancel button
+        When I click the cancel button for questionnaire
         Then I should be redirected to questionnaire version listing screen
         Then I should see the version table header containing '["NAME", "LAST EDITED", "EDITED BY", "STATUS"]'
         When I change the status of the version to testing

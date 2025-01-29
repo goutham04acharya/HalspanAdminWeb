@@ -1766,7 +1766,7 @@ const QuestionnaryForm = () => {
                                     handleDataChanges()
                                     dispatch(setSelectedComponent(false))
                                 }}
-                                data-testid='cancel'>
+                                data-testid='cancel-qsn'>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle"/>
                                 Cancel
                             </button>
