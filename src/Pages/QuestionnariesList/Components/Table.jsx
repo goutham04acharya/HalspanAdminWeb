@@ -67,8 +67,8 @@ function Table({ loading, QueList, lastElementRef, setCloneModal, handleVersionL
                                     <td data-testid="status" className='py-2 px-[10px] bg-[#F4F6FA]'>
                                         {QueInfo?.status
                                             ? (
-                                                <span className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ${getStatusStyles(QueInfo?.status)} `} title={`${getStatusText(QueInfo?.status)}`}>
-                                                    {getStatusText(QueInfo?.status)}
+                                                <span className={`py-[4px] px-[19px] rounded-[15px] text-[16px] font-normal text-[#2B333B] capitalize ${getStatusStyles(QueInfo.is_published ? 'Published' :  QueInfo?.status)} `} title={`${getStatusText(QueInfo?.status)}`}>
+                                                    {getStatusText(QueInfo.is_published ? 'Published' : QueInfo?.status)}
                                                 </span>
                                             )
                                             : (
