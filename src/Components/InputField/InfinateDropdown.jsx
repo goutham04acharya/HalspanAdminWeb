@@ -38,7 +38,11 @@ function InfinateDropdown({
     setOptionData,
     fetchFunc,
     lookup,
-    lastEvaluatedKeyRef
+    lastEvaluatedKeyRef,
+    handleInputFieldClick,
+    disabled,
+    cursor,
+    noDataMessage
 }) {
 
     const [timer, setTimer] = useState();
@@ -56,9 +60,8 @@ function InfinateDropdown({
             //loader
         }
     }
-
     return (
-        <div className={`cursor-pointer w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
+        <div className={`w-full relative mt-3 ${mainDivStyle}`} ref={dropdownRef}>
             <label htmlFor={id} className={labelStyle}>
                 {label} {mandatoryField ? <span className='text-[#FFA318]'>*</span> : null}
             </label>
@@ -67,11 +70,16 @@ function InfinateDropdown({
                     type="text"
                     id={id}
                     placeholder={placeholder}
-                    onClick={() => setDropdownOpen(isDropdownOpen ? null : id)}
+                    onClick={() => {
+                        if (!disabled) {
+                            handleInputFieldClick && handleInputFieldClick();
+                            setDropdownOpen(isDropdownOpen ? null : id);
+                        }
+                    }}
                     data-testid={testID}
                     disabled={!preview ? (formStatus !== 'Draft' && !choiceBox && !preview && !textFieldLookup && !assetLocation) : readonly}
                     value={preview ? selectedOption : (selectedOption ? selectedOption.label : '')}
-                    className={`${className} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
+                    className={`${className} ${cursor} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
                 {(selectedOption && close) ?
@@ -133,8 +141,9 @@ function InfinateDropdown({
                                     </li>
                                 ))
                             ) : (
-                                <p className="p-5">No search results found</p>
-                            )}
+                                <p className="p-5">
+                                    {noDataMessage ? noDataMessage : "No search results found"}
+                                </p>)}
                             <li ref={lastElementRef} className="h-1"></li>
                         </ul>
                     </div>

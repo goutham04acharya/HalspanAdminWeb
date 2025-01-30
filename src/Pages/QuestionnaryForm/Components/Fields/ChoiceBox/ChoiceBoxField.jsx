@@ -190,7 +190,7 @@ const ChoiceBoxField = ({
                         setDropdownOpen={setIsDropdownOpen}
                         handleOptionClick={handleDropdownChange}
                         top='20px'
-                        options={question?.source_value ? question?.source_value : null}
+                        options={question?.source_value ? question.source_value.filter(item => item.value !== "") : null}
                         selectedOption={questionValue[question?.question_id]}
                         preview
                         choiceBox
@@ -198,6 +198,7 @@ const ChoiceBoxField = ({
                         type={question?.type}
                         dropdownRef={dropdownRef}
                         readonly={question?.options?.read_only}
+                        noDataMessage='No data found'
                     />}
                 </div>
             )}
