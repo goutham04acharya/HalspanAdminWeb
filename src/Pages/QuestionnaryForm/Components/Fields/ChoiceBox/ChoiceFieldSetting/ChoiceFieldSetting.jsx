@@ -262,7 +262,6 @@ function ChoiceFieldSetting({
                                     Lookup
                                 </label>
                             </div>
-
                             {fieldSettingParameters?.source === 'lookup' &&
                                 <div className='w-full flex items-center mt-3'>
                                     <div className='w-[90%]'>
@@ -273,7 +272,7 @@ function ChoiceFieldSetting({
                                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                             testID='lookup-dropdown'
                                             labeltestID='lookup-list'
-                                            selectedOption={optionData?.find(option => option?.label === fieldSettingParameters?.lookupValue)}
+                                            selectedOption={{label : fieldSettingParameters.lookupValue, value: fieldSettingParameters.lookupOption, choices: fieldSettingParameters.lookupOptionChoice}}
                                             handleRemoveLookup={formStatus === 'Draft' ? handleRemoveLookup : null}
                                             isDropdownOpen={formStatus === 'Draft' ? isLookupOpen : false}
                                             setDropdownOpen={formStatus === 'Draft' ? setIsLookupOpen : null}
@@ -289,14 +288,13 @@ function ChoiceFieldSetting({
                                             fetchFunc={fetchLookupList}
                                             lookup={true}
                                             lastEvaluatedKeyRef={lastEvaluatedKeyRef}
-
                                         />
                                     </div>
                                     <button onClick={formStatus === 'Draft' ? () => setShowCreateModal(true) : null} className={`${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} ml-4`}>
                                         <img src="/Images/plus.svg" alt="plus" />
                                     </button>
                                 </div>}
-                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
+                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (fieldSettingParameters.lookupValue ==='' || fieldSettingParameters.lookupValue === undefined)  && (
                                 <ErrorMessage error={'No lookup list available. Please create one'} />
                             )}
                             {/* OptionsComponent added here */}

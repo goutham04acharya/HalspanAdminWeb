@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Debounce from '../../CommonMethods/debounce';
+import React, { useState } from 'react';
 
 function InfinateDropdown({
     className,
@@ -19,7 +18,6 @@ function InfinateDropdown({
     labeltestID,
     validationError,
     close,
-    setSelectedOption,
     lastElementRef,
     handleRemoveLookup,
     preview,
