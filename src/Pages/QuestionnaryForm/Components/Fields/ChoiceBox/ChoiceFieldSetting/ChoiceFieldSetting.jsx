@@ -294,7 +294,7 @@ function ChoiceFieldSetting({
                                         <img src="/Images/plus.svg" alt="plus" />
                                     </button>
                                 </div>}
-                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (
+                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (fieldSettingParameters.lookupValue ==='' || fieldSettingParameters.lookupValue === undefined)  && (
                                 <ErrorMessage error={'No lookup list available. Please create one'} />
                             )}
                             {/* OptionsComponent added here */}
