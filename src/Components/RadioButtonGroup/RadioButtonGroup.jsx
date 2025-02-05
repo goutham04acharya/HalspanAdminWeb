@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
 import { useDispatch } from 'react-redux';
 
-const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidationErrors, preview, question, questionValue }) => {
-    const [selectedValue, setSelectedValue] = useState('');
+const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
     const dispatch = useDispatch();
 
     const handleChange = (event, uniqueKey) => {
@@ -12,7 +11,6 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
             value: event.target.value,
         };
         dispatch(setQuestionValue({ question_id: question?.question_id, value: newValue }));
-        setSelectedValue(newValue);
         onChange(newValue);
     };
 
@@ -20,9 +18,8 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
         <div className="space-y-2 mt-4">
             <div className="space-y-2 mt-4 flex flex-col relative">
                 {values?.map((option, index) => {
-                    const uniqueKey = option.id || option.uuid || option.index || index; // Determine unique key
+                    const uniqueKey = option?.id || option?.uuid || option?.index || index; // Determine unique key
                     const isChecked = questionValue?.[question?.question_id]?.key === uniqueKey; // Check based on uniqueKey
-
                     return (
                         <label
                             key={uniqueKey}
@@ -31,7 +28,7 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
                             <div className="relative flex items-center">
                                 <input
                                     type="radio"
-                                    value={option.value}
+                                    value={option?.value}
                                     checked={isChecked}
                                     onChange={(e) => handleChange(e, uniqueKey)}
                                     className="absolute w-0 h-0 opacity-0"
@@ -42,7 +39,7 @@ const RadioButtonGroup = ({ values, name, onChange, testId, setValue, setValidat
                                     )}
                                 </div>
                             </div>
-                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option.value || option}</span>
+                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value}</span>
                         </label>
                     );
                 })}
