@@ -52,7 +52,7 @@ Feature: Halspan - Admin adds the condition in basic editor
         When I select the condition from basic editor
         Then I click the save button for default value
         And I should see the basic editor compliance logic in default value field
-        When I click the save button
+        When I click the save button for the questionnaire version
 
         When I click the preview button
         Then I should see the mobile preview
