@@ -380,12 +380,13 @@ stages:
             npm run generate_report_cobertura
             echo "Completed tasks - exit $?"
           displayName: Integration Testing
+          condition: always()
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/failed_scenarios/ # Assuming logs are in working directory
           artifact: '$(system.JobId)-failedScenarios'
           condition: always()
         - publish: $(System.DefaultWorkingDirectory)/test/step-definations/coverageData/ # Assuming logs are in working directory
           artifact: '1-coverageData'
-          condition: always()
+          # condition: always()
         - publish: $(System.DefaultWorkingDirectory)/reports/ # Assuming logs are in working directory
           artifact: '1-living-documentation'
         - task: PublishTestResults@2
