@@ -95,7 +95,7 @@ function CreateQuestionnary() {
       public_name: createDetails?.public_name.trim(),
       internal_name: createDetails?.internal_name.trim(),
       description: createDetails?.description.trim(),
-      asset_type: selectedOption?.asset_name?.id.toString(),
+      asset_type: selectedOption?.asset_name?.id,
       asset_name: selectedOption?.asset_name?.name,
       language: selectedOption?.language?.value,
       services_type: selectedOption?.services_type?.value,
