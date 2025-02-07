@@ -52,6 +52,8 @@ function Questionnaries() {
   };
 
   const handleFilter = (option) => {
+    if(selectedOption !== option.name) {
+      lastEvaluatedKeyRef.current = null
     setSelectedOption(option?.name);
     let params = Object.fromEntries(searchParams);
     if (params.asset_type === option?.id) {
@@ -68,8 +70,9 @@ function Questionnaries() {
       delete params.asset_type;
       delete params.asset_name;
     }
-    setDropdownOpen(false);
     setSearchParams({ ...params });
+  }
+  setDropdownOpen(false);
   };
 
   const clearFilters = () => {
