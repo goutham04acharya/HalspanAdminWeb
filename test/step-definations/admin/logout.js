@@ -56,10 +56,9 @@ Then('I should be on the dashboard screen', async function () {
 When('I click the confirm button', async function () {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     await driver.wait(until.elementLocated(By.css('[data-testid="confirm"]'))).click();
-    await new Promise((resolve) => setTimeout(resolve, 4000));
 });
 
 Then('I should be redirected to the login screen', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 4000));
     await driver.wait(until.elementLocated(By.xpath('//h1[text()="Welcome"]')));
 });
