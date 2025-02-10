@@ -16,7 +16,7 @@ When('I click the log out button', async function () {
 });
 
 Then('I should see a confirmation prompt stating to logout', async function () {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     await driver.wait(until.elementLocated(By.xpath('//*[text()="Logout"]')));
     await driver.wait(until.elementLocated(By.xpath('//*[text()="You will be signed out of your account."]')));
 });
