@@ -182,6 +182,10 @@ function Questionnaries() {
   };
 
   const handleClone = async () => {
+    if (!selectedVersion) {
+      setToastError('Please select a version to duplicate.');
+      return;
+  }
     setCloneLoading(true)
     try {
       let body = {

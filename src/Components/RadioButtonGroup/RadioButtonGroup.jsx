@@ -26,6 +26,7 @@ const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
                             className="flex items-center cursor-pointer group space-x-2"
                         >
                             <div className="relative flex items-center">
+                                {console.log('option?.valueoption?.value', option)}
                                 <input
                                     type="radio"
                                     value={option?.value}
@@ -39,7 +40,7 @@ const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
                                     )}
                                 </div>
                             </div>
-                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value}</span>
+                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value !== undefined ? option?.value : option}</span>
                         </label>
                     );
                 })}
