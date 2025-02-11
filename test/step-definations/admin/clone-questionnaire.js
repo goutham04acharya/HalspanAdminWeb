@@ -37,12 +37,12 @@ Then('I should see the new duplicated questionnaire created', async function () 
     console.log("Clearing search box...");
     await searchBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     console.log("Typing in search box: ", global.questionPublicName + " copy1");
     await searchBox.sendKeys(global.questionPublicName + " copy1");
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     console.log("Waiting for first row in table...");
 
@@ -60,7 +60,7 @@ Then('I should see the new duplicated questionnaire created', async function () 
         }
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     console.log(`Comparing values: ${publicName} === ${global.questionPublicName + " copy1"}`);
     assert.equal(publicName, global.questionPublicName + " copy1");
