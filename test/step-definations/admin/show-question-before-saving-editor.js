@@ -32,3 +32,10 @@ When('I enter the conditional logic for choice field', async function() {
         }
     }
 });
+
+When('I try the choice for section {int} page {int} question {int}', async function (sectionNumber, pageNumber, quesionNumber) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const choices = await driver.wait(until.elementLocated(By.css(`[data-testid="preview-section-${sectionNumber - 1}-page-${pageNumber - 1}-question-${quesionNumber - 1}"]`)), 5000);
+    await driver.wait(until.elementIsVisible(choices), 2000);
+    await driver.wait(until.elementLocated(By.css(`[data-testid="lookup-dropdown"]`)), 5000).click();
+} );

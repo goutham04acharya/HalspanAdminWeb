@@ -1065,7 +1065,7 @@ const QuestionnaryForm = () => {
             dispatch(setNewComponent({ id: 'options', value: { 'visible': true }, questionId }));
         })
     });
-    // function to handle the compliance logic click
+    // function to handle the compliance logic click 
     const handleComplianceLogicClick = () => {
         let arr = complianceLogic || [];
         arr.push({
@@ -1238,6 +1238,7 @@ const QuestionnaryForm = () => {
         // handleComplianceLogic()
         fetchComplianceLogic();
         dispatch(setSavedSection(sections));
+        dispatch(setSelectedComponent(''));
     }, []);
 
     const addNewCompliance = (type, index) => {
@@ -1596,6 +1597,14 @@ const QuestionnaryForm = () => {
         return `${text.slice(0, maxLength)}...`;
     };
 
+    const handleDisableButtons = () => {
+        const array = []
+        if(complianceLogic.length === 1) {
+            array.push('Compliance')
+        }
+        return array
+    }
+
     return (
         <>
             {pageLoading ? (
@@ -1827,6 +1836,7 @@ const QuestionnaryForm = () => {
                                     buttons={Fieldsneeded}
                                     handleClick={handleClick}
                                     formStatus={formStatus}
+                                    disableButtons={handleDisableButtons()}
                                 />
                             )}
 

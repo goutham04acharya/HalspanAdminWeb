@@ -142,7 +142,7 @@ function ImageUploader({ maxImages, drawOnImage, sections, minImages, setIsModif
                     disabled={images.length >= maxImages}
                 />
                 <span className={`text-[12px] my-2 items-center justify-center flex px-3 ${images.length >= maxImages ? 'disabled' : ''}`}>
-                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Image ({maxImages})
+                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Image ({maxImages - images.length || maxImages})
                 </span>
             </label>
 
