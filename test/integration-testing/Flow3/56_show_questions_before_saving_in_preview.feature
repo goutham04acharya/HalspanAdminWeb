@@ -10,9 +10,9 @@ As a admin, I want to see the questions inside the preview before saving.
         When I add a new question to the page 1 in section 1
         When I click the textbox button
         Then I should see field settings
-        # And I should see the text box added to the section 1
-        # When I enter the label name for textbox
-        # Then I should see the label name updated in the section 1
+        And I should see the text box added to the section 1
+        When I enter the label name for textbox as "Textbox."
+        Then I should see the label name as "Textbox" updated in the section 1
         # When I enter the help text for textbox
         # Then I should see the help text updated in the section 1
         # When I enter the placeholder content for textbox

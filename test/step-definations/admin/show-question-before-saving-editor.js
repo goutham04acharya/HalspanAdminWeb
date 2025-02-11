@@ -39,3 +39,18 @@ When('I try the choice for section {int} page {int} question {int}', async funct
     await driver.wait(until.elementIsVisible(choices), 2000);
     await driver.wait(until.elementLocated(By.css(`[data-testid="lookup-dropdown"]`)), 5000).click();
 } );
+
+When('I enter the label name for textbox as {string}', async function (labelName) {
+    await new Promise(resolve => setTimeout(resolve, 750));
+    const labelNameInput = await driver.wait(until.elementLocated(By.css('[data-testid="label-name-input"]')));
+    await labelNameInput.sendKeys(Key.chord(Key.CONTROL, "a"), Key.DELETE)
+    await labelNameInput.sendKeys(labelName);
+    this.labelName = "Textbox";
+});
+
+Then('I should see the label name as "Textbox" updated in the section {int}', async function (sectionNumber) {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const labelName = await driver.wait(until.elementLocated(By.css(`[data-testid="section-${sectionNumber}-page-1-question-1"] [data-testid="label-name"]`)));
+    const labelNameText = await labelName.getText();
+    assert.equal(labelNameText, this.labelName);
+});
