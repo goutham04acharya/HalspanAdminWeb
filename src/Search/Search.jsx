@@ -1,43 +1,58 @@
-import React from 'react'
-import Debounce from '../CommonMethods/debounce';
+import React, { useState, useCallback } from "react"
+import Debounce from "../CommonMethods/debounce"
 
 function Search({
   className,
-  searchValue,
   testId,
-  setSearchValue,
-  searchParams,
   setQueList,
+  searchParams,
   setSearchParams,
+  setLoading,
   placeholder,
+  setLookupList,
 }) {
-  const handleChange = Debounce((e) => {
-    const value = e.target.value.trimStart() // Trim leading spaces
+  const [searchValue, setSearchValue] = useState("")
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState("")
+
+  const debouncedSetSearch = useCallback(
+    Debounce((value) => {
+      setDebouncedSearchValue(value)
+    }, 300),
+    [],
+  )
+
+  const handleChange = useCallback(
+    (e) => {
+      const newValue = e.target.value
+      setSearchValue(newValue)
+
+      const trimmedValue = newValue.trimStart()
+      if (trimmedValue !== debouncedSearchValue) {
+        debouncedSetSearch(trimmedValue)
+      }
+    },
+    [debouncedSearchValue, debouncedSetSearch],
+  )
+
+  React.useEffect(() => {
     const params = Object.fromEntries(searchParams)
 
-    if (!value) {
+    if (!debouncedSearchValue) {
       delete params.search
       setQueList([])
     } else {
-      // Encode for URL but keep original value in state
-      params.search = encodeURIComponent(value)
+      params.search = encodeURIComponent(debouncedSearchValue)
     }
     delete params.start_key
     setSearchParams(params)
-  }, 300)
-
-  const handleInputChange = (e) => {
-    // Keep unencoded value in state, but trim leading spaces
-    const value = e.target.value.trimStart()
-    setSearchValue(value)
-    handleChange(e)
-  }
+  }, [debouncedSearchValue, searchParams, setQueList, setSearchParams])
 
   const handleSearchClose = () => {
+    setSearchValue("")
+    setDebouncedSearchValue("")
     const params = Object.fromEntries(searchParams)
     delete params.search
     delete params.start_key
-    setSearchValue("")
     setSearchParams(params)
     setQueList([])
   }
@@ -49,9 +64,9 @@ function Search({
         <input
           data-testid={testId}
           type="text"
-          value={searchValue} // This will now always show decoded value without leading spaces
+          value={searchValue}
           placeholder={placeholder}
-          onChange={handleInputChange}
+          onChange={handleChange}
           className={`w-full outline-0 ${className} pr-10 placeholder:text-[#2B333B] placeholder:text-base placeholder:font-normal`}
         />
         {searchValue && (
