@@ -11,24 +11,30 @@ const Key = webdriver.Key
 When('I upload {string} for section {int} page {int} question {int} and check counter',
     async function (fileType, sectionNumber, pageNumber, questionNumber) {
 
-        // Map file type to sample files
-        const fileMap = {
-            photo: { testId: 'add-image', fileName: 'image.png', counterTestId: 'image-count' },
-            video: { testId: 'add-video', fileName: 'sample1.mp4', counterTestId: 'video-count' },
-            file: { testId: 'add-file', fileName: 'test.pdf', counterTestId: 'file-count' }
-        };
-    
-        if (!fileMap[fileType]) {
+        let testId, fileName, counterTestId;
+
+        // Use if-else to map file types
+        if (fileType === 'photo') {
+            testId = 'add-image';
+            fileName = 'image.png';
+            counterTestId = 'image-count';
+        } else if (fileType === 'video') {
+            testId = 'add-video';
+            fileName = '1.mp4';
+            counterTestId = 'video-count';
+        } else if (fileType === 'file') {
+            testId = 'add-file';
+            fileName = 'test.pdf';
+            counterTestId = 'file-count';
+        } else {
             throw new Error(`Unsupported file type: ${fileType}`);
         }
-
-        const { testId, fileName, counterTestId } = fileMap;
 
         // Locate the correct counter element
         let counterSelector = `[data-testid="${counterTestId}"]`;
         let countElement = await driver.wait(until.elementLocated(By.css(counterSelector)), 5000);
         let initialText = await countElement.getText();
-        
+
         // Extract numeric count from text
         let match = initialText.match(/\d+/);
         if (!match) {
@@ -45,12 +51,13 @@ When('I upload {string} for section {int} page {int} question {int} and check co
         console.log(`Looking for upload element: ${uploadSelector}`);
 
         let uploadElement = await driver.wait(until.elementLocated(By.css(uploadSelector)), 5000);
-    
+
         // Upload the file
         const filePath = path.resolve(__dirname, `../../support/${fileName}`);
         console.log(`Uploading file from: ${filePath}`);
         await uploadElement.sendKeys(filePath);
 
+        await new Promise(resolve => setTimeout(resolve, 3000));
         // Wait for counter to decrease
         await driver.wait(async () => {
             let updatedText = await countElement.getText();
@@ -60,6 +67,7 @@ When('I upload {string} for section {int} page {int} question {int} and check co
             return updatedCount === initialCount - 1;
         }, 5000);
 
+        await new Promise(resolve => setTimeout(resolve, 3000));
         // Verify the final count
         let finalText = await countElement.getText();
         let finalMatch = finalText.match(/\d+/);
@@ -67,6 +75,7 @@ When('I upload {string} for section {int} page {int} question {int} and check co
             throw new Error(`Could not extract final count from text: "${finalText}"`);
         }
 
+        await new Promise(resolve => setTimeout(resolve, 3000));
         let finalCount = parseInt(finalMatch[0]);
         console.log(`Final count for ${fileType}: ${finalCount}`);
         assert.strictEqual(finalCount, initialCount - 1);
