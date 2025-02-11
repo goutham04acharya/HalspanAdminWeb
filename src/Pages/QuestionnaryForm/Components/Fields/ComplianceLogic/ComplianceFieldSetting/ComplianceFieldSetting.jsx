@@ -46,7 +46,6 @@ const handleInputChange = (id, field, value) => {
     arr[id][field] = value; // Dynamically update field
     setComplianceLogic(arr);
 };
-
     return (
         <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <div>
@@ -65,8 +64,9 @@ const handleInputChange = (id, field, value) => {
                             onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
                         />
-                        {validationErrors?.label && (
-                            <ErrorMessage error={validationErrors.label} />)}
+                        {typeof validationErrors?.label === String && (
+                            <ErrorMessage error={validationErrors.label} />
+                        )}
                     </div>
 
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
@@ -95,7 +95,8 @@ const handleInputChange = (id, field, value) => {
                     </div>
                 </div>
             </div>
-        </div>)
+        </div>
+        )
 }
 
 export default ComplianceFieldSetting
