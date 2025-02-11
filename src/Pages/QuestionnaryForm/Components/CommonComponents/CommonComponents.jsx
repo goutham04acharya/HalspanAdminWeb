@@ -21,8 +21,8 @@ function CommonComponents({
     validationErrors,
     selectedQuestionId
 }) {
-    const handleInputChangeValue = (e) => {
-        if (labelName === 'Label' && e.target.value.includes('.')) {
+    const handleInputChangeValue = (e, id) => {
+        if (id === 'label' && e.target.value.includes('.')) {
             return; // Prevent updating if value contains '.'
         }
         handleInputChange(e)
@@ -38,7 +38,7 @@ function CommonComponents({
                     type="text"
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
-                    onChange={formStatus === 'Draft' ? (e) => handleInputChangeValue(e) : null} 
+                    onChange={formStatus === 'Draft' ? (e) => handleInputChangeValue(e, 'label') : null} 
                     value={formParameters?.label || ''}
                     id='label'
                     onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
