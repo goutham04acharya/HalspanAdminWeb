@@ -1797,7 +1797,6 @@ const QuestionnaryForm = () => {
                             />
                         </div>
                         <div>
-                            {console.log('selectedComponent', selectedComponent)}
                             {selectedComponent ? (
                                 React.createElement(
                                     sideComponentMap[selectedComponent],  // Dynamically select the component
