@@ -24,18 +24,48 @@ When('I click the clone button', async function () {
 });
 
 Then('I should see the new duplicated questionnaire created', async function () {
+    console.log("Step started: Checking for duplicated questionnaire");
+
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log("Waiting for search box...");
     let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Search box located");
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Clearing search box...");
     await searchBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Typing in search box: ", global.questionPublicName + " copy1");
     await searchBox.sendKeys(global.questionPublicName + " copy1");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    let publicName = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]`)), 10000).getText();
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log(publicName, " === ", global.questionPublicName + " copy1");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Waiting for first row in table...");
+
+    let publicName;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            let publicNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]`)), 10000);
+            console.log(`Attempt ${attempt}: Checking if element is attached...`);
+            publicName = await publicNameElement.getText();
+            console.log(`Found public name: ${publicName}`);
+            break; // If successful, exit the loop
+        } catch (error) {
+            console.log(`Attempt ${attempt}: Element was stale, retrying...`);
+            if (attempt === 3) throw error; // If all attempts fail, throw error
+        }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log(`Comparing values: ${publicName} === ${global.questionPublicName + " copy1"}`);
     assert.equal(publicName, global.questionPublicName + " copy1");
+
+    console.log("Step completed successfully");
 });
 
 Then('I should see exact duplication of the selected version of a questionnaire', async function () {
