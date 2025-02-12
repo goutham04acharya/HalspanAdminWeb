@@ -72,14 +72,14 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         if (lastEvaluatedKeyRef.current) {
             params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        if (searchValue !== '') {
+        if (searchParams.get('search') !== undefined) {
             delete params.start_key
         }
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
             setLookupList(prevItems => {
-                if (searchValue !== '' && !lastEvaluatedKeyRef.current) {
+                if (searchParams.get('search') !== undefined && !lastEvaluatedKeyRef.current) {
                     // New search: return only new items
                     return [...newItems];
                 } else {
@@ -432,9 +432,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                 </div>
                                 {!loading && (isContentNotFound || (LookupList?.length === 0 || LookupList?.items?.length === 0)) ? (
                                     <ContentNotFound
-                                        src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                                        text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No lookup dataset available.'}
-                                        className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
+                                        src={searchParams.get('search') !== undefined ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
+                                        text={searchParams.get('search') !== undefined ? "We're sorry, but we couldn't find any results matching your search query." : 'No lookup dataset available.'}
+                                        className={searchParams.get('search') !== undefined ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'} />
                                 ) : (
                                     <div className='bg-white mt-12'>
                                         <LookupTable
