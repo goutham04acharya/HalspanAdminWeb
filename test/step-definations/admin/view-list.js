@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 const assert = require('assert');
 const { Given, When, Then, But } = require('@cucumber/cucumber')
-const webdriver = 'selenium-webdriver'
+const webdriver = require('selenium-webdriver');
 const until = require('selenium-webdriver').until
 const By = require('selenium-webdriver').By
 const Key = webdriver.Key
@@ -92,3 +92,23 @@ Then('The results should be refined to show questionnaries of the selected asset
     item = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[5]`))).getText();
     assert.equal(this.asset, item);
 });
+   
+When('I store the first internal name from list', async function () {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let internalNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[2]`)), 10000);
+    this.internal_name = await internalNameElement.getText();
+    console.log(this.internal_name, "1234");
+});
+
+When('I search by internal name with spaces', async function () {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
+    await searchBox.sendKeys("     ");
+    await new Promise(resolve => setTimeout(resolve, 2000));
+});
+
+When('I clear the empty search', async function () {
+    let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
+    await searchBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
+    await new Promise(resolve => setTimeout(resolve, 1000));
+} );
