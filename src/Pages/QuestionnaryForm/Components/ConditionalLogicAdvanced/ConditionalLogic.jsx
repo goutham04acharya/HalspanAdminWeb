@@ -74,6 +74,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseStatement: {}
     });
 
+    const [editorCheck, setEditorCheck] = useState({
+        conditonalEditor: [],
+        isBasicEditorCompliance: false,
+        isAdvanceEditorCompliance: false,
+    });
+
 
     const complianceInitialState = [
         {
@@ -264,9 +270,58 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const lastPart = parts.pop(); // Remove the last part
             condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
-        if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
+        console.log(!condition_logic);
+        console.log(defaultContentConverter(complianceLogic?.[0]?.default_content));
+
+        // if (!condition_logic && complianceLogic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
+        //     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
+        // }
+
+        if ((!editorCheck.isBasicEditorCompliance && !editorCheck.isAdvanceEditorCompliance) || (selectedQuestionId === editorCheck.selectedQuestionId)) {
             setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         }
+
+        ////
+        setEditorCheck((prev) => {
+            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                item.questionId === selectedQuestionId
+                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                    : item
+            );
+        
+            // Check if the question already exists
+            const existingQuestion = prev.conditonalEditor.find(
+                (item) => item.questionId === selectedQuestionId
+            );
+        
+            const questionExists = !!existingQuestion;
+        
+            // Check if the toast should be shown
+            if (complianceState) {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
+            } else {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
+            }
+        
+            return {
+                ...prev,
+                conditonalEditor: questionExists
+                    ? updatedConditionalEditor // Update existing
+                    : [
+                        ...prev.conditonalEditor,
+                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                      ] // Add new if not exists
+            };
+        });
+        
     }, [conditions])
 
     useEffect(() => {
@@ -858,6 +913,37 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
     const handleSave = async () => {
+        if (!complianceState) {
+            setEditorCheck((prev) => {
+                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                    item.questionId === selectedQuestionId
+                        ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                        : item
+                );
+
+                // Check if the question already exists
+                const questionExists = prev.conditonalEditor.some(
+                    (item) => item.questionId === selectedQuestionId
+                );
+
+                return {
+                    ...prev,
+                    conditonalEditor: questionExists
+                        ? updatedConditionalEditor // Update existing
+                        : [
+                            ...prev.conditonalEditor,
+                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                        ] // Add new if not exists
+                };
+            });
+        } else {
+            setEditorCheck((prev) => ({
+                ...prev,
+                isBasicEditorCompliance: false,
+                isAdvanceEditorCompliance: true
+            }));
+        }
+
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1588,6 +1674,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [conditions])
 
     const handleSaveBasicEditor = () => {
+
+        if (!complianceState) {
+            setEditorCheck((prev) => {
+                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                    item.questionId === selectedQuestionId
+                        ? { ...item, isBasicEditor: true, isAdvanceEditor: false }
+                        : item
+                );
+
+                // Check if the question already exists
+                const questionExists = prev.conditonalEditor.some(
+                    (item) => item.questionId === selectedQuestionId
+                );
+
+                return {
+                    ...prev,
+                    conditonalEditor: questionExists
+                        ? updatedConditionalEditor // Update existing
+                        : [
+                            ...prev.conditonalEditor,
+                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                        ] // Add new if not exists
+                };
+            });
+        } else {
+            setEditorCheck((prev) => ({
+                ...prev,
+                isBasicEditorCompliance: true,
+                isAdvanceEditorCompliance: false
+            }));
+        }
+
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
