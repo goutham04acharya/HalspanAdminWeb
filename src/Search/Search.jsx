@@ -7,9 +7,7 @@ function Search({
   setQueList,
   searchParams,
   setSearchParams,
-  setLoading,
   placeholder,
-  setLookupList,
 }) {
   const [searchValue, setSearchValue] = useState("")
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("")
