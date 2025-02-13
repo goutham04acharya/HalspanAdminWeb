@@ -236,7 +236,7 @@ function DateTimeField({
                         data-testid="input"
                         type="date"
                         id={textId}
-                        value={questionValue?.[question?.question_id]}
+                        value={questionValue?.[question?.question_id] ? questionValue?.[question?.question_id] : ''}
                         className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                         placeholder={question?.placeholder_content}
                         onChange={(e) => handleFunction(e.target.value)}
@@ -252,7 +252,7 @@ function DateTimeField({
                         onChange={handleFunction}
                         format={question?.format}
                         validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
-                        questionValue={questionValue?.[question?.question_id]}
+                        questionValue={questionValue?.[question?.question_id] ? questionValue?.[question?.question_id] : ''}
                     />
                 )}
 
@@ -262,7 +262,7 @@ function DateTimeField({
                             data-testid="input"
                             type="date"
                             id={textId}
-                            value={questionValue?.[question?.question_id]?.split(' ')[0]} // Use state to manage date value
+                            value={questionValue?.[question?.question_id] ? questionValue?.[question?.question_id]?.split(' ')[0] : ''} // Use state to manage date value
                             className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
                             onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
@@ -277,7 +277,7 @@ function DateTimeField({
                         onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
                         format={question?.format}
                         validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
-                        questionValue={questionValue[question?.question_id]?.split(' ')[1]}
+                        questionValue={questionValue?.[question?.question_id] ? questionValue[question?.question_id]?.split(' ')[1] : ''}
                         readOnly={question?.options?.read_only}
                     />
                 </div>}
