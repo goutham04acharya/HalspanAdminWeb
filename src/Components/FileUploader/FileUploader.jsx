@@ -15,7 +15,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
             const allowedTypes = fileType ? fileType.split(',').map((type) => type.trim().toLowerCase()) : [];
             const maxSizeInBytes = fileSize * 1024 * 1024;
 
-            let newFiles = [...files];
+            let newFiles = questionValue[question.question_id] ? [...questionValue[question.question_id]] : []; // Copy existing images
 
             for (let i = 0; i < uploadedFiles.length; i++) {
                 const file = uploadedFiles[i];
@@ -112,7 +112,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                                         : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                 </span>
                                 <button className='text-red-500 hover:text-red-700' onClick={() => handleRemoveFile(index)}>
-                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" data-testid={`remove-file-${index}`}/>
+                                    <img src="/Images/close.svg" alt="" className="w-5 h-5" data-testid={`remove-file-${index}`} />
                                 </button>
                             </div>
                         </li>
