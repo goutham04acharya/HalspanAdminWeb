@@ -182,6 +182,10 @@ function Questionnaries() {
   };
 
   const handleClone = async () => {
+    if (!selectedVersion) {
+      setToastError('Please select a version to duplicate.');
+      return;
+  }
     setCloneLoading(true)
     try {
       let body = {
@@ -264,9 +268,9 @@ function Questionnaries() {
           {
             !loading && (isContentNotFound || (QueList?.length === 0 || QueList?.items?.length === 0)) ? (
               <ContentNotFound
-                src={searchValue !== '' ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
-                text={searchValue !== '' ? "We're sorry, but we couldn't find any results matching your search query." : 'No questionnaires available.'}
-                className={searchValue !== '' ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'}
+                src={searchParams.get('search') !== undefined ? "/Images/empty-search.svg" : "/Images/Content-NotFound.svg"}
+                text={searchParams.get('search') !== undefined ? "We're sorry, but we couldn't find any results matching your search query." : 'No questionnaires available.'}
+                className={searchParams.get('search') !== undefined ? 'mt-[40px] font-medium text-xl w-[34%] mx-auto text-center' : 'ml-8'}
               />
             ) : (
               <div className='bg-white mt-12'>

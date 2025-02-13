@@ -21,6 +21,12 @@ function CommonComponents({
     validationErrors,
     selectedQuestionId
 }) {
+    const handleInputChangeValue = (e, id) => {
+        if (id === 'label' && e.target.value.includes('.')) {
+            return; // Prevent updating if value contains '.'
+        }
+        handleInputChange(e)
+    }
     return (
         <div>
             <div className='flex flex-col justify-start'>
@@ -32,7 +38,7 @@ function CommonComponents({
                     type="text"
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={labelPlaceholder}
-                    onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null} 
+                    onChange={formStatus === 'Draft' ? (e) => handleInputChangeValue(e, 'label') : null} 
                     value={formParameters?.label || ''}
                     id='label'
                     onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}
@@ -58,7 +64,7 @@ function CommonComponents({
                     type="text"
                     className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                     placeholder={helpTextPlaceholder}
-                    onChange={(e) => handleInputChange(e)}
+                    onChange={(e) => handleInputChangeValue(e)}
                     value={formParameters?.helptext || ''}
                     id='helptext'
                     onBlur={(e) => handleBlur(e)}
@@ -87,7 +93,7 @@ function CommonComponents({
                         className='mt-[11px] border border-[#AEB3B7] rounded py-[11px] px-4 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                         placeholder={placeholderContent}
                         value={formParameters?.placeholderContent || ''}
-                        onChange={formStatus === 'Draft' ? (e) => handleInputChange(e) : null}
+                        onChange={formStatus === 'Draft' ? (e) => handleInputChangeValue(e) : null}
                         id='placeholderContent'
                         disabled={formStatus !== 'Draft'}
                         onBlur={formStatus === 'Draft' ? (e) => handleBlur(e) : null}

@@ -62,7 +62,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
             node scripts/licences_complaince.js
@@ -85,7 +84,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
           condition: ne(variables.CACHE_RESTORED, 'true')
@@ -121,7 +119,6 @@ stages:
       pool:
           vmImage: "ubuntu-latest"
       steps:
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install -g license-checker --force
             license-checker --json > licenses.json  
@@ -151,7 +148,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
             npm install -g retire
@@ -196,7 +192,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
           condition: ne(variables.CACHE_RESTORED, 'true')
@@ -410,7 +405,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
           condition: ne(variables.CACHE_RESTORED, 'true')
@@ -486,7 +480,6 @@ stages:
             path: "$(System.DefaultWorkingDirectory)/node_modules"
             cacheHitVar: CACHE_RESTORED
           displayName: Cache npm
-        - script: npm config set registry https://registry.npmmirror.com
         - script: |
             npm install --force
           condition: ne(variables.CACHE_RESTORED, 'true')

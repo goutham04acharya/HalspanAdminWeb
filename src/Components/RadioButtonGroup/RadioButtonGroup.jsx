@@ -39,7 +39,7 @@ const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
                                     )}
                                 </div>
                             </div>
-                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value}</span>
+                            <span data-testid={`choices-${index}`} className="text-sm text-gray-700">{option?.value !== undefined ? option?.value : option}</span>
                         </label>
                     );
                 })}
