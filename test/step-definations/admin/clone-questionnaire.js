@@ -24,48 +24,50 @@ When('I click the clone button', async function () {
 });
 
 Then('I should see the new duplicated questionnaire created', async function () {
+    await new Promise((resolve) => setTimeout(resolve, 10000));
     console.log("Step started: Checking for duplicated questionnaire");
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+        // Locate and clear the search box
+        let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
+        await driver.wait(until.elementIsVisible(searchBox), 5000);
+        console.log("Search box located, clearing input...");
+        await searchBox.sendKeys(Key.chord(Key.CONTROL, "a", Key.DELETE));
 
-    console.log("Waiting for search box...");
-    let searchBox = await driver.wait(until.elementLocated(By.css('[data-testid="searchBox"]')), 10000);
-    console.log("Search box located");
+        // Enter search text
+        let searchText = global.questionPublicName + " copy1";
+        console.log("Typing in search box:", searchText);
+        await searchBox.sendKeys(searchText);
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        // Wait for the first row to be updated with the new data
+        console.log("Waiting for results to be updated...");
+        let firstRowLocator = By.xpath("//tbody/tr[1]/td[3]");
+        let firstRowElement = await driver.wait(until.elementLocated(firstRowLocator), 10000);
+        await driver.wait(until.elementIsVisible(firstRowElement), 5000);
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log("Clearing search box...");
-    await searchBox.sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE));
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log("Typing in search box: ", global.questionPublicName + " copy1");
-    await searchBox.sendKeys(global.questionPublicName + " copy1");
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log("Waiting for first row in table...");
-
-    let publicName;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-            let publicNameElement = await driver.wait(until.elementLocated(By.xpath(`//tbody/tr[1]/td[3]`)), 10000);
-            console.log(`Attempt ${attempt}: Checking if element is attached...`);
-            publicName = await publicNameElement.getText();
-            console.log(`Found public name: ${publicName}`);
-            break; // If successful, exit the loop
-        } catch (error) {
-            console.log(`Attempt ${attempt}: Element was stale, retrying...`);
-            if (attempt === 3) throw error; // If all attempts fail, throw error
+        // Retry fetching the text if necessary
+        let publicName;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                publicName = await firstRowElement.getText();
+                console.log(`Attempt ${attempt}: Found text: "${publicName}"`);
+                if (publicName === searchText) break; // Success
+            } catch (error) {
+                console.log(`Attempt ${attempt}: Element was stale or missing, retrying...`);
+                if (attempt === 3) throw error; // If all attempts fail, throw error
+            }
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Short retry delay
         }
+
+        // Assert the public name matches expected value
+        console.log(`Comparing values: ${publicName} === ${searchText}`);
+        assert.strictEqual(publicName, searchText, `Expected '${searchText}', but found '${publicName}'`);
+
+        console.log("Step completed successfully");
+    } catch (error) {
+        console.error("Error in step:", error);
+        throw new Error("Failed to verify duplicated questionnaire. Check logs for details.");
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log(`Comparing values: ${publicName} === ${global.questionPublicName + " copy1"}`);
-    assert.equal(publicName, global.questionPublicName + " copy1");
-
-    console.log("Step completed successfully");
 });
 
 Then('I should see exact duplication of the selected version of a questionnaire', async function () {
