@@ -176,7 +176,7 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={
-                        questionValue[question?.question_id] !== true
+                        questionValue[question?.question_id]
                             ? questionValue[question?.question_id]
                             : ""
                     }
@@ -200,7 +200,7 @@ const TextBoxField = ({
                     type={type}
                     id={textId}
                     value={
-                        questionValue[question?.question_id] !== true
+                        questionValue[question?.question_id]
                             ? questionValue[question?.question_id]
                             : ""
                     }
