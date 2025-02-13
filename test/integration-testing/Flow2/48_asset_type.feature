@@ -11,6 +11,7 @@ Feature: Halspan - Admin -Asset type
     elevators
     etcs as per API
 
+  # @login
   Scenario Outline: Admin adds all the fields for the questionnaire
     Given I am on the dashboard screen
     When I click the create new questionnaire button

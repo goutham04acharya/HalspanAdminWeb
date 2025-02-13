@@ -66,7 +66,9 @@ When('I save all the data inside the version about to be duplicated', async func
 
     await driver.wait(until.elementLocated(By.css(`[data-testid="version-0"]`))).click();
     await new Promise(resolve => setTimeout(resolve, 1000));
-
+    await driver.wait(until.elementLocated(By.css(`[data-testid="add-question-btn-section-1-page-1"]`))).click();
+    await driver.wait(until.elementLocated(By.css(`[data-testid="textbox"]`))).click();
+    await new Promise(resolve => setTimeout(resolve, 1000));
     await driver.wait(until.elementLocated(By.css('[data-testid="add-section"]'))).click();
     await new Promise(resolve => setTimeout(resolve, 500));
     await driver.wait(until.elementLocated(By.css('[data-testid="add-page-sec-0"]'))).click();
