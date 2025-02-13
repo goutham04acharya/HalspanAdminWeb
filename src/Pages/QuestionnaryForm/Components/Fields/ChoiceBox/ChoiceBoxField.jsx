@@ -191,7 +191,7 @@ const ChoiceBoxField = ({
                         handleOptionClick={handleDropdownChange}
                         top='20px'
                         options={question?.source_value ? question.source_value.filter(item => item.value !== "") : null}
-                        selectedOption={questionValue[question?.question_id]}
+                        selectedOption={questionValue[question?.question_id] ? questionValue[question?.question_id] : ''}
                         preview
                         choiceBox
                         validationError={validationErrors?.preview_choiceboxfield?.[question.question_id]}

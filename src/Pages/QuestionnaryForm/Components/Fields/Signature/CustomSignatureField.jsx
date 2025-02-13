@@ -2,12 +2,20 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addSignature, clearSignature } from './signatureSlice';
+import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 
 const SignatureCanvas = ({ id }) => {
     const dispatch = useDispatch();
     const canvasRef = useRef(null);
-    const signatures = useSelector((state) => state?.signature?.signatures);
-    const currentSignature = signatures?.[id] || null;
+    const questionValues = useSelector((state) => state.questionValues.questions);
+    const currentSignature = questionValues?.[id] || null;
+
+    // Initialize signature from questionValues if available
+    useEffect(() => {
+        if (questionValues[id]) {
+            dispatch(addSignature({ id, signature: questionValues[id] }));
+        }
+    }, [dispatch, id, questionValues]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -44,6 +52,12 @@ const SignatureCanvas = ({ id }) => {
             // Save the signature data URL to the Redux state
             const signatureData = canvas.toDataURL();
             dispatch(addSignature({ id, signature: signatureData }));
+            dispatch(
+                setQuestionValue({
+                    question_id: id,
+                    value: signatureData,
+                })
+            );
         };
 
         // Add event listeners
@@ -80,7 +94,25 @@ const SignatureCanvas = ({ id }) => {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         dispatch(clearSignature({ id }));
+        dispatch(
+            setQuestionValue({
+                question_id: id,
+                value: '',
+            })
+        );
     };
+
+    useEffect(() => {
+        return () => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            dispatch(clearSignature({ id })); // Clear Redux state on unmount
+        };
+    }, [dispatch, id]);
+
 
     return (
         <div>

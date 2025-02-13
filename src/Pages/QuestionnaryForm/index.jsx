@@ -1600,7 +1600,7 @@ const QuestionnaryForm = () => {
     const handleDisableButtons = () => {
         const array = []
         if(complianceLogic.length === 1) {
-            array.push('complianceLogic')
+            array.push('Compliance')
         }
         return array
     }

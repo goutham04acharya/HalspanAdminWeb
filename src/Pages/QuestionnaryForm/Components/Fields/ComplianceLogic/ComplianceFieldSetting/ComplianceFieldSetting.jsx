@@ -25,22 +25,27 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
         // dispatch(setNewComponent({ id: 'format', value: option.value, questionId: selectedQuestionId }));
         // dispatch(setShouldAutoSave(true));
     };
-    const handleInputChange = (id, field, value) => {
-        if(value === ''){
-            setValidationErrors(prevErrors => ({
-                ...prevErrors,
-                label: `This is a mandatory field`,
-            }));
-        }else{
-            setValidationErrors(prevErrors => ({
-                ...prevErrors,
-                label: '',
-            }));
-        }
-        let arr = [...complianceLogic];
-        arr[id][field] = value; // Dynamically update field
-        setComplianceLogic(arr);
-    };
+const handleInputChange = (id, field, value) => {
+    if (field === 'label' && value.includes('.')) {
+        return; // Prevent updating if value contains '.'
+    }
+
+    if (value === '') {
+        setValidationErrors(prevErrors => ({
+            ...prevErrors,
+            [field]: `This is a mandatory field`,
+        }));
+    } else {
+        setValidationErrors(prevErrors => ({
+            ...prevErrors,
+            [field]: '',
+        }));
+    }
+
+    let arr = [...complianceLogic];
+    arr[id][field] = value; // Dynamically update field
+    setComplianceLogic(arr);
+};
     return (
         <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
             <div>
@@ -59,8 +64,9 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                             onChange={(e) => handleInputChange(complianceLogicId, 'label', e.target.value)}
                             value={complianceLogic[complianceLogicId]?.label}
                         />
-                        {validationErrors?.label && (
-                            <ErrorMessage error={validationErrors.label} />)}
+                        {typeof validationErrors?.label === String && (
+                            <ErrorMessage error={validationErrors.label} />
+                        )}
                     </div>
 
                     <div className='flex flex-col justify-start mt-7 w-full relative'>
@@ -89,7 +95,8 @@ function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompli
                     </div>
                 </div>
             </div>
-        </div>)
+        </div>
+        )
 }
 
 export default ComplianceFieldSetting

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
 
-function SideLayout({ formDefaultInfo, sections, handleSection, handlePage, handlePageScroll,
+function SideLayout({ formDefaultInfo, sections, handlePageScroll,
     selectedSection,
     setSelectedSection,
     selectedPage,
