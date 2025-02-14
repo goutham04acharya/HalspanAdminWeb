@@ -19,7 +19,8 @@ function NumberFieldSetting({
     validationErrors,
     setConditionalLogic,
     setIsDefaultLogic,
-    formStatus
+    formStatus,
+    setEditorCheck,
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
     const dispatch = useDispatch();
@@ -64,65 +65,65 @@ function NumberFieldSetting({
                         <div className='flex items-center justify-between w-full'>
                             <div className='relative w-full'>
                                 <input
-                                type="text"
-                                id='Label'
-                                data-testid="default-value-input"
-                                className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
-                                placeholder='Populates the content'
-                                disabled={formStatus !== 'Draft'}
-                                value={
-                                    fieldSettingParameters?.default_conditional_logic
-                                    ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
-                                    : ''
-                                } // Prefill the input with `defaultString` if it exists, otherwise empty string
-                                onChange={
-                                    formStatus === 'Draft'
-                                    ? (e) =>
-                                        dispatch(
-                                            setNewComponent({
-                                            id: 'default_conditional_logic',
-                                            value: e.target.value,
-                                            questionId: selectedQuestionId,
-                                            })
-                                        )
-                                    : null
-                                }
+                                    type="text"
+                                    id='Label'
+                                    data-testid="default-value-input"
+                                    className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
+                                    placeholder='Populates the content'
+                                    disabled={formStatus !== 'Draft'}
+                                    value={
+                                        fieldSettingParameters?.default_conditional_logic
+                                            ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                                            : ''
+                                    } // Prefill the input with `defaultString` if it exists, otherwise empty string
+                                    onChange={
+                                        formStatus === 'Draft'
+                                            ? (e) =>
+                                                dispatch(
+                                                    setNewComponent({
+                                                        id: 'default_conditional_logic',
+                                                        value: e.target.value,
+                                                        questionId: selectedQuestionId,
+                                                    })
+                                                )
+                                            : null
+                                    }
                                 />
                                 <img
-                                src="/Images/setting.svg"
-                                alt="setting"
-                                data-testid="default-value"
-                                className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} `}
-                                onClick={
-                                    formStatus === 'Draft'
-                                    ? () => {
-                                        setIsDefaultLogic(true);
-                                        setConditionalLogic(false);
-                                        }
-                                    : null
-                                }
+                                    src="/Images/setting.svg"
+                                    alt="setting"
+                                    data-testid="default-value"
+                                    className={`absolute top-5 right-3 ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-not-allowed'} `}
+                                    onClick={
+                                        formStatus === 'Draft'
+                                            ? () => {
+                                                setIsDefaultLogic(true);
+                                                setConditionalLogic(false);
+                                            }
+                                            : null
+                                    }
                                 />
                             </div>
 
                             {/* Conditionally render the delete icon */}
                             {fieldSettingParameters?.default_conditional_logic && (
                                 <img
-                                src="/Images/trash-black.svg"
-                                alt="delete"
-                                data-testid="delete-default-value"
-                                className='w-7 h-7 cursor-pointer ml-3 mt-2'
-                                onClick={() => {
-                                    dispatch(
-                                    setNewComponent({
-                                        id: 'default_conditional_logic',
-                                        value: '',
-                                        questionId: selectedQuestionId,
-                                    })
-                                    );
-                                }}
+                                    src="/Images/trash-black.svg"
+                                    alt="delete"
+                                    data-testid="delete-default-value"
+                                    className='w-7 h-7 cursor-pointer ml-3 mt-2'
+                                    onClick={() => {
+                                        dispatch(
+                                            setNewComponent({
+                                                id: 'default_conditional_logic',
+                                                value: '',
+                                                questionId: selectedQuestionId,
+                                            })
+                                        );
+                                    }}
                                 />
                             )}
-                            </div>
+                        </div>
                     </div>
                     <div className='mt-7'>
                         <p className='font-semibold text-base text-[#2B333B]'>Type</p>
@@ -399,6 +400,14 @@ function NumberFieldSetting({
                                     className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                        setEditorCheck((prev) => {
+                                            return {
+                                                ...prev,
+                                                conditonalEditor: prev.conditonalEditor.filter(
+                                                    (item) => item.questionId !== selectedQuestionId
+                                                ),
+                                            };
+                                        });
                                     }}
                                 >
                                     Remove Conditional Logic
