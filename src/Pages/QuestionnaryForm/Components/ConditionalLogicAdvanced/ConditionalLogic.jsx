@@ -28,7 +28,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -73,13 +73,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseIfStatements: [],
         elseStatement: {}
     });
-
-    const [editorCheck, setEditorCheck] = useState({
-        conditonalEditor: [],
-        isBasicEditorCompliance: false,
-        isAdvanceEditorCompliance: false,
-    });
-
 
     const complianceInitialState = [
         {
@@ -270,59 +263,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const lastPart = parts.pop(); // Remove the last part
             condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
-        console.log(!condition_logic);
-        console.log(defaultContentConverter(complianceLogic?.[0]?.default_content));
 
         // if (!condition_logic && complianceLogic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
         //     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
         // }
 
-        if ((!editorCheck.isBasicEditorCompliance && !editorCheck.isAdvanceEditorCompliance) || (selectedQuestionId === editorCheck.selectedQuestionId)) {
-            setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
-        }
 
-        ////
-        setEditorCheck((prev) => {
-            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
-                item.questionId === selectedQuestionId
-                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
-                    : item
-            );
-        
-            // Check if the question already exists
-            const existingQuestion = prev.conditonalEditor.find(
+
+        // Check if the toast should be shown
+        if (complianceState) {
+            if (editorCheck.isAdvanceEditorCompliance) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
+            }
+        } else {
+            // Find the question in conditionalEditor array
+            const existingQuestion = editorCheck.conditonalEditor.find(
                 (item) => item.questionId === selectedQuestionId
             );
-        
-            const questionExists = !!existingQuestion;
-        
-            // Check if the toast should be shown
-            if (complianceState) {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
-            } else {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
+
+            // If the question exists and isAdvanceEditor is true, show the toast
+            if (existingQuestion?.isAdvanceEditor) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
             }
-        
-            return {
-                ...prev,
-                conditonalEditor: questionExists
-                    ? updatedConditionalEditor // Update existing
-                    : [
-                        ...prev.conditonalEditor,
-                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                      ] // Add new if not exists
-            };
-        });
-        
+        }
+
     }, [conditions])
+
+    console.log(editorCheck, 'editorCheck')
+
 
     useEffect(() => {
         if (allSectionDetails) {
@@ -911,6 +883,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             findSelectedQuestion(); // Set the existing conditional logic as input value
         }
     }, [selectedQuestionId]);
+
+
+
 
     const handleSave = async () => {
         if (!complianceState) {
@@ -1529,8 +1504,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case "equals":
                     resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     break;
-                case "not equals to":
-                    resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                case "not equal to":
+                    if(item.condition_type === 'choiceboxfield'){
+                        resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
+                    }else{
+                        resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
+                    }
                     break;
                 case "does not include":
                     resultExpression = `!${item.question_name}.includes("${item.value}")`;
@@ -1650,6 +1629,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
+                console.log(condition_logic, 'condition_logic')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -1673,6 +1653,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [conditions])
 
+
+
+
+
+
     const handleSaveBasicEditor = () => {
 
         if (!complianceState) {
@@ -1682,20 +1667,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         ? { ...item, isBasicEditor: true, isAdvanceEditor: false }
                         : item
                 );
-
                 // Check if the question already exists
                 const questionExists = prev.conditonalEditor.some(
                     (item) => item.questionId === selectedQuestionId
                 );
-
                 return {
                     ...prev,
                     conditonalEditor: questionExists
-                        ? updatedConditionalEditor // Update existing
+                        ? updatedConditionalEditor
                         : [
                             ...prev.conditonalEditor,
-                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                        ] // Add new if not exists
+                            { questionId: selectedQuestionId, isBasicEditor: true, isAdvanceEditor: false }
+                        ]
                 };
             });
         } else {
