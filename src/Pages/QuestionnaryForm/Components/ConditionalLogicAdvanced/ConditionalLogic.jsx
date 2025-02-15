@@ -252,7 +252,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
                 ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                ?.replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                ?.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
                 ?.replaceAll('&&', 'and') // Replace && with and
                 ?.replaceAll('||', 'or') // Replace || with or
                 ?.replaceAll('.length', '.()')
@@ -1636,7 +1636,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                        .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                        .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
                         .replaceAll('&&', 'and') // Replace && with and
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
@@ -1648,7 +1648,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
                 setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
-
 
             } catch (error) {
                 console.error('Error while converting', error);
