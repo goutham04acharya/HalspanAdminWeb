@@ -293,7 +293,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     }, [conditions])
 
-    console.log(editorCheck, 'editorCheck')
 
 
     useEffect(() => {
