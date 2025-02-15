@@ -293,7 +293,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     }, [conditions])
 
-    console.log(editorCheck, 'editorCheck')
 
 
     useEffect(() => {
@@ -1502,7 +1501,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
+                    if(item.condition_type === 'choiceboxfield'){
+                        resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
+                    }else{
+                        resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
+                    }
                     break;
                 case "not equal to":
                     if(item.condition_type === 'choiceboxfield'){
