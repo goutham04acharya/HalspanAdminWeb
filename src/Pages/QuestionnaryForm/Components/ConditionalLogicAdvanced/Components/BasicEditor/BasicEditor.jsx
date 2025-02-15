@@ -300,8 +300,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
 
     //handler for datepicker
-    const handleDatePicker = (dateString, mainIndex, subIndex) => {
-
+    const handleDatePicker = (dateString, mainIndex, subIndex) => {     
         setConditions(prevConditions => {
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
