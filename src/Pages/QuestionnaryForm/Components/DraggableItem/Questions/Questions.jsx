@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TextBoxField from '../../Fields/TextBox/TextBoxField';
 import ChoiceBoxField from '../../Fields/ChoiceBox/ChoiceBoxField';
@@ -15,23 +15,27 @@ import DIsplayContentField from '../../Fields/DisplayContent/DIsplayContentField
 import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, setShouldAutoSave, setDataIsSame, setFormDefaultInfo, setSavedSection, setSelectedComponent, setSectionToDelete, setPageToDelete, setQuestionToDelete, setShowquestionDeleteModal, setShowPageDeleteModal } from '../../QuestionnaryFormSlice'
 import ComplanceLogicField from '../../Fields/ComplianceLogic/ComplanceLogicField';
 import TagScanField from '../../Fields/TagScan/TagScanField';
+import { formControlClasses } from '@mui/material';
+import { saveCurrentData, setCurrentData, setcurrentQuestionLabel } from '../../Fields/fieldSettingParamsSlice';
 
 
 const Questions = ({
     item,
     dragHandleProps,
-    questionData
+    questionData,
 
 }) => {
-    
+
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
-    const { index, selectedQuestionId, formStatus } = item;
+    const { index, selectedQuestionId, formStatus, sections } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
+    const savedData = useSelector(state => state.fieldSettingParams.savedData);
+    const currentQuestionLabel = useSelector(state => state.fieldSettingParams.currentQuestionLabel);
 
     const handleDeletequestionModal = (sectionIndex, pageIndex, item) => {
         dispatch(setSelectedQuestionId(item?.question_id))
-        dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: item.index , questionName: fieldSettingParams[item.question_id].label}));
+        dispatch(setQuestionToDelete({ sectionIndex, pageIndex, questionIndex: item.index, questionName: fieldSettingParams[item.question_id].label }));
         dispatch(setSelectedSectionData(fieldSettingParams[selectedQuestionId]));
         dispatch(setShowquestionDeleteModal(true));
     };
@@ -94,14 +98,74 @@ const Questions = ({
                 {...props}
             />,
     };
-
+    console.log(sections, 'item')
     const handleQuestionIndexCapture = (question) => {
+        console.log(selectedQuestionId, 'selectedQuestionId')
+        console.log(savedData[selectedQuestionId]?.label, 'saved')
+        console.log(fieldSettingParams[selectedQuestionId]?.label, 'currrent')
+        console.log(currentQuestionLabel[selectedQuestionId], 'selected')
+        if (selectedQuestionId && currentQuestionLabel[selectedQuestionId] !== fieldSettingParams[selectedQuestionId]?.label) {
+            console.log(handleQuestionLabelChange(selectedQuestionId), 'ppp')
+        }
+        let currentLabel = {
+            id: question.question_id,
+            label: findQuestionPath(question?.question_id, fieldSettingParams[question?.question_id].label),
+        }
+        console.log(currentLabel,'currentLbael')
+        dispatch(setcurrentQuestionLabel(currentLabel))
         // Update state for selected question and reset component state
         dispatch(setSelectedQuestionId(question.question_id));
         dispatch(setSelectedAddQuestion({ questionId: question.question_id }));
         const componentType = fieldSettingParams[question.question_id]?.componentType;
         dispatch(setSelectedComponent(componentType));
     };
+
+    //getting the path of the question
+    const findQuestionPath = (questionId, label) => {
+        for (const section of sections) {
+            for (const page of section.pages) {
+                for (const question of page.questions) {
+                    if (question.question_id === questionId && !label) {
+                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${question?.label?.replace(/ /g, "_")}`;
+                    }else{
+                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${label?.replace(/ /g, "_")}`;
+                    }
+                }
+            }
+        }
+        return null; // Return null if question ID is not found
+    };
+    const handleQuestionLabelChange = (questionId) => {
+        if (!fieldSettingParams[questionId]) return fieldSettingParams; // If questionId is not found, return original data
+
+        // Create a new copy of fieldSettingParams
+        const updatedFieldSettingParams = { ...fieldSettingParams };
+        console.log(currentQuestionLabel[questionId].replace(/ /g, '_'));
+        // Iterate through the object and update conditionally
+        Object.keys(updatedFieldSettingParams).forEach((key) => {
+            if (
+                updatedFieldSettingParams[key].conditional_logic &&
+                updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId].replace(/ /g, '_'))
+            ) {
+                // Create a new copy of the object to ensure immutability
+                console.log(currentQuestionLabel[questionId].replace(/ /g, '_'), 'replacing')
+                console.log(findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_'), 'okokoko')
+                updatedFieldSettingParams[key] = {
+                    ...updatedFieldSettingParams[key],
+                    conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                        new RegExp(currentQuestionLabel[questionId].replace(/ /g, '_'), 'g'),
+                        findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')
+                    )
+                };
+            }
+        });
+        console.log(updatedFieldSettingParams, 'updated')
+        dispatch(setCurrentData(updatedFieldSettingParams));
+        dispatch(saveCurrentData(updatedFieldSettingParams));
+        return updatedFieldSettingParams;
+        // Update the state
+    };
+
     return (
         <div
             data-testid={`section-${item.sectionIndex + 1}-page-${item.pageIndex + 1}-question-${index + 1}`}
@@ -117,17 +181,17 @@ const Questions = ({
                         onMouseDown={formStatus === 'Draft' ? (e) => {
                             document.body.style.overflow = "hidden";
                             onMouseDown(e);
-                        }: null}
+                        } : null}
                         onMouseUp={formStatus === 'Draft' ? () => {
                             document.body.style.overflow = "visible";
-                        }: null}
+                        } : null}
                         onTouchStart={formStatus === 'Draft' ? (e) => {
                             document.body.style.overflow = "hidden";
                             onTouchStart(e);
-                        }: null}
+                        } : null}
                         onTouchEnd={formStatus === 'Draft' ? () => {
                             document.body.style.overflow = "visible";
-                        }: null}
+                        } : null}
                     >
                         <img
                             className={`${formStatus === 'Draft' ? 'cursor-grab hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} p-2 mb-2 absolute top-2 right-12 z-[9] rounded-full`}
@@ -143,11 +207,11 @@ const Questions = ({
                         alt="delete"
                         title='Delete'
                         className={`pl-2.5 ${formStatus === 'Draft' ? 'cursor-pointer hover:bg-[#FFFFFF]' : 'cursor-not-allowed'} absolute top-2 right-2 p-2 mb-2 z-[9] rounded-full `}
-                        onClick={formStatus === 'Draft' ?(e) => {
+                        onClick={formStatus === 'Draft' ? (e) => {
                             e.stopPropagation();
                             handleDeletequestionModal(item.sectionIndex, item.pageIndex, item);
                             dispatch(setShowquestionDeleteModal(true));
-                        }:null}
+                        } : null}
                     />
                 </div>
             </div>
