@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -919,7 +919,7 @@ const QuestionnaryForm = () => {
     }
 
     // Save the section and page name
-    const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
+    const handleSaveSectionName = (value, sectionIndex, pageIndex, noFocus) => {
         // Create a deep copy of sections
         let updatedSections = sections.map((section, idx) => {
             if (idx === sectionIndex) {
@@ -935,9 +935,69 @@ const QuestionnaryForm = () => {
 
         // Check if a pageIndex is provided to update a page name or section name
         if (pageIndex !== undefined && pageIndex !== null) {
+            if (noFocus && updatedSections[sectionIndex].pages[pageIndex].page_name !== value) {
+                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
+                let page = updatedSections[sectionIndex].pages[pageIndex].page_name.replace(/ /g, '_');
+                let replaceWord = section + '.' + page;
+                let newWord = section + '.' + value.replace(/ /g, '_');
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                console.log(updatedFieldSettingParams, 'updated')
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+
+            }
             updatedSections[sectionIndex].pages[pageIndex].page_name = value; // Safe to update now
             setPageName(value)
+
         } else {
+            if (noFocus && updatedSections[sectionIndex].section_name !== value) {
+                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
+                let replaceWord = section;
+                let newWord = value.replace(/ /g, '_');
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        console.log(updatedFieldSettingParams[key].conditional_logic, 'updatedFieldSettingParams[key].conditional_logic')
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+
+            }
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
         }
@@ -949,6 +1009,8 @@ const QuestionnaryForm = () => {
         // handleSaveSection(updatedSections[sectionIndex]?.section_id, updatedSections);
         // setSectionName(value)
     };
+
+
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
         if (!selectedAddQuestion?.pageId) return;
@@ -1291,7 +1353,7 @@ const QuestionnaryForm = () => {
             };
         });
         console.log('delete');
-        
+
         setComplianceLoader(true)
         const body = {
             compliance_logic: []

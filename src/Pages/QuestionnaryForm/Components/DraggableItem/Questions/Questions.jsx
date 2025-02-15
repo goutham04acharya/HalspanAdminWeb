@@ -98,12 +98,7 @@ const Questions = ({
                 {...props}
             />,
     };
-    console.log(sections, 'item')
     const handleQuestionIndexCapture = (question) => {
-        console.log(selectedQuestionId, 'selectedQuestionId')
-        console.log(savedData[selectedQuestionId]?.label, 'saved')
-        console.log(fieldSettingParams[selectedQuestionId]?.label, 'currrent')
-        console.log(currentQuestionLabel[selectedQuestionId], 'selected')
         if (selectedQuestionId && currentQuestionLabel[selectedQuestionId] !== fieldSettingParams[selectedQuestionId]?.label) {
             console.log(handleQuestionLabelChange(selectedQuestionId), 'ppp')
         }
@@ -140,16 +135,12 @@ const Questions = ({
 
         // Create a new copy of fieldSettingParams
         const updatedFieldSettingParams = { ...fieldSettingParams };
-        console.log(currentQuestionLabel[questionId].replace(/ /g, '_'));
         // Iterate through the object and update conditionally
         Object.keys(updatedFieldSettingParams).forEach((key) => {
             if (
                 updatedFieldSettingParams[key].conditional_logic &&
                 updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId].replace(/ /g, '_'))
             ) {
-                // Create a new copy of the object to ensure immutability
-                console.log(currentQuestionLabel[questionId].replace(/ /g, '_'), 'replacing')
-                console.log(findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_'), 'okokoko')
                 updatedFieldSettingParams[key] = {
                     ...updatedFieldSettingParams[key],
                     conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
