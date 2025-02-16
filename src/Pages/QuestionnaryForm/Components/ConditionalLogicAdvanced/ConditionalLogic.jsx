@@ -1495,20 +1495,34 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // to get the condition expression
         const getConditionValue = (item) => {
+            let questionType = null;
+
+
+            allSectionDetails.sections.forEach(section => {
+                section.pages.forEach(page => {
+                    page.questions.forEach(question => {
+                        // Correctly format section, page, and question name
+                        let formattedQuestionName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
+                        if (formattedQuestionName === item.question_name) {
+                            questionType = question.type; // Get type (multi_choice, single_line, etc.)
+                        }
+                    });
+                });
+            });   
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    if(item.condition_type === 'choiceboxfield'){
+                    if(item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice'){
                         resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
                     }else{
                         resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     }
                     break;
                 case "not equal to":
-                    if(item.condition_type === 'choiceboxfield'){
+                    if(item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice'){
                         resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
                     }else{
                         resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
