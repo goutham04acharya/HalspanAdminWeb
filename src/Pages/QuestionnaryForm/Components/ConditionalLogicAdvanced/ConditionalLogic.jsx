@@ -869,7 +869,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Transform only non-question parts
                     if (!questionRegex.test(part)) {
                         return part
-                            .replaceAll(/\?/g, ' then ') // Replace "?" with "then"
+                            .replaceAll(/\s\?\s/g, ' then ') // Replace "?" with "then"
                             .replaceAll(/\s:\s/g, ' else ') // Replace ":" with "else"
                     }
                     return part; // Leave question names unchanged
@@ -1496,7 +1496,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // to get the condition expression
         const getConditionValue = (item) => {
             let questionType = null;
-
 
             allSectionDetails.sections.forEach(section => {
                 section.pages.forEach(page => {
