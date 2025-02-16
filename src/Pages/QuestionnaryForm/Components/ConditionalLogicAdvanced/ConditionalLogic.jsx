@@ -23,6 +23,8 @@ import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/Compl
 import { generateElseBlockString, generateTernaryOperation, generateThenActionString } from '../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
 import parseExpression from '../../../../CommonMethods/advancedToBasicLogic';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { formatDate, reverseFormat, reversingFormat } from "../../../../CommonMethods/FormatDate";
+
 
 // Extend Day.js with the custom parse format plugin
 dayjs.extend(customParseFormat);
@@ -269,27 +271,46 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // }
 
 
+        ////
+        setEditorCheck((prev) => {
+            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                item.questionId === selectedQuestionId
+                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                    : item
+            );
 
-        // Check if the toast should be shown
-        if (complianceState) {
-            if (editorCheck.isAdvanceEditorCompliance) {
-                setToastError(
-                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                );
-            }
-        } else {
-            // Find the question in conditionalEditor array
-            const existingQuestion = editorCheck.conditonalEditor.find(
+            // Check if the question already exists
+            const existingQuestion = prev.conditonalEditor.find(
                 (item) => item.questionId === selectedQuestionId
             );
 
-            // If the question exists and isAdvanceEditor is true, show the toast
-            if (existingQuestion?.isAdvanceEditor) {
-                setToastError(
-                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                );
+            const questionExists = !!existingQuestion;
+
+            // Check if the toast should be shown
+            if (complianceState) {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
+            } else {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
             }
-        }
+
+            return {
+                ...prev,
+                conditonalEditor: questionExists
+                    ? updatedConditionalEditor // Update existing
+                    : [
+                        ...prev.conditonalEditor,
+                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                    ] // Add new if not exists
+            };
+        });
 
     }, [conditions])
 
@@ -1564,9 +1585,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case "date is after today":
                     resultExpression = `${item.question_name} > new Date()`;
                     break;
-                case "date is “X” date of set date":
-                    resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
-                    break;
+                // case "date is “Xd” date of set date":
+                //     resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
+                //     break;
+                case 'date is “X” date of set date':
+                    const formatteDate = formatDate(item.date);
+                    const actualFormat = reverseFormat(formatteDate)
+                    return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
                 default:
                     // Handle unknown condition logic  
                     console.error(`Unknown condition logic: ${item.condition_logic}`);
@@ -1711,7 +1736,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         if (complianceState) {
+            console.log(conditions, 'conditions');
             let compliance_logic = getFinalComplianceLogic(conditions);
+            console.log(compliance_logic, 'compliance_logic');
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
