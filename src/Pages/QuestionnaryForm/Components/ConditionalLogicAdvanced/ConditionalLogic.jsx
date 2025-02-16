@@ -75,7 +75,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseIfStatements: [],
         elseStatement: {}
     });
-
+    const [render, setRender] = useState(0);
     const complianceInitialState = [
         {
             'conditions': [
@@ -890,7 +890,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Transform only non-question parts
                     if (!questionRegex.test(part)) {
                         return part
-                            .replaceAll(/\?/g, ' then ') // Replace "?" with "then"
+                            .replaceAll(/\s\?\s/g, ' then ') // Replace "?" with "then"
                             .replaceAll(/\s:\s/g, ' else ') // Replace ":" with "else"
                     }
                     return part; // Leave question names unchanged
@@ -1518,7 +1518,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const getConditionValue = (item) => {
             let questionType = null;
 
-
             allSectionDetails.sections.forEach(section => {
                 section.pages.forEach(page => {
                     page.questions.forEach(question => {
@@ -1529,23 +1528,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                     });
                 });
-            });   
+            });
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    if(item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice'){
+                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
                         resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
-                    }else{
+                    } else {
                         resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     }
                     break;
                 case "not equal to":
-                    if(item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice'){
+                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
                         resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
-                    }else{
+                    } else {
                         resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
                     }
                     break;
@@ -1925,6 +1924,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         sectionConditionLogicId={sectionConditionLogicId}
                                         pageConditionLogicId={pageConditionLogicId}
                                         combinedArray={combinedArray}
+                                        render={render}
+                                        setRender={setRender}
                                     />
                                 </div>
                                 <div className='mt-4 pt-2'>

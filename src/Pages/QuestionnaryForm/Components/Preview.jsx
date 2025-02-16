@@ -209,8 +209,16 @@ function PreviewModal({
                     (match, path, operator, value) => `${path}[0] ${operator} "${value}"`
                 );
             }
+
+            // converting Section_1.Page_1.Question_1_?_?_?_  -> (Section_1.Page_1["Question_1_?_?_?_"] 
+            if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
+                logic = logic.replace(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g, '["$1"]');
+            }
+
             return logic;
-        }
+
+        };
+
         results = complianceLogic.map((rule) => {
             let evaluationResult = {
                 STATUS: "",
