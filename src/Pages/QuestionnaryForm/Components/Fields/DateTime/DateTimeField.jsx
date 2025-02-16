@@ -117,7 +117,7 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: combinedDateTime, // Ensure this holds the correct combined value
+                        [label]: Math.round(combinedDateTime.getTime() / 1000), // Ensure this holds the correct combined value
                     },
                 },
             }));
@@ -174,6 +174,7 @@ function DateTimeField({
             }))
         } else if (type === 'date') {
             const value = e;
+            console.log(value)
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
