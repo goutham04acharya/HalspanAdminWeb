@@ -133,10 +133,48 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+    function isSameDate(question_id, setDate, value) {
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
+        
+        // Parse the dd/mm/yyyy format to Date object
+        const [day, month, year] = setDate.split('/');
+        const setDateObj = new Date(year, month - 1, day);
+
+        // Add the specified number of days (value) to the set date
+        setDateObj.setDate(setDateObj.getDate() + value);
+
+        // Compare the year, month, and day
+        return (
+            selectedDate.getFullYear() === setDateObj.getFullYear() &&
+            selectedDate.getMonth() === setDateObj.getMonth() &&
+            selectedDate.getDate() === setDateObj.getDate()
+        );
+    }
     const evaluateComplianceLogic = () => {
+
         let results = [];
 
+        function transformTernaryExpression(input) {
+            // Regex to match the patterns (handles dynamic values)
+            const pattern = /\(STATUS\s*=\s*'([^']+)',\s*(?:REASON\s*=\s*'([^']+)',\s*ACTIONS\.push\('([^']+)'\)|GRADE\s*=\s*'([^']+)')\)/g;
+
+            // Replacement function to handle both cases
+            return input.replace(pattern, (match, status, reason, action, grade) => {
+                if (grade) {
+                    // Case for PASS with GRADE
+                    return `{STATUS: '${status}', GRADE: '${grade}'}`;
+                } else {
+                    // Case for FAIL with REASON and ACTIONS
+                    return `{STATUS: '${status}', REASON: '${reason}', ACTIONS: ['${action}']}`;
+                }
+            });
+        }
         const preprocessLogic = (logic) => {
+            // debugger
+            if (logic?.includes("if")) {
+                logic = logic?.replace('if', '');
+            }
             // Replace occurrences of getMonth() with getMonth() + 1
             if (logic?.includes("getMonth()")) {
                 logic = logic?.replace(/getMonth\(\)/g, "getMonth() + 1");
@@ -163,16 +201,60 @@ function PreviewModal({
             }
 
             // Wrap new Date() for any necessary processing (can be extended if required)
-            if (logic?.includes("new Date(")) {
+            if (logic?.includes("new Date()")) {
                 try {
-                    eval(logic); // Test the validity of the new Date logic
+                    // Convert new Date() to epoch seconds
+                    logic = logic?.replace(/new Date\((.*?)\)/g,
+                        `new Date().toLocaleDateString()`
+                    );
+                    eval(transformTernaryExpression(logic));
                 } catch (error) {
                     console.error("Error evaluating new Date logic:", error);
                     throw error; // Re-throw the error for handling
                 }
             }
 
+            if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
+                // Replace double-quoted comparisons with single quotes for array elements
+                // Handle both === and !== operators
+                logic = logic.replace(
+                    /([a-zA-Z_][\w.?]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
+                    (match, path, operator, value) => {
+                        let modifiedPath = path; // Preserve original path
+
+                        // Convert last key to bracket notation while preserving '?'
+                        let parts = path.split(".");
+                        if (parts.length > 1) {
+                            let lastKey = parts.pop();
+                            modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+                        }
+                        try {
+                            let questionArray = eval(modifiedPath); // Use modified path for evaluation
+                            if (Array.isArray(questionArray) && questionArray.length === 1) {
+                                return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
+                            } else {
+                                return `${path}[999999] ${operator} "${value}"`;
+                            }
+                        } catch (e) {
+                            return match; 
+                        }
+                    }
+                );
+            }
+
+            // converting Section_1.Page_1.Question_1_?_?_?_  -> (Section_1.Page_1["Question_1_?_?_?_"] 
+            if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
+                logic = logic.replace(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g, '["$1"]');
+            }
+
+            // Fix misplaced `[0]` inside brackets
+            logic = logic.replace(
+                /\["([^"\]]+)\[\s*0\s*\]"\]/g, // Match ["Question_1?[0]"]
+                '["$1"][0]' // Convert to ["Question_1?"][0]
+            );
+
             return logic;
+
         };
 
         results = complianceLogic.map((rule) => {
@@ -1307,17 +1389,16 @@ function PreviewModal({
                                                     // Replace 'new Date()' with epoch value in seconds
                                                     let updatedLogic = list?.conditional_logic?.replace(
                                                         /new Date\(\)/g,
-                                                        "Math.round(new Date().getTime() / 1000)",
+                                                        "new Date().toLocaleDateString()",
                                                     );
 
                                                     // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
                                                     updatedLogic = updatedLogic?.replace(
                                                         /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
                                                         (_, year, month, day) => {
-                                                            return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                            return `new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).toLocaleDateString()`;
                                                         },
                                                     );
-
                                                     // Evaluate the updated logic
                                                     if (!eval(updatedLogic)) {
                                                         return null; // Skip rendering this question

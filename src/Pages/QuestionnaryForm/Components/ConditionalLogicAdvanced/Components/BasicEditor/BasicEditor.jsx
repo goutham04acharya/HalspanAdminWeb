@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import InputField from '../../../../../../Components/InputField/InputField'
 import Image from '../../../../../../Components/Image/Image'
 import InputWithDropDown from '../../../../../../Components/InputField/Dropdown';
@@ -8,7 +8,36 @@ import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
 import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
-function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray }) {
+function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray, render, setRender }) {
+
+    useEffect(() => {
+        const result = {};
+
+        questions?.sections?.forEach(section => {
+            section?.pages?.forEach(page => {
+                page?.questions?.forEach(question => {
+                    const key = `${section.section_name}.${page.page_name}.${question.question_name}`.replace(/ /g, "_"); // Replace spaces with underscores
+                    result[key] = question.component_type;
+                });
+            });
+        });
+    
+        setRender(prev => prev + 1);
+        if (!conditions || conditions[0]?.conditions[0].question_name === "" ) return; // Check for valid conditions and data before updating
+        const updatedConditions = conditions.map(conditionGroup => ({
+            ...conditionGroup,
+            conditions: conditionGroup.conditions.map(condition => {
+                return {
+                    ...condition,
+                    condition_type: result ? result[condition.question_name] : undefined
+                };
+            })
+        }));
+        if (render > 1) {
+            setConditions(updatedConditions);
+        }
+    }, [questions, setConditions,conditions[0]?.conditions[0].question_name]);
+
     const dropdownRef = useRef();
     const dropdownRef2 = useRef();
 
@@ -279,7 +308,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
     //handler for datepicker
     const handleDatePicker = (dateString, mainIndex, subIndex) => {
-
         setConditions(prevConditions => {
             // Create a new array from the current conditions
             const updatedConditions = [...prevConditions];
