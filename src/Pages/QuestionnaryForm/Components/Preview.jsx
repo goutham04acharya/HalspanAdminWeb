@@ -173,12 +173,16 @@ function PreviewModal({
             }
 
             if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
-
                 // Replace double-quoted comparisons with single quotes for array elements
                 // Handle both === and !== operators
                 logic = logic.replace(
                     /(Section_\d+\.Page_\d+\.Question_\d+)\s*(===|!==)\s*""([^""]*)""/g,
-                    (match, path, operator, value) => `${path}[0] ${operator} "${value}"`
+                    (match, path, operator, value) => {
+                        let questionArray = eval(path); // Be careful with eval! 
+                        if (Array.isArray(questionArray) && questionArray.length === 1) {
+                            return `${path}[0] ${operator} "${value}"`;
+                        }
+                    }
                 );
             }
 
