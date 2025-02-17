@@ -201,7 +201,7 @@ function PreviewModal({
                 // Replace double-quoted comparisons with single quotes for array elements
                 // Handle both === and !== operators
                 logic = logic.replace(
-                    /([a-zA-Z_][\w.]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
+                    /([a-zA-Z_][\w.?]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
                     (match, path, operator, value) => {
                         let modifiedPath = path; // Preserve original path
 
