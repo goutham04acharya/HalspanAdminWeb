@@ -67,6 +67,7 @@ function PreviewModal({
     const [isLastPage, setIsLastPage] = useState(false);
     const [isModified, setIsModified] = useState(false);
     const previousSectionsRef = useRef();
+    console.log(conditionalValues, "conditionalValues");
     const fieldStatus = useSelector(
         (state) => state?.defaultContent?.fieldStatus,
     );
@@ -133,10 +134,31 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+
     const evaluateComplianceLogic = () => {
+
         let results = [];
 
+        function transformTernaryExpression(input) {
+            // Regex to match the patterns (handles dynamic values)
+            const pattern = /\(STATUS\s*=\s*'([^']+)',\s*(?:REASON\s*=\s*'([^']+)',\s*ACTIONS\.push\('([^']+)'\)|GRADE\s*=\s*'([^']+)')\)/g;
+            
+            // Replacement function to handle both cases
+            return input.replace(pattern, (match, status, reason, action, grade) => {
+                if (grade) {
+                    // Case for PASS with GRADE
+                    return `{STATUS: '${status}', GRADE: '${grade}'}`;
+                } else {
+                    // Case for FAIL with REASON and ACTIONS
+                    return `{STATUS: '${status}', REASON: '${reason}', ACTIONS: ['${action}']}`;
+                }
+            });
+        }
         const preprocessLogic = (logic) => {
+            // debugger
+            if (logic?.includes("if")) {
+                logic = logic?.replace('if', '');
+            }
             // Replace occurrences of getMonth() with getMonth() + 1
             if (logic?.includes("getMonth()")) {
                 logic = logic?.replace(/getMonth\(\)/g, "getMonth() + 1");
@@ -163,9 +185,15 @@ function PreviewModal({
             }
 
             // Wrap new Date() for any necessary processing (can be extended if required)
-            if (logic?.includes("new Date(")) {
+            if (logic?.includes("new Date()")) {
                 try {
-                    eval(logic); // Test the validity of the new Date logic
+                    // Convert new Date() to epoch seconds
+                    logic = logic?.replace(/new Date\((.*?)\)/g,
+                        `Math.round(new Date().getTime() / 1000)`
+                    );
+                    
+                    console.log(transformTernaryExpression(logic), "logic");
+                    eval(transformTernaryExpression(logic));
                 } catch (error) {
                     console.error("Error evaluating new Date logic:", error);
                     throw error; // Re-throw the error for handling
@@ -1338,6 +1366,7 @@ function PreviewModal({
                                                         },
                                                     );
 
+                                                    console.log(updatedLogic, "updatedLogic");
                                                     // Evaluate the updated logic
                                                     if (!eval(updatedLogic)) {
                                                         return null; // Skip rendering this question
