@@ -271,46 +271,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // }
 
 
-        ////
-        setEditorCheck((prev) => {
-            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
-                item.questionId === selectedQuestionId
-                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
-                    : item
-            );
 
-            // Check if the question already exists
-            const existingQuestion = prev.conditonalEditor.find(
+        // Check if the toast should be shown
+        if (complianceState) {
+            if (editorCheck.isAdvanceEditorCompliance) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
+            }
+        } else {
+            // Find the question in conditionalEditor array
+            const existingQuestion = editorCheck.conditonalEditor.find(
                 (item) => item.questionId === selectedQuestionId
             );
 
-            const questionExists = !!existingQuestion;
-
-            // Check if the toast should be shown
-            if (complianceState) {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
-            } else {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
+            // If the question exists and isAdvanceEditor is true, show the toast
+            if (existingQuestion?.isAdvanceEditor) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
             }
-
-            return {
-                ...prev,
-                conditonalEditor: questionExists
-                    ? updatedConditionalEditor // Update existing
-                    : [
-                        ...prev.conditonalEditor,
-                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                    ] // Add new if not exists
-            };
-        });
+        }
 
     }, [conditions])
 
@@ -1670,7 +1651,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                console.log(condition_logic, 'condition_logic')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -1735,9 +1715,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         if (complianceState) {
-            console.log(conditions, 'conditions');
             let compliance_logic = getFinalComplianceLogic(conditions);
-            console.log(compliance_logic, 'compliance_logic');
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
