@@ -8,6 +8,7 @@ import DatePicker from '../../../../../../Components/Datepicker/DatePicker';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { generateElseBlockString, generateThenActionString } from '../../../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
+import dayjs from 'dayjs';
 
 function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, setUserInput, combinedArray }) {
     const dispatch = useDispatch();
@@ -643,27 +644,29 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
     }
 
     const handleDatePicker = (dateString, mainIndex, subIndex, isElseIf = false, elseIfIndex = null) => {
-
-        if (isElseIf) {
-            setConditions(prevConditions => {
-                const updatedConditions = [...prevConditions];
-
-                const conditionToUpdate = updatedConditions[mainIndex].elseIfBlocks[elseIfIndex].conditions[subIndex];
-
-                conditionToUpdate['date'] = dateString;
-                return updatedConditions;
-            });
-        } else {
-            setConditions(prevConditions => {
-                const updatedConditions = [...prevConditions];
-
-                const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-
-                conditionToUpdate['date'] = dateString;
-                return updatedConditions;
-            });
-        }
-    }
+        setConditions(prevConditions => {
+            const updatedConditions = [...prevConditions]; // Clone the outer array
+    
+            if (isElseIf) {
+                const elseIfBlock = { ...updatedConditions[mainIndex].elseIfBlocks[elseIfIndex] }; // Clone elseIfBlock
+                const newConditions = [...elseIfBlock.conditions]; // Clone conditions array
+                newConditions[subIndex] = { ...newConditions[subIndex], date: dateString }; // Clone condition object and update date
+    
+                elseIfBlock.conditions = newConditions;
+                updatedConditions[mainIndex].elseIfBlocks[elseIfIndex] = elseIfBlock; // Update the block
+            } else {
+                const conditionBlock = { ...updatedConditions[mainIndex] }; // Clone conditionBlock
+                const newConditions = [...conditionBlock.conditions]; // Clone conditions array
+                newConditions[subIndex] = { ...newConditions[subIndex], date: dateString }; // Clone condition object and update date
+    
+                conditionBlock.conditions = newConditions;
+                updatedConditions[mainIndex] = conditionBlock; // Update the block
+            }
+    
+            return updatedConditions;
+        });
+    };
+    
 
     const handleDeleteCondition = (blockId, innerIndex, isElseIf = false, elseIfIndex = null) => {
         setSubmitSelected(false);
@@ -1025,7 +1028,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                         label=''
                                                                         id='value'
                                                                         type='text'
-                                                                        value={conditions[index].conditions[i]?.date || null}
+                                                                        value={conditions[index].conditions[i]?.date ? dayjs(conditions[index].conditions[i]?.date) : null}
                                                                         className='w-full'
                                                                         labelStyle=''
                                                                         testId={`set-date-${index}-${i}`}

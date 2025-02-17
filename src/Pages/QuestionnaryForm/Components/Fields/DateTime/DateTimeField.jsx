@@ -117,7 +117,7 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: combinedDateTime, // Ensure this holds the correct combined value
+                        [label]: Math.round(combinedDateTime.getTime() / 1000), // Ensure this holds the correct combined value
                     },
                 },
             }));
@@ -174,15 +174,15 @@ function DateTimeField({
             }))
         } else if (type === 'date') {
             const value = e;
+            console.log(value)
             // Extract current time
             const currentHours = new Date().getHours();
             const currentMinutes = new Date().getMinutes();
             const currentSeconds = new Date().getSeconds();
             const currentMilliSeconds = new Date().getMilliseconds();
             const selectedDate = new Date(value);
-            selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
+            selectedDate.setHours(0, 0, 0, 0);
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
@@ -190,7 +190,7 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: Math.round(selectedDate.getTime() / 1000) // Add or update the label key with the selectedDate
+                        [label]: selectedDate.toLocaleDateString() // Add or update the label key with the selectedDate
                     }
                 }
             }));

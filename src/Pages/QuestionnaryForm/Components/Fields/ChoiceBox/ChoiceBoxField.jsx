@@ -109,7 +109,7 @@ const ChoiceBoxField = ({
                 ...prevValues[section_name], // Preserve existing entries for this section
                 [page_name]: {
                     ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: value.toString() // Add or update the label key with newValue
+                    [label]: value.map(item => item.value) // Add or update the label key with newValue
                 }
             }
         })) 
