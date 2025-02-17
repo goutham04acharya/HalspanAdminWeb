@@ -26,6 +26,7 @@ const Sections = ({
   formStatus,
   setDropdown,
   setPageConditionLogicId,
+  replaceComplianceLogic
 }) => {
   const sectionRefs = useRef([]);
   const dispatch = useDispatch();
@@ -228,6 +229,7 @@ const Sections = ({
                           // handleAutoSave={handleAutoSave}
                           setSections={setSections}
                           formStatus={formStatus}
+                          replaceComplianceLogic={replaceComplianceLogic}
                         />
                       </li>
                     )}

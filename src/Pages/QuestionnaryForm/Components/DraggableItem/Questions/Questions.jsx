@@ -16,7 +16,7 @@ import { setSelectedAddQuestion, setSelectedQuestionId, setSelectedSectionData, 
 import ComplanceLogicField from '../../Fields/ComplianceLogic/ComplanceLogicField';
 import TagScanField from '../../Fields/TagScan/TagScanField';
 import { formControlClasses } from '@mui/material';
-import { saveCurrentData, setCurrentData, setcurrentQuestionLabel } from '../../Fields/fieldSettingParamsSlice';
+import { saveCurrentData, setComplianceLogicCondition, setCurrentData, setcurrentQuestionLabel } from '../../Fields/fieldSettingParamsSlice';
 
 
 const Questions = ({
@@ -28,10 +28,11 @@ const Questions = ({
 
     const dispatch = useDispatch();
     const { onMouseDown, onTouchStart } = dragHandleProps;
-    const { index, selectedQuestionId, formStatus, sections } = item;
+    const { index, selectedQuestionId, formStatus, sections, replaceComplianceLogic } = item;
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedData = useSelector(state => state.fieldSettingParams.savedData);
     const currentQuestionLabel = useSelector(state => state.fieldSettingParams.currentQuestionLabel);
+    const { conditions } = useSelector(state => state.fieldSettingParams);
 
     const handleDeletequestionModal = (sectionIndex, pageIndex, item) => {
         dispatch(setSelectedQuestionId(item?.question_id))
@@ -106,7 +107,6 @@ const Questions = ({
             id: question.question_id,
             label: findQuestionPath(question?.question_id, fieldSettingParams[question?.question_id].label),
         }
-        console.log(currentLabel,'currentLbael')
         dispatch(setcurrentQuestionLabel(currentLabel))
         // Update state for selected question and reset component state
         dispatch(setSelectedQuestionId(question.question_id));
@@ -122,7 +122,7 @@ const Questions = ({
                 for (const question of page.questions) {
                     if (question.question_id === questionId && !label) {
                         return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${question?.label?.replace(/ /g, "_")}`;
-                    }else{
+                    } else {
                         return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${label?.replace(/ /g, "_")}`;
                     }
                 }
@@ -130,6 +130,80 @@ const Questions = ({
         }
         return null; // Return null if question ID is not found
     };
+
+    //recursive udating the 
+    // function recursiveUpdate(obj, oldName, newName) {
+    //     console.log(obj,'pppppp')
+    //     obj.map((item, index) => {
+    //         console.log(item,'itemsss')
+    //         Object.keys(item).forEach((key) => {
+    //             console.log(key,'keyyy')
+    //             if (key === 'conditions') {
+    //                 obj[index][key].map((condition, i) => {
+    //                     if (condition.question_name.includes(condition.question_name)) {
+    //                         obj[index][key][i].question_name = condition.question_name.replace(oldName, newName);
+    //                     }
+    //                 })
+    //             } else if (key === 'elseIfBlocks') {
+    //                 console.log(obj[index][key],'ololol')
+    //                 obj[index][key].map((conditionsgrp, i) => {
+    //                     console.log(conditionsgrp.conditions,'vvvvvvv')
+    //                     conditionsgrp.conditions.length > 0 && conditionsgrp.conditions.map((condition, ii) => {
+    //                         if (condition.question_name.includes(oldName)) {
+    //                             console.log(obj[index][key][i].conditions[ii].question_name,'ggggg')
+    //                             obj[index][key][i].conditions[ii].question_name = condition.question_name.replace(oldName, newName);
+    //                         }
+    //                     })
+    //                 })
+    //             }
+    //         });
+    //     });
+
+    //     console.log(obj)
+    //     // if (Array.isArray(obj)) {
+    //     //     return obj.map(item => recursiveUpdate(item));
+    //     // } else if (typeof obj === 'object' && obj !== null) {
+    //     //     const updatedObj = {};
+    //     //     for (const key in obj) {
+    //     //         if (key === 'question_name' && obj[key] === oldName) {
+    //     //             updatedObj[key] = newName;
+    //     //         } else {
+    //     //             updatedObj[key] = recursiveUpdate(obj[key]);
+    //     //         }
+    //     //     }
+    //     //     return updatedObj;
+    //     // }
+    //     // return obj;
+
+    // }
+    function recursiveUpdate(obj, oldName, newName) {
+        return obj.map((item) => {
+            let newItem = { ...item }; // Create a shallow copy of the object
+    
+            Object.keys(newItem).forEach((key) => {
+                if (key === 'conditions') {
+                    newItem[key] = newItem[key].map((condition) => ({
+                        ...condition, // Create a new condition object
+                        question_name: condition.question_name.includes(oldName)
+                            ? condition.question_name.replace(oldName, newName)
+                            : condition.question_name
+                    }));
+                } else if (key === 'elseIfBlocks') {
+                    newItem[key] = newItem[key].map((conditionsgrp) => ({
+                        ...conditionsgrp, // Create a new conditions group object
+                        conditions: conditionsgrp.conditions.map((condition) => ({
+                            ...condition, // Create a new condition object
+                            question_name: condition.question_name.includes(oldName)
+                                ? condition.question_name.replace(oldName, newName)
+                                : condition.question_name
+                        }))
+                    }));
+                }
+            });
+    
+            return newItem;
+        });
+    }
     const handleQuestionLabelChange = (questionId) => {
         if (!fieldSettingParams[questionId]) return fieldSettingParams; // If questionId is not found, return original data
 
@@ -148,6 +222,8 @@ const Questions = ({
                         findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')
                     )
                 };
+                replaceComplianceLogic(currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_'));
+                dispatch(setComplianceLogicCondition(recursiveUpdate(recursiveUpdate(conditions, currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')))));
             }
         });
         console.log(updatedFieldSettingParams, 'updated')

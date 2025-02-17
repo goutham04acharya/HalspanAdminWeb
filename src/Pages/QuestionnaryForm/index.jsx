@@ -86,6 +86,7 @@ const QuestionnaryForm = () => {
     const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
+    const complianceConditions = useSelector((state) => state.fieldSettingParams.conditions); //newly added for compliance logic conditions
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
@@ -918,6 +919,35 @@ const QuestionnaryForm = () => {
 
     }
 
+    //recursive udating the 
+    function recursiveUpdate(obj, oldName, newName) {
+        return obj.map((item) => {
+            let newItem = { ...item }; // Create a shallow copy of the object
+
+            Object.keys(newItem).forEach((key) => {
+                if (key === 'conditions') {
+                    newItem[key] = newItem[key].map((condition) => ({
+                        ...condition, // Create a new condition object
+                        question_name: condition.question_name.includes(oldName)
+                            ? condition.question_name.replace(oldName, newName)
+                            : condition.question_name
+                    }));
+                } else if (key === 'elseIfBlocks') {
+                    newItem[key] = newItem[key].map((conditionsgrp) => ({
+                        ...conditionsgrp, // Create a new conditions group object
+                        conditions: conditionsgrp.conditions.map((condition) => ({
+                            ...condition, // Create a new condition object
+                            question_name: condition.question_name.includes(oldName)
+                                ? condition.question_name.replace(oldName, newName)
+                                : condition.question_name
+                        }))
+                    }));
+                }
+            });
+
+            return newItem;
+        });
+    }
     // Save the section and page name
     const handleSaveSectionName = (value, sectionIndex, pageIndex, noFocus) => {
         // Create a deep copy of sections
@@ -960,10 +990,10 @@ const QuestionnaryForm = () => {
                         };
                     }
                 });
-                console.log(updatedFieldSettingParams, 'updated')
                 dispatch(setCurrentData(updatedFieldSettingParams));
                 dispatch(saveCurrentData(updatedFieldSettingParams));
-
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
             }
             updatedSections[sectionIndex].pages[pageIndex].page_name = value; // Safe to update now
             setPageName(value)
@@ -983,7 +1013,6 @@ const QuestionnaryForm = () => {
                         updatedFieldSettingParams[key].conditional_logic &&
                         updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
                     ) {
-                        console.log(updatedFieldSettingParams[key].conditional_logic, 'updatedFieldSettingParams[key].conditional_logic')
                         // Create a new copy of the object to ensure immutability
                         updatedFieldSettingParams[key] = {
                             ...updatedFieldSettingParams[key],
@@ -996,7 +1025,8 @@ const QuestionnaryForm = () => {
                 });
                 dispatch(setCurrentData(updatedFieldSettingParams));
                 dispatch(saveCurrentData(updatedFieldSettingParams));
-
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
             }
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
@@ -1010,6 +1040,16 @@ const QuestionnaryForm = () => {
         // setSectionName(value)
     };
 
+    //function to swap complance logic
+    const replaceComplianceLogic = (oldName, newName) => {
+        setComplianceLogic(prevState => prevState.map(item => {
+            if (item.default_content.includes(oldName)) {
+                const updatedContent = item.default_content.replace(new RegExp(`\\b${oldName}\\b`, 'g'), newName);
+                return { ...item, default_content: updatedContent };
+            }
+            return item;
+        }));
+    }
 
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
@@ -1374,7 +1414,6 @@ const QuestionnaryForm = () => {
     const compareSections = (sections, compareSavedSections) => {
         // Check if the number of sections matches
         if (sections.length !== compareSavedSections.length) {
-            console.log('Number of sections does not match');
             return false;
         }
 
@@ -1829,6 +1868,7 @@ const QuestionnaryForm = () => {
                                                                             dropdownOpen={dropdownOpen}
                                                                             setPageConditionLogicId={setPageConditionLogicId}
                                                                             pageConditionLogicId={setPageConditionLogicId}
+                                                                            replaceComplianceLogic={replaceComplianceLogic}
                                                                         />
                                                                     </li>
                                                                 )}

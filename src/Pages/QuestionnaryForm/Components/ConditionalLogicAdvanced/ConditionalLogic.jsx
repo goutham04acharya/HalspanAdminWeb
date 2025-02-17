@@ -293,7 +293,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     }, [conditions])
 
-    console.log(editorCheck, 'editorCheck')
 
 
     useEffect(() => {
@@ -1629,7 +1628,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                console.log(condition_logic, 'condition_logic')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
