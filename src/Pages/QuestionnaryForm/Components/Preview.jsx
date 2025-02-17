@@ -133,9 +133,7 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
-    console.log(conditionalValues, "conditionalValues");
     function isSameDate(question_id, setDate, value) {
-        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
         // Convert the epoch values (in seconds) to Date objects
         const selectedDate = new Date(question_id * 1000);
         
@@ -146,7 +144,6 @@ function PreviewModal({
         // Add the specified number of days (value) to the set date
         setDateObj.setDate(setDateObj.getDate() + value);
 
-        console.log(setDateObj, 'set date obj')
         // Compare the year, month, and day
         return (
             selectedDate.getFullYear() === setDateObj.getFullYear() &&

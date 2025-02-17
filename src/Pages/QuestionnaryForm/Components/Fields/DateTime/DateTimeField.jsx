@@ -183,7 +183,6 @@ function DateTimeField({
             const selectedDate = new Date(value);
             selectedDate.setHours(0, 0, 0, 0);
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            console.log(selectedDate.toLocaleDateString(), 'selectedDate')
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
