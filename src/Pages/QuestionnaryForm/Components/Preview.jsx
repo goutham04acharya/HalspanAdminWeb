@@ -67,7 +67,6 @@ function PreviewModal({
     const [isLastPage, setIsLastPage] = useState(false);
     const [isModified, setIsModified] = useState(false);
     const previousSectionsRef = useRef();
-    console.log(conditionalValues, "conditionalValues");
     const fieldStatus = useSelector(
         (state) => state?.defaultContent?.fieldStatus,
     );
@@ -142,7 +141,7 @@ function PreviewModal({
         function transformTernaryExpression(input) {
             // Regex to match the patterns (handles dynamic values)
             const pattern = /\(STATUS\s*=\s*'([^']+)',\s*(?:REASON\s*=\s*'([^']+)',\s*ACTIONS\.push\('([^']+)'\)|GRADE\s*=\s*'([^']+)')\)/g;
-            
+
             // Replacement function to handle both cases
             return input.replace(pattern, (match, status, reason, action, grade) => {
                 if (grade) {
@@ -191,8 +190,6 @@ function PreviewModal({
                     logic = logic?.replace(/new Date\((.*?)\)/g,
                         `Math.round(new Date().getTime() / 1000)`
                     );
-                    
-                    console.log(transformTernaryExpression(logic), "logic");
                     eval(transformTernaryExpression(logic));
                 } catch (error) {
                     console.error("Error evaluating new Date logic:", error);
@@ -201,12 +198,30 @@ function PreviewModal({
             }
 
             if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
-
                 // Replace double-quoted comparisons with single quotes for array elements
                 // Handle both === and !== operators
                 logic = logic.replace(
-                    /(Section_\d+\.Page_\d+\.Question_\d+)\s*(===|!==)\s*""([^""]*)""/g,
-                    (match, path, operator, value) => `${path}[0] ${operator} "${value}"`
+                    /([a-zA-Z_][\w.?]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
+                    (match, path, operator, value) => {
+                        let modifiedPath = path; // Preserve original path
+
+                        // Convert last key to bracket notation while preserving '?'
+                        let parts = path.split(".");
+                        if (parts.length > 1) {
+                            let lastKey = parts.pop();
+                            modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+                        }
+                        try {
+                            let questionArray = eval(modifiedPath); // Use modified path for evaluation
+                            if (Array.isArray(questionArray) && questionArray.length === 1) {
+                                return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
+                            } else {
+                                return `${path}[999999] ${operator} "${value}"`;
+                            }
+                        } catch (e) {
+                            return match; 
+                        }
+                    }
                 );
             }
 
@@ -214,6 +229,12 @@ function PreviewModal({
             if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
                 logic = logic.replace(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g, '["$1"]');
             }
+
+            // Fix misplaced `[0]` inside brackets
+            logic = logic.replace(
+                /\["([^"\]]+)\[\s*0\s*\]"\]/g, // Match ["Question_1?[0]"]
+                '["$1"][0]' // Convert to ["Question_1?"][0]
+            );
 
             return logic;
 
