@@ -10,6 +10,7 @@ export const complianceContentConverter = (conditionalLogic) => {
         conditionalLogic = conditionalLogic?.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
+        // conditionalLogic = conditionalLogic?.replaceAll(/""/g, '"');
 
         conditionalLogic = conditionalLogic
             ?.replace(/ACTIONS\.push\('([^']+)'\)/g, 'ACTIONS += "$1"')
