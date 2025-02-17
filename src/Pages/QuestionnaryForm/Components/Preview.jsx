@@ -134,7 +134,27 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+    console.log(conditionalValues, "conditionalValues");
+    function isSameDate(question_id, setDate, value) {
+        console.log(question_id, setDate, value, 'adfasdfe') // 1735473017 NaN 450000
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
+        
+        // Parse the dd/mm/yyyy format to Date object
+        const [day, month, year] = setDate.split('/');
+        const setDateObj = new Date(year, month - 1, day);
 
+        // Add the specified number of days (value) to the set date
+        setDateObj.setDate(setDateObj.getDate() + value);
+
+        console.log(setDateObj, 'set date obj')
+        // Compare the year, month, and day
+        return (
+            selectedDate.getFullYear() === setDateObj.getFullYear() &&
+            selectedDate.getMonth() === setDateObj.getMonth() &&
+            selectedDate.getDate() === setDateObj.getDate()
+        );
+    }
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -189,7 +209,7 @@ function PreviewModal({
                 try {
                     // Convert new Date() to epoch seconds
                     logic = logic?.replace(/new Date\((.*?)\)/g,
-                        `Math.round(new Date().getTime() / 1000)`
+                        `new Date().toLocaleDateString()`
                     );
                     
                     console.log(transformTernaryExpression(logic), "logic");
@@ -1351,18 +1371,16 @@ function PreviewModal({
                                                     // Replace 'new Date()' with epoch value in seconds
                                                     let updatedLogic = list?.conditional_logic?.replace(
                                                         /new Date\(\)/g,
-                                                        "Math.round(new Date().getTime() / 1000)",
+                                                        "new Date().toLocaleDateString()",
                                                     );
 
                                                     // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
                                                     updatedLogic = updatedLogic?.replace(
                                                         /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
                                                         (_, year, month, day) => {
-                                                            return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                            return `new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).toLocaleDateString()`;
                                                         },
                                                     );
-
-                                                    console.log(updatedLogic, "updatedLogic");
                                                     // Evaluate the updated logic
                                                     if (!eval(updatedLogic)) {
                                                         return null; // Skip rendering this question

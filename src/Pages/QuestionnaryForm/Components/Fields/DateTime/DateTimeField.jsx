@@ -181,9 +181,9 @@ function DateTimeField({
             const currentSeconds = new Date().getSeconds();
             const currentMilliSeconds = new Date().getMilliseconds();
             const selectedDate = new Date(value);
-            selectedDate.setHours(currentHours, currentMinutes, currentSeconds, currentMilliSeconds);
+            selectedDate.setHours(0, 0, 0, 0);
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+            console.log(selectedDate.toLocaleDateString(), 'selectedDate')
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
@@ -191,7 +191,7 @@ function DateTimeField({
                     ...prevValues[section_name],
                     [page_name]: {
                         ...prevValues[section_name]?.[page_name],
-                        [label]: Math.round(selectedDate.getTime() / 1000) // Add or update the label key with the selectedDate
+                        [label]: selectedDate.toLocaleDateString() // Add or update the label key with the selectedDate
                     }
                 }
             }));
