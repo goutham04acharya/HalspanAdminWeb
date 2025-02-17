@@ -7,4 +7,4 @@ Feature: My Account - UVIK Portal
     Scenario Outline: Admin adds invalid fields for the questionnaire
         Given I am on the dashboard screen
         When I click the my account button
-        Then I should be redirected to my account 
+        Then I should be redirected to my account
