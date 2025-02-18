@@ -14,9 +14,10 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
     handleAddRemoveSection,
     handleSectionSaveOrder,
     handleSectionScroll,
-    // handleDragStart
+    complianceLogic,
+    setComplianceClick
 }) {
-
+    console.log(complianceLogic.length, 'complianceLogic')
     const handleDropdown = (sectionId) => {
         if (dropdownOpen === sectionId) {
             setDropdown('')
@@ -31,8 +32,8 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
             setDropdown(sections[0]?.section_id);
         }
     }, []);
-    
-    
+
+
     return (
         <div className='py-4'>
             <div className='flex items-center px-9'>
@@ -42,8 +43,8 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
                     className='ml-3 font-semibold text-base text-[#2B333B] truncate w-[90%]'>{formDefaultInfo?.internal_name}</p>
             </div>
             <div className='mt-5 overflow-auto default-sidebar h-customh8'>
-            {/* onDragStart={handleDragStart} */}
-                <DragDropContext  onDragEnd={onDragEnd}>
+                {/* onDragStart={handleDragStart} */}
+                <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable">
                         {(provided) => (
                             <ul
@@ -73,6 +74,7 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
                                                         setSelectedPage(null); // Reset selected page when a section is selected
                                                         handleDropdown(sectionItem?.section_id);
                                                         handleSectionScroll(sectionIndex, sectionItem?.section_id);
+                                                        setComplianceClick(false)
                                                     }}
                                                     className={`${selectedSection === sectionItem?.section_id ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center justify-between pl-11 pr-3 cursor-pointer`}>
                                                     <div className='flex items-center'>
@@ -113,6 +115,7 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
                                                                 setSelectedSection(sectionItem?.section_id); // Keep track of the section
                                                                 setSelectedPage(pageIndex); // Highlight the selected page
                                                                 handlePageScroll(sectionIndex, pageItem.page_id);
+                                                                setComplianceClick(false)
                                                             }}
                                                             className={`${selectedSection === sectionItem?.section_id && selectedPage === pageIndex ? 'bg-[#d1d3d9b7]' : 'hover:bg-[#EFF1F8]'} flex items-center pl-14 pr-2 cursor-pointer truncate`}>
                                                             <p className='rounded-full min-w-2 h-2 bg-black mr-4'></p>
@@ -135,6 +138,12 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
                         )}
                     </Droppable>
                 </DragDropContext>
+                {complianceLogic.length > 0 && <div className={`pl-11 py-2 cursor-pointer ${selectedSection === 'compliance' ? 'bg-[#d1d3d9b7]' : ''}`} onClick={() => {
+                    setComplianceClick(true)
+                    setSelectedSection('compliance')
+                }}>
+                    compliance Logic
+                </div>}
                 <button
                     onClick={formStatus === 'Draft' ? () => {
                         handleAddRemoveSection('add');
