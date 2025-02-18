@@ -71,6 +71,7 @@ const QuestionnaryForm = () => {
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [sectionDetails, setSectionDetails] = useState({})
+    const [complianceClick, setComplianceClick] = useState(false)
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -1715,7 +1716,8 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
-                            // handleDragStart={handleDragStart}
+                            setComplianceClick={setComplianceClick}
+                            complianceLogic={complianceLogic}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1851,7 +1853,7 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
+                                    {(selectedComponent === 'compliancelogic' || complianceClick) && (
                                         <div>
                                             <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                         </div>

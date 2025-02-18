@@ -539,14 +539,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
-
         // Step 2: Replace underscores with spaces to match the actual names
         const sectionName = sectionPart.replaceAll(/_/g, ' ');
         const pageName = pagePart.replaceAll(/_/g, ' ');
         const questionName = questionPart.replaceAll(/_/g, ' ');
-
+        
         // Step 3: Search for the matching section in the data
-        const matchingSection = data?.sections?.find(section => section?.section_name === sectionName);
+        const matchingSection = data?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
             return null; // No matching section found
         }
@@ -670,11 +669,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                // Try parsing as a date condition
+                // const regex = /^([\w_.]+)\s*([<>]=?|[=!]=)\s*(new\s+Date\(\))$/
+                // const match = condition.match(regex)
+                // if (match) {
+                //     const [_, question, operator, value] = match
+                //     console.log({
+                //         question,
+                //         operator,
+                //         value
+                //     })
+                // }                // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
                 const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                console.log(matches, 'asdasd')
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -684,6 +693,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.sections);
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
+                    console.log(question, 'asdasd')
                     if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
