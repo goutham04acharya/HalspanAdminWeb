@@ -12,7 +12,7 @@ function ConfirmationModal({ text, setReplaceCancel, subText, Button1text, Butto
 
     const handleClose = () => {
         dispatch(setModalOpen(false));
-        setSectionWarningShown(false);
+        // setSectionWarningShown(false);
     };
 
     useEffect(() => {

@@ -107,6 +107,7 @@ const QuestionnaryForm = () => {
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
+    const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
@@ -591,6 +592,7 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             setSectionDetails(response?.data?.data);
+            setCompareInitialSavedSection(response?.data?.data?.sections?.length ? [response.data.data.sections[0]] : [])
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -1290,8 +1292,6 @@ const QuestionnaryForm = () => {
                 isAdvanceEditorCompliance: false
             };
         });
-        console.log('delete');
-        
         setComplianceLoader(true)
         const body = {
             compliance_logic: []
@@ -1308,86 +1308,157 @@ const QuestionnaryForm = () => {
         }
     };
 
-    // Function to compare sections state with compareSavedSections to show the cancle modal or not
+    const isEmptyValue = (value) => {
+        return value === undefined || value === null || value === '';
+    };
+    
+    const compareObjects = (obj1, obj2) => {
+        // Get all unique keys from both objects
+        const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+    
+        for (const key of allKeys) {
+            const value1 = obj1[key];
+            const value2 = obj2[key];
+    
+            // Skip comparison if both values are empty
+            if (isEmptyValue(value1) && isEmptyValue(value2)) {
+                continue;
+            }
+    
+            // If one value is empty and the other isn't, they're different
+            if (isEmptyValue(value1) !== isEmptyValue(value2)) {
+                console.log(`Mismatch in property ${key}:`, { value1, value2 });
+                return false;
+            }
+    
+            // Handle arrays (including source_value arrays)
+            if (Array.isArray(value1) && Array.isArray(value2)) {
+                if (value1.length !== value2.length) {
+                    console.log(`Array length mismatch for ${key}:`, { value1, value2 });
+                    return false;
+                }
+    
+                // For arrays of objects (like source_value)
+                if (value1.length > 0 && typeof value1[0] === 'object') {
+                    for (let i = 0; i < value1.length; i++) {
+                        if (!compareObjects(value1[i], value2[i])) {
+                            console.log(`Mismatch in array item ${i} of ${key}:`, {
+                                item1: value1[i],
+                                item2: value2[i]
+                            });
+                            return false;
+                        }
+                    }
+                } else {
+                    // For primitive arrays, compare directly
+                    const areEqual = value1.every((item, index) => item === value2[index]);
+                    if (!areEqual) {
+                        console.log(`Array content mismatch for ${key}:`, { value1, value2 });
+                        return false;
+                    }
+                }
+                continue;
+            }
+    
+            // Handle nested objects
+            if (typeof value1 === 'object' && typeof value2 === 'object') {
+                if (!compareObjects(value1, value2)) {
+                    return false;
+                }
+                continue;
+            }
+    
+            // Compare primitive values
+            if (value1 !== value2) {
+                console.log(`Value mismatch for ${key}:`, { value1, value2 });
+                return false;
+            }
+        }
+    
+        return true;
+    };
+    
     const compareSections = (sections, compareSavedSections) => {
         // Check if the number of sections matches
         if (sections.length !== compareSavedSections.length) {
             console.log('Number of sections does not match');
             return false;
         }
-
+    
         // Compare each section in detail
         for (let i = 0; i < sections.length; i++) {
             const section = sections[i];
             const savedSection = compareSavedSections[i];
-
-            // Compare section-level properties
-            if (
-                section.section_name !== savedSection.section_name ||
-                section.section_id !== savedSection.section_id ||
-                section.updated_at !== savedSection.updated_at
-            ) {
-                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
+    
+            // Compare all section properties
+            if (!compareObjects(section, savedSection)) {
+                console.log(`Mismatch in section ${i + 1}`);
                 return false;
             }
-
+    
             // Compare pages within the section
             if (section.pages.length !== savedSection.pages.length) {
                 console.log(`Mismatch in the number of pages in section ${i + 1}`);
                 return false;
             }
-
+    
             for (let j = 0; j < section.pages.length; j++) {
                 const page = section.pages[j];
                 const savedPage = savedSection.pages[j];
-
-                // Compare page-level properties
-                if (
-                    page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id
-                ) {
-                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
-                        page,
-                        savedPage,
-                    });
+    
+                // Compare all page properties
+                if (!compareObjects(page, savedPage)) {
+                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}`);
                     return false;
                 }
-
+    
                 // Compare questions within the page
                 if (page.questions.length !== savedPage.questions.length) {
-                    console.log(
-                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
-                    );
+                    console.log(`Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`);
                     return false;
                 }
-
+    
                 for (let k = 0; k < page.questions.length; k++) {
                     const question = page.questions[k];
                     const savedQuestion = savedPage.questions[k];
-
-                    // Compare question-level properties
-                    if (
-                        question.question_id !== savedQuestion.question_id ||
-                        question.question_name !== savedQuestion.question_name
-                    ) {
-                        console.log(
-                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
-                            { question, savedQuestion }
-                        );
+    
+                    // Compare all question properties
+                    if (!compareObjects(question, savedQuestion)) {
+                        console.log(`Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}`);
                         return false;
                     }
                 }
             }
         }
-
-        return true; // Sections, pages, and questions are identical
+    
+        return true;
     };
 
-    // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
     const hasUnsavedChanges = () => {
-        return (
-            !compareSections(sections, compareSavedSections)
-        );
+        if (Array.isArray(compareInitialSavedSection) && compareInitialSavedSection.length > 0) {
+            // Create a deep copy to avoid modifying state directly
+            const modifiedSections = JSON.parse(JSON.stringify(compareInitialSavedSection));
+            
+            modifiedSections.forEach(section => {
+                delete section.created_at;
+                delete section.updated_at;
+                delete section.questionnaire_id;
+                delete section.version_number;
+                delete section['ttl'];
+                
+                if (section.pages && Array.isArray(section.pages)) {
+                    section.pages.forEach(page => {
+                        delete page.index;
+                        delete page.sectionIndex;
+                    });
+                }
+            });
+    
+            return !compareSections([sectionDetails?.sections[0]], modifiedSections);
+        } else {
+            console.error("compareSavedSections is not an array:", compareSavedSections);
+            return false;
+        }
     };
 
     // Cancel button click handler (related to showing the cancle modal)
@@ -1577,6 +1648,7 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
+            setCompareInitialSavedSection([sectionBody.sections[0]])
             setSectionDetails(sectionBody);
             cleanSections();
             let hasQuestion = checkForQuestions();
