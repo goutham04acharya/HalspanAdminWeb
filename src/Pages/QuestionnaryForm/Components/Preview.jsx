@@ -546,7 +546,13 @@ function PreviewModal({
         // Call the computeNextNavigation only if the page is validated
         computeNextNavigation();
     }, [sections, currentSection, currentPage, value]);
-
+    function formatDateWithOffset(formatteDate, value, question_name) {
+        let [day, month, year] = formatteDate.split('/').map(Number); 
+        let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
+        date.setDate(date.getDate() + Number(value)); 
+        console.log(date, 'hasdjmasd')
+        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+    }
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
         setValidationErrors({});

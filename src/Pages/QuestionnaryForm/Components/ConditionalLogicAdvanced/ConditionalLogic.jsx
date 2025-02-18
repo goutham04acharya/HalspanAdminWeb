@@ -638,20 +638,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
-            const date = new Date(timestamp * 1000);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+            const date = timestamp.split('/')[0].length === 1 ? `0${timestamp}` : timestamp;
+            return date
         };
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
-            const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
+            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w_.]+)\)/;
             const match = condition?.match(pattern);
             if (!match) {
                 return null;
             }
-            const [_, question_name, timestamp, offsetDays] = match;
+            const [_, timestamp, offsetDays, question_name] = match;
+            console.log(timestamp, offsetDays, question_name, 'asdasdjasdjadajsd')
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
@@ -1571,7 +1569,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case 'date is “X” date of set date':
                     const formatteDate = formatDate(item.date);
                     const actualFormat = reverseFormat(formatteDate)
-                    return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
+                    return `formatDateWithOffset('${formatteDate}', ${item.value}, ${item.question_name})`
+                    // return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
                 default:
                     // Handle unknown condition logic  
                     console.error(`Unknown condition logic: ${item.condition_logic}`);
