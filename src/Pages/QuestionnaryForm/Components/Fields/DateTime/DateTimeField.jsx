@@ -61,7 +61,6 @@ function DateTimeField({
         };
     };
     const handleDateTime = (date, time) => {
-        console.log('hiiii')
         if (date) {
             setDateVal(date)
             dispatch(setQuestionValue({ question_id: question?.question_id, value: date }))
@@ -183,7 +182,6 @@ function DateTimeField({
             const currentMilliSeconds = new Date().getMilliseconds();
             const selectedDate = new Date(value);
             selectedDate.setHours(0, 0, 0, 0);
-            console.log(selectedDate.toLocaleDateString(), 'selectedDate')
             // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({

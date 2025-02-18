@@ -649,7 +649,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return null;
             }
             const [_, timestamp, offsetDays, question_name] = match;
-            console.log(timestamp, offsetDays, question_name, 'asdasdjasdjadajsd')
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
