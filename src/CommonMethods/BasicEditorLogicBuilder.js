@@ -55,7 +55,12 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
                 date.setDate(date.getDate() + Number(value)); 
                 return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
             })());
-                        return `${question_name} === ${formatedValue}`
+                        return `${question_name} === "() => { 
+                let [day, month, year] = ${formatteDate}.split('/').map(Number); 
+                let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
+                date.setDate(date.getDate() + Number(${value})); 
+                return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+            })()"`
         // return `isSameDate(${question_name}, ${formatteDate}, ${value})`
         // return `Math.abs(${question_name} - ${actualFormat} ) == ${value / 24 * 60 * 60 * 1000}`
         default:
