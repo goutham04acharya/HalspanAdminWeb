@@ -133,7 +133,9 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+    console.log(conditionalValues, "conditionalValues");
     function isSameDate(question_id, setDate, value) {
+        console.log(question_id, setDate, value, 'adfasdfe')
         // Convert the epoch values (in seconds) to Date objects
         const selectedDate = new Date(question_id * 1000);
         
@@ -143,7 +145,7 @@ function PreviewModal({
 
         // Add the specified number of days (value) to the set date
         setDateObj.setDate(setDateObj.getDate() + value);
-
+        console.log(setDateObj, 'set date obj')
         // Compare the year, month, and day
         return (
             selectedDate.getFullYear() === setDateObj.getFullYear() &&
@@ -207,6 +209,7 @@ function PreviewModal({
                     logic = logic?.replace(/new Date\((.*?)\)/g,
                         `new Date().toLocaleDateString()`
                     );
+                    console.log('logic', logic)
                     eval(transformTernaryExpression(logic));
                 } catch (error) {
                     console.error("Error evaluating new Date logic:", error);
@@ -229,6 +232,7 @@ function PreviewModal({
                             modifiedPath = `${parts.join(".")}["${lastKey}"]`;
                         }
                         try {
+                            console.log('modifiedPathmodifiedPath', modifiedPath)
                             let questionArray = eval(modifiedPath); // Use modified path for evaluation
                             if (Array.isArray(questionArray) && questionArray.length === 1) {
                                 return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
@@ -371,6 +375,8 @@ function PreviewModal({
     };
 
     const evaluateLogic = (logic) => {
+        console.log('conditionalValues', conditionalValues)
+        console.log('logiclogic', logic)
         try {
             if (logic?.includes("new Date(")) {
                 return eval(logic);
@@ -1440,6 +1446,7 @@ function PreviewModal({
                                                         return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
                                                     },
                                                 );
+                                                console.log('logicWithoutBrackets', logicWithoutBrackets)
 
                                                 // Remove parentheses from around the entire string, if they exist
                                                 const logicWithoutBrackets = replacedLogic?.replace(
@@ -1447,6 +1454,7 @@ function PreviewModal({
                                                     "$1",
                                                 );
                                                 try {
+
                                                     let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                     if (!result) {
                                                         return null; // Skip rendering this question
