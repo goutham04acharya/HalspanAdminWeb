@@ -41,7 +41,7 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         case 'date is “X” date of set date':
             const formatteDate = formatDate(date);
             const actualFormat = reverseFormat(formatteDate)
-            return `${question_name} === new Date(${formatteDate} + (${value} * 24 * 60 * 60 * 1000)).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'})`
+            return `formatDateWithOffset('${formatteDate}', ${value}, ${question_name})`
         // return `isSameDate(${question_name}, ${formatteDate}, ${value})`
         // return `Math.abs(${question_name} - ${actualFormat} ) == ${value / 24 * 60 * 60 * 1000}`
         default:

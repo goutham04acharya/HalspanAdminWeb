@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable max-len */
 export const defaultContentConverter = (conditionalLogic) => {
-    
+
     if (conditionalLogic !== "") {
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' and ')?.replace(/\s\|\|\s/g, ' or ');
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' AND ')?.replace(/\s\|\|\s/g, ' OR ');
@@ -23,11 +23,9 @@ export const defaultContentConverter = (conditionalLogic) => {
                 '$1.SubtractDays($2)'
             )
             ?.replace(
-                /new Date\((\w+\.\w+\.\w+) \* 1000\)\.toDateString\(\) === new Date\(new Date\((\d+) \* 1000\)\.setDate\(new Date\(\2 \* 1000\)\.getDate\(\) \+ (\d+)\)\)\.toDateString\(\);/g,
-                `$1.setDate($3) === '$2'`            
-            );
-        // `$1.setDate($3) === '${new Date('$2').toLocaleDateString() * 1000}'`
-
+                /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w_.]+)\)/,
+                `$3.setDate($2) === '$1'`
+            )
         return conditionalLogic;
 
     } else {
