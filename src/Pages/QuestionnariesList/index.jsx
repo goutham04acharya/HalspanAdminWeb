@@ -1,20 +1,15 @@
 
 import React, { useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ContentNotFound from '../../Components/Content-NotFound/ContentNotFound.jsx';
 import Button2 from '../../Components/Button2/ButtonLight.jsx';
 import Table from './Components/Table.jsx';
 import Search from '../../Search/Search.jsx';
-import Debounce from '../../CommonMethods/debounce.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { handleCurrentPage, handlePagination } from '../../redux/paginationSlice.js';
 import FilterDropdown from '../../Components/InputField/FilterDropdown.jsx';
 import useApi from '../../services/CustomHook/useApi.js';
 import objectToQueryString from '../../CommonMethods/ObjectToQueryString.js';
 import VersionEditModal from '../../Components/Modals/VersionEditModal.jsx';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
-import { dataService } from '../../services/data.services.js';
 
 function Questionnaries() {
   const { setToastError, setToastSuccess } = useContext(GlobalContext);
@@ -86,10 +81,12 @@ function Questionnaries() {
     setSearchParams({ ...params });
     setSelectedOption(null); // Reset selected option
   };
+  console.log('lastEvaluatedKeyRefqaaaa', lastEvaluatedKeyRef)
 
   const fetchQuestionnaryList = useCallback(async () => {
     const params = Object.fromEntries(searchParams);
-    
+    console.log('paramsparams', params)
+    console.log('searchParams', searchParams)
     // Only set loading true if it's the first fetch (no start_key)
     if (!params.start_key) {
       setLoading(true);

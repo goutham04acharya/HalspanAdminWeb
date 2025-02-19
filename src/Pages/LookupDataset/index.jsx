@@ -72,21 +72,26 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         if (lastEvaluatedKeyRef.current) {
             params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        if (searchParams.get('search') !== undefined) {
-            delete params.start_key
-        }
+        // if (searchParams.get('search') !== undefined) {
+        //     delete params.start_key
+        // }
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            setLookupList(prevItems => {
-                if (searchParams.get('search') !== undefined && !lastEvaluatedKeyRef.current) {
-                    // New search: return only new items
-                    return [...newItems];
-                } else {
-                    // Pagination: append new items
-                    return [...prevItems, ...newItems];
-                }
-            });
+            // setLookupList(prevItems => {
+            //     if (!lastEvaluatedKeyRef.current) {
+            //         // New search: return only new items
+            //         return [...newItems];
+            //     } else {
+            //         // Pagination: append new items
+            //         return [...prevItems, ...newItems];
+            //     }
+            // });
+            if (!params.start_key) {
+                setLookupList(newItems);
+              } else {
+                setLookupList(prevItems => [...prevItems, ...newItems]);
+              }
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
             console.error('Error fetching questionnaires:', error);
@@ -382,17 +387,20 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     }, [fetchLookupList, location.state]);
 
 
-    const lastElementRef = useCallback(node => {
-        if (loading || isFetchingMore) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
-                setIsFetchingMore(true);
-                fetchLookupList();
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, isFetchingMore]);
+  const lastElementRef = useCallback(node => {
+    
+    if (loading || isFetchingMore) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
+        setIsFetchingMore(true);
+        fetchLookupList();
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [loading, isFetchingMore, fetchLookupList]);
 
     useEffect(() => {
         if (showCreateModal) {
