@@ -5,7 +5,7 @@ export const defaultContentConverter = (conditionalLogic) => {
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' and ')?.replace(/\s\|\|\s/g, ' or ');
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' AND ')?.replace(/\s\|\|\s/g, ' OR ');
         conditionalLogic = conditionalLogic?.replaceAll(/\s&&\s/g, ' And ')?.replace(/\s\|\|\s/g, ' Or ');
-        conditionalLogic = conditionalLogic?.replaceAll(/\?/g, 'then').replace(/(?!.*:.*:.*):(?!.*:)/g, ' else ').replace(/\s:\s/g, ' else if ');        // Replace the : with ' else ' // Replace the ? with ' then '
+        conditionalLogic = conditionalLogic?.replaceAll(/\?/g, 'then').replace(/(?!.*:.*:.*):(?!.*:)/g, 'else').replace(/\s:\s/g, 'else if');        // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
