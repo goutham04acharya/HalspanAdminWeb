@@ -58,7 +58,7 @@ When('I select the question from the default value suggestions for number field'
 
 When('I enter the default value correct conditional logic for number field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Sample_Number_Label_Name >= 18) then "20"  else  "18"`;
+    const default_value = `if (Section_1.Page_1.Sample_Number_Label_Name >= 18) then "20"   else   "18"`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
     this.default_value = default_value;
 });

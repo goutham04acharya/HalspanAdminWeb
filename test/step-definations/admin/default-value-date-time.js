@@ -95,7 +95,7 @@ When('I select the question from the default value suggestions for date\\/time f
 
 When('I enter the default value correct conditional logic for date\\/time field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Date_or_time === "Today") then "30/11/2024"  else  "25/11/2024"`;
+    const default_value = `if (Section_1.Page_1.Date_or_time === "Today") then "30/11/2024"   else   "25/11/2024"`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
     this.default_value = default_value;
 });

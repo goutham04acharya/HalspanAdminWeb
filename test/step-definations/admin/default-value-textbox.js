@@ -85,7 +85,7 @@ When('I select the question from the default value suggestions for textbox field
 
 When('I enter the default value correct conditional logic for textbox field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
-    const default_value = `if (Section_1.Page_1.Sample_Label_Name === "India") then "INR"  else  "USD"`;
+    const default_value = `if (Section_1.Page_1.Sample_Label_Name === "India") then "INR"   else   "USD"`;
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(Key.chord(Key.CONTROL, "a"), Key.DELETE)
 
     await driver.wait(until.elementLocated(By.css(`[data-testid="conditional-logic-text"]`))).sendKeys(default_value);
