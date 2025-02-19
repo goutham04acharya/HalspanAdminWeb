@@ -232,7 +232,7 @@ function PreviewModal({
                             if (Array.isArray(questionArray) && questionArray.length === 1) {
                                 return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
                             } else {
-                                return `${path}[999999] ${operator} "${value}"`;
+                                return `${path}[-1] ${operator} "${value}"`;
                             }
                         } catch (e) {
                             return match; 
