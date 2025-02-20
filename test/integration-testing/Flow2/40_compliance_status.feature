@@ -61,7 +61,7 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
         When I enter the correct compliance logic for choice field
         Then I click the save button for default value
         And I should see the compliance logic in default value field
-        When I click the save button
+        When I click the save button for the questionnaire version
 
         When I click the preview button
         Then I should see the mobile preview
@@ -110,7 +110,7 @@ Feature: Halspan - Admin- Compliant status and Sub status of questionnaire respo
         When I select the condition from basic editor
         Then I click the save button for default value
         And I should see the basic editor compliance logic in default value field
-        When I click the save button
+        When I click the save button for the questionnaire version
 
         When I click the preview button
         Then I should see the mobile preview

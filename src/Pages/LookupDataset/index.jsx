@@ -72,21 +72,9 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         if (lastEvaluatedKeyRef.current) {
             params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        // if (searchParams.get('search') !== undefined) {
-        //     delete params.start_key
-        // }
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const newItems = response?.data?.data?.items || [];
-            // setLookupList(prevItems => {
-            //     if (!lastEvaluatedKeyRef.current) {
-            //         // New search: return only new items
-            //         return [...newItems];
-            //     } else {
-            //         // Pagination: append new items
-            //         return [...prevItems, ...newItems];
-            //     }
-            // });
             if (!params.start_key) {
                 setLookupList(newItems);
               } else {
