@@ -929,7 +929,6 @@ function PreviewModal({
     };
 
     const renderQuestion = (question) => {
-        console.log('question', question)
         switch (question?.component_type) {
             case "textboxfield":
                 return (
@@ -998,7 +997,6 @@ function PreviewModal({
                     />
                 );
             case "choiceboxfield":
-                console.log('value[question?.question_id]', sections[currentSection])
                 return (
                     <ChoiceBoxField
                         sections={sections[currentSection]}

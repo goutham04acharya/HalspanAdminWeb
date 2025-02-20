@@ -15,7 +15,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const assetType = useSelector(state => state?.questionnaryForm.assetType)
     const selectedServiceValue = useSelector(state => state?.questionnaryForm.selectedServiceValue)
-
     const [toggleStates, setToggleStates] = useState({});
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
