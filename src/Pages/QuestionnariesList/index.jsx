@@ -81,12 +81,9 @@ function Questionnaries() {
     setSearchParams({ ...params });
     setSelectedOption(null); // Reset selected option
   };
-  console.log('lastEvaluatedKeyRefqaaaa', lastEvaluatedKeyRef)
 
   const fetchQuestionnaryList = useCallback(async () => {
     const params = Object.fromEntries(searchParams);
-    console.log('paramsparams', params)
-    console.log('searchParams', searchParams)
     // Only set loading true if it's the first fetch (no start_key)
     if (!params.start_key) {
       setLoading(true);

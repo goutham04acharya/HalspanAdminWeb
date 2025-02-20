@@ -1,73 +1,35 @@
-.MuiDateCalendar-root {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    padding: 16px;
-    overflow: hidden;
-  }
-  
-  .MuiPickersCalendarHeader-root {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    margin-bottom: 8px;
-  }
-  
-  .MuiPickersCalendarHeader-label {
-    font-family: poppins !important;
-    font-weight: 700;
-    font-size: clamp(16px, 4vw, 18px) !important;
-  }
-  
-  .MuiDayCalendar-header {
-    display: flex;
-    justify-content: space-between !important;
-    width: 100%;
-    padding: 0 4px;
-  }
-  
-  .MuiDayCalendar-weekContainer {
-    display: flex;
-    justify-content: space-between !important;
-    margin: 0px !important;
-    width: 100%;
-    padding: 0 4px;
-  }
-  
-  .MuiPickersDay-root {
-    border: 1px solid #D5D4DF !important;
-    border-radius: 0px !important;
-    margin: 0px !important;
-    width: calc((100% - 16px) / 7);
-    height: auto;
-    min-height: 36px;
-    max-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .MuiPickersDay-root.Mui-selected {
-    background-color: #2B333B !important;
-  }
-  
-  .MuiPickersCalendarHeader-switchViewButton {
-    display: none !important;
-  }
-  
-  /* Ensure calendar stays within container */
-  .MuiDateCalendar-viewTransitionContainer {
-    width: 100% !important;
-    overflow: hidden;
-  }
-  
-  @media (max-width: 600px) {
-    .MuiPickersDay-root {
-      padding: 0 !important;
-      font-size: 0.875rem;
-      min-height: 32px;
-    }
-    
-    .MuiDateCalendar-root {
-      padding: 8px;
-    }
-  }
+.MuiDateCalendar-root{
+  width: fit-content;
+  /* width: 100% !important; */
+}
+.MuiPickersCalendarHeader-root{
+  padding-left: 28px !important;
+  padding-right: 18px !important;
+}
+.MuiPickersCalendarHeader-label{
+  font-family: poppins !important;
+  font-weight: 700;
+  font-size: 18px !important;
+}
+.MuiDayCalendar-header{
+  display: flex;
+  /* justify-content: space-evenly !important; */
+
+}
+.MuiDayCalendar-weekContainer{
+  display: flex;
+  /* justify-content: space-evenly !important; */
+  margin: 0px !important;
+}
+.MuiPickersDay-root{
+  border: 1px solid #D5D4DF !important;
+  border-radius: 0px !important;
+  margin: 0px !important;
+}
+.MuiPickersDay-root.Mui-selected{
+background-color: #2B333B !important;
+}
+
+.MuiPickersCalendarHeader-switchViewButton{
+  display: none !important;
+}
