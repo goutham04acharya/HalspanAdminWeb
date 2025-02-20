@@ -9,7 +9,7 @@ export default {
                 'customh3': 'calc(100vh - 142px)',
                 'customh4': 'calc(100vh - 380px)',
                 'customh5': 'calc(100vh - 91px)',
-                'customh6': 'calc(100vh - 151px)',
+                'customh6': 'calc(100vh - 131px)',
                 'customh7': 'calc(100vh - 157px)',
                 'customh8': 'calc(100vh - 176px)',
                 'customh9': 'calc(100vh - 245px)',

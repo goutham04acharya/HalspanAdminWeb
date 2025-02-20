@@ -85,29 +85,29 @@ function PreviewModal({
         current_section: 1,
         total_pages: 0,
     });
-    const handleConditionalLogic = async (data) => {
-        let result = {};
-        data.forEach((section, sectionIndex) => {
-            const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
-            result[sectionKey] = {}; // Initialize the section key
+    // const handleConditionalLogic = async (data) => {
+    //     let result = {};
+    //     data.forEach((section, sectionIndex) => {
+    //         const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
+    //         result[sectionKey] = {}; // Initialize the section key
 
-            section.pages.forEach((page, pageIndex) => {
-                const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
-                result[sectionKey][pageKey] = {}; // Initialize the page key within the section
+    //         section.pages.forEach((page, pageIndex) => {
+    //             const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
+    //             result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-                page.questions.forEach((question, questionIndex) => {
-                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
-                });
-            });
-        });
-        return result;
-    };
+    //             page.questions.forEach((question, questionIndex) => {
+    //                 const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+    //                 result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+    //             });
+    //         });
+    //     });
+    //     return result;
+    // };
 
-    const updateConditionalValues = async (data) => {
-        const result = await handleConditionalLogic(data);
-        setConditionalValues(result);
-    };
+    // const updateConditionalValues = async (data) => {
+    //     const result = await handleConditionalLogic(data);
+    //     setConditionalValues(result);
+    // };
 
     useEffect(() => {
         const fetchSections = async () => {
@@ -133,23 +133,6 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
-    function isSameDate(question_id, setDate, value) {
-        // Convert the epoch values (in seconds) to Date objects
-        const selectedDate = new Date(question_id * 1000);
-        
-        // Parse the dd/mm/yyyy format to Date object
-        const [day, month, year] = setDate.split('/');
-        const setDateObj = new Date(year, month - 1, day);
-
-        // Add the specified number of days (value) to the set date
-        setDateObj.setDate(setDateObj.getDate() + value);
-        // Compare the year, month, and day
-        return (
-            selectedDate.getFullYear() === setDateObj.getFullYear() &&
-            selectedDate.getMonth() === setDateObj.getMonth() &&
-            selectedDate.getDate() === setDateObj.getDate()
-        );
-    }
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -1124,8 +1107,11 @@ function PreviewModal({
     };
 
     Object.entries(conditionalValues).forEach(([key, value]) => {
-        window[key] = value;
+        // console.log(key.replace(/-/g, '_'), value, conditionalValues, 'key')
+        window[key.replace(/-/g, '_')] = value;
     });
+    // console.log(SEC_22db86cc_dc6c_46e2_b354_ab3a45e3f2bf_PG_98fb7037_15b4_4563_aa2f_af3c76854ab6_QUES_c20fff2a_fbd7_496b_8548_fc20927c47c1, 'window')
+    
 
     useEffect(() => {
         sections.forEach((section) => {
@@ -1202,11 +1188,7 @@ function PreviewModal({
                                             question?.conditional_logic,
                                         );
                                         if (!isVisible) {
-                                            const labelKey = question?.label.replace(/\s+/g, "_");
-                                            draft[sectionKey] = draft[sectionKey] || {};
-                                            draft[sectionKey][pageKey] =
-                                                draft[sectionKey][pageKey] || {};
-                                            draft[sectionKey][pageKey][labelKey] = "";
+                                            draft[question?.question_id.replace(/-/g, "_")] = "";
                                             dispatch(
                                                 setQuestionValue({
                                                     question_id: question?.question_id,
@@ -1222,14 +1204,13 @@ function PreviewModal({
                         });
                     });
                 });
-
+                console.log(newConditionalValues, "newConditionalValues");
                 setConditionalValues(newConditionalValues);
             };
 
             updateConditionalValues();
         }
     }, [sections, evaluateLogic, isModified]);
-
     const handleClose = () => {
         setModalOpen(false);
         setValidationErrors((prevErrors) => ({
