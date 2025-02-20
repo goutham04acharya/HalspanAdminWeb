@@ -182,7 +182,7 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                                                             onClick={() => handleDropdownClick(versionListInfo?.version_number)}>
                                                             {loading ? <Shimmer column={1} row={1} dropdown /> : <input
                                                                 type="text"
-                                                                data-testid="status"
+                                                                data-testid={`status-${index}`}
                                                                 id={versionListInfo?.version_number}
                                                                 value={versionListInfo?.status}
                                                                 className={`w-full placeholder:font-normal placeholder:text-base outline-0 border-0 cursor-pointer`}
@@ -233,6 +233,8 @@ export function GridTable({ setVersionList, versionList, setLoading, loading, la
                 setModalOpen={setModalOpen}
                 isOpen={isModalOpen}
                 Button1text='Publish'
+                testIDBtn1='publish'
+                testIDBtn2='cancel'
                 Button2text='Cancel'
                 handleButton2={handleCancel}
                 handleButton1={handleConfirmPublish}

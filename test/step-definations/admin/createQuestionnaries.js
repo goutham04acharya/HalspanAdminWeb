@@ -67,6 +67,7 @@ Given('I am on the questionnaire creation screen', async function () {
 When('I enter Unique Public Name in the public name field', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     const publicName = `bddtest${faker.string.alphanumeric(5)}`; // Use random.alphaNumeric
+    global.publicNameStatus = publicName;
     await driver.wait(until.elementLocated(By.css('[data-testid = "publicName"]'))).sendKeys(Key.chord(Key.CONTROL, 'a', Key.DELETE), publicName);
 });
 
