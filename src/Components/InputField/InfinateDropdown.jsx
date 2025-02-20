@@ -80,11 +80,16 @@ function InfinateDropdown({
                     className={`${className} ${cursor} ${validationError ? 'border border-[#FFA318]' : 'border border-[#AEB3B7]'} outline-0 rounded px-[18px] placeholder:font-normal placeholder:text-base`}
                     readOnly
                 />
-                {(selectedOption && close) ?
-                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[11px]`} onClick={() => handleRemoveLookup()} />
+                {(Array.isArray(selectedOption?.choices) && selectedOption.choices.length > 0) ?
+                    <img src="/Images/gray-close.svg" alt="close" className={`absolute right-4 transition-transform duration-300 top-[11px] cursor-pointer`} onClick={() => handleRemoveLookup()} />
                     :
-                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`absolute right-4 ${assets ? 'bottom-5' : ''} transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
-                        style={{ top }} />
+                    <img src="/Images/open-Filter.svg" alt="open-filter" className={`cursor-pointer absolute right-4 ${assets ? 'bottom-5' : ''} transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : 'rotate-0'}`}
+                        style={{ top }} onClick={() => {
+                            if (!disabled) {
+                                handleInputFieldClick && handleInputFieldClick();
+                                setDropdownOpen(isDropdownOpen ? null : id);
+                            }
+                        }} />
                 }
             </div>
             {isDropdownOpen && (
@@ -107,7 +112,7 @@ function InfinateDropdown({
                             {options.length > 0 ? (
                                 options.map((option, index) => (
                                     <li
-                                        key={preview ? option.id : option.value}
+                                        key={`${preview ? option.id : option.value}-${index}`}
                                         data-testid={`${labeltestID}-${index}`}
                                         className="py-2 px-4 cursor-pointer hover:bg-[#F4F6FA]"
                                     >
