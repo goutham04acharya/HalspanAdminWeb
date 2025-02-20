@@ -17,7 +17,6 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
     complianceLogic,
     setComplianceClick
 }) {
-    console.log(complianceLogic.length, 'complianceLogic')
     const handleDropdown = (sectionId) => {
         if (dropdownOpen === sectionId) {
             setDropdown('')
