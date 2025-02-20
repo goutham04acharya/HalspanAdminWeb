@@ -78,7 +78,7 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
                     className={`hidden-input ${(questionValue?.[question?.question_id]?.length || 0) >= max ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                     disabled={(questionValue?.[question?.question_id]?.length || 0) >= max}
                 />
-                <span className={`text-[12px] my-2 items-center justify-center flex px-3 ${(questionValue?.[question?.question_id]?.length || 0) >= max ? 'disabled' : ''}`}>
+                <span data-testid='video-count' className={`text-[12px] my-2 items-center justify-center flex px-3 ${(questionValue?.[question?.question_id]?.length || 0) >= max ? 'disabled' : ''}`}>
                     <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Video ({max - questionValue?.[question?.question_id]?.length || max})
                 </span>
             </label>

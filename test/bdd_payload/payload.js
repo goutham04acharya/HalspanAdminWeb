@@ -16,7 +16,7 @@ async function create_questionnaire_payload() {
         "public_name": publicName,
         "internal_name": "Minerva Levy 1",
         "description": "Pariatur Error quia fugiat officia hic sunt quibusdam culpa perferendis a ipsam mollitia minus in consequuntur eum autem dolor",
-        "asset_type": "1",
+        "asset_type": 1,
         "language": "UK- English",
         "services_type":"INSTALLATION",
         "is_adhoc": "No",
