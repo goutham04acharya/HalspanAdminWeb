@@ -155,21 +155,20 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
 
-        console.log(fieldSettingParams[selectedQuestionId]?.source);
+        if (fieldSettingParams[selectedQuestionId]?.source === 'fixedList') {
+            const hasEmptyChoices = fixedChoiceArray.some(choice => !choice.value || !choice.value.trim());
 
-        if (fieldSettingParams[selectedQuestionId]?.source) {
-            if (fieldSettingParams[selectedQuestionId]?.source === 'fixedList' && fixedChoiceArray.length > 0) {
-                const hasEmptyChoices = fixedChoiceArray.some(choice => !choice.value || !choice.value.trim());
-
-                setValidationErrors((prevErrors) => ({
-                    ...prevErrors,
-                    choice: {
-                        ...prevErrors.choice,
-                        [selectedQuestionId]: hasEmptyChoices ? 'These are mandatory fields' : '',
-                    },
-                }));
-            } else {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                choice: {
+                    ...prevErrors.choice,
+                    [selectedQuestionId]: hasEmptyChoices ? 'These are mandatory fields' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.choice && validationErrors?.choice[selectedQuestionId] === 'These are mandatory fields') {
                 setValidationErrors((prevErrors) => ({
                     ...prevErrors,
                     choice: {
@@ -180,6 +179,35 @@ const QuestionnaryForm = () => {
             }
         }
     }, [selectedQuestionId, fixedChoiceArray, fieldSettingParams]);
+
+    useEffect(() => {
+        if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
+
+        const hasLookupValue =
+            fieldSettingParams[selectedQuestionId]?.lookupValue &&
+            fieldSettingParams[selectedQuestionId]?.lookupValue.trim();
+
+        if (fieldSettingParams[selectedQuestionId]?.source === 'lookup') {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                lookup: {
+                    ...prevErrors.lookup,
+                    [selectedQuestionId]: (!hasLookupValue) ? 'This is a mandatory field' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.lookup && validationErrors?.lookup[selectedQuestionId] === 'This is a mandatory field') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    lookup: {
+                        ...prevErrors.lookup,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+    }, [selectedQuestionId, fieldSettingParams]);
 
 
     const handleInputChange = (e) => {
@@ -1637,14 +1665,40 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
 
-
         if (!key) {
+            function listQuestionIds(data) {
+                let questionIds = [];
+
+                data.forEach(section => {
+                    section.pages.forEach(page => {
+                        page.questions.forEach(question => {
+                            questionIds.push(question.question_id);
+                        });
+                    });
+                });
+
+                return questionIds;
+            }
+            function filterValidationErrors(validationErrors, questionIds) {
+                return {
+                    lookup: Object.fromEntries(
+                        Object.entries(validationErrors?.lookup || {}).filter(([key]) => questionIds.includes(key))
+                    ),
+                    label: validationErrors.label || {},
+                    choice: validationErrors.choice || {}
+                };
+            }
+
+            const questionIds = listQuestionIds(sections);
+            const filteredValidationErrors = filterValidationErrors(validationErrors, questionIds);
+
             // Check if there are any validation errors
             const hasValidationErrorsLabel = Object.values(validationErrors?.label || {}).some(error => error !== '');
-            const hasValidationErrorsChoice = Object.values(validationErrors?.choice || {}).some(error => error !== '');
+            const hasValidationErrorsChoice = Object.values(filteredValidationErrors?.choice || {}).some(error => error !== '');
+            const hasValidationErrorsLookup = Object.values(filteredValidationErrors?.lookup || {}).some(error => error !== '');
 
 
-            if (hasValidationErrorsLabel || hasValidationErrorsChoice) {
+            if (hasValidationErrorsLabel || hasValidationErrorsChoice || hasValidationErrorsLookup) {
                 setToastError('Please fix the validation errors before saving.');
                 setGlobalSaveLoading(false);
                 return;

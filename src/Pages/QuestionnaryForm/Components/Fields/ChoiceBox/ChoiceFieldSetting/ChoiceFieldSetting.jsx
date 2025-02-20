@@ -37,6 +37,7 @@ function ChoiceFieldSetting({
     const [searchParams, setSearchParams] = useSearchParams();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isOptionDataLoading, setIsOptionDataLoading] = useState(false);
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
     const optionDataRef = useRef();
@@ -77,6 +78,7 @@ function ChoiceFieldSetting({
             params.search = searchTerm
         }
         try {
+            setIsOptionDataLoading(true);
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
             const transformedArray = response.data.data.items.map(item => ({
                 value: item.lookup_id,
@@ -91,7 +93,9 @@ function ChoiceFieldSetting({
             }
             setOptionData(updateOptions);
             lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+            setIsOptionDataLoading(false);
         } catch (error) {
+            setIsOptionDataLoading(false);
             console.error('Error fetching questionnaires:', error);
         }
 
@@ -141,9 +145,6 @@ function ChoiceFieldSetting({
             .replaceAll('?', 'then')
             .replaceAll('', 'if');
     }
-    console.log(fixedChoiceArray);
-    console.log(validationErrors);
-    
 
     return (
         <>
@@ -271,7 +272,7 @@ function ChoiceFieldSetting({
                                 </label>
                             </div>
                             {fieldSettingParameters?.source === 'lookup' &&
-                                <div className='w-full flex items-center mt-3'>
+                                <div className='w-full flex items-center'>
                                     <div className='w-[90%]'>
                                         <InfinateDropdown
                                             label=''
@@ -302,7 +303,10 @@ function ChoiceFieldSetting({
                                         <img src="/Images/plus.svg" alt="plus" />
                                     </button>
                                 </div>}
-                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (fieldSettingParameters.lookupValue === '' || fieldSettingParameters.lookupValue === undefined) && (
+                            {validationErrors?.lookup?.[selectedQuestionId] && (
+                                <ErrorMessage error={validationErrors?.lookup?.[selectedQuestionId]} />
+                            )}
+                            {fieldSettingParameters?.source === 'lookup' && !isOptionDataLoading && optionData.length === 0 && (fieldSettingParameters.lookupValue === '' || fieldSettingParameters.lookupValue === undefined) && (
                                 <ErrorMessage error={'No lookup list available. Please create one'} />
                             )}
                             {/* OptionsComponent added here */}
