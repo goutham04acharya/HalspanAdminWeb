@@ -16,6 +16,8 @@ Feature: Halspan - Admin - Cloning questionnaire
     When I search for the recently created questionnaire
     When I click the clone button
     Then I should see a confirmation modal to select the version
+    When I click the confirm duplicate button
+    Then I should read a message stating that "Please select a version to duplicate"
     When I select the version of the questionnaire
     When I click the modal cancel button
     When I click the clone button
@@ -26,5 +28,5 @@ Feature: Halspan - Admin - Cloning questionnaire
     Then I should see a confirmation modal to select the version
     When I select the version of the questionnaire
     When I click the confirm duplicate button
-    # Then I should see the new duplicated questionnaire created
-    # Then I should see exact duplication of the selected version of a questionnaire
+    Then I should see the new duplicated questionnaire created
+    Then I should see exact duplication of the selected version of a questionnaire

@@ -72,7 +72,7 @@ The script `integration_testing.js` is used for running integration tests. It:
 
 ### Running Individual Feature Files
 
-You can run dry run using:
+You can run dry run using the below command:
 
 ```bash
 npm run bdd_dry_run
@@ -166,4 +166,4 @@ Ensure the following dependencies are installed:
 
 ---
 
-For further details or issues, please reach out to the QA team.
+For further details or issues, please reach out to the QA team. 
