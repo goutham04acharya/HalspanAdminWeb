@@ -1685,7 +1685,9 @@ const QuestionnaryForm = () => {
                         Object.entries(validationErrors?.lookup || {}).filter(([key]) => questionIds.includes(key))
                     ),
                     label: validationErrors.label || {},
-                    choice: validationErrors.choice || {}
+                    choice: Object.fromEntries( // Ensure choice is filtered as well
+                        Object.entries(validationErrors?.choice || {}).filter(([key]) => questionIds.includes(key))
+                    )
                 };
             }
 
