@@ -1,7 +1,7 @@
     @1.0
 Feature:Feature: Brief About Feature
 As a admin, I want to see the image/video/files count decrease by one as I upload
-    @login
+
     @create_question
     Scenario: Admin adds the label, help text and placeholder content
         Given I am on the questionnaire management section

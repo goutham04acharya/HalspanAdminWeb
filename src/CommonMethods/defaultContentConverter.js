@@ -9,7 +9,7 @@ export const defaultContentConverter = (conditionalLogic) => {
         conditionalLogic = conditionalLogic?.replaceAll(/\s\?\s/g, ' then ').replace(/\s:\s/g, ' else ');
         conditionalLogic = conditionalLogic?.replaceAll(/""/g, '"');
         // Replace the : with ' else ' // Replace the ? with ' then '
-        conditionalLogic = conditionalLogic?.replace(/(?!.*:.*:.*):(?!.*:)/g, ' else ').replace(/\s:\s/g, ' else if ');        // Replace the : with ' else ' // Replace the ? with ' then '
+        conditionalLogic = conditionalLogic?.replace(/(?!.*:.*:.*):(?!.*:)/g, 'else').replace(/\s:\s/g, 'else if');        // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/^ /, 'if '); // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/sections\./g, '') // Replace the : with ' else ' // Replace the ? with ' then '
         conditionalLogic = conditionalLogic?.replace(/\slength\s/g, '()') // Replace the : with ' else ' // Replace the ? with ' then '
