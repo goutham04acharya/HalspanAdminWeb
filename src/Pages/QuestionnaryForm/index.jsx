@@ -108,6 +108,12 @@ const QuestionnaryForm = () => {
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
 
+    const [editorCheck, setEditorCheck] = useState({
+        conditonalEditor: [],
+        isBasicEditorCompliance: false,
+        isAdvanceEditorCompliance: false
+    });
+
     const [conditions, setConditions] = useState([{
         'conditions': [
             {
@@ -377,6 +383,9 @@ const QuestionnaryForm = () => {
     const fetchComplianceLogic = async () => {
         try {
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
+            if (response?.data?.data[0]?.editorCheck) {
+                setEditorCheck(response?.data?.data[0]?.editorCheck[0])
+            }
             if (response?.data?.data[0]?.logic) {
                 // setConditions(response?.data?.data[0]?.logic);
                 dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
@@ -1274,6 +1283,15 @@ const QuestionnaryForm = () => {
     }
     //this is the function called when you click on delete of compliance logic
     const handleDeleteComplianceLogic = async () => {
+        setEditorCheck((prev) => {
+            return {
+                ...prev,
+                isBasicEditorCompliance: false,
+                isAdvanceEditorCompliance: false
+            };
+        });
+        console.log('delete');
+        
         setComplianceLoader(true)
         const body = {
             compliance_logic: []
@@ -1391,7 +1409,8 @@ const QuestionnaryForm = () => {
         const payload = {
             'questionnaire_id': parseInt(questionnaire_id),
             'version_number': parseInt(version_number),
-            'logic': conditions.length !== 0 ? conditions : complianceInitialState
+            'logic': conditions.length !== 0 ? conditions : complianceInitialState,
+            'editorCheck': [editorCheck],
         }
         try {
             const response = await PostAPI(`questionnaires/compliancelogic`, payload);
@@ -1583,9 +1602,9 @@ const QuestionnaryForm = () => {
 
     };
     useEffect(() => {
-        try { 
-            globalSaveHandler('localsave'); 
-        } catch { 
+        try {
+            globalSaveHandler('localsave');
+        } catch {
             console.log('error while calling save function');
         }
 
@@ -1599,7 +1618,7 @@ const QuestionnaryForm = () => {
 
     const handleDisableButtons = () => {
         const array = []
-        if(complianceLogic.length === 1) {
+        if (complianceLogic.length === 1) {
             array.push('Compliance')
         }
         return array
@@ -1828,7 +1847,8 @@ const QuestionnaryForm = () => {
                                         setCompliancestate: setCompliancestate,
                                         complianceSaveHandler: complianceSaveHandler,
                                         scrollToPage: scrollToPage,
-                                        formStatus: formStatus
+                                        formStatus: formStatus,
+                                        setEditorCheck: setEditorCheck,
                                     }
                                 )
                             ) : (
@@ -1988,6 +2008,8 @@ const QuestionnaryForm = () => {
                         conditions={conditions}
                         setSectionDetails={setSectionDetails}
                         sectionDetails={sectionDetails}
+                        editorCheck={editorCheck}
+                        setEditorCheck={setEditorCheck}
                     />
                 )
             }

@@ -23,12 +23,14 @@ import ComplianceBasicEditor from './Components/ComplianceLogicBasicEditor/Compl
 import { generateElseBlockString, generateTernaryOperation, generateThenActionString } from '../../../../CommonMethods/ComplianceBasicEditorLogicBuilder';
 import parseExpression from '../../../../CommonMethods/advancedToBasicLogic';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { formatDate, reverseFormat, reversingFormat } from "../../../../CommonMethods/FormatDate";
+
 
 // Extend Day.js with the custom parse format plugin
 dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -73,8 +75,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         elseIfStatements: [],
         elseStatement: {}
     });
-
-
+    const [render, setRender] = useState(0);
     const complianceInitialState = [
         {
             'conditions': [
@@ -253,7 +254,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
                 ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                ?.replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                ?.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
                 ?.replaceAll('&&', 'and') // Replace && with and
                 ?.replaceAll('||', 'or') // Replace || with or
                 ?.replaceAll('.length', '.()')
@@ -264,10 +265,56 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const lastPart = parts.pop(); // Remove the last part
             condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
-        if (!condition_logic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
-            setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
-        }
+
+        // if (!condition_logic && complianceLogic && defaultContentConverter(complianceLogic?.[0]?.default_content) && !isDefaultLogic) {
+        //     setToastError(`Oh no! To use the basic editor you'll have to use a simpler expression.Please go back to the advanced editor.`);
+        // }
+
+
+        ////
+        setEditorCheck((prev) => {
+            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                item.questionId === selectedQuestionId
+                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                    : item
+            );
+
+            // Check if the question already exists
+            const existingQuestion = prev.conditonalEditor.find(
+                (item) => item.questionId === selectedQuestionId
+            );
+
+            const questionExists = !!existingQuestion;
+
+            // Check if the toast should be shown
+            if (complianceState) {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
+            } else {
+                if (existingQuestion?.isAdvanceEditor) {
+                    setToastError(
+                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                    );
+                }
+            }
+
+            return {
+                ...prev,
+                conditonalEditor: questionExists
+                    ? updatedConditionalEditor // Update existing
+                    : [
+                        ...prev.conditonalEditor,
+                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                    ] // Add new if not exists
+            };
+        });
+
     }, [conditions])
+
+
 
     useEffect(() => {
         if (allSectionDetails) {
@@ -843,7 +890,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Transform only non-question parts
                     if (!questionRegex.test(part)) {
                         return part
-                            .replaceAll(/\?/g, ' then ') // Replace "?" with "then"
+                            .replaceAll(/\s\?\s/g, ' then ') // Replace "?" with "then"
                             .replaceAll(/\s:\s/g, ' else ') // Replace ":" with "else"
                     }
                     return part; // Leave question names unchanged
@@ -857,7 +904,41 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [selectedQuestionId]);
 
+
+
+
     const handleSave = async () => {
+        if (!complianceState) {
+            setEditorCheck((prev) => {
+                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                    item.questionId === selectedQuestionId
+                        ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                        : item
+                );
+
+                // Check if the question already exists
+                const questionExists = prev.conditonalEditor.some(
+                    (item) => item.questionId === selectedQuestionId
+                );
+
+                return {
+                    ...prev,
+                    conditonalEditor: questionExists
+                        ? updatedConditionalEditor // Update existing
+                        : [
+                            ...prev.conditonalEditor,
+                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                        ] // Add new if not exists
+                };
+            });
+        } else {
+            setEditorCheck((prev) => ({
+                ...prev,
+                isBasicEditorCompliance: false,
+                isAdvanceEditorCompliance: true
+            }));
+        }
+
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         if (sectionConditionLogicId) {
             sectionId = sectionConditionLogicId
@@ -1435,16 +1516,37 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // to get the condition expression
         const getConditionValue = (item) => {
+            let questionType = null;
+
+            allSectionDetails.sections.forEach(section => {
+                section.pages.forEach(page => {
+                    page.questions.forEach(question => {
+                        // Correctly format section, page, and question name
+                        let formattedQuestionName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
+                        if (formattedQuestionName === item.question_name) {
+                            questionType = question.type; // Get type (multi_choice, single_line, etc.)
+                        }
+                    });
+                });
+            });
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
+                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
+                        resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
+                    } else {
+                        resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
+                    }
                     break;
-                case "not equals to":
-                    resultExpression = `${item.question_name} != ${getValue(item.value, item.condition_type)}`;
+                case "not equal to":
+                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
+                        resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
+                    } else {
+                        resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
+                    }
                     break;
                 case "does not include":
                     resultExpression = `!${item.question_name}.includes("${item.value}")`;
@@ -1482,9 +1584,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case "date is after today":
                     resultExpression = `${item.question_name} > new Date()`;
                     break;
-                case "date is “X” date of set date":
-                    resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
-                    break;
+                // case "date is “Xd” date of set date":
+                //     resultExpression = `Math.abs(${item.question_name} - new Date(${item.date})) == ${item.value}`;
+                //     break;
+                case 'date is “X” date of set date':
+                    const formatteDate = formatDate(item.date);
+                    const actualFormat = reverseFormat(formatteDate)
+                    return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
                 default:
                     // Handle unknown condition logic  
                     console.error(`Unknown condition logic: ${item.condition_logic}`);
@@ -1564,10 +1670,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
+                console.log(condition_logic, 'condition_logic')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                        .replaceAll(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ') // Replace ? with then
+                        .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
                         .replaceAll('&&', 'and') // Replace && with and
                         .replaceAll('||', 'or') // Replace || with or
                         .replaceAll('.length', '.()')
@@ -1580,21 +1687,57 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
                 setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
 
-
             } catch (error) {
                 console.error('Error while converting', error);
             }
         }
     }, [conditions])
 
+
+
+
+
+
     const handleSaveBasicEditor = () => {
+
+        if (!complianceState) {
+            setEditorCheck((prev) => {
+                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                    item.questionId === selectedQuestionId
+                        ? { ...item, isBasicEditor: true, isAdvanceEditor: false }
+                        : item
+                );
+                // Check if the question already exists
+                const questionExists = prev.conditonalEditor.some(
+                    (item) => item.questionId === selectedQuestionId
+                );
+                return {
+                    ...prev,
+                    conditonalEditor: questionExists
+                        ? updatedConditionalEditor
+                        : [
+                            ...prev.conditonalEditor,
+                            { questionId: selectedQuestionId, isBasicEditor: true, isAdvanceEditor: false }
+                        ]
+                };
+            });
+        } else {
+            setEditorCheck((prev) => ({
+                ...prev,
+                isBasicEditorCompliance: true,
+                isAdvanceEditorCompliance: false
+            }));
+        }
+
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
         }
 
         if (complianceState) {
+            console.log(conditions, 'conditions');
             let compliance_logic = getFinalComplianceLogic(conditions);
+            console.log(compliance_logic, 'compliance_logic');
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1781,6 +1924,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         sectionConditionLogicId={sectionConditionLogicId}
                                         pageConditionLogicId={pageConditionLogicId}
                                         combinedArray={combinedArray}
+                                        render={render}
+                                        setRender={setRender}
                                     />
                                 </div>
                                 <div className='mt-4 pt-2'>

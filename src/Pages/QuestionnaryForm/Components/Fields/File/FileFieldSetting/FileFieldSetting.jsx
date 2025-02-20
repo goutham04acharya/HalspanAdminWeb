@@ -15,7 +15,8 @@ function FileFieldSetting({ handleInputChange,
     selectedQuestionId,
     validationErrors,
     setConditionalLogic,
-    formStatus
+    formStatus,
+    setEditorCheck,
 }) {
     const dispatch = useDispatch();
     return (
@@ -170,6 +171,14 @@ function FileFieldSetting({ handleInputChange,
                                     className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
                                     onClick={() => {
                                         dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                        setEditorCheck((prev) => {
+                                            return {
+                                                ...prev,
+                                                conditonalEditor: prev.conditonalEditor.filter(
+                                                    (item) => item.questionId !== selectedQuestionId
+                                                ),
+                                            };
+                                        });
                                     }}
                                 >
                                     Remove Conditional Logic
