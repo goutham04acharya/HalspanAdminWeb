@@ -134,16 +134,16 @@ When('I enter invalid date for compliance for section {int} page {int} question 
     let invalidDate;
     switch (condition) {
     case 'date is before today':
-        invalidDate = moment().format('DD/MM/YYYY'); // Today (invalid for "before today")
+        invalidDate = moment().add(1, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before today")
         break;
     case 'date is before or equal to today':
-        invalidDate = moment().add(1, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before or equal to today")
+        invalidDate = moment().add(2, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before or equal to today")
         break;
     case 'date is after today':
-        invalidDate = moment().subtract(1, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after today")
+        invalidDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after today")
         break;
     case 'date is after or equal to today':
-        invalidDate = moment().subtract(1, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after or equal to today")
+        invalidDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after or equal to today")
         break;
     case 'date is "X" date of set date':
         invalidDate = '99/99/9999'; // Clearly invalid date format
@@ -168,13 +168,13 @@ When('I enter the date for compliance in date field for section {int} page {int}
     let inputDate;
     switch (condition) {
     case 'date is before today':
-        inputDate = moment().subtract(1, 'days').format('DD/MM/YYYY'); // Yesterday
+        inputDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday
         break;
     case 'date is before or equal to today':
         inputDate = today; // Today (valid case)
         break;
     case 'date is after today':
-        inputDate = moment().add(1, 'days').format('DD/MM/YYYY'); // Tomorrow
+        inputDate = moment().add(2, 'days').format('DD/MM/YYYY'); // Tomorrow
         break;
     case 'date is after or equal to today':
         inputDate = today; // Today (valid case)
