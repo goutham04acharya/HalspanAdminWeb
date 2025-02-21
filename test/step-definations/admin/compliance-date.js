@@ -136,22 +136,31 @@ When('I enter invalid date for compliance for section {int} page {int} question 
     case 'date is before today':
         invalidDate = moment().add(1, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before today")
         console.log(invalidDate ,"invalidDate")
-        invalidDate = '27/12/2025'
+        invalidDate = '30/12/2025'
         break;
     case 'date is before or equal to today':
         invalidDate = moment().add(2, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before or equal to today")
+        console.log(invalidDate ,"invalidDate")
+        invalidDate = '30/12/2025'
         break;
     case 'date is after today':
         invalidDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after today")
+        console.log(invalidDate ,"invalidDate")
+        invalidDate = '01/01/2025'
+
         break;
     case 'date is after or equal to today':
         invalidDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday (invalid for "after or equal to today")
+        console.log(invalidDate ,"invalidDate")
+        invalidDate = '01/01/2025'
         break;
     case 'date is "X" date of set date':
-        invalidDate = '99/99/9999'; // Clearly invalid date format
+        invalidDate = '99/99/9999'; // Clearly invalid date format\        console.log(invalidDate ,"invalidDate")
+        console.log(invalidDate ,"invalidDate")
         break;
     default:
         throw new Error(`Invalid condition type: ${condition}`);
+
     }
 
     await text_area.sendKeys(Keys.chord(Keys.ENTER, invalidDate));
@@ -171,18 +180,27 @@ When('I enter the date for compliance in date field for section {int} page {int}
     switch (condition) {
     case 'date is before today':
         inputDate = moment().subtract(2, 'days').format('DD/MM/YYYY'); // Yesterday
+        console.log(inputDate ,"invalidDate")
+        inputDate = '01/01/2025'
         break;
     case 'date is before or equal to today':
         inputDate = today; // Today (valid case)
+        console.log(inputDate ,"invalidDate")
+        inputDate = '01/01/2025'
         break;
     case 'date is after today':
         inputDate = moment().add(2, 'days').format('DD/MM/YYYY'); // Tomorrow
+        console.log(inputDate ,"invalidDate")
+        inputDate = '30/12/2025'
         break;
     case 'date is after or equal to today':
         inputDate = today; // Today (valid case)
+        console.log(inputDate ,"invalidDate")
+        inputDate = '30/12/2025'
         break;
     case 'date is "X" date of set date':
         inputDate = '31/12/2024'; // Example fixed date
+        console.log(inputDate ,"invalidDate")
         break;
     default:
         throw new Error(`Invalid condition type: ${condition}`);
