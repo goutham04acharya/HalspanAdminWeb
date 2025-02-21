@@ -1905,14 +1905,14 @@ const QuestionnaryForm = () => {
         const questionDetailsWithUuid = {};
 
         sections?.forEach((section) => {
-            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
+            const sectionName = section.section_name;
 
             section.pages?.forEach((page) => {
-                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
+                const pageName = `${sectionName}.${page.page_name}`;
 
                 page.questions?.forEach((question) => {
                     const questionId = question?.question_id;
-                    const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
+                    const questionName = `${pageName}.${question.question_name}`;
                     // if (questionId !== selectedQuestionId && !['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type)) {
                         questionDetailsWithUuid[questionName] = questionId.replace(/-/g, '_');
                     // }
