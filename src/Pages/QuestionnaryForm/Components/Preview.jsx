@@ -97,7 +97,7 @@ function PreviewModal({
 
                 page.questions.forEach((question, questionIndex) => {
                     const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
                 });
             });
         });
@@ -132,24 +132,7 @@ function PreviewModal({
             }
         };
         fetchSections();
-    }, [questionnaire_id, version_number]);
-    function isSameDate(question_id, setDate, value) {
-        // Convert the epoch values (in seconds) to Date objects
-        const selectedDate = new Date(question_id * 1000);
-        
-        // Parse the dd/mm/yyyy format to Date object
-        const [day, month, year] = setDate.split('/');
-        const setDateObj = new Date(year, month - 1, day);
-
-        // Add the specified number of days (value) to the set date
-        setDateObj.setDate(setDateObj.getDate() + value);
-        // Compare the year, month, and day
-        return (
-            selectedDate.getFullYear() === setDateObj.getFullYear() &&
-            selectedDate.getMonth() === setDateObj.getMonth() &&
-            selectedDate.getDate() === setDateObj.getDate()
-        );
-    }
+    }, [questionnaire_id, version_number, sectionDetails]);
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -235,7 +218,7 @@ function PreviewModal({
                                 return `${path}[-1] ${operator} "${value}"`;
                             }
                         } catch (e) {
-                            return match; 
+                            return match;
                         }
                     }
                 );
@@ -540,10 +523,10 @@ function PreviewModal({
         computeNextNavigation();
     }, [sections, currentSection, currentPage, value]);
     function formatDateWithOffset(formatteDate, value, question_name) {
-        let [day, month, year] = formatteDate.split('/').map(Number); 
+        let [day, month, year] = formatteDate.split('/').map(Number);
         let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-        date.setDate(date.getDate() + Number(value)); 
-        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+        date.setDate(date.getDate() + Number(value));
+        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
@@ -1124,7 +1107,7 @@ function PreviewModal({
     };
 
     Object.entries(conditionalValues).forEach(([key, value]) => {
-        window[key] = value;
+        window[key.replace(/-/g, '_')] = value;
     });
 
     useEffect(() => {
@@ -1202,17 +1185,13 @@ function PreviewModal({
                                             question?.conditional_logic,
                                         );
                                         if (!isVisible) {
-                                            const labelKey = question?.label.replace(/\s+/g, "_");
-                                            draft[sectionKey] = draft[sectionKey] || {};
-                                            draft[sectionKey][pageKey] =
-                                                draft[sectionKey][pageKey] || {};
-                                            draft[sectionKey][pageKey][labelKey] = "";
-                                            dispatch(
-                                                setQuestionValue({
-                                                    question_id: question?.question_id,
-                                                    value: "",
-                                                }),
-                                            );
+                                        draft[question?.question_id.replace(/-/g, "_")] = "";
+                                        dispatch(
+                                            setQuestionValue({
+                                                question_id: question?.question_id,
+                                                value: "",
+                                            }),
+                                        );
                                         }
                                     } catch (error) {
                                         console.error("Error evaluating conditional logic:", error);
@@ -1222,14 +1201,13 @@ function PreviewModal({
                         });
                     });
                 });
-
+                console.log(newConditionalValues, "newConditionalValues");
                 setConditionalValues(newConditionalValues);
             };
 
             updateConditionalValues();
         }
     }, [sections, evaluateLogic, isModified]);
-
     const handleClose = () => {
         setModalOpen(false);
         setValidationErrors((prevErrors) => ({

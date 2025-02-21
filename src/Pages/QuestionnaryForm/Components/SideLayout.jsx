@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { useDispatch } from 'react-redux';
+import { setSelectedComponent } from './QuestionnaryFormSlice';
 
 
 function SideLayout({ formDefaultInfo, sections, handlePageScroll,
@@ -15,8 +17,10 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
     handleSectionSaveOrder,
     handleSectionScroll,
     complianceLogic,
-    setComplianceClick
+    setComplianceClick,
 }) {
+    const dispatch = useDispatch();
+    
     const handleDropdown = (sectionId) => {
         if (dropdownOpen === sectionId) {
             setDropdown('')
@@ -137,11 +141,13 @@ function SideLayout({ formDefaultInfo, sections, handlePageScroll,
                         )}
                     </Droppable>
                 </DragDropContext>
-                {complianceLogic.length > 0 && <div className={`pl-11 py-2 cursor-pointer ${selectedSection === 'compliance' ? 'bg-[#d1d3d9b7]' : ''}`} onClick={() => {
+                {complianceLogic.length > 0 && 
+                <div className={`pl-11 py-2 cursor-pointer ${selectedSection === 'compliance' ? 'bg-[#d1d3d9b7]' : ''}`} onClick={() => {
                     setComplianceClick(true)
                     setSelectedSection('compliance')
+                    dispatch(setSelectedComponent('compliancelogic'));
                 }}>
-                    compliance Logic
+                    Compliance Logic
                 </div>}
                 <button
                     onClick={formStatus === 'Draft' ? () => {

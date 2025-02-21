@@ -586,7 +586,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return trimmedExpression;
     };
-
     const parseLogicExpression = (expression) => {
         // Default structure if no expression is provided
         if (!expression || expression === '') {

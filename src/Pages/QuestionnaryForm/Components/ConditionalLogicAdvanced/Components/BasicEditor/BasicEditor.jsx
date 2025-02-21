@@ -9,7 +9,7 @@ import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
 import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray, render, setRender }) {
-
+    const [selectedQuestion, setSelectedQuestion] = useState(null);
     useEffect(() => {
         const result = {};
 
@@ -21,9 +21,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 });
             });
         });
-    
+
         setRender(prev => prev + 1);
-        if (!conditions || conditions[0]?.conditions[0]?.question_name === "" ) return; // Check for valid conditions and data before updating
+        if (!conditions || conditions[0]?.conditions[0]?.question_name === "") return; // Check for valid conditions and data before updating
         const updatedConditions = conditions?.map(conditionGroup => ({
             ...conditionGroup,
             conditions: conditionGroup?.conditions?.map(condition => {
@@ -36,7 +36,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         if (render > 1) {
             setConditions(updatedConditions);
         }
-    }, [questions, setConditions,conditions[0]?.conditions[0]?.question_name]);
+    }, [questions, setConditions, conditions[0]?.conditions[0]?.question_name]);
 
     const dropdownRef = useRef();
     const dropdownRef2 = useRef();
@@ -188,6 +188,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
         setSubmitSelected(false)
+        setSelectedQuestion(key);
         let selectedQuestion = getDetails(key, questions);
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
@@ -249,6 +250,12 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
     }
     const getConditions = (key) => {
         let arr = ['No conditions available'];
+        let timeArr = ["No conditions available for time field"];
+        let isTime = false;
+        const matchedQuestion = combinedArray.find(item => item.question_detail === selectedQuestion);
+        if (matchedQuestion && matchedQuestion.type === 'time') {
+            isTime = true;
+        }
         if (secDetailsForSearching.length > 0) {
             switch (key) {
                 case "textboxfield":
@@ -266,7 +273,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 case "floorPlanfield":
                     return conditionObj['file'];
                 case "dateTimefield":
-                    return conditionObj['date'];
+                    if(isTime) {
+                        return timeArr;
+                    }else{
+                        return conditionObj['date'];
+                    }
                 default:
                     return arr; // This is the fallback if none of the cases match
             }

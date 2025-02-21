@@ -31,7 +31,6 @@ const VideoUploader = ({ fileSize, min, max, setValue, question, handleChange, h
             }else{
                 setError('')
             }
-
             if (file.size > maxSizeInBytes) {
                 setError(`File size exceeds ${fileSize}MB limit`);
                 hasError = true;

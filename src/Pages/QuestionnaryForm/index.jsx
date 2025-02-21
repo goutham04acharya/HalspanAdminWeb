@@ -2082,7 +2082,7 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceClick) && (
+                                    {(complianceClick && complianceLogic.length > 0) && (
                                         <div>
                                             <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                         </div>
@@ -2119,10 +2119,18 @@ const QuestionnaryForm = () => {
                                 }}
                             />
                         </div>
+                        {console.log(selectedComponent, 'selectedComponent')}
                         <div>
-                            {selectedComponent ? (
+                            {selectedComponent === null && !complianceClick ? (
+                                <AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                    formStatus={formStatus}
+                                    disableButtons={handleDisableButtons()}
+                                />
+                            ) : (sideComponentMap[selectedComponent] && selectedComponent !== 'compliancelogic') ? (
                                 React.createElement(
-                                    sideComponentMap[selectedComponent],  // Dynamically select the component
+                                    sideComponentMap[selectedComponent],
                                     {
                                         handleInputChange: handleInputChange,
                                         formParameters: fieldSettingParams[selectedQuestionId],
@@ -2154,15 +2162,28 @@ const QuestionnaryForm = () => {
                                         setEditorCheck: setEditorCheck,
                                     }
                                 )
-                            ) : (
-                                <AddFields
-                                    buttons={Fieldsneeded}
-                                    handleClick={handleClick}
-                                    formStatus={formStatus}
-                                    disableButtons={handleDisableButtons()}
-                                />
-                            )}
-
+                                ) : selectedComponent === 'compliancelogic' && complianceClick ?
+                                (
+                                    React.createElement(
+                                        sideComponentMap['compliancelogic'],  // Dynamically select the component
+                                        {
+                                            complianceLogic: complianceLogic,
+                                            setComplianceLogic: setComplianceLogic,
+                                            setCompliancestate: setCompliancestate,
+                                            formStatus: formStatus,
+                                            validationErrors: validationErrors,
+                                            setValidationErrors: setValidationErrors,
+                                        }
+                                    )
+                                ) : (
+                                    <AddFields
+                                        buttons={Fieldsneeded}
+                                        handleClick={handleClick}
+                                        formStatus={formStatus}
+                                        disableButtons={handleDisableButtons()}
+                                    />
+                                )
+                            }
                         </div>
                     </div>
                 </div >

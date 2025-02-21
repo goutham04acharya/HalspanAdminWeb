@@ -68,19 +68,9 @@ function ImageUploader({
                 value: newImages,
             }),
         );
-        const { section_name, page_name, label } = findSectionAndPageName(
-            sections,
-            question?.question_id,
-        );
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newImages,
-                },
-            },
+            [question?.question_id.replace(/-/g, '_')]: newImages
         }));
         setIsModified(!isModified);
 
@@ -94,25 +84,13 @@ function ImageUploader({
         setImages(newImages);
         handleRemoveImage(newImages);
 
-        // Update Redux store with new image array
-        // const imageUrls = newImages.map((image) => URL.createObjectURL(image));
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: newImages,
         }));
-        const { section_name, page_name, label } = findSectionAndPageName(
-            sections,
-            question?.question_id,
-        );
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newImages,
-                },
-            },
+            [question?.question_id.replace(/-/g, '_')]: newImages
         }));
         dispatch(
             setQuestionValue({

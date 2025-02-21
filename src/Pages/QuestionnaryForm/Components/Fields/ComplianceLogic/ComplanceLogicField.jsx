@@ -11,7 +11,7 @@ function ComplanceLogicField({ complianceLogic, setConditions, setComplianceLogi
   // const {complianceLogicId} = useSelector(state => state.)
   const dispatch = useDispatch()
   const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
-
+  
   return (
     <div className='bg-white rounded-[10px] font-medium p-4 mt-8'>
       <div className='flex justify-between'>
