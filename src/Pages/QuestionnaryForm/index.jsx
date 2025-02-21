@@ -57,7 +57,8 @@ const QuestionnaryForm = () => {
 
     }]);
 
-
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
+    const [questionWithUuid, setQuestionWithUuid] = useState({})
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -754,6 +755,16 @@ const QuestionnaryForm = () => {
         }
     }
 
+    //for replacing the string
+    function replaceUUIDs(questionWithUUID, replacements) {
+        let updatedString = questionWithUUID;
+        Object.entries(replacements).forEach(([key, value]) => {
+            const regex = new RegExp(value, "g"); // Global replacement
+            updatedString = updatedString.replace(regex, key);
+        });
+
+        return updatedString;
+    }
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
@@ -956,6 +967,15 @@ const QuestionnaryForm = () => {
                             console.error('Page not found for the given pageConditionLogicId');
                         }
                     } else {
+                        // payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                        //     return logic.replace(new RegExp(questionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        // }, payloadString);
+                        payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                            // Escape all special regex characters
+                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+                            
+                            return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        }, payloadString);
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
                 } else {
@@ -1881,6 +1901,31 @@ const QuestionnaryForm = () => {
         return array
     }
 
+    const getQuestionDetails = () => {
+        const questionDetailsWithUuid = {};
+
+        sections?.forEach((section) => {
+            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
+
+            section.pages?.forEach((page) => {
+                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
+
+                page.questions?.forEach((question) => {
+                    const questionId = question?.question_id;
+                    const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
+                    // if (questionId !== selectedQuestionId && !['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type)) {
+                        questionDetailsWithUuid[questionName] = questionId.replace(/-/g, '_');
+                    // }
+                });
+            });
+        });
+        setQuestionWithUuid(questionDetailsWithUuid);
+    };
+
+    useEffect(() => {
+        getQuestionDetails();
+    }, [sections, fieldSettingParams, handleTextboxClick]);
+
     return (
         <>
             {pageLoading ? (
@@ -2053,7 +2098,7 @@ const QuestionnaryForm = () => {
                                     dispatch(setSelectedComponent(false))
                                 }}
                                 data-testid='cancel-qsn'>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle"/>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
@@ -2246,6 +2291,7 @@ const QuestionnaryForm = () => {
             {
                 (conditionalLogic || isDefaultLogic || complianceState || sectionConditionLogicId || pageConditionLogicId) && (
                     <ConditionalLogic
+                        questionWithUuid={questionWithUuid}
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
                         handleSaveSection={handleSaveSection}

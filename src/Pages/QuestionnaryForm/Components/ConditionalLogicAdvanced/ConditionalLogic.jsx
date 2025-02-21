@@ -30,7 +30,7 @@ import { formatDate, reverseFormat, reversingFormat } from "../../../../CommonMe
 dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck, questionWithUuid }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -1751,7 +1751,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else if (selectedQuestionId) {
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
-
+        console.log(condition_logic,'ooooooo')
+        console.log(questionWithUuid, 'questionWithUuid')
+        // condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+        //     return logic.replace(new RegExp(questionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+        // }, condition_logic);
+        condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+            // Escape all special regex characters
+            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+            
+            return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+        }, condition_logic);
+        
         handleSaveSection(sectionId, true, condition_logic);
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
@@ -1763,6 +1774,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setPageConditionLogicId(false);
     }
 
+    function replaceUUIDs(questionWithUUID, replacements) {
+        let updatedString = questionWithUUID;
+        if (!updatedString) {
+            return '';
+        }
+        Object.entries(replacements).forEach(([key, value]) => {
+            const regex = new RegExp(value, "g"); // Global replacement
+            updatedString = updatedString.replace(regex, key);
+        });
+
+        return updatedString;
+    }
     useEffect(() => {
         let compliance_logic;
         if (!complianceState) {
@@ -1772,7 +1795,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 if (section) {
                     // Extract and parse the section's conditional logic
-                    compliance_logic = parseLogicExpression(section?.section_conditional_logic);
+                    compliance_logic = parseLogicExpression(replaceUUIDs(section?.section_conditional_logic, questionWithUuid));
                 } else {
                     console.error('Section not found for the given sectionConditionLogicId');
                 }
@@ -1786,7 +1809,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (page) {
                         pageFound = true;
                         // Extract and parse the page's conditional logic
-                        compliance_logic = parseLogicExpression(page.page_conditional_logic);
+                        compliance_logic = parseLogicExpression(replaceUUIDs(page.page_conditional_logic, questionWithUuid));
                     }
                 });
 
@@ -1796,7 +1819,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             else {
                 // Default: Extract and parse the conditional logic from the selected question
-                compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+                compliance_logic = parseLogicExpression(replaceUUIDs(fieldSettingParams[selectedQuestionId]?.conditional_logic, questionWithUuid));
 
             }
             setConditions(compliance_logic)
