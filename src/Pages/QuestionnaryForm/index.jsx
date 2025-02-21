@@ -110,7 +110,7 @@ const QuestionnaryForm = () => {
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
     const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
-    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState(null);
+    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState([]);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
@@ -1485,13 +1485,11 @@ const QuestionnaryForm = () => {
                 delete cleanedSection[field];
                 delete cleanedSavedSection[field];
             });
-
             // Compare pages within the section
             if (cleanedSection.pages?.length !== cleanedSavedSection.pages?.length) {
                 console.log(`Mismatch in the number of pages in section ${i + 1}`);
                 return false;
             }
-
             // Clean page data
             if (cleanedSection.pages) {
                 cleanedSection.pages = cleanedSection.pages.map(page => {
@@ -1501,25 +1499,17 @@ const QuestionnaryForm = () => {
                     return cleanedPage;
                 });
             }
-
             // Compare the cleaned sections
             if (!compareObjects(cleanedSection, cleanedSavedSection)) {
                 console.log(`Mismatch in section ${i + 1}`);
                 return false;
             }
         }
-
         return true;
     };
 
 
     function compareCompliance(array1, array2) {
-        // Helper function to extract comparison value
-        function getComparisonValue(content) {
-            const match = content.match(/includes\("(\d+)"\)/);
-            return match ? match[1] : null;
-        }
-
         // If arrays have different lengths, they're not identical
         if (array1.length !== array2.length) {
             return false;
@@ -1527,10 +1517,7 @@ const QuestionnaryForm = () => {
 
         // Compare each item in the arrays
         for (let i = 0; i < array1.length; i++) {
-            const value1 = getComparisonValue(array1[i].default_content);
-            const value2 = getComparisonValue(array2[i].default_content);
-
-            if (value1 !== value2) {
+            if (array1[i].default_content !== array2[i].default_content) {
                 return false;
             }
         }
