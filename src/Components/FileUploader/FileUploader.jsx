@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { findSectionAndPageName } from '../../CommonMethods/SectionPageFinder';
 import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
