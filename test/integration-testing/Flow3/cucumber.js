@@ -13,6 +13,7 @@ module.exports = {
             'test/integration-testing/Flow3/58_questionnaire_status.feature',
             'test/integration-testing/Flow3/59_decrease_counter.feature',
             'test/integration-testing/Flow3/60_compliance_text.feature',
+            'test/integration-testing/Flow3/61_compliance_date.feature',
             'test/integration-testing/Flow2/2_logout.feature'
         ]
     }
