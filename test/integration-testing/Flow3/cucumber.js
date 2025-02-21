@@ -3,6 +3,7 @@ module.exports = {
         import: ['test'],
         paths: [
             'test/integration-testing/Flow3/1_login.feature',
+            'test/integration-testing/Flow3/61_compliance_date.feature',
             'test/integration-testing/Flow3/51_checkbox.feature',
             'test/integration-testing/Flow3/52_file_uploader.feature',
             'test/integration-testing/Flow3/53_time.feature',

@@ -71,6 +71,7 @@ const QuestionnaryForm = () => {
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [sectionDetails, setSectionDetails] = useState({})
+    const [complianceClick, setComplianceClick] = useState(false)
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -107,6 +108,8 @@ const QuestionnaryForm = () => {
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
+    const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
+    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState(null);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
@@ -591,6 +594,7 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             setSectionDetails(response?.data?.data);
+            setCompareInitialSavedSection(response?.data?.data)
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -1177,6 +1181,8 @@ const QuestionnaryForm = () => {
             })),
             'compliance_logic': complianceLogic,
         }
+        setCompareInitialSavedComplianceLogic(complianceLogic)
+
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -1197,6 +1203,7 @@ const QuestionnaryForm = () => {
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section?.id);
                 setComplianceLogic(response?.data?.data?.compliance_logic)
+                setCompareInitialSavedComplianceLogic(response?.data?.data?.compliance_logic)
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -1290,8 +1297,6 @@ const QuestionnaryForm = () => {
                 isAdvanceEditorCompliance: false
             };
         });
-        console.log('delete');
-        
         setComplianceLoader(true)
         const body = {
             compliance_logic: []
@@ -1308,86 +1313,243 @@ const QuestionnaryForm = () => {
         }
     };
 
-    // Function to compare sections state with compareSavedSections to show the cancle modal or not
-    const compareSections = (sections, compareSavedSections) => {
-        // Check if the number of sections matches
-        if (sections.length !== compareSavedSections.length) {
-            console.log('Number of sections does not match');
-            return false;
+    const isEmptyValue = (value) => {
+        return value === undefined || value === null || value === '' || value === "";
+    };
+    
+    const compareObjects = (obj1, obj2) => {
+        // Handle null/undefined objects
+        if (!obj1 || !obj2) {
+            return obj1 === obj2;
         }
-
-        // Compare each section in detail
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i];
-            const savedSection = compareSavedSections[i];
-
-            // Compare section-level properties
-            if (
-                section.section_name !== savedSection.section_name ||
-                section.section_id !== savedSection.section_id ||
-                section.updated_at !== savedSection.updated_at
-            ) {
-                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
-                return false;
+    
+        // Get all unique keys from both objects
+        const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+    
+        for (const key of allKeys) {
+            const value1 = obj1[key];
+            const value2 = obj2[key];
+    
+            // Skip comparison if both values are empty
+            if (isEmptyValue(value1) && isEmptyValue(value2)) {
+                continue;
             }
-
-            // Compare pages within the section
-            if (section.pages.length !== savedSection.pages.length) {
-                console.log(`Mismatch in the number of pages in section ${i + 1}`);
-                return false;
-            }
-
-            for (let j = 0; j < section.pages.length; j++) {
-                const page = section.pages[j];
-                const savedPage = savedSection.pages[j];
-
-                // Compare page-level properties
-                if (
-                    page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id
-                ) {
-                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
-                        page,
-                        savedPage,
-                    });
+    
+            // Handle arrays (including source_value arrays)
+            if (Array.isArray(value1) && Array.isArray(value2)) {
+                if (value1.length !== value2.length) {
+                    console.log(`Array length mismatch for ${key}:`, { value1, value2 });
                     return false;
                 }
-
-                // Compare questions within the page
-                if (page.questions.length !== savedPage.questions.length) {
-                    console.log(
-                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
-                    );
-                    return false;
-                }
-
-                for (let k = 0; k < page.questions.length; k++) {
-                    const question = page.questions[k];
-                    const savedQuestion = savedPage.questions[k];
-
-                    // Compare question-level properties
-                    if (
-                        question.question_id !== savedQuestion.question_id ||
-                        question.question_name !== savedQuestion.question_name
-                    ) {
-                        console.log(
-                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
-                            { question, savedQuestion }
-                        );
+    
+                // For arrays of objects (like source_value)
+                if (value1.length > 0 && typeof value1[0] === 'object') {
+                    for (let i = 0; i < value1.length; i++) {
+                        if (!compareObjects(value1[i], value2[i])) {
+                            console.log(`Mismatch in array item ${i} of ${key}:`, {
+                                item1: value1[i],
+                                item2: value2[i]
+                            });
+                            return false;
+                        }
+                    }
+                } else {
+                    // For primitive arrays, compare directly
+                    const areEqual = value1.every((item, index) => item === value2[index]);
+                    if (!areEqual) {
+                        console.log(`Array content mismatch for ${key}:`, { value1, value2 });
                         return false;
                     }
                 }
+                continue;
+            }
+    
+            // Handle nested objects
+            if (typeof value1 === 'object' && typeof value2 === 'object') {
+                if (!compareObjects(value1, value2)) {
+                    return false;
+                }
+                continue;
+            }
+    
+            // Compare primitive values
+            if (value1 !== value2) {
+                // Skip comparison if one value is empty and the key is optional
+                const isOptionalField = [
+                    'created_at',
+                    'updated_at',
+                    'questionnaire_id',
+                    'version_number',
+                    'ttl',
+                    'index',
+                    'sectionIndex'
+                ].includes(key);
+    
+                if (!isOptionalField) {
+                    console.log(`Value mismatch for ${key}:`, { value1, value2 });
+                    return false;
+                }
             }
         }
-
-        return true; // Sections, pages, and questions are identical
+    
+        return true;
+    };
+    
+    const compareSections = (sections, compareSavedSections) => {
+        // Handle null/undefined inputs
+        if (!sections || !compareSavedSections) {
+            return sections === compareSavedSections;
+        }
+    
+        // Ensure we're working with arrays
+        const sectionsArray = Array.isArray(sections) ? sections : sections.sections || [];
+        const compareSectionsArray = Array.isArray(compareSavedSections) ? 
+            compareSavedSections : compareSavedSections.sections || [];
+    
+        // Check if the number of sections matches
+        if (sectionsArray.length !== compareSectionsArray.length) {
+            console.log('Number of sections does not match');
+            return false;
+        }
+    
+        // Compare each section in detail
+        for (let i = 0; i < sectionsArray.length; i++) {
+            const section = sectionsArray[i];
+            const savedSection = compareSectionsArray[i];
+    
+            // Skip optional fields
+            const cleanedSection = { ...section };
+            const cleanedSavedSection = { ...savedSection };
+    
+            ['created_at', 'updated_at', 'questionnaire_id', 'version_number', 'ttl'].forEach(field => {
+                delete cleanedSection[field];
+                delete cleanedSavedSection[field];
+            });
+    
+            // Compare pages within the section
+            if (cleanedSection.pages?.length !== cleanedSavedSection.pages?.length) {
+                console.log(`Mismatch in the number of pages in section ${i + 1}`);
+                return false;
+            }
+    
+            // Clean page data
+            if (cleanedSection.pages) {
+                cleanedSection.pages = cleanedSection.pages.map(page => {
+                    const cleanedPage = { ...page };
+                    delete cleanedPage.index;
+                    delete cleanedPage.sectionIndex;
+                    return cleanedPage;
+                });
+            }
+    
+            // Compare the cleaned sections
+            if (!compareObjects(cleanedSection, cleanedSavedSection)) {
+                console.log(`Mismatch in section ${i + 1}`);
+                return false;
+            }
+        }
+    
+        return true;
     };
 
-    // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
+
+    function compareCompliance(array1, array2) {
+        // Helper function to extract comparison value
+        function getComparisonValue(content) {
+            const match = content.match(/includes\("(\d+)"\)/);
+            return match ? match[1] : null;
+        }
+
+        // If arrays have different lengths, they're not identical
+        if (array1.length !== array2.length) {
+            return false;
+        }
+
+        // Compare each item in the arrays
+        for (let i = 0; i < array1.length; i++) {
+            const value1 = getComparisonValue(array1[i].default_content);
+            const value2 = getComparisonValue(array2[i].default_content);
+
+            if (value1 !== value2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    const cleanSectionData = (data) => {
+        // If input is not valid, return empty array
+        if (!data || typeof data !== 'object') {
+            return [];
+        }
+
+        // Deep clone the data to avoid mutations
+        const clonedData = JSON.parse(JSON.stringify(data));
+
+        // Extract sections array from the main object
+        const sectionsArray = clonedData.sections || (Array.isArray(clonedData) ? clonedData : []);
+
+        // Clean each section
+        const cleanedSections = sectionsArray.map(section => {
+            const cleanedSection = { ...section };
+
+            // Remove unwanted section-level properties
+            delete cleanedSection.created_at;
+            delete cleanedSection.updated_at;
+            delete cleanedSection.questionnaire_id;
+            delete cleanedSection.version_number;
+            delete cleanedSection.ttl;
+
+            // Clean pages if they exist
+            if (cleanedSection.pages && Array.isArray(cleanedSection.pages)) {
+                cleanedSection.pages = cleanedSection.pages.map(page => {
+                    const cleanedPage = { ...page };
+                    delete cleanedPage.index;
+                    delete cleanedPage.sectionIndex;
+
+                    // Clean questions if they exist
+                    if (cleanedPage.questions && Array.isArray(cleanedPage.questions)) {
+                        cleanedPage.questions = cleanedPage.questions.map(question => {
+                            const cleanedQuestion = { ...question };
+                            // Clean up empty options objects
+                            if (cleanedQuestion.options && typeof cleanedQuestion.options === 'object') {
+                                Object.keys(cleanedQuestion.options).forEach(key => {
+                                    if (cleanedQuestion.options[key] === undefined ||
+                                        cleanedQuestion.options[key] === null ||
+                                        cleanedQuestion.options[key] === "" ||
+                                        cleanedQuestion.options[key] === '') {
+                                        delete cleanedQuestion.options[key];
+                                    }
+                                });
+                            }
+                            return cleanedQuestion;
+                        });
+                    }
+
+                    return cleanedPage;
+                });
+            }
+
+            return cleanedSection;
+        });
+
+        return cleanedSections;
+    };
+
+
     const hasUnsavedChanges = () => {
-        return (
-            !compareSections(sections, compareSavedSections)
-        );
+        if (compareInitialSavedSection && 
+            (Array.isArray(compareInitialSavedSection) || compareInitialSavedSection.sections)) {
+            // Clean both data sets
+            const cleanedNewData = cleanSectionData(sectionDetails);
+            const cleanedOldData = cleanSectionData(compareInitialSavedSection);
+
+            return !compareSections(cleanedNewData, cleanedOldData) ||
+                !compareCompliance(compareInitialSavedComplianceLogic, complianceLogic);
+        } else {
+            console.error("compareSavedSections is not an array:", compareSavedSections);
+            return false;
+        }
     };
 
     // Cancel button click handler (related to showing the cancle modal)
@@ -1577,6 +1739,9 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
+            if (!key) {
+                setCompareInitialSavedSection(sectionBody)
+            }
             setSectionDetails(sectionBody);
             cleanSections();
             let hasQuestion = checkForQuestions();
@@ -1643,7 +1808,8 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
-                            // handleDragStart={handleDragStart}
+                            setComplianceClick={setComplianceClick}
+                            complianceLogic={complianceLogic}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1779,7 +1945,7 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
+                                    {(selectedComponent === 'compliancelogic' || complianceClick) && (
                                         <div>
                                             <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                         </div>
@@ -2036,4 +2202,3 @@ const QuestionnaryForm = () => {
 }
 
 export default QuestionnaryForm;
-

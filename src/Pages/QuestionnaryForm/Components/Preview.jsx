@@ -67,7 +67,6 @@ function PreviewModal({
     const [isLastPage, setIsLastPage] = useState(false);
     const [isModified, setIsModified] = useState(false);
     const previousSectionsRef = useRef();
-    console.log(conditionalValues, "conditionalValues");
     const fieldStatus = useSelector(
         (state) => state?.defaultContent?.fieldStatus,
     );
@@ -134,7 +133,23 @@ function PreviewModal({
         };
         fetchSections();
     }, [questionnaire_id, version_number]);
+    function isSameDate(question_id, setDate, value) {
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
+        
+        // Parse the dd/mm/yyyy format to Date object
+        const [day, month, year] = setDate.split('/');
+        const setDateObj = new Date(year, month - 1, day);
 
+        // Add the specified number of days (value) to the set date
+        setDateObj.setDate(setDateObj.getDate() + value);
+        // Compare the year, month, and day
+        return (
+            selectedDate.getFullYear() === setDateObj.getFullYear() &&
+            selectedDate.getMonth() === setDateObj.getMonth() &&
+            selectedDate.getDate() === setDateObj.getDate()
+        );
+    }
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -142,7 +157,7 @@ function PreviewModal({
         function transformTernaryExpression(input) {
             // Regex to match the patterns (handles dynamic values)
             const pattern = /\(STATUS\s*=\s*'([^']+)',\s*(?:REASON\s*=\s*'([^']+)',\s*ACTIONS\.push\('([^']+)'\)|GRADE\s*=\s*'([^']+)')\)/g;
-            
+
             // Replacement function to handle both cases
             return input.replace(pattern, (match, status, reason, action, grade) => {
                 if (grade) {
@@ -189,10 +204,8 @@ function PreviewModal({
                 try {
                     // Convert new Date() to epoch seconds
                     logic = logic?.replace(/new Date\((.*?)\)/g,
-                        `Math.round(new Date().getTime() / 1000)`
+                        `new Date().toLocaleDateString()`
                     );
-                    
-                    console.log(transformTernaryExpression(logic), "logic");
                     eval(transformTernaryExpression(logic));
                 } catch (error) {
                     console.error("Error evaluating new Date logic:", error);
@@ -201,12 +214,30 @@ function PreviewModal({
             }
 
             if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
-
                 // Replace double-quoted comparisons with single quotes for array elements
                 // Handle both === and !== operators
                 logic = logic.replace(
-                    /(Section_\d+\.Page_\d+\.Question_\d+)\s*(===|!==)\s*""([^""]*)""/g,
-                    (match, path, operator, value) => `${path}[0] ${operator} "${value}"`
+                    /([a-zA-Z_][\w.?]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
+                    (match, path, operator, value) => {
+                        let modifiedPath = path; // Preserve original path
+
+                        // Convert last key to bracket notation while preserving '?'
+                        let parts = path.split(".");
+                        if (parts.length > 1) {
+                            let lastKey = parts.pop();
+                            modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+                        }
+                        try {
+                            let questionArray = eval(modifiedPath); // Use modified path for evaluation
+                            if (Array.isArray(questionArray) && questionArray.length === 1) {
+                                return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
+                            } else {
+                                return `${path}[-1] ${operator} "${value}"`;
+                            }
+                        } catch (e) {
+                            return match; 
+                        }
+                    }
                 );
             }
 
@@ -214,6 +245,12 @@ function PreviewModal({
             if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
                 logic = logic.replace(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g, '["$1"]');
             }
+
+            // Fix misplaced `[0]` inside brackets
+            logic = logic.replace(
+                /\["([^"\]]+)\[\s*0\s*\]"\]/g, // Match ["Question_1?[0]"]
+                '["$1"][0]' // Convert to ["Question_1?"][0]
+            );
 
             return logic;
 
@@ -502,7 +539,12 @@ function PreviewModal({
         // Call the computeNextNavigation only if the page is validated
         computeNextNavigation();
     }, [sections, currentSection, currentPage, value]);
-
+    function formatDateWithOffset(formatteDate, value, question_name) {
+        let [day, month, year] = formatteDate.split('/').map(Number); 
+        let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
+        date.setDate(date.getDate() + Number(value)); 
+        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+    }
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
         setValidationErrors({});
@@ -1351,18 +1393,16 @@ function PreviewModal({
                                                     // Replace 'new Date()' with epoch value in seconds
                                                     let updatedLogic = list?.conditional_logic?.replace(
                                                         /new Date\(\)/g,
-                                                        "Math.round(new Date().getTime() / 1000)",
+                                                        "new Date().toLocaleDateString()",
                                                     );
 
                                                     // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
                                                     updatedLogic = updatedLogic?.replace(
                                                         /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
                                                         (_, year, month, day) => {
-                                                            return `Math.round(new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).getTime() / 1000)`;
+                                                            return `new Date(${parseInt(year)}, ${parseInt(month)}, ${parseInt(day)}).toLocaleDateString()`;
                                                         },
                                                     );
-
-                                                    console.log(updatedLogic, "updatedLogic");
                                                     // Evaluate the updated logic
                                                     if (!eval(updatedLogic)) {
                                                         return null; // Skip rendering this question
@@ -1411,6 +1451,7 @@ function PreviewModal({
                                                     "$1",
                                                 );
                                                 try {
+
                                                     let result = eval(logicWithoutBrackets); // Evaluate the modified logic
                                                     if (!result) {
                                                         return null; // Skip rendering this question

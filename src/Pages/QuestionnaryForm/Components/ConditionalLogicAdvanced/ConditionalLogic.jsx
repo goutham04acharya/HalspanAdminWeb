@@ -271,46 +271,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // }
 
 
-        ////
-        setEditorCheck((prev) => {
-            const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
-                item.questionId === selectedQuestionId
-                    ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
-                    : item
-            );
 
-            // Check if the question already exists
-            const existingQuestion = prev.conditonalEditor.find(
+        // Check if the toast should be shown
+        if (complianceState) {
+            if (editorCheck.isAdvanceEditorCompliance) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
+            }
+        } else {
+            // Find the question in conditionalEditor array
+            const existingQuestion = editorCheck.conditonalEditor.find(
                 (item) => item.questionId === selectedQuestionId
             );
 
-            const questionExists = !!existingQuestion;
-
-            // Check if the toast should be shown
-            if (complianceState) {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
-            } else {
-                if (existingQuestion?.isAdvanceEditor) {
-                    setToastError(
-                        `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
-                    );
-                }
+            // If the question exists and isAdvanceEditor is true, show the toast
+            if (existingQuestion?.isAdvanceEditor) {
+                setToastError(
+                    `Oh no! To use the basic editor you'll have to use a simpler expression. Please go back to the advanced editor.`
+                );
             }
-
-            return {
-                ...prev,
-                conditonalEditor: questionExists
-                    ? updatedConditionalEditor // Update existing
-                    : [
-                        ...prev.conditonalEditor,
-                        { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                    ] // Add new if not exists
-            };
-        });
+        }
 
     }, [conditions])
 
@@ -558,14 +539,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     function getDetails(path, data) {
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
-
         // Step 2: Replace underscores with spaces to match the actual names
         const sectionName = sectionPart.replaceAll(/_/g, ' ');
         const pageName = pagePart.replaceAll(/_/g, ' ');
         const questionName = questionPart.replaceAll(/_/g, ' ');
-
+        
         // Step 3: Search for the matching section in the data
-        const matchingSection = data?.sections?.find(section => section?.section_name === sectionName);
+        const matchingSection = data?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
             return null; // No matching section found
         }
@@ -657,20 +637,17 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         // Helper function to convert a timestamp into a date string
         const convertTimestampToDate = (timestamp) => {
-            const date = new Date(timestamp * 1000);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+            const date = timestamp.split('/')[0].length === 1 ? `0${timestamp}` : timestamp;
+            return date
         };
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
-            const pattern = /new\s+Date\(([\w_.]+)\s*\*\s*1000\)\.toDateString\(\)\s*===\s*new\s+Date\(\s*new\s+Date\((\d+)\s*\*\s*1000\)\.setDate\(\s*new\s+Date\([\w_.]+\s*\*\s*1000\)\.getDate\(\)\s*\+\s*(\d+)\s*\)\s*\)\.toDateString\(\)/;
+            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w_.]+)\)/;
             const match = condition?.match(pattern);
             if (!match) {
                 return null;
             }
-            const [_, question_name, timestamp, offsetDays] = match;
+            const [_, timestamp, offsetDays, question_name] = match;
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
@@ -689,11 +666,21 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                // Try parsing as a date condition
+                // const regex = /^([\w_.]+)\s*([<>]=?|[=!]=)\s*(new\s+Date\(\))$/
+                // const match = condition.match(regex)
+                // if (match) {
+                //     const [_, question, operator, value] = match
+                //     console.log({
+                //         question,
+                //         operator,
+                //         value
+                //     })
+                // }                // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
                 const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                console.log(matches, 'asdasd')
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -703,6 +690,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.sections);
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
+                    console.log(question, 'asdasd')
                     if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
@@ -1590,7 +1578,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 case 'date is “X” date of set date':
                     const formatteDate = formatDate(item.date);
                     const actualFormat = reverseFormat(formatteDate)
-                    return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
+                    return `formatDateWithOffset('${formatteDate}', ${item.value}, ${item.question_name})`
+                    // return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
                 default:
                     // Handle unknown condition logic  
                     console.error(`Unknown condition logic: ${item.condition_logic}`);
@@ -1670,7 +1659,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                console.log(condition_logic, 'condition_logic')
                 if (condition_logic !== '') {
                     condition_logic
                         .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
@@ -1735,9 +1723,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
 
         if (complianceState) {
-            console.log(conditions, 'conditions');
             let compliance_logic = getFinalComplianceLogic(conditions);
-            console.log(compliance_logic, 'compliance_logic');
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId

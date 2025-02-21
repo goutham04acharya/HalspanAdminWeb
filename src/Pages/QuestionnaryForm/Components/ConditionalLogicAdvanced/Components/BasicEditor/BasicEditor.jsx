@@ -9,27 +9,34 @@ import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
 import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray, render, setRender }) {
+
     useEffect(() => {
-        const data = questions?.sections?.flatMap(section =>
-            section.pages?.flatMap(page => page.questions) || []
-        ) || [];
+        const result = {};
+
+        questions?.sections?.forEach(section => {
+            section?.pages?.forEach(page => {
+                page?.questions?.forEach(question => {
+                    const key = `${section?.section_name}.${page?.page_name}.${question?.question_name}`.replace(/ /g, "_"); // Replace spaces with underscores
+                    result[key] = question?.component_type;
+                });
+            });
+        });
+    
         setRender(prev => prev + 1);
-        if (!conditions || conditions[0]?.conditions[0].question_name === "" || !data.length) return; // Check for valid conditions and data before updating
-        const updatedConditions = conditions.map(conditionGroup => ({
+        if (!conditions || conditions[0]?.conditions[0]?.question_name === "" ) return; // Check for valid conditions and data before updating
+        const updatedConditions = conditions?.map(conditionGroup => ({
             ...conditionGroup,
-            conditions: conditionGroup.conditions.map(condition => {
-                const matchingQuestion = data.find(q => q.question_id === selectedQuestionId);
+            conditions: conditionGroup?.conditions?.map(condition => {
                 return {
                     ...condition,
-                    condition_type: matchingQuestion ? matchingQuestion.component_type : undefined
+                    condition_type: result ? result[condition?.question_name] : undefined
                 };
             })
         }));
         if (render > 1) {
             setConditions(updatedConditions);
         }
-    }, [questions, selectedQuestionId, setConditions, conditions[0]?.conditions[0].question_name]);
-
+    }, [questions, setConditions,conditions[0]?.conditions[0]?.question_name]);
 
     const dropdownRef = useRef();
     const dropdownRef2 = useRef();
