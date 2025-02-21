@@ -110,7 +110,7 @@ const QuestionnaryForm = () => {
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
     const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
-    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState(null);
+    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState([]);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
