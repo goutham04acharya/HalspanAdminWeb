@@ -85,29 +85,29 @@ function PreviewModal({
         current_section: 1,
         total_pages: 0,
     });
-    // const handleConditionalLogic = async (data) => {
-    //     let result = {};
-    //     data.forEach((section, sectionIndex) => {
-    //         const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
-    //         result[sectionKey] = {}; // Initialize the section key
+    const handleConditionalLogic = async (data) => {
+        let result = {};
+        data.forEach((section, sectionIndex) => {
+            const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
+            result[sectionKey] = {}; // Initialize the section key
 
-    //         section.pages.forEach((page, pageIndex) => {
-    //             const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
-    //             result[sectionKey][pageKey] = {}; // Initialize the page key within the section
+            section.pages.forEach((page, pageIndex) => {
+                const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
+                result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-    //             page.questions.forEach((question, questionIndex) => {
-    //                 const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-    //                 result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
-    //             });
-    //         });
-    //     });
-    //     return result;
-    // };
+                page.questions.forEach((question, questionIndex) => {
+                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
+                });
+            });
+        });
+        return result;
+    };
 
-    // const updateConditionalValues = async (data) => {
-    //     const result = await handleConditionalLogic(data);
-    //     setConditionalValues(result);
-    // };
+    const updateConditionalValues = async (data) => {
+        const result = await handleConditionalLogic(data);
+        setConditionalValues(result);
+    };
 
     useEffect(() => {
         const fetchSections = async () => {
@@ -132,7 +132,7 @@ function PreviewModal({
             }
         };
         fetchSections();
-    }, [questionnaire_id, version_number]);
+    }, [questionnaire_id, version_number, sectionDetails]);
     const evaluateComplianceLogic = () => {
 
         let results = [];
@@ -218,7 +218,7 @@ function PreviewModal({
                                 return `${path}[-1] ${operator} "${value}"`;
                             }
                         } catch (e) {
-                            return match; 
+                            return match;
                         }
                     }
                 );
@@ -523,10 +523,10 @@ function PreviewModal({
         computeNextNavigation();
     }, [sections, currentSection, currentPage, value]);
     function formatDateWithOffset(formatteDate, value, question_name) {
-        let [day, month, year] = formatteDate.split('/').map(Number); 
+        let [day, month, year] = formatteDate.split('/').map(Number);
         let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-        date.setDate(date.getDate() + Number(value)); 
-        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }); 
+        date.setDate(date.getDate() + Number(value));
+        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
     const handleNextClick = () => {
         // Reset previous validation errors before proceeding
@@ -1108,7 +1108,7 @@ function PreviewModal({
 
     Object.entries(conditionalValues).forEach(([key, value]) => {
         window[key.replace(/-/g, '_')] = value;
-    });    
+    });
 
     useEffect(() => {
         sections.forEach((section) => {
@@ -1185,13 +1185,13 @@ function PreviewModal({
                                             question?.conditional_logic,
                                         );
                                         if (!isVisible) {
-                                            draft[question?.question_id.replace(/-/g, "_")] = "";
-                                            dispatch(
-                                                setQuestionValue({
-                                                    question_id: question?.question_id,
-                                                    value: "",
-                                                }),
-                                            );
+                                        draft[question?.question_id.replace(/-/g, "_")] = "";
+                                        dispatch(
+                                            setQuestionValue({
+                                                question_id: question?.question_id,
+                                                value: "",
+                                            }),
+                                        );
                                         }
                                     } catch (error) {
                                         console.error("Error evaluating conditional logic:", error);
