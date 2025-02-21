@@ -135,6 +135,8 @@ When('I enter invalid date for compliance for section {int} page {int} question 
     switch (condition) {
     case 'date is before today':
         invalidDate = moment().add(1, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before today")
+        console.log(invalidDate ,"invalidDate")
+        invalidDate = '27/12/2025'
         break;
     case 'date is before or equal to today':
         invalidDate = moment().add(2, 'days').format('DD/MM/YYYY'); // Tomorrow (invalid for "before or equal to today")
@@ -152,7 +154,7 @@ When('I enter invalid date for compliance for section {int} page {int} question 
         throw new Error(`Invalid condition type: ${condition}`);
     }
 
-    await text_area.sendKeys(invalidDate);
+    await text_area.sendKeys(Keys.chord(Keys.ENTER, invalidDate));
 });
 
 When('I enter the date for compliance in date field for section {int} page {int} question {int} with condition {string}', async function (sectionNumber, pageNumber, questionNumber, condition) {
