@@ -137,7 +137,7 @@ function NumberField({
         }
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [question?.question_id.replace(/-/g, '_')]: newValue, // Add or update the label key with newValue
+            [question?.question_id.replace(/-/g, '_')]: Number(newValue), // Add or update the label key with newValue
         }));
         dispatch(
             setQuestionValue({

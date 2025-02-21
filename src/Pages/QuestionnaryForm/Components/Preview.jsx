@@ -1107,11 +1107,8 @@ function PreviewModal({
     };
 
     Object.entries(conditionalValues).forEach(([key, value]) => {
-        // console.log(key.replace(/-/g, '_'), value, conditionalValues, 'key')
         window[key.replace(/-/g, '_')] = value;
-    });
-    // console.log(SEC_22db86cc_dc6c_46e2_b354_ab3a45e3f2bf_PG_98fb7037_15b4_4563_aa2f_af3c76854ab6_QUES_c20fff2a_fbd7_496b_8548_fc20927c47c1, 'window')
-    
+    });    
 
     useEffect(() => {
         sections.forEach((section) => {
