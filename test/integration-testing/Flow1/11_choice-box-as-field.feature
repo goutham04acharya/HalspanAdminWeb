@@ -61,6 +61,12 @@ Feature: Halspan - Admin - Create a Questionnaire using Choice Box as a Field
     Then I should see the 4th choice deleted
     When I enter the admin field notes
 
+  Scenario: Admin tries to save questionnaire without entering the choice
+    Given I am on the Questionnaire management sections
+    When I click the save button for the questionnaire version for section 1
+    Then I should read a message stating that "Please fix the validation errors before saving."
+    Then I should read a message stating that "These are mandatory fields"
+
   @create_question
   Scenario Outline: Admin selects the type of choice
     Given I am on the questionnaire management section
