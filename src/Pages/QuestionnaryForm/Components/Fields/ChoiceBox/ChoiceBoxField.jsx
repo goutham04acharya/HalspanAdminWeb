@@ -137,11 +137,10 @@ const ChoiceBoxField = ({
                 ? fixedChoiceArray?.map(choice => choice.value) || []
                 : lookupOptionChoice || source_value || [];
         }
-
         if (type === 'single_choice') {
-            return <RadioButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
+            return <RadioButtonGroup isDisable={question?.options?.read_only} testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
         } else if (type === 'multi_choice') {
-            return <CheckboxButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
+            return <CheckboxButtonGroup isDisable={question?.options?.read_only} testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
         }
     };
 

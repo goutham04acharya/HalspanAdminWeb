@@ -87,6 +87,7 @@ const QuestionnaryForm = () => {
     const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
+    const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
@@ -109,7 +110,7 @@ const QuestionnaryForm = () => {
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
     const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
-    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState(null);
+    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState([]);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
@@ -151,6 +152,64 @@ const QuestionnaryForm = () => {
         setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
+
+    useEffect(() => {
+        if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
+
+        if (fieldSettingParams[selectedQuestionId]?.source === 'fixedList') {
+            const hasEmptyChoices = fixedChoiceArray.some(choice => !choice.value || !choice.value.trim());
+
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                choice: {
+                    ...prevErrors.choice,
+                    [selectedQuestionId]: hasEmptyChoices ? 'These are mandatory fields' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.choice && validationErrors?.choice[selectedQuestionId] === 'These are mandatory fields') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    choice: {
+                        ...prevErrors.choice,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+    }, [selectedQuestionId, fixedChoiceArray, fieldSettingParams]);
+
+    useEffect(() => {
+        if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
+
+        const hasLookupValue =
+            fieldSettingParams[selectedQuestionId]?.lookupValue &&
+            fieldSettingParams[selectedQuestionId]?.lookupValue.trim();
+
+        if (fieldSettingParams[selectedQuestionId]?.source === 'lookup') {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                lookup: {
+                    ...prevErrors.lookup,
+                    [selectedQuestionId]: (!hasLookupValue) ? 'This is a mandatory field' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.lookup && validationErrors?.lookup[selectedQuestionId] === 'This is a mandatory field') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    lookup: {
+                        ...prevErrors.lookup,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+    }, [selectedQuestionId, fieldSettingParams]);
+
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -175,6 +234,7 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
+
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
@@ -1316,32 +1376,32 @@ const QuestionnaryForm = () => {
     const isEmptyValue = (value) => {
         return value === undefined || value === null || value === '' || value === "";
     };
-    
+
     const compareObjects = (obj1, obj2) => {
         // Handle null/undefined objects
         if (!obj1 || !obj2) {
             return obj1 === obj2;
         }
-    
+
         // Get all unique keys from both objects
         const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
-    
+
         for (const key of allKeys) {
             const value1 = obj1[key];
             const value2 = obj2[key];
-    
+
             // Skip comparison if both values are empty
             if (isEmptyValue(value1) && isEmptyValue(value2)) {
                 continue;
             }
-    
+
             // Handle arrays (including source_value arrays)
             if (Array.isArray(value1) && Array.isArray(value2)) {
                 if (value1.length !== value2.length) {
                     console.log(`Array length mismatch for ${key}:`, { value1, value2 });
                     return false;
                 }
-    
+
                 // For arrays of objects (like source_value)
                 if (value1.length > 0 && typeof value1[0] === 'object') {
                     for (let i = 0; i < value1.length; i++) {
@@ -1363,7 +1423,7 @@ const QuestionnaryForm = () => {
                 }
                 continue;
             }
-    
+
             // Handle nested objects
             if (typeof value1 === 'object' && typeof value2 === 'object') {
                 if (!compareObjects(value1, value2)) {
@@ -1371,7 +1431,7 @@ const QuestionnaryForm = () => {
                 }
                 continue;
             }
-    
+
             // Compare primitive values
             if (value1 !== value2) {
                 // Skip comparison if one value is empty and the key is optional
@@ -1384,54 +1444,52 @@ const QuestionnaryForm = () => {
                     'index',
                     'sectionIndex'
                 ].includes(key);
-    
+
                 if (!isOptionalField) {
                     console.log(`Value mismatch for ${key}:`, { value1, value2 });
                     return false;
                 }
             }
         }
-    
+
         return true;
     };
-    
+
     const compareSections = (sections, compareSavedSections) => {
         // Handle null/undefined inputs
         if (!sections || !compareSavedSections) {
             return sections === compareSavedSections;
         }
-    
+
         // Ensure we're working with arrays
         const sectionsArray = Array.isArray(sections) ? sections : sections.sections || [];
-        const compareSectionsArray = Array.isArray(compareSavedSections) ? 
+        const compareSectionsArray = Array.isArray(compareSavedSections) ?
             compareSavedSections : compareSavedSections.sections || [];
-    
+
         // Check if the number of sections matches
         if (sectionsArray.length !== compareSectionsArray.length) {
             console.log('Number of sections does not match');
             return false;
         }
-    
+
         // Compare each section in detail
         for (let i = 0; i < sectionsArray.length; i++) {
             const section = sectionsArray[i];
             const savedSection = compareSectionsArray[i];
-    
+
             // Skip optional fields
             const cleanedSection = { ...section };
             const cleanedSavedSection = { ...savedSection };
-    
+
             ['created_at', 'updated_at', 'questionnaire_id', 'version_number', 'ttl'].forEach(field => {
                 delete cleanedSection[field];
                 delete cleanedSavedSection[field];
             });
-    
             // Compare pages within the section
             if (cleanedSection.pages?.length !== cleanedSavedSection.pages?.length) {
                 console.log(`Mismatch in the number of pages in section ${i + 1}`);
                 return false;
             }
-    
             // Clean page data
             if (cleanedSection.pages) {
                 cleanedSection.pages = cleanedSection.pages.map(page => {
@@ -1441,25 +1499,17 @@ const QuestionnaryForm = () => {
                     return cleanedPage;
                 });
             }
-    
             // Compare the cleaned sections
             if (!compareObjects(cleanedSection, cleanedSavedSection)) {
                 console.log(`Mismatch in section ${i + 1}`);
                 return false;
             }
         }
-    
         return true;
     };
 
 
     function compareCompliance(array1, array2) {
-        // Helper function to extract comparison value
-        function getComparisonValue(content) {
-            const match = content.match(/includes\("(\d+)"\)/);
-            return match ? match[1] : null;
-        }
-
         // If arrays have different lengths, they're not identical
         if (array1.length !== array2.length) {
             return false;
@@ -1467,10 +1517,7 @@ const QuestionnaryForm = () => {
 
         // Compare each item in the arrays
         for (let i = 0; i < array1.length; i++) {
-            const value1 = getComparisonValue(array1[i].default_content);
-            const value2 = getComparisonValue(array2[i].default_content);
-
-            if (value1 !== value2) {
+            if (array1[i].default_content !== array2[i].default_content) {
                 return false;
             }
         }
@@ -1538,7 +1585,7 @@ const QuestionnaryForm = () => {
 
 
     const hasUnsavedChanges = () => {
-        if (compareInitialSavedSection && 
+        if (compareInitialSavedSection &&
             (Array.isArray(compareInitialSavedSection) || compareInitialSavedSection.sections)) {
             // Clean both data sets
             const cleanedNewData = cleanSectionData(sectionDetails);
@@ -1605,14 +1652,46 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
 
+        if (!key) {
+            function listQuestionIds(data) {
+                let questionIds = [];
 
-        // Check if there are any validation errors
-        const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
+                data.forEach(section => {
+                    section.pages.forEach(page => {
+                        page.questions.forEach(question => {
+                            questionIds.push(question.question_id);
+                        });
+                    });
+                });
 
-        if (hasValidationErrors) {
-            setToastError('Please fix the validation errors before saving.');
-            setGlobalSaveLoading(false);
-            return;
+                return questionIds;
+            }
+            function filterValidationErrors(validationErrors, questionIds) {
+                return {
+                    lookup: Object.fromEntries(
+                        Object.entries(validationErrors?.lookup || {}).filter(([key]) => questionIds.includes(key))
+                    ),
+                    label: validationErrors.label || {},
+                    choice: Object.fromEntries( // Ensure choice is filtered as well
+                        Object.entries(validationErrors?.choice || {}).filter(([key]) => questionIds.includes(key))
+                    )
+                };
+            }
+
+            const questionIds = listQuestionIds(sections);
+            const filteredValidationErrors = filterValidationErrors(validationErrors, questionIds);
+
+            // Check if there are any validation errors
+            const hasValidationErrorsLabel = Object.values(validationErrors?.label || {}).some(error => error !== '');
+            const hasValidationErrorsChoice = Object.values(filteredValidationErrors?.choice || {}).some(error => error !== '');
+            const hasValidationErrorsLookup = Object.values(filteredValidationErrors?.lookup || {}).some(error => error !== '');
+
+
+            if (hasValidationErrorsLabel || hasValidationErrorsChoice || hasValidationErrorsLookup) {
+                setToastError('Please fix the validation errors before saving.');
+                setGlobalSaveLoading(false);
+                return;
+            }
         }
 
         try {

@@ -680,7 +680,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
                 const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                console.log(matches, 'asdasd')
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -690,7 +689,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     }
                     let question = getDetails(question_name.trim(), allSectionDetails.sections);
                     //this if block is for dateTime only. returning value inside this if block to stop further execution
-                    console.log(question, 'asdasd')
                     if (question?.component_type === 'dateTimefield') {
                         //assigning new Date() value
                         if (value.includes('new Date()')) {
@@ -1504,33 +1502,20 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // to get the condition expression
         const getConditionValue = (item) => {
-            let questionType = null;
-
-            allSectionDetails.sections.forEach(section => {
-                section.pages.forEach(page => {
-                    page.questions.forEach(question => {
-                        // Correctly format section, page, and question name
-                        let formattedQuestionName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
-                        if (formattedQuestionName === item.question_name) {
-                            questionType = question.type; // Get type (multi_choice, single_line, etc.)
-                        }
-                    });
-                });
-            });
             let resultExpression = '';
             switch (item.condition_logic) {
                 case "includes":
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
+                    if (item.condition_type === 'choiceboxfield') {
                         resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
                     } else {
                         resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     }
                     break;
                 case "not equal to":
-                    if (item.condition_type === 'choiceboxfield' && questionType !== 'multi_choice') {
+                    if (item.condition_type === 'choiceboxfield') {
                         resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
                     } else {
                         resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
