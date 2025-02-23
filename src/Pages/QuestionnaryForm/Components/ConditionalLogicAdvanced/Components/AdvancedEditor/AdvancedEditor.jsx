@@ -55,15 +55,15 @@ function AdvancedEditor({
     };
 
     const handleAddQuestion = (suggestion, sections, e) => {
+        console.log(suggestion, 'suggestion', sections)
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-
+        console.log(valueType,'oioioi')
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
-
         setShowMethodSuggestions(false);
         setFilteredSuggestions(secDetailsForSearching);
     };

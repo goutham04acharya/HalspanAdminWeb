@@ -311,13 +311,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let result = {};
         if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
             allSectionDetails.sections.forEach((section) => {
-                const sectionKey = section.section_name.replaceAll(' ', '_');
+                const sectionKey = section.section_name;
                 let sectionObject = {
                     [sectionKey]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
-                        const pageKey = page.page_name.replaceAll(' ', '_');
+                        const pageKey = page.page_name;
                         sectionObject[sectionKey][pageKey] = {};
 
                         if (page.questions && page.questions.length > 0) {
@@ -325,7 +325,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 if (question?.component_type === 'dateTimefield') {
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
-                                const questionKey = question.question_name.replaceAll(' ', '_');
+                                const questionKey = question.question_name;
                                 const fieldType = getFieldType(question.component_type);
                                 sectionObject[sectionKey][pageKey][questionKey] = fieldType;
                             });
@@ -345,6 +345,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
+        
         setError('');
         // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
@@ -360,6 +361,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
+            debugger
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -448,7 +450,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
     };
-
+    console.log(selectedFieldType,'field type')
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
@@ -511,6 +513,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setShowSectionList(true)
             } else {
                 let fieldType = '';
+                debugger
                 switch (componentType) {
                     case 'string':
                         fieldType = [
@@ -942,7 +945,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
+                // return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
+                return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'questionWithUuid.$1');
             };
 
             const handleError = (message) => {
@@ -989,7 +993,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
-
+            console.log(evalInputValue,'first one')
             if (evalInputValue.includes('getMonth')) {
 
                 // Extract the value after `getMonth()` with any comparison operator using regex
@@ -1170,6 +1174,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
+            console.log(evalInputValue,'evalInputValue')
             // Extract variable names from the payloadString using a regex
             // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
@@ -1213,6 +1218,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let ACTIONS = []
             let REASON = ''
             let GRADE = '';
+            evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, evalInputValue);
+            console.log(evalInputValue,'near eval ')
             const result = eval(evalInputValue);
 
             if (isDefaultLogic || complianceState) {
@@ -1272,7 +1284,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         break;
                 }
             }
-
+            debugger
             if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
 
@@ -1315,6 +1327,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(result);
             }
         } catch (error) {
+            console.log(error)
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
