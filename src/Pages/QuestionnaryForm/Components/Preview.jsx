@@ -96,14 +96,29 @@ function PreviewModal({
         const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
         result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-        page.questions.forEach((question, questionIndex) => {
-          const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-          result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                page.questions.forEach((question, questionIndex) => {
+                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                });
+            });
         });
-      });
-    });
-    return result;
-  };
+        return result;
+    };
+
+    function getFilteredQuestions(data, filterKey, filterValue) {
+        let result = [];
+        data.sections.forEach(section => {
+            section.pages.forEach(page => {
+                page.questions.forEach(question => {
+                    if (question[filterKey] === filterValue) {
+                        let formattedName = `${section.section_name.replace(/\s+/g, '_')}.${page.page_name.replace(/\s+/g, '_')}.${question.question_name.replace(/\s+/g, '_')}`;
+                        result.push(formattedName);
+                    }
+                });
+            });
+        });
+        return result;
+    }
 
   const updateConditionalValues = async (data) => {
     const result = await handleConditionalLogic(data);
@@ -118,29 +133,29 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-        setPreviewNavigation((prev) => ({
-          ...prev,
-          total_pages: sectionDetails?.sections.reduce(
-            (total, section) => total + section.pages.length,
-            0
-          ),
-        }));
-        updateConditionalValues(sectionDetails?.sections);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSections();
-  }, [questionnaire_id, version_number]);
-  function isSameDate(question_id, setDate, value) {
-    // Convert the epoch values (in seconds) to Date objects
-    const selectedDate = new Date(question_id * 1000);
+                setPreviewNavigation((prev) => ({
+                    ...prev,
+                    total_pages: sectionDetails?.sections.reduce(
+                        (total, section) => total + section.pages.length,
+                        0,
+                    ),
+                }));
+                updateConditionalValues(sectionDetails?.sections);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSections();
+    }, [questionnaire_id, version_number]);
+    function isSameDate(question_id, setDate, value) {
+        // Convert the epoch values (in seconds) to Date objects
+        const selectedDate = new Date(question_id * 1000);
 
-    // Parse the dd/mm/yyyy format to Date object
-    const [day, month, year] = setDate.split("/");
-    const setDateObj = new Date(year, month - 1, day);
+        // Parse the dd/mm/yyyy format to Date object
+        const [day, month, year] = setDate.split('/');
+        const setDateObj = new Date(year, month - 1, day);
 
     // Add the specified number of days (value) to the set date
     setDateObj.setDate(setDateObj.getDate() + value);
@@ -216,36 +231,39 @@ function PreviewModal({
         }
       }
 
-      if (
-        (logic?.includes("===") || logic?.includes("!==")) &&
-        /(===|!==)\s*""[^""]*""/.test(logic)
-      ) {
-        // Replace double-quoted comparisons with single quotes for array elements
-        // Handle both === and !== operators
-        logic = logic.replace(
-          /([a-zA-Z_][\w.?]*\??)\s*(===|!==)\s*""([^""]*)""/g, // Match both cases
-          (match, path, operator, value) => {
-            let modifiedPath = path; // Preserve original path
+            if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
+                logic = logic.replace(
+                    /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))?)\s*(===|!==)\s*""([^""]*)""/g,
+                    (match, path, operator, value) => {
+                        let modifiedPath = path;
 
-            // Convert last key to bracket notation while preserving '?'
-            let parts = path.split(".");
-            if (parts.length > 1) {
-              let lastKey = parts.pop();
-              modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+                        // Handle method calls separately
+                        let methodCall = '';
+                        if (path.match(/\.(toUpperCase|toLowerCase|trim)\(\)$/)) {
+                            methodCall = path.match(/\.(toUpperCase|toLowerCase|trim)\(\)$/)[0];
+                            path = path.replace(/\.(toUpperCase|toLowerCase|trim)\(\)$/, '');
+                        }
+
+                        // Convert last key to bracket notation
+                        let parts = path.split(".");
+                        if (parts.length > 1) {
+                            let lastKey = parts.pop();
+                            modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+                        }
+                        try {
+                            let questionArray = eval(modifiedPath);
+                            if (Array.isArray(questionArray) && questionArray.length === 1) {
+                                // Add back method call if it existed
+                                return `${path}[0]${methodCall} ${operator} "${value}"`;
+                            } else {
+                                return `${path}[-1] ${operator} "${value}"`;
+                            }
+                        } catch (e) {
+                            return match;
+                        }
+                    }
+                );
             }
-            try {
-              let questionArray = eval(modifiedPath); // Use modified path for evaluation
-              if (Array.isArray(questionArray) && questionArray.length === 1) {
-                return `${path}[0] ${operator} "${value}"`; // Preserve `?` in the output
-              } else {
-                return `${path}[-1] ${operator} "${value}"`;
-              }
-            } catch (e) {
-              return match;
-            }
-          }
-        );
-      }
 
       // converting Section_1.Page_1.Question_1_?_?_?_  -> (Section_1.Page_1["Question_1_?_?_?_"]
       if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
@@ -269,15 +287,52 @@ function PreviewModal({
         GRADE: "",
       };
 
-      try {
-        // Preprocess the rule's default_content
-        let processedContent = preprocessLogic(rule?.default_content);
-        processedContent = processedContent?.replace("if", "");
-        // Define variables that will be set in eval
-        let STATUS = "";
-        let REASON = "";
-        let ACTIONS = [];
-        let GRADE = "";
+            try {
+                let processedContentMultiChoice = "";
+                const filteredByType = getFilteredQuestions(sectionDetails, "type", "multi_choice");
+
+                if (filteredByType.length > 0) {
+                    filteredByType.forEach(question => {
+                        // regex for === and !== operators
+                        const regexEquals = new RegExp(
+                            `(${question}(?:\\.(?:toUpperCase|toLowerCase|trim)\\(\\))?\\s*[=!]==\\s*)["']?([^"',\\s\\)]+)["']?`,
+                            'g'
+                        );
+
+                        // regex for includes and !includes operators
+                        const regexIncludes = new RegExp(
+                            `(!)?\\s*(${question})(\\.(?:toUpperCase|toLowerCase|trim)\\(\\))*\\s*\\.includes\\s*\\(["']?([^"',\\s\\)]+)["']?\\)`,
+                            'g'
+                        );
+
+                        let tempContent = rule?.default_content;
+
+                        // Handle equals cases first
+                        tempContent = tempContent.replace(regexEquals, '$1""$2""');
+
+                        // Handle includes cases
+                        tempContent = tempContent.replace(regexIncludes, (match, negation, path, methodChain, value) => {
+                            // Always include toLowerCase and trim in the map
+                            if (methodChain) {
+                                return `${negation ? '!' : ''}${path}.map(q => q${methodChain}).includes("${value}")`;
+                            } else {
+                                return `${negation ? '!' : ''}${path}.includes("${value}")`;
+                            }
+                        });
+                        processedContentMultiChoice = tempContent;
+                    });
+                } else {
+                    processedContentMultiChoice = rule?.default_content;
+                }
+
+                // Preprocess the rule's default_content
+                let processedContent = preprocessLogic(processedContentMultiChoice);
+                processedContent = processedContent?.replace("if", "");
+                // Define variables that will be set in eval
+                let STATUS = "";
+                let REASON = "";
+                let ACTIONS = [];
+                let GRADE = "";
 
         // Evaluate the processed logic
         eval(processedContent);
@@ -531,77 +586,28 @@ function PreviewModal({
       isLastSection = true;
     }
 
-    // Update state with precomputed navigation
-    setPrecomputedNavigation({
-      nextPage,
-      nextSection,
-      isLastPageInSection,
-      isLastSection,
-    });
-  };
-  // useEffect to evaluate conditional logic dynamically
-  useEffect(() => {
-    // Call the computeNextNavigation only if the page is validated
-    computeNextNavigation();
-  }, [sections, currentSection, currentPage, value]);
-  function formatDateWithOffset(formatteDate, value, question_name) {
-    let [day, month, year] = formatteDate.split("/").map(Number);
-    let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-    date.setDate(date.getDate() + Number(value));
-    return (
-      question_name ===
-      date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    );
-  }
-  const handleDisplayField = (selectedQuestion, selectedSections) => {
-    const { section_name, page_name, label } = findSectionAndPageName(
-      selectedSections,
-      selectedQuestion?.question_id
-    );
-
-    if (!section_name || !page_name || !label) {
-      console.error("Missing section_name, page_name, or label");
-      return;
+        // Update state with precomputed navigation
+        setPrecomputedNavigation({
+            nextPage,
+            nextSection,
+            isLastPageInSection,
+            isLastSection,
+        });
+    };
+    // useEffect to evaluate conditional logic dynamically
+    useEffect(() => {
+        // Call the computeNextNavigation only if the page is validated
+        computeNextNavigation();
+    }, [sections, currentSection, currentPage, value]);
+    function formatDateWithOffset(formatteDate, value, question_name) {
+        let [day, month, year] = formatteDate.split('/').map(Number);
+        let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
+        date.setDate(date.getDate() + Number(value));
+        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
-
-    let newValue = "";
-    switch (selectedQuestion?.type) {
-      case "heading":
-        newValue = selectedQuestion?.display_type?.heading || "";
-        break;
-      case "text":
-        newValue = selectedQuestion?.display_type?.text || "";
-        break;
-      case "image":
-        newValue = selectedQuestion?.display_type?.image || "";
-        break;
-      case "url":
-        newValue = selectedQuestion?.display_type?.url?.value || "";
-        break;
-      default:
-        newValue = "";
-    }
-
-    setConditionalValues((prevValues) => {
-      return {
-        ...prevValues,
-        [section_name]: {
-          ...(prevValues[section_name] || {}),
-          [page_name]: {
-            ...(prevValues[section_name]?.[page_name] || {}),
-            [label]: newValue,
-          },
-        },
-      };
-    });
-  };
-  const handleNextClick = () => {
-    // Reset previous validation errors before proceeding
-    setValidationErrors({});
+    const handleNextClick = () => {
+        // Reset previous validation errors before proceeding
+        setValidationErrors({});
 
     // Function to validate mandatory fields
     const validateMandatoryFields = () => {
