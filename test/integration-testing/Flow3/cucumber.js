@@ -3,7 +3,6 @@ module.exports = {
         import: ['test'],
         paths: [
             'test/integration-testing/Flow3/1_login.feature',
-            'test/integration-testing/Flow3/61_compliance_date.feature',
             'test/integration-testing/Flow3/51_checkbox.feature',
             'test/integration-testing/Flow3/52_file_uploader.feature',
             'test/integration-testing/Flow3/53_time.feature',
@@ -14,6 +13,8 @@ module.exports = {
             'test/integration-testing/Flow3/58_questionnaire_status.feature',
             'test/integration-testing/Flow3/59_decrease_counter.feature',
             'test/integration-testing/Flow3/60_compliance_text.feature',
+            'test/integration-testing/Flow3/61_compliance_date.feature',
+            'test/integration-testing/Flow3/62_compliance_number.feature',
             'test/integration-testing/Flow2/2_logout.feature'
         ]
     }
