@@ -1729,15 +1729,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                 condition_logic = getReplacedComplianceLogic(condition_logic)
-                // console.log(condition_logic, conditions, 'condition_logic');
-                // if (condition_logic !== '') {
-                //     condition_logic
-                //         .replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                //         .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                //         .replace(/&&/g, 'and') // Replace && with and
-                //         .replace(/||/g, 'or') // Replace || with or
-                //         .replace(/.length/g, '.()')
-                // }
                 if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic?.split(':');

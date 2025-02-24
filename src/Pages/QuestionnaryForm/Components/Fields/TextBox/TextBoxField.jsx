@@ -64,7 +64,14 @@ const TextBoxField = ({
         const newValue = e.target.value;
         const formatError = question?.format_error;
         const format = question?.format;
-        const regex = question?.regular_expression;
+        let regex = question?.regular_expression;
+        if(!regex.startsWith('^')){
+            regex = '^' + regex;
+        }
+        if(!regex.endsWith('$')){
+            regex = regex + '$';
+        }
+        console.log(regex, 'regex')
         setConditionalValues((prevValues) => ({
             ...prevValues,
             [question_id.replace(/-/g, '_')] : newValue,
