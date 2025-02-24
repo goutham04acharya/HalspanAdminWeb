@@ -122,6 +122,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
     const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
+    const notRequiredConditions = ["toUpperCase()", "toLowerCase()", "trim()"].concat(dateTimeMethods).concat(dateMethods).concat(timeMethods).concat(fileMethods)
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -230,10 +231,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const questionId = question?.question_id;
                     const questionName = `${pageName}.${question.question_name}`;
                     if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
-                        // let questions = {
-                        //     id: questionId,
-                        //     option: questionName
-                        // }
                         sectionDetailsArray.push(questionName);
                     } else {
 
@@ -362,7 +359,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
-            // debugger
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -453,7 +449,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        // debugger
         const textarea = textareaRef.current;
 
         if (textarea) {
@@ -514,7 +509,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setShowSectionList(true)
             } else {
                 let fieldType = '';
-                // debugger
                 switch (componentType) {
                     case 'string':
                         fieldType = [
@@ -945,7 +939,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                // return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
                 return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'questionWithUuid.$1');
             };
 
@@ -1297,7 +1290,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         break;
                 }
             }
-            // debugger
             if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
 
@@ -1341,7 +1333,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(result);
             }
         } catch (error) {
-            console.log(error)
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
@@ -1693,6 +1684,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return condition_logic;
     }
 
+    const handleTab = () => {
+        if(!notRequiredConditions.some(element => inputValue.includes(element))) {
+            let parsedLogic = parseLogicExpression(inputValue)
+            setConditions(parsedLogic)
+        }
+    }
+
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
             let condition_logic = buildConditionExpression(conditions, combinedArray)
@@ -1929,7 +1927,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                                         {!isDefaultLogic &&
                                             <div className='flex gap-5 items-end'>
-                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <button onClick={() => {setTab('basic'); handleTab()}} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }
