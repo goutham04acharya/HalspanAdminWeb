@@ -66,28 +66,39 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [activeInputs, setActiveInputs] = useState({});
     // Functions
     // List Functions
-    const fetchLookupList = useCallback(async () => {
-        setLoading(true);
+      const fetchLookupList = useCallback(async () => {
         const params = Object.fromEntries(searchParams);
-        if (lastEvaluatedKeyRef.current) {
-            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+        // Only set loading true if it's the first fetch (no start_key)
+        if (!params.start_key) {
+          setLoading(true);
         }
+        if(searchParams.get('search')) {
+            lastEvaluatedKeyRef.current = null 
+        }
+        if (lastEvaluatedKeyRef.current) {
+          params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+        }
+      
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-            const newItems = response?.data?.data?.items || [];
-            if (!params.start_key) {
-                setLookupList(newItems);
-              } else {
-                setLookupList(prevItems => [...prevItems, ...newItems]);
-              }
-            lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+          const newItems = response?.data?.data?.items || [];
+          // If this is a new fetch (no start_key), replace the list
+          // Otherwise, append to the existing list
+          if (!params.start_key) {
+            setLookupList(newItems);
+          } else {
+            setLookupList(prevItems => [...prevItems, ...newItems]);
+          }
+          
+          lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
-            console.error('Error fetching questionnaires:', error);
+          console.error('Error fetching questionnaires:', error);
+          lastEvaluatedKeyRef.current = null;
         }
-
+      
         setLoading(false);
         setIsFetchingMore(false);
-    }, [searchParams]);
+      }, [searchParams]);
 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
@@ -422,7 +433,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                             setSearchParams={setSearchParams}
                                             setLoading={setLoading}
                                             placeholder='Search by Name'
-                                            setLookupList={setLookupList}
                                         />
                                     </div>
                                 </div>
