@@ -9,7 +9,7 @@ let isMultiChoice = false;
 export const buildLogicExpression = (question_name, condition_logic, value, date, isMultiChoice) => {
     switch (condition_logic) {
         case 'equals':
-            return `${question_name} === "${isMultiChoice ? value.toString() : value}"`;
+            return `${question_name} == "${isMultiChoice ? value.toString() : value}"`;
         case 'not equal to':
             return `${question_name} !== "${isMultiChoice ? value.toString() : value}"`;
         case 'includes':

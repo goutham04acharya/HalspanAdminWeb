@@ -4,6 +4,7 @@ import { setSelectedQuestionId } from "../../../QuestionnaryFormSlice";
 import { useDispatch } from "react-redux";
 import { complianceContentConverter } from "../../../../../../CommonMethods/complianceContentConverter";
 import ErrorMessage from "../../../../../../Components/ErrorMessage/ErrorMessage";
+import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
 function ComplianceFieldSetting({
     complianceLogic,

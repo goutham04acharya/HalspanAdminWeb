@@ -15,6 +15,7 @@ function Pages({ pageIndex,
   // handleAutoSave,
   setSections,
   formStatus,
+  replaceComplianceLogic
 }) {
   const pageRefs = useRef({});
   const dispatch = useDispatch();
@@ -85,6 +86,8 @@ function Pages({ pageIndex,
             index: questionIndex,
             selectedQuestionId: selectedQuestionId,
             handleDeletequestionModal: handleDeletequestionModal,
+            sections: sections,
+            replaceComplianceLogic: replaceComplianceLogic
           }))}
           onMoveEnd={(newList) =>
             handleMoveEnd(newList, sectionIndex, pageIndex)

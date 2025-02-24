@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -57,7 +57,8 @@ const QuestionnaryForm = () => {
 
     }]);
 
-
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
+    const [questionWithUuid, setQuestionWithUuid] = useState({})
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -88,6 +89,7 @@ const QuestionnaryForm = () => {
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
     const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
+    const complianceConditions = useSelector((state) => state.fieldSettingParams.conditions); //newly added for compliance logic conditions
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
@@ -758,6 +760,16 @@ const QuestionnaryForm = () => {
         }
     }
 
+    //for replacing the string
+    function replaceUUIDs(questionWithUUID, replacements) {
+        let updatedString = questionWithUUID;
+        Object.entries(replacements).forEach(([key, value]) => {
+            const regex = new RegExp(value, "g"); // Global replacement
+            updatedString = updatedString.replace(regex, key);
+        });
+
+        return updatedString;
+    }
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
@@ -960,6 +972,15 @@ const QuestionnaryForm = () => {
                             console.error('Page not found for the given pageConditionLogicId');
                         }
                     } else {
+                        // payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                        //     return logic.replace(new RegExp(questionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        // }, payloadString);
+                        payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                            // Escape all special regex characters
+                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                            
+                            return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        }, payloadString);
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
                 } else {
@@ -986,8 +1007,37 @@ const QuestionnaryForm = () => {
 
     }
 
+    //recursive udating the 
+    function recursiveUpdate(obj, oldName, newName) {
+        return obj.map((item) => {
+            let newItem = { ...item }; // Create a shallow copy of the object
+
+            Object.keys(newItem).forEach((key) => {
+                if (key === 'conditions') {
+                    newItem[key] = newItem[key].map((condition) => ({
+                        ...condition, // Create a new condition object
+                        question_name: condition.question_name.includes(oldName)
+                            ? condition.question_name.replace(oldName, newName)
+                            : condition.question_name
+                    }));
+                } else if (key === 'elseIfBlocks') {
+                    newItem[key] = newItem[key].map((conditionsgrp) => ({
+                        ...conditionsgrp, // Create a new conditions group object
+                        conditions: conditionsgrp.conditions.map((condition) => ({
+                            ...condition, // Create a new condition object
+                            question_name: condition.question_name.includes(oldName)
+                                ? condition.question_name.replace(oldName, newName)
+                                : condition.question_name
+                        }))
+                    }));
+                }
+            });
+
+            return newItem;
+        });
+    }
     // Save the section and page name
-    const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
+    const handleSaveSectionName = (value, sectionIndex, pageIndex, noFocus) => {
         // Create a deep copy of sections
         let updatedSections = sections.map((section, idx) => {
             if (idx === sectionIndex) {
@@ -1003,9 +1053,69 @@ const QuestionnaryForm = () => {
 
         // Check if a pageIndex is provided to update a page name or section name
         if (pageIndex !== undefined && pageIndex !== null) {
+            if (noFocus && updatedSections[sectionIndex].pages[pageIndex].page_name !== value) {
+                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
+                let page = updatedSections[sectionIndex].pages[pageIndex].page_name.replace(/ /g, '_');
+                let replaceWord = section + '.' + page;
+                let newWord = section + '.' + value.replace(/ /g, '_');
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
+            }
             updatedSections[sectionIndex].pages[pageIndex].page_name = value; // Safe to update now
             setPageName(value)
+
         } else {
+            if (noFocus && updatedSections[sectionIndex].section_name !== value) {
+                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
+                let replaceWord = section;
+                let newWord = value.replace(/ /g, '_');
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
+            }
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
         }
@@ -1017,6 +1127,18 @@ const QuestionnaryForm = () => {
         // handleSaveSection(updatedSections[sectionIndex]?.section_id, updatedSections);
         // setSectionName(value)
     };
+
+    //function to swap complance logic
+    const replaceComplianceLogic = (oldName, newName) => {
+        setComplianceLogic(prevState => prevState.map(item => {
+            if (item.default_content.includes(oldName)) {
+                const updatedContent = item.default_content.replace(new RegExp(`\\b${oldName}\\b`, 'g'), newName);
+                return { ...item, default_content: updatedContent };
+            }
+            return item;
+        }));
+    }
+
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
         if (!selectedAddQuestion?.pageId) return;
@@ -1872,6 +1994,31 @@ const QuestionnaryForm = () => {
         return array
     }
 
+    const getQuestionDetails = () => {
+        const questionDetailsWithUuid = {};
+
+        sectionDetails?.sections?.forEach((section) => {
+            const sectionName = section.section_name;
+
+            section.pages?.forEach((page) => {
+                const pageName = `${sectionName}.${page.page_name}`;
+
+                page.questions?.forEach((question) => {
+                    const questionId = question?.question_id;
+                    const questionName = `${pageName}.${question.question_name}`;
+                    // if (questionId !== selectedQuestionId && !['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type)) {
+                        questionDetailsWithUuid[questionName] = questionId.replace(/-/g, '_');
+                    // }
+                });
+            });
+        });
+        setQuestionWithUuid(questionDetailsWithUuid);
+    };
+
+    useEffect(() => {
+        getQuestionDetails();
+    }, [sectionDetails, fieldSettingParams, handleTextboxClick]);
+
     return (
         <>
             {pageLoading ? (
@@ -2016,6 +2163,7 @@ const QuestionnaryForm = () => {
                                                                             dropdownOpen={dropdownOpen}
                                                                             setPageConditionLogicId={setPageConditionLogicId}
                                                                             pageConditionLogicId={setPageConditionLogicId}
+                                                                            replaceComplianceLogic={replaceComplianceLogic}
                                                                         />
                                                                     </li>
                                                                 )}
@@ -2028,9 +2176,9 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceClick) && (
+                                    {(complianceClick && complianceLogic.length > 0) && (
                                         <div>
-                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} questionWithUuid={questionWithUuid} />
                                         </div>
                                     )}
                                 </div>
@@ -2044,7 +2192,7 @@ const QuestionnaryForm = () => {
                                     dispatch(setSelectedComponent(false))
                                 }}
                                 data-testid='cancel-qsn'>
-                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle"/>
+                                <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
                             <button data-testid="preview" className='w-1/3 py-[17px] px-[29px] flex items-center font-semibold text-base text-[#2B333B] border-l border-r border-[#EFF1F8] bg-[#FFFFFF] hover:bg-[#EFF1F8]' onClick={() => {
@@ -2065,10 +2213,18 @@ const QuestionnaryForm = () => {
                                 }}
                             />
                         </div>
+                        {console.log(selectedComponent, 'selectedComponent')}
                         <div>
-                            {selectedComponent ? (
+                            {selectedComponent === null && !complianceClick ? (
+                                <AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                    formStatus={formStatus}
+                                    disableButtons={handleDisableButtons()}
+                                />
+                            ) : (sideComponentMap[selectedComponent] && selectedComponent !== 'compliancelogic') ? (
                                 React.createElement(
-                                    sideComponentMap[selectedComponent],  // Dynamically select the component
+                                    sideComponentMap[selectedComponent],
                                     {
                                         handleInputChange: handleInputChange,
                                         formParameters: fieldSettingParams[selectedQuestionId],
@@ -2098,17 +2254,32 @@ const QuestionnaryForm = () => {
                                         scrollToPage: scrollToPage,
                                         formStatus: formStatus,
                                         setEditorCheck: setEditorCheck,
+                                        questionWithUuid:questionWithUuid,
                                     }
                                 )
-                            ) : (
-                                <AddFields
-                                    buttons={Fieldsneeded}
-                                    handleClick={handleClick}
-                                    formStatus={formStatus}
-                                    disableButtons={handleDisableButtons()}
-                                />
-                            )}
-
+                                ) : selectedComponent === 'compliancelogic' && complianceClick ?
+                                (
+                                    React.createElement(
+                                        sideComponentMap['compliancelogic'],  // Dynamically select the component
+                                        {
+                                            complianceLogic: complianceLogic,
+                                            setComplianceLogic: setComplianceLogic,
+                                            setCompliancestate: setCompliancestate,
+                                            formStatus: formStatus,
+                                            validationErrors: validationErrors,
+                                            setValidationErrors: setValidationErrors,
+                                            questionWithUuid:questionWithUuid,
+                                        }
+                                    )
+                                ) : (
+                                    <AddFields
+                                        buttons={Fieldsneeded}
+                                        handleClick={handleClick}
+                                        formStatus={formStatus}
+                                        disableButtons={handleDisableButtons()}
+                                    />
+                                )
+                            }
                         </div>
                     </div>
                 </div >
@@ -2237,6 +2408,7 @@ const QuestionnaryForm = () => {
             {
                 (conditionalLogic || isDefaultLogic || complianceState || sectionConditionLogicId || pageConditionLogicId) && (
                     <ConditionalLogic
+                        questionWithUuid={questionWithUuid}
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
                         handleSaveSection={handleSaveSection}

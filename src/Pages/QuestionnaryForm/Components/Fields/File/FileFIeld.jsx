@@ -58,61 +58,14 @@ function FileField({
             }));
         }
 
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newFilesList
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: newFilesList
         }));
         setIsModified(!isModified);
     };
 
     const handleFileRemove = (newFiles, fileNameToRemove) => {
-        // setFileState((prev) => {
-        //     // Re-check if the minimum number of files is still met after removal
-        //     if (newFiles.length >= (question?.field_range?.min || 0)) {
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: true
-        //         }));
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: ''
-        //         }));
-        //     }else{
-        //         setValue((prev) => ({
-        //             ...prev,
-        //             [question?.question_id]: false
-        //         }));
-        //         setValidationErrors((prevErrors) => ({
-        //             ...prevErrors,
-        //             preview_filefield: 'Minimum file requirement not met'
-        //         }));
-        //     }
-
-        //     // Update conditional values after file removal
-        //     const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-        //     setConditionalValues((prevValues) => ({
-        //         ...prevValues,
-        //         [section_name]: {
-        //             ...prevValues[section_name],
-        //             [page_name]: {
-        //                 ...prevValues[section_name]?.[page_name],
-        //                 [label]: newFiles
-        //             }
-        //         }
-        //     }));
-
-        //     return {
-        //         ...prev,
-        //         [question?.question_id]: newFiles
-        //     };
-        // });
         setFileState((prev) => ({
             ...prev,
             [question?.question_id]: newFiles
@@ -138,16 +91,9 @@ function FileField({
         }
 
         // Update conditional values after file removal
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newFiles
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: newFiles
         }));
         setIsModified(!isModified);
     };
