@@ -1210,16 +1210,22 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let REASON = ''
             let GRADE = '';
             const questionValues = initializeQuestionValues(questionWithUuid);
-            try {
-                evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
-                    let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
-                    let replacement = `${sanitizedUuid}`;
-                    return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
-                }, evalInputValue);
+            console.log(questionValues, "questionValues")
+            // evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+            //     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
+            //     let replacement = `${sanitizedUuid}`;
+            //     return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
+            // }, evalInputValue);
+            evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, evalInputValue);
 
-                // **Fix: Remove unwanted `questionWithUuid.` reference**
-                evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
-                const wrappedEval = `(function(questionValues) { 
+            // **Fix: Remove unwanted `questionWithUuid.` reference**
+            // evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
+            console.log(evalInputValue)
+            const wrappedEval = `(function(questionValues) { 
                                         try {
                                             return ${evalInputValue};
                                         } catch (error) {
@@ -1227,12 +1233,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-
-                const result = eval(wrappedEval);
-            } catch (error) {
-                console.error("Unexpected error:", error);
-            }
-
+            console.log(wrappedEval, 'wrappedEval')
+            const result = eval(wrappedEval);
+            console.log(result, 'result')
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -1264,7 +1267,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             setError('');  // No error, valid number
                         }
                         break;
-                        default:
+                    default:
                         break;
                 }
             } else if (complianceState) {
@@ -1321,8 +1324,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
+                    handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
+                    return;
                 }
-                handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
+                
+                evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
+                console.log(evalInputValue, 'at end')
+                handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
                 handleError('');  // Clear the error since the result is valid
@@ -1658,34 +1666,34 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
     function getReplacedComplianceLogic(conditions) {
         let condition_logic = conditions; // Assuming this is your input string
-        
+
         // Step 1: Replace ternary operator pattern
         condition_logic = condition_logic.replace(/\)\s*\?\s*\(/g, ') then (');
-        
+
         // Step 2: Replace && with "and"
         condition_logic = condition_logic.replace(/&&/g, 'and');
-        
+
         // Step 3: Replace || with "or"
         condition_logic = condition_logic.replace(/\|\|/g, 'or');
-        
+
         // Step 4: Replace .length with .()
         condition_logic = condition_logic.replace(/\.length/g, '.()');
-        
+
         // Step 5: Replace ACTIONS.push() with ACTIONS =
         condition_logic = condition_logic.replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, "ACTIONS = '$1'");
-        
+
         // Step 6: Handle if-else conversion from ternary
         if (condition_logic.includes(':')) {
             const parts = condition_logic.split(':');
             const lastPart = parts.pop();
             condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
         }
-        
+
         return condition_logic;
     }
 
     const handleTab = () => {
-        if(!notRequiredConditions.some(element => inputValue.includes(element))) {
+        if (!notRequiredConditions.some(element => inputValue.includes(element))) {
             let parsedLogic = parseLogicExpression(inputValue)
             setConditions(parsedLogic)
         }
@@ -1750,7 +1758,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 isAdvanceEditorCompliance: false
             }));
         }
-        
+
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
@@ -1767,7 +1775,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 );
             });
         }
-        
+
         let condition_logic;
         if (!complianceState) {
             try {
@@ -1785,7 +1793,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else if (selectedQuestionId) {
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
-        if(!complianceState){
+        if (!complianceState) {
             condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                 // Escape all special regex characters
                 let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
@@ -1927,7 +1935,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                                         {!isDefaultLogic &&
                                             <div className='flex gap-5 items-end'>
-                                                <button onClick={() => {setTab('basic'); handleTab()}} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <button onClick={() => { setTab('basic'); handleTab() }} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }
