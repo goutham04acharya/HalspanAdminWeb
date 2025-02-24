@@ -972,7 +972,7 @@ const QuestionnaryForm = () => {
                         // }, payloadString);
                         payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                             // Escape all special regex characters
-                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
                             
                             return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
                         }, payloadString);
@@ -1908,7 +1908,7 @@ const QuestionnaryForm = () => {
         });
         setQuestionWithUuid(questionDetailsWithUuid);
     };
-
+    console.log(questionWithUuid,'brooooo')
     useEffect(() => {
         getQuestionDetails();
     }, [sections, fieldSettingParams, handleTextboxClick]);
