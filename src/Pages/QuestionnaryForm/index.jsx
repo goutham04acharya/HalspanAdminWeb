@@ -446,15 +446,19 @@ const QuestionnaryForm = () => {
     const fetchComplianceLogic = async () => {
         try {
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
-            if (response?.data?.data[0]?.editorCheck) {
-                setEditorCheck(response?.data?.data[0]?.editorCheck[0])
-            }
-            if (response?.data?.data[0]?.logic) {
-                // setConditions(response?.data?.data[0]?.logic);
-                dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+            if(!response?.error) {
+                if (response?.data?.data[0]?.editorCheck) {
+                    setEditorCheck(response?.data?.data[0]?.editorCheck[0])
+                }
+                if (response?.data?.data[0]?.logic) {
+                    // setConditions(response?.data?.data[0]?.logic);
+                    dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+                } else {
+                    // setConditions(complianceInitialState);
+                    dispatch(setComplianceLogicCondition(complianceInitialState));
+                }
             } else {
-                // setConditions(complianceInitialState);
-                dispatch(setComplianceLogicCondition(complianceInitialState));
+                navigate('/404')
             }
         } catch {
             console.log('error while getting ')
