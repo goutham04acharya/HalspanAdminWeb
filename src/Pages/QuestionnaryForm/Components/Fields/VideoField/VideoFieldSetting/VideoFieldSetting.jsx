@@ -1,12 +1,13 @@
-import React from 'react'
-import { useDispatch } from 'react-redux';
-import CommonComponents from '../../../CommonComponents/CommonComponents';
-import InputField from '../../../../../../Components/InputField/InputField';
-import OptionsComponent from '../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent';
-import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
-import { setNewComponent } from '../../fieldSettingParamsSlice';
+import React from "react";
+import { useDispatch } from "react-redux";
+import CommonComponents from "../../../CommonComponents/CommonComponents";
+import InputField from "../../../../../../Components/InputField/InputField";
+import OptionsComponent from "../../TextBox/TextFieldSetting/OptionalComponent/OptionalComponent";
+import ErrorMessage from "../../../../../../Components/ErrorMessage/ErrorMessage";
+import { setNewComponent } from "../../fieldSettingParamsSlice";
 
-function VideoFieldSetting({ handleInputChange,
+function VideoFieldSetting({
+    handleInputChange,
     formParameters,
     handleBlur,
     handleRadiobtn,
@@ -20,19 +21,24 @@ function VideoFieldSetting({ handleInputChange,
     const dispatch = useDispatch();
     return (
         <>
-            <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
-                <p className='font-semibold text-[#2B333B] text-[22px]'>Field settings</p>
-                <div className='mt-[14px] h-customh9 overflow-auto default-sidebar'>
+            <div
+                data-testid="field-settings"
+                className="py-[34px] px-[32px] h-customh10"
+            >
+                <p className="font-semibold text-[#2B333B] text-[22px]">
+                    Field settings
+                </p>
+                <div className="mt-[14px] h-customh9 overflow-auto default-sidebar">
                     <CommonComponents
-                        labelID='label'
-                        labelName='Label'
-                        labelPlaceholder='Question 1'
-                        helpTextId='Help Text'
-                        helpText='Help Text'
-                        helpTextPlaceholder='Enter help text'
-                        placeholderContentId='placeholder'
-                        placeholder='Placeholder Content'
-                        placeholderContent='Text displayed in the field'
+                        labelID="label"
+                        labelName="Label"
+                        labelPlaceholder="Question 1"
+                        helpTextId="Help Text"
+                        helpText="Help Text"
+                        helpTextPlaceholder="Enter help text"
+                        placeholderContentId="placeholder"
+                        placeholder="Placeholder Content"
+                        placeholderContent="Text displayed in the field"
                         handleInputChange={handleInputChange}
                         formParameters={formParameters}
                         handleBlur={handleBlur}
@@ -41,101 +47,119 @@ function VideoFieldSetting({ handleInputChange,
                         validationErrors={validationErrors}
                         selectedQuestionId={selectedQuestionId}
                     />
-                    <div className='mt-7'>
+                    <div className="mt-7">
                         <InputField
-                            autoComplete='off'
-                            label='File Size'
-                            optional='(System Max 10MB. Use whole number)'
-                            id='fileSize'
-                            type='text'
+                            autoComplete="off"
+                            label="File Size"
+                            optional="(System Max 10MB. Use whole number)"
+                            id="fileSize"
+                            type="text"
                             value={fieldSettingParameters?.fileSize}
-                            className='w-full mt-2.5'
+                            className="w-full mt-2.5"
                             formStatus={formStatus}
-                            labelStyle=''
-                            placeholder='e.g. 5'
-                            testId='file-size'
-                            htmlFor='fileSize'
+                            labelStyle=""
+                            placeholder="e.g. 5"
+                            testId="file-size"
+                            htmlFor="fileSize"
                             maxLength={2}
-                            handleChange={(e) => handleInputChange(e)} />
+                            handleChange={(e) => handleInputChange(e)}
+                        />
                     </div>
-                    <div className='mt-7'>
-                        <p className='font-semibold text-base text-[#2B333B]'>Number of Videos</p>
-                        <div className='flex items-center mt-3'>
+                    <div className="mt-7">
+                        <p className="font-semibold text-base text-[#2B333B]">
+                            Number of Videos
+                        </p>
+                        <div className="flex items-center mt-3">
                             <InputField
-                                autoComplete='off'
-                                label=''
-                                id='min'
-                                type='text'
+                                autoComplete="off"
+                                label=""
+                                id="min"
+                                type="text"
                                 value={fieldSettingParameters?.min}
-                                className='w-full'
+                                className="w-full"
                                 formStatus={formStatus}
-                                labelStyle=''
-                                placeholder='Minimum'
-                                testId='minChar'
-                                htmlFor='min'
+                                labelStyle=""
+                                placeholder="Minimum"
+                                testId="minChar"
+                                htmlFor="min"
                                 maxLength={10}
-                                handleChange={(e) => handleInputChange(e)} />
-                            <p className='mx-3 font-normal text-base text-[#2B333B]'> to</p>
+                                handleChange={(e) => handleInputChange(e)}
+                            />
+                            <p className="mx-3 font-normal text-base text-[#2B333B]"> to</p>
                             <InputField
-                                autoComplete='off'
-                                label=''
-                                id='max'
-                                type='text'
+                                autoComplete="off"
+                                label=""
+                                id="max"
+                                type="text"
                                 value={fieldSettingParameters?.max}
-                                className='w-full'
+                                className="w-full"
                                 formStatus={formStatus}
-                                labelStyle=''
-                                placeholder='Maximum'
-                                testId='maxChar'
-                                htmlFor='max'
+                                labelStyle=""
+                                placeholder="Maximum"
+                                testId="maxChar"
+                                htmlFor="max"
                                 maxLength={10}
-                                handleChange={(e) => handleInputChange(e)} />
+                                handleChange={(e) => handleInputChange(e)}
+                            />
                         </div>
                         {validationErrors?.minMax && (
                             <ErrorMessage error={validationErrors.minMax} />
                         )}
                     </div>
-                    <OptionsComponent selectedQuestionId={selectedQuestionId} formStatus={formStatus} />
-                    <div className='mt-7'>
+                    <OptionsComponent
+                        selectedQuestionId={selectedQuestionId}
+                        formStatus={formStatus}
+                    />
+                    <div className="mt-7">
                         <InputField
-                            autoComplete='off'
-                            label='Admin Field Notes'
-                            id='admin_field_notes'
-                            type='text'
+                            autoComplete="off"
+                            label="Admin Field Notes"
+                            id="admin_field_notes"
+                            type="text"
                             value={fieldSettingParameters?.admin_field_notes}
-                            className='w-full mt-2.5'
-                            labelStyle='font-semibold text-base text-[#2B333B]'
-                            placeholder='Notes'
-                            testId='Notes'
-                            htmlFor='admin_field_notes'
+                            className="w-full mt-2.5"
+                            labelStyle="font-semibold text-base text-[#2B333B]"
+                            placeholder="Notes"
+                            testId="Notes"
+                            htmlFor="admin_field_notes"
                             maxLength={500}
                             handleChange={handleInputChange}
                             handleBlur={handleBlur}
                             formStatus={formStatus}
                         />
                     </div>
-                    <div className='mx-auto mt-7 flex flex-col items-center w-full'>
-                        <div className='flex items-center w-full'>
+                    <div className="mx-auto mt-7 flex flex-col items-center w-full">
+                        <div className="flex items-center w-full">
                             <button
-                                type='button'
+                                type="button"
                                 data-testid="add-conditional-logic"
-                                className={`mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? 'px-[40px] w-[50%] ' : 'px-[52px] w-[80%]'}`}
-                                onClick={formStatus === 'Draft' ? () => setConditionalLogic(true) : null}  // Use arrow function
+                                className={`mx-auto py-[13px] ${formStatus === "Draft" ? "" : "cursor-not-allowed"} bg-black rounded font-semibold text-[#FFFFFF] text-base ${fieldSettingParameters?.conditional_logic ? "px-[40px] w-[50%] " : "px-[52px] w-[80%]"}`}
+                                onClick={
+                                    formStatus === "Draft"
+                                        ? () => setConditionalLogic(true)
+                                        : null
+                                } // Use arrow function
                             >
                                 Add Conditional Logic
                             </button>
-                            {fieldSettingParameters?.conditional_logic &&
+                            {fieldSettingParameters?.conditional_logic && (
                                 <button
-                                    type='button'
+                                    type="button"
                                     data-testid="remove-conditional-logic"
-                                    className={`w-[50%] mx-auto py-[13px] ${formStatus === 'Draft' ? '' : 'cursor-not-allowed'} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
+                                    className={`w-[50%] mx-auto py-[13px] ${formStatus === "Draft" ? "" : "cursor-not-allowed"} bg-white border border-[#000000] rounded font-semibold text-[#000000] text-base px-[40px] ml-5`}
                                     onClick={() => {
-                                        dispatch(setNewComponent({ id: 'conditional_logic', value: '', questionId: selectedQuestionId }))
+                                        dispatch(
+                                            setNewComponent({
+                                                id: "conditional_logic",
+                                                value: "",
+                                                questionId: selectedQuestionId,
+                                            }),
+                                        );
                                         setEditorCheck((prev) => {
                                             return {
                                                 ...prev,
                                                 conditonalEditor: prev.conditonalEditor.filter(
-                                                    (item) => item.questionId !== selectedQuestionId
+                                                    (item) => item.questionId !== selectedQuestionId,
                                                 ),
                                             };
                                         });
@@ -143,16 +167,16 @@ function VideoFieldSetting({ handleInputChange,
                                 >
                                     Remove Conditional Logic
                                 </button>
-                            }
+                            )}
                         </div>
-                        {fieldSettingParameters?.conditional_logic &&
-                            <p className='text-center italic mt-1'>Conditional Logic Added</p>
-                        }
+                        {fieldSettingParameters?.conditional_logic && (
+                            <p className="text-center italic mt-1">Conditional Logic Added</p>
+                        )}
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default VideoFieldSetting
+export default VideoFieldSetting;

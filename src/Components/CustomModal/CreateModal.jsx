@@ -75,9 +75,9 @@ const CreateModal = ({
         if (choicesLength <= 4) return "h-fit ";
         if (choicesLength <= 6) return "h-fit ";
         if (choicesLength < 10) return "h-fit ";
-        return "h-fit";
         // if (choicesLength < 10) return "h-[calc(100vh-580px)] ";
-        // return "h-[calc(100vh-480px)]";
+        // return "h-fit";
+        return "h-[calc(100vh-480px)]";
     };
     const getChoiceShimmerCol = () => {
         if (choicesLength <= 4) return 2;
@@ -145,15 +145,21 @@ const CreateModal = ({
                             <div className="flex w-full mt-5 mb-1.5">
                                 <div className="flex items-center w-1/3">
                                     <h1 className="font-[600] text-[#2B333B] w-[30%] ms-2">Id</h1>
-                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">Value</h1>
+                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">
+                                        Value
+                                    </h1>
                                 </div>
                                 <div className="flex items-center w-1/3">
                                     <h1 className="font-[600] text-[#2B333B] w-[30%] ms-2">Id</h1>
-                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">Value</h1>
+                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">
+                                        Value
+                                    </h1>
                                 </div>
                                 <div className="flex items-center w-1/3">
                                     <h1 className="font-[600] text-[#2B333B] w-[30%] ms-2">Id</h1>
-                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">Value</h1>
+                                    <h1 className="font-[600] text-[#2B333B] w-[40%] ms-2">
+                                        Value
+                                    </h1>
                                 </div>
                             </div>
                         )}

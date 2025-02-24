@@ -8,7 +8,7 @@ import objectToQueryString from '../../../../../../../CommonMethods/ObjectToQuer
 import ErrorMessage from '../../../../../../../Components/ErrorMessage/ErrorMessage';
 import { BeatLoader } from 'react-spinners';
 
-function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus, smallLoader}) {
+function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus, smallLoader }) {
 
     const dispatch = useDispatch();
     const { getAPI } = useApi();
@@ -25,7 +25,10 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [questionList, setQuestionList] = useState([]);
     const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
     const [showError, setShowError] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingQuestionnaires, setIsLoadingQuestionnaires] = useState(false);
+    const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
+    const [isLoadingAsset, setIsLoadingAsset] = useState(false)
+    const [attributes, setAttributes] = useState([])
 
     const getOptions = (componentType) => {
         switch (componentType) {
@@ -44,12 +47,28 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed'];
         }
     };
-    
-    const attributes = [
-        { value: 'Height', label: 'Height' },
-        { value: 'Width', label: 'Width' },
-        { value: 'Finish', label: 'Finish' },
-    ];
+
+    useEffect(() => {
+        const getAssetData = async () => {
+            setIsLoadingAsset(true)
+            try {
+                let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types/${assetType?.asset_type}/attributes`, null, true);
+                if (response?.data) {
+                    setAttributes(response.data?.results
+                        ?.map(item => ({
+                            value: item.key,
+                            label: item.label
+                        }))
+                    );
+                }
+                setIsLoadingAsset(false)
+            } catch (error) {
+                console.error("Error fetching asset data:", error);
+                setIsLoadingAsset(false)
+            }
+        };
+        getAssetData();
+    }, []);
 
     const serviceRecordOptions = [
         { value: 'FABRICATION', label: 'FABRICATION' },
@@ -63,23 +82,26 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             ...assetType,
             services_type
         }
+        setIsLoadingQuestionnaires(true);
         try {
             const response = await getAPI(`questionnaires${objectToQueryString(query)}`);
             setQuestionnairesList(response?.data?.data?.items);
+            setIsLoadingQuestionnaires(false);
         } catch {
             console.error('Error fetching question list:', error);
-
+            setIsLoadingQuestionnaires(false);
         }
     };
 
     const fetchQuestionList = async (selectedQuestionnaireId) => {
-        setIsLoading(true);
         try {
+            setIsLoadingQuestion(true);
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
-            setIsLoading(false); // Start loading
+            setIsLoadingQuestion(false);
         } catch (error) {
             console.error('Error fetching question list:', error);
+            setIsLoadingQuestion(false);
         }
     }
 
@@ -102,12 +124,12 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         if (!questionList || !componentType) {
             return [];
         }
-    
+
         const filteredList = questionList.filter((item) => item.component_type === componentType);
-    
+
         return filteredList.map((item) => {
             let componentTypeLabel;
-    
+
             switch (componentType) {
                 case "textboxfield":
                     componentTypeLabel = "Text-Box Field";
@@ -154,14 +176,14 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 default:
                     componentTypeLabel = "Unknown Component";
             }
-    
+
             return {
                 label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentTypeLabel})`,
                 value: item.question_id,
             };
         });
     };
-    
+
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
@@ -299,24 +321,29 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                         </p>
                     </div>
                     {activeTab === 'attributeData' && (
-                        <InfinateDropdown
-                            id='format'
-                            top='25px'
-                            placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='select-attribute'
-                            labeltestID='attribute'
-                            selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
-                            handleOptionClick={handleAttributeClick}
-                            isDropdownOpen={isAttributeDropdownOpen}
-                            setDropdownOpen={(isOpen) => {
-                                if (formStatus === 'Draft') {
-                                    handleDropdownState(isOpen ? 'attributeData' : null);
-                                }
-                            }}
-                            options={attributes}
-                            formStatus={formStatus}
-                        />
+                        isLoadingAsset ?
+                            <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} />
+                            :
+                            (
+                                <InfinateDropdown
+                                    id='format'
+                                    top='25px'
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                    testID='select-attribute'
+                                    labeltestID='attribute'
+                                    selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
+                                    handleOptionClick={handleAttributeClick}
+                                    isDropdownOpen={isAttributeDropdownOpen}
+                                    setDropdownOpen={(isOpen) => {
+                                        if (formStatus === 'Draft') {
+                                            handleDropdownState(isOpen ? 'attributeData' : null);
+                                        }
+                                    }}
+                                    options={attributes}
+                                    formStatus={formStatus}
+                                />
+                            )
                     )}
                     {activeTab === 'serviceRecord' && (
                         <InfinateDropdown
@@ -343,6 +370,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                     )}
                     {activeTab !== 'attributeData' && (
                         fieldSettingParameters.service_record_lfp ?
+                        isLoadingQuestionnaires ? (
+                            <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
+                        ) : 
                             (<InfinateDropdown
                                 label='Questionnaire List'
                                 mainDivStyle='mt-3'
@@ -371,7 +401,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                     )}
                     {activeTab !== 'attributeData' && (
                         (fieldSettingParameters.questionnaire_name_lfp && handleQuesList(questionList, fieldSettingParameters?.componentType)?.length !== 0) ?
-                            isLoading ? (
+                            isLoadingQuestion ? (
                                 <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
                             ) : (
                                 <InfinateDropdown
@@ -396,7 +426,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                     options={handleQuesList(questionList, fieldSettingParameters?.componentType)} // Filtered list
                                     formStatus={formStatus}
                                 />
-                            ) : (fieldSettingParameters?.questionnaire_name_lfp &&(handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0) && activeTab !== 'attributeData') ? (
+                            ) : (fieldSettingParameters?.questionnaire_name_lfp && (handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0) && activeTab !== 'attributeData') ? (
                                 <ErrorMessage error={'No questions available for the selected questionnaire'} />
                             ) : null
                     )}
