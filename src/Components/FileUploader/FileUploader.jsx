@@ -95,7 +95,7 @@ const FileUploader = ({ fileType, fileSize, min, max, setValidationErrors, handl
                     disabled={files.length >= max && files.length > 0}
                 />
                 <span data-testid='file-count' className={`text-[12px] my-2 items-center justify-center flex px-3 ${files.length >= max && files.length > 0 ? 'disabled' : ''}`}>
-                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add File ({max - files.length || max})
+                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add File ({max - files.length})
                 </span>
             </label>
             {error && <p className='text-red-500 text-sm'>{error}</p>}
