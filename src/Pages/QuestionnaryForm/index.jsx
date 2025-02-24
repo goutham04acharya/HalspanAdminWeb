@@ -973,7 +973,7 @@ const QuestionnaryForm = () => {
                         // }, payloadString);
                         payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                             // Escape all special regex characters
-                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
                             
                             return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
                         }, payloadString);
@@ -1993,7 +1993,7 @@ const QuestionnaryForm = () => {
     const getQuestionDetails = () => {
         const questionDetailsWithUuid = {};
 
-        sections?.forEach((section) => {
+        sectionDetails?.sections?.forEach((section) => {
             const sectionName = section.section_name;
 
             section.pages?.forEach((page) => {
@@ -2013,7 +2013,7 @@ const QuestionnaryForm = () => {
 
     useEffect(() => {
         getQuestionDetails();
-    }, [sections, fieldSettingParams, handleTextboxClick]);
+    }, [sectionDetails, fieldSettingParams, handleTextboxClick]);
 
     return (
         <>
@@ -2174,7 +2174,7 @@ const QuestionnaryForm = () => {
                                     </div>
                                     {(complianceClick && complianceLogic.length > 0) && (
                                         <div>
-                                            <ComplanceLogicField questionWithUuid={questionWithUuid} setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} questionWithUuid={questionWithUuid} />
                                         </div>
                                     )}
                                 </div>
@@ -2250,6 +2250,7 @@ const QuestionnaryForm = () => {
                                         scrollToPage: scrollToPage,
                                         formStatus: formStatus,
                                         setEditorCheck: setEditorCheck,
+                                        questionWithUuid:questionWithUuid,
                                     }
                                 )
                                 ) : selectedComponent === 'compliancelogic' && complianceClick ?
@@ -2263,7 +2264,7 @@ const QuestionnaryForm = () => {
                                             formStatus: formStatus,
                                             validationErrors: validationErrors,
                                             setValidationErrors: setValidationErrors,
-                                            questionWithUUID: questionWithUuid
+                                            questionWithUuid:questionWithUuid,
                                         }
                                     )
                                 ) : (

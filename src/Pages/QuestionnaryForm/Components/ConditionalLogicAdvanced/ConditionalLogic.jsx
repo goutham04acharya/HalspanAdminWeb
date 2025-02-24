@@ -687,7 +687,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
                 // const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                const matches = condition.match(/^\s*(!?)\s*([\w\s.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                // const matches = condition.match(/^\s*(!?)\s*([\w\s.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/^\s*(!?)\s*([^\n]+?)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -1822,11 +1824,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
         if(!complianceState){
-
             condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                 // Escape all special regex characters
-                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-                
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
                 return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
             }, condition_logic);
         }
@@ -1850,7 +1850,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         });
     }
     function escapeRegex(str) {
-        return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return str.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
     }
     function replaceUUIDs(questionWithUUID, replacements) {
         let updatedString = questionWithUUID;
