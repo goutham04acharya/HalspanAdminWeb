@@ -69,10 +69,10 @@ function PreviewModal({
   const [isModified, setIsModified] = useState(false);
   const previousSectionsRef = useRef();
   const fieldStatus = useSelector(
-    (state) => state?.defaultContent?.fieldStatus
+    (state) => state?.defaultContent?.fieldStatus,
   );
   const questionValue = useSelector(
-    (state) => state?.questionValues?.questions
+    (state) => state?.questionValues?.questions,
   );
   // const fieldValues = useSelector(state => state?.fields?.fieldValues);
   const [precomputedNavigation, setPrecomputedNavigation] = useState({
@@ -96,29 +96,29 @@ function PreviewModal({
         const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
         result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-                page.questions.forEach((question, questionIndex) => {
-                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
-                });
-            });
+        page.questions.forEach((question, questionIndex) => {
+          const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+          result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
         });
-        return result;
-    };
+      });
+    });
+    return result;
+  };
 
-    function getFilteredQuestions(data, filterKey, filterValue) {
-        let result = [];
-        data.sections.forEach(section => {
-            section.pages.forEach(page => {
-                page.questions.forEach(question => {
-                    if (question[filterKey] === filterValue) {
-                        let formattedName = `${section.section_name.replace(/\s+/g, '_')}.${page.page_name.replace(/\s+/g, '_')}.${question.question_name.replace(/\s+/g, '_')}`;
-                        result.push(formattedName);
-                    }
-                });
-            });
+  function getFilteredQuestions(data, filterKey, filterValue) {
+    let result = [];
+    data.sections.forEach((section) => {
+      section.pages.forEach((page) => {
+        page.questions.forEach((question) => {
+          if (question[filterKey] === filterValue) {
+            let formattedName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
+            result.push(formattedName);
+          }
         });
-        return result;
-    }
+      });
+    });
+    return result;
+  }
 
   const updateConditionalValues = async (data) => {
     const result = await handleConditionalLogic(data);
@@ -133,29 +133,29 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-                setPreviewNavigation((prev) => ({
-                    ...prev,
-                    total_pages: sectionDetails?.sections.reduce(
-                        (total, section) => total + section.pages.length,
-                        0,
-                    ),
-                }));
-                updateConditionalValues(sectionDetails?.sections);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSections();
-    }, [questionnaire_id, version_number]);
-    function isSameDate(question_id, setDate, value) {
-        // Convert the epoch values (in seconds) to Date objects
-        const selectedDate = new Date(question_id * 1000);
+        setPreviewNavigation((prev) => ({
+          ...prev,
+          total_pages: sectionDetails?.sections.reduce(
+            (total, section) => total + section.pages.length,
+            0,
+          ),
+        }));
+        updateConditionalValues(sectionDetails?.sections);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSections();
+  }, [questionnaire_id, version_number]);
+  function isSameDate(question_id, setDate, value) {
+    // Convert the epoch values (in seconds) to Date objects
+    const selectedDate = new Date(question_id * 1000);
 
-        // Parse the dd/mm/yyyy format to Date object
-        const [day, month, year] = setDate.split('/');
-        const setDateObj = new Date(year, month - 1, day);
+    // Parse the dd/mm/yyyy format to Date object
+    const [day, month, year] = setDate.split("/");
+    const setDateObj = new Date(year, month - 1, day);
 
     // Add the specified number of days (value) to the set date
     setDateObj.setDate(setDateObj.getDate() + value);
@@ -167,7 +167,6 @@ function PreviewModal({
     );
   }
   const evaluateComplianceLogic = () => {
-
     let results = [];
 
     function transformTernaryExpression(input) {
@@ -212,7 +211,7 @@ function PreviewModal({
           /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
           (match, operator, day) => {
             return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`;
-          }
+          },
         );
       }
 
@@ -222,7 +221,7 @@ function PreviewModal({
           // Convert new Date() to epoch seconds
           logic = logic?.replace(
             /new Date\((.*?)\)/g,
-            `new Date().toLocaleDateString()`
+            `new Date().toLocaleDateString()`,
           );
           eval(transformTernaryExpression(logic));
         } catch (error) {
@@ -231,39 +230,47 @@ function PreviewModal({
         }
       }
 
-            if ((logic?.includes("===") || logic?.includes("!==")) && /(===|!==)\s*""[^""]*""/.test(logic)) {
-                logic = logic.replace(
-                    /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))?)\s*(===|!==)\s*""([^""]*)""/g,
-                    (match, path, operator, value) => {
-                        let modifiedPath = path;
+      if (
+        (logic?.includes("===") || logic?.includes("!==")) &&
+        /(===|!==)\s*""[^""]*""/.test(logic)
+      ) {
+        logic = logic.replace(
+          /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*""([^""]*)""/g,
+          (match, path, operator, value) => {
+            let modifiedPath = path;
 
-                        // Handle method calls separately
-                        let methodCall = '';
-                        if (path.match(/\.(toUpperCase|toLowerCase|trim)\(\)$/)) {
-                            methodCall = path.match(/\.(toUpperCase|toLowerCase|trim)\(\)$/)[0];
-                            path = path.replace(/\.(toUpperCase|toLowerCase|trim)\(\)$/, '');
-                        }
-
-                        // Convert last key to bracket notation
-                        let parts = path.split(".");
-                        if (parts.length > 1) {
-                            let lastKey = parts.pop();
-                            modifiedPath = `${parts.join(".")}["${lastKey}"]`;
-                        }
-                        try {
-                            let questionArray = eval(modifiedPath);
-                            if (Array.isArray(questionArray) && questionArray.length === 1) {
-                                // Add back method call if it existed
-                                return `${path}[0]${methodCall} ${operator} "${value}"`;
-                            } else {
-                                return `${path}[-1] ${operator} "${value}"`;
-                            }
-                        } catch (e) {
-                            return match;
-                        }
-                    }
-                );
+            // Handle method calls separately
+            let methodCall = "";
+            if (path.match(/(\.(toUpperCase|toLowerCase|trim)\(\))+$/)) {
+              methodCall = path.match(
+                /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+              )[0];
+              path = path.replace(
+                /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                "",
+              );
             }
+
+            // Convert last key to bracket notation
+            let parts = path.split(".");
+            if (parts.length > 1) {
+              let lastKey = parts.pop();
+              modifiedPath = `${parts.join(".")}["${lastKey}"]`;
+            }
+            try {
+              let questionArray = eval(modifiedPath);
+              if (Array.isArray(questionArray) && questionArray.length === 1) {
+                // Add back method call if it existed
+                return `${path}[0]${methodCall} ${operator} "${value}"`;
+              } else {
+                return `${path}[-1] ${operator} "${value}"`;
+              }
+            } catch (e) {
+              return match;
+            }
+          },
+        );
+      }
 
       // converting Section_1.Page_1.Question_1_?_?_?_  -> (Section_1.Page_1["Question_1_?_?_?_"]
       if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
@@ -273,7 +280,7 @@ function PreviewModal({
       // Fix misplaced `[0]` inside brackets
       logic = logic.replace(
         /\["([^"\]]+)\[\s*0\s*\]"\]/g, // Match ["Question_1?[0]"]
-        '["$1"][0]' // Convert to ["Question_1?"][0]
+        '["$1"][0]', // Convert to ["Question_1?"][0]
       );
 
       return logic;
@@ -287,52 +294,58 @@ function PreviewModal({
         GRADE: "",
       };
 
-            try {
-                let processedContentMultiChoice = "";
-                const filteredByType = getFilteredQuestions(sectionDetails, "type", "multi_choice");
+      let processedContentMultiChoice = rule?.default_content;
+      try {
+        const filteredByType = getFilteredQuestions(
+          sectionDetails,
+          "type",
+          "multi_choice",
+        );
 
-                if (filteredByType.length > 0) {
-                    filteredByType.forEach(question => {
-                        // regex for === and !== operators
-                        const regexEquals = new RegExp(
-                            `(${question}(?:\\.(?:toUpperCase|toLowerCase|trim)\\(\\))?\\s*[=!]==\\s*)["']?([^"',\\s\\)]+)["']?`,
-                            'g'
-                        );
+        if (filteredByType.length > 0) {
+          filteredByType.forEach((question) => {
+            // regex for === and !== operators
+            const regexEquals = new RegExp(
+              `(${question}((?:\\.(?:toUpperCase|toLowerCase|trim|map\\(.*?\\))\\(\\))*)?\\s*[=!]==\\s*)["']?([^"',\\s\\)]+)["']?`,
+              "g",
+            );
 
-                        // regex for includes and !includes operators
-                        const regexIncludes = new RegExp(
-                            `(!)?\\s*(${question})(\\.(?:toUpperCase|toLowerCase|trim)\\(\\))*\\s*\\.includes\\s*\\(["']?([^"',\\s\\)]+)["']?\\)`,
-                            'g'
-                        );
+            // regex for includes and !includes operators
+            const regexIncludes = new RegExp(
+              `(!)?\\s*(${question})((?:\\.(?:toUpperCase|toLowerCase|trim)\\(\\))+)?\\s*\\.includes\\s*\\(["']?([^"',\\s\\)]+)["']?\\)`,
+              "g",
+            );
+            let tempContent = processedContentMultiChoice;
 
-                        let tempContent = rule?.default_content;
+            // Handle equals cases first
+            tempContent = tempContent.replace(regexEquals, '$1""$3""');
 
-                        // Handle equals cases first
-                        tempContent = tempContent.replace(regexEquals, '$1""$2""');
-
-                        // Handle includes cases
-                        tempContent = tempContent.replace(regexIncludes, (match, negation, path, methodChain, value) => {
-                            // Always include toLowerCase and trim in the map
-                            if (methodChain) {
-                                return `${negation ? '!' : ''}${path}.map(q => q${methodChain}).includes("${value}")`;
-                            } else {
-                                return `${negation ? '!' : ''}${path}.includes("${value}")`;
-                            }
-                        });
-                        processedContentMultiChoice = tempContent;
-                    });
+            // Handle includes cases
+            tempContent = tempContent.replace(
+              regexIncludes,
+              (match, negation, path, methodChain, value) => {
+                // Always include toLowerCase and trim in the map
+                if (methodChain) {
+                  return `${negation ? "!" : ""}${path}.map(q => q${methodChain}).includes("${value}")`;
                 } else {
-                    processedContentMultiChoice = rule?.default_content;
+                  return `${negation ? "!" : ""}${path}.includes("${value}")`;
                 }
+              },
+            );
+            processedContentMultiChoice = tempContent;
+          });
+        } else {
+          processedContentMultiChoice = rule?.default_content;
+        }
 
-                // Preprocess the rule's default_content
-                let processedContent = preprocessLogic(processedContentMultiChoice);
-                processedContent = processedContent?.replace("if", "");
-                // Define variables that will be set in eval
-                let STATUS = "";
-                let REASON = "";
-                let ACTIONS = [];
-                let GRADE = "";
+        // Preprocess the rule's default_content
+        let processedContent = preprocessLogic(processedContentMultiChoice);
+        processedContent = processedContent?.replace("if", "");
+        // Define variables that will be set in eval
+        let STATUS = "";
+        let REASON = "";
+        let ACTIONS = [];
+        let GRADE = "";
 
         // Evaluate the processed logic
         eval(processedContent);
@@ -366,7 +379,7 @@ function PreviewModal({
     .filter(
       (section) =>
         !section?.section_conditional_logic ||
-        section?.section_conditional_logic.trim() === ""
+        section?.section_conditional_logic.trim() === "",
     )
     .filter((section) => {
       if (section?.section_conditional_logic) {
@@ -384,7 +397,7 @@ function PreviewModal({
       section.pages.map((page) => ({
         page_name: page?.page_name,
         page_id: page?.page_id,
-      }))
+      })),
     );
 
   // Dynamically evaluate `section_conditional_logic` and update pages
@@ -408,7 +421,7 @@ function PreviewModal({
           .map((page) => ({
             page_name: page?.page_name,
             page_id: page?.page_id,
-          }))
+          })),
       );
   };
 
@@ -449,7 +462,7 @@ function PreviewModal({
         const replacedLogic = logic?.replace(
           /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
           (match, operator, day) =>
-            `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`
+            `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`,
         );
         return eval(replacedLogic);
       } else {
@@ -627,28 +640,35 @@ function PreviewModal({
       isLastSection = true;
     }
 
-        // Update state with precomputed navigation
-        setPrecomputedNavigation({
-            nextPage,
-            nextSection,
-            isLastPageInSection,
-            isLastSection,
-        });
-    };
-    // useEffect to evaluate conditional logic dynamically
-    useEffect(() => {
-        // Call the computeNextNavigation only if the page is validated
-        computeNextNavigation();
-    }, [sections, currentSection, currentPage, value]);
-    function formatDateWithOffset(formatteDate, value, question_name) {
-        let [day, month, year] = formatteDate.split('/').map(Number);
-        let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-        date.setDate(date.getDate() + Number(value));
-        return question_name === date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-    const handleNextClick = () => {
-        // Reset previous validation errors before proceeding
-        setValidationErrors({});
+    // Update state with precomputed navigation
+    setPrecomputedNavigation({
+      nextPage,
+      nextSection,
+      isLastPageInSection,
+      isLastSection,
+    });
+  };
+  // useEffect to evaluate conditional logic dynamically
+  useEffect(() => {
+    // Call the computeNextNavigation only if the page is validated
+    computeNextNavigation();
+  }, [sections, currentSection, currentPage, value]);
+  function formatDateWithOffset(formatteDate, value, question_name) {
+    let [day, month, year] = formatteDate.split("/").map(Number);
+    let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
+    date.setDate(date.getDate() + Number(value));
+    return (
+      question_name ===
+      date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    );
+  }
+  const handleNextClick = () => {
+    // Reset previous validation errors before proceeding
+    setValidationErrors({});
 
     // Function to validate mandatory fields
     const validateMandatoryFields = () => {
@@ -693,7 +713,7 @@ function PreviewModal({
                   !validateFormat(
                     value[question.question_id],
                     question.format,
-                    question.regular_expression
+                    question.regular_expression,
                   )
                 ) {
                   acc.preview_textboxfield[question.question_id] =
@@ -767,9 +787,8 @@ function PreviewModal({
                   questionValue[question?.question_id].length <
                   question?.field_range?.min
                 ) {
-                  acc.preview_photofield[
-                    question.question_id
-                  ] = `Upload minimum of ${question?.field_range?.min} images`;
+                  acc.preview_photofield[question.question_id] =
+                    `Upload minimum of ${question?.field_range?.min} images`;
                 }
               }
               break;
@@ -786,9 +805,8 @@ function PreviewModal({
                   questionValue[question?.question_id].length <
                   question?.field_range?.min
                 ) {
-                  acc.preview_filefield[
-                    question.question_id
-                  ] = `Upload minimum of ${question?.field_range?.min} files`;
+                  acc.preview_filefield[question.question_id] =
+                    `Upload minimum of ${question?.field_range?.min} files`;
                 }
               }
               break;
@@ -805,9 +823,8 @@ function PreviewModal({
                   questionValue[question?.question_id].length <
                   question?.field_range?.min
                 ) {
-                  acc.preview_videofield[
-                    question.question_id
-                  ] = `Upload minimum of ${question?.field_range?.min} videos`;
+                  acc.preview_videofield[question.question_id] =
+                    `Upload minimum of ${question?.field_range?.min} videos`;
                 }
               }
               break;
@@ -907,7 +924,7 @@ function PreviewModal({
           const replacedLogic = logic?.replace(
             /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
             (match, operator, day) =>
-              `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`
+              `getDay() ${operator} ${daysMap[day] ?? `"${day}"`}`,
           );
           return eval(replacedLogic);
         } else {
@@ -1256,14 +1273,14 @@ function PreviewModal({
                     setQuestionValue({
                       question_id: question?.question_id,
                       value: splitDate(result),
-                    })
+                    }),
                   );
                 } else {
                   dispatch(
                     setQuestionValue({
                       question_id: question?.question_id,
                       value: result,
-                    })
+                    }),
                   );
                 }
                 // Evaluate the string expression
@@ -1284,7 +1301,7 @@ function PreviewModal({
                 // Log the error if eval fails
                 console.error(
                   `Failed to evaluate "${default_conditional_logic}":`,
-                  error
+                  error,
                 );
               }
             }
@@ -1305,7 +1322,7 @@ function PreviewModal({
                 if (question?.conditional_logic) {
                   try {
                     const isVisible = evaluateLogic(
-                      question?.conditional_logic
+                      question?.conditional_logic,
                     );
                     if (!isVisible) {
                       const labelKey = question?.label.replace(/\s+/g, "_");
@@ -1317,7 +1334,7 @@ function PreviewModal({
                         setQuestionValue({
                           question_id: question?.question_id,
                           value: "",
-                        })
+                        }),
                       );
                     }
                   } catch (error) {
@@ -1402,18 +1419,16 @@ function PreviewModal({
                           {result?.label}
                         </h3>
                         <span
-                          className={` p-2 rounded-full gap-2 flex text-sm font-medium ${
-                            result?.STATUS === "PASS"
+                          className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === "PASS"
                               ? "bg-green-500"
                               : "bg-red-500 text-white"
-                          }`}
+                            }`}
                         >
                           <img
-                            src={`${
-                              result?.STATUS === "PASS"
+                            src={`${result?.STATUS === "PASS"
                                 ? "/Images/compliant.svg"
                                 : "/Images/non-compliant.svg"
-                            }`}
+                              }`}
                             width={12}
                             data-testid={
                               result?.STATUS === "PASS"
@@ -1486,10 +1501,10 @@ function PreviewModal({
                   <span className="text-sm text-gray-600">
                     {allPages.length > 0
                       ? (
-                          ((previewNavigation?.current_page - 1) /
-                            allPages.length) *
-                          100
-                        ).toFixed(0)
+                        ((previewNavigation?.current_page - 1) /
+                          allPages.length) *
+                        100
+                      ).toFixed(0)
                       : 0}
                     %
                   </span>
@@ -1511,7 +1526,7 @@ function PreviewModal({
                           // Replace 'new Date()' with epoch value in seconds
                           let updatedLogic = list?.conditional_logic?.replace(
                             /new Date\(\)/g,
-                            "new Date().toLocaleDateString()"
+                            "new Date().toLocaleDateString()",
                           );
 
                           // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
@@ -1519,9 +1534,9 @@ function PreviewModal({
                             /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
                             (_, year, month, day) => {
                               return `new Date(${parseInt(year)}, ${parseInt(
-                                month
+                                month,
                               )}, ${parseInt(day)}).toLocaleDateString()`;
-                            }
+                            },
                           );
                           // Evaluate the updated logic
                           if (!eval(updatedLogic)) {
@@ -1536,7 +1551,7 @@ function PreviewModal({
                       ) {
                         const replacedLogic = list?.conditional_logic?.replace(
                           "getMonth()",
-                          "getMonth() + 1"
+                          "getMonth() + 1",
                         );
                         try {
                           if (!eval(replacedLogic)) {
@@ -1561,16 +1576,15 @@ function PreviewModal({
                         const replacedLogic = list?.conditional_logic?.replace(
                           /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
                           (match, operator, day) => {
-                            return `getDay() ${operator} ${
-                              daysMap[day] ?? `"${day}"`
-                            }`;
-                          }
+                            return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`
+                              }`;
+                          },
                         );
 
                         // Remove parentheses from around the entire string, if they exist
                         const logicWithoutBrackets = replacedLogic?.replace(
                           /^\((.*)\)$/,
-                          "$1"
+                          "$1",
                         );
                         try {
                           let result = eval(logicWithoutBrackets); // Evaluate the modified logic
@@ -1589,7 +1603,7 @@ function PreviewModal({
                         } catch (error) {
                           console.warn(
                             "Error evaluating conditional logic:",
-                            error
+                            error,
                           );
                           return null;
                         }
@@ -1604,7 +1618,7 @@ function PreviewModal({
                         <div className="px-2">{renderQuestion(list)}</div>
                       </div>
                     );
-                  }
+                  },
                 )}
               </div>
             </div>
@@ -1637,9 +1651,8 @@ function PreviewModal({
               />
               <label
                 htmlFor="file-upload"
-                className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded ${
-                  isImportLoading ? "cursor-not-allowed" : "cursor-pointer"
-                } flex justify-center items-center`}
+                className={`w-[200px] h-[50px] ${button1Style} text-white font-semibold text-base rounded ${isImportLoading ? "cursor-not-allowed" : "cursor-pointer"
+                  } flex justify-center items-center`}
               >
                 {isImportLoading ? (
                   <BeatLoader color="#fff" size="10px" />
