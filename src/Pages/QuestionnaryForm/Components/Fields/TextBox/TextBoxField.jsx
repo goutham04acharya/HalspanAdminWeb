@@ -71,7 +71,6 @@ const TextBoxField = ({
         if(!regex.endsWith('$')){
             regex = regex + '$';
         }
-        console.log(regex, 'regex')
         setConditionalValues((prevValues) => ({
             ...prevValues,
             [question_id.replace(/-/g, '_')] : newValue,

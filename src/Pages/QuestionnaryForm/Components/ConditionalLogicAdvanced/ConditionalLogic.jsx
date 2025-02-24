@@ -673,16 +673,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                // const regex = /^([\w_.]+)\s*([<>]=?|[=!]=)\s*(new\s+Date\(\))$/
-                // const match = condition.match(regex)
-                // if (match) {
-                //     const [_, question, operator, value] = match
-                //     console.log({
-                //         question,
-                //         operator,
-                //         value
-                //     })
-                // }                // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
@@ -823,7 +813,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
-                        console.log(transformedContent, 'transformedContent');
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(replaceUUIDs(transformedContent, questionWithUuid));
                     } else {
@@ -1004,7 +993,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
-            console.log(evalInputValue, 'first one')
             if (evalInputValue.includes('getMonth')) {
 
                 // Extract the value after `getMonth()` with any comparison operator using regex
@@ -1185,7 +1173,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
-            console.log(evalInputValue, 'evalInputValue')
             // Extract variable names from the payloadString using a regex
             // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
@@ -1234,17 +1221,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
                     let replacement = `${sanitizedUuid}`;
-
-                    console.log("Replacing:", questionName, "with:", replacement);
-
                     return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
                 }, evalInputValue);
 
                 // **Fix: Remove unwanted `questionWithUuid.` reference**
                 evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
-
-                console.log("Fixed evalInputValue:", evalInputValue);
-
                 const wrappedEval = `(function(questionValues) { 
                                         try {
                                             return ${evalInputValue};
@@ -1254,16 +1235,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         }
                                      })(${JSON.stringify(questionValues)})`;
 
-                console.log("About to evaluate:", wrappedEval);
-
                 const result = eval(wrappedEval);
-                console.log("Final result:", result);
-                
             } catch (error) {
                 console.error("Unexpected error:", error);
             }
-            
-            console.log(payloadString, 'payloadString')
 
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
@@ -1735,7 +1710,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-                console.log(condition_logic,'condition_logic after')
                 setInputValue(replaceUUIDs(condition_logic, questionWithUuid) || defaultContentConverter(replaceUUIDs(complianceLogic[0].default_content, questionWithUuid)));
             } catch (error) {
                 console.error('Error while converting', error);
@@ -1794,7 +1768,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         : item
                 );
             });
-            console.log(complianceLogic, 'get compliance')
         }
         
         let condition_logic;
@@ -1821,8 +1794,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
             }, condition_logic);
         }
-        
-        console.log(conditions, 'compliance conditions')
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1845,18 +1816,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
     function replaceUUIDs(questionWithUUID, replacements) {
         let updatedString = questionWithUUID;
-        console.log(replacements, 'updatin')
         if (!updatedString) {
             return '';
         }
         Object.entries(replacements).forEach(([key, value]) => {
             const escapedValue = escapeRegex(value);
-            console.log(key, value, 'replacements')
             const regex = new RegExp(escapedValue, "g"); // Global replacement
-            console.log(regex, 'regex')
             updatedString = updatedString.replace(regex, key);
         });
-        console.log(updatedString, 'updated string')
         return updatedString;
     }
     useEffect(() => {

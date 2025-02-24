@@ -2213,7 +2213,6 @@ const QuestionnaryForm = () => {
                                 }}
                             />
                         </div>
-                        {console.log(selectedComponent, 'selectedComponent')}
                         <div>
                             {selectedComponent === null && !complianceClick ? (
                                 <AddFields

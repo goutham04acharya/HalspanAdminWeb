@@ -47,7 +47,6 @@ function ComplanceLogicField({ complianceLogic, setConditions, setComplianceLogi
             className="w-full h-auto break-words border border-[#AEB3B7] rounded-lg bg-white py-3 px-4 mt-3 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] undefined"
             value={defaultContentConverter(replaceUUIDsWithQuestions(item?.default_content || '', questionWithUuid))}
           />
-          {console.log(defaultContentConverter(item?.default_content || ''), 'compliance')}
           <p data-testid="help-text" className="italic mt-2 font-normal text-sm text-[#2B333B] break-words max-w-[90%]"></p>
         </div>))
       }
