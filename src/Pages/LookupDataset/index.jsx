@@ -72,8 +72,10 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
         if (!params.start_key) {
           setLoading(true);
         }
-      
-        if (lastEvaluatedKeyRef.current && searchParams.get('search') === undefined) {
+        if(searchParams.get('search')) {
+            lastEvaluatedKeyRef.current = null 
+        }
+        if (lastEvaluatedKeyRef.current) {
           params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
       
