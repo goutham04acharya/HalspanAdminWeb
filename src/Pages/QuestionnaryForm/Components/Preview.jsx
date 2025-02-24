@@ -480,7 +480,48 @@ function PreviewModal({
     }
     return true; // Default to true if no conditional logic exists
   };
+  const handleDisplayField = (selectedQuestion, selectedSections) => {
+    const { section_name, page_name, label } = findSectionAndPageName(
+      selectedSections,
+      selectedQuestion?.question_id
+    );
 
+    if (!section_name || !page_name || !label) {
+      console.error("Missing section_name, page_name, or label");
+      return;
+    }
+
+    let newValue = "";
+    switch (selectedQuestion?.type) {
+      case "heading":
+        newValue = selectedQuestion?.display_type?.heading || "";
+        break;
+      case "text":
+        newValue = selectedQuestion?.display_type?.text || "";
+        break;
+      case "image":
+        newValue = selectedQuestion?.display_type?.image || "";
+        break;
+      case "url":
+        newValue = selectedQuestion?.display_type?.url?.value || "";
+        break;
+      default:
+        newValue = "";
+    }
+
+    setConditionalValues((prevValues) => {
+      return {
+        ...prevValues,
+        [section_name]: {
+          ...(prevValues[section_name] || {}),
+          [page_name]: {
+            ...(prevValues[section_name]?.[page_name] || {}),
+            [label]: newValue,
+          },
+        },
+      };
+    });
+  };
   const computeNextNavigation = () => {
     let nextPage = currentPage + 1;
     let nextSection = currentSection;
