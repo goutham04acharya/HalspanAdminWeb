@@ -72,7 +72,7 @@ async function runTest(featureFile) {
     return new Promise((resolve, reject) => {
         COUNTER = COUNTER + 1;
         const file = featureFile.split('/').pop().split('.').slice(0, -1).join('.');
-        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --force-exit -f json:./reports/test-report-${featureFile}.json -f junit:./reports-xml/TEST-test-report-unit-test-${file}.xml --config ${featureFile}/cucumber.js`;
+        const command = `./node_modules/@cucumber/cucumber/bin/cucumber.js --retry 2 --force-exit -f json:./reports/test-report-${featureFile}.json -f junit:./reports-xml/TEST-test-report-unit-test-${file}.xml --config ${featureFile}/cucumber.js`;
 
         console.log('started executing file --', featureFile);
 
