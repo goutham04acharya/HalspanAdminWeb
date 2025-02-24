@@ -55,7 +55,43 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types/${assetType?.asset_type}/attributes`, null, true);
                 if (response?.data) {
                     setAttributes(response.data?.results
-                        ?.map(item => ({
+                        .filter(item => {
+                            if (!componentType) return true;
+
+                            const { schema } = item;
+                            const schemaType = schema?.type;
+                            const itemsType = schema?.items?.type;
+
+                            // Handle numberfield
+                            if (componentType === 'numberfield' &&
+                                (schemaType === 'number' || schemaType === 'integer' ||
+                                    itemsType === 'number' || itemsType === 'integer')) {
+                                return true;
+                            }
+
+                            // Handle textboxfield
+                            if (componentType === 'textboxfield' &&
+                                ((schemaType === 'string' && !schema?.format && !schema?.enum))) {
+                                return true;
+                            }
+
+                            // Handle dateTimefield
+                            if (componentType === 'dateTimefield' &&
+                                ((schemaType === 'string' && schema?.format === 'date') ||
+                                    itemsType === 'date')) {
+                                return true;
+                            }
+
+                            // Handle choiceboxfield
+                            if (componentType === 'choiceboxfield' &&
+                                (schema?.enum || schemaType === 'boolean' ||
+                                    itemsType === 'boolean' || schema?.items?.enum?.length > 0)) {
+                                return true;
+                            }
+
+                            return false;
+                        })
+                        .map(item => ({
                             value: item.key,
                             label: item.label
                         }))
