@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ImageZoomPin from "../../../Components/PinOnTheFloor/PinOnTheFloor";
 import GPSField from "./Fields/GPS/GPSField";
 
-export default function PreviewSummary({ conditionalValues }) {
+export default function PreviewSummary({ conditionalValues, sections }) {
   const [currentImage, setCurrentImage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -22,13 +22,13 @@ export default function PreviewSummary({ conditionalValues }) {
       >
         Summary
       </h2>
-      {Object.keys(conditionalValues)?.map((section, sectionIndex) => (
+      {sections?.map((section, sectionIndex) => (
         <div key={`section-${sectionIndex}`}>
           <h1 className="text-xl font-bold text-[#2B333B] mb-4">
-            {section.replaceAll("_", " ")}
+            {section.section_name.replaceAll("_", " ")}
           </h1>
 
-          {Object.keys(conditionalValues[section])?.map((page, pageIndex) => (
+          {section.pages?.map((page, pageIndex) => (
             <div
               key={`page-${pageIndex}`}
               className="mt-3 mb-3 bg-white rounded-xl py-4 px-3 gap-1"
@@ -37,21 +37,20 @@ export default function PreviewSummary({ conditionalValues }) {
                 data-testid="label-name"
                 className="font-medium pb-1 text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] h-auto"
               >
-                {page.replaceAll("_", " ")}
+                {page.page_name.replaceAll("_", " ")}
               </label>
-              {Object.keys(conditionalValues[section][page])?.map(
-                (field, fieldIndex) => (
-                  <div key={`field-${fieldIndex}`} className="pb-2">
-                    <h1 className="text-sm text-[#000000] font-medium pb-1">
-                      {field.replaceAll("_", " ")}
-                    </h1>
-                    {field === "Photo" ? (
+              {page.questions?.map((field, fieldIndex) => (
+                <div key={`field-${fieldIndex}`} className="pb-2">
+                  <h1 className="text-sm text-[#000000] font-medium pb-1">
+                    {field.question_name.replaceAll("_", " ")}
+                  </h1>
+                  {page.page_name === "Photo" ? (
                       <div className="flex">
-                        {Object.values(conditionalValues[section][page][field])
+                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[section][page][field]
+                              conditionalValues[field.question_id.replaceAll('-','_')]
                             ).map((img) => (
                               <img
                                 src={URL.createObjectURL(img)}
@@ -61,17 +60,17 @@ export default function PreviewSummary({ conditionalValues }) {
                               />
                             ))}
                       </div>
-                    ) : field === 'GPS' ? <GPSField
+                    ) : page.page_name === 'GPS' ? <GPSField
                     preview
-                /> : field === "Floorplan" ? (
+                /> : page.page_name === "Floorplan" ? (
                       <ImageZoomPin floorPlan/>
-                    ) : field === "Video" ? (
+                    ) : page.page_name === "Video" ? (
                       <ul>
-                        {Object.values(conditionalValues[section][page][field])
+                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[section][page][field]
+                              conditionalValues[field.question_id.replaceAll('-','_')]
                             ).map((file, index) => (
                               <li
                                 key={index}
@@ -83,13 +82,13 @@ export default function PreviewSummary({ conditionalValues }) {
                               </li>
                             ))}
                       </ul>
-                    ) : field === "File" ? (
+                    ) : page.page_name === "File" ? (
                       <ul>
-                        {Object.values(conditionalValues[section][page][field])
+                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[section][page][field]
+                              conditionalValues[field.question_id.replaceAll('-','_')]
                             ).map((file, index) => (
                               <li
                                 key={index}
@@ -104,18 +103,17 @@ export default function PreviewSummary({ conditionalValues }) {
                       </ul>
                     ) : (
                       <p className="text-sm text-gray-700">
-                        {conditionalValues[section][page][field]
-                          ? (typeof conditionalValues[section][page][field] ===
-                            "string" || typeof conditionalValues[section][page][field] ===
+                        {conditionalValues[field.question_id.replaceAll('-','_')]
+                          ? (typeof conditionalValues[field.question_id.replaceAll('-','_')] ===
+                            "string" || typeof conditionalValues[field.question_id.replaceAll('-','_')] ===
                             "number")
-                            ? conditionalValues[section][page][field]?.includes('https://halspan-assets-') ? <ImageZoomPin imageSrc={conditionalValues[section][page][field]}/>: conditionalValues[section][page][field]
-                            : conditionalValues[section][page][field].join(",")
+                            ? conditionalValues[field.question_id.replaceAll('-','_')]?.includes('https://halspan-assets-') ? <ImageZoomPin imageSrc={conditionalValues[field.question_id.replaceAll('-','_')]}/>: conditionalValues[field.question_id.replaceAll('-','_')]
+                            : conditionalValues[field.question_id.replaceAll('-','_')].join(",")
                           : "-"}
                       </p>
                     )}
-                  </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           ))}
         </div>

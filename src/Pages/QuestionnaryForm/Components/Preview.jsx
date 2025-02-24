@@ -1381,7 +1381,7 @@ function PreviewModal({
             </div>
           ) : showComplianceScreen ? (
             <div className="p-4">
-              <PreviewSummary conditionalValues={conditionalValues} />
+              <PreviewSummary conditionalValues={conditionalValues} sections={sections} />
               <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">
                 Compliance Results
               </h2>
