@@ -30,7 +30,7 @@ import { formatDate, reverseFormat, reversingFormat } from "../../../../CommonMe
 dayjs.extend(customParseFormat);
 
 function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSection, isDefaultLogic, setIsDefaultLogic, setDefaultString, defaultString, complianceState, setSectionConditionLogicId, sectionConditionLogicId, pageConditionLogicId, setPageConditionLogicId,
-    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck }) {
+    setCompliancestate, complianceLogic, setComplianceLogic, sectionsData, setConditions, conditions, setSectionDetails, sectionDetails, editorCheck, setEditorCheck, questionWithUuid }) {
 
     const modalRef = useRef();
     const dispatch = useDispatch();
@@ -70,6 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
+
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -121,6 +122,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
     const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
+    const notRequiredConditions = ["toUpperCase()", "toLowerCase()", "trim()"].concat(dateTimeMethods).concat(dateMethods).concat(timeMethods).concat(fileMethods)
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -182,16 +184,16 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const questionDetailsArray = [];
         // Access the sections from the data object
         allSectionDetails?.sections?.forEach((section) => {
-            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
+            const sectionName = section.section_name;
 
             // Access pages within each section
             section.pages?.forEach((page) => {
-                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
+                const pageName = `${sectionName}.${page.page_name}`;
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
                     if (question.question_id !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
-                        const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
+                        const questionName = `${pageName}.${question.question_name}`;
                         sectionDetailsArray.push(questionName); // Add section.page.question
                         questionDetailsArray.push({
                             'question_type': question?.component_type,
@@ -216,18 +218,18 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         // Access the sections from the data object
         allSectionDetails?.sections?.forEach((section) => {
-            const sectionName = section.section_name.replaceAll(/\s+/g, '_');
+            const sectionName = section.section_name;
             // sectionDetailsArray.push(sectionName); // Add the section name
 
             // Access pages within each section
             section.pages?.forEach((page) => {
-                const pageName = `${sectionName}.${page.page_name.replaceAll(/\s+/g, '_')}`;
+                const pageName = `${sectionName}.${page.page_name}`;
                 // sectionDetailsArray.push(pageName); // Add section.page
 
                 // Access questions within each page
                 page.questions?.forEach((question) => {
                     const questionId = question?.question_id;
-                    const questionName = `${pageName}.${question.question_name.replaceAll(/\s+/g, '_')}`;
+                    const questionName = `${pageName}.${question.question_name}`;
                     if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
                         sectionDetailsArray.push(questionName);
                     } else {
@@ -253,11 +255,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic = getFinalComplianceLogic(conditions)
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
-                ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                ?.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                ?.replaceAll('&&', 'and') // Replace && with and
-                ?.replaceAll('||', 'or') // Replace || with or
-                ?.replaceAll('.length', '.()')
+                ?.replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                ?.replace('/\b(?<!\w\.)\?(?!\w+\))/g', ' then ')
+                ?.replace(/&&/g, 'and') // Replace && with and
+                ?.replace(/||/g, 'or') // Replace || with or
+                ?.replace(/.length/g, '.()')
         }
         if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
@@ -307,13 +309,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let result = {};
         if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
             allSectionDetails.sections.forEach((section) => {
-                const sectionKey = section.section_name.replaceAll(' ', '_');
+                const sectionKey = section.section_name;
                 let sectionObject = {
                     [sectionKey]: {}
                 };
                 if (section.pages && section.pages.length > 0) {
                     section.pages.forEach((page) => {
-                        const pageKey = page.page_name.replaceAll(' ', '_');
+                        const pageKey = page.page_name;
                         sectionObject[sectionKey][pageKey] = {};
 
                         if (page.questions && page.questions.length > 0) {
@@ -321,7 +323,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 if (question?.component_type === 'dateTimefield') {
                                     datetimefieldQuestions.push(question); // Push to temporary array
                                 }
-                                const questionKey = question.question_name.replaceAll(' ', '_');
+                                const questionKey = question.question_name;
                                 const fieldType = getFieldType(question.component_type);
                                 sectionObject[sectionKey][pageKey][questionKey] = fieldType;
                             });
@@ -341,13 +343,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     // Handle input change and check for matches
     const handleInputField = (event, sections) => {
+
         setError('');
         // handleClickToInsert(suggestion, false, valueType);
         setShowMethodSuggestions(false);
         setShowSectionList(true)
         const value = event.target.value;
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
-        const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
+        const regex = /\b[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\b/g;
         let questionMatches = value.match(regex);
         setLogic(value);
         setInputValue(value)
@@ -444,7 +447,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
     };
-
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
         const textarea = textareaRef.current;
@@ -540,10 +542,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         // Step 1: Split the path by '.' to get section, page, and question names
         const [sectionPart, pagePart, questionPart] = path.split('.');
         // Step 2: Replace underscores with spaces to match the actual names
-        const sectionName = sectionPart.replaceAll(/_/g, ' ');
-        const pageName = pagePart.replaceAll(/_/g, ' ');
-        const questionName = questionPart.replaceAll(/_/g, ' ');
-        
+        const sectionName = sectionPart;
+        const pageName = pagePart;
+        const questionName = questionPart;
+
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.find(section => section?.section_name === sectionName);
         if (!matchingSection) {
@@ -586,7 +588,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return trimmedExpression;
     };
-
     const parseLogicExpression = (expression) => {
         // Default structure if no expression is provided
         if (!expression || expression === '') {
@@ -666,20 +667,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                // const regex = /^([\w_.]+)\s*([<>]=?|[=!]=)\s*(new\s+Date\(\))$/
-                // const match = condition.match(regex)
-                // if (match) {
-                //     const [_, question, operator, value] = match
-                //     console.log({
-                //         question,
-                //         operator,
-                //         value
-                //     })
-                // }                // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
-                const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                // const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                // const matches = condition.match(/^\s*(!?)\s*([\w\s.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/^\s*(!?)\s*([^\n]+?)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
                     let [, negate, question_name, condition_logic, value] = matches;
@@ -723,9 +717,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             // Convert to a number if it's not a string
                             value = Number(value);
                         }
-                        if (condition_logic === '===' && value == 0) condition_logic = 'has no files'
+                        if ((condition_logic === '===' || condition_logic === '==') && value == 0) condition_logic = 'has no files'
                         else if (condition_logic === '>=' || condition_logic === '=>') condition_logic = 'has atleast one file';
-                        else if (condition_logic === '===') condition_logic = 'number of file is';
+                        else if (condition_logic === '===' || condition_logic === '==') condition_logic = 'number of file is';
 
                         return {
                             question_name: question_name.trim(),
@@ -742,7 +736,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             condition_logic = 'does not include';
                         } else {
                             // Convert logical operators to corresponding values in conditions
-                            if (condition_logic === '===') condition_logic = 'equals';
+                            if (condition_logic === '===' || condition_logic === '==') condition_logic = 'equals';
                             else if (condition_logic === '!==') condition_logic = 'not equals to';
                             else if (condition_logic === '<') condition_logic = 'smaller';
                             else if (condition_logic === '>') condition_logic = 'larger';
@@ -751,7 +745,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         }
                     } else {
                         // Convert logical operators to corresponding values in conditions
-                        if (condition_logic === '===') condition_logic = 'equals';
+                        if (condition_logic === '===' || condition_logic === '==') condition_logic = 'equals';
                         else if (condition_logic === '!==') condition_logic = 'not equals to';
                         else if (condition_logic === '<') condition_logic = 'smaller';
                         else if (condition_logic === '>') condition_logic = 'larger';
@@ -814,7 +808,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
                         setConditions(parseLogicExpression(transformedContent));
-                        setInputValue(transformedContent);
+                        setInputValue(replaceUUIDs(transformedContent, questionWithUuid));
                     } else {
                         setInputValue('');
                     }
@@ -891,7 +885,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }, [selectedQuestionId]);
 
 
-
+    function initializeQuestionValues(questionWithUuid) {
+        return Object.values(questionWithUuid).reduce((acc, uuid) => {
+            // Replace dashes with underscores in the UUID
+            const sanitizedUuid = uuid.replace(/-/g, '_');
+            // Initialize each question value as empty string (or you could use null)
+            acc[sanitizedUuid] = '';
+            return acc;
+        }, {});
+    }
 
     const handleSave = async () => {
         if (!complianceState) {
@@ -937,7 +939,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
+                return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'questionWithUuid.$1');
             };
 
             const handleError = (message) => {
@@ -984,7 +986,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
-
             if (evalInputValue.includes('getMonth')) {
 
                 // Extract the value after `getMonth()` with any comparison operator using regex
@@ -1208,7 +1209,29 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let ACTIONS = []
             let REASON = ''
             let GRADE = '';
-            const result = eval(evalInputValue);
+            const questionValues = initializeQuestionValues(questionWithUuid);
+            try {
+                evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                    let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
+                    let replacement = `${sanitizedUuid}`;
+                    return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
+                }, evalInputValue);
+
+                // **Fix: Remove unwanted `questionWithUuid.` reference**
+                evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
+                const wrappedEval = `(function(questionValues) { 
+                                        try {
+                                            return ${evalInputValue};
+                                        } catch (error) {
+                                            console.error("Evaluation error:", error);
+                                            return false;
+                                        }
+                                     })(${JSON.stringify(questionValues)})`;
+
+                const result = eval(wrappedEval);
+            } catch (error) {
+                console.error("Unexpected error:", error);
+            }
 
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
@@ -1241,7 +1264,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             setError('');  // No error, valid number
                         }
                         break;
-                    default:
+                        default:
                         break;
                 }
             } else if (complianceState) {
@@ -1267,7 +1290,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         break;
                 }
             }
-
             if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
 
@@ -1295,6 +1317,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(true);
             if (!error) {
                 if (complianceState) {
+                    payloadString = evalInputValue;
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
@@ -1564,7 +1587,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const formatteDate = formatDate(item.date);
                     const actualFormat = reverseFormat(formatteDate)
                     return `formatDateWithOffset('${formatteDate}', ${item.value}, ${item.question_name})`
-                    // return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
+                // return `new Date(${item.question_name} * 1000).toDateString() === new Date(new Date(${actualFormat} * 1000).setDate(new Date(${actualFormat} * 1000).getDate() + ${item.value})).toDateString();`
                 default:
                     // Handle unknown condition logic  
                     console.error(`Unknown condition logic: ${item.condition_logic}`);
@@ -1633,6 +1656,40 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return finalString;
     }
+    function getReplacedComplianceLogic(conditions) {
+        let condition_logic = conditions; // Assuming this is your input string
+        
+        // Step 1: Replace ternary operator pattern
+        condition_logic = condition_logic.replace(/\)\s*\?\s*\(/g, ') then (');
+        
+        // Step 2: Replace && with "and"
+        condition_logic = condition_logic.replace(/&&/g, 'and');
+        
+        // Step 3: Replace || with "or"
+        condition_logic = condition_logic.replace(/\|\|/g, 'or');
+        
+        // Step 4: Replace .length with .()
+        condition_logic = condition_logic.replace(/\.length/g, '.()');
+        
+        // Step 5: Replace ACTIONS.push() with ACTIONS =
+        condition_logic = condition_logic.replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, "ACTIONS = '$1'");
+        
+        // Step 6: Handle if-else conversion from ternary
+        if (condition_logic.includes(':')) {
+            const parts = condition_logic.split(':');
+            const lastPart = parts.pop();
+            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+        }
+        
+        return condition_logic;
+    }
+
+    const handleTab = () => {
+        if(!notRequiredConditions.some(element => inputValue.includes(element))) {
+            let parsedLogic = parseLogicExpression(inputValue)
+            setConditions(parsedLogic)
+        }
+    }
 
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
@@ -1644,22 +1701,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic !== '') {
-                    condition_logic
-                        .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                        .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                        .replaceAll('&&', 'and') // Replace && with and
-                        .replaceAll('||', 'or') // Replace || with or
-                        .replaceAll('.length', '.()')
-                }
+                condition_logic = getReplacedComplianceLogic(condition_logic)
                 if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic?.split(':');
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-                setInputValue(condition_logic || defaultContentConverter(complianceLogic[0].default_content));
-
+                setInputValue(replaceUUIDs(condition_logic, questionWithUuid) || defaultContentConverter(replaceUUIDs(complianceLogic[0].default_content, questionWithUuid)));
             } catch (error) {
                 console.error('Error while converting', error);
             }
@@ -1701,14 +1750,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 isAdvanceEditorCompliance: false
             }));
         }
-
+        
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
         }
-
         if (complianceState) {
+
             let compliance_logic = getFinalComplianceLogic(conditions);
+            compliance_logic = replaceQuestionKey(compliance_logic, questionWithUuid);
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1716,9 +1766,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         : item
                 );
             });
-            setCompliancestate(false);
         }
-
+        
         let condition_logic;
         if (!complianceState) {
             try {
@@ -1736,18 +1785,45 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else if (selectedQuestionId) {
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
-
-        handleSaveSection(sectionId, true, condition_logic);
+        if(!complianceState){
+            condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, condition_logic);
+        }
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
             dispatch(setComplianceLogicCondition(conditions));
         }
+        handleSaveSection(sectionId, true, condition_logic);
         setConditionalLogic(false);
+        setCompliancestate(false);
         setSectionConditionLogicId(false);
         setPageConditionLogicId(false);
     }
-
+    function replaceQuestionKey(expression, state) {
+        const regex = /\b[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\b/g;
+        return expression.replace(regex, match => {
+            return state[match] || match;
+        });
+    }
+    function escapeRegex(str) {
+        return str.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+    }
+    function replaceUUIDs(questionWithUUID, replacements) {
+        let updatedString = questionWithUUID;
+        if (!updatedString) {
+            return '';
+        }
+        Object.entries(replacements).forEach(([key, value]) => {
+            const escapedValue = escapeRegex(value);
+            const regex = new RegExp(escapedValue, "g"); // Global replacement
+            updatedString = updatedString.replace(regex, key);
+        });
+        return updatedString;
+    }
     useEffect(() => {
         let compliance_logic;
         if (!complianceState) {
@@ -1757,7 +1833,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 if (section) {
                     // Extract and parse the section's conditional logic
-                    compliance_logic = parseLogicExpression(section?.section_conditional_logic);
+                    compliance_logic = parseLogicExpression(replaceUUIDs(section?.section_conditional_logic, questionWithUuid));
                 } else {
                     console.error('Section not found for the given sectionConditionLogicId');
                 }
@@ -1771,7 +1847,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     if (page) {
                         pageFound = true;
                         // Extract and parse the page's conditional logic
-                        compliance_logic = parseLogicExpression(page.page_conditional_logic);
+                        compliance_logic = parseLogicExpression(replaceUUIDs(page.page_conditional_logic, questionWithUuid));
                     }
                 });
 
@@ -1781,7 +1857,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }
             else {
                 // Default: Extract and parse the conditional logic from the selected question
-                compliance_logic = parseLogicExpression(fieldSettingParams[selectedQuestionId]?.conditional_logic);
+                compliance_logic = parseLogicExpression(replaceUUIDs(fieldSettingParams[selectedQuestionId]?.conditional_logic, questionWithUuid));
 
             }
             setConditions(compliance_logic)
@@ -1851,7 +1927,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                                         {!isDefaultLogic &&
                                             <div className='flex gap-5 items-end'>
-                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <button onClick={() => {setTab('basic'); handleTab()}} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }

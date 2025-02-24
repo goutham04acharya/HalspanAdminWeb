@@ -64,20 +64,16 @@ const TextBoxField = ({
         const newValue = e.target.value;
         const formatError = question?.format_error;
         const format = question?.format;
-        const regex = question?.regular_expression;
-        const { section_name, page_name, label } = findSectionAndPageName(
-            sections,
-            question_id,
-        );
+        let regex = question?.regular_expression;
+        if(!regex.startsWith('^')){
+            regex = '^' + regex;
+        }
+        if(!regex.endsWith('$')){
+            regex = regex + '$';
+        }
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name], // Preserve existing entries for this section
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: newValue, // Add or update the label key with newValue
-                },
-            },
+            [question_id.replace(/-/g, '_')] : newValue,
         }));
         let obj = {
             fieldId: question_id,

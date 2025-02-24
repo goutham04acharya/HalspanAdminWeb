@@ -96,12 +96,12 @@ function PreviewModal({
         const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
         result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-        page.questions.forEach((question, questionIndex) => {
-          const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-          result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                page.questions.forEach((question, questionIndex) => {
+                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
+                });
+            });
         });
-      });
-    });
     return result;
   };
 
@@ -133,40 +133,24 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-        setPreviewNavigation((prev) => ({
-          ...prev,
-          total_pages: sectionDetails?.sections.reduce(
-            (total, section) => total + section.pages.length,
-            0,
-          ),
-        }));
-        updateConditionalValues(sectionDetails?.sections);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSections();
-  }, [questionnaire_id, version_number]);
-  function isSameDate(question_id, setDate, value) {
-    // Convert the epoch values (in seconds) to Date objects
-    const selectedDate = new Date(question_id * 1000);
+                setPreviewNavigation((prev) => ({
+                    ...prev,
+                    total_pages: sectionDetails?.sections.reduce(
+                        (total, section) => total + section.pages.length,
+                        0,
+                    ),
+                }));
+                updateConditionalValues(sectionDetails?.sections);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSections();
+    }, [questionnaire_id, version_number, sectionDetails]);
+    const evaluateComplianceLogic = () => {
 
-    // Parse the dd/mm/yyyy format to Date object
-    const [day, month, year] = setDate.split("/");
-    const setDateObj = new Date(year, month - 1, day);
-
-    // Add the specified number of days (value) to the set date
-    setDateObj.setDate(setDateObj.getDate() + value);
-    // Compare the year, month, and day
-    return (
-      selectedDate.getFullYear() === setDateObj.getFullYear() &&
-      selectedDate.getMonth() === setDateObj.getMonth() &&
-      selectedDate.getDate() === setDateObj.getDate()
-    );
-  }
-  const evaluateComplianceLogic = () => {
     let results = [];
 
     function transformTernaryExpression(input) {
@@ -186,7 +170,6 @@ function PreviewModal({
       });
     }
     const preprocessLogic = (logic) => {
-      // debugger
       if (logic?.includes("if")) {
         logic = logic?.replace("if", "");
       }

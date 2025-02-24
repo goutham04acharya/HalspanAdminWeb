@@ -44,40 +44,14 @@ function VideoField({ label,
             ...prev,
             [question?.question_id]: newFilesList
         }));
-
-        // const updatedFileCount = newFilesList.length;
-
-        // // Check if the minimum required number of files has been uploaded
-        // if (updatedFileCount >= (question?.field_range?.min || 0)) {
-        //     setValue((prev) => ({
-        //         ...prev,
-        //         [question?.question_id]: true
-        //     }));
-        //     setValidationErrors((prevErrors) => ({
-        //         ...prevErrors,
-        //         preview_videofield: '' // Clear validation error if criteria met
-        //     }));
-        // } else {
-        //     setValue((prev) => ({
-        //         ...prev,
-        //         [question?.question_id]: false
-        //     }));
-        // }
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_videofield: '' // Clear validation error if criteria met
         }));
         // Update conditional values with the current file list
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newFilesList
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: newFilesList
         }));
         setIsModified(!isModified)
     };
@@ -109,16 +83,9 @@ function VideoField({ label,
         }
 
         // Update conditional values with the updated file count
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: fileList
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: fileList
         }));
         setIsModified(!isModified)
     };

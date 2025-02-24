@@ -45,7 +45,6 @@ export default function PreviewSummary({ conditionalValues }) {
                     <h1 className="text-sm text-[#000000] font-medium pb-1">
                       {field.replaceAll("_", " ")}
                     </h1>
-                    {console.log("field", field)}
                     {field === "Photo" ? (
                       <div className="flex">
                         {Object.values(conditionalValues[section][page][field])
