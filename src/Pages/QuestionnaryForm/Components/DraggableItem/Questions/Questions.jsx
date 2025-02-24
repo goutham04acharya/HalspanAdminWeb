@@ -180,7 +180,6 @@ const Questions = ({
                 dispatch(setComplianceLogicCondition(recursiveUpdate(recursiveUpdate(conditions, currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')))));
             }
         });
-        console.log(updatedFieldSettingParams, 'updated')
         dispatch(setCurrentData(updatedFieldSettingParams));
         dispatch(saveCurrentData(updatedFieldSettingParams));
         return updatedFieldSettingParams;
