@@ -477,7 +477,7 @@ function PreviewModal({
     return true; // Default to true if no conditional logic exists
   };
   const handleDisplayField = (selectedQuestion, selectedSections) => {
-    const { section_name, page_name, label } = findSectionAndPageName(
+    const { section_name, page_name, label, question_id } = findSectionAndPageName(
       selectedSections,
       selectedQuestion?.question_id
     );
@@ -504,19 +504,10 @@ function PreviewModal({
       default:
         newValue = "";
     }
-
-    setConditionalValues((prevValues) => {
-      return {
-        ...prevValues,
-        [section_name]: {
-          ...(prevValues[section_name] || {}),
-          [page_name]: {
-            ...(prevValues[section_name]?.[page_name] || {}),
-            [label]: newValue,
-          },
-        },
-      };
-    });
+    setConditionalValues((prevValues) => ({
+      ...prevValues,
+      [selectedQuestion?.question_id.replace(/-/g, '_')]: newValue
+  }));
   };
   const computeNextNavigation = () => {
     let nextPage = currentPage + 1;

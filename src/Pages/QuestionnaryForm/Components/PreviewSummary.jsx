@@ -5,7 +5,6 @@ import GPSField from "./Fields/GPS/GPSField";
 export default function PreviewSummary({ conditionalValues, sections }) {
   const [currentImage, setCurrentImage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const handleImageClick = (image) => {
     setCurrentImage(image);
     setModalOpen(true);
@@ -44,13 +43,13 @@ export default function PreviewSummary({ conditionalValues, sections }) {
                   <h1 className="text-sm text-[#000000] font-medium pb-1">
                     {field.question_name.replaceAll("_", " ")}
                   </h1>
-                  {page.page_name === "Photo" ? (
+                  {field.question_name === "Photo" ? (
                       <div className="flex">
-                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
+                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[field.question_id.replaceAll('-','_')]
+                              conditionalValues[field?.question_id?.replaceAll('-','_')]
                             ).map((img) => (
                               <img
                                 src={URL.createObjectURL(img)}
@@ -60,17 +59,17 @@ export default function PreviewSummary({ conditionalValues, sections }) {
                               />
                             ))}
                       </div>
-                    ) : page.page_name === 'GPS' ? <GPSField
+                    ) : field.question_name === 'GPS' ? <GPSField
                     preview
-                /> : page.page_name === "Floorplan" ? (
+                /> : field.question_name === "Floorplan" ? (
                       <ImageZoomPin floorPlan/>
-                    ) : page.page_name === "Video" ? (
+                    ) : field.question_name === "Video" ? (
                       <ul>
-                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
+                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[field.question_id.replaceAll('-','_')]
+                              conditionalValues[field?.question_id?.replaceAll('-','_')]
                             ).map((file, index) => (
                               <li
                                 key={index}
@@ -82,13 +81,13 @@ export default function PreviewSummary({ conditionalValues, sections }) {
                               </li>
                             ))}
                       </ul>
-                    ) : page.page_name === "File" ? (
+                    ) : field.question_name === "File" ? (
                       <ul>
-                        {Object.values(conditionalValues[field.question_id.replaceAll('-','_')])
+                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
                           .length === 0
                           ? "-"
                           : Object.values(
-                              conditionalValues[field.question_id.replaceAll('-','_')]
+                              conditionalValues[field?.question_id?.replaceAll('-','_')]
                             ).map((file, index) => (
                               <li
                                 key={index}
@@ -103,12 +102,12 @@ export default function PreviewSummary({ conditionalValues, sections }) {
                       </ul>
                     ) : (
                       <p className="text-sm text-gray-700">
-                        {conditionalValues[field.question_id.replaceAll('-','_')]
-                          ? (typeof conditionalValues[field.question_id.replaceAll('-','_')] ===
-                            "string" || typeof conditionalValues[field.question_id.replaceAll('-','_')] ===
+                        {conditionalValues[field?.question_id?.replaceAll('-','_')]
+                          ? (typeof conditionalValues[field?.question_id?.replaceAll('-','_')] ===
+                            "string" || typeof conditionalValues[field?.question_id?.replaceAll('-','_')] ===
                             "number")
-                            ? conditionalValues[field.question_id.replaceAll('-','_')]?.includes('https://halspan-assets-') ? <ImageZoomPin imageSrc={conditionalValues[field.question_id.replaceAll('-','_')]}/>: conditionalValues[field.question_id.replaceAll('-','_')]
-                            : conditionalValues[field.question_id.replaceAll('-','_')].join(",")
+                            ? conditionalValues[field?.question_id?.replaceAll('-','_')]?.includes('https://halspan-assets-') ? <ImageZoomPin imageSrc={conditionalValues[field?.question_id?.replaceAll('-','_')]}/>: conditionalValues[field?.question_id?.replaceAll('-','_')]
+                            : conditionalValues[field?.question_id?.replaceAll('-','_')].join(",")
                           : "-"}
                       </p>
                     )}
