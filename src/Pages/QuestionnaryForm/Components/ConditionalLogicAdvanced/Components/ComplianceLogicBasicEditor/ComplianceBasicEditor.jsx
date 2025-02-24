@@ -974,6 +974,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
                                                                 <div className='w-1/3 px-2 '>
                                                                     <div className=''>
                                                                         <p className='text-sm text-[#2B333B] font-medium'>Select</p>
+                                                                        {console.log(secDetailsForSearching, 'secDetailsForSearching')}
                                                                         <InputWithDropDown
                                                                             label=''
                                                                             labelStyle='font-semibold text-[#2B333B] text-base'

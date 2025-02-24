@@ -419,7 +419,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                                                     subIndex={i}
                                                     dropdownRef={dropdownRef}
                                                     setDropdownOpen={updateDropdown}
-                                                    options={secDetailsForSearching.map((item)=> item?.option)}
+                                                    options={secDetailsForSearching}
                                                     validationError={submitSelected && conditions[index]?.conditions[i]?.question_name === ''}
                                                 />
                                                 {submitSelected && conditions[index]?.conditions[i]?.question_name === '' && <ErrorMessage error={'This field is mandatory'} />}
