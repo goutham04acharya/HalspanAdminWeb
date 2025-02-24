@@ -1,20 +1,13 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { setSelectedQuestionId } from "../../../QuestionnaryFormSlice";
-import { useDispatch } from "react-redux";
-import { complianceContentConverter } from "../../../../../../CommonMethods/complianceContentConverter";
-import ErrorMessage from "../../../../../../Components/ErrorMessage/ErrorMessage";
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
+import { useDispatch } from 'react-redux';
+import { complianceContentConverter } from '../../../../../../CommonMethods/complianceContentConverter';
+import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
-function ComplianceFieldSetting({
-    complianceLogic,
-    setComplianceLogic,
-    setCompliancestate,
-    formStatus,
-    validationErrors,
-    setValidationErrors,
-}) {
-    const { complianceLogicId } = useSelector((state) => state?.questionnaryForm);
+function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus, validationErrors, setValidationErrors, questionWithUuid }) {
+    const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [failGradeValue, setFailGradeValue] = useState("");
     const dispatch = useDispatch();
@@ -86,36 +79,18 @@ function ComplianceFieldSetting({
                         )}
                     </div>
 
-                    <div className="flex flex-col justify-start mt-7 w-full relative">
-                        <label
-                            htmlFor="Label"
-                            className="font-semibold text-base text-[#2B333B]"
-                        >
-                            Default Content
-                        </label>
-                        <div className="relative w-full">
-                            <input
-                                type="text"
-                                id="Label"
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        complianceLogicId,
-                                        "default_content",
-                                        e.target.value,
-                                    )
-                                }
-                                value={
-                                    complianceLogic[complianceLogicId]?.default_content
-                                        ? complianceContentConverter(
-                                            complianceLogic[complianceLogicId].default_content,
-                                        )
-                                        : ""
-                                }
-                                disabled={formStatus !== "Draft"}
-                                className="mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0"
+                    <div className='flex flex-col justify-start mt-7 w-full relative'>
+                        <label htmlFor="Label" className='font-semibold text-base text-[#2B333B]'>Default Content</label>
+                        <div className='relative w-full'>
+                            <input type="text" id='Label'
+                                onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
+                                value={complianceLogic[complianceLogicId]?.default_content
+                                    ? complianceContentConverter(replaceUUIDsWithQuestions(complianceLogic[complianceLogicId].default_content.replaceAll(/""/g, '"'), questionWithUuid))
+                                    : ''}
+                                disabled={formStatus !== 'Draft'}
+                                className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                                 data-testid="default-value-input"
-                                placeholder="Populates the content"
-                            />
+                                placeholder='Populates the content' />
                             <img
                                 src="/Images/setting.svg"
                                 alt="setting"

@@ -667,16 +667,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const parseConditions = (group) => {
             const conditions = group.split('&&').map(condition => {
                 condition = trimParentheses(condition);
-                // const regex = /^([\w_.]+)\s*([<>]=?|[=!]=)\s*(new\s+Date\(\))$/
-                // const match = condition.match(regex)
-                // if (match) {
-                //     const [_, question, operator, value] = match
-                //     console.log({
-                //         question,
-                //         operator,
-                //         value
-                //     })
-                // }                // Try parsing as a date condition
                 const dateCondition = parseDateCondition(condition);
                 if (dateCondition) return dateCondition;
                 // Regex to match logical conditions
@@ -1237,10 +1227,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-                const result = eval(wrappedEval);                
+
+                const result = eval(wrappedEval);
             } catch (error) {
                 console.error("Unexpected error:", error);
             }
+
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
