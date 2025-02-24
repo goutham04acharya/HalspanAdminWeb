@@ -120,20 +120,18 @@ const Questions = ({
             for (const page of section.pages) {
                 for (const question of page.questions) {
                     if (question.question_id === questionId && !label) {
-                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${question?.label?.replace(/ /g, "_")}`;
+                        return `${section?.section_name}.${page?.page_name}.${question?.label}`;
                     } else {
-                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${label?.replace(/ /g, "_")}`;
+                        return `${section?.section_name}.${page?.page_name}.${label}`;
                     }
                 }
             }
         }
         return null; // Return null if question ID is not found
     };
-
     function recursiveUpdate(obj, oldName, newName) {
         return obj.map((item) => {
             let newItem = { ...item }; // Create a shallow copy of the object
-    
             Object.keys(newItem).forEach((key) => {
                 if (key === 'conditions') {
                     newItem[key] = newItem[key].map((condition) => ({
@@ -167,19 +165,20 @@ const Questions = ({
         Object.keys(updatedFieldSettingParams).forEach((key) => {
             if (
                 updatedFieldSettingParams[key].conditional_logic &&
-                updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId].replace(/ /g, '_'))
+                updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId])
             ) {
                 updatedFieldSettingParams[key] = {
                     ...updatedFieldSettingParams[key],
                     conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
-                        new RegExp(currentQuestionLabel[questionId].replace(/ /g, '_'), 'g'),
-                        findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')
+                        new RegExp(currentQuestionLabel[questionId], 'g'),
+                        findQuestionPath(questionId, fieldSettingParams[questionId]?.label)
                     )
                 };
-                replaceComplianceLogic(currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_'));
-                dispatch(setComplianceLogicCondition(recursiveUpdate(recursiveUpdate(conditions, currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')))));
+
             }
         });
+        replaceComplianceLogic(currentQuestionLabel[questionId], findQuestionPath(questionId, fieldSettingParams[questionId]?.label));
+        dispatch(setComplianceLogicCondition(recursiveUpdate(conditions, currentQuestionLabel[questionId], findQuestionPath(questionId, fieldSettingParams[questionId]?.label))));
         dispatch(setCurrentData(updatedFieldSettingParams));
         dispatch(saveCurrentData(updatedFieldSettingParams));
         return updatedFieldSettingParams;
