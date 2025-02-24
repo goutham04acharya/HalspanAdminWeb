@@ -98,7 +98,7 @@ function PreviewModal({
 
                 page.questions.forEach((question, questionIndex) => {
                     const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[sectionKey][pageKey][questionKey] = ""; // Assign empty string as value
+                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
                 });
             });
         });
@@ -148,25 +148,8 @@ function PreviewModal({
             }
         };
         fetchSections();
-    }, [questionnaire_id, version_number]);
-    function isSameDate(question_id, setDate, value) {
-        // Convert the epoch values (in seconds) to Date objects
-        const selectedDate = new Date(question_id * 1000);
-
-        // Parse the dd/mm/yyyy format to Date object
-        const [day, month, year] = setDate.split('/');
-        const setDateObj = new Date(year, month - 1, day);
-
-    // Add the specified number of days (value) to the set date
-    setDateObj.setDate(setDateObj.getDate() + value);
-    // Compare the year, month, and day
-    return (
-      selectedDate.getFullYear() === setDateObj.getFullYear() &&
-      selectedDate.getMonth() === setDateObj.getMonth() &&
-      selectedDate.getDate() === setDateObj.getDate()
-    );
-  }
-  const evaluateComplianceLogic = () => {
+    }, [questionnaire_id, version_number, sectionDetails]);
+    const evaluateComplianceLogic = () => {
 
     let results = [];
 

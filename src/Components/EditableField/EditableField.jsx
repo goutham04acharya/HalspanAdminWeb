@@ -31,7 +31,7 @@ const EditableField = ({ name, index, secondIndex, handleSave, section, testId, 
         if (!inputValue || inputValue?.trim() === '') {
             return;
         }
-        handleSave(inputValue, index, secondIndex);
+        handleSave(inputValue, index, secondIndex, true);
     };
 
     const handleKeyDown = (e) => {

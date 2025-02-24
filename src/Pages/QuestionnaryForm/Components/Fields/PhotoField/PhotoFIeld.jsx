@@ -55,40 +55,15 @@ function PhotoField({ label,
             ...prev,
             [question?.question_id]: newFilesList
         }));
-        // setValidationErrors((prevErrors) => ({
-        //     ...prevErrors,
-        //     preview_videofield: '' // Clear the validation error
-        // }));
-
-        // const updatedFileCount = newFilesList.length;
-        // // Check if the minimum required number of files has been uploaded
-        // if (updatedFileCount >= (question?.field_range?.min || 0)) {
-        //     setValidationErrors((prevErrors) => ({
-        //         ...prevErrors,
-        //         preview_photofield: '' // Clear validation error if criteria met
-        //     }));
-        // } else {
-        //     setValidationErrors((prevErrors) => ({
-        //         ...prevErrors,
-        //         preview_photofield: '' // Clear validation error if criteria met
-        //     }));
-        // }
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
             preview_photofield: '' // Clear validation error if criteria met
         }));
 
         // Update conditional values to track the current file count
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newFilesList
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: newFilesList
         }));
         setIsModified(!isModified)
     };
@@ -120,16 +95,9 @@ function PhotoField({ label,
 
 
         // Update conditional values to reflect the new file count
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: newImages
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: newImages
         }));
         setIsModified(!isModified)
     };
@@ -150,21 +118,6 @@ function PhotoField({ label,
             }));
         }
     }
-    // useEffect(() => {
-    //   if(questionValue?.[question?.question_id]?.length !== 0){
-    //     setValidationErrors((prevErrors) => ({
-    //         ...prevErrors,
-    //         preview_videofield: '' // Clear the validation error
-    //     }));
-    //   }else{
-    //     setValidationErrors((prevErrors) => ({
-    //         ...prevErrors,
-    //         preview_videofield: 'This is a mandatory field' // Clear the validation error
-    //     }));
-    //   }
-
-    // }, [questionValue, setValidationErrors])
-
 
     return (
         <div>

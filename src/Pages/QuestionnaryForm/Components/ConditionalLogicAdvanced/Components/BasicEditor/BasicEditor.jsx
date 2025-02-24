@@ -9,21 +9,21 @@ import useOnClickOutside from '../../../../../../CommonMethods/outSideClick';
 import useOnClickOutsideById from '../../../../../../CommonMethods/outSideClickId';
 
 function BasicEditor({ secDetailsForSearching, questions, conditions, setConditions, submitSelected, setSubmitSelected, selectedQuestionId, conditionalLogicData, sectionConditionLogicId, pageConditionLogicId, combinedArray, render, setRender }) {
-
+    const [selectedQuestion, setSelectedQuestion] = useState(null);
     useEffect(() => {
         const result = {};
 
         questions?.sections?.forEach(section => {
             section?.pages?.forEach(page => {
                 page?.questions?.forEach(question => {
-                    const key = `${section?.section_name}.${page?.page_name}.${question?.question_name}`.replace(/ /g, "_"); // Replace spaces with underscores
+                    const key = `${section?.section_name}.${page?.page_name}.${question?.question_name}`; // Replace spaces with underscores
                     result[key] = question?.component_type;
                 });
             });
         });
-    
+
         setRender(prev => prev + 1);
-        if (!conditions || conditions[0]?.conditions[0]?.question_name === "" ) return; // Check for valid conditions and data before updating
+        if (!conditions || conditions[0]?.conditions[0]?.question_name === "") return; // Check for valid conditions and data before updating
         const updatedConditions = conditions?.map(conditionGroup => ({
             ...conditionGroup,
             conditions: conditionGroup?.conditions?.map(condition => {
@@ -36,7 +36,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         if (render > 1) {
             setConditions(updatedConditions);
         }
-    }, [questions, setConditions,conditions[0]?.conditions[0]?.question_name]);
+    }, [questions, setConditions, conditions[0]?.conditions[0]?.question_name]);
 
     const dropdownRef = useRef();
     const dropdownRef2 = useRef();
@@ -144,9 +144,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         const [sectionPart, pagePart, questionPart] = path.split('.', 3);
         const fullQuestionPart = path.split('.').slice(2).join('.');  // To include everything after the second dot
         // Step 2: Replace underscores with spaces to match the actual names
-        const sectionName = sectionPart?.replace(/_/g, ' ');
-        const pageName = pagePart?.replace(/_/g, ' ');
-        const questionName = fullQuestionPart?.replace(/_/g, ' ');
+        const sectionName = sectionPart;
+        const pageName = pagePart;
+        const questionName = fullQuestionPart;
 
         // Step 3: Search for the matching section in the data
         const matchingSection = data?.sections.find(section => section.section_name === sectionName);
@@ -161,7 +161,7 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
         }
 
         // Step 5: Search for the matching question in the page
-        const matchingQuestion = matchingPage.questions.find(question => question.question_name === questionName);
+        const matchingQuestion = matchingPage.questions.find(question => question.question_name === questionPart);
         if (!matchingQuestion) {
             return null; // No matching question found
         }
@@ -187,8 +187,9 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
     //function to set the value from the selection dropdown for selecting the question
     const handleSelectDropdown = (key, mainIndex, subIndex, type) => {
-        setSubmitSelected(false)
-        let selectedQuestion = getDetails(key, questions);
+        setSubmitSelected(false);
+        setSelectedQuestion(key);
+        let matcheQuestion = getDetails(key, questions);
         if (type === 'condition_dropdown') {
             setConditions(prevConditions => {
                 // Create a new array from the current conditions
@@ -229,10 +230,10 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-
+            console.log(matcheQuestion?.component_type, 'matcheQuestion')
             // Update question_name and condition_type with the new values
             conditionToUpdate.question_name = key;
-            conditionToUpdate.condition_type = selectedQuestion?.component_type;
+            conditionToUpdate.condition_type = matcheQuestion?.component_type;
             conditionToUpdate.value = '';
             conditionToUpdate.condition_logic = '';
 
@@ -244,11 +245,15 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
             return updatedConditions;
         });
         updateDropdown(type, mainIndex, subIndex)
-
-
     }
     const getConditions = (key) => {
         let arr = ['No conditions available'];
+        let timeArr = ["No conditions available for time field"];
+        let isTime = false;
+        const matchedQuestion = combinedArray.find(item => item.question_detail === selectedQuestion);
+        if (matchedQuestion && matchedQuestion.type === 'time') {
+            isTime = true;
+        }
         if (secDetailsForSearching.length > 0) {
             switch (key) {
                 case "textboxfield":
@@ -266,7 +271,11 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
                 case "floorPlanfield":
                     return conditionObj['file'];
                 case "dateTimefield":
-                    return conditionObj['date'];
+                    if(isTime) {
+                        return timeArr;
+                    }else{
+                        return conditionObj['date'];
+                    }
                 default:
                     return arr; // This is the fallback if none of the cases match
             }

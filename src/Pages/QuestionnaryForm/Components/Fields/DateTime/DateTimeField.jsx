@@ -32,22 +32,6 @@ function DateTimeField({
     const [timeValue, setTimeValue] = useState('');
     const dispatch = useDispatch();
     const questionValue = useSelector(state => state.questionValues.questions);
-    // const [date, setDate] = useState(questionValue[question?.question_id]?.split(' ')[0] ? new Date(questionValue[question?.question_id]?.split(' ')[0]) : '');
-    const splitDate = (dateStr) => {
-        if (!dateStr || typeof dateStr !== 'string') {
-            return new Date().toISOString().split('T')[0];
-        }
-        const [day, month, year] = dateStr.split("/");
-        return `${year}-${month}-${day}`;
-    }
-
-    const handleDatwChange = (selectedDate) => {
-        if (selectedDate) {
-            const formattedDate = selectedDate.toLocaleDateString('en-GB'); // Converts to DD/MM/YYYY
-            setDate(selectedDate);
-            handleDateTime(formattedDate, timeValue);
-        }
-    };
     const splitTime = (timeStr) => {
         if (!timeStr) {
             return { hours: 0, minutes: 0, seconds: 0 };
@@ -95,31 +79,15 @@ function DateTimeField({
         // Combine date and time if both are available
         if (date && time) {
             const parsedDate = new Date(date); // Assuming date is in 'yyyy-mm-dd' format
-            const { hours, minutes, seconds, milliseconds } = splitTime(time);
-
             const combinedDateTime = new Date(
                 parsedDate.getFullYear(),
                 parsedDate.getMonth(),
                 parsedDate.getDate(),
-                hours,
-                minutes,
-                seconds,
-                milliseconds
             );
-
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
-
             // Update conditional values
-
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name],
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name],
-                        [label]: Math.round(combinedDateTime.getTime() / 1000), // Ensure this holds the correct combined value
-                    },
-                },
+                [question?.question_id.replace(/-/g, '_')]: combinedDateTime.toLocaleDateString()
             }));
 
             // Combine date and time into a string for setValue
@@ -158,41 +126,20 @@ function DateTimeField({
                     [question?.question_id]: '' // Only clear the error message for the current question  
                 }
             }));
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             const { hours, minutes, seconds } = splitTime(value);
             const currentDateTime = new Date();
             currentDateTime.setHours(hours, minutes, seconds, 0);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name], // Preserve existing entries for this section
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                        [label]: currentDateTime // Thu Mar 01 2001 02:01:00 GMT+0530 (India Standard Time)
-                    }
-                }
+                [question?.question_id.replace(/-/g, '_')]: currentDateTime
             }))
         } else if (type === 'date') {
             const value = e;
-            console.log(value)
-            // Extract current time
-            const currentHours = new Date().getHours();
-            const currentMinutes = new Date().getMinutes();
-            const currentSeconds = new Date().getSeconds();
-            const currentMilliSeconds = new Date().getMilliseconds();
             const selectedDate = new Date(value);
             selectedDate.setHours(0, 0, 0, 0);
-            // const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [section_name]: {
-                    ...prevValues[section_name],
-                    [page_name]: {
-                        ...prevValues[section_name]?.[page_name],
-                        [label]: selectedDate.toLocaleDateString() // Add or update the label key with the selectedDate
-                    }
-                }
+                [question?.question_id.replace(/-/g, '_')]: selectedDate.toLocaleDateString()
             }));
 
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));
