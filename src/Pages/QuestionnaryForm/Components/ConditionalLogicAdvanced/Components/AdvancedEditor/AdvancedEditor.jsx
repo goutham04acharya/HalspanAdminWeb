@@ -55,12 +55,10 @@ function AdvancedEditor({
     };
 
     const handleAddQuestion = (suggestion, sections, e) => {
-        console.log(suggestion, 'suggestion', sections)
         const keys = suggestion.split('.');
         const propertyValue = keys.reduce((obj, key) => obj?.[key], sections);
         const getVariableType = (a) => a?.constructor?.name?.toLowerCase();
         const valueType = getVariableType(propertyValue);
-        console.log(valueType,'oioioi')
         setSelectedQuestion(suggestion)
         setSelectedType(valueType);
         handleClickToInsert(suggestion, false, valueType);
@@ -140,7 +138,6 @@ function AdvancedEditor({
                     showSectionList && Object.keys(sections).length > 0 && (
                         <div className='pl-2.5 py-2.5 pr-1.5 h-[260px] w-[60%] overflow-y-auto scrollbar_gray border-l border-b border-r border-[#AEB3B7]'>
                             <div className="pr-1">
-                                {console.log(suggestions, filteredSuggestions, 'filteredSuggestions')}
                                 {showMethodSuggestions ? (
                                     <div className="suggestions-box">
                                         {suggestions.map((method, index) => (
