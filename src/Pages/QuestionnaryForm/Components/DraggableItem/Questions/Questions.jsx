@@ -120,9 +120,9 @@ const Questions = ({
             for (const page of section.pages) {
                 for (const question of page.questions) {
                     if (question.question_id === questionId && !label) {
-                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${question?.label?.replace(/ /g, "_")}`;
+                        return `${section?.section_name}.${page?.page_name}.${question?.label}`;
                     } else {
-                        return `${section?.section_name?.replace(/ /g, "_")}.${page?.page_name?.replace(/ /g, "_")}.${label?.replace(/ /g, "_")}`;
+                        return `${section?.section_name}.${page?.page_name}.${label}`;
                     }
                 }
             }
@@ -130,10 +130,54 @@ const Questions = ({
         return null; // Return null if question ID is not found
     };
 
+    //recursive udating the 
+    // function recursiveUpdate(obj, oldName, newName) {
+    //     console.log(obj,'pppppp')
+    //     obj.map((item, index) => {
+    //         console.log(item,'itemsss')
+    //         Object.keys(item).forEach((key) => {
+    //             console.log(key,'keyyy')
+    //             if (key === 'conditions') {
+    //                 obj[index][key].map((condition, i) => {
+    //                     if (condition.question_name.includes(condition.question_name)) {
+    //                         obj[index][key][i].question_name = condition.question_name.replace(oldName, newName);
+    //                     }
+    //                 })
+    //             } else if (key === 'elseIfBlocks') {
+    //                 console.log(obj[index][key],'ololol')
+    //                 obj[index][key].map((conditionsgrp, i) => {
+    //                     console.log(conditionsgrp.conditions,'vvvvvvv')
+    //                     conditionsgrp.conditions.length > 0 && conditionsgrp.conditions.map((condition, ii) => {
+    //                         if (condition.question_name.includes(oldName)) {
+    //                             console.log(obj[index][key][i].conditions[ii].question_name,'ggggg')
+    //                             obj[index][key][i].conditions[ii].question_name = condition.question_name.replace(oldName, newName);
+    //                         }
+    //                     })
+    //                 })
+    //             }
+    //         });
+    //     });
+
+    //     console.log(obj)
+    //     // if (Array.isArray(obj)) {
+    //     //     return obj.map(item => recursiveUpdate(item));
+    //     // } else if (typeof obj === 'object' && obj !== null) {
+    //     //     const updatedObj = {};
+    //     //     for (const key in obj) {
+    //     //         if (key === 'question_name' && obj[key] === oldName) {
+    //     //             updatedObj[key] = newName;
+    //     //         } else {
+    //     //             updatedObj[key] = recursiveUpdate(obj[key]);
+    //     //         }
+    //     //     }
+    //     //     return updatedObj;
+    //     // }
+    //     // return obj;
+
+    // }
     function recursiveUpdate(obj, oldName, newName) {
         return obj.map((item) => {
             let newItem = { ...item }; // Create a shallow copy of the object
-    
             Object.keys(newItem).forEach((key) => {
                 if (key === 'conditions') {
                     newItem[key] = newItem[key].map((condition) => ({
@@ -167,19 +211,20 @@ const Questions = ({
         Object.keys(updatedFieldSettingParams).forEach((key) => {
             if (
                 updatedFieldSettingParams[key].conditional_logic &&
-                updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId].replace(/ /g, '_'))
+                updatedFieldSettingParams[key].conditional_logic.includes(currentQuestionLabel[questionId])
             ) {
                 updatedFieldSettingParams[key] = {
                     ...updatedFieldSettingParams[key],
                     conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
-                        new RegExp(currentQuestionLabel[questionId].replace(/ /g, '_'), 'g'),
-                        findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')
+                        new RegExp(currentQuestionLabel[questionId], 'g'),
+                        findQuestionPath(questionId, fieldSettingParams[questionId]?.label)
                     )
                 };
-                replaceComplianceLogic(currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_'));
-                dispatch(setComplianceLogicCondition(recursiveUpdate(recursiveUpdate(conditions, currentQuestionLabel[questionId].replace(/ /g, '_'), findQuestionPath(questionId, fieldSettingParams[questionId]?.label).replace(/ /g, '_')))));
+
             }
         });
+        replaceComplianceLogic(currentQuestionLabel[questionId], findQuestionPath(questionId, fieldSettingParams[questionId]?.label));
+        dispatch(setComplianceLogicCondition(recursiveUpdate(conditions, currentQuestionLabel[questionId], findQuestionPath(questionId, fieldSettingParams[questionId]?.label))));
         dispatch(setCurrentData(updatedFieldSettingParams));
         dispatch(saveCurrentData(updatedFieldSettingParams));
         return updatedFieldSettingParams;
