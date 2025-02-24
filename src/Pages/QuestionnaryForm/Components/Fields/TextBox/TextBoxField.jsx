@@ -96,14 +96,14 @@ const TextBoxField = ({
                 newValue,
             )
         ) {
-            displayValidationError("Only alphabets are allowed.");
+            displayValidationError("Only alphabetic characters allowed");
         } else if (
             format === "Alphanumeric" &&
             /[^a-zA-Z0-9 ]+|^(Backspace|Tab|Enter|Shift|Control|Alt|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|CapsLock|\s)$/.test(
                 newValue,
             )
         ) {
-            displayValidationError("Only alphabets and numbers are allowed.");
+            displayValidationError("Only alphabetic characters and numbers allowed");
         } else if (
             format === "Numeric" &&
             /[^0-9 ]+|^(Backspace|Tab|Enter|Shift|Control|Alt|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|CapsLock|\s)$/.test(
