@@ -231,10 +231,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const questionId = question?.question_id;
                     const questionName = `${pageName}.${question.question_name}`;
                     if (questionId !== selectedQuestionId && (!['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type))) {
-                        // let questions = {
-                        //     id: questionId,
-                        //     option: questionName
-                        // }
                         sectionDetailsArray.push(questionName);
                     } else {
 
@@ -363,7 +359,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         const cursorPosition = event.target.selectionStart; // Get the cursor position
         // If the last character is a dot, check the field type and show method suggestions
         if (value[cursorPosition - 1] === '.') {
-            // debugger
             if (selectedFieldType === 'textboxfield, choiceboxfield, assetLocationfield, floorPlanfield, signaturefield, gpsfield, displayfield') {
                 setSuggestions(stringMethods);
                 setShowMethodSuggestions(true);
@@ -454,7 +449,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     };
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
-        // debugger
         const textarea = textareaRef.current;
 
         if (textarea) {
@@ -515,7 +509,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 setShowSectionList(true)
             } else {
                 let fieldType = '';
-                // debugger
                 switch (componentType) {
                     case 'string':
                         fieldType = [
@@ -956,7 +949,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                // return input.replace(/\b(\w+\.\w+\.\w+)\b/g, 'sections.$1')
                 return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'questionWithUuid.$1');
             };
 
@@ -1306,7 +1298,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         break;
                 }
             }
-            // debugger
             if (!isDefaultLogic && !complianceState) {
                 const validationResult = splitAndValidate(evalInputValue);
 
@@ -1350,7 +1341,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError(result);
             }
         } catch (error) {
-            console.log(error)
             const handleError = (message) => {
                 setError(message);
                 setIsThreedotLoader(false);
@@ -1720,15 +1710,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                 condition_logic = getReplacedComplianceLogic(condition_logic)
-                // console.log(condition_logic, conditions, 'condition_logic');
-                // if (condition_logic !== '') {
-                //     condition_logic
-                //         .replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                //         .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                //         .replace(/&&/g, 'and') // Replace && with and
-                //         .replace(/||/g, 'or') // Replace || with or
-                //         .replace(/.length/g, '.()')
-                // }
                 if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic?.split(':');

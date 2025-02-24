@@ -230,7 +230,6 @@ function BasicEditor({ secDetailsForSearching, questions, conditions, setConditi
 
             // Access the specific condition using mainIndex and subIndex
             const conditionToUpdate = updatedConditions[mainIndex].conditions[subIndex];
-            console.log(matcheQuestion?.component_type, 'matcheQuestion')
             // Update question_name and condition_type with the new values
             conditionToUpdate.question_name = key;
             conditionToUpdate.condition_type = matcheQuestion?.component_type;

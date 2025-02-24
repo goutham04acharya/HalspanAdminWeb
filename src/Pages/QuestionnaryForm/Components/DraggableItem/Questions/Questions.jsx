@@ -101,7 +101,6 @@ const Questions = ({
     };
     const handleQuestionIndexCapture = (question) => {
         if (selectedQuestionId && currentQuestionLabel[selectedQuestionId] !== fieldSettingParams[selectedQuestionId]?.label) {
-            console.log(handleQuestionLabelChange(selectedQuestionId), 'ppp')
         }
         let currentLabel = {
             id: question.question_id,
@@ -131,51 +130,6 @@ const Questions = ({
         return null; // Return null if question ID is not found
     };
 
-    //recursive udating the 
-    // function recursiveUpdate(obj, oldName, newName) {
-    //     console.log(obj,'pppppp')
-    //     obj.map((item, index) => {
-    //         console.log(item,'itemsss')
-    //         Object.keys(item).forEach((key) => {
-    //             console.log(key,'keyyy')
-    //             if (key === 'conditions') {
-    //                 obj[index][key].map((condition, i) => {
-    //                     if (condition.question_name.includes(condition.question_name)) {
-    //                         obj[index][key][i].question_name = condition.question_name.replace(oldName, newName);
-    //                     }
-    //                 })
-    //             } else if (key === 'elseIfBlocks') {
-    //                 console.log(obj[index][key],'ololol')
-    //                 obj[index][key].map((conditionsgrp, i) => {
-    //                     console.log(conditionsgrp.conditions,'vvvvvvv')
-    //                     conditionsgrp.conditions.length > 0 && conditionsgrp.conditions.map((condition, ii) => {
-    //                         if (condition.question_name.includes(oldName)) {
-    //                             console.log(obj[index][key][i].conditions[ii].question_name,'ggggg')
-    //                             obj[index][key][i].conditions[ii].question_name = condition.question_name.replace(oldName, newName);
-    //                         }
-    //                     })
-    //                 })
-    //             }
-    //         });
-    //     });
-
-    //     console.log(obj)
-    //     // if (Array.isArray(obj)) {
-    //     //     return obj.map(item => recursiveUpdate(item));
-    //     // } else if (typeof obj === 'object' && obj !== null) {
-    //     //     const updatedObj = {};
-    //     //     for (const key in obj) {
-    //     //         if (key === 'question_name' && obj[key] === oldName) {
-    //     //             updatedObj[key] = newName;
-    //     //         } else {
-    //     //             updatedObj[key] = recursiveUpdate(obj[key]);
-    //     //         }
-    //     //     }
-    //     //     return updatedObj;
-    //     // }
-    //     // return obj;
-
-    // }
     function recursiveUpdate(obj, oldName, newName) {
         return obj.map((item) => {
             let newItem = { ...item }; // Create a shallow copy of the object

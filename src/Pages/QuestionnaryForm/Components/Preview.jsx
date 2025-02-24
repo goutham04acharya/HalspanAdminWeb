@@ -186,7 +186,6 @@ function PreviewModal({
       });
     }
     const preprocessLogic = (logic) => {
-      // debugger
       if (logic?.includes("if")) {
         logic = logic?.replace("if", "");
       }
