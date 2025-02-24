@@ -4,8 +4,9 @@ import { setSelectedQuestionId } from '../../../QuestionnaryFormSlice';
 import { useDispatch } from 'react-redux';
 import { complianceContentConverter } from '../../../../../../CommonMethods/complianceContentConverter';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
+import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
-function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus, validationErrors, setValidationErrors }) {
+function ComplianceFieldSetting({ complianceLogic, setComplianceLogic, setCompliancestate, formStatus, validationErrors, setValidationErrors, questionWithUUID }) {
     const { complianceLogicId } = useSelector(state => state?.questionnaryForm)
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [failGradeValue, setFailGradeValue] = useState('')
@@ -75,7 +76,7 @@ const handleInputChange = (id, field, value) => {
                             <input type="text" id='Label'
                                 onChange={(e) => handleInputChange(complianceLogicId, 'default_content', e.target.value)}
                                 value={complianceLogic[complianceLogicId]?.default_content
-                                    ? complianceContentConverter(complianceLogic[complianceLogicId].default_content.replaceAll(/""/g, '"'))
+                                    ? complianceContentConverter(replaceUUIDsWithQuestions(complianceLogic[complianceLogicId].default_content.replaceAll(/""/g, '"'), questionWithUUID))
                                     : ''}
                                 disabled={formStatus !== 'Draft'}
                                 className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'

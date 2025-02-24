@@ -147,7 +147,7 @@ function ImageUploader({
                     disabled={images.length >= maxImages}
                 />
                 <span data-testid="image-count" className={`text-[12px] my-2 items-center justify-center flex px-3 ${images.length >= maxImages ? 'disabled' : ''}`}>
-                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Image ({maxImages - images.length || maxImages})
+                    <img src="/Images/add-media.svg" alt="" className="mx-2" /> Add Image ({maxImages - images.length})
                 </span>
             </label>
 

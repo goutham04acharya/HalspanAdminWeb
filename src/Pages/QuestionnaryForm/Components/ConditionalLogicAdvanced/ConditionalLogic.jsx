@@ -70,6 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
+
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -257,11 +258,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         let condition_logic = getFinalComplianceLogic(conditions)
         if (condition_logic !== '' || condition_logic !== undefined) {
             condition_logic
-                ?.replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                ?.replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                ?.replaceAll('&&', 'and') // Replace && with and
-                ?.replaceAll('||', 'or') // Replace || with or
-                ?.replaceAll('.length', '.()')
+                ?.replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                ?.replace('/\b(?<!\w\.)\?(?!\w+\))/g', ' then ')
+                ?.replace(/&&/g, 'and') // Replace && with and
+                ?.replace(/||/g, 'or') // Replace || with or
+                ?.replace(/.length/g, '.()')
         }
         if (condition_logic?.includes(':')) {
             // Split by colon and rebuild with "else if" and "else" logic
@@ -352,7 +353,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowSectionList(true)
         const value = event.target.value;
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
-        const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
+        const regex = /\b[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\b/g;
         let questionMatches = value.match(regex);
         setLogic(value);
         setInputValue(value)
@@ -450,9 +451,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setShowMethodSuggestions(false); // Reset method suggestions
         }
     };
-    console.log(selectedFieldType, 'field type')
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        // debugger
         const textarea = textareaRef.current;
 
         if (textarea) {
@@ -822,8 +823,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
+                        console.log(transformedContent, 'transformedContent');
                         setConditions(parseLogicExpression(transformedContent));
-                        setInputValue(replaceUUIDs(transformedContent, questionWithUUID));
+                        setInputValue(replaceUUIDs(transformedContent, questionWithUuid));
                     } else {
                         setInputValue('');
                     }
@@ -1256,11 +1258,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
                 const result = eval(wrappedEval);
                 console.log("Final result:", result);
-
+                
             } catch (error) {
                 console.error("Unexpected error:", error);
             }
-
+            
+            console.log(payloadString, 'payloadString')
 
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
@@ -1293,7 +1296,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                             setError('');  // No error, valid number
                         }
                         break;
-                    default:
+                        default:
                         break;
                 }
             } else if (complianceState) {
@@ -1347,6 +1350,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(true);
             if (!error) {
                 if (complianceState) {
+                    payloadString = evalInputValue;
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
@@ -1686,6 +1690,33 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         return finalString;
     }
+    function getReplacedComplianceLogic(conditions) {
+        let condition_logic = conditions; // Assuming this is your input string
+        
+        // Step 1: Replace ternary operator pattern
+        condition_logic = condition_logic.replace(/\)\s*\?\s*\(/g, ') then (');
+        
+        // Step 2: Replace && with "and"
+        condition_logic = condition_logic.replace(/&&/g, 'and');
+        
+        // Step 3: Replace || with "or"
+        condition_logic = condition_logic.replace(/\|\|/g, 'or');
+        
+        // Step 4: Replace .length with .()
+        condition_logic = condition_logic.replace(/\.length/g, '.()');
+        
+        // Step 5: Replace ACTIONS.push() with ACTIONS =
+        condition_logic = condition_logic.replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, "ACTIONS = '$1'");
+        
+        // Step 6: Handle if-else conversion from ternary
+        if (condition_logic.includes(':')) {
+            const parts = condition_logic.split(':');
+            const lastPart = parts.pop();
+            condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+        }
+        
+        return condition_logic;
+    }
 
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
@@ -1697,20 +1728,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else {
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
-                if (condition_logic !== '') {
-                    condition_logic
-                        .replaceAll(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
-                        .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
-                        .replaceAll('&&', 'and') // Replace && with and
-                        .replaceAll('||', 'or') // Replace || with or
-                        .replaceAll('.length', '.()')
-                }
+                condition_logic = getReplacedComplianceLogic(condition_logic)
+                // console.log(condition_logic, conditions, 'condition_logic');
+                // if (condition_logic !== '') {
+                //     condition_logic
+                //         .replace(/ACTIONS\.push\(['"](.*?)['"]\)/g, `ACTIONS += '$1'`) // Replace ACTION.push logic
+                //         .replace(/\b(?<!\w\.)\?(?!\w+\))/g, ' then ')
+                //         .replace(/&&/g, 'and') // Replace && with and
+                //         .replace(/||/g, 'or') // Replace || with or
+                //         .replace(/.length/g, '.()')
+                // }
                 if (condition_logic?.includes(':')) {
                     // Split by colon and rebuild with "else if" and "else" logic
                     const parts = condition_logic?.split(':');
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
+                console.log(condition_logic,'condition_logic after')
                 setInputValue(replaceUUIDs(condition_logic, questionWithUuid) || defaultContentConverter(replaceUUIDs(complianceLogic[0].default_content, questionWithUuid)));
             } catch (error) {
                 console.error('Error while converting', error);
@@ -1753,13 +1787,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 isAdvanceEditorCompliance: false
             }));
         }
-
+        
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
-        }
-        function escapeRegex(str) {
-            return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
         }
         if (complianceState) {
 
@@ -1773,9 +1804,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 );
             });
             console.log(complianceLogic, 'get compliance')
-            setCompliancestate(false);
         }
-
+        
         let condition_logic;
         if (!complianceState) {
             try {
@@ -1793,25 +1823,23 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         } else if (selectedQuestionId) {
             sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
         }
-        console.log(condition_logic, 'ooooooo')
-        console.log(questionWithUuid, 'questionWithUuid')
-        // condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
-        //     return logic.replace(new RegExp(questionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
-        // }, condition_logic);
-        condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
-            // Escape all special regex characters
-            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
-
-            return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
-        }, condition_logic);
-
-        handleSaveSection(sectionId, true, condition_logic);
+        if(!complianceState){
+            condition_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, condition_logic);
+        }
+        
+        console.log(conditions, 'compliance conditions')
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
             dispatch(setComplianceLogicCondition(conditions));
         }
+        handleSaveSection(sectionId, true, condition_logic);
         setConditionalLogic(false);
+        setCompliancestate(false);
         setSectionConditionLogicId(false);
         setPageConditionLogicId(false);
     }
@@ -1824,7 +1852,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     function escapeRegex(str) {
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
     }
-    console.log(questionWithUuid, 'questionWithUuid')
     function replaceUUIDs(questionWithUUID, replacements) {
         let updatedString = questionWithUUID;
         console.log(replacements, 'updatin')

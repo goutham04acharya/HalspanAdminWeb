@@ -1908,7 +1908,7 @@ const QuestionnaryForm = () => {
         });
         setQuestionWithUuid(questionDetailsWithUuid);
     };
-    console.log(questionWithUuid,'brooooo')
+
     useEffect(() => {
         getQuestionDetails();
     }, [sections, fieldSettingParams, handleTextboxClick]);
