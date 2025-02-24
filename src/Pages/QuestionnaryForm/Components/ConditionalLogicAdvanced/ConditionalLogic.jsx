@@ -122,6 +122,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const dateMethods = ["AddDays()", "SubtractDays()", "getFullYear()", "getMonth()", "getDate()", "getDay()"]
     const timeMethods = ["getHours()", "getMinutes()", "getSeconds()", "getMilliseconds()", "getTime()"]
     const fileMethods = ["()"];
+    const notRequiredConditions = ["toUpperCase()", "toLowerCase()", "trim()"].concat(dateTimeMethods).concat(dateMethods).concat(timeMethods).concat(fileMethods)
 
     //this is my listing of types based on the component type
     const getFieldType = (componentType) => {
@@ -823,7 +824,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     // Use defaultContentConverter to transform default_content if selectedLogic exists
                     if (selectedLogic) {
                         const transformedContent = defaultContentConverter(selectedLogic.default_content);
-                        console.log(transformedContent, 'transformedContent');
                         setConditions(parseLogicExpression(transformedContent));
                         setInputValue(replaceUUIDs(transformedContent, questionWithUuid));
                     } else {
@@ -1004,7 +1004,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let methods = [
                 "AddDays", "SubtractDays", "includes"
             ]
-            console.log(evalInputValue, 'first one')
             if (evalInputValue.includes('getMonth')) {
 
                 // Extract the value after `getMonth()` with any comparison operator using regex
@@ -1185,7 +1184,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
-            console.log(evalInputValue, 'evalInputValue')
             // Extract variable names from the payloadString using a regex
             // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
@@ -1234,17 +1232,11 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
                     let replacement = `${sanitizedUuid}`;
-
-                    console.log("Replacing:", questionName, "with:", replacement);
-
                     return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
                 }, evalInputValue);
 
                 // **Fix: Remove unwanted `questionWithUuid.` reference**
                 evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
-
-                console.log("Fixed evalInputValue:", evalInputValue);
-
                 const wrappedEval = `(function(questionValues) { 
                                         try {
                                             return ${evalInputValue};
@@ -1253,18 +1245,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-
-                console.log("About to evaluate:", wrappedEval);
-
-                const result = eval(wrappedEval);
-                console.log("Final result:", result);
-                
+                const result = eval(wrappedEval);                
             } catch (error) {
                 console.error("Unexpected error:", error);
             }
-            
-            console.log(payloadString, 'payloadString')
-
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -1718,6 +1702,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return condition_logic;
     }
 
+    const handleTab = () => {
+        if(!notRequiredConditions.some(element => inputValue.includes(element))) {
+            let parsedLogic = parseLogicExpression(inputValue)
+            setConditions(parsedLogic)
+        }
+    }
+
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
             let condition_logic = buildConditionExpression(conditions, combinedArray)
@@ -1744,7 +1735,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     const lastPart = parts.pop(); // Remove the last part
                     condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
                 }
-                console.log(condition_logic,'condition_logic after')
                 setInputValue(replaceUUIDs(condition_logic, questionWithUuid) || defaultContentConverter(replaceUUIDs(complianceLogic[0].default_content, questionWithUuid)));
             } catch (error) {
                 console.error('Error while converting', error);
@@ -1803,7 +1793,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         : item
                 );
             });
-            console.log(complianceLogic, 'get compliance')
         }
         
         let condition_logic;
@@ -1830,8 +1819,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
             }, condition_logic);
         }
-        
-        console.log(conditions, 'compliance conditions')
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
@@ -1854,18 +1841,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     }
     function replaceUUIDs(questionWithUUID, replacements) {
         let updatedString = questionWithUUID;
-        console.log(replacements, 'updatin')
         if (!updatedString) {
             return '';
         }
         Object.entries(replacements).forEach(([key, value]) => {
             const escapedValue = escapeRegex(value);
-            console.log(key, value, 'replacements')
             const regex = new RegExp(escapedValue, "g"); // Global replacement
-            console.log(regex, 'regex')
             updatedString = updatedString.replace(regex, key);
         });
-        console.log(updatedString, 'updated string')
         return updatedString;
     }
     useEffect(() => {
@@ -1971,7 +1954,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                     <div className={`${isDefaultLogic ? 'flex justify-end items-end w-full' : 'flex justify-between items-end'}`}>
                                         {!isDefaultLogic &&
                                             <div className='flex gap-5 items-end'>
-                                                <button onClick={() => setTab('basic')} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
+                                                <button onClick={() => {setTab('basic'); handleTab()}} className={tab === 'advance' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Basic Editor</button>
                                                 <p data-testId="advance-editor-tab" onClick={() => setTab('advance')} className={tab === 'basic' ? 'text-lg text-[#9FACB9] font-semibold px-[1px] border-b-2 border-white cursor-pointer' : 'text-[#2B333B] font-semibold px-[1px] border-b-2 border-[#2B333B] text-lg cursor-pointer'}>Advanced Editor</p>
                                             </div>
                                         }

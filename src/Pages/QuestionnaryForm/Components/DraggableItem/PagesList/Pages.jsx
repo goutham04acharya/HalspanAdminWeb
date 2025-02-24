@@ -63,7 +63,6 @@ function Pages({ pageIndex,
     // Call handleAutoSave with the correct sectionId and updated sections
     // handleAutoSave(sectionId, updatedSections);
   };
-  console.log(sections, 'sections')
   return (
     <div>
       <div
