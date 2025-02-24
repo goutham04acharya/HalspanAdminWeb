@@ -65,10 +65,10 @@ const TextBoxField = ({
         const formatError = question?.format_error;
         const format = question?.format;
         let regex = question?.regular_expression;
-        if(!regex.startsWith('^')){
+        if(!regex?.startsWith('^')){
             regex = '^' + regex;
         }
-        if(!regex.endsWith('$')){
+        if(!regex?.endsWith('$')){
             regex = regex + '$';
         }
         setConditionalValues((prevValues) => ({

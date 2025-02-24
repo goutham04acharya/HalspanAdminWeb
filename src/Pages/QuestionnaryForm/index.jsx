@@ -1054,10 +1054,10 @@ const QuestionnaryForm = () => {
         // Check if a pageIndex is provided to update a page name or section name
         if (pageIndex !== undefined && pageIndex !== null) {
             if (noFocus && updatedSections[sectionIndex].pages[pageIndex].page_name !== value) {
-                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
-                let page = updatedSections[sectionIndex].pages[pageIndex].page_name.replace(/ /g, '_');
+                let section = updatedSections[sectionIndex].section_name;
+                let page = updatedSections[sectionIndex].pages[pageIndex].page_name;
                 let replaceWord = section + '.' + page;
-                let newWord = section + '.' + value.replace(/ /g, '_');
+                let newWord = section + '.' + value;
 
                 // Create a new copy of fieldSettingParams
                 const updatedFieldSettingParams = { ...fieldSettingParams };
@@ -1088,9 +1088,9 @@ const QuestionnaryForm = () => {
 
         } else {
             if (noFocus && updatedSections[sectionIndex].section_name !== value) {
-                let section = updatedSections[sectionIndex].section_name.replace(/ /g, '_');
+                let section = updatedSections[sectionIndex].section_name;
                 let replaceWord = section;
-                let newWord = value.replace(/ /g, '_');
+                let newWord = value;
 
                 // Create a new copy of fieldSettingParams
                 const updatedFieldSettingParams = { ...fieldSettingParams };
