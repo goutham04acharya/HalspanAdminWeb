@@ -2057,6 +2057,7 @@ const QuestionnaryForm = () => {
                                                                             dropdownOpen={dropdownOpen}
                                                                             setPageConditionLogicId={setPageConditionLogicId}
                                                                             pageConditionLogicId={setPageConditionLogicId}
+
                                                                         />
                                                                     </li>
                                                                 )}
@@ -2071,7 +2072,7 @@ const QuestionnaryForm = () => {
                                     </div>
                                     {(complianceClick && complianceLogic.length > 0) && (
                                         <div>
-                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                            <ComplanceLogicField questionWithUuid={questionWithUuid} setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
                                         </div>
                                     )}
                                 </div>
@@ -2160,6 +2161,7 @@ const QuestionnaryForm = () => {
                                             formStatus: formStatus,
                                             validationErrors: validationErrors,
                                             setValidationErrors: setValidationErrors,
+                                            questionWithUUID: questionWithUuid
                                         }
                                     )
                                 ) : (

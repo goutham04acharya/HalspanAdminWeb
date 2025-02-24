@@ -70,6 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
+    console.log(complianceLogicCondition, 'complianceLogicCondition')
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -352,7 +353,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setShowSectionList(true)
         const value = event.target.value;
         // let questionName = value?.split('.')[2]?.replace('_', ' ');
-        const regex = /\b[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\.[^.\s]+_[^.\s]+\b/g;
+        const regex = /\b[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\.[^.\s]+ [^.\s]+\b/g;
         let questionMatches = value.match(regex);
         setLogic(value);
         setInputValue(value)
@@ -453,6 +454,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     console.log(selectedFieldType, 'field type')
     // Combined function to insert either a question or a method
     const handleClickToInsert = (textToInsert, isMethod, componentType) => {
+        // debugger
         const textarea = textareaRef.current;
 
         if (textarea) {
@@ -1755,9 +1757,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         setSubmitSelected(true);
         if (validateConditions()) {
             return;
-        }
-        function escapeRegex(str) {
-            return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
         }
         if (complianceState) {
 
