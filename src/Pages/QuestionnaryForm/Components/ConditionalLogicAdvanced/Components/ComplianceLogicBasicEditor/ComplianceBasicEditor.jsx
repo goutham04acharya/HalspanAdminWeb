@@ -573,9 +573,7 @@ function ComplianceBasicEditor({ secDetailsForSearching, questions, conditions, 
         } else {
             setConditions(prevConditions => {
                 const updatedConditions = [...prevConditions];
-
                 const conditionToUpdate = updatedConditions[mainIndex]?.conditions[subIndex];
-
                 conditionToUpdate.question_name = key;
                 conditionToUpdate.condition_type = selectedQuestion?.component_type;
                 conditionToUpdate.value = '';
