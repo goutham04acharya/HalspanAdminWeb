@@ -920,11 +920,13 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 };
             });
         } else {
-            setEditorCheck((prev) => ({
-                ...prev,
-                isBasicEditorCompliance: false,
-                isAdvanceEditorCompliance: true
-            }));
+            if (!isDefaultLogic) {
+                setEditorCheck((prev) => ({
+                    ...prev,
+                    isBasicEditorCompliance: false,
+                    isAdvanceEditorCompliance: true
+                }));
+            }
         }
 
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
@@ -1223,7 +1225,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }, evalInputValue);
 
             // **Fix: Remove unwanted `questionWithUuid.` reference**
-            // evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
+            evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
             console.log(evalInputValue)
             const wrappedEval = `(function(questionValues) { 
                                         try {
@@ -1327,7 +1329,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
                     return;
                 }
-                
+
                 evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
                 console.log(evalInputValue, 'at end')
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
@@ -1723,13 +1725,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [conditions])
 
-
-
-
-
-
     const handleSaveBasicEditor = () => {
-
         if (!complianceState) {
             setEditorCheck((prev) => {
                 const updatedConditionalEditor = prev.conditonalEditor.map((item) =>

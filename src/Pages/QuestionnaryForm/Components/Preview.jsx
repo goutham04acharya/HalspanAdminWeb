@@ -96,12 +96,12 @@ function PreviewModal({
         const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
         result[sectionKey][pageKey] = {}; // Initialize the page key within the section
 
-                page.questions.forEach((question, questionIndex) => {
-                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
-                });
-            });
+        page.questions.forEach((question, questionIndex) => {
+          const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
+          result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
         });
+      });
+    });
     return result;
   };
 
@@ -133,23 +133,23 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-                setPreviewNavigation((prev) => ({
-                    ...prev,
-                    total_pages: sectionDetails?.sections.reduce(
-                        (total, section) => total + section.pages.length,
-                        0,
-                    ),
-                }));
-                updateConditionalValues(sectionDetails?.sections);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSections();
-    }, [questionnaire_id, version_number, sectionDetails]);
-    const evaluateComplianceLogic = () => {
+        setPreviewNavigation((prev) => ({
+          ...prev,
+          total_pages: sectionDetails?.sections.reduce(
+            (total, section) => total + section.pages.length,
+            0,
+          ),
+        }));
+        updateConditionalValues(sectionDetails?.sections);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSections();
+  }, [questionnaire_id, version_number, sectionDetails]);
+  const evaluateComplianceLogic = () => {
 
     let results = [];
 
@@ -1235,6 +1235,18 @@ function PreviewModal({
             if (default_conditional_logic) {
               try {
                 const result = eval(default_conditional_logic);
+
+                // console.log(default_conditional_logic);
+
+                // console.log(result);
+
+
+                // dispatch(
+                //   setQuestionValue({
+                //     question_id: question?.question_id,
+                //     value: result,
+                //   }),
+
                 if (component_type === "dateTimefield") {
                   const splitDate = (dateStr) => {
                     if (!dateStr || typeof dateStr !== "string") {
@@ -1394,14 +1406,14 @@ function PreviewModal({
                         </h3>
                         <span
                           className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === "PASS"
-                              ? "bg-green-500"
-                              : "bg-red-500 text-white"
+                            ? "bg-green-500"
+                            : "bg-red-500 text-white"
                             }`}
                         >
                           <img
                             src={`${result?.STATUS === "PASS"
-                                ? "/Images/compliant.svg"
-                                : "/Images/non-compliant.svg"
+                              ? "/Images/compliant.svg"
+                              : "/Images/non-compliant.svg"
                               }`}
                             width={12}
                             data-testid={

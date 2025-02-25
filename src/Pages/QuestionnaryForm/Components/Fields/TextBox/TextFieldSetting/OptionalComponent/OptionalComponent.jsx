@@ -29,6 +29,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
     const [isLoadingAsset, setIsLoadingAsset] = useState(false)
     const [attributes, setAttributes] = useState([])
+    const [hasFinishedLoading, setHasFinishedLoading] = useState(false);
 
     const getOptions = (componentType) => {
         switch (componentType) {
@@ -119,13 +120,15 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             services_type
         }
         setIsLoadingQuestionnaires(true);
+        setHasFinishedLoading(false);
         try {
             const response = await getAPI(`questionnaires${objectToQueryString(query)}`);
             setQuestionnairesList(response?.data?.data?.items);
-            setIsLoadingQuestionnaires(false);
         } catch {
             console.error('Error fetching question list:', error);
+        } finally {
             setIsLoadingQuestionnaires(false);
+            setHasFinishedLoading(true);
         }
     };
 
@@ -163,55 +166,27 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
 
         const filteredList = questionList.filter((item) => item.component_type === componentType);
 
-        return filteredList.map((item) => {
-            let componentTypeLabel;
+        // Map component types to their display labels
+        const componentTypeLabels = {
+            "textboxfield": "Text-Box Field",
+            "choiceboxfield": "Choice-Box Field",
+            "dateTimefield": "Date-Time Field",
+            "assetLocationfield": "Asset-Location Field",
+            "numberfield": "Number Field",
+            "floorPlanfield": "Floor-Plan Field",
+            "photofield": "Photo Field",
+            "videofield": "Video Field",
+            "filefield": "File Field",
+            "signaturefield": "Signature Field",
+            "gpsfield": "GPS Field",
+            "displayfield": "Display Field",
+            "compliancelogic": "Compliance Logic",
+            "tagScanfield": "Tag-Scan Field"
+        };
 
-            switch (componentType) {
-                case "textboxfield":
-                    componentTypeLabel = "Text-Box Field";
-                    break;
-                case "choiceboxfield":
-                    componentTypeLabel = "Choice-Box Field";
-                    break;
-                case "dateTimefield":
-                    componentTypeLabel = "Date-Time Field";
-                    break;
-                case "assetLocationfield":
-                    componentTypeLabel = "Asset-Location Field";
-                    break;
-                case "numberfield":
-                    componentTypeLabel = "Number Field";
-                    break;
-                case "floorPlanfield":
-                    componentTypeLabel = "Floor-Plan Field";
-                    break;
-                case "photofield":
-                    componentTypeLabel = "Photo Field";
-                    break;
-                case "videofield":
-                    componentTypeLabel = "Video Field";
-                    break;
-                case "filefield":
-                    componentTypeLabel = "File Field";
-                    break;
-                case "signaturefield":
-                    componentTypeLabel = "Signature Field";
-                    break;
-                case "gpsfield":
-                    componentTypeLabel = "GPS Field";
-                    break;
-                case "displayfield":
-                    componentTypeLabel = "Display Field";
-                    break;
-                case "compliancelogic":
-                    componentTypeLabel = "Compliance Logic";
-                    break;
-                case "tagScanfield":
-                    componentTypeLabel = "Tag-Scan Field";
-                    break;
-                default:
-                    componentTypeLabel = "Unknown Component";
-            }
+        return filteredList.map((item) => {
+            // Get the label or default to "Unknown Component"
+            const componentTypeLabel = componentTypeLabels[componentType] || "Unknown Component";
 
             return {
                 label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentTypeLabel})`,
@@ -249,14 +224,15 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }
 
     useEffect(() => {
-        if (fieldSettingParams[selectedQuestionId]) {
+        const questionSettings = fieldSettingParams[selectedQuestionId]?.options;
+        if (questionSettings) {
             setToggleStates({
-                'Load from previously entered data': fieldSettingParams[selectedQuestionId]?.options?.load_from_previous || false,
-                'Read only': fieldSettingParams[selectedQuestionId]?.options?.read_only || false,
-                'Visible': fieldSettingParams[selectedQuestionId]?.options?.visible || false,
-                'Optional': fieldSettingParams[selectedQuestionId]?.options?.optional || false,
-                'Remember allowed': fieldSettingParams[selectedQuestionId]?.options?.remember_allowed || false,
-                'Field validation': fieldSettingParams[selectedQuestionId]?.options?.field_validation || false,
+                'Load from previously entered data': questionSettings.load_from_previous || false,
+                'Read only': questionSettings.read_only || false,
+                'Visible': questionSettings.visible || false,
+                'Optional': questionSettings.optional || false,
+                'Remember allowed': questionSettings.remember_allowed || false,
+                'Field validation': questionSettings.field_validation || false,
             });
         }
     }, [fieldSettingParams, selectedQuestionId]);
@@ -312,15 +288,16 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         setIsQuesDropdownOpen(dropdownType === 'question')
     };
 
-    // show the error message after 2seconds
     useEffect(() => {
-        if (questionnairesList.length === 0 && activeTab !== 'attributeData' && selectedServiceValue !== '') {
-            const timer = setTimeout(() => setShowError(true), 2000); // 2-second delay
-            return () => clearTimeout(timer); // Cleanup timeout
-        } else {
-            setShowError(false); // Reset the state when conditions change
-        }
-    }, [questionnairesList, activeTab, selectedServiceValue])
+        const shouldShowError = 
+          activeTab !== 'attributeData' && 
+          !!selectedServiceValue && 
+          hasFinishedLoading && 
+          questionnairesList.length === 0 && 
+          !isLoadingQuestionnaires;
+        
+        setShowError(shouldShowError);
+      }, [questionnairesList, activeTab, selectedServiceValue, hasFinishedLoading, isLoadingQuestionnaires]);
 
     return (
         <div className='mt-7 w-[97%]'>
@@ -406,32 +383,32 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                     )}
                     {activeTab !== 'attributeData' && (
                         fieldSettingParameters.service_record_lfp ?
-                        isLoadingQuestionnaires ? (
-                            <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
-                        ) : 
-                            (<InfinateDropdown
-                                label='Questionnaire List'
-                                mainDivStyle='mt-3'
-                                labelStyle='font-semibold text-[#2B333B] text-base'
-                                id='serviceRecord'
-                                top='50px'
-                                mandatoryField
-                                placeholder='Select'
-                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
-                                testID='select-questionnaire-list'
-                                labeltestID='service-record'
-                                selectedOption={handleQuestionnarieList.find(option => option.value === fieldSettingParameters.questionnaire_name_lfp)}
-                                handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
-                                isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
-                                setDropdownOpen={(isOpen) => {
-                                    if (formStatus === 'Draft') {
-                                        handleDropdownState(isOpen ? 'questionnaire' : null);
-                                    }
-                                }}
-                                options={handleQuestionnarieList}
-                                formStatus={formStatus}
-                            />
-                            ) : (
+                            isLoadingQuestionnaires ? (
+                                <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
+                            ) :
+                                (<InfinateDropdown
+                                    label='Questionnaire List'
+                                    mainDivStyle='mt-3'
+                                    labelStyle='font-semibold text-[#2B333B] text-base'
+                                    id='serviceRecord'
+                                    top='50px'
+                                    mandatoryField
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
+                                    testID='select-questionnaire-list'
+                                    labeltestID='service-record'
+                                    selectedOption={handleQuestionnarieList.find(option => option.value === fieldSettingParameters.questionnaire_name_lfp)}
+                                    handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
+                                    isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
+                                    setDropdownOpen={(isOpen) => {
+                                        if (formStatus === 'Draft') {
+                                            handleDropdownState(isOpen ? 'questionnaire' : null);
+                                        }
+                                    }}
+                                    options={handleQuestionnarieList}
+                                    formStatus={formStatus}
+                                />
+                                ) : (
                                 showError && <ErrorMessage error={"No questionnaire is available"} />
                             )
                     )}
