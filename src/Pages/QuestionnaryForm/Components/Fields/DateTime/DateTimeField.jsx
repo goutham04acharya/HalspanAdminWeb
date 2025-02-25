@@ -110,7 +110,6 @@ function DateTimeField({
 
 
     function handleFunction(e) {
-        console.log('type', type)
         if (type === 'time') {
             const value = e
             setValue((prev) => ({
