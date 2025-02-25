@@ -27,6 +27,7 @@ import { clearAllSignatures } from "./Fields/Signature/signatureSlice.js";
 import { list } from "postcss";
 import { findSectionAndPageName } from "../../../CommonMethods/SectionPageFinder.js";
 import PreviewSummary from "./PreviewSummary.jsx";
+import { getFilteredQuestions } from "../../../CommonMethods/filteredQuestions.js";
 
 function PreviewModal({
   text,
@@ -97,21 +98,6 @@ function PreviewModal({
     });
     return result;
   };
-
-  function getFilteredQuestions(data, filterKey, filterValue) {
-    let result = [];
-    data.sections.forEach((section) => {
-      section.pages.forEach((page) => {
-        page.questions.forEach((question) => {
-          if (question[filterKey] === filterValue) {
-            let formattedName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
-            result.push(formattedName);
-          }
-        });
-      });
-    });
-    return result;
-  }
 
   const updateConditionalValues = async (data) => {
     const result = await handleConditionalLogic(data);
@@ -380,44 +366,44 @@ function PreviewModal({
 
   // Dynamically evaluate `section_conditional_logic` and update pages
   const getEvaluatedAllPages = () => {
-    return sections
-      .filter((section) => {
-        if (section?.section_conditional_logic) {
-          try {
-            // Evaluate the section's conditional logic
-            return eval(section?.section_conditional_logic);
-          } catch (err) {
-            console.error("Error evaluating section conditional logic:", err);
-            return false; // Exclude the section if evaluation fails
-          }
-        }
+    // Filter sections based on conditional logic
+    const filteredSections = sections.filter((section) => {
+      if (!section?.section_conditional_logic) {
         return true; // Include sections without conditional logic
-      })
-      .flatMap((section) =>
-        section?.pages
-          .filter((page) => page?.questions && page?.questions.length > 0) // Ignore pages without questions
-          .map((page) => ({
-            page_name: page?.page_name,
-            page_id: page?.page_id,
-          })),
-      );
+      }
+
+      try {
+        // Evaluate the section's conditional logic
+        return eval(section.section_conditional_logic);
+      } catch (err) {
+        console.error("Error evaluating section conditional logic:", err);
+        return false; // Exclude the section if evaluation fails
+      }
+    });
+
+    return filteredSections.flatMap((section) =>
+      (section?.pages || [])
+        .filter((page) => page?.questions && page.questions.length > 0)
+        .map((page) => ({
+          page_name: page?.page_name,
+          page_id: page?.page_id,
+        }))
+    );
   };
 
   // Simulate user interaction or dynamic evaluation
   const allPages = getEvaluatedAllPages();
+
   const validateFormat = (value, format, regex) => {
-    switch (format) {
-      case "Alpha":
-        return /^[a-zA-Z]+$/.test(value);
-      case "Alphanumeric":
-        return /^[a-zA-Z0-9]+$/.test(value);
-      case "Numeric":
-        return /^[0-9]+$/.test(value);
-      case "Custom Regular Expression":
-        return new RegExp(regex).test(value);
-      default:
-        return true; // Allow any format if not specified
-    }
+    const formatValidators = {
+      "Alpha": /^[a-zA-Z]+$/,
+      "Alphanumeric": /^[a-zA-Z0-9]+$/,
+      "Numeric": /^[0-9]+$/,
+      "Custom Regular Expression": new RegExp(regex)
+    };
+    return formatValidators[format]
+      ? formatValidators[format].test(value)
+      : true;
   };
 
   const evaluateLogic = (logic) => {
@@ -472,9 +458,13 @@ function PreviewModal({
     return true; // Default to true if no conditional logic exists
   };
   const handleDisplayField = (selectedQuestion, selectedSections) => {
-    const { section_name, page_name, label, question_id } = findSectionAndPageName(
+    // Early return if selectedQuestion is undefined or null
+    if (!selectedQuestion) return;
+
+    const { question_id } = selectedQuestion;
+    const { section_name, page_name, label } = findSectionAndPageName(
       selectedSections,
-      selectedQuestion?.question_id
+      question_id
     );
 
     if (!section_name || !page_name || !label) {
@@ -482,26 +472,35 @@ function PreviewModal({
       return;
     }
 
-    let newValue = "";
-    switch (selectedQuestion?.type) {
-      case "heading":
-        newValue = selectedQuestion?.display_type?.heading || "";
-        break;
-      case "text":
-        newValue = selectedQuestion?.display_type?.text || "";
-        break;
-      case "image":
-        newValue = selectedQuestion?.display_type?.image || "";
-        break;
-      case "url":
-        newValue = selectedQuestion?.display_type?.url?.value || "";
-        break;
-      default:
-        newValue = "";
+    // Use object lookup instead of switch statement
+    const displayTypeMap = {
+      heading: 'heading',
+      text: 'text',
+      image: 'image',
+      url: 'url.value'
+    };
+
+    const typePath = displayTypeMap[selectedQuestion.type];
+
+    // If type is not in the map, use empty string
+    let newValue = '';
+
+    if (typePath) {
+      // Handle nested path for url.value
+      const displayType = selectedQuestion.display_type || {};
+      if (typePath.includes('.')) {
+        const [obj, prop] = typePath.split('.');
+        newValue = displayType[obj]?.[prop] || '';
+      } else {
+        newValue = displayType[typePath] || '';
+      }
     }
-    setConditionalValues((prevValues) => ({
+
+    // Update state with normalized question_id
+    const normalizedId = question_id.replace(/-/g, '_');
+    setConditionalValues(prevValues => ({
       ...prevValues,
-      [selectedQuestion?.question_id.replace(/-/g, '_')]: newValue
+      [normalizedId]: newValue
     }));
   };
   const computeNextNavigation = () => {
@@ -1225,9 +1224,8 @@ function PreviewModal({
           if (!fieldStatus?.[question?.question_id]) {
             if (default_conditional_logic) {
               try {
-                console.log('i am here', default_conditional_logic)
-                console.log(conditionalValues, 'conditionalValues')
-                const result = evaluateLogic(default_conditional_logic);
+                const result = eval(default_conditional_logic);
+
                 if (component_type === "dateTimefield") {
                   const splitDate = (dateStr) => {
                     if (!dateStr || typeof dateStr !== "string") {
@@ -1243,12 +1241,27 @@ function PreviewModal({
                     }),
                   );
                 } else {
-                  dispatch(
-                    setQuestionValue({
-                      question_id: question?.question_id,
-                      value: result,
-                    }),
-                  );
+                  if (question?.lookup_id) {
+                    // Find the matching lookup item by index instead of array position
+                    const lookupItem = question.lookup_value.find(item => item.index === result.toString());
+
+                    // Use the lookup value if found, otherwise use the result directly
+                    const valueToSet = lookupItem?.value || result;
+
+                    dispatch(
+                      setQuestionValue({
+                        question_id: question?.question_id,
+                        value: valueToSet,
+                      })
+                    );
+                  } else {
+                    dispatch(
+                      setQuestionValue({
+                        question_id: question?.question_id,
+                        value: result,
+                      })
+                    );
+                  }
                 }
                 // Evaluate the string expression
                 if (default_content === "advance") {
