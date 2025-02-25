@@ -839,7 +839,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 const pageConditionLogic = page?.page_conditional_logic || '';
                 conditionalLogic = pageConditionLogic;
             } else if (isDefaultLogic) {
-                conditionalLogic = fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '';
+                conditionalLogic = replaceUUIDs(fieldSettingParams[selectedQuestionId]['default_conditional_logic'] || '', questionWithUuid);
             } else {
                 conditionalLogic = fieldSettingParams[selectedQuestionId]['conditional_logic'] || '';
                 // dispatch(setNewComponent({ id: 'conditional_logic', value: conditionalLogic, questionId: selectedQuestionId }));
@@ -1174,19 +1174,19 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             // Validate if all variable names exist in secDetailsForSearching
             // const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
             //this function is for considering the special char as a valid expression
-            const invalidVariables = variableNames.filter(variable => {
-                // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
-                const sanitizedVariable = variable.replaceAll(/[^\w.]/g, ''); // Remove special characters except dots
-                return !secDetailsForSearching.some(item => {
-                    const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
-                    return sanitizedItem === sanitizedVariable;
-                });
-            });
+            // const invalidVariables = variableNames.filter(variable => {
+            //     // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
+            //     const sanitizedVariable = variable.replaceAll(/[^\w.]/g, ''); // Remove special characters except dots
+            //     return !secDetailsForSearching.some(item => {
+            //         const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
+            //         return sanitizedItem === sanitizedVariable;
+            //     });
+            // });
 
-            if (invalidVariables.length > 0) {
-                handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
-                return;
-            }
+            // if (invalidVariables.length > 0) {
+            //     handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
+            //     return;
+            // }
             if (isDefaultLogic || complianceState) {
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
