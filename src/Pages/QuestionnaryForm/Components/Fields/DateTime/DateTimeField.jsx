@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { setQuestionValue } from '../../previewQuestionnaireValuesSlice';
 import DatePicker from 'react-date-picker';
 import { setFieldEditable } from '../../defaultContentPreviewSlice';
+import { formatDate } from '../../../../../CommonMethods/FormatDate';
 
 function DateTimeField({
     label,
@@ -87,7 +88,7 @@ function DateTimeField({
             // Update conditional values
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [question?.question_id.replace(/-/g, '_')]: date
+                [question?.question_id.replace(/-/g, '_')]: `${formatDate(date)} ${time}`
             }));
 
             // Combine date and time into a string for setValue
