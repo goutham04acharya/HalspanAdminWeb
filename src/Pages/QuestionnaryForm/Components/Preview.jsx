@@ -1254,6 +1254,10 @@ function PreviewModal({
                         value: valueToSet,
                       })
                     );
+                    setConditionalValues(prevValues => ({
+                      ...prevValues,
+                      [question?.question_id.replace(/-/g,'_')]: valueToSet
+                    }));
                   } else {
                     dispatch(
                       setQuestionValue({
@@ -1261,6 +1265,10 @@ function PreviewModal({
                         value: result,
                       })
                     );
+                    setConditionalValues(prevValues => ({
+                      ...prevValues,
+                      [question?.question_id.replace(/-/g,'_')]: result
+                    }));
                   }
                 }
                 // Evaluate the string expression
@@ -1305,17 +1313,14 @@ function PreviewModal({
                     );
                     console.log(isVisible, 'isVisible')
                     if (!isVisible) {
-                      const labelKey = question?.label.replace(/\s+/g, "_");
-                      draft[sectionKey] = draft[sectionKey] || {};
-                      draft[sectionKey][pageKey] =
-                        draft[sectionKey][pageKey] || {};
-                      draft[sectionKey][pageKey][labelKey] = question.component_type === 'assetLocationfield' ? {} : "";
+                      draft[question?.question_id.replace(/-/g,'_')] = question.component_type === 'assetLocationfield' ? {} : "";
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
                           value: "",
                         }),
                       );
+                      
                     }
                   } catch (error) {
                     console.error("Error evaluating conditional logic:", error);
