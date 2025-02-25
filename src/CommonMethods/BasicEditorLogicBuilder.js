@@ -6,7 +6,7 @@ import { formatDate, reverseFormat, reversingFormat } from "./FormatDate";
 
 let isMultiChoice = false;
 // Function to handle logic transformation
-export const buildLogicExpression = (question_name, condition_logic, value, date, isMultiChoice) => {
+export const buildLogicExpression = (question_name, condition_logic, value, date, isMultiChoice, isAdvanced) => {
     switch (condition_logic) {
         case 'equals':
             return `${question_name} == "${isMultiChoice ? value.toString() : value}"`;
@@ -31,13 +31,13 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         case 'number of file is':
             return `${question_name}.length === ${value}`;
         case 'date is before today':
-            return `${question_name} < new Date()`;
+            return `${question_name} < ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is before or equal to today':
-            return `${question_name} <= new Date()`;
+            return `${question_name} <= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is after today':
-            return `${question_name} > new Date()`;
+            return `${question_name} > ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is after or equal to today':
-            return `${question_name} >= new Date()`;
+            return `${question_name} >= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is “X” date of set date':
             const formatteDate = formatDate(date);
             const actualFormat = reverseFormat(formatteDate)
@@ -51,16 +51,18 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
 };
 
 // Main function to build the overall condition expression
-export const buildConditionExpression = (conditionsArray, combinedArray) => {
+export const buildConditionExpression = (conditionsArray, combinedArray, isAdvanced) => {
     return conditionsArray?.map((conditionGroup) => {
         const expressions = conditionGroup.conditions.map((cond) => {
             const { question_name, condition_logic, value, date } = cond;
             const matchedQuestion = combinedArray.find(q => q.question_detail === question_name);
             if (matchedQuestion && matchedQuestion.type === 'multi_choice') {
                 isMultiChoice = true;
+                
             }
+            
             // Use the buildLogicExpression function for each condition
-            return `${buildLogicExpression(question_name, condition_logic, value, date, isMultiChoice)}`;
+            return `${buildLogicExpression(question_name, condition_logic, value, date, isMultiChoice, isAdvanced)}`;
         });
 
         // Join expressions with " && " and wrap the entire expression in parentheses

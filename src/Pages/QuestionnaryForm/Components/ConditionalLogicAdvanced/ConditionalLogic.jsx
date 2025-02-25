@@ -70,7 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
-
+    const [ evaluateObject,setEvaluateObject] = useState({})
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -307,6 +307,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
+        let evalObject ={}
         if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
             allSectionDetails.sections.forEach((section) => {
                 const sectionKey = section.section_name;
@@ -326,6 +327,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                 const questionKey = question.question_name;
                                 const fieldType = getFieldType(question.component_type);
                                 sectionObject[sectionKey][pageKey][questionKey] = fieldType;
+                                evalObject[question.question_id.replace(/-/g, '_')] = fieldType;
                             });
                         }
                     });
@@ -336,6 +338,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     ...sectionObject
                 }
                 setSections(result);
+                setEvaluateObject(evalObject)
             });
             setDatetimefieldQuestions(datetimefieldQuestions);
         }
@@ -894,7 +897,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return acc;
         }, {});
     }
-
+    console.log(sections,'popo')
     const handleSave = async () => {
         if (!complianceState) {
             setEditorCheck((prev) => {
@@ -941,7 +944,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
         try {
             const addSectionPrefix = (input) => {
-                return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'questionWithUuid.$1');
+                return input.replace(/\b([\w\s]+\.[\w\s]+\.[\w\s]+)\b/g, 'evaluateObject.$1');
             };
 
             const handleError = (message) => {
@@ -966,7 +969,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             );
 
             evalInputValue = evalInputValue.replaceAll(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
-                .replaceAll('Today()', 'new Date()')
                 .replaceAll('if', '')
                 .replaceAll('if', ' ')
 
@@ -1159,6 +1161,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
+            // if(evalInputValue.includes('Today')){
+            //     evalInputValue = evalInputValue.replace(/Today/g, `new Date().toISOString().split('T')[0]`);
+            // }
+
 
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
@@ -1236,6 +1242,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                         }
                                      })(${JSON.stringify(questionValues)})`;
             console.log(wrappedEval, 'wrappedEval')
+            console.log(evaluateObject,'oooo')
             const result = eval(wrappedEval);
             console.log(result, 'result')
             if (isDefaultLogic || complianceState) {
@@ -1329,8 +1336,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
                     return;
                 }
-
-                evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
+                
+                evalInputValue = evalInputValue.replace(/evaluateObject\./g, "");questionWithUuid
                 console.log(evalInputValue, 'at end')
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
@@ -1541,14 +1548,14 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     resultExpression = `${item.question_name}.includes("${item.value}")`;
                     break;
                 case "equals":
-                    if (item.condition_type === 'choiceboxfield') {
+                    if (item.condition_type === 'choiceboxfield' || item.condition_type === 'numberfield') {
                         resultExpression = `${item.question_name} === ${getValue(item.value, item.condition_type)}`
                     } else {
                         resultExpression = `${item.question_name} === "${getValue(item.value, item.condition_type)}"`;
                     }
                     break;
                 case "not equal to":
-                    if (item.condition_type === 'choiceboxfield') {
+                    if (item.condition_type === 'choiceboxfield' || item.condition_type === 'numberfield') {
                         resultExpression = `${item.question_name} !== ${getValue(item.value, item.condition_type)}`
                     } else {
                         resultExpression = `${item.question_name} !== "${getValue(item.value, item.condition_type)}"`;
@@ -1700,10 +1707,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setConditions(parsedLogic)
         }
     }
-
+    let isAdvance = false;
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
-            let condition_logic = buildConditionExpression(conditions, combinedArray)
+            let condition_logic = buildConditionExpression(conditions, combinedArray, isAdvance = true)
             condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
             setInputValue(condition_logic);
         }
