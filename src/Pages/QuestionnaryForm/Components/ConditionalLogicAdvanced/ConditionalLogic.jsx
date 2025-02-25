@@ -1160,10 +1160,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-            // if(evalInputValue.includes('Today')){
-            //     evalInputValue = evalInputValue.replace(/Today/g, `new Date().toISOString().split('T')[0]`);
-            // }
-
 
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
