@@ -1174,26 +1174,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
-            // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
             const variableNames = payloadString.match(variableRegex) || [];
 
-            // Validate if all variable names exist in secDetailsForSearching
-            // const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
-            //this function is for considering the special char as a valid expression
-            // const invalidVariables = variableNames.filter(variable => {
-            //     // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
-            //     const sanitizedVariable = variable.replaceAll(/[^\w.]/g, ''); // Remove special characters except dots
-            //     return !secDetailsForSearching.some(item => {
-            //         const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
-            //         return sanitizedItem === sanitizedVariable;
-            //     });
-            // });
-
-            // if (invalidVariables.length > 0) {
-            //     handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
-            //     return;
-            // }
             if (isDefaultLogic || complianceState) {
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
@@ -1217,11 +1200,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let REASON = ''
             let GRADE = '';
             const questionValues = initializeQuestionValues(questionWithUuid);
-            // evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
-            //     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
-            //     let replacement = `${sanitizedUuid}`;
-            //     return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
-            // }, evalInputValue);
             evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                 // Escape all special regex characters
                 let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');

@@ -114,7 +114,6 @@ function DateTimeField({
     function handleFunction(e) {
         if (type === 'time') {
             const value = e
-            console.log(value, 'time')
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false

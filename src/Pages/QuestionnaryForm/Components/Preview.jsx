@@ -182,7 +182,6 @@ function PreviewModal({
             /new Date()/g,
             "new Date().toISOString().split('T')[0]",
           );
-          // console.log(updatedLogic, 'updatedLogic');
           // Evaluate the updated logic
           eval(transformTernaryExpression(logic));
         } catch (error) {
@@ -619,12 +618,8 @@ function PreviewModal({
     computeNextNavigation();
   }, [sections, currentSection, currentPage, value]);
   function formatDateWithOffset(formatteDate, value, question_name) {
-    console.log(formatteDate, 'formatteDate');
     let [day, month, year] = formatteDate.split('/').map(Number);
     let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
-    // console.log(date, 'date before');
-    // date.setDate(date.getDate() + Number(value));
-    console.log(date, 'date after');
     return question_name === date;
   }
   const handleNextClick = () => {
@@ -1300,7 +1295,6 @@ function PreviewModal({
   }, [sections, setValue, questionValue, setQuestionValue, dispatch]);
   useEffect(() => {
     if (sections) {
-      // console.log('running runnin runni runn run ru r .')
       const updateConditionalValues = () => {
         const newConditionalValues = produce(conditionalValues, (draft) => {
           sections.forEach((section) => {
@@ -1311,7 +1305,6 @@ function PreviewModal({
                     const isVisible = evaluateLogic(
                       question?.conditional_logic,
                     );
-                    console.log(isVisible, 'isVisible')
                     if (!isVisible) {
                       draft[question?.question_id.replace(/-/g,'_')] = question.component_type === 'assetLocationfield' ? {} : "";
                       dispatch(
@@ -1578,7 +1571,6 @@ function PreviewModal({
                           `(new Date($1).toUTCString().slice(17, 25))`
                         )
 
-                        console.log(replacedLogic, 'replacedLogic')
                         try {
 
                           let result = eval(replacedLogic); // Evaluate the modified logic
