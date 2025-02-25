@@ -87,7 +87,7 @@ function DateTimeField({
             // Update conditional values
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [question?.question_id.replace(/-/g, '_')]: combinedDateTime.toLocaleDateString()
+                [question?.question_id.replace(/-/g, '_')]: date
             }));
 
             // Combine date and time into a string for setValue
@@ -113,6 +113,7 @@ function DateTimeField({
     function handleFunction(e) {
         if (type === 'time') {
             const value = e
+            console.log(value, 'time')
             setValue((prev) => ({
                 ...prev,
                 [question?.question_id]: value || false
@@ -131,7 +132,7 @@ function DateTimeField({
             currentDateTime.setHours(hours, minutes, seconds, 0);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [question?.question_id.replace(/-/g, '_')]: currentDateTime
+                [question?.question_id.replace(/-/g, '_')]: value
             }))
         } else if (type === 'date') {
             const value = e;
@@ -139,7 +140,7 @@ function DateTimeField({
             selectedDate.setHours(0, 0, 0, 0);
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [question?.question_id.replace(/-/g, '_')]: selectedDate.toLocaleDateString()
+                [question?.question_id.replace(/-/g, '_')]: value
             }));
 
             dispatch(setQuestionValue({ question_id: question?.question_id, value: value }));

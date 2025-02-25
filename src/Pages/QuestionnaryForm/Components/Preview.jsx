@@ -88,20 +88,13 @@ function PreviewModal({
   });
   const handleConditionalLogic = async (data) => {
     let result = {};
-    data.forEach((section, sectionIndex) => {
-      const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
-      result[sectionKey] = {}; // Initialize the section key
-
-      section.pages.forEach((page, pageIndex) => {
-        const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
-        result[sectionKey][pageKey] = {}; // Initialize the page key within the section
-
-                page.questions.forEach((question, questionIndex) => {
-                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
-                });
-            });
+    data.forEach((section) => {
+      section.pages.forEach((page) => {
+        page.questions.forEach((question) => {
+          result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
         });
+      });
+    });
     return result;
   };
 
@@ -133,23 +126,23 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-                setPreviewNavigation((prev) => ({
-                    ...prev,
-                    total_pages: sectionDetails?.sections.reduce(
-                        (total, section) => total + section.pages.length,
-                        0,
-                    ),
-                }));
-                updateConditionalValues(sectionDetails?.sections);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSections();
-    }, [questionnaire_id, version_number, sectionDetails]);
-    const evaluateComplianceLogic = () => {
+        setPreviewNavigation((prev) => ({
+          ...prev,
+          total_pages: sectionDetails?.sections.reduce(
+            (total, section) => total + section.pages.length,
+            0,
+          ),
+        }));
+        updateConditionalValues(sectionDetails?.sections);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSections();
+  }, [questionnaire_id, version_number, sectionDetails]);
+  const evaluateComplianceLogic = () => {
 
     let results = [];
 
@@ -199,13 +192,15 @@ function PreviewModal({
       }
 
       // Wrap new Date() for any necessary processing (can be extended if required)
-      if (logic?.includes("new Date()")) {
+      if (logic?.includes('new Date()')) {
         try {
-          // Convert new Date() to epoch seconds
-          logic = logic?.replace(
-            /new Date\((.*?)\)/g,
-            `new Date().toLocaleDateString()`,
+          // Replace 'new Date()' with epoch value in seconds
+          let updatedLogic = logic?.replace(
+            /new Date()/g,
+            "new Date().toISOString().split('T')[0]",
           );
+          // console.log(updatedLogic, 'updatedLogic');
+          // Evaluate the updated logic
           eval(transformTernaryExpression(logic));
         } catch (error) {
           console.error("Error evaluating new Date logic:", error);
@@ -477,7 +472,7 @@ function PreviewModal({
     return true; // Default to true if no conditional logic exists
   };
   const handleDisplayField = (selectedQuestion, selectedSections) => {
-    const { section_name, page_name, label } = findSectionAndPageName(
+    const { section_name, page_name, label, question_id } = findSectionAndPageName(
       selectedSections,
       selectedQuestion?.question_id
     );
@@ -504,19 +499,10 @@ function PreviewModal({
       default:
         newValue = "";
     }
-
-    setConditionalValues((prevValues) => {
-      return {
-        ...prevValues,
-        [section_name]: {
-          ...(prevValues[section_name] || {}),
-          [page_name]: {
-            ...(prevValues[section_name]?.[page_name] || {}),
-            [label]: newValue,
-          },
-        },
-      };
-    });
+    setConditionalValues((prevValues) => ({
+      ...prevValues,
+      [selectedQuestion?.question_id.replace(/-/g, '_')]: newValue
+    }));
   };
   const computeNextNavigation = () => {
     let nextPage = currentPage + 1;
@@ -637,17 +623,13 @@ function PreviewModal({
     computeNextNavigation();
   }, [sections, currentSection, currentPage, value]);
   function formatDateWithOffset(formatteDate, value, question_name) {
-    let [day, month, year] = formatteDate.split("/").map(Number);
-    let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-    date.setDate(date.getDate() + Number(value));
-    return (
-      question_name ===
-      date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    );
+    console.log(formatteDate, 'formatteDate');
+    let [day, month, year] = formatteDate.split('/').map(Number);
+    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
+    // console.log(date, 'date before');
+    // date.setDate(date.getDate() + Number(value));
+    console.log(date, 'date after');
+    return question_name === date;
   }
   const handleNextClick = () => {
     // Reset previous validation errors before proceeding
@@ -1243,7 +1225,9 @@ function PreviewModal({
           if (!fieldStatus?.[question?.question_id]) {
             if (default_conditional_logic) {
               try {
-                const result = eval(default_conditional_logic);
+                console.log('i am here', default_conditional_logic)
+                console.log(conditionalValues, 'conditionalValues')
+                const result = evaluateLogic(default_conditional_logic);
                 if (component_type === "dateTimefield") {
                   const splitDate = (dateStr) => {
                     if (!dateStr || typeof dateStr !== "string") {
@@ -1295,24 +1279,20 @@ function PreviewModal({
   }, [sections, setValue, questionValue, setQuestionValue, dispatch]);
   useEffect(() => {
     if (sections) {
+      // console.log('running runnin runni runn run ru r .')
       const updateConditionalValues = () => {
         const newConditionalValues = produce(conditionalValues, (draft) => {
           sections.forEach((section) => {
-            const sectionKey = section?.section_name.replace(/\s+/g, "_");
             section.pages.forEach((page) => {
-              const pageKey = page?.page_name.replace(/\s+/g, "_");
               page.questions.forEach((question) => {
                 if (question?.conditional_logic) {
                   try {
                     const isVisible = evaluateLogic(
                       question?.conditional_logic,
                     );
+                    console.log(isVisible, 'isVisible')
                     if (!isVisible) {
-                      const labelKey = question?.label.replace(/\s+/g, "_");
-                      draft[sectionKey] = draft[sectionKey] || {};
-                      draft[sectionKey][pageKey] =
-                        draft[sectionKey][pageKey] || {};
-                      draft[sectionKey][pageKey][labelKey] = "";
+                      draft[question?.question_id.replace(/-/, '_')] = "";
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
@@ -1334,7 +1314,7 @@ function PreviewModal({
 
       updateConditionalValues();
     }
-  }, [sections, evaluateLogic, isModified]);
+  }, [sections, isModified]);
 
   const handleClose = () => {
     setModalOpen(false);
@@ -1381,7 +1361,7 @@ function PreviewModal({
             </div>
           ) : showComplianceScreen ? (
             <div className="p-4">
-              <PreviewSummary conditionalValues={conditionalValues} />
+              <PreviewSummary conditionalValues={conditionalValues} sections={sections} />
               <h2 className="text-2xl font-bold text-[#2B333B] items-center w-full flex justify-center mb-4">
                 Compliance Results
               </h2>
@@ -1403,14 +1383,14 @@ function PreviewModal({
                         </h3>
                         <span
                           className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === "PASS"
-                              ? "bg-green-500"
-                              : "bg-red-500 text-white"
+                            ? "bg-green-500"
+                            : "bg-red-500 text-white"
                             }`}
                         >
                           <img
                             src={`${result?.STATUS === "PASS"
-                                ? "/Images/compliant.svg"
-                                : "/Images/non-compliant.svg"
+                              ? "/Images/compliant.svg"
+                              : "/Images/non-compliant.svg"
                               }`}
                             width={12}
                             data-testid={
@@ -1504,22 +1484,12 @@ function PreviewModal({
                       return null;
                     }
                     if (list?.conditional_logic) {
-                      if (list?.conditional_logic?.includes("new Date(")) {
+                      if (list?.conditional_logic?.includes('"Today"')) {
                         try {
                           // Replace 'new Date()' with epoch value in seconds
                           let updatedLogic = list?.conditional_logic?.replace(
-                            /new Date\(\)/g,
-                            "new Date().toLocaleDateString()",
-                          );
-
-                          // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
-                          updatedLogic = updatedLogic?.replace(
-                            /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
-                            (_, year, month, day) => {
-                              return `new Date(${parseInt(year)}, ${parseInt(
-                                month,
-                              )}, ${parseInt(day)}).toLocaleDateString()`;
-                            },
+                            /"Today"/g,
+                            "new Date().toISOString().split('T')[0]",
                           );
                           // Evaluate the updated logic
                           if (!eval(updatedLogic)) {
@@ -1571,6 +1541,25 @@ function PreviewModal({
                         );
                         try {
                           let result = eval(logicWithoutBrackets); // Evaluate the modified logic
+                          if (!result) {
+                            return null; // Skip rendering this question
+                          }
+                        } catch (error) {
+                          console.error(error, "Error evaluating getDay logic");
+                          return null;
+                        }
+                      } else if (list?.conditional_logic.includes('getTime()')) {
+                        // before replace: Section_1.Page_1.Question_2.getTime() === "04:01:04"
+                        // after replace: Section_1.Page_1.Question_2.getTime() === new Date('1970-01-01T04:01:04Z').getTime()
+                        const replacedLogic = list?.conditional_logic?.replace(
+                          /(\w+\.\w+\.\w+)\.getTime\(\)/,
+                          `(new Date($1).toUTCString().slice(17, 25))`
+                        )
+
+                        console.log(replacedLogic, 'replacedLogic')
+                        try {
+
+                          let result = eval(replacedLogic); // Evaluate the modified logic
                           if (!result) {
                             return null; // Skip rendering this question
                           }
