@@ -70,7 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
-    const [ evaluateObject,setEvaluateObject] = useState({})
+    const [evaluateObject, setEvaluateObject] = useState({})
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -307,7 +307,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
-        let evalObject ={}
+        let evalObject = {}
         if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
             allSectionDetails.sections.forEach((section) => {
                 const sectionKey = section.section_name;
@@ -897,39 +897,38 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return acc;
         }, {});
     }
-    console.log(sections,'popo')
     const handleSave = async () => {
         if (!complianceState) {
-            setEditorCheck((prev) => {
-                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
-                    item.questionId === selectedQuestionId
-                        ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
-                        : item
-                );
-
-                // Check if the question already exists
-                const questionExists = prev.conditonalEditor.some(
-                    (item) => item.questionId === selectedQuestionId
-                );
-
-                return {
-                    ...prev,
-                    conditonalEditor: questionExists
-                        ? updatedConditionalEditor // Update existing
-                        : [
-                            ...prev.conditonalEditor,
-                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                        ] // Add new if not exists
-                };
-            });
-        } else {
             if (!isDefaultLogic) {
-                setEditorCheck((prev) => ({
-                    ...prev,
-                    isBasicEditorCompliance: false,
-                    isAdvanceEditorCompliance: true
-                }));
+                setEditorCheck((prev) => {
+                    const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                        item.questionId === selectedQuestionId
+                            ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                            : item
+                    );
+
+                    // Check if the question already exists
+                    const questionExists = prev.conditonalEditor.some(
+                        (item) => item.questionId === selectedQuestionId
+                    );
+
+                    return {
+                        ...prev,
+                        conditonalEditor: questionExists
+                            ? updatedConditionalEditor // Update existing
+                            : [
+                                ...prev.conditonalEditor,
+                                { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                            ] // Add new if not exists
+                    };
+                });
             }
+        } else {
+            setEditorCheck((prev) => ({
+                ...prev,
+                isBasicEditorCompliance: false,
+                isAdvanceEditorCompliance: true
+            }));
         }
 
         let sectionId = selectedQuestionId.split('_')[0].length > 1 ? selectedQuestionId.split('_')[0] : selectedQuestionId.split('_')[1];
@@ -1218,7 +1217,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let REASON = ''
             let GRADE = '';
             const questionValues = initializeQuestionValues(questionWithUuid);
-            console.log(questionValues, "questionValues")
             // evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
             //     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
             //     let replacement = `${sanitizedUuid}`;
@@ -1232,7 +1230,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
             // **Fix: Remove unwanted `questionWithUuid.` reference**
             evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
-            console.log(evalInputValue)
             const wrappedEval = `(function(questionValues) { 
                                         try {
                                             return ${evalInputValue};
@@ -1241,10 +1238,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-            console.log(wrappedEval, 'wrappedEval')
-            console.log(evaluateObject,'oooo')
             const result = eval(wrappedEval);
-            console.log(result, 'result')
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
@@ -1336,9 +1330,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
                     return;
                 }
-                
-                evalInputValue = evalInputValue.replace(/evaluateObject\./g, "");questionWithUuid
-                console.log(evalInputValue, 'at end')
+
+                evalInputValue = evalInputValue.replace(/evaluateObject\./g, ""); questionWithUuid
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
