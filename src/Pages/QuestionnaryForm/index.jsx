@@ -459,9 +459,7 @@ const QuestionnaryForm = () => {
                     // setConditions(complianceInitialState);
                     dispatch(setComplianceLogicCondition(complianceInitialState));
                 }
-            } else {
-                navigate('/404')
-            }
+            } 
         } catch {
             console.log('error while getting ')
         }
