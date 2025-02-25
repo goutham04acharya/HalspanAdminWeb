@@ -72,7 +72,7 @@ function NumberField({
             100
             : ((sliderValue - minRange) / (maxRange - minRange)) * 100;
         setSliderPercentage(percentage);
-
+        
         if (preview) {
             setValue((prev) => ({
                 ...prev,

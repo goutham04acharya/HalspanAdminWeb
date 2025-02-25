@@ -24,6 +24,7 @@ import {
 import { clearAllSignatures } from "./Fields/Signature/signatureSlice.js";
 import { findSectionAndPageName } from "../../../CommonMethods/SectionPageFinder.js";
 import PreviewSummary from "./PreviewSummary.jsx";
+import { getFilteredQuestions } from "../../../CommonMethods/filteredQuestions.js";
 
 function PreviewModal({
   text,
@@ -85,37 +86,15 @@ function PreviewModal({
   });
   const handleConditionalLogic = async (data) => {
     let result = {};
-    data.forEach((section, sectionIndex) => {
-      const sectionKey = section.section_name.replace(/\s+/g, "_"); // Convert section name to key format
-      result[sectionKey] = {}; // Initialize the section key
-
-      section.pages.forEach((page, pageIndex) => {
-        const pageKey = page.page_name.replace(/\s+/g, "_"); // Convert page name to key format
-        result[sectionKey][pageKey] = {}; // Initialize the page key within the section
-
-                page.questions.forEach((question, questionIndex) => {
-                    const questionKey = question.label.replace(/\s+/g, "_"); // Convert label to key format
-                    result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
-                });
-            });
-        });
-    return result;
-  };
-
-  function getFilteredQuestions(data, filterKey, filterValue) {
-    let result = [];
-    data.sections.forEach((section) => {
+    data.forEach((section) => {
       section.pages.forEach((page) => {
         page.questions.forEach((question) => {
-          if (question[filterKey] === filterValue) {
-            let formattedName = `${section.section_name.replace(/\s+/g, "_")}.${page.page_name.replace(/\s+/g, "_")}.${question.question_name.replace(/\s+/g, "_")}`;
-            result.push(formattedName);
-          }
+          result[question.question_id.replace(/-/g, '_')] = ""; // Assign empty string as value
         });
       });
     });
     return result;
-  }
+  };
 
   const updateConditionalValues = async (data) => {
     const result = await handleConditionalLogic(data);
@@ -130,23 +109,23 @@ function PreviewModal({
         setComplianceLogic(questionnaireComplianceLogic || []);
         setSections(sectionDetails?.sections);
 
-                setPreviewNavigation((prev) => ({
-                    ...prev,
-                    total_pages: sectionDetails?.sections.reduce(
-                        (total, section) => total + section.pages.length,
-                        0,
-                    ),
-                }));
-                updateConditionalValues(sectionDetails?.sections);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSections();
-    }, [questionnaire_id, version_number, sectionDetails]);
-    const evaluateComplianceLogic = () => {
+        setPreviewNavigation((prev) => ({
+          ...prev,
+          total_pages: sectionDetails?.sections.reduce(
+            (total, section) => total + section.pages.length,
+            0,
+          ),
+        }));
+        updateConditionalValues(sectionDetails?.sections);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSections();
+  }, [questionnaire_id, version_number, sectionDetails]);
+  const evaluateComplianceLogic = () => {
 
     let results = [];
 
@@ -196,13 +175,14 @@ function PreviewModal({
       }
 
       // Wrap new Date() for any necessary processing (can be extended if required)
-      if (logic?.includes("new Date()")) {
+      if (logic?.includes('new Date()')) {
         try {
-          // Convert new Date() to epoch seconds
-          logic = logic?.replace(
-            /new Date\((.*?)\)/g,
-            `new Date().toLocaleDateString()`,
+          // Replace 'new Date()' with epoch value in seconds
+          let updatedLogic = logic?.replace(
+            /new Date()/g,
+            "new Date().toISOString().split('T')[0]",
           );
+          // Evaluate the updated logic
           eval(transformTernaryExpression(logic));
         } catch (error) {
           console.error("Error evaluating new Date logic:", error);
@@ -382,44 +362,44 @@ function PreviewModal({
 
   // Dynamically evaluate `section_conditional_logic` and update pages
   const getEvaluatedAllPages = () => {
-    return sections
-      .filter((section) => {
-        if (section?.section_conditional_logic) {
-          try {
-            // Evaluate the section's conditional logic
-            return eval(section?.section_conditional_logic);
-          } catch (err) {
-            console.error("Error evaluating section conditional logic:", err);
-            return false; // Exclude the section if evaluation fails
-          }
-        }
+    // Filter sections based on conditional logic
+    const filteredSections = sections.filter((section) => {
+      if (!section?.section_conditional_logic) {
         return true; // Include sections without conditional logic
-      })
-      .flatMap((section) =>
-        section?.pages
-          .filter((page) => page?.questions && page?.questions.length > 0) // Ignore pages without questions
-          .map((page) => ({
-            page_name: page?.page_name,
-            page_id: page?.page_id,
-          })),
-      );
+      }
+
+      try {
+        // Evaluate the section's conditional logic
+        return eval(section.section_conditional_logic);
+      } catch (err) {
+        console.error("Error evaluating section conditional logic:", err);
+        return false; // Exclude the section if evaluation fails
+      }
+    });
+
+    return filteredSections.flatMap((section) =>
+      (section?.pages || [])
+        .filter((page) => page?.questions && page.questions.length > 0)
+        .map((page) => ({
+          page_name: page?.page_name,
+          page_id: page?.page_id,
+        }))
+    );
   };
 
   // Simulate user interaction or dynamic evaluation
   const allPages = getEvaluatedAllPages();
+
   const validateFormat = (value, format, regex) => {
-    switch (format) {
-      case "Alpha":
-        return /^[a-zA-Z]+$/.test(value);
-      case "Alphanumeric":
-        return /^[a-zA-Z0-9]+$/.test(value);
-      case "Numeric":
-        return /^[0-9]+$/.test(value);
-      case "Custom Regular Expression":
-        return new RegExp(regex).test(value);
-      default:
-        return true; // Allow any format if not specified
-    }
+    const formatValidators = {
+      "Alpha": /^[a-zA-Z]+$/,
+      "Alphanumeric": /^[a-zA-Z0-9]+$/,
+      "Numeric": /^[0-9]+$/,
+      "Custom Regular Expression": new RegExp(regex)
+    };
+    return formatValidators[format]
+      ? formatValidators[format].test(value)
+      : true;
   };
 
   const evaluateLogic = (logic) => {
@@ -474,9 +454,13 @@ function PreviewModal({
     return true; // Default to true if no conditional logic exists
   };
   const handleDisplayField = (selectedQuestion, selectedSections) => {
-    const { section_name, page_name, label, question_id } = findSectionAndPageName(
+    // Early return if selectedQuestion is undefined or null
+    if (!selectedQuestion) return;
+
+    const { question_id } = selectedQuestion;
+    const { section_name, page_name, label } = findSectionAndPageName(
       selectedSections,
-      selectedQuestion?.question_id
+      question_id
     );
 
     if (!section_name || !page_name || !label) {
@@ -484,27 +468,36 @@ function PreviewModal({
       return;
     }
 
-    let newValue = "";
-    switch (selectedQuestion?.type) {
-      case "heading":
-        newValue = selectedQuestion?.display_type?.heading || "";
-        break;
-      case "text":
-        newValue = selectedQuestion?.display_type?.text || "";
-        break;
-      case "image":
-        newValue = selectedQuestion?.display_type?.image || "";
-        break;
-      case "url":
-        newValue = selectedQuestion?.display_type?.url?.value || "";
-        break;
-      default:
-        newValue = "";
+    // Use object lookup instead of switch statement
+    const displayTypeMap = {
+      heading: 'heading',
+      text: 'text',
+      image: 'image',
+      url: 'url.value'
+    };
+
+    const typePath = displayTypeMap[selectedQuestion.type];
+
+    // If type is not in the map, use empty string
+    let newValue = '';
+
+    if (typePath) {
+      // Handle nested path for url.value
+      const displayType = selectedQuestion.display_type || {};
+      if (typePath.includes('.')) {
+        const [obj, prop] = typePath.split('.');
+        newValue = displayType[obj]?.[prop] || '';
+      } else {
+        newValue = displayType[typePath] || '';
+      }
     }
-    setConditionalValues((prevValues) => ({
+
+    // Update state with normalized question_id
+    const normalizedId = question_id.replace(/-/g, '_');
+    setConditionalValues(prevValues => ({
       ...prevValues,
-      [selectedQuestion?.question_id.replace(/-/g, '_')]: newValue
-  }));
+      [normalizedId]: newValue
+    }));
   };
   const computeNextNavigation = () => {
     let nextPage = currentPage + 1;
@@ -625,17 +618,9 @@ function PreviewModal({
     computeNextNavigation();
   }, [sections, currentSection, currentPage, value]);
   function formatDateWithOffset(formatteDate, value, question_name) {
-    let [day, month, year] = formatteDate.split("/").map(Number);
-    let date = new Date(year, month - 1, day); // Use Date(year, monthIndex, day)
-    date.setDate(date.getDate() + Number(value));
-    return (
-      question_name ===
-      date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    );
+    let [day, month, year] = formatteDate.split('/').map(Number);
+    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
+    return question_name === date;
   }
   const handleNextClick = () => {
     // Reset previous validation errors before proceeding
@@ -1235,6 +1220,7 @@ function PreviewModal({
             if (default_conditional_logic) {
               try {
                 const result = eval(default_conditional_logic);
+
                 if (component_type === "dateTimefield") {
                   const splitDate = (dateStr) => {
                     if (!dateStr || typeof dateStr !== "string") {
@@ -1250,12 +1236,35 @@ function PreviewModal({
                     }),
                   );
                 } else {
-                  dispatch(
-                    setQuestionValue({
-                      question_id: question?.question_id,
-                      value: result,
-                    }),
-                  );
+                  if (question?.lookup_id) {
+                    // Find the matching lookup item by index instead of array position
+                    const lookupItem = question.lookup_value.find(item => item.index === result.toString());
+
+                    // Use the lookup value if found, otherwise use the result directly
+                    const valueToSet = lookupItem?.value || '';
+
+                    dispatch(
+                      setQuestionValue({
+                        question_id: question?.question_id,
+                        value: valueToSet,
+                      })
+                    );
+                    setConditionalValues(prevValues => ({
+                      ...prevValues,
+                      [question?.question_id.replace(/-/g,'_')]: valueToSet
+                    }));
+                  } else {
+                    dispatch(
+                      setQuestionValue({
+                        question_id: question?.question_id,
+                        value: result,
+                      })
+                    );
+                    setConditionalValues(prevValues => ({
+                      ...prevValues,
+                      [question?.question_id.replace(/-/g,'_')]: result
+                    }));
+                  }
                 }
                 // Evaluate the string expression
                 if (default_content === "advance") {
@@ -1289,9 +1298,7 @@ function PreviewModal({
       const updateConditionalValues = () => {
         const newConditionalValues = produce(conditionalValues, (draft) => {
           sections.forEach((section) => {
-            const sectionKey = section?.section_name.replace(/\s+/g, "_");
             section.pages.forEach((page) => {
-              const pageKey = page?.page_name.replace(/\s+/g, "_");
               page.questions.forEach((question) => {
                 if (question?.conditional_logic) {
                   try {
@@ -1299,17 +1306,14 @@ function PreviewModal({
                       question?.conditional_logic,
                     );
                     if (!isVisible) {
-                      const labelKey = question?.label.replace(/\s+/g, "_");
-                      draft[sectionKey] = draft[sectionKey] || {};
-                      draft[sectionKey][pageKey] =
-                        draft[sectionKey][pageKey] || {};
-                      draft[sectionKey][pageKey][labelKey] = question.component_type === 'assetLocationfield' ? {} : "";
+                      draft[question?.question_id.replace(/-/g,'_')] = question.component_type === 'assetLocationfield' ? {} : "";
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
                           value: "",
                         }),
                       );
+                      
                     }
                   } catch (error) {
                     console.error("Error evaluating conditional logic:", error);
@@ -1325,7 +1329,7 @@ function PreviewModal({
 
       updateConditionalValues();
     }
-  }, [sections, evaluateLogic, isModified]);
+  }, [sections, isModified]);
 
   const handleClose = () => {
     setModalOpen(false);
@@ -1394,14 +1398,14 @@ function PreviewModal({
                         </h3>
                         <span
                           className={` p-2 rounded-full gap-2 flex text-sm font-medium ${result?.STATUS === "PASS"
-                              ? "bg-green-500"
-                              : "bg-red-500 text-white"
+                            ? "bg-green-500"
+                            : "bg-red-500 text-white"
                             }`}
                         >
                           <img
                             src={`${result?.STATUS === "PASS"
-                                ? "/Images/compliant.svg"
-                                : "/Images/non-compliant.svg"
+                              ? "/Images/compliant.svg"
+                              : "/Images/non-compliant.svg"
                               }`}
                             width={12}
                             data-testid={
@@ -1495,22 +1499,12 @@ function PreviewModal({
                       return null;
                     }
                     if (list?.conditional_logic) {
-                      if (list?.conditional_logic?.includes("new Date(")) {
+                      if (list?.conditional_logic?.includes('"Today"')) {
                         try {
                           // Replace 'new Date()' with epoch value in seconds
                           let updatedLogic = list?.conditional_logic?.replace(
-                            /new Date\(\)/g,
-                            "new Date().toLocaleDateString()",
-                          );
-
-                          // Replace 'new Date(YYYY, MM, DD)' with 'Math.round(new Date(YYYY, MM, DD).getTime() / 1000)'
-                          updatedLogic = updatedLogic?.replace(
-                            /new Date\((\d+),\s*(\d+),\s*(\d+)\)/g,
-                            (_, year, month, day) => {
-                              return `new Date(${parseInt(year)}, ${parseInt(
-                                month,
-                              )}, ${parseInt(day)}).toLocaleDateString()`;
-                            },
+                            /"Today"/g,
+                            "new Date().toISOString().split('T')[0]",
                           );
                           // Evaluate the updated logic
                           if (!eval(updatedLogic)) {
@@ -1562,6 +1556,24 @@ function PreviewModal({
                         );
                         try {
                           let result = eval(logicWithoutBrackets); // Evaluate the modified logic
+                          if (!result) {
+                            return null; // Skip rendering this question
+                          }
+                        } catch (error) {
+                          console.error(error, "Error evaluating getDay logic");
+                          return null;
+                        }
+                      } else if (list?.conditional_logic.includes('getTime()')) {
+                        // before replace: Section_1.Page_1.Question_2.getTime() === "04:01:04"
+                        // after replace: Section_1.Page_1.Question_2.getTime() === new Date('1970-01-01T04:01:04Z').getTime()
+                        const replacedLogic = list?.conditional_logic?.replace(
+                          /(\w+\.\w+\.\w+)\.getTime\(\)/,
+                          `(new Date($1).toUTCString().slice(17, 25))`
+                        )
+
+                        try {
+
+                          let result = eval(replacedLogic); // Evaluate the modified logic
                           if (!result) {
                             return null; // Skip rendering this question
                           }
