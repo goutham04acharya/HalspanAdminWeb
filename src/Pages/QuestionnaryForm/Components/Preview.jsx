@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import Image from "../../../Components/Image/Image.jsx";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import DIsplayContentField from "./Fields/DisplayContent/DIsplayContentField.jsx";
@@ -14,17 +13,15 @@ import NumberField from "./Fields/Number/NumberField.jsx";
 import AssetLocationField from "./Fields/AssetLocation/AssetLocationField.jsx";
 import PhotoField from "./Fields/PhotoField/PhotoFIeld.jsx";
 import VideoField from "./Fields/VideoField/VideoField.jsx";
-import useApi from "../../../services/CustomHook/useApi.js";
 import TagScanField from "./Fields/TagScan/TagScanField.jsx";
 import { produce } from "immer";
-import { resetFields, setFieldEditable } from "./defaultContentPreviewSlice.js";
+import { resetFields } from "./defaultContentPreviewSlice.js";
 import { useSelector } from "react-redux";
 import {
   clearQuestions,
   setQuestionValue,
 } from "./previewQuestionnaireValuesSlice.js";
 import { clearAllSignatures } from "./Fields/Signature/signatureSlice.js";
-import { list } from "postcss";
 import { findSectionAndPageName } from "../../../CommonMethods/SectionPageFinder.js";
 import PreviewSummary from "./PreviewSummary.jsx";
 
@@ -1075,6 +1072,9 @@ function PreviewModal({
             setValidationErrors={setValidationErrors}
             question={question}
             validationErrors={validationErrors}
+            setConditionalValues={setConditionalValues}
+            question_id={question?.question_id}
+
           />
         );
       case "filefield":
@@ -1157,7 +1157,7 @@ function PreviewModal({
             preview
             sections={sections[currentSection]}
             setConditionalValues={setConditionalValues}
-            conditionalValues={setConditionalValues}
+            conditionalValues={conditionalValues}
             setValidationErrors={setValidationErrors}
             question={question}
             validationErrors={validationErrors}
@@ -1303,7 +1303,7 @@ function PreviewModal({
                       draft[sectionKey] = draft[sectionKey] || {};
                       draft[sectionKey][pageKey] =
                         draft[sectionKey][pageKey] || {};
-                      draft[sectionKey][pageKey][labelKey] = "";
+                      draft[sectionKey][pageKey][labelKey] = question.component_type === 'assetLocationfield' ? {} : "";
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
