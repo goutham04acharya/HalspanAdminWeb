@@ -45,8 +45,8 @@ function DateTimeField({
             milliseconds: new Date().getMilliseconds()
         };
     };
-    const handleDateTime = (date, time) => {
-        if (date) {
+    const handleDateTime = (date, time, type) => {
+        if (type === 'date') {
             setDateVal(date)
             dispatch(setQuestionValue({ question_id: question?.question_id, value: date }))
             setValue((prev) => ({
@@ -61,7 +61,7 @@ function DateTimeField({
                 },
             }));
         }
-        if (time) {
+        if (type === 'time') {
             setTimeValue(time)
             dispatch(setQuestionValue({ question_id: question?.question_id, value: time }))
             setValue((prev) => ({
@@ -78,7 +78,6 @@ function DateTimeField({
         };
 
         // Combine date and time if both are available
-        if (date && time) {
             const parsedDate = new Date(date); // Assuming date is in 'yyyy-mm-dd' format
             const combinedDateTime = new Date(
                 parsedDate.getFullYear(),
@@ -88,7 +87,7 @@ function DateTimeField({
             // Update conditional values
             setConditionalValues((prevValues) => ({
                 ...prevValues,
-                [question?.question_id.replace(/-/g, '_')]: `${formatDate(date)} ${time}`
+                [question?.question_id.replace(/-/g, '_')]: `${date ? `${formatDate(date)} ` : ''}${time ? time : ''}`
             }));
 
             // Combine date and time into a string for setValue
@@ -107,7 +106,6 @@ function DateTimeField({
                     [question?.question_id]: '', // Clear errors for this field
                 },
             }));
-        }
     };
 
 
@@ -213,7 +211,7 @@ function DateTimeField({
                             value={questionValue?.[question?.question_id] ? questionValue?.[question?.question_id]?.split(' ')[0] : ''} // Use state to manage date value
                             className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id] ? 'border-[#FFA318]' : 'border-[#AEB3B7]'} rounded-md mt-2 ${question?.options?.read_only ? 'bg-gray-50' : 'bg-white'} py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                             placeholder={question?.placeholder_content}
-                            onChange={(e) => handleDateTime(e.target.value, timeValue)} // Pass date and current time
+                            onChange={(e) => handleDateTime(e.target.value, timeValue, 'date')} // Pass date and current time
                             pattern='\d{4}-\d{2}-\d{2}'
                             min="1000-01-01"
                             max="9999-12-31"
@@ -222,7 +220,7 @@ function DateTimeField({
                         />
                     </div>
                     <TimePicker
-                        onChange={(time) => handleDateTime(dateVal, time)} // Pass current date and new time
+                        onChange={(time) => handleDateTime(dateVal, time, 'time')} // Pass current date and new time
                         format={question?.format}
                         validationErrors={validationErrors?.preview_datetimefield?.[question.question_id]}
                         questionValue={questionValue?.[question?.question_id] ? questionValue[question?.question_id]?.split(' ')[1] : ''}
