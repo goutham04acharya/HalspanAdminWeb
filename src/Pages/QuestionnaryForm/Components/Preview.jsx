@@ -1246,7 +1246,7 @@ function PreviewModal({
                     const lookupItem = question.lookup_value.find(item => item.index === result.toString());
 
                     // Use the lookup value if found, otherwise use the result directly
-                    const valueToSet = lookupItem?.value || result;
+                    const valueToSet = lookupItem?.value || '';
 
                     dispatch(
                       setQuestionValue({
