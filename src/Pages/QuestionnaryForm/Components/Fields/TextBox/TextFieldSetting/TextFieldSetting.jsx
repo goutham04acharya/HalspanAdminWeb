@@ -91,20 +91,6 @@ function TestFieldSetting({
     }
   };
 
-  const handleRegularExpression = (event) => {
-    const value = event.target.value;
-
-    if (value === '' || validateRegex(value)) {
-
-      dispatch(setNewComponent({ id: 'regular_expression', questionId: selectedQuestionId, value }));
-      // dispatch(setShouldAutoSave(true));
-    } else {
-      // setToastError('Not a valid regex')
-      // return false;
-    }
-
-  };
-
   const handleErrorMessage = (event) => {
     const value = event.target.value;
     dispatch(setNewComponent({ id: 'format_error', value, questionId: selectedQuestionId }));
@@ -114,6 +100,7 @@ function TestFieldSetting({
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'lookupValue', value: option.choices, questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   };
 
@@ -138,7 +125,8 @@ function TestFieldSetting({
       const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
       const transformedArray = response.data.data.items.map(item => ({
         value: item.lookup_id,
-        label: item.name
+        label: item.name,
+        choices: item.choices
       }));
       let updateOptions;
       if (params.start_key) {
@@ -182,26 +170,35 @@ function TestFieldSetting({
 
   const handleKeyDown = (event) => {
     const textarea = textareaRef.current;
-    const value = textareaRef.current.value;
-
-    if (event.key === "Backspace" && textarea.selectionStart > 0) {
-
-      // Find all regex matches in the input value
-      const matches = [...value.matchAll(regex)];
-      // Check if the cursor is at the end of any match
-      for (let match of matches) {
-        const start = match.index;
-        const end = match.index + match[0].length;
-        // If the cursor is at the end of the match, delete the entire match
-        if (textarea.selectionStart === end) {
-          event.preventDefault(); // Prevent default backspace behavior
-
-          // Remove the matched string
-          const newValue =
-            value.slice(0, start) + value.slice(end);
-          dispatch(setNewComponent({ id: 'default_conditional_logic', value: newValue, questionId: selectedQuestionId }))
-          return;
-        }
+    const value = textarea.value;
+    
+    if (event.key !== "Backspace" || textarea.selectionStart === 0) {
+      return;
+    }
+    
+    // Find all regex matches in the input value
+    const matches = [...value.matchAll(regex)];
+    
+    // Check if cursor is at the end of any match
+    for (const match of matches) {
+      const start = match.index;
+      const end = start + match[0].length;
+      
+      // If cursor is at the end of a match, delete the entire match
+      if (textarea.selectionStart === end) {
+        event.preventDefault(); // Prevent default backspace behavior
+        
+        // Create new value by removing the matched string
+        const newValue = value.slice(0, start) + value.slice(end);
+        
+        // Update state with the new value
+        dispatch(setNewComponent({ 
+          id: 'default_conditional_logic', 
+          value: newValue, 
+          questionId: selectedQuestionId 
+        }));
+        
+        return;
       }
     }
   };
@@ -371,24 +368,6 @@ function TestFieldSetting({
                       lookup={true}
                       lastEvaluatedKeyRef={lastEvaluatedKeyRef}
                     />
-                    {/* <DropdownWithSearch
-                      label=''
-                      id='lookup'
-                      placeholder='Select the lookup list'
-                      className={`w-full ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px]`}
-                      testID='lookup-dropdown'
-                      labeltestID='lookup-list'
-                      selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
-                      isDropdownOpen={isLookupOpen}
-                      setDropdownOpen={setIsLookupOpen}
-                      handleOptionClick={handleLookupOption}
-                      formStatus={formStatus}
-                      top='20px'
-                      close='true'
-                      options={optionData}
-                      handleRemoveLookup={handleRemoveLookup} // Pass the remove handler
-                      textFieldLookup={true} // Enable search functionality
-                    /> */}
                   </div>
                   <button onClick={formStatus === 'Draft' ? () => {
                     setShowCreateModal(true)

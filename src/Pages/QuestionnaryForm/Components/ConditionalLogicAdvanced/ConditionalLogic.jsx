@@ -70,7 +70,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
     const conditionalLogicData = useSelector(state => state.fieldSettingParams.editorToggle)
     const { complianceLogicId } = useSelector((state) => state?.questionnaryForm)
     const [choiceBoxOptions, setChoiceBoxOptions] = useState({});
-    const [ evaluateObject,setEvaluateObject] = useState({})
+    const [evaluateObject, setEvaluateObject] = useState({})
     const [userInput, setUserInput] = useState({
         ifStatements: [],
         elseIfStatements: [],
@@ -307,7 +307,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
 
     function handleQuestionnaryObject(allSectionDetails) {
         let result = {};
-        let evalObject ={}
+        let evalObject = {}
         if (allSectionDetails?.sections && allSectionDetails?.sections.length > 0) {
             allSectionDetails.sections.forEach((section) => {
                 const sectionKey = section.section_name;
@@ -897,31 +897,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return acc;
         }, {});
     }
-    console.log(sections,'popo')
     const handleSave = async () => {
         if (!complianceState) {
-            setEditorCheck((prev) => {
-                const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
-                    item.questionId === selectedQuestionId
-                        ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
-                        : item
-                );
+            if (!isDefaultLogic) {
+                setEditorCheck((prev) => {
+                    const updatedConditionalEditor = prev.conditonalEditor.map((item) =>
+                        item.questionId === selectedQuestionId
+                            ? { ...item, isBasicEditor: false, isAdvanceEditor: true }
+                            : item
+                    );
 
-                // Check if the question already exists
-                const questionExists = prev.conditonalEditor.some(
-                    (item) => item.questionId === selectedQuestionId
-                );
+                    // Check if the question already exists
+                    const questionExists = prev.conditonalEditor.some(
+                        (item) => item.questionId === selectedQuestionId
+                    );
 
-                return {
-                    ...prev,
-                    conditonalEditor: questionExists
-                        ? updatedConditionalEditor // Update existing
-                        : [
-                            ...prev.conditonalEditor,
-                            { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
-                        ] // Add new if not exists
-                };
-            });
+                    return {
+                        ...prev,
+                        conditonalEditor: questionExists
+                            ? updatedConditionalEditor // Update existing
+                            : [
+                                ...prev.conditonalEditor,
+                                { questionId: selectedQuestionId, isBasicEditor: false, isAdvanceEditor: true }
+                            ] // Add new if not exists
+                    };
+                });
+            }
         } else {
             setEditorCheck((prev) => ({
                 ...prev,
@@ -1159,10 +1160,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
             }
-            // if(evalInputValue.includes('Today')){
-            //     evalInputValue = evalInputValue.replace(/Today/g, `new Date().toISOString().split('T')[0]`);
-            // }
-
 
             const functionCallRegex = new RegExp(`\\.(${methods.join('|')})\\(\\)`, 'g');
             if (functionCallRegex.test(evalInputValue)) {
@@ -1174,26 +1171,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
-            // const variableRegex = /\b(\w+\.\w+\.\w+)\b/g;
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
             const variableNames = payloadString.match(variableRegex) || [];
 
-            // Validate if all variable names exist in secDetailsForSearching
-            // const invalidVariables = variableNames.filter(variable => !secDetailsForSearching.includes(variable));
-            //this function is for considering the special char as a valid expression
-            // const invalidVariables = variableNames.filter(variable => {
-            //     // Normalize and sanitize the variable name (e.g., remove special characters for comparison)
-            //     const sanitizedVariable = variable.replaceAll(/[^\w.]/g, ''); // Remove special characters except dots
-            //     return !secDetailsForSearching.some(item => {
-            //         const sanitizedItem = item.replace(/[^\w.]/g, ''); // Remove special characters in the searchable list
-            //         return sanitizedItem === sanitizedVariable;
-            //     });
-            // });
-
-            // if (invalidVariables.length > 0) {
-            //     handleError(`Invalid variable name(s): ${invalidVariables.join(', ')}`);
-            //     return;
-            // }
             if (isDefaultLogic || complianceState) {
                 payloadString = payloadString.replaceAll('else', ':')
                     .replaceAll('then', '?')
@@ -1217,12 +1197,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             let REASON = ''
             let GRADE = '';
             const questionValues = initializeQuestionValues(questionWithUuid);
-            console.log(questionValues, "questionValues")
-            // evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
-            //     let sanitizedUuid = (questionWithUuid[questionName] || "").replace(/-/g, '_');
-            //     let replacement = `${sanitizedUuid}`;
-            //     return logic.replace(new RegExp(`\\b${questionName}\\b`, 'g'), replacement);
-            // }, evalInputValue);
             evalInputValue = Object.keys(questionWithUuid).reduce((logic, questionName) => {
                 // Escape all special regex characters
                 let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
@@ -1334,9 +1308,8 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     handleSaveSection(sectionId, true, payloadString, isDefaultLogic, complianceState);
                     return;
                 }
-                
-                evalInputValue = evalInputValue.replace(/evaluateObject\./g, "");questionWithUuid
-                console.log(evalInputValue, 'at end')
+
+                evalInputValue = evalInputValue.replace(/evaluateObject\./g, ""); questionWithUuid
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
@@ -1730,13 +1703,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }, [conditions])
 
-
-
-
-
-
     const handleSaveBasicEditor = () => {
-
         if (!complianceState) {
             setEditorCheck((prev) => {
                 const updatedConditionalEditor = prev.conditonalEditor.map((item) =>

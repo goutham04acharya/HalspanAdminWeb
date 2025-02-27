@@ -43,74 +43,160 @@ export default function PreviewSummary({ conditionalValues, sections }) {
                   <h1 className="text-sm text-[#000000] font-medium pb-1">
                     {field.question_name.replaceAll("_", " ")}
                   </h1>
-                  {field.question_name === "Photo" ? (
-                      <div className="flex">
-                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
-                          .length === 0
-                          ? "-"
-                          : Object.values(
-                              conditionalValues[field?.question_id?.replaceAll('-','_')]
-                            ).map((img) => (
-                              <img
-                                src={URL.createObjectURL(img)}
-                                alt="Selected Image"
-                                className="w-[70px] h-[70px] rounded-lg mx-3"
-                                onClick={() => handleImageClick(img)}
-                              />
-                            ))}
-                      </div>
-                    ) : field.question_name === 'GPS' ? <GPSField
-                    preview
-                /> : field.question_name === "Floorplan" ? (
-                      <ImageZoomPin floorPlan/>
-                    ) : field.question_name === "Video" ? (
-                      <ul>
-                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
-                          .length === 0
-                          ? "-"
-                          : Object.values(
-                              conditionalValues[field?.question_id?.replaceAll('-','_')]
-                            ).map((file, index) => (
-                              <li
-                                key={index}
-                                className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
-                              >
-                                <span className="truncate w-[300px]">
-                                  {file.name}
-                                </span>
-                              </li>
-                            ))}
-                      </ul>
-                    ) : field.question_name === "File" ? (
-                      <ul>
-                        {Object.values(conditionalValues[field?.question_id?.replaceAll('-','_')])
-                          .length === 0
-                          ? "-"
-                          : Object.values(
-                              conditionalValues[field?.question_id?.replaceAll('-','_')]
-                            ).map((file, index) => (
-                              <li
-                                key={index}
-                                className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
-                              >
-                                <span className="truncate w-[300px]">
-                                  {file}
-                                </span>
-                                <div className="flex gap-2"></div>
-                              </li>
-                            ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-gray-700">
-                        {conditionalValues[field?.question_id?.replaceAll('-','_')]
-                          ? (typeof conditionalValues[field?.question_id?.replaceAll('-','_')] ===
-                            "string" || typeof conditionalValues[field?.question_id?.replaceAll('-','_')] ===
-                            "number")
-                            ? conditionalValues[field?.question_id?.replaceAll('-','_')]?.includes('https://halspan-assets-') ? <ImageZoomPin imageSrc={conditionalValues[field?.question_id?.replaceAll('-','_')]}/>: conditionalValues[field?.question_id?.replaceAll('-','_')]
-                            : conditionalValues[field?.question_id?.replaceAll('-','_')].join(",")
-                          : "-"}
-                      </p>
-                    )}
+                  {field.component_type === "photofield" ? (
+                    <div className="flex">
+                      {Object.values(
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ]
+                      ).length === 0
+                        ? "-"
+                        : Object.values(
+                            conditionalValues[
+                              field?.question_id?.replaceAll("-", "_")
+                            ]
+                          ).map((img) => (
+                            <img
+                              src={URL.createObjectURL(img)}
+                              alt="Selected Image"
+                              className="w-[70px] h-[70px] rounded-lg mx-3"
+                              onClick={() => handleImageClick(img)}
+                            />
+                          ))}
+                    </div>
+                  ) : field.component_type === "gpsfield" ? (
+                    <GPSField preview />
+                  ) : field.component_type === "floorPlanfield" ? (
+                    <ImageZoomPin floorPlan />
+                  ) : field.component_type === "videofield" ? (
+                    <ul>
+                      {Object.values(
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ]
+                      ).length === 0
+                        ? "-"
+                        : Object.values(
+                            conditionalValues[
+                              field?.question_id?.replaceAll("-", "_")
+                            ]
+                          ).map((file, index) => (
+                            <li
+                              key={index}
+                              className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
+                            >
+                              <span className="truncate w-[300px]">
+                                {file.name}
+                              </span>
+                            </li>
+                          ))}
+                    </ul>
+                  ) : field.component_type === "filefield" ? (
+                    <ul>
+                      {Object.values(
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ]
+                      ).length === 0
+                        ? "-"
+                        : Object.values(
+                            conditionalValues[
+                              field?.question_id?.replaceAll("-", "_")
+                            ]
+                          ).map((file, index) => (
+                            <li
+                              key={index}
+                              className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
+                            >
+                              <span className="truncate w-[300px]">{file}</span>
+                              <div className="flex gap-2"></div>
+                            </li>
+                          ))}
+                    </ul>
+                  ) : field.component_type === "displayfield" ? (
+                    <>
+                      {field.display_type.text ? (
+                        <p className="text-sm text-gray-700">
+                          {field.display_type.text}
+                        </p>
+                      ) : field.display_type.heading ? (
+                        <p className="text-sm text-gray-700">
+                          {field.display_type.heading}
+                        </p>
+                      ) : field.display_type.image ? (
+                        <ImageZoomPin imageSrc={field.display_type.image} />
+                      ) : field.display_type.url ? (
+                        <p className="text-sm text-gray-700">
+                          {field.display_type.url.value}
+                        </p>
+                      ) : (
+                        "-"
+                      )}
+                    </>
+                  ) : field.component_type === "signaturefield" ? (
+                    <>
+                      {conditionalValues[
+                        field?.question_id?.replaceAll("-", "_")
+                      ] ? (
+                        <ImageZoomPin
+                          imageSrc={
+                            conditionalValues[
+                              field?.question_id?.replaceAll("-", "_")
+                            ]
+                          }
+                        />
+                      ) : (
+                        "-"
+                      )}
+                    </>
+                  ) : field.component_type === "assetLocationfield" ? (
+                    <div className="text-sm text-gray-700">
+                      <p>{`Site: ${
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ].site || "-"
+                      }`}</p>
+                      <p>{`Building: ${
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ].building || "-"
+                      }`}</p>
+                      <p>{`Floor: ${
+                        conditionalValues[
+                          field?.question_id?.replaceAll("-", "_")
+                        ].floor || "-"
+                      }`}</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-700">
+                      {(() => {
+                        const key = field?.question_id?.replaceAll("-", "_");
+                        const value = conditionalValues[key];
+                        if (!value) return "-"; // Handle empty values
+
+                        if (
+                          typeof value === "string" ||
+                          typeof value === "number"
+                        ) {
+                          return value;
+                        }
+                        if (
+                          typeof value === "object" &&
+                          value !== null &&
+                          field.component_type === "dateTimefield"
+                        ) {
+                          const timeMatch =
+                            JSON.stringify(value).match(/\d{2}:\d{2}:\d{2}/);
+                          if (timeMatch) return timeMatch[0]; // Return only the time
+                        }
+                        if (Array.isArray(value)) {
+                          return value.join(", ");
+                        }
+
+                        return "-";
+                      })()}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

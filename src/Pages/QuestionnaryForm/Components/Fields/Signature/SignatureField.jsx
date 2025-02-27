@@ -17,7 +17,8 @@ const SignatureField = ({
     validationErrors,
     setValidationErrors,
     setValue,
-    choiceValue
+    choiceValue,
+    setConditionalValues,
 }) => {
     return (
         <div>
@@ -38,6 +39,8 @@ const SignatureField = ({
                         setValidationErrors={setValidationErrors}
                         question={question}
                         value={choiceValue}
+                        setConditionalValues={setConditionalValues}
+                        question_id={question?.question_id}
                     />
 
                     {/* Optionally, display a message if the signature is empty */}
