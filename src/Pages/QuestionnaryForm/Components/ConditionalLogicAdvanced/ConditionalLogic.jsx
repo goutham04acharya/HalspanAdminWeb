@@ -1170,6 +1170,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 return; // Stop execution if validation fails
             }
 
+            console.log(evalInputValue, 'evalInputValue');
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
@@ -1229,8 +1230,10 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }, evalInputValue);
 
             // **Fix: Remove unwanted `questionWithUuid.` reference**
-            // evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
-            console.log(evalInputValue)
+            if (evalInputValue.includes('bddtest#')) {
+                evalInputValue = evalInputValue.replace(/bddtest#/g, "");
+            }
+            evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
             const wrappedEval = `(function(questionValues) { 
                                         try {
                                             return ${evalInputValue};
@@ -1239,10 +1242,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-            console.log(wrappedEval, 'wrappedEval')
-            console.log(evaluateObject,'oooo')
             const result = eval(wrappedEval);
-            console.log(result, 'result')
             if (isDefaultLogic || complianceState) {
                 switch (selectedComponent) {
                     case 'choiceboxfield':
