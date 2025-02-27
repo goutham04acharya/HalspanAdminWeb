@@ -646,7 +646,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
-            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w_.]+)\)/;
+            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w\s.]+)\)/;
             const match = condition?.match(pattern);
             if (!match) {
                 return null;
@@ -1166,7 +1166,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError('Please pass the parameter inside the function');
                 return; // Stop execution if validation fails
             }
-
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
@@ -1203,6 +1202,9 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             }, evalInputValue);
 
             // **Fix: Remove unwanted `questionWithUuid.` reference**
+            if (evalInputValue.includes('bddtest#')) {
+                evalInputValue = evalInputValue.replace(/bddtest#/g, "");
+            }
             evalInputValue = evalInputValue.replace(/questionWithUuid\./g, "");
             const wrappedEval = `(function(questionValues) { 
                                         try {
@@ -1297,7 +1299,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(true);
             if (!error) {
                 if (complianceState) {
-                    payloadString = evalInputValue;
+                    payloadString = evalInputValue.replace(/evaluateObject\./g, "");
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
@@ -1305,7 +1307,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
 
-                evalInputValue = evalInputValue.replace(/evaluateObject\./g, ""); questionWithUuid
+                evalInputValue = evalInputValue.replace(/evaluateObject\./g, "");
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
@@ -1734,9 +1736,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         if (complianceState) {
-
             let compliance_logic = getFinalComplianceLogic(conditions);
-            compliance_logic = replaceQuestionKey(compliance_logic, questionWithUuid);
+            compliance_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, compliance_logic);
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
