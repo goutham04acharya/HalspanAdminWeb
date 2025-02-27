@@ -655,15 +655,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
-            console.log({
-                question_name: question_name.trim(),
-                condition_logic: 'date is “X” date of set date',
-                value: offsetDays,
-                dropdown: false,
-                condition_dropdown: false,
-                condition_type: question?.component_type,
-                date: passingDate
-            }, 'date condition');
             return {
                 question_name: question_name.trim(),
                 condition_logic: 'date is “X” date of set date',
