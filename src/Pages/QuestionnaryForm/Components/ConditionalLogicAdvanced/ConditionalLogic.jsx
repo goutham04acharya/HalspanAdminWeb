@@ -1166,8 +1166,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 handleError('Please pass the parameter inside the function');
                 return; // Stop execution if validation fails
             }
-
-            console.log(evalInputValue, 'evalInputValue');
             let payloadString = expression;
             evalInputValue = addSectionPrefix(evalInputValue);
             // Extract variable names from the payloadString using a regex
@@ -1687,7 +1685,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         else if (isDefaultLogic && !complianceState) {
         } else {
-            debugger
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                 condition_logic = getReplacedComplianceLogic(condition_logic)
@@ -1781,7 +1778,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
-            console.log(conditions,'condi')
             dispatch(setComplianceLogicCondition(conditions));
         }
         handleSaveSection(sectionId, true, condition_logic);
@@ -1800,7 +1796,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
     }
     function replaceUUIDs(questionWithUUID, replacements) {
-        console.log(questionWithUUID, 'questionWithUUID');
         let updatedString = questionWithUUID;
         if (!updatedString) {
             return '';
@@ -1810,7 +1805,6 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const regex = new RegExp(escapedValue, "g"); // Global replacement
             updatedString = updatedString.replace(regex, key);
         });
-        console.log(updatedString, 'updatedString');
         return updatedString;
     }
     useEffect(() => {
