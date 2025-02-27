@@ -243,6 +243,19 @@ function PreviewModal({
         '["$1"][0]', // Convert to ["Question_1?"][0]
       );
 
+      const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
+
+      logic = logic.replace(regex, (match, variable, functionName) => {
+        if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {          
+          if (eval(variable).includes("AM") || eval(variable).includes("AM")) {
+            return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
+          } else {
+            return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
+          }
+        } else {
+          return `new Date(${variable}).${functionName}()`;
+        }
+      });
       return logic;
     };
 
@@ -594,12 +607,7 @@ function PreviewModal({
       isLastPageInSection =
         nextPage === sections?.[currentSection]?.pages.length - 1;
     }
-
-    // Final check to determine if this is the last section and page
-    // if (nextSection === sections.length - 1 &&
-    //     nextPage === sections[nextSection]?.pages.length - 1) {
-    //     isLastSection = true;
-    // }
+    
     if (!sections[nextSection]) {
       isLastSection = true;
     }
@@ -1251,7 +1259,7 @@ function PreviewModal({
                     );
                     setConditionalValues(prevValues => ({
                       ...prevValues,
-                      [question?.question_id.replace(/-/g,'_')]: valueToSet
+                      [question?.question_id.replace(/-/g, '_')]: valueToSet
                     }));
                   } else {
                     dispatch(
@@ -1262,7 +1270,7 @@ function PreviewModal({
                     );
                     setConditionalValues(prevValues => ({
                       ...prevValues,
-                      [question?.question_id.replace(/-/g,'_')]: result
+                      [question?.question_id.replace(/-/g, '_')]: result
                     }));
                   }
                 }
@@ -1306,14 +1314,14 @@ function PreviewModal({
                       question?.conditional_logic,
                     );
                     if (!isVisible) {
-                      draft[question?.question_id.replace(/-/g,'_')] = question.component_type === 'assetLocationfield' ? {} : "";
+                      draft[question?.question_id.replace(/-/g, '_')] = question.component_type === 'assetLocationfield' ? {} : "";
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
                           value: "",
                         }),
                       );
-                      
+
                     }
                   } catch (error) {
                     console.error("Error evaluating conditional logic:", error);
