@@ -646,7 +646,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         };
         // Helper function to parse date conditions
         const parseDateCondition = (condition) => {
-            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w_.]+)\)/;
+            const pattern = /formatDateWithOffset\('([^']+)',\s*(\d+),\s*([\w\s.]+)\)/;
             const match = condition?.match(pattern);
             if (!match) {
                 return null;
@@ -655,6 +655,15 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const question = getDetails(question_name.trim(), allSectionDetails.sections);
             let passingDate = convertTimestampToDate(timestamp);
             passingDate = dayjs(passingDate, 'DD/MM/YYYY');
+            console.log({
+                question_name: question_name.trim(),
+                condition_logic: 'date is “X” date of set date',
+                value: offsetDays,
+                dropdown: false,
+                condition_dropdown: false,
+                condition_type: question?.component_type,
+                date: passingDate
+            }, 'date condition');
             return {
                 question_name: question_name.trim(),
                 condition_logic: 'date is “X” date of set date',
@@ -1301,7 +1310,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             setIsThreedotLoader(true);
             if (!error) {
                 if (complianceState) {
-                    payloadString = evalInputValue;
+                    payloadString = evalInputValue.replace(/evaluateObject\./g, "");
                     setInputValue(payloadString)
                     setConditions(complianceInitialState)
                     dispatch(setComplianceLogicCondition(complianceInitialState))
@@ -1309,7 +1318,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     return;
                 }
 
-                evalInputValue = evalInputValue.replace(/evaluateObject\./g, ""); questionWithUuid
+                evalInputValue = evalInputValue.replace(/evaluateObject\./g, "");
                 handleSaveSection(sectionId, true, evalInputValue, isDefaultLogic, complianceState);
 
             } else if (typeof result === 'boolean') {
@@ -1687,6 +1696,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
         else if (isDefaultLogic && !complianceState) {
         } else {
+            debugger
             try {
                 let condition_logic = getFinalComplianceLogic(conditions)
                 condition_logic = getReplacedComplianceLogic(condition_logic)
@@ -1738,9 +1748,12 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             return;
         }
         if (complianceState) {
-
             let compliance_logic = getFinalComplianceLogic(conditions);
-            compliance_logic = replaceQuestionKey(compliance_logic, questionWithUuid);
+            compliance_logic = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                // Escape all special regex characters
+                let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+            }, compliance_logic);
             setComplianceLogic((prev) => {
                 return prev.map((item, index) =>
                     index === complianceLogicId
@@ -1777,6 +1790,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         if (!complianceState) {
             dispatch(setNewComponent({ id: 'conditional_logic', value: condition_logic, questionId: selectedQuestionId }));
         } else {
+            console.log(conditions,'condi')
             dispatch(setComplianceLogicCondition(conditions));
         }
         handleSaveSection(sectionId, true, condition_logic);
@@ -1795,6 +1809,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
     }
     function replaceUUIDs(questionWithUUID, replacements) {
+        console.log(questionWithUUID, 'questionWithUUID');
         let updatedString = questionWithUUID;
         if (!updatedString) {
             return '';
@@ -1804,6 +1819,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const regex = new RegExp(escapedValue, "g"); // Global replacement
             updatedString = updatedString.replace(regex, key);
         });
+        console.log(updatedString, 'updatedString');
         return updatedString;
     }
     useEffect(() => {
