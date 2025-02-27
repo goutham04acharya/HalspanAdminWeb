@@ -1098,25 +1098,32 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 }
             }
             if (evalInputValue.includes('getHours')) {
-                // Match getHours() with either a two-digit number and a comparison operator
-                const timeMatches = evalInputValue.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
+                const timeMatches = evalInputValue.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/g);
 
                 if (timeMatches) {
                     for (const timeMatch of timeMatches) {
-                        const [, operator, hours] = timeMatch.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/);
+                        const matchParts = timeMatch.match(/getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/);
 
-                        // Ensure the hours value is a two-digit number between 00 and 23
-                        if (parseInt(hours) < 0 || parseInt(hours) > 23) {
-                            setError(`Invalid hours: "${hours}". The value must be a valid number between 00 and 23.`);
+                        if (matchParts && matchParts.length === 3) {
+                            const operator = matchParts[1];
+                            const hours = matchParts[2];
+                            const hoursValue = parseInt(hours, 10);
+
+                            if (isNaN(hoursValue) || hoursValue < 0 || hoursValue > 23) {
+                                setError(`Invalid hours: "${hours}". The value must be a valid number between 00 and 23.`);
+                                return;
+                            }
+                        } else {
+                            setError("Unexpected format error while processing getHours() expressions.");
                             return;
                         }
                     }
-                    // Continue with other logic if all times are valid
                 } else {
                     setError("Invalid format. Please use the format `getHours() === hh` where hh is a two-digit number.");
                     return;
                 }
             }
+
             if (evalInputValue.includes('getMinutes')) {
                 // Match getMinutes() with a comparison operator and a two-digit number
                 const timeMatches = evalInputValue.match(/getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g);
@@ -1172,14 +1179,27 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             const variableRegex = /^\w+\.\w+\.[^\.]+$/;
             const variableNames = payloadString.match(variableRegex) || [];
 
-            if (isDefaultLogic || complianceState) {
-                payloadString = payloadString.replaceAll('else', ':')
-                    .replaceAll('then', '?')
-                    .replaceAll('if', ' ');
-                evalInputValue = evalInputValue.replaceAll('else', ':')
-                    .replaceAll('then', '?')
-                    .replaceAll('if', ' ');
+            // Function to replace logical keywords with their corresponding symbols
+            function replaceLogicOperators(inputString) {
+                let modifiedString = inputString.replaceAll('else', ':');
+                modifiedString = modifiedString.replaceAll('then', '?');
+                modifiedString = modifiedString.replaceAll('if', ' ');
+                return modifiedString;
             }
+
+            // Check if either isDefaultLogic or complianceState is true before proceeding
+            if (isDefaultLogic || complianceState) {
+                // Apply the transformation to payloadString
+                let updatedPayloadString = replaceLogicOperators(payloadString);
+
+                // Apply the transformation to evalInputValue
+                let updatedEvalInputValue = replaceLogicOperators(evalInputValue);
+
+                // Assign the modified values back to the original variables
+                payloadString = updatedPayloadString;
+                evalInputValue = updatedEvalInputValue;
+            }
+
             //just checking for datetimefield before the evaluating the expression (only for default checking)
             if ((isDefaultLogic || complianceState) && selectedComponent === "dateTimefield" && (evalInputValue.includes('setDate'))) {
                 let invalid = DateValidator(evalInputValue)
@@ -1677,29 +1697,42 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }
     let isAdvance = false;
+    
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
-            let condition_logic = buildConditionExpression(conditions, combinedArray, isAdvance = true)
-            condition_logic = condition_logic?.replaceAll('new Date()', '"Today"')
+            let condition_logic = buildConditionExpression(conditions, combinedArray, (isAdvance = true));
+
+            if (condition_logic) {
+                condition_logic = condition_logic.replaceAll('new Date()', '"Today"');
+            }
+
             setInputValue(condition_logic);
-        }
-        else if (isDefaultLogic && !complianceState) {
+        } else if (isDefaultLogic && !complianceState) {
+            // This block is intentionally left empty, as per the original logic.
         } else {
             try {
-                let condition_logic = getFinalComplianceLogic(conditions)
-                condition_logic = getReplacedComplianceLogic(condition_logic)
-                if (condition_logic?.includes(':')) {
-                    // Split by colon and rebuild with "else if" and "else" logic
-                    const parts = condition_logic?.split(':');
-                    const lastPart = parts.pop(); // Remove the last part
-                    condition_logic = parts.map(part => part.trim()).join(' else if ') + ' else ' + lastPart.trim();
+                let condition_logic = getFinalComplianceLogic(conditions);
+                condition_logic = getReplacedComplianceLogic(condition_logic);
+
+                if (condition_logic && condition_logic.includes(':')) {
+                    const parts = condition_logic.split(':');
+                    const lastPart = parts.pop();
+
+                    const transformedParts = parts.map(part => part.trim());
+                    condition_logic = transformedParts.join(' else if ') + ' else ' + lastPart.trim();
                 }
-                setInputValue(replaceUUIDs(condition_logic, questionWithUuid) || defaultContentConverter(replaceUUIDs(complianceLogic[0].default_content, questionWithUuid)));
+
+                const replacedLogic = replaceUUIDs(condition_logic, questionWithUuid);
+                const defaultLogic = replaceUUIDs(complianceLogic[0].default_content, questionWithUuid);
+                const finalLogic = replacedLogic || defaultContentConverter(defaultLogic);
+
+                setInputValue(finalLogic);
             } catch (error) {
-                console.error('Error while converting', error);
+                console.error('Error while converting:', error);
             }
         }
-    }, [conditions])
+    }, [conditions]);
+
 
     const handleSaveBasicEditor = () => {
         if (!complianceState) {

@@ -15,6 +15,7 @@ import GlobalContext from '../../../../../../Components/Context/GlobalContext';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import LookupDataset from '../../../../../LookupDataset';
 import DropdownWithSearch from '../../../../../../Components/InputField/DropdownWithSearch';
+import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
 function TestFieldSetting({
   handleInputChange,
@@ -29,6 +30,7 @@ function TestFieldSetting({
   setIsDefaultLogic,
   formStatus,
   setEditorCheck,
+  questionWithUuid
 }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -241,7 +243,7 @@ function TestFieldSetting({
                   className='mt-[11px] w-full border border-[#AEB3B7] rounded py-[11px] pl-4 pr-11 font-normal text-base text-[#2B333B] placeholder:text-[#9FACB9] outline-0'
                   value={
                     fieldSettingParameters?.default_conditional_logic
-                      ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                      ? defaultContentConverter(replaceUUIDsWithQuestions(fieldSettingParameters?.default_conditional_logic, questionWithUuid))
                       : ''
                   } // Prefill the input with `defaultString` if it exists, otherwise empty string
                   onChange={(e) =>
