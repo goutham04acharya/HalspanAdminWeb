@@ -14,14 +14,6 @@ export const complianceContentConverter = (conditionalLogic) => {
 
         conditionalLogic = conditionalLogic
             ?.replace(/ACTIONS\.push\('([^']+)'\)/g, 'ACTIONS += "$1"')
-            ?.replace(
-                /(\w+\.\w+\.\w+)\.AddDays\((\d+)\)/g,
-                'new Date(new Date($1).setDate(new Date($1).getDate() + $2)).toLocaleDateString("en-GB")'
-            )
-            ?.replace(
-                /(\w+\.\w+\.\w+)\.SubtractDays\((\d+)\)/g,
-                'new Date(new Date($1).setDate(new Date($1).getDate() - $2)).toLocaleDateString("en-GB")'
-            )
             ?.replace(/\belse\s{2}/g, 'else if ')
 
         return conditionalLogic;
