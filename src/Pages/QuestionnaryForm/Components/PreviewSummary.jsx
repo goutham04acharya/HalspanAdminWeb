@@ -1,18 +1,145 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import ImageZoomPin from "../../../Components/PinOnTheFloor/PinOnTheFloor";
 import GPSField from "./Fields/GPS/GPSField";
+
+const formatName = (name) => name.replaceAll("_", " ");
+const formatQuestionId = (id) => id?.replaceAll("-", "_");
+
+const ImagePreview = ({ images, onImageClick }) => {
+  if (!images || images.length === 0) return "-";
+  
+  return (
+    <div className="flex flex-wrap gap-2">
+      {Object.values(images).map((img, index) => (
+        <img
+          key={index}
+          src={URL.createObjectURL(img)}
+          alt="Selected Image"
+          className="w-16 h-16 rounded-lg cursor-pointer"
+          onClick={() => onImageClick(img)}
+        />
+      ))}
+    </div>
+  );
+};
+
+const FilePreview = ({ files }) => {
+  if (!files || Object.values(files).length === 0) return "-";
+  
+  return (
+    <ul className="w-full">
+      {Object.values(files).map((file, index) => (
+        <li
+          key={index}
+          className="bg-gray-200 my-2 p-2 rounded flex justify-between"
+        >
+          <span className="truncate w-full max-w-xs">{file.name || file}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const DisplayFieldPreview = ({ display_type }) => {
+  switch (true) {
+    case !!display_type.text:
+      return <p className="text-sm text-gray-700">{display_type.text}</p>;
+    case !!display_type.heading:
+      return <p className="text-sm text-gray-700">{display_type.heading}</p>;
+    case !!display_type.image:
+      return <ImageZoomPin imageSrc={display_type.image} />;
+    case !!display_type.url:
+      return <p className="text-sm text-gray-700">{display_type.url.value}</p>;
+    default:
+      return "-";
+  }
+};
+
+const AssetLocationPreview = ({ value }) => (
+  <div className="text-sm text-gray-700">
+    <p>{`Site: ${value?.site || "-"}`}</p>
+    <p>{`Building: ${value?.building || "-"}`}</p>
+    <p>{`Floor: ${value?.floor || "-"}`}</p>
+  </div>
+);
+
+const StandardFieldPreview = ({ value, component_type }) => {
+  if (!value) return "-";
+
+  switch (true) {
+    case typeof value === "string" || typeof value === "number":
+      return value;
+    case typeof value === "object" && value !== null && component_type === "dateTimefield":
+      const timeMatch = JSON.stringify(value).match(/\d{2}:\d{2}:\d{2}/);
+      return timeMatch ? timeMatch[0] : "-";
+    case Array.isArray(value):
+      return value.join(", ");
+    default:
+      return "-";
+  }
+};
+
+const FieldPreview = ({ field, conditionalValues, onImageClick }) => {
+  const questionId = formatQuestionId(field.question_id);
+  const value = conditionalValues[questionId];
+
+  return (
+    <div className="pb-2">
+      <h1 className="text-sm text-black font-medium pb-1">
+        {formatName(field.question_name)}
+      </h1>
+      
+      {renderFieldContent(field, value, onImageClick)}
+    </div>
+  );
+};
+
+const renderFieldContent = (field, value, onImageClick) => {
+  switch (field.component_type) {
+    case "photofield":
+      return <ImagePreview images={value} onImageClick={onImageClick} />;
+    case "gpsfield":
+      return <GPSField preview />;
+    case "floorPlanfield":
+      return <ImageZoomPin floorPlan />;
+    case "videofield":
+    case "filefield":
+      return <FilePreview files={value} />;
+    case "displayfield":
+      return <DisplayFieldPreview display_type={field.display_type} />;
+    case "signaturefield":
+      return value ? <ImageZoomPin imageSrc={value} /> : "-";
+    case "assetLocationfield":
+      return <AssetLocationPreview value={value} />;
+    default:
+      return (
+        <p className="text-sm text-gray-700">
+          <StandardFieldPreview value={value} component_type={field.component_type} />
+        </p>
+      );
+  }
+};
 
 export default function PreviewSummary({ conditionalValues, sections }) {
   const [currentImage, setCurrentImage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const handleImageClick = (image) => {
+  
+  const handleImageClick = useCallback((image) => {
     setCurrentImage(image);
     setModalOpen(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+
+  const shouldShowField = (field) => {
+    return (
+      field.options.visible &&
+      (eval(field.conditional_logic) || eval(field.conditional_logic) === undefined)
+    );
   };
 
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
   return (
     <>
       <h2
@@ -21,10 +148,11 @@ export default function PreviewSummary({ conditionalValues, sections }) {
       >
         Summary
       </h2>
+      
       {sections?.map((section, sectionIndex) => (
         <div key={`section-${sectionIndex}`}>
           <h1 className="text-xl font-bold text-[#2B333B] mb-4">
-            {section.section_name.replaceAll("_", " ")}
+            {formatName(section.section_name)}
           </h1>
 
           {section.pages?.map((page, pageIndex) => (
@@ -34,189 +162,42 @@ export default function PreviewSummary({ conditionalValues, sections }) {
             >
               <label
                 data-testid="label-name"
-                className="font-medium pb-1 text-base text-[#000000] overflow-hidden break-all block w-full max-w-[85%] h-auto"
+                className="font-medium pb-1 text-base text-black overflow-hidden break-all block w-full max-w-[85%]"
               >
-                {page.page_name.replaceAll("_", " ")}
+                {formatName(page.page_name)}
               </label>
-              {page.questions?.map((field, fieldIndex) => (
-                <div key={`field-${fieldIndex}`} className="pb-2">
-                  <h1 className="text-sm text-[#000000] font-medium pb-1">
-                    {field.question_name.replaceAll("_", " ")}
-                  </h1>
-                  {field.component_type === "photofield" ? (
-                    <div className="flex">
-                      {Object.values(
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ]
-                      ).length === 0
-                        ? "-"
-                        : Object.values(
-                            conditionalValues[
-                              field?.question_id?.replaceAll("-", "_")
-                            ]
-                          ).map((img) => (
-                            <img
-                              src={URL.createObjectURL(img)}
-                              alt="Selected Image"
-                              className="w-[70px] h-[70px] rounded-lg mx-3"
-                              onClick={() => handleImageClick(img)}
-                            />
-                          ))}
-                    </div>
-                  ) : field.component_type === "gpsfield" ? (
-                    <GPSField preview />
-                  ) : field.component_type === "floorPlanfield" ? (
-                    <ImageZoomPin floorPlan />
-                  ) : field.component_type === "videofield" ? (
-                    <ul>
-                      {Object.values(
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ]
-                      ).length === 0
-                        ? "-"
-                        : Object.values(
-                            conditionalValues[
-                              field?.question_id?.replaceAll("-", "_")
-                            ]
-                          ).map((file, index) => (
-                            <li
-                              key={index}
-                              className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
-                            >
-                              <span className="truncate w-[300px]">
-                                {file.name}
-                              </span>
-                            </li>
-                          ))}
-                    </ul>
-                  ) : field.component_type === "filefield" ? (
-                    <ul>
-                      {Object.values(
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ]
-                      ).length === 0
-                        ? "-"
-                        : Object.values(
-                            conditionalValues[
-                              field?.question_id?.replaceAll("-", "_")
-                            ]
-                          ).map((file, index) => (
-                            <li
-                              key={index}
-                              className="bg-[#DFE0E2] my-2 p-2 rounded flex justify-between"
-                            >
-                              <span className="truncate w-[300px]">{file}</span>
-                              <div className="flex gap-2"></div>
-                            </li>
-                          ))}
-                    </ul>
-                  ) : field.component_type === "displayfield" ? (
-                    <>
-                      {field.display_type.text ? (
-                        <p className="text-sm text-gray-700">
-                          {field.display_type.text}
-                        </p>
-                      ) : field.display_type.heading ? (
-                        <p className="text-sm text-gray-700">
-                          {field.display_type.heading}
-                        </p>
-                      ) : field.display_type.image ? (
-                        <ImageZoomPin imageSrc={field.display_type.image} />
-                      ) : field.display_type.url ? (
-                        <p className="text-sm text-gray-700">
-                          {field.display_type.url.value}
-                        </p>
-                      ) : (
-                        "-"
-                      )}
-                    </>
-                  ) : field.component_type === "signaturefield" ? (
-                    <>
-                      {conditionalValues[
-                        field?.question_id?.replaceAll("-", "_")
-                      ] ? (
-                        <ImageZoomPin
-                          imageSrc={
-                            conditionalValues[
-                              field?.question_id?.replaceAll("-", "_")
-                            ]
-                          }
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </>
-                  ) : field.component_type === "assetLocationfield" ? (
-                    <div className="text-sm text-gray-700">
-                      <p>{`Site: ${
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ].site || "-"
-                      }`}</p>
-                      <p>{`Building: ${
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ].building || "-"
-                      }`}</p>
-                      <p>{`Floor: ${
-                        conditionalValues[
-                          field?.question_id?.replaceAll("-", "_")
-                        ].floor || "-"
-                      }`}</p>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-700">
-                      {(() => {
-                        const key = field?.question_id?.replaceAll("-", "_");
-                        const value = conditionalValues[key];
-                        if (!value) return "-"; // Handle empty values
-
-                        if (
-                          typeof value === "string" ||
-                          typeof value === "number"
-                        ) {
-                          return value;
-                        }
-                        if (
-                          typeof value === "object" &&
-                          value !== null &&
-                          field.component_type === "dateTimefield"
-                        ) {
-                          const timeMatch =
-                            JSON.stringify(value).match(/\d{2}:\d{2}:\d{2}/);
-                          if (timeMatch) return timeMatch[0]; // Return only the time
-                        }
-                        if (Array.isArray(value)) {
-                          return value.join(", ");
-                        }
-
-                        return "-";
-                      })()}
-                    </p>
-                  )}
-                </div>
-              ))}
+              
+              {page.questions?.map(
+                (field, fieldIndex) =>
+                  shouldShowField(field) && (
+                    <FieldPreview 
+                      key={`field-${fieldIndex}`}
+                      field={field}
+                      conditionalValues={conditionalValues}
+                      onImageClick={handleImageClick}
+                    />
+                  )
+              )}
             </div>
           ))}
         </div>
       ))}
+      
       {modalOpen && (
         <div className="modal-overlay absolute rounded-[50px] top-0 flex-col z-20 left-0 w-[356px] h-full bg-white flex justify-center items-center">
-          <span
-            className="close-icon delay-300 z-[2] items-end text-[20px] ml-[325px] top-10 relative hover:bg-slate-700 transition-transform bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer"
+          <button
+            className="close-icon delay-300 z-[2] items-end text-[20px] ml-auto mr-4 -mt-64 hover:bg-slate-700 transition-transform bg-slate-800 px-1.5 rounded-lg text-white cursor-pointer"
             onClick={handleModalClose}
+            aria-label="Close"
           >
             &#10005;
-          </span>
+          </button>
 
           <div className="z-[1]">
             <img
               src={URL.createObjectURL(currentImage)}
               className="w-[374px] h-[600px] bg-white p-2 rounded-lg object-contain"
-              alt=""
+              alt="Enlarged"
             />
           </div>
         </div>
