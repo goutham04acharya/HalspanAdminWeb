@@ -956,16 +956,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
             if (isDefaultLogic || complianceState) {
                 setDefaultString(evalInputValue);
             }
-            // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
-            evalInputValue = evalInputValue.replaceAll(
-                /(\w+\.\w+\.\w+)\.AddDays\((\d+)\)/g,
-                'new Date(new Date($1).setDate(new Date($1).getDate() + $2)).toLocaleDateString("en-GB")'
-            );
-            // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
-            evalInputValue = evalInputValue.replaceAll(
-                /(\w+\.\w+\.\w+)\.SubtractDays\((\d+)\)/g,
-                'new Date(new Date($1).setDate(new Date($1).getDate() - $2)).toLocaleDateString("en-GB")'
-            );
+            
 
             evalInputValue = evalInputValue.replaceAll(/ACTIONS?\s*\+=\s*"(.*?)"/g, `ACTIONS.push('$1')`)
                 .replaceAll('if', '')
@@ -1697,7 +1688,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
         }
     }
     let isAdvance = false;
-    
+
     useEffect(() => {
         if (!complianceState && !isDefaultLogic) {
             let condition_logic = buildConditionExpression(conditions, combinedArray, (isAdvance = true));

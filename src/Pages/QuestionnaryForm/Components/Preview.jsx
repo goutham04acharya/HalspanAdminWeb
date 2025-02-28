@@ -246,7 +246,7 @@ function PreviewModal({
       const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
 
       logic = logic.replace(regex, (match, variable, functionName) => {
-        if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {          
+        if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
           if (eval(variable).includes("AM") || eval(variable).includes("AM")) {
             return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
           } else {
@@ -256,6 +256,19 @@ function PreviewModal({
           return `new Date(${variable}).${functionName}()`;
         }
       });
+
+      // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
+      logic = logic.replaceAll(
+        /(\w+)\.AddDays\((\d+)\)/g,
+        '(new Date(new Date($1).getTime() + ($2 * 86400000))).toLocaleDateString("en-GB")'
+      );
+
+      // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
+      logic = logic.replaceAll(
+        /(\w+)\.SubtractDays\((\d+)\)/g,
+        '(new Date(new Date($1).getTime() - ($2 * 86400000))).toLocaleDateString("en-GB")'
+      );
+
       return logic;
     };
 
@@ -607,7 +620,7 @@ function PreviewModal({
       isLastPageInSection =
         nextPage === sections?.[currentSection]?.pages.length - 1;
     }
-    
+
     if (!sections[nextSection]) {
       isLastSection = true;
     }
@@ -1589,6 +1602,33 @@ function PreviewModal({
                           console.error(error, "Error evaluating getDay logic");
                           return null;
                         }
+
+                      } else if (list?.conditional_logic.includes('AddDays') || list?.conditional_logic.includes('SubtractDays')) {
+                        let replacedLogic = list?.conditional_logic
+                        // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
+                        replacedLogic = replacedLogic.replaceAll(
+                          /(\w+)\.AddDays\((\d+)\)/g,
+                          '(new Date(new Date($1).getTime() + ($2 * 86400000))).toLocaleDateString("en-GB")'
+                        );
+
+                        // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
+                        replacedLogic = replacedLogic.replaceAll(
+                          /(\w+)\.SubtractDays\((\d+)\)/g,
+                          '(new Date(new Date($1).getTime() - ($2 * 86400000))).toLocaleDateString("en-GB")'
+                        );
+
+                        try {
+
+                          let result = eval(replacedLogic); // Evaluate the modified logic
+                          if (!result) {
+                            return null; // Skip rendering this question
+                          }
+                        } catch (error) {
+                          console.error(error, "Error evaluating AddDay or SubtractDays logic");
+                          return null;
+                        }
+
+
                       } else {
                         try {
                           if (!eval(list?.conditional_logic)) {
