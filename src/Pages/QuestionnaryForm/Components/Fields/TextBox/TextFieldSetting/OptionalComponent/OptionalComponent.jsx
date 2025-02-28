@@ -62,11 +62,9 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             const { schema } = item;
                             const schemaType = schema?.type;
                             const itemsType = schema?.items?.type;
-
                             // Handle numberfield
                             if (componentType === 'numberfield' &&
-                                (schemaType === 'number' || schemaType === 'integer' ||
-                                    itemsType === 'number' || itemsType === 'integer')) {
+                                (schemaType === 'number' || schemaType === 'integer' )) {
                                 return true;
                             }
 
@@ -80,13 +78,6 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                             if (componentType === 'dateTimefield' &&
                                 ((schemaType === 'string' && schema?.format === 'date') ||
                                     itemsType === 'date')) {
-                                return true;
-                            }
-
-                            // Handle choiceboxfield
-                            if (componentType === 'choiceboxfield' &&
-                                (schema?.enum || schemaType === 'boolean' ||
-                                    itemsType === 'boolean' || schema?.items?.enum?.length > 0)) {
                                 return true;
                             }
 

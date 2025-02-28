@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * The `useApi` function is a custom hook in a React application that handles API requests with
  * authentication using Auth0 and Axios.
@@ -50,7 +51,11 @@ const useApi = () => {
             const headers = { ...defaultHeaders, ...customHeaders };
             const { data } = await axios.get(externalApi ? endpoint : `${baseURL}${endpoint}`, { headers });
             return { error: false, data };
+            
         } catch (error) {
+            if(error.response.status === 404 && !(endpoint.includes('compliancelogic') || endpoint.includes('questionnaires/layout/'))) {
+                window.location.replace('/404');
+            }
             return { error: true, data: error.response };
         }
     };
