@@ -190,58 +190,51 @@ function PreviewModal({
         }
       }
 
-      if (
-        (logic?.includes("===") || logic?.includes("!==")) &&
-        /(===|!==)\s*""[^""]*""/.test(logic)
-      ) {
+      //handle Multi-choice
+      const arrayMultiChoiceId = [];
+      // Loop through all properties in questionValue
+      Object.entries(questionValue).forEach(([key, value]) => {
+        // Check if the value is an array
+        if (Array.isArray(value)) {
+          if (logic?.includes(key.replace(/-/g, "_"))) {
+            arrayMultiChoiceId.push(key.replace(/-/g, "_"));
+          }
+        }
+      });
+      //handle Multi-choice
+      if ((logic?.includes("===") || logic?.includes("!==")) && arrayMultiChoiceId.length > 0) {
         logic = logic.replace(
-          /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*""([^""]*)""/g,
+          /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*"([^"]*)"/g,
           (match, path, operator, value) => {
-            let modifiedPath = path;
-
-            // Handle method calls separately
-            let methodCall = "";
-            if (path.match(/(\.(toUpperCase|toLowerCase|trim)\(\))+$/)) {
-              methodCall = path.match(
-                /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
-              )[0];
-              path = path.replace(
-                /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
-                "",
-              );
-            }
-
-            // Convert last key to bracket notation
-            let parts = path.split(".");
-            if (parts.length > 1) {
-              let lastKey = parts.pop();
-              modifiedPath = `${parts.join(".")}["${lastKey}"]`;
-            }
-            try {
-              let questionArray = eval(modifiedPath);
-              if (Array.isArray(questionArray) && questionArray.length === 1) {
-                // Add back method call if it existed
-                return `${path}[0]${methodCall} ${operator} "${value}"`;
-              } else {
-                return `${path}[-1] ${operator} "${value}"`;
+            if (arrayMultiChoiceId.includes(path.replace(/\..*/, ""))) {
+              // Handle method calls separately
+              let methodCall = "";
+              if (path.match(/(\.(toUpperCase|toLowerCase|trim)\(\))+$/)) {
+                methodCall = path.match(
+                  /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                )[0];
+                path = path.replace(
+                  /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                  "",
+                );
               }
-            } catch (e) {
+              try {
+                let questionArray = eval(path);
+                if (Array.isArray(questionArray) && questionArray.length === 1) {
+                  // Add back method call if it existed
+                  return `${path}[0]${methodCall} ${operator} "${value}"`;
+                } else {
+                  return `${path}[-1] ${operator} "${value}"`;
+                }
+              } catch (e) {
+                return match;
+              }
+            } else {
               return match;
             }
-          },
+          }
         );
       }
-
-      // converting Section_1.Page_1.Question_1_?_?_?_  -> (Section_1.Page_1["Question_1_?_?_?_"]
-      if (logic.match(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g)) {
-        logic = logic.replace(/\.([A-Za-z0-9_]*\?_?[^.\s]*)/g, '["$1"]');
-      }
-
-      // Fix misplaced `[0]` inside brackets
-      logic = logic.replace(
-        /\["([^"\]]+)\[\s*0\s*\]"\]/g, // Match ["Question_1?[0]"]
-        '["$1"][0]', // Convert to ["Question_1?"][0]
-      );
 
       const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
 
@@ -280,7 +273,7 @@ function PreviewModal({
           if (evaluatedVariable.includes(':') && evaluatedVariable.includes('/')) {
             return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           } else {
-            return `(new Date(new Date(${p1}).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+            return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           }
         }
       );
@@ -294,7 +287,7 @@ function PreviewModal({
           if (evaluatedVariable.includes(':') && evaluatedVariable.includes('/')) {
             return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           } else {
-            return `(new Date(new Date(${p1}).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+            return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           }
         }
       );
