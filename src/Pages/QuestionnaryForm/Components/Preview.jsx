@@ -1256,12 +1256,23 @@ function PreviewModal({
     sections.forEach((section) => {
       section?.pages?.forEach((page) => {
         page?.questions?.forEach((question) => {
-          const { default_conditional_logic, default_content, component_type } =
+          let { default_conditional_logic, default_content, component_type } =
             question;
           // Check if default_conditional_logic is not empty
           if (!fieldStatus?.[question?.question_id]) {
             if (default_conditional_logic) {
               try {
+                default_conditional_logic = default_conditional_logic.replaceAll(
+                  /(\w+)\.AddDays\((\d+)\)/g,
+                  '(new Date(new Date($1).getTime() + ($2 * 86400000))).toLocaleDateString("en-GB")'
+                );
+          
+                // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
+                default_conditional_logic = default_conditional_logic.replaceAll(
+                  /(\w+)\.SubtractDays\((\d+)\)/g,
+                  '(new Date(new Date($1).getTime() - ($2 * 86400000))).toLocaleDateString("en-GB")'
+                );
+
                 const result = eval(default_conditional_logic);
 
                 if (component_type === "dateTimefield") {

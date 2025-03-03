@@ -1889,7 +1889,7 @@ const QuestionnaryForm = () => {
                                                 pin_drop: fieldSettingParams[question.question_id].pin_drop,
                                                 include_metadata: fieldSettingParams[question.question_id].include_metadata,
                                                 file_size: fieldSettingParams[question.question_id].fileSize,
-                                                file_type: fieldSettingParams[question.question_id].fileType,
+                                                file_type: fieldSettingParams[question.question_id].fileType || 'pdf',
                                             },
                                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,

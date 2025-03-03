@@ -53,7 +53,7 @@ const useApi = () => {
             return { error: false, data };
             
         } catch (error) {
-            if(error.response.status === 404 && !(endpoint.includes('compliancelogic') || endpoint.includes('questionnaires/layout/'))) {
+            if(error.response.status === 404 && !(endpoint.includes('questionnaires/layout/'))) {
                 window.location.replace('/404');
             }
             return { error: true, data: error.response };
