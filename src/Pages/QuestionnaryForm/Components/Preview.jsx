@@ -179,11 +179,10 @@ function PreviewModal({
         try {
           // Replace 'new Date()' with epoch value in seconds
           let updatedLogic = logic?.replace(
-            /new Date()/g,
-            "new Date().toISOString().split('T')[0]",
+            /new Date\(\)/g,
+            `(new Date().toISOString().split('T')[0])`
           );
-          // Evaluate the updated logic
-          eval(transformTernaryExpression(logic));
+          logic = updatedLogic
         } catch (error) {
           console.error("Error evaluating new Date logic:", error);
           throw error; // Re-throw the error for handling
