@@ -1521,7 +1521,12 @@ function ConditionalLogic({
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-      const result = eval(wrappedEval);
+                                     let result = ""
+        if(wrappedEval.match(/\b(AddDays|SubtractDays)\s*\(/g)){
+            result = ""
+        }else{
+            result = eval(wrappedEval);
+        }
       if (isDefaultLogic || complianceState) {
         switch (selectedComponent) {
           case "choiceboxfield":
@@ -1662,7 +1667,7 @@ function ConditionalLogic({
     const typeMethods = ["includes()"]; // Update the regex to match valid expressions
     // const validExpressionRegex = /^\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_\.]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_\.]+)\s*\)?)*$/i;
     const validExpressionRegex =
-      /^\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?)*$/i;
+      /^\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|!=|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?(\s*(AND|OR)\s*\(?\s*[a-zA-Z0-9_.@#$&?!-]+(?:\([^\)]*\))?\s*(===|==|!==|>|<|>=|<=)\s*("[^"]*"|\d+|[a-zA-Z0-9_.@#$&?!-]+)\s*\)?)*$/i;
 
     // const addDaysValidator = /^new Date\(new Date\((sections\.[\w\.]+)\)\.setDate\(new Date\(\1\)\.getDate\(\) [+-] \d+\)\)\.toLocaleDateString\("en-GB"\) === "\d{2}\/\d{2}\/\d{4}"$/;
     const addDaysValidator =
