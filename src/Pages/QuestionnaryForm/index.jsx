@@ -2058,7 +2058,7 @@ const QuestionnaryForm = () => {
                         {sections.length === 0 ?
                             (<p className='flex items-center justify-center h-customh6 text-lg font-semibold bg-[#EFF1F8] w-full'>No Sections available for this Questionnaire</p>)
                             : (
-                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh15 overflow-auto default-sidebar'>
                                     <p
                                         title={formDefaultInfo?.internal_name}
                                         className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
