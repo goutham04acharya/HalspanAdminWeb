@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import ImageZoomPin from "../../../Components/PinOnTheFloor/PinOnTheFloor";
 import GPSField from "./Fields/GPS/GPSField";
+import { formatDate } from "../../../CommonMethods/FormatDate";
 
 const formatName = (name) => name.replaceAll("_", " ");
 const formatQuestionId = (id) => id?.replaceAll("-", "_");
@@ -63,9 +64,9 @@ const AssetLocationPreview = ({ value }) => (
   </div>
 );
 
-const StandardFieldPreview = ({ value, component_type }) => {
+const StandardFieldPreview = ({ value, component_type, type }) => {
   if (!value) return "-";
-
+  if(type === 'date') return formatDate(value)
   switch (true) {
     case typeof value === "string" || typeof value === "number":
       return value;
@@ -114,7 +115,7 @@ const renderFieldContent = (field, value, onImageClick) => {
     default:
       return (
         <p className="text-sm text-gray-700">
-          <StandardFieldPreview value={value} component_type={field.component_type} />
+          <StandardFieldPreview value={value} component_type={field.component_type} type={field.type} />
         </p>
       );
   }

@@ -91,9 +91,7 @@ function DateTimeField({
     // Update conditional values
     setConditionalValues((prevValues) => ({
       ...prevValues,
-      [question?.question_id.replace(/-/g, "_")]: `${
-        date ? `${formatDate(date)} ` : ""
-      }${time ? time : ""}`,
+      [question?.question_id.replace(/-/g, "_")]: date,
     }));
 
     // Combine date and time into a string for setValue
@@ -150,7 +148,7 @@ function DateTimeField({
       selectedDate.setHours(0, 0, 0, 0);
       setConditionalValues((prevValues) => ({
         ...prevValues,
-        [question?.question_id.replace(/-/g, "_")]: formatDate(value),
+        [question?.question_id.replace(/-/g, "_")]: value,
       }));
 
       dispatch(

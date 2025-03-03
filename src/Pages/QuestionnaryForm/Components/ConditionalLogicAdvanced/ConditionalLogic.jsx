@@ -675,7 +675,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                 // Regex to match logical conditions
                 // const matches = condition.match(/^\s*(!?)\s*([\w.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
                 // const matches = condition.match(/^\s*(!?)\s*([\w\s.()[\]{}\-+*%&^$#@!|\\/<>?:`'"]+)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
-                const matches = condition.match(/^\s*(!?)\s*([^\n]+?)\s*(\.includes|\?.includes|does not include|===|==|!==|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
+                const matches = condition.match(/^\s*(!?)\s*([^\n]+?)\s*(\.includes|\?.includes|does not include|===|==|!==|!=|<|>|<=|>=)\s*(['"]([^'"]*)['"]|\(([^()]*)\)|\d+|new\s+Date\(\))/);
 
                 if (matches) {
                     // Destructure the match to extract question name, logic, and value
@@ -740,7 +740,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                         } else {
                             // Convert logical operators to corresponding values in conditions
                             if (condition_logic === '===' || condition_logic === '==') condition_logic = 'equals';
-                            else if (condition_logic === '!==') condition_logic = 'not equals to';
+                            else if (condition_logic === '!=') condition_logic = 'not equal to';
                             else if (condition_logic === '<') condition_logic = 'smaller';
                             else if (condition_logic === '>') condition_logic = 'larger';
                             else if (condition_logic === '<=') condition_logic = 'smaller or equal';
@@ -749,7 +749,7 @@ function ConditionalLogic({ setConditionalLogic, conditionalLogic, handleSaveSec
                     } else {
                         // Convert logical operators to corresponding values in conditions
                         if (condition_logic === '===' || condition_logic === '==') condition_logic = 'equals';
-                        else if (condition_logic === '!==') condition_logic = 'not equals to';
+                        else if (condition_logic === '!=') condition_logic = 'not equal to';
                         else if (condition_logic === '<') condition_logic = 'smaller';
                         else if (condition_logic === '>') condition_logic = 'larger';
                         else if (condition_logic === '<=') condition_logic = 'smaller or equal';
