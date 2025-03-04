@@ -1338,7 +1338,7 @@ function PreviewModal({
                 } else {
                   if (question?.lookup_id) {
                     // Find the matching lookup item by index instead of array position
-                    const lookupItem = question.lookup_value.find(item => item.index === result.toString());
+                    const lookupItem = question.lookup_list.find(item => item.uuid === result.toString());
 
                     // Use the lookup value if found, otherwise use the result directly
                     const valueToSet = lookupItem?.value || '';
