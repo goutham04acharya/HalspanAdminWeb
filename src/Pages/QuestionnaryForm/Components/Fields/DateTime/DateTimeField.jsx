@@ -88,14 +88,15 @@ function DateTimeField({
       parsedDate.getMonth(),
       parsedDate.getDate()
     );
+    
     // Update conditional values
+    const dateTimeString = `${date} ${time}`;
     setConditionalValues((prevValues) => ({
       ...prevValues,
-      [question?.question_id.replace(/-/g, "_")]: date,
+      [question?.question_id.replace(/-/g, "_")]: dateTimeString,
     }));
 
     // Combine date and time into a string for setValue
-    const dateTimeString = `${date} ${time}`;
     setValue((prev) => ({
       ...prev,
       [question?.question_id]: dateTimeString, // Ensure this stores the correct string value
