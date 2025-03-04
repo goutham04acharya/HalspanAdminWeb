@@ -169,6 +169,7 @@ const fieldSettingParamsSlice = createSlice({
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
                     lookupValue: item.lookup_value,
+                    lookupList: item.lookup_list,
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,

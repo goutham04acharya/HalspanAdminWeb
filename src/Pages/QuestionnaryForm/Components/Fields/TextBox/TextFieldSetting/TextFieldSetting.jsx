@@ -102,13 +102,16 @@ function TestFieldSetting({
   const handleLookupOption = (option) => {
     setIsLookupOpen(false);
     dispatch(setNewComponent({ id: 'lookupOption', value: option.value, questionId: selectedQuestionId }));
-    dispatch(setNewComponent({ id: 'lookupValue', value: option.choices, questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'lookupValue', value: option.label, questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'lookupList', value: option.choices, questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   };
 
   const handleRemoveLookup = () => {
     setSearchTerm('')
     dispatch(setNewComponent({ id: 'lookupOption', value: '', questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'lookupValue', value: '', questionId: selectedQuestionId }));
+    dispatch(setNewComponent({ id: 'lookupList', value: '', questionId: selectedQuestionId }));
     dispatch(setShouldAutoSave(true));
   }
 
@@ -352,7 +355,7 @@ function TestFieldSetting({
                       className={`w-full ${formStatus === 'Draft' ? 'cursor-pointer' : 'cursor-default'} placeholder:text-[#9FACB9] h-[45px]`}
                       testID='lookup-dropdown'
                       labeltestID='lookup-list'
-                      selectedOption={optionData.find(option => option.value === fieldSettingParameters?.lookupOption)}
+                      selectedOption={{ label: fieldSettingParameters.lookupValue, value: fieldSettingParameters.lookupOption, choices: fieldSettingParameters.lookupList }}
                       handleRemoveLookup={handleRemoveLookup}
                       isDropdownOpen={isLookupOpen}
                       setDropdownOpen={setIsLookupOpen}
