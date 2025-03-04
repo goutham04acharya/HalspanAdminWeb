@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable complexity */
 
-import { formatDate, reverseFormat, reversingFormat } from "./FormatDate";
+import { formatDate, reverseFormat } from "./FormatDate";
 
 let isMultiChoice = false;
 // Function to handle logic transformation
@@ -31,13 +31,13 @@ export const buildLogicExpression = (question_name, condition_logic, value, date
         case 'number of file is':
             return `${question_name}.length === ${value}`;
         case 'date is before today':
-            return `${question_name} < ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
+            return `${question_name} && ${question_name} < ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is before or equal to today':
-            return `${question_name} <= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
+            return `${question_name} && ${question_name} <= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is after today':
-            return `${question_name} > ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
+            return `${question_name} && ${question_name} > ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is after or equal to today':
-            return `${question_name} >= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
+            return `${question_name} && ${question_name} >= ${isAdvanced ? 'new Date()' : `new Date().toISOString().split('T')[0]`}`;
         case 'date is “X” date of set date':
             const formatteDate = formatDate(date);
             const actualFormat = reverseFormat(formatteDate)
