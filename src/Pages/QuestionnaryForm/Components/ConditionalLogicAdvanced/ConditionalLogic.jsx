@@ -151,7 +151,7 @@ function ConditionalLogic({
       if (
         fieldSettingParams[question.question_id] &&
         fieldSettingParams[question.question_id].componentType ===
-          "choiceboxfield"
+        "choiceboxfield"
       ) {
         if (fieldSettingParams[question?.question_id]?.source === "fixedList") {
           choiceBoxOptionsObj[question.question_id] =
@@ -541,7 +541,7 @@ function ConditionalLogic({
         let valueType = "";
         try {
           valueType = getVariableType(eval(`allSections.${wordToSearch}`));
-        } catch (e) {}
+        } catch (e) { }
         switch (valueType) {
           case "string":
             setSuggestions(stringMethods);
@@ -1027,7 +1027,7 @@ function ConditionalLogic({
       } else if (isDefaultLogic) {
         conditionalLogic = replaceUUIDs(
           fieldSettingParams[selectedQuestionId]["default_conditional_logic"] ||
-            "",
+          "",
           questionWithUuid
         );
       } else {
@@ -1115,13 +1115,13 @@ function ConditionalLogic({
             conditonalEditor: questionExists
               ? updatedConditionalEditor // Update existing
               : [
-                  ...prev.conditonalEditor,
-                  {
-                    questionId: selectedQuestionId,
-                    isBasicEditor: false,
-                    isAdvanceEditor: true,
-                  },
-                ], // Add new if not exists
+                ...prev.conditonalEditor,
+                {
+                  questionId: selectedQuestionId,
+                  isBasicEditor: false,
+                  isAdvanceEditor: true,
+                },
+              ], // Add new if not exists
           };
         });
       }
@@ -1309,33 +1309,31 @@ function ConditionalLogic({
         }
       }
       if (evalInputValue.includes("getSeconds")) {
-        // Match getSeconds() with either a quoted 2-digit seconds number or raw number
-        const timeMatches = evalInputValue.match(
-          /getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/g
-        );
+        // Match getSeconds() with a comparison operator and a valid seconds number (0-59)
+        const timeMatches = evalInputValue.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/g);
 
         if (timeMatches) {
           for (const timeMatch of timeMatches) {
-            const [, operator, seconds] = timeMatch.match(
-              /getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*"?([0-5]\d)"?/
-            );
+            // Extract operator and seconds using capturing groups
+            const matchResult = timeMatch.match(/getSeconds\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/);
 
-            // Validate that seconds are exactly two digits and between 00 and 59
-            if (!/^[0-5][0-9]$/.test(seconds)) {
-              setError(
-                `Invalid seconds: "${seconds}". Please enter a valid two-digit value between 00 and 59.`
-              );
+            if (!matchResult) continue; // Skip if regex fails
+
+            const operator = matchResult[1]; // Extract operator (===, !==, >=, etc.)
+            const seconds = matchResult[2]; // Extract seconds value
+
+            // Ensure seconds are between 0-59 (allowing single-digit and two-digit numbers)
+            if (parseInt(seconds, 10) < 0 || parseInt(seconds, 10) > 59) {
+              setError(`Invalid seconds: "${seconds}". Please enter a value between 0 and 59.`);
               return;
             }
           }
-          // Continue with other logic if all times are valid
         } else {
-          setError(
-            'Invalid format. Please use the format `getSeconds() === "ss"` the seconds should to between 0 - 59 '
-          );
+          setError('Invalid format. Please use the format `getSeconds() === ss` where ss is between 0-59.');
           return;
         }
       }
+
       if (evalInputValue.includes("getHours")) {
         const timeMatches = evalInputValue.match(
           /getHours\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/g
@@ -1521,12 +1519,12 @@ function ConditionalLogic({
                                             return false;
                                         }
                                      })(${JSON.stringify(questionValues)})`;
-                                     let result = ""
-        if(wrappedEval.match(/\b(AddDays|SubtractDays)\s*\(/g)){
-            result = ""
-        }else{
-            result = eval(wrappedEval);
-        }
+      let result = ""
+      if (wrappedEval.match(/\b(AddDays|SubtractDays)\s*\(/g)) {
+        result = ""
+      } else {
+        result = eval(wrappedEval);
+      }
       if (isDefaultLogic || complianceState) {
         switch (selectedComponent) {
           case "choiceboxfield":
@@ -2164,13 +2162,13 @@ function ConditionalLogic({
           conditonalEditor: questionExists
             ? updatedConditionalEditor
             : [
-                ...prev.conditonalEditor,
-                {
-                  questionId: selectedQuestionId,
-                  isBasicEditor: true,
-                  isAdvanceEditor: false,
-                },
-              ],
+              ...prev.conditonalEditor,
+              {
+                questionId: selectedQuestionId,
+                isBasicEditor: true,
+                isAdvanceEditor: false,
+              },
+            ],
         };
       });
     } else {
@@ -2216,7 +2214,7 @@ function ConditionalLogic({
     if (!complianceState) {
       try {
         condition_logic = buildConditionExpression(conditions, combinedArray);
-      } catch (error) {}
+      } catch (error) { }
     } else {
       condition_logic = conditions;
     }
@@ -2359,8 +2357,8 @@ function ConditionalLogic({
                 <div className="flex flex-1 overflow-auto default-sidebar">
                   <div className="w-[60%]">
                     {conditionalLogic ||
-                    sectionConditionLogicId ||
-                    pageConditionLogicId ? (
+                      sectionConditionLogicId ||
+                      pageConditionLogicId ? (
                       <p className="text-start text-[22px] text-[#2B333B] font-semibold">
                         Shows when...
                       </p>
@@ -2412,11 +2410,10 @@ function ConditionalLogic({
                 </div>
                 <div className="mt-4 pt-2">
                   <div
-                    className={`${
-                      isDefaultLogic
+                    className={`${isDefaultLogic
                         ? "flex justify-end items-end w-full"
                         : "flex justify-between items-end"
-                    }`}
+                      }`}
                   >
                     {!isDefaultLogic && (
                       <div className="flex gap-5 items-end">
@@ -2496,11 +2493,10 @@ function ConditionalLogic({
                 </div>
                 <div className="mt-4 pt-2">
                   <div
-                    className={`${
-                      isDefaultLogic
+                    className={`${isDefaultLogic
                         ? "flex justify-end items-end w-full"
                         : "flex justify-between items-end"
-                    }`}
+                      }`}
                   >
                     {!isDefaultLogic && (
                       <div className="flex gap-5 items-end">
@@ -2573,11 +2569,10 @@ function ConditionalLogic({
                   </div>
                   <div className="mt-4 pt-2">
                     <div
-                      className={`${
-                        isDefaultLogic
+                      className={`${isDefaultLogic
                           ? "flex justify-end items-end w-full"
                           : "flex justify-between items-end"
-                      }`}
+                        }`}
                     >
                       {!isDefaultLogic && (
                         <div className="flex gap-5 items-end">
