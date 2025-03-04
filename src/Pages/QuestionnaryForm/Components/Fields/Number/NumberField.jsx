@@ -154,6 +154,7 @@ function NumberField({
       ...prevValues,
       [question?.question_id.replace(/-/g, "_")]: Number(newValue), // Add or update the label key with newValue
     }));
+    setLocalSliderValue(newValue);
     dispatch(
       setQuestionValue({
         question_id: question?.question_id,
