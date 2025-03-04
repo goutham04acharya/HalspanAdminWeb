@@ -200,10 +200,12 @@ function PreviewModal({
           }
         }
       });
+      
       //handle Multi-choice
       if ((logic?.includes("===") || logic?.includes("!==")) && arrayMultiChoiceId.length > 0) {
+        
         logic = logic.replace(
-          /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*"([^"]*)"/g,
+          /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*['"]([^'"]*)['"]/g,
           (match, path, operator, value) => {
             if (arrayMultiChoiceId.includes(path.replace(/\..*/, ""))) {
               // Handle method calls separately
@@ -302,52 +304,9 @@ function PreviewModal({
         GRADE: "",
       };
 
-      let processedContentMultiChoice = rule?.default_content;
       try {
-        const filteredByType = getFilteredQuestions(
-          sectionDetails,
-          "type",
-          "multi_choice",
-        );
-
-        if (filteredByType.length > 0) {
-          filteredByType.forEach((question) => {
-            // regex for === and !== operators
-            const regexEquals = new RegExp(
-              `(${question}((?:\\.(?:toUpperCase|toLowerCase|trim|map\\(.*?\\))\\(\\))*)?\\s*[=!]==\\s*)["']?([^"',\\s\\)]+)["']?`,
-              "g",
-            );
-
-            // regex for includes and !includes operators
-            const regexIncludes = new RegExp(
-              `(!)?\\s*(${question})((?:\\.(?:toUpperCase|toLowerCase|trim)\\(\\))+)?\\s*\\.includes\\s*\\(["']?([^"',\\s\\)]+)["']?\\)`,
-              "g",
-            );
-            let tempContent = processedContentMultiChoice;
-
-            // Handle equals cases first
-            tempContent = tempContent.replace(regexEquals, '$1""$3""');
-
-            // Handle includes cases
-            tempContent = tempContent.replace(
-              regexIncludes,
-              (match, negation, path, methodChain, value) => {
-                // Always include toLowerCase and trim in the map
-                if (methodChain) {
-                  return `${negation ? "!" : ""}${path}.map(q => q${methodChain}).includes("${value}")`;
-                } else {
-                  return `${negation ? "!" : ""}${path}.includes("${value}")`;
-                }
-              },
-            );
-            processedContentMultiChoice = tempContent;
-          });
-        } else {
-          processedContentMultiChoice = rule?.default_content;
-        }
-
         // Preprocess the rule's default_content
-        let processedContent = preprocessLogic(processedContentMultiChoice);
+        let processedContent = preprocessLogic(rule?.default_content);
         processedContent = processedContent?.replace("if", "");
         // Define variables that will be set in eval
         let STATUS = "";
@@ -1319,7 +1278,53 @@ function PreviewModal({
                   });
                 }
 
-                const result = eval(default_conditional_logic);
+                let logic = default_conditional_logic;
+                const arrayMultiChoiceId = [];
+                // Loop through all properties in questionValue
+                Object.entries(questionValue).forEach(([key, value]) => {
+                  // Check if the value is an array
+                  if (Array.isArray(value)) {
+                    if (logic?.includes(key.replace(/-/g, "_"))) {
+                      arrayMultiChoiceId.push(key.replace(/-/g, "_"));
+                    }
+                  }
+                });
+                //handle Multi-choice
+                if ((logic?.includes("===") || logic?.includes("!==") || logic?.includes("==") || logic?.includes("!=")) && arrayMultiChoiceId.length > 0) {
+                  logic = logic.replace(
+                    /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|==|!=|!==)\s*['"]([^'"]*)['"]/g,
+                    (match, path, operator, value) => {
+                      if (arrayMultiChoiceId.includes(path.replace(/\..*/, ""))) {
+                        // Handle method calls separately
+                        let methodCall = "";
+                        if (path.match(/(\.(toUpperCase|toLowerCase|trim)\(\))+$/)) {
+                          methodCall = path.match(
+                            /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                          )[0];
+                          path = path.replace(
+                            /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                            "",
+                          );
+                        }
+                        try {
+                          let questionArray = eval(path);
+                          if (Array.isArray(questionArray) && questionArray.length === 1) {
+                            // Add back method call if it existed
+                            return `${path}[0]${methodCall} ${operator} "${value}"`;
+                          } else {
+                            return `${path}[-1] ${operator} "${value}"`;
+                          }
+                        } catch (e) {
+                          return match;
+                        }
+                      } else {
+                        return match;
+                      }
+                    }
+                  );
+                }
+
+                const result = eval(logic);
 
                 if (component_type === "dateTimefield") {
                   const splitDate = (dateStr) => {
@@ -1765,8 +1770,53 @@ function PreviewModal({
                           return null;
                         }
                       } else {
+                        let logic = list?.conditional_logic;
+                        const arrayMultiChoiceId = [];
+                        // Loop through all properties in questionValue
+                        Object.entries(questionValue).forEach(([key, value]) => {
+                          // Check if the value is an array
+                          if (Array.isArray(value)) {
+                            if (logic?.includes(key.replace(/-/g, "_"))) {
+                              arrayMultiChoiceId.push(key.replace(/-/g, "_"));
+                            }
+                          }
+                        });
                         try {
-                          if (!eval(list?.conditional_logic)) {
+                          //handle Multi-choice
+                          if ((logic?.includes("===") || logic?.includes("!==") || logic?.includes("==") || logic?.includes("!=")) && arrayMultiChoiceId.length > 0) {
+                            logic = logic.replace(
+                              /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|==|!=|!==)\s*['"]([^'"]*)['"]/g,
+                              (match, path, operator, value) => {
+                                if (arrayMultiChoiceId.includes(path.replace(/\..*/, ""))) {
+                                  // Handle method calls separately
+                                  let methodCall = "";
+                                  if (path.match(/(\.(toUpperCase|toLowerCase|trim)\(\))+$/)) {
+                                    methodCall = path.match(
+                                      /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                                    )[0];
+                                    path = path.replace(
+                                      /(\.(toUpperCase|toLowerCase|trim)\(\))+$/,
+                                      "",
+                                    );
+                                  }
+                                  try {
+                                    let questionArray = eval(path);
+                                    if (Array.isArray(questionArray) && questionArray.length === 1) {
+                                      // Add back method call if it existed
+                                      return `${path}[0]${methodCall} ${operator} "${value}"`;
+                                    } else {
+                                      return `${path}[-1] ${operator} "${value}"`;
+                                    }
+                                  } catch (e) {
+                                    return match;
+                                  }
+                                } else {
+                                  return match;
+                                }
+                              }
+                            );
+                          }
+                          if (!eval(logic)) {
                             return null; // Skip rendering this question
                           }
                         } catch (error) {
