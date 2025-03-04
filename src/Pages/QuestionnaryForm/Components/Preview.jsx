@@ -374,7 +374,6 @@ function PreviewModal({
       if (!section?.section_conditional_logic) {
         return true; // Include sections without conditional logic
       }
-
       try {
         // Evaluate the section's conditional logic
         return eval(section.section_conditional_logic);
