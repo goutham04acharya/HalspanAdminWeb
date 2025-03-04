@@ -240,9 +240,9 @@ function PreviewModal({
       logic = logic.replace(regex, (match, variable, functionName) => {
         const evaluatedVariable = eval(variable)
 
-        if (evaluatedVariable.includes(':') && evaluatedVariable.includes('/')) {
+        if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
           if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
-            if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("AM")) {
+            if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
               return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
             } else {
               return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
@@ -252,7 +252,7 @@ function PreviewModal({
           }
         } else {
           if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
-            if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("AM")) {
+            if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
               return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
             } else {
               return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
@@ -269,7 +269,7 @@ function PreviewModal({
         /(\w+)\.AddDays\((\d+)\)/g,
         (match, p1, p2) => {
           const evaluatedVariable = eval(p1)
-          if (evaluatedVariable.includes(':') && evaluatedVariable.includes('/')) {
+          if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
             return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           } else {
             return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
@@ -283,7 +283,7 @@ function PreviewModal({
         /(\w+)\.SubtractDays\((\d+)\)/g,
         (match, p1, p2) => {
           const evaluatedVariable = eval(p1)
-          if (evaluatedVariable.includes(':') && evaluatedVariable.includes('/')) {
+          if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
             return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
           } else {
             return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
@@ -1264,14 +1264,60 @@ function PreviewModal({
               try {
                 default_conditional_logic = default_conditional_logic.replaceAll(
                   /(\w+)\.AddDays\((\d+)\)/g,
-                  '(new Date(new Date($1).getTime() + ($2 * 86400000))).toLocaleDateString("en-GB")'
+                  (match, p1, p2) => {
+                    const evaluatedVariable = eval(p1)
+                    if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                      return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                    } else {
+                      return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                    }
+                  }
                 );
-          
+
                 // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
                 default_conditional_logic = default_conditional_logic.replaceAll(
                   /(\w+)\.SubtractDays\((\d+)\)/g,
-                  '(new Date(new Date($1).getTime() - ($2 * 86400000))).toLocaleDateString("en-GB")'
+                  (match, p1, p2) => {
+                    const evaluatedVariable = eval(p1)
+                    if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                      return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                    } else {
+                      return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                    }
+                  }
                 );
+
+                if (['getFullYear', 'getMonth', 'getDate', 'getDay', 'getHours', 'getMinutes', 'getSeconds', 'getMilliseconds', 'getTime']
+                  .some(fn => default_conditional_logic?.includes(fn))) {
+
+                  const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
+
+                  default_conditional_logic = default_conditional_logic.replace(regex, (match, variable, functionName) => {
+                    const evaluatedVariable = eval(variable)
+
+                    if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                      if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
+                        if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
+                          return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
+                        } else {
+                          return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
+                        }
+                      } else {
+                        return `new Date(${variable}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).${functionName}()`;
+                      }
+                    } else {
+                      if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
+                        if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
+                          return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
+                        } else {
+                          return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
+                        }
+                      } else {
+                        return `new Date(${variable}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).${functionName}()`;
+                      }
+                    }
+                  });
+                }
 
                 const result = eval(default_conditional_logic);
 
@@ -1626,7 +1672,6 @@ function PreviewModal({
                         )
 
                         try {
-
                           let result = eval(replacedLogic); // Evaluate the modified logic
                           if (!result) {
                             return null; // Skip rendering this question
@@ -1637,31 +1682,88 @@ function PreviewModal({
                         }
 
                       } else if (list?.conditional_logic.includes('AddDays') || list?.conditional_logic.includes('SubtractDays')) {
+
                         let replacedLogic = list?.conditional_logic
-                        // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
+
                         replacedLogic = replacedLogic.replaceAll(
                           /(\w+)\.AddDays\((\d+)\)/g,
-                          '(new Date(new Date($1).getTime() + ($2 * 86400000))).toLocaleDateString("en-GB")'
+                          (match, p1, p2) => {
+                            const evaluatedVariable = eval(p1)
+                            if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                              return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                            } else {
+                              return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() + (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                            }
+                          }
                         );
 
                         // Replace `SubtractDays` with the new Date handling for subtraction and format as dd/mm/yyyy
                         replacedLogic = replacedLogic.replaceAll(
                           /(\w+)\.SubtractDays\((\d+)\)/g,
-                          '(new Date(new Date($1).getTime() - ($2 * 86400000))).toLocaleDateString("en-GB")'
+                          (match, p1, p2) => {
+                            const evaluatedVariable = eval(p1)
+                            if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                              return `(new Date(new Date(${p1}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$3-$2-$1')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                            } else {
+                              return `(new Date(new Date(${p1}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).getTime() - (${p2} * 86400000))).toLocaleDateString("en-GB")`;
+                            }
+                          }
                         );
 
                         try {
-
                           let result = eval(replacedLogic); // Evaluate the modified logic
                           if (!result) {
                             return null; // Skip rendering this question
                           }
                         } catch (error) {
-                          console.error(error, "Error evaluating AddDay or SubtractDays logic");
+                          console.warn(
+                            "Error evaluating conditional logic:",
+                            error,
+                          );
                           return null;
                         }
+                      }
+                      else if (['getFullYear', 'getMonth', 'getDate', 'getDay', 'getHours', 'getMinutes', 'getSeconds', 'getMilliseconds', 'getTime']
+                        .some(fn => list?.conditional_logic?.includes(fn))) {
+                        let logic = list?.conditional_logic;
+                        const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
+                        logic = logic.replace(regex, (match, variable, functionName) => {
+                          const evaluatedVariable = eval(variable)
 
-
+                          if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
+                            if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
+                              if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
+                                return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
+                              } else {
+                                return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
+                              }
+                            } else {
+                              return `new Date(${variable}.replace(/\\s+[\\d:]+\\s*[APM]*$/, '').replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).${functionName}()`;
+                            }
+                          } else {
+                            if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
+                              if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
+                                return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
+                              } else {
+                                return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
+                              }
+                            } else {
+                              return `new Date(${variable}.replace(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/, '$2/$1/$3')).${functionName}()`;
+                            }
+                          }
+                        });
+                        try {
+                          let result = eval(logic); // Evaluate the modified logic
+                          if (!result) {
+                            return null; // Skip rendering this question
+                          }
+                        } catch (error) {
+                          console.warn(
+                            "Error evaluating conditional logic:",
+                            error,
+                          );
+                          return null;
+                        }
                       } else {
                         try {
                           if (!eval(list?.conditional_logic)) {
