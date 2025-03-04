@@ -149,10 +149,6 @@ function PreviewModal({
       if (logic?.includes("if")) {
         logic = logic?.replace("if", "");
       }
-      // Replace occurrences of getMonth() with getMonth() + 1
-      if (logic?.includes("getMonth()")) {
-        logic = logic?.replace(/getMonth\(\)/g, "getMonth() + 1");
-      }
 
       // Replace occurrences of getDay() comparisons with string days
       if (logic?.includes("getDay()")) {
@@ -200,10 +196,10 @@ function PreviewModal({
           }
         }
       });
-      
+
       //handle Multi-choice
       if ((logic?.includes("===") || logic?.includes("!==")) && arrayMultiChoiceId.length > 0) {
-        
+
         logic = logic.replace(
           /([a-zA-Z_][\w.?]*(?:\.(?:toUpperCase|toLowerCase|trim)\(\))*)\s*(===|!==)\s*['"]([^'"]*)['"]/g,
           (match, path, operator, value) => {
@@ -265,6 +261,7 @@ function PreviewModal({
         }
       });
 
+      logic = logic.replace(/\.getMonth\(\)/g, ".getMonth()+1");
 
       // Replace `AddDays` with the new Date handling for addition and format as dd/mm/yyyy
       logic = logic.replaceAll(
@@ -1246,6 +1243,32 @@ function PreviewModal({
                   }
                 );
 
+                if (default_conditional_logic.includes('getDay()')) {
+                  const daysMap = {
+                    Sunday: 0,
+                    Monday: 1,
+                    Tuesday: 2,
+                    Wednesday: 3,
+                    Thursday: 4,
+                    Friday: 5,
+                    Saturday: 6,
+                  };
+                  // Replace day names with corresponding numeric values
+                  const replacedLogic = default_conditional_logic.replace(
+                    /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
+                    (match, operator, day) => {
+                      return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`
+                        }`;
+                    },
+                  );
+
+                  // Remove parentheses from around the entire string, if they exist
+                  default_conditional_logic = replacedLogic?.replace(
+                    /^\((.*)\)$/,
+                    "$1",
+                  );
+                }
+
                 if (['getFullYear', 'getMonth', 'getDate', 'getDay', 'getHours', 'getMinutes', 'getSeconds', 'getMilliseconds', 'getTime']
                   .some(fn => default_conditional_logic?.includes(fn))) {
 
@@ -1277,6 +1300,8 @@ function PreviewModal({
                     }
                   });
                 }
+
+                default_conditional_logic = default_conditional_logic.replace(/\.getMonth\(\)/g, ".getMonth()+1");
 
                 let logic = default_conditional_logic;
                 const arrayMultiChoiceId = [];
@@ -1619,55 +1644,6 @@ function PreviewModal({
                           console.error("Error evaluating expression:", error);
                           return null;
                         }
-                      } else if (
-                        list?.conditional_logic?.includes("getMonth(")
-                      ) {
-                        const replacedLogic = list?.conditional_logic?.replace(
-                          "getMonth()",
-                          "getMonth() + 1",
-                        );
-                        try {
-                          if (!eval(replacedLogic)) {
-                            return null; // Skip rendering this question
-                          }
-                        } catch (error) {
-                          return null;
-                        }
-                      } else if (
-                        list?.conditional_logic?.includes("getDay()")
-                      ) {
-                        const daysMap = {
-                          Sunday: 0,
-                          Monday: 1,
-                          Tuesday: 2,
-                          Wednesday: 3,
-                          Thursday: 4,
-                          Friday: 5,
-                          Saturday: 6,
-                        };
-                        // Replace day names with corresponding numeric values
-                        const replacedLogic = list?.conditional_logic?.replace(
-                          /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
-                          (match, operator, day) => {
-                            return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`
-                              }`;
-                          },
-                        );
-
-                        // Remove parentheses from around the entire string, if they exist
-                        const logicWithoutBrackets = replacedLogic?.replace(
-                          /^\((.*)\)$/,
-                          "$1",
-                        );
-                        try {
-                          let result = eval(logicWithoutBrackets); // Evaluate the modified logic
-                          if (!result) {
-                            return null; // Skip rendering this question
-                          }
-                        } catch (error) {
-                          console.error(error, "Error evaluating getDay logic");
-                          return null;
-                        }
                       } else if (list?.conditional_logic.includes('getTime()')) {
                         // before replace: Section_1.Page_1.Question_2.getTime() === "04:01:04"
                         // after replace: Section_1.Page_1.Question_2.getTime() === new Date('1970-01-01T04:01:04Z').getTime()
@@ -1730,7 +1706,36 @@ function PreviewModal({
                       }
                       else if (['getFullYear', 'getMonth', 'getDate', 'getDay', 'getHours', 'getMinutes', 'getSeconds', 'getMilliseconds', 'getTime']
                         .some(fn => list?.conditional_logic?.includes(fn))) {
-                        let logic = list?.conditional_logic;
+
+                        let updatedLogic = list?.conditional_logic;
+
+                        if (list?.conditional_logic.includes('getDay()')) {
+                          const daysMap = {
+                            Sunday: 0,
+                            Monday: 1,
+                            Tuesday: 2,
+                            Wednesday: 3,
+                            Thursday: 4,
+                            Friday: 5,
+                            Saturday: 6,
+                          };
+                          // Replace day names with corresponding numeric values
+                          const replacedLogic = list?.conditional_logic?.replace(
+                            /getDay\(\)\s*(===|!==)\s*"(.*?)"/g,
+                            (match, operator, day) => {
+                              return `getDay() ${operator} ${daysMap[day] ?? `"${day}"`
+                                }`;
+                            },
+                          );
+
+                          // Remove parentheses from around the entire string, if they exist
+                          updatedLogic = replacedLogic?.replace(
+                            /^\((.*)\)$/,
+                            "$1",
+                          );
+                        }
+
+                        let logic = updatedLogic;
                         const regex = /(\w+)\.(getFullYear|getMonth|getDate|getDay|getHours|getMinutes|getSeconds|getMilliseconds|getTime)\(\)/g;
                         logic = logic.replace(regex, (match, variable, functionName) => {
                           const evaluatedVariable = eval(variable)
@@ -1757,6 +1762,9 @@ function PreviewModal({
                             }
                           }
                         });
+
+                        logic = logic.replace(/\.getMonth\(\)/g, ".getMonth()+1");
+
                         try {
                           let result = eval(logic); // Evaluate the modified logic
                           if (!result) {
