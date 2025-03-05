@@ -1674,6 +1674,9 @@ function ConditionalLogic({
     // Define a regex to detect incomplete expressions (e.g., missing operators or values)
     const incompleteExpressionRegex = /^[a-zA-Z0-9_\.]+(?:\([^\)]*\))?$/;
 
+    const regexSingleQuestion = /evaluateObject\.SEC_[a-f0-9]{8}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{12}_PG_[a-f0-9]{8}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{12}_QUES_[a-f0-9]{8}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{4}_[a-f0-9]{12}/;
+
+
     // Regex for valid date format (dd/mm/yyyy)
     const validDateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
@@ -1705,9 +1708,11 @@ function ConditionalLogic({
       else if (containsTypeMethod) {
         errors.push(`Expression is correct (contains a valid method).`);
       } else if (incompleteExpressionRegex.test(part) && !part.endsWith(")")) {
-        errors.push(
-          `Error in expression: "${displayPart}" is incomplete (missing operator or value).`
-        );
+        if (!regexSingleQuestion.test(part)) {
+          errors.push(
+            `Error in expression: "${displayPart}" is incomplete (missing operator or value).`
+          );
+        }
       }
       // Check if it's a date type
       else if (selectedType === "date" && expression.includes("setDate")) {
@@ -1736,8 +1741,10 @@ function ConditionalLogic({
         !validExpressionRegex.test(part) &&
         !addDaysValidator.test(part)
       ) {
-        // errors.push(`Error in expression: "${displayPart}" is incorrect.`);
-        errors.push(`Error in expression: The Expression format is incorrect.`);
+        if (!part.includes('formatDateWithOffset')) {
+          // errors.push(`Error in expression: "${displayPart}" is incorrect.`);
+          errors.push(`Error in expression: The Expression format is incorrect.`);
+        }
       }
       // If the expression is correct, log that it's valid
       else {
