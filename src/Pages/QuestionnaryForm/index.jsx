@@ -9,7 +9,7 @@ import Fieldsneeded from './Components/AddFieldComponents/Field.js';
 import GlobalContext from '../../Components/Context/GlobalContext.jsx';
 import TestFieldSetting from './Components/Fields/TextBox/TextFieldSetting/TextFieldSetting.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
+import { compareData, resetFixedChoice, saveCurrentData, setComplianceLogicCondition, setCurrentData, setInitialData, setNewComponent } from './Components/Fields/fieldSettingParamsSlice.js';
 import ChoiceFieldSetting from './Components/Fields/ChoiceBox/ChoiceFieldSetting/ChoiceFieldSetting.jsx';
 import { v4 as uuidv4 } from 'uuid';
 import ConfirmationModal from '../../Components/Modals/ConfirmationModal/ConfirmationModal.jsx';
@@ -57,7 +57,8 @@ const QuestionnaryForm = () => {
 
     }]);
 
-
+    const allSectionDetails = useSelector(state => state?.allsectiondetails?.allSectionDetails);
+    const [questionWithUuid, setQuestionWithUuid] = useState({})
     const sectionRefs = useRef([]);
     const { setToastError, setToastSuccess } = useContext(GlobalContext);
     const [pageLoading, setPageLoading] = useState(false);
@@ -71,6 +72,7 @@ const QuestionnaryForm = () => {
     const [defaultString, setDefaultString] = useState('')
     const [compareSavedSections, setCompareSavedSections] = useState(sections);
     const [sectionDetails, setSectionDetails] = useState({})
+    const [complianceClick, setComplianceClick] = useState(false)
     // text field related states
     const selectedAddQuestion = useSelector((state) => state?.questionnaryForm?.selectedAddQuestion);
     const selectedQuestionId = useSelector((state) => state?.questionnaryForm?.selectedQuestionId);
@@ -86,6 +88,8 @@ const QuestionnaryForm = () => {
     const showCancelModal = useSelector((state) => state?.questionnaryForm?.showCancelModal);
     const showPageDeleteModal = useSelector((state) => state?.questionnaryForm?.showPageDeleteModal);
     const isModalOpen = useSelector((state) => state?.questionnaryForm?.isModalOpen);
+    const fixedChoiceArray = useSelector(state => state.fieldSettingParams.currentData[selectedQuestionId]?.fixedChoiceArray || []);
+    const complianceConditions = useSelector((state) => state.fieldSettingParams.conditions); //newly added for compliance logic conditions
 
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const savedFieldSettingParams = useSelector(state => state.fieldSettingParams.savedData);
@@ -107,6 +111,8 @@ const QuestionnaryForm = () => {
     const [complianceLoader, setComplianceLoader] = useState(false)
     const [prevLabelValue, setPrevLabelValue] = useState('')
     const [hasSectionData, setHasSectionData] = useState([]);
+    const [compareInitialSavedSection, setCompareInitialSavedSection] = useState(null);
+    const [compareInitialSavedComplianceLogic, setCompareInitialSavedComplianceLogic] = useState([]);
 
     const [editorCheck, setEditorCheck] = useState({
         conditonalEditor: [],
@@ -148,6 +154,64 @@ const QuestionnaryForm = () => {
         setIsDeleteComplianceLogic(false);
         dispatch(setSectionToDelete(null)); // Reset the section to delete
     }
+
+    useEffect(() => {
+        if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
+
+        if (fieldSettingParams[selectedQuestionId]?.source === 'fixedList') {
+            const hasEmptyChoices = fixedChoiceArray.some(choice => !choice.value || !choice.value.trim());
+
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                choice: {
+                    ...prevErrors.choice,
+                    [selectedQuestionId]: hasEmptyChoices ? 'These are mandatory fields' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.choice && validationErrors?.choice[selectedQuestionId] === 'These are mandatory fields') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    choice: {
+                        ...prevErrors.choice,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+    }, [selectedQuestionId, fixedChoiceArray, fieldSettingParams]);
+
+    useEffect(() => {
+        if (!selectedQuestionId) return;
+        if (!fieldSettingParams[selectedQuestionId]?.source) return;
+
+        const hasLookupValue =
+            fieldSettingParams[selectedQuestionId]?.lookupValue &&
+            fieldSettingParams[selectedQuestionId]?.lookupValue.trim();
+
+        if (fieldSettingParams[selectedQuestionId]?.source === 'lookup') {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                lookup: {
+                    ...prevErrors.lookup,
+                    [selectedQuestionId]: (!hasLookupValue) ? 'This is a mandatory field' : '',
+                },
+            }));
+        } else {
+            if (validationErrors?.lookup && validationErrors?.lookup[selectedQuestionId] === 'This is a mandatory field') {
+                setValidationErrors((prevErrors) => ({
+                    ...prevErrors,
+                    lookup: {
+                        ...prevErrors.lookup,
+                        [selectedQuestionId]: '',
+                    },
+                }));
+            }
+        }
+    }, [selectedQuestionId, fieldSettingParams]);
+
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         let updatedValue = value;
@@ -172,6 +236,7 @@ const QuestionnaryForm = () => {
                 }));
             }
         }
+
         if (id === 'fileType') {
             // Remove numbers, spaces around commas, and trim any leading/trailing spaces
             updatedValue = value
@@ -383,16 +448,18 @@ const QuestionnaryForm = () => {
     const fetchComplianceLogic = async () => {
         try {
             const response = await getAPI(`questionnaires/compliancelogic/${questionnaire_id}/${version_number}`)
-            if (response?.data?.data[0]?.editorCheck) {
-                setEditorCheck(response?.data?.data[0]?.editorCheck[0])
-            }
-            if (response?.data?.data[0]?.logic) {
-                // setConditions(response?.data?.data[0]?.logic);
-                dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
-            } else {
-                // setConditions(complianceInitialState);
-                dispatch(setComplianceLogicCondition(complianceInitialState));
-            }
+            if(!response?.error) {
+                if (response?.data?.data[0]?.editorCheck) {
+                    setEditorCheck(response?.data?.data[0]?.editorCheck[0])
+                }
+                if (response?.data?.data[0]?.logic) {
+                    // setConditions(response?.data?.data[0]?.logic);
+                    dispatch(setComplianceLogicCondition(response?.data?.data[0]?.logic));
+                } else {
+                    // setConditions(complianceInitialState);
+                    dispatch(setComplianceLogicCondition(complianceInitialState));
+                }
+            } 
         } catch {
             console.log('error while getting ')
         }
@@ -591,6 +658,7 @@ const QuestionnaryForm = () => {
         try {
             const response = await getAPI(`questionnaires/${questionnaire_id}/${version_number}`);
             setSectionDetails(response?.data?.data);
+            setCompareInitialSavedSection(response?.data?.data)
             if (!response?.error) {
                 dispatch(setFormDefaultInfo(response?.data?.data));
                 setFormStatus(response?.data?.data?.status);
@@ -611,6 +679,7 @@ const QuestionnaryForm = () => {
                     source_value: question?.source_value,
                     source: question?.source,
                     lookup_value: question?.lookup_value,
+                    lookup_list: question?.lookup_list,
                     lookup_id: question?.lookup_id,
                     help_text: question?.help_text,
                     placeholder_content: question?.placeholder_content,
@@ -690,6 +759,16 @@ const QuestionnaryForm = () => {
         }
     }
 
+    //for replacing the string
+    function replaceUUIDs(questionWithUUID, replacements) {
+        let updatedString = questionWithUUID;
+        Object.entries(replacements).forEach(([key, value]) => {
+            const regex = new RegExp(value, "g"); // Global replacement
+            updatedString = updatedString.replace(regex, key);
+        });
+
+        return updatedString;
+    }
     const handleSaveSection = async (sectionId, isSaving = true, payloadString, defaultString, compliance) => {
         // handleSectionSaveOrder(sections, compliance, payloadString)
         // Find the section to save  
@@ -768,6 +847,7 @@ const QuestionnaryForm = () => {
                             ,
                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
                             lookup_value: fieldSettingParams[question.question_id].lookupValue,
+                            lookup_list: fieldSettingParams[question.question_id].lookupList,
                             options: fieldSettingParams[question.question_id].options,
                             default_value: fieldSettingParams[question.question_id].defaultValue,
                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -892,6 +972,15 @@ const QuestionnaryForm = () => {
                             console.error('Page not found for the given pageConditionLogicId');
                         }
                     } else {
+                        // payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                        //     return logic.replace(new RegExp(questionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        // }, payloadString);
+                        payloadString = Object.keys(questionWithUuid).reduce((logic, questionName) => {
+                            // Escape all special regex characters
+                            let escapedQuestionName = questionName.replace(/[-[\]{}()*+?.,\\^$|#\s/~`!@#%^&_=:"';<>]/g, '\\$&');
+                            
+                            return logic.replace(new RegExp(escapedQuestionName, 'g'), questionWithUuid[questionName].replace(/-/g, '_')).trim();
+                        }, payloadString);
                         dispatch(setNewComponent({ id: 'conditional_logic', value: payloadString, questionId: selectedQuestionId }))
                     }
                 } else {
@@ -918,8 +1007,37 @@ const QuestionnaryForm = () => {
 
     }
 
+    //recursive udating the 
+    function recursiveUpdate(obj, oldName, newName) {
+        return obj.map((item) => {
+            let newItem = { ...item }; // Create a shallow copy of the object
+
+            Object.keys(newItem).forEach((key) => {
+                if (key === 'conditions') {
+                    newItem[key] = newItem[key].map((condition) => ({
+                        ...condition, // Create a new condition object
+                        question_name: condition.question_name.includes(oldName)
+                            ? condition.question_name.replace(oldName, newName)
+                            : condition.question_name
+                    }));
+                } else if (key === 'elseIfBlocks') {
+                    newItem[key] = newItem[key].map((conditionsgrp) => ({
+                        ...conditionsgrp, // Create a new conditions group object
+                        conditions: conditionsgrp.conditions.map((condition) => ({
+                            ...condition, // Create a new condition object
+                            question_name: condition.question_name.includes(oldName)
+                                ? condition.question_name.replace(oldName, newName)
+                                : condition.question_name
+                        }))
+                    }));
+                }
+            });
+
+            return newItem;
+        });
+    }
     // Save the section and page name
-    const handleSaveSectionName = (value, sectionIndex, pageIndex) => {
+    const handleSaveSectionName = (value, sectionIndex, pageIndex, noFocus) => {
         // Create a deep copy of sections
         let updatedSections = sections.map((section, idx) => {
             if (idx === sectionIndex) {
@@ -935,9 +1053,69 @@ const QuestionnaryForm = () => {
 
         // Check if a pageIndex is provided to update a page name or section name
         if (pageIndex !== undefined && pageIndex !== null) {
+            if (noFocus && updatedSections[sectionIndex].pages[pageIndex].page_name !== value) {
+                let section = updatedSections[sectionIndex].section_name;
+                let page = updatedSections[sectionIndex].pages[pageIndex].page_name;
+                let replaceWord = section + '.' + page;
+                let newWord = section + '.' + value;
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
+            }
             updatedSections[sectionIndex].pages[pageIndex].page_name = value; // Safe to update now
             setPageName(value)
+
         } else {
+            if (noFocus && updatedSections[sectionIndex].section_name !== value) {
+                let section = updatedSections[sectionIndex].section_name;
+                let replaceWord = section;
+                let newWord = value;
+
+                // Create a new copy of fieldSettingParams
+                const updatedFieldSettingParams = { ...fieldSettingParams };
+
+                // Iterate through the object and update conditionally
+                Object.keys(updatedFieldSettingParams).forEach((key) => {
+                    if (
+                        updatedFieldSettingParams[key].conditional_logic &&
+                        updatedFieldSettingParams[key].conditional_logic.includes(replaceWord)
+                    ) {
+                        // Create a new copy of the object to ensure immutability
+                        updatedFieldSettingParams[key] = {
+                            ...updatedFieldSettingParams[key],
+                            conditional_logic: updatedFieldSettingParams[key].conditional_logic.replace(
+                                new RegExp(replaceWord, 'g'), newWord
+
+                            )
+                        };
+                    }
+                });
+                dispatch(setCurrentData(updatedFieldSettingParams));
+                dispatch(saveCurrentData(updatedFieldSettingParams));
+                replaceComplianceLogic(replaceWord, newWord);
+                dispatch(setComplianceLogicCondition(recursiveUpdate(complianceConditions, replaceWord, newWord)))
+            }
             updatedSections[sectionIndex].section_name = value;
             setSectionName(value)
         }
@@ -949,6 +1127,18 @@ const QuestionnaryForm = () => {
         // handleSaveSection(updatedSections[sectionIndex]?.section_id, updatedSections);
         // setSectionName(value)
     };
+
+    //function to swap complance logic
+    const replaceComplianceLogic = (oldName, newName) => {
+        setComplianceLogic(prevState => prevState.map(item => {
+            if (item.default_content.includes(oldName)) {
+                const updatedContent = item.default_content.replace(new RegExp(`\\b${oldName}\\b`, 'g'), newName);
+                return { ...item, default_content: updatedContent };
+            }
+            return item;
+        }));
+    }
+
 
     const addNewQuestion = useCallback((componentType, additionalActions = () => { }) => {
         if (!selectedAddQuestion?.pageId) return;
@@ -1177,6 +1367,8 @@ const QuestionnaryForm = () => {
             })),
             'compliance_logic': complianceLogic,
         }
+        setCompareInitialSavedComplianceLogic(complianceLogic)
+
         try {
             const response = await PatchAPI(`questionnaires/layout/${questionnaire_id}/${version_number}`, body);
             if (!(response?.data?.error)) {
@@ -1197,6 +1389,7 @@ const QuestionnaryForm = () => {
                 // Extract section IDs in the order provided
                 const sectionOrder = response.data.data.sections.map(section => section?.id);
                 setComplianceLogic(response?.data?.data?.compliance_logic)
+                setCompareInitialSavedComplianceLogic(response?.data?.data?.compliance_logic)
                 return sectionOrder; // Return the ordered section IDs
             } else if (response?.data?.status === 404) {
                 return 'no_data'
@@ -1290,8 +1483,6 @@ const QuestionnaryForm = () => {
                 isAdvanceEditorCompliance: false
             };
         });
-        console.log('delete');
-        
         setComplianceLoader(true)
         const body = {
             compliance_logic: []
@@ -1308,86 +1499,230 @@ const QuestionnaryForm = () => {
         }
     };
 
-    // Function to compare sections state with compareSavedSections to show the cancle modal or not
+    const isEmptyValue = (value) => {
+        return value === undefined || value === null || value === '' || value === "";
+    };
+
+    const compareObjects = (obj1, obj2) => {
+        // Handle null/undefined objects
+        if (!obj1 || !obj2) {
+            return obj1 === obj2;
+        }
+
+        // Get all unique keys from both objects
+        const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
+
+        for (const key of allKeys) {
+            const value1 = obj1[key];
+            const value2 = obj2[key];
+
+            // Skip comparison if both values are empty
+            if (isEmptyValue(value1) && isEmptyValue(value2)) {
+                continue;
+            }
+
+            // Handle arrays (including source_value arrays)
+            if (Array.isArray(value1) && Array.isArray(value2)) {
+                if (value1.length !== value2.length) {
+                    console.log(`Array length mismatch for ${key}:`, { value1, value2 });
+                    return false;
+                }
+
+                // For arrays of objects (like source_value)
+                if (value1.length > 0 && typeof value1[0] === 'object') {
+                    for (let i = 0; i < value1.length; i++) {
+                        if (!compareObjects(value1[i], value2[i])) {
+                            console.log(`Mismatch in array item ${i} of ${key}:`, {
+                                item1: value1[i],
+                                item2: value2[i]
+                            });
+                            return false;
+                        }
+                    }
+                } else {
+                    // For primitive arrays, compare directly
+                    const areEqual = value1.every((item, index) => item === value2[index]);
+                    if (!areEqual) {
+                        console.log(`Array content mismatch for ${key}:`, { value1, value2 });
+                        return false;
+                    }
+                }
+                continue;
+            }
+
+            // Handle nested objects
+            if (typeof value1 === 'object' && typeof value2 === 'object') {
+                if (!compareObjects(value1, value2)) {
+                    return false;
+                }
+                continue;
+            }
+
+            // Compare primitive values
+            if (value1 !== value2) {
+                // Skip comparison if one value is empty and the key is optional
+                const isOptionalField = [
+                    'created_at',
+                    'updated_at',
+                    'questionnaire_id',
+                    'version_number',
+                    'ttl',
+                    'index',
+                    'sectionIndex'
+                ].includes(key);
+
+                if (!isOptionalField) {
+                    console.log(`Value mismatch for ${key}:`, { value1, value2 });
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+
     const compareSections = (sections, compareSavedSections) => {
+        // Handle null/undefined inputs
+        if (!sections || !compareSavedSections) {
+            return sections === compareSavedSections;
+        }
+
+        // Ensure we're working with arrays
+        const sectionsArray = Array.isArray(sections) ? sections : sections.sections || [];
+        const compareSectionsArray = Array.isArray(compareSavedSections) ?
+            compareSavedSections : compareSavedSections.sections || [];
+
         // Check if the number of sections matches
-        if (sections.length !== compareSavedSections.length) {
+        if (sectionsArray.length !== compareSectionsArray.length) {
             console.log('Number of sections does not match');
             return false;
         }
 
         // Compare each section in detail
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i];
-            const savedSection = compareSavedSections[i];
+        for (let i = 0; i < sectionsArray.length; i++) {
+            const section = sectionsArray[i];
+            const savedSection = compareSectionsArray[i];
 
-            // Compare section-level properties
-            if (
-                section.section_name !== savedSection.section_name ||
-                section.section_id !== savedSection.section_id ||
-                section.updated_at !== savedSection.updated_at
-            ) {
-                console.log(`Mismatch in section ${i + 1}:`, { section, savedSection });
-                return false;
-            }
+            // Skip optional fields
+            const cleanedSection = { ...section };
+            const cleanedSavedSection = { ...savedSection };
 
+            ['created_at', 'updated_at', 'questionnaire_id', 'version_number', 'ttl'].forEach(field => {
+                delete cleanedSection[field];
+                delete cleanedSavedSection[field];
+            });
             // Compare pages within the section
-            if (section.pages.length !== savedSection.pages.length) {
+            if (cleanedSection.pages?.length !== cleanedSavedSection.pages?.length) {
                 console.log(`Mismatch in the number of pages in section ${i + 1}`);
                 return false;
             }
-
-            for (let j = 0; j < section.pages.length; j++) {
-                const page = section.pages[j];
-                const savedPage = savedSection.pages[j];
-
-                // Compare page-level properties
-                if (
-                    page.page_name !== savedPage.page_name ||
-                    page.page_id !== savedPage.page_id
-                ) {
-                    console.log(`Mismatch in page ${j + 1} of section ${i + 1}:`, {
-                        page,
-                        savedPage,
-                    });
-                    return false;
-                }
-
-                // Compare questions within the page
-                if (page.questions.length !== savedPage.questions.length) {
-                    console.log(
-                        `Mismatch in the number of questions in page ${j + 1} of section ${i + 1}`
-                    );
-                    return false;
-                }
-
-                for (let k = 0; k < page.questions.length; k++) {
-                    const question = page.questions[k];
-                    const savedQuestion = savedPage.questions[k];
-
-                    // Compare question-level properties
-                    if (
-                        question.question_id !== savedQuestion.question_id ||
-                        question.question_name !== savedQuestion.question_name
-                    ) {
-                        console.log(
-                            `Mismatch in question ${k + 1} of page ${j + 1} in section ${i + 1}:`,
-                            { question, savedQuestion }
-                        );
-                        return false;
-                    }
-                }
+            // Clean page data
+            if (cleanedSection.pages) {
+                cleanedSection.pages = cleanedSection.pages.map(page => {
+                    const cleanedPage = { ...page };
+                    delete cleanedPage.index;
+                    delete cleanedPage.sectionIndex;
+                    return cleanedPage;
+                });
+            }
+            // Compare the cleaned sections
+            if (!compareObjects(cleanedSection, cleanedSavedSection)) {
+                console.log(`Mismatch in section ${i + 1}`);
+                return false;
             }
         }
-
-        return true; // Sections, pages, and questions are identical
+        return true;
     };
 
-    // Function to compare sections state with compareSavedSections (related to showing the cancle modal)
+
+    function compareCompliance(array1, array2) {
+        // If arrays have different lengths, they're not identical
+        if (array1.length !== array2.length) {
+            return false;
+        }
+
+        // Compare each item in the arrays
+        for (let i = 0; i < array1.length; i++) {
+            if (array1[i].default_content !== array2[i].default_content) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    const cleanSectionData = (data) => {
+        // If input is not valid, return empty array
+        if (!data || typeof data !== 'object') {
+            return [];
+        }
+
+        // Deep clone the data to avoid mutations
+        const clonedData = JSON.parse(JSON.stringify(data));
+
+        // Extract sections array from the main object
+        const sectionsArray = clonedData.sections || (Array.isArray(clonedData) ? clonedData : []);
+
+        // Clean each section
+        const cleanedSections = sectionsArray.map(section => {
+            const cleanedSection = { ...section };
+
+            // Remove unwanted section-level properties
+            delete cleanedSection.created_at;
+            delete cleanedSection.updated_at;
+            delete cleanedSection.questionnaire_id;
+            delete cleanedSection.version_number;
+            delete cleanedSection.ttl;
+
+            // Clean pages if they exist
+            if (cleanedSection.pages && Array.isArray(cleanedSection.pages)) {
+                cleanedSection.pages = cleanedSection.pages.map(page => {
+                    const cleanedPage = { ...page };
+                    delete cleanedPage.index;
+                    delete cleanedPage.sectionIndex;
+
+                    // Clean questions if they exist
+                    if (cleanedPage.questions && Array.isArray(cleanedPage.questions)) {
+                        cleanedPage.questions = cleanedPage.questions.map(question => {
+                            const cleanedQuestion = { ...question };
+                            // Clean up empty options objects
+                            if (cleanedQuestion.options && typeof cleanedQuestion.options === 'object') {
+                                Object.keys(cleanedQuestion.options).forEach(key => {
+                                    if (cleanedQuestion.options[key] === undefined ||
+                                        cleanedQuestion.options[key] === null ||
+                                        cleanedQuestion.options[key] === "" ||
+                                        cleanedQuestion.options[key] === '') {
+                                        delete cleanedQuestion.options[key];
+                                    }
+                                });
+                            }
+                            return cleanedQuestion;
+                        });
+                    }
+
+                    return cleanedPage;
+                });
+            }
+
+            return cleanedSection;
+        });
+
+        return cleanedSections;
+    };
+
+
     const hasUnsavedChanges = () => {
-        return (
-            !compareSections(sections, compareSavedSections)
-        );
+        if (compareInitialSavedSection &&
+            (Array.isArray(compareInitialSavedSection) || compareInitialSavedSection.sections)) {
+            // Clean both data sets
+            const cleanedNewData = cleanSectionData(sectionDetails);
+            const cleanedOldData = cleanSectionData(compareInitialSavedSection);
+
+            return !compareSections(cleanedNewData, cleanedOldData) ||
+                !compareCompliance(compareInitialSavedComplianceLogic, complianceLogic);
+        } else {
+            console.error("compareSavedSections is not an array:", compareSavedSections);
+            return false;
+        }
     };
 
     // Cancel button click handler (related to showing the cancle modal)
@@ -1443,14 +1778,46 @@ const QuestionnaryForm = () => {
             setGlobalSaveLoading(false)
         }
 
+        if (!key) {
+            function listQuestionIds(data) {
+                let questionIds = [];
 
-        // Check if there are any validation errors
-        const hasValidationErrors = Object.values(validationErrors?.label || {}).some(error => error !== '');
+                data.forEach(section => {
+                    section.pages.forEach(page => {
+                        page.questions.forEach(question => {
+                            questionIds.push(question.question_id);
+                        });
+                    });
+                });
 
-        if (hasValidationErrors) {
-            setToastError('Please fix the validation errors before saving.');
-            setGlobalSaveLoading(false);
-            return;
+                return questionIds;
+            }
+            function filterValidationErrors(validationErrors, questionIds) {
+                return {
+                    lookup: Object.fromEntries(
+                        Object.entries(validationErrors?.lookup || {}).filter(([key]) => questionIds.includes(key))
+                    ),
+                    label: validationErrors.label || {},
+                    choice: Object.fromEntries( // Ensure choice is filtered as well
+                        Object.entries(validationErrors?.choice || {}).filter(([key]) => questionIds.includes(key))
+                    )
+                };
+            }
+
+            const questionIds = listQuestionIds(sections);
+            const filteredValidationErrors = filterValidationErrors(validationErrors, questionIds);
+
+            // Check if there are any validation errors
+            const hasValidationErrorsLabel = Object.values(validationErrors?.label || {}).some(error => error !== '');
+            const hasValidationErrorsChoice = Object.values(filteredValidationErrors?.choice || {}).some(error => error !== '');
+            const hasValidationErrorsLookup = Object.values(filteredValidationErrors?.lookup || {}).some(error => error !== '');
+
+
+            if (hasValidationErrorsLabel || hasValidationErrorsChoice || hasValidationErrorsLookup) {
+                setToastError('Please fix the validation errors before saving.');
+                setGlobalSaveLoading(false);
+                return;
+            }
         }
 
         try {
@@ -1512,6 +1879,7 @@ const QuestionnaryForm = () => {
                                                     fieldSettingParams[question.question_id].lookupOptionChoice,
                                             lookup_id: fieldSettingParams[question.question_id].lookupOption,
                                             lookup_value: fieldSettingParams[question.question_id].lookupValue,
+                                            lookup_list: fieldSettingParams[question.question_id].lookupList,
                                             options: fieldSettingParams[question.question_id].options,
                                             default_value: fieldSettingParams[question.question_id].defaultValue,
                                             increment_by: fieldSettingParams[question.question_id].incrementby,
@@ -1524,7 +1892,7 @@ const QuestionnaryForm = () => {
                                                 pin_drop: fieldSettingParams[question.question_id].pin_drop,
                                                 include_metadata: fieldSettingParams[question.question_id].include_metadata,
                                                 file_size: fieldSettingParams[question.question_id].fileSize,
-                                                file_type: fieldSettingParams[question.question_id].fileType,
+                                                file_type: fieldSettingParams[question.question_id].fileType || 'pdf',
                                             },
                                             attribute_data_lfp: fieldSettingParams[question.question_id].attribute_data_lfp,
                                             service_record_lfp: fieldSettingParams[question.question_id].service_record_lfp,
@@ -1577,6 +1945,9 @@ const QuestionnaryForm = () => {
                     console.error("sectionBody is not an array:", sectionBody);
                 }
             }
+            if (!key) {
+                setCompareInitialSavedSection(sectionBody)
+            }
             setSectionDetails(sectionBody);
             cleanSections();
             let hasQuestion = checkForQuestions();
@@ -1624,6 +1995,31 @@ const QuestionnaryForm = () => {
         return array
     }
 
+    const getQuestionDetails = () => {
+        const questionDetailsWithUuid = {};
+
+        sectionDetails?.sections?.forEach((section) => {
+            const sectionName = section.section_name;
+
+            section.pages?.forEach((page) => {
+                const pageName = `${sectionName}.${page.page_name}`;
+
+                page.questions?.forEach((question) => {
+                    const questionId = question?.question_id;
+                    const questionName = `${pageName}.${question.question_name}`;
+                    // if (questionId !== selectedQuestionId && !['assetLocationfield', 'floorPlanfield', 'signaturefield', 'gpsfield', 'displayfield'].includes(question?.component_type)) {
+                        questionDetailsWithUuid[questionName] = questionId.replace(/-/g, '_');
+                    // }
+                });
+            });
+        });
+        setQuestionWithUuid(questionDetailsWithUuid);
+    };
+
+    useEffect(() => {
+        getQuestionDetails();
+    }, [sectionDetails, fieldSettingParams, handleTextboxClick]);
+
     return (
         <>
             {pageLoading ? (
@@ -1643,7 +2039,8 @@ const QuestionnaryForm = () => {
                             setDropdown={setDropdown}
                             dropdownOpen={dropdownOpen}
                             onDragEnd={onDragEnd}
-                            // handleDragStart={handleDragStart}
+                            setComplianceClick={setComplianceClick}
+                            complianceLogic={complianceLogic}
                             formStatus={formStatus}
                             handleAddRemoveSection={handleAddRemoveSection}
                             handleSectionSaveOrder={handleSectionSaveOrder}
@@ -1664,7 +2061,7 @@ const QuestionnaryForm = () => {
                         {sections.length === 0 ?
                             (<p className='flex items-center justify-center h-customh6 text-lg font-semibold bg-[#EFF1F8] w-full'>No Sections available for this Questionnaire</p>)
                             : (
-                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh6 overflow-auto default-sidebar'>
+                                <div className='bg-[#EFF1F8] w-full py-[30px] px-[26px] h-customh15 overflow-auto default-sidebar'>
                                     <p
                                         title={formDefaultInfo?.internal_name}
                                         className={`font-semibold text-[22px] text-[#2B333B] truncate w-[90%] ${sections && sections.length === 0 ? 'mb-3' : ''}`}
@@ -1767,6 +2164,7 @@ const QuestionnaryForm = () => {
                                                                             dropdownOpen={dropdownOpen}
                                                                             setPageConditionLogicId={setPageConditionLogicId}
                                                                             pageConditionLogicId={setPageConditionLogicId}
+                                                                            replaceComplianceLogic={replaceComplianceLogic}
                                                                         />
                                                                     </li>
                                                                 )}
@@ -1779,9 +2177,9 @@ const QuestionnaryForm = () => {
                                         </DragDropContext>
                                         {/* //add section buttion was there here */}
                                     </div>
-                                    {(selectedComponent === 'compliancelogic' || complianceLogic?.length > 0 || sections.length === 0) && (
+                                    {(complianceClick && complianceLogic.length > 0) && (
                                         <div>
-                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} />
+                                            <ComplanceLogicField setConditions={setConditions} addNewCompliance={addNewCompliance} complianceLogic={complianceLogic} setComplianceLogic={setComplianceLogic} complianceSaveHandler={complianceSaveHandler} setIsDeleteComplianceLogic={setIsDeleteComplianceLogic} formStatus={formStatus} questionWithUuid={questionWithUuid} />
                                         </div>
                                     )}
                                 </div>
@@ -1793,7 +2191,8 @@ const QuestionnaryForm = () => {
                                 onClick={() => {
                                     handleDataChanges()
                                     dispatch(setSelectedComponent(false))
-                                }}>
+                                }}
+                                data-testid='cancel-qsn'>
                                 <img src="/Images/cancel.svg" className='pr-2.5' alt="cancle" />
                                 Cancel
                             </button>
@@ -1816,9 +2215,16 @@ const QuestionnaryForm = () => {
                             />
                         </div>
                         <div>
-                            {selectedComponent ? (
+                            {selectedComponent === null && !complianceClick ? (
+                                <AddFields
+                                    buttons={Fieldsneeded}
+                                    handleClick={handleClick}
+                                    formStatus={formStatus}
+                                    disableButtons={handleDisableButtons()}
+                                />
+                            ) : (sideComponentMap[selectedComponent] && selectedComponent !== 'compliancelogic') ? (
                                 React.createElement(
-                                    sideComponentMap[selectedComponent],  // Dynamically select the component
+                                    sideComponentMap[selectedComponent],
                                     {
                                         handleInputChange: handleInputChange,
                                         formParameters: fieldSettingParams[selectedQuestionId],
@@ -1848,17 +2254,32 @@ const QuestionnaryForm = () => {
                                         scrollToPage: scrollToPage,
                                         formStatus: formStatus,
                                         setEditorCheck: setEditorCheck,
+                                        questionWithUuid:questionWithUuid,
                                     }
                                 )
-                            ) : (
-                                <AddFields
-                                    buttons={Fieldsneeded}
-                                    handleClick={handleClick}
-                                    formStatus={formStatus}
-                                    disableButtons={handleDisableButtons()}
-                                />
-                            )}
-
+                                ) : selectedComponent === 'compliancelogic' && complianceClick ?
+                                (
+                                    React.createElement(
+                                        sideComponentMap['compliancelogic'],  // Dynamically select the component
+                                        {
+                                            complianceLogic: complianceLogic,
+                                            setComplianceLogic: setComplianceLogic,
+                                            setCompliancestate: setCompliancestate,
+                                            formStatus: formStatus,
+                                            validationErrors: validationErrors,
+                                            setValidationErrors: setValidationErrors,
+                                            questionWithUuid:questionWithUuid,
+                                        }
+                                    )
+                                ) : (
+                                    <AddFields
+                                        buttons={Fieldsneeded}
+                                        handleClick={handleClick}
+                                        formStatus={formStatus}
+                                        disableButtons={handleDisableButtons()}
+                                    />
+                                )
+                            }
                         </div>
                     </div>
                 </div >
@@ -1987,6 +2408,7 @@ const QuestionnaryForm = () => {
             {
                 (conditionalLogic || isDefaultLogic || complianceState || sectionConditionLogicId || pageConditionLogicId) && (
                     <ConditionalLogic
+                        questionWithUuid={questionWithUuid}
                         setConditionalLogic={setConditionalLogic}
                         conditionalLogic={conditionalLogic}
                         handleSaveSection={handleSaveSection}
@@ -2035,4 +2457,3 @@ const QuestionnaryForm = () => {
 }
 
 export default QuestionnaryForm;
-

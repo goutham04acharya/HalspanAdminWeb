@@ -8,14 +8,13 @@ import objectToQueryString from '../../../../../../../CommonMethods/ObjectToQuer
 import ErrorMessage from '../../../../../../../Components/ErrorMessage/ErrorMessage';
 import { BeatLoader } from 'react-spinners';
 
-function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus, smallLoader}) {
+function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStatus, smallLoader }) {
 
     const dispatch = useDispatch();
     const { getAPI } = useApi();
     const fieldSettingParams = useSelector(state => state.fieldSettingParams.currentData);
     const assetType = useSelector(state => state?.questionnaryForm.assetType)
     const selectedServiceValue = useSelector(state => state?.questionnaryForm.selectedServiceValue)
-
     const [toggleStates, setToggleStates] = useState({});
     const [activeTab, setActiveTab] = useState('attributeData');
     const [isServiceRecordDropdownOpen, setServiceRecordDropdownOpen] = useState(false);
@@ -26,7 +25,11 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     const [questionList, setQuestionList] = useState([]);
     const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
     const [showError, setShowError] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingQuestionnaires, setIsLoadingQuestionnaires] = useState(false);
+    const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
+    const [isLoadingAsset, setIsLoadingAsset] = useState(false)
+    const [attributes, setAttributes] = useState([])
+    const [hasFinishedLoading, setHasFinishedLoading] = useState(false);
 
     const getOptions = (componentType) => {
         switch (componentType) {
@@ -45,12 +48,55 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                 return ['Load from previously entered data', 'Read only', 'Visible', 'Optional', 'Remember allowed'];
         }
     };
-    
-    const attributes = [
-        { value: 'Height', label: 'Height' },
-        { value: 'Width', label: 'Width' },
-        { value: 'Finish', label: 'Finish' },
-    ];
+
+    useEffect(() => {
+        const getAssetData = async () => {
+            setIsLoadingAsset(true)
+            try {
+                let response = await getAPI(`${import.meta.env.VITE_API_BASE_URL}asset_types/${assetType?.asset_type}/attributes`, null, true);
+                if (response?.data) {
+                    setAttributes(response.data?.results
+                        .filter(item => {
+                            if (!componentType) return true;
+
+                            const { schema } = item;
+                            const schemaType = schema?.type;
+                            const itemsType = schema?.items?.type;
+                            // Handle numberfield
+                            if (componentType === 'numberfield' &&
+                                (schemaType === 'number' || schemaType === 'integer' )) {
+                                return true;
+                            }
+
+                            // Handle textboxfield
+                            if (componentType === 'textboxfield' &&
+                                ((schemaType === 'string' && !schema?.format && !schema?.enum))) {
+                                return true;
+                            }
+
+                            // Handle dateTimefield
+                            if (componentType === 'dateTimefield' &&
+                                ((schemaType === 'string' && schema?.format === 'date') ||
+                                    itemsType === 'date')) {
+                                return true;
+                            }
+
+                            return false;
+                        })
+                        .map(item => ({
+                            value: item.key,
+                            label: item.label
+                        }))
+                    );
+                }
+                setIsLoadingAsset(false)
+            } catch (error) {
+                console.error("Error fetching asset data:", error);
+                setIsLoadingAsset(false)
+            }
+        };
+        getAssetData();
+    }, []);
 
     const serviceRecordOptions = [
         { value: 'FABRICATION', label: 'FABRICATION' },
@@ -64,23 +110,28 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
             ...assetType,
             services_type
         }
+        setIsLoadingQuestionnaires(true);
+        setHasFinishedLoading(false);
         try {
             const response = await getAPI(`questionnaires${objectToQueryString(query)}`);
             setQuestionnairesList(response?.data?.data?.items);
         } catch {
             console.error('Error fetching question list:', error);
-
+        } finally {
+            setIsLoadingQuestionnaires(false);
+            setHasFinishedLoading(true);
         }
     };
 
     const fetchQuestionList = async (selectedQuestionnaireId) => {
-        setIsLoading(true);
         try {
+            setIsLoadingQuestion(true);
             const response = await getAPI(`questionnaires/list/${encodeURIComponent(selectedQuestionnaireId)}`);
             setQuestionList(response?.data?.data || []); // Set the question list data
-            setIsLoading(false); // Start loading
+            setIsLoadingQuestion(false);
         } catch (error) {
             console.error('Error fetching question list:', error);
+            setIsLoadingQuestion(false);
         }
     }
 
@@ -103,66 +154,38 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         if (!questionList || !componentType) {
             return [];
         }
-    
+
         const filteredList = questionList.filter((item) => item.component_type === componentType);
-    
+
+        // Map component types to their display labels
+        const componentTypeLabels = {
+            "textboxfield": "Text-Box Field",
+            "choiceboxfield": "Choice-Box Field",
+            "dateTimefield": "Date-Time Field",
+            "assetLocationfield": "Asset-Location Field",
+            "numberfield": "Number Field",
+            "floorPlanfield": "Floor-Plan Field",
+            "photofield": "Photo Field",
+            "videofield": "Video Field",
+            "filefield": "File Field",
+            "signaturefield": "Signature Field",
+            "gpsfield": "GPS Field",
+            "displayfield": "Display Field",
+            "compliancelogic": "Compliance Logic",
+            "tagScanfield": "Tag-Scan Field"
+        };
+
         return filteredList.map((item) => {
-            let componentTypeLabel;
-    
-            switch (componentType) {
-                case "textboxfield":
-                    componentTypeLabel = "Text-Box Field";
-                    break;
-                case "choiceboxfield":
-                    componentTypeLabel = "Choice-Box Field";
-                    break;
-                case "dateTimefield":
-                    componentTypeLabel = "Date-Time Field";
-                    break;
-                case "assetLocationfield":
-                    componentTypeLabel = "Asset-Location Field";
-                    break;
-                case "numberfield":
-                    componentTypeLabel = "Number Field";
-                    break;
-                case "floorPlanfield":
-                    componentTypeLabel = "Floor-Plan Field";
-                    break;
-                case "photofield":
-                    componentTypeLabel = "Photo Field";
-                    break;
-                case "videofield":
-                    componentTypeLabel = "Video Field";
-                    break;
-                case "filefield":
-                    componentTypeLabel = "File Field";
-                    break;
-                case "signaturefield":
-                    componentTypeLabel = "Signature Field";
-                    break;
-                case "gpsfield":
-                    componentTypeLabel = "GPS Field";
-                    break;
-                case "displayfield":
-                    componentTypeLabel = "Display Field";
-                    break;
-                case "compliancelogic":
-                    componentTypeLabel = "Compliance Logic";
-                    break;
-                case "tagScanfield":
-                    componentTypeLabel = "Tag-Scan Field";
-                    break;
-                default:
-                    componentTypeLabel = "Unknown Component";
-            }
-    
+            // Get the label or default to "Unknown Component"
+            const componentTypeLabel = componentTypeLabels[componentType] || "Unknown Component";
+
             return {
                 label: `${item.section_name}.${item.page_name}.${item.question_name} - (${componentTypeLabel})`,
                 value: item.question_id,
             };
         });
     };
-    
+
 
     const handleAttributeClick = (option) => {
         dispatch(setNewComponent({ id: 'attribute_data_lfp', value: option.value, questionId: selectedQuestionId }));
@@ -192,14 +215,15 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
     }
 
     useEffect(() => {
-        if (fieldSettingParams[selectedQuestionId]) {
+        const questionSettings = fieldSettingParams[selectedQuestionId]?.options;
+        if (questionSettings) {
             setToggleStates({
-                'Load from previously entered data': fieldSettingParams[selectedQuestionId]?.options?.load_from_previous || false,
-                'Read only': fieldSettingParams[selectedQuestionId]?.options?.read_only || false,
-                'Visible': fieldSettingParams[selectedQuestionId]?.options?.visible || false,
-                'Optional': fieldSettingParams[selectedQuestionId]?.options?.optional || false,
-                'Remember allowed': fieldSettingParams[selectedQuestionId]?.options?.remember_allowed || false,
-                'Field validation': fieldSettingParams[selectedQuestionId]?.options?.field_validation || false,
+                'Load from previously entered data': questionSettings.load_from_previous || false,
+                'Read only': questionSettings.read_only || false,
+                'Visible': questionSettings.visible || false,
+                'Optional': questionSettings.optional || false,
+                'Remember allowed': questionSettings.remember_allowed || false,
+                'Field validation': questionSettings.field_validation || false,
             });
         }
     }, [fieldSettingParams, selectedQuestionId]);
@@ -255,15 +279,16 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
         setIsQuesDropdownOpen(dropdownType === 'question')
     };
 
-    // show the error message after 2seconds
     useEffect(() => {
-        if (questionnairesList.length === 0 && activeTab !== 'attributeData' && selectedServiceValue !== '') {
-            const timer = setTimeout(() => setShowError(true), 2000); // 2-second delay
-            return () => clearTimeout(timer); // Cleanup timeout
-        } else {
-            setShowError(false); // Reset the state when conditions change
-        }
-    }, [questionnairesList, activeTab, selectedServiceValue])
+        const shouldShowError = 
+          activeTab !== 'attributeData' && 
+          !!selectedServiceValue && 
+          hasFinishedLoading && 
+          questionnairesList.length === 0 && 
+          !isLoadingQuestionnaires;
+        
+        setShowError(shouldShowError);
+      }, [questionnairesList, activeTab, selectedServiceValue, hasFinishedLoading, isLoadingQuestionnaires]);
 
     return (
         <div className='mt-7 w-[97%]'>
@@ -300,24 +325,29 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                         </p>
                     </div>
                     {activeTab === 'attributeData' && (
-                        <InfinateDropdown
-                            id='format'
-                            top='25px'
-                            placeholder='Select'
-                            className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
-                            testID='select-attribute'
-                            labeltestID='attribute'
-                            selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
-                            handleOptionClick={handleAttributeClick}
-                            isDropdownOpen={isAttributeDropdownOpen}
-                            setDropdownOpen={(isOpen) => {
-                                if (formStatus === 'Draft') {
-                                    handleDropdownState(isOpen ? 'attributeData' : null);
-                                }
-                            }}
-                            options={attributes}
-                            formStatus={formStatus}
-                        />
+                        isLoadingAsset ?
+                            <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} />
+                            :
+                            (
+                                <InfinateDropdown
+                                    id='format'
+                                    top='25px'
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2'
+                                    testID='select-attribute'
+                                    labeltestID='attribute'
+                                    selectedOption={attributes.find(option => option.value === fieldSettingParameters.attribute_data_lfp)}
+                                    handleOptionClick={handleAttributeClick}
+                                    isDropdownOpen={isAttributeDropdownOpen}
+                                    setDropdownOpen={(isOpen) => {
+                                        if (formStatus === 'Draft') {
+                                            handleDropdownState(isOpen ? 'attributeData' : null);
+                                        }
+                                    }}
+                                    options={attributes}
+                                    formStatus={formStatus}
+                                />
+                            )
                     )}
                     {activeTab === 'serviceRecord' && (
                         <InfinateDropdown
@@ -344,35 +374,38 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                     )}
                     {activeTab !== 'attributeData' && (
                         fieldSettingParameters.service_record_lfp ?
-                            (<InfinateDropdown
-                                label='Questionnaire List'
-                                mainDivStyle='mt-3'
-                                labelStyle='font-semibold text-[#2B333B] text-base'
-                                id='serviceRecord'
-                                top='50px'
-                                mandatoryField
-                                placeholder='Select'
-                                className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
-                                testID='select-questionnaire-list'
-                                labeltestID='service-record'
-                                selectedOption={handleQuestionnarieList.find(option => option.value === fieldSettingParameters.questionnaire_name_lfp)}
-                                handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
-                                isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
-                                setDropdownOpen={(isOpen) => {
-                                    if (formStatus === 'Draft') {
-                                        handleDropdownState(isOpen ? 'questionnaire' : null);
-                                    }
-                                }}
-                                options={handleQuestionnarieList}
-                                formStatus={formStatus}
-                            />
-                            ) : (
+                            isLoadingQuestionnaires ? (
+                                <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
+                            ) :
+                                (<InfinateDropdown
+                                    label='Questionnaire List'
+                                    mainDivStyle='mt-3'
+                                    labelStyle='font-semibold text-[#2B333B] text-base'
+                                    id='serviceRecord'
+                                    top='50px'
+                                    mandatoryField
+                                    placeholder='Select'
+                                    className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px] mt-2 pr-10'
+                                    testID='select-questionnaire-list'
+                                    labeltestID='service-record'
+                                    selectedOption={handleQuestionnarieList.find(option => option.value === fieldSettingParameters.questionnaire_name_lfp)}
+                                    handleOptionClick={formStatus === 'Draft' ? handleQuestionnaryClick : null}
+                                    isDropdownOpen={formStatus === 'Draft' ? isQuestionnariesDropdownOpen : false}
+                                    setDropdownOpen={(isOpen) => {
+                                        if (formStatus === 'Draft') {
+                                            handleDropdownState(isOpen ? 'questionnaire' : null);
+                                        }
+                                    }}
+                                    options={handleQuestionnarieList}
+                                    formStatus={formStatus}
+                                />
+                                ) : (
                                 showError && <ErrorMessage error={"No questionnaire is available"} />
                             )
                     )}
                     {activeTab !== 'attributeData' && (
                         (fieldSettingParameters.questionnaire_name_lfp && handleQuesList(questionList, fieldSettingParameters?.componentType)?.length !== 0) ?
-                            isLoading ? (
+                            isLoadingQuestion ? (
                                 <BeatLoader color="#000" size={smallLoader ? '7px' : '10px'} /> // Add your loader component or HTML here
                             ) : (
                                 <InfinateDropdown
@@ -397,7 +430,7 @@ function OptionsComponent({ selectedQuestionId, fieldSettingParameters, formStat
                                     options={handleQuesList(questionList, fieldSettingParameters?.componentType)} // Filtered list
                                     formStatus={formStatus}
                                 />
-                            ) : (fieldSettingParameters?.questionnaire_name_lfp &&(handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0) && activeTab !== 'attributeData') ? (
+                            ) : (fieldSettingParameters?.questionnaire_name_lfp && (handleQuesList(questionList, fieldSettingParameters?.componentType)?.length === 0) && activeTab !== 'attributeData') ? (
                                 <ErrorMessage error={'No questions available for the selected questionnaire'} />
                             ) : null
                     )}

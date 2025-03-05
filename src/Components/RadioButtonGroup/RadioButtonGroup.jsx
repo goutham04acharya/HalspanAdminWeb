@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { setQuestionValue } from '../../Pages/QuestionnaryForm/Components/previewQuestionnaireValuesSlice';
 import { useDispatch } from 'react-redux';
 
-const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
+const RadioButtonGroup = ({ values, onChange, question, questionValue, isDisable }) => {
     const dispatch = useDispatch();
 
     const handleChange = (event, uniqueKey) => {
@@ -30,6 +30,7 @@ const RadioButtonGroup = ({ values, onChange, question, questionValue }) => {
                                     type="radio"
                                     value={option?.value}
                                     checked={isChecked}
+                                    disabled={isDisable}
                                     onChange={(e) => handleChange(e, uniqueKey)}
                                     className="absolute w-0 h-0 opacity-0"
                                 />

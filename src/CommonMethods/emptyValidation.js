@@ -48,7 +48,6 @@ export default function isNotEmptyValidation(formData, setErrors) {
             });
         } 
     }else if (formData.choices.length < 1) {
-        // debugger
         setErrors('choices', 'This field is mandatory');
         isValid = false;
     }

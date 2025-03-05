@@ -19,6 +19,15 @@ Feature: Halspan - Admin - View List of All Available Questionnaire
       | "suggwh"     |
       | "562563576g" |
       | "!@#$%^&*"   |
+      | "   yted"    |
+
+  Scenario: Searching by internal name with spaces
+    Given I am in questionnaire listing screen
+    When I store the first internal name from list 
+    When I search by internal name with spaces
+    Then The results should display questionnaries matching the internal name
+    When I clear the empty search
+    Then The results should display questionnaries matching the internal name
 
   Scenario: Searching by internal name
     Given I am in questionnaire listing screen

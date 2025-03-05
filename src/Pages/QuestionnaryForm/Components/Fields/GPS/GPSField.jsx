@@ -46,10 +46,6 @@ function GPSField({
                 setError("Geolocation is not supported by this browser.");
                 setLoading(false); // Stop loading once location is fetched
                 dispatch(setQuestionValue({ question_id: question?.question_id, value: false }))
-                // setValue((prev) => ({
-                //     ...prev,
-                //     [question?.question_id]: false
-                // }))
             }
         };
 
@@ -68,11 +64,6 @@ function GPSField({
 
         return `${formattedLat}, ${formattedLon}`;
     };
-    // if (loading) {
-
-    // } else {
-    //     dispatch(setQuestionValue({ question_id: question?.question_id, value: false }))
-    // }
 
     return (
         <div>

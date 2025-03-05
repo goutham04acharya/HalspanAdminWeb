@@ -7,6 +7,7 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
 import Button2 from '../../../../../../Components/Button2/ButtonLight';
+import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
 function DateTimeFieldSetting({
   handleInputChange,
@@ -20,6 +21,7 @@ function DateTimeFieldSetting({
   setIsDefaultLogic,
   formStatus,
   setEditorCheck,
+  questionWithUuid
 }) {
   const dispatch = useDispatch();
 
@@ -66,7 +68,7 @@ function DateTimeFieldSetting({
                 <input
                   value={
                     fieldSettingParameters?.default_conditional_logic
-                      ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                      ? defaultContentConverter(replaceUUIDsWithQuestions(fieldSettingParameters?.default_conditional_logic, questionWithUuid))
                       : ''
                   }
                   type="text"

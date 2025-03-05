@@ -38,25 +38,16 @@ const ChoiceBoxField = ({
     const dispatch = useDispatch()
     const questionValue = useSelector(state => state.questionValues.questions);
     const handleRadioChange = (selectedValue) => {
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id);
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name],
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name],
-                    [label]: selectedValue.value,
-                },
-            },
+            [question?.question_id.replace(/-/g, '_')]: selectedValue.value
         }));
-    
         // Update the selected value in the parent state for the specific question
         dispatch(setQuestionValue({ question_id: question?.question_id, value: selectedValue }));
         setValue((prev) => ({
             ...prev,
             [question?.question_id]: selectedValue,
         }));
-    
         // Optionally reset validation errors for this question
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
@@ -72,16 +63,9 @@ const ChoiceBoxField = ({
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value.value }))
         setIsDropdownOpen(false)
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name], // Preserve existing entries for this section
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: value.value // Add or update the label key with newValue
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: value.value
         }))
         setValue((prev) => ({
             ...prev,
@@ -102,16 +86,9 @@ const ChoiceBoxField = ({
         setOptionSelected(questionValue[question?.question_id]);
         dispatch(setQuestionValue({ question_id: question?.question_id, value: value }))
         setIsDropdownOpen(false)
-        const { section_name, page_name, label } = findSectionAndPageName(sections, question?.question_id)
         setConditionalValues((prevValues) => ({
             ...prevValues,
-            [section_name]: {
-                ...prevValues[section_name], // Preserve existing entries for this section
-                [page_name]: {
-                    ...prevValues[section_name]?.[page_name], // Preserve existing entries for this page
-                    [label]: value.map(item => item.value) // Add or update the label key with newValue
-                }
-            }
+            [question?.question_id.replace(/-/g, '_')]: value.map(item => item.value)
         })) 
         setValidationErrors((prevErrors) => ({
             ...prevErrors,
@@ -137,11 +114,10 @@ const ChoiceBoxField = ({
                 ? fixedChoiceArray?.map(choice => choice.value) || []
                 : lookupOptionChoice || source_value || [];
         }
-
         if (type === 'single_choice') {
-            return <RadioButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
+            return <RadioButtonGroup isDisable={question?.options?.read_only} testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleRadioChange} />;
         } else if (type === 'multi_choice') {
-            return <CheckboxButtonGroup testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
+            return <CheckboxButtonGroup isDisable={question?.options?.read_only} testId={testId} questionValue={questionValue} setValue={setValue} setValidationErrors={setValidationErrors} preview values={values} question={question} name={source} onChange={handleCheckboxChange} />;
         }
     };
 
