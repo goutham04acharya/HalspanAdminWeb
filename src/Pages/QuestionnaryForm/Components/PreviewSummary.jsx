@@ -187,6 +187,15 @@ export default function PreviewSummary({ conditionalValues, sections }) {
       return true;
     }
   }, []);
+  const setXDate = (conditional_logic) => {
+      function formatDateWithOffset(formatteDate, value, question_name) {
+        let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
+        let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
+        return conditionalValues[question_name.trim()] === date;
+      }
+      const spitedValue = conditional_logic.split('(')[1].split(')')[0].split(',');
+      return formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])
+  }
 
   // Memoized section filtering
   const filteredSections = useMemo(() => {
@@ -199,7 +208,7 @@ export default function PreviewSummary({ conditionalValues, sections }) {
         ...page,
         shouldRender: evaluateCondition(page.page_conditional_logic),
         questions: page.questions?.filter(field => 
-          field.options.visible && evaluateCondition(field.conditional_logic)
+          field.options.visible &&field.conditional_logic.includes('formatDateWithOffset') ? setXDate(field.conditional_logic) : evaluateCondition(field.conditional_logic)
         )
       })).filter(page => page.shouldRender && page.questions?.length > 0)
     })).filter(section => section.shouldRender && section.pages?.length > 0);
