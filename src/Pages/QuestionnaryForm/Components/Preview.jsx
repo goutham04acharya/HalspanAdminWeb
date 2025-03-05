@@ -431,6 +431,9 @@ function PreviewModal({
             `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`,
         );
         return eval(replacedLogic);
+      }else if(logic.includes('formatDateWithOffset')) {
+        const spitedValue = logic.split('(')[1].split(')')[0].split(',');
+        return formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])
       } else {
         return eval(logic);
       }
@@ -618,11 +621,6 @@ function PreviewModal({
     // Call the computeNextNavigation only if the page is validated
     computeNextNavigation();
   }, [sections, currentSection, currentPage, value]);
-  function formatDateWithOffset(formatteDate, value, question_name) {
-    let [day, month, year] = formatteDate.split('/').map(Number);
-    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
-    return question_name === date;
-  }
   const handleNextClick = () => {
     // Reset previous validation errors before proceeding
     setValidationErrors({});
@@ -1452,7 +1450,11 @@ function PreviewModal({
     dispatch(resetFields());
     dispatch(clearAllSignatures());
   };
-
+  function formatDateWithOffset(formatteDate, value, question_name) {
+    let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
+    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
+    return conditionalValues[question_name.trim()] === date;
+  }
   return (
     <div
       className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}
@@ -1617,6 +1619,11 @@ function PreviewModal({
                         } catch (error) {
                           console.error("Error evaluating expression:", error);
                           return null;
+                        }
+                      }else if(list?.conditional_logic.includes('formatDateWithOffset')) {
+                        const spitedValue = list?.conditional_logic.split('(')[1].split(')')[0].split(',');
+                        if(!formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])) {
+                            return null;
                         }
                       } else if (
                         list?.conditional_logic?.includes("getMonth(")
