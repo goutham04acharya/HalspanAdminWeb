@@ -100,7 +100,11 @@ function PreviewModal({
     const result = await handleConditionalLogic(data);
     setConditionalValues(result);
   };
-
+  function formatDateWithOffset(formatteDate, value, question_name) {
+    let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
+    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; 
+    return conditionalValues[question_name.trim()] === date;
+  }
   useEffect(() => {
     const fetchSections = async () => {
       setLoading(true);
@@ -301,10 +305,8 @@ function PreviewModal({
           }
         }
       );
-
       return logic;
     };
-
     results = complianceLogic.map((rule) => {
       let evaluationResult = {
         STATUS: "",
@@ -322,7 +324,12 @@ function PreviewModal({
         let REASON = "";
         let ACTIONS = [];
         let GRADE = "";
+        if(processedContent.includes('formatDateWithOffset(')) {
+          let splitValue = processedContent.split('?')[0].replaceAll('))', ')').trim().replace(/^\(/, '').replace(/\)$/, '').split('formatDateWithOffset(')[1].split(',')
+          splitValue = formatDateWithOffset(splitValue[0], splitValue[1], splitValue[2])
+          processedContent = `${splitValue} ? ${processedContent.split('?')[1]}`
 
+        }
         // Evaluate the processed logic
         eval(processedContent);
 
@@ -346,7 +353,6 @@ function PreviewModal({
         };
       }
     });
-
     return results;
   };
 
@@ -1499,11 +1505,7 @@ function PreviewModal({
     dispatch(resetFields());
     dispatch(clearAllSignatures());
   };
-  function formatDateWithOffset(formatteDate, value, question_name) {
-    let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
-    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; // Use Date(year, monthIndex, day)
-    return conditionalValues[question_name.trim()] === date;
-  }
+
   return (
     <div
       className={`bg-[#0e0d0d71] pointer-events-auto w-full h-screen absolute top-0 flex flex-col z-[998]`}
