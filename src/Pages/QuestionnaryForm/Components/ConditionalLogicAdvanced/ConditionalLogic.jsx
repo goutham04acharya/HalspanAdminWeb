@@ -2327,14 +2327,30 @@ function ConditionalLogic({
         }
       } else {
         // Default: Extract and parse the conditional logic from the selected question
-        compliance_logic = parseLogicExpression(
-          replaceUUIDs(
+        const notRequiredConditionsAdvanceEditor = ["toUpperCase()", "toLowerCase()", "trim()"]
+          .concat(dateTimeMethods)
+          .concat(dateMethods)
+          .concat(timeMethods);
+        if (
+          !notRequiredConditionsAdvanceEditor.some((element) => replaceUUIDs(
             fieldSettingParams[selectedQuestionId]?.conditional_logic,
             questionWithUuid
-          )
-        );
+          ).includes(element))
+        ) {
+          compliance_logic = parseLogicExpression(
+            replaceUUIDs(
+              fieldSettingParams[selectedQuestionId]?.conditional_logic,
+              questionWithUuid
+            )
+          );
+          setConditions(compliance_logic);
+        } else {
+          setInputValue(defaultContentConverter(replaceUUIDs(
+            fieldSettingParams[selectedQuestionId]?.conditional_logic,
+            questionWithUuid
+          )))
+        }
       }
-      setConditions(compliance_logic);
     } else {
       if (complianceLogicCondition[0] !== undefined) {
         setConditions(complianceLogicCondition);
@@ -2411,8 +2427,8 @@ function ConditionalLogic({
                 <div className="mt-4 pt-2">
                   <div
                     className={`${isDefaultLogic
-                        ? "flex justify-end items-end w-full"
-                        : "flex justify-between items-end"
+                      ? "flex justify-end items-end w-full"
+                      : "flex justify-between items-end"
                       }`}
                   >
                     {!isDefaultLogic && (
@@ -2494,8 +2510,8 @@ function ConditionalLogic({
                 <div className="mt-4 pt-2">
                   <div
                     className={`${isDefaultLogic
-                        ? "flex justify-end items-end w-full"
-                        : "flex justify-between items-end"
+                      ? "flex justify-end items-end w-full"
+                      : "flex justify-between items-end"
                       }`}
                   >
                     {!isDefaultLogic && (
@@ -2570,8 +2586,8 @@ function ConditionalLogic({
                   <div className="mt-4 pt-2">
                     <div
                       className={`${isDefaultLogic
-                          ? "flex justify-end items-end w-full"
-                          : "flex justify-between items-end"
+                        ? "flex justify-end items-end w-full"
+                        : "flex justify-between items-end"
                         }`}
                     >
                       {!isDefaultLogic && (
