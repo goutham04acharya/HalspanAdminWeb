@@ -50,37 +50,12 @@ const AssetLocationField = ({
 
   // Helper function to update conditional values
   const updateConditionalValues = (fieldType, newValue) => {
-    const { section_name, page_name, label } = findSectionAndPageName(
-      sections,
-      question?.question_id,
-    );
-
-    setConditionalValues((prevValues) => {
-      // Get existing values for this location
-      const existingLocationValues =
-        prevValues[section_name]?.[page_name]?.[label] || {};
-
-      // Create new location values
-      const newLocationValues = {
-        ...existingLocationValues,
-        [fieldType]: newValue?.label || null,
-      };
-
-      // Return updated state
-      return {
-        ...prevValues,
-        [section_name]: {
-          ...prevValues[section_name],
-          [page_name]: {
-            ...prevValues[section_name]?.[page_name],
-            [label]: newLocationValues,
-          },
-        },
-      };
-    });
-
+    let prevValue = {...conditionalValues[question?.question_id.replace(/-/g, "_")], [fieldType]: newValue.label || null} 
+    setConditionalValues((prevValues) => ({
+      ...prevValues,
+      [question?.question_id.replace(/-/g, "_")]: prevValue,
+    }));
     // Update Redux store with the full location data
-
     if (fieldType === "site" && newValue) {
       dispatch(
         setQuestionValue({

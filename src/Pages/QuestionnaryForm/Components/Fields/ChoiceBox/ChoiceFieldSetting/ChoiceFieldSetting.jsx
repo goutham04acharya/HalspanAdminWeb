@@ -37,6 +37,7 @@ function ChoiceFieldSetting({
     const [searchParams, setSearchParams] = useSearchParams();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isOptionDataLoading, setIsOptionDataLoading] = useState(false);
     const lastEvaluatedKeyRef = useRef(null);
     const observer = useRef();
     const optionDataRef = useRef();
@@ -71,34 +72,37 @@ function ChoiceFieldSetting({
         setLoading(true);
         const params = Object.fromEntries(searchParams);
         if (lastEvaluatedKeyRef.current) {
-          params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        if (searchTerm) { 
-          params.search = searchTerm
+        if (searchTerm) {
+            params.search = searchTerm
         }
         try {
-          const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-          const transformedArray = response.data.data.items.map(item => ({
-            value: item.lookup_id,
-            label: item.name,
-            choices: item.choices,
-          }));
-          let updateOptions;
-          if (params.start_key) {
-            updateOptions = [...optionDataRef.current, ...transformedArray]
-          } else {
-            updateOptions = [...transformedArray]
-          }
-          setOptionData(updateOptions);
-          lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+            setIsOptionDataLoading(true);
+            const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
+            const transformedArray = response.data.data.items.map(item => ({
+                value: item.lookup_id,
+                label: item.name,
+                choices: item.choices,
+            }));
+            let updateOptions;
+            if (params.start_key) {
+                updateOptions = [...optionDataRef.current, ...transformedArray]
+            } else {
+                updateOptions = [...transformedArray]
+            }
+            setOptionData(updateOptions);
+            lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+            setIsOptionDataLoading(false);
         } catch (error) {
-          console.error('Error fetching questionnaires:', error);
+            setIsOptionDataLoading(false);
+            console.error('Error fetching questionnaires:', error);
         }
-    
+
         setLoading(false);
         setIsFetchingMore(false);
-      }, []);
-    
+    }, []);
+
 
     //funtion for infinate scrooling of dropdown
     const lastElementRef = useCallback(node => {
@@ -141,6 +145,7 @@ function ChoiceFieldSetting({
             .replaceAll('?', 'then')
             .replaceAll('', 'if');
     }
+
     return (
         <>
             <div data-testid="field-settings" className='py-[34px] px-[32px] h-customh10'>
@@ -244,6 +249,9 @@ function ChoiceFieldSetting({
                                     onMoveEnd={handleMoveEnd}
                                     container={formStatus === 'Draft' ? () => document.body : null}
                                 />}
+                            {validationErrors?.choice?.[selectedQuestionId] && (
+                                <ErrorMessage error={validationErrors?.choice?.[selectedQuestionId]} />
+                            )}
                             <div className="relative custom-radioBlue flex items-center mt-3">
                                 <input
                                     type='radio'
@@ -264,7 +272,7 @@ function ChoiceFieldSetting({
                                 </label>
                             </div>
                             {fieldSettingParameters?.source === 'lookup' &&
-                                <div className='w-full flex items-center mt-3'>
+                                <div className='w-full flex items-center'>
                                     <div className='w-[90%]'>
                                         <InfinateDropdown
                                             label=''
@@ -273,7 +281,7 @@ function ChoiceFieldSetting({
                                             className='w-full cursor-pointer placeholder:text-[#9FACB9] h-[45px]'
                                             testID='lookup-dropdown'
                                             labeltestID='lookup-list'
-                                            selectedOption={{label : fieldSettingParameters.lookupValue, value: fieldSettingParameters.lookupOption, choices: fieldSettingParameters.lookupOptionChoice}}
+                                            selectedOption={{ label: fieldSettingParameters.lookupValue, value: fieldSettingParameters.lookupOption, choices: fieldSettingParameters.lookupOptionChoice }}
                                             handleRemoveLookup={formStatus === 'Draft' ? handleRemoveLookup : null}
                                             isDropdownOpen={formStatus === 'Draft' ? isLookupOpen : false}
                                             setDropdownOpen={formStatus === 'Draft' ? setIsLookupOpen : null}
@@ -295,7 +303,10 @@ function ChoiceFieldSetting({
                                         <img src="/Images/plus.svg" alt="plus" />
                                     </button>
                                 </div>}
-                            {fieldSettingParameters?.source === 'lookup' && optionData.length === 0 && (fieldSettingParameters.lookupValue ==='' || fieldSettingParameters.lookupValue === undefined)  && (
+                            {validationErrors?.lookup?.[selectedQuestionId] && (
+                                <ErrorMessage error={validationErrors?.lookup?.[selectedQuestionId]} />
+                            )}
+                            {fieldSettingParameters?.source === 'lookup' && !isOptionDataLoading && optionData.length === 0 && (fieldSettingParameters.lookupValue === '' || fieldSettingParameters.lookupValue === undefined) && (
                                 <ErrorMessage error={'No lookup list available. Please create one'} />
                             )}
                             {/* OptionsComponent added here */}

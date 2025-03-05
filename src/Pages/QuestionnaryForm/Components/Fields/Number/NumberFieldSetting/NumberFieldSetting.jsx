@@ -7,6 +7,7 @@ import { setNewComponent } from '../../fieldSettingParamsSlice';
 import ErrorMessage from '../../../../../../Components/ErrorMessage/ErrorMessage';
 import { setShouldAutoSave } from '../../../QuestionnaryFormSlice';
 import { defaultContentConverter } from '../../../../../../CommonMethods/defaultContentConverter';
+import { replaceUUIDsWithQuestions } from '../../../../../../CommonMethods/replaceUUIDwithQuestion';
 
 
 function NumberFieldSetting({
@@ -21,6 +22,7 @@ function NumberFieldSetting({
     setIsDefaultLogic,
     formStatus,
     setEditorCheck,
+    questionWithUuid,
 }) {
     const [activeTab, setActiveTab] = useState('postField'); // default is 'preField'
     const dispatch = useDispatch();
@@ -73,7 +75,7 @@ function NumberFieldSetting({
                                     disabled={formStatus !== 'Draft'}
                                     value={
                                         fieldSettingParameters?.default_conditional_logic
-                                            ? defaultContentConverter(fieldSettingParameters?.default_conditional_logic)
+                                            ? defaultContentConverter(replaceUUIDsWithQuestions(fieldSettingParameters?.default_conditional_logic, questionWithUuid))
                                             : ''
                                     } // Prefill the input with `defaultString` if it exists, otherwise empty string
                                     onChange={

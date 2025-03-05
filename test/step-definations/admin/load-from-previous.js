@@ -77,13 +77,17 @@ When('I select the service record list', async function () {
 When('I select the questionnaire list', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="select-questionnaire-list"]`))).click();
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let cook = await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).getText();
+    console.log('Questionnaire Name = ', cook);
     await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).click();
 });
 
 When('I select the field list', async function () {
     await new Promise(resolve => setTimeout(resolve, 750));
     await driver.wait(until.elementLocated(By.css(`[data-testid="select-field-list"]`))).click();
-    await new Promise(resolve => setTimeout(resolve, 750));
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let cook = await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).getText();
+    console.log('Field Name = ', cook);
     await driver.wait(until.elementLocated(By.css(`[data-testid="service-record-0"]`))).click();
 });

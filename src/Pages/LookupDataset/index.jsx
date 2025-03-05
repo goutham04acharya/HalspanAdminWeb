@@ -66,35 +66,39 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     const [activeInputs, setActiveInputs] = useState({});
     // Functions
     // List Functions
-    const fetchLookupList = useCallback(async () => {
-        setLoading(true);
+      const fetchLookupList = useCallback(async () => {
         const params = Object.fromEntries(searchParams);
+        // Only set loading true if it's the first fetch (no start_key)
+        if (!params.start_key) {
+          setLoading(true);
+        }
+        if(searchParams.get('search')) {
+            lastEvaluatedKeyRef.current = null 
+        }
         if (lastEvaluatedKeyRef.current) {
-            params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
+          params.start_key = encodeURIComponent(JSON.stringify(lastEvaluatedKeyRef.current));
         }
-        if (searchParams.get('search') !== undefined) {
-            delete params.start_key
-        }
+      
         try {
             const response = await getAPI(`lookup-data${objectToQueryString(params)}`);
-            const newItems = response?.data?.data?.items || [];
-            setLookupList(prevItems => {
-                if (searchParams.get('search') !== undefined && !lastEvaluatedKeyRef.current) {
-                    // New search: return only new items
-                    return [...newItems];
-                } else {
-                    // Pagination: append new items
-                    return [...prevItems, ...newItems];
-                }
-            });
-            lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
+          const newItems = response?.data?.data?.items || [];
+          // If this is a new fetch (no start_key), replace the list
+          // Otherwise, append to the existing list
+          if (!params.start_key) {
+            setLookupList(newItems);
+          } else {
+            setLookupList(prevItems => [...prevItems, ...newItems]);
+          }
+          
+          lastEvaluatedKeyRef.current = response?.data?.data?.last_evaluated_key || null;
         } catch (error) {
-            console.error('Error fetching questionnaires:', error);
+          console.error('Error fetching questionnaires:', error);
+          lastEvaluatedKeyRef.current = null;
         }
-
+      
         setLoading(false);
         setIsFetchingMore(false);
-    }, [searchParams]);
+      }, [searchParams]);
 
     const handleRemoveChoice = (uuidToRemove) => {
         setData("choices", data.choices.filter(choice => choice.uuid !== uuidToRemove));
@@ -382,17 +386,20 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
     }, [fetchLookupList, location.state]);
 
 
-    const lastElementRef = useCallback(node => {
-        if (loading || isFetchingMore) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
-                setIsFetchingMore(true);
-                fetchLookupList();
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, isFetchingMore]);
+  const lastElementRef = useCallback(node => {
+    
+    if (loading || isFetchingMore) return;
+    if (observer.current) observer.current.disconnect();
+    
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0]?.isIntersecting && lastEvaluatedKeyRef.current) {
+        setIsFetchingMore(true);
+        fetchLookupList();
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [loading, isFetchingMore, fetchLookupList]);
 
     useEffect(() => {
         if (showCreateModal) {
@@ -426,7 +433,6 @@ const LookupDataset = ({ isQuestionaryPage, showCreateModal, setShowCreateModal 
                                             setSearchParams={setSearchParams}
                                             setLoading={setLoading}
                                             placeholder='Search by Name'
-                                            setLookupList={setLookupList}
                                         />
                                     </div>
                                 </div>

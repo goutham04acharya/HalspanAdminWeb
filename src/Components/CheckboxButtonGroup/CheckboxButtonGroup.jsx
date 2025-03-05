@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const CustomCheckboxGroup = ({ values, onChange, questionValue, question }) => {
+const CustomCheckboxGroup = ({ values, onChange, questionValue, question, isDisable }) => {
     // Initialize with the first value selected by default
     const [selectedValues, setSelectedValues] = useState([]);
 
@@ -37,6 +37,7 @@ const CustomCheckboxGroup = ({ values, onChange, questionValue, question }) => {
                             checked={selectedValues.includes(value)}
                             onChange={() => handleCheckboxChange(value)}
                             className="absolute w-0 h-0 opacity-0"
+                            disabled={isDisable}
                         />
                         <div className={`w-5 h-5 border-2 border-[#2B333B] transition-colors`}>
                             {selectedValues.includes(value) && (

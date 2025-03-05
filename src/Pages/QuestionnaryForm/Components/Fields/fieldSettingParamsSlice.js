@@ -7,6 +7,7 @@ const initialState = {
     currentData: {},
     editorToggle: {},
     conditions: [],
+    currentQuestionLabel: {}
 };
 
 // Helper function to process displayType
@@ -76,20 +77,20 @@ const fieldSettingParamsSlice = createSlice({
         },
         setNewLogic: (state, action) => {
             const { questionId, id, value } = action.payload;
-        
+
             if (!state.editorToggle[questionId]) {
                 state.editorToggle[questionId] = {};
             }
-        
+
             const newValue = Array.isArray(value)
                 ? value.map((item) => ({ ...item }))
                 : { ...value };
-        
+
             state.editorToggle[questionId] = {
                 ...state.editorToggle[questionId],
                 [id]: newValue
             };
-        },     
+        },
         addNewFixedChoice: (state, action) => {
             const { questionId } = action.payload;
 
@@ -143,6 +144,9 @@ const fieldSettingParamsSlice = createSlice({
         saveCurrentData: (state) => {
             state.savedData = { ...state.currentData };
         },
+        setCurrentData: (state,action) => {
+            state.currentData =  action.payload;
+        },
         setInitialData: (state, action) => {
             const data = action.payload;
 
@@ -165,6 +169,7 @@ const fieldSettingParamsSlice = createSlice({
                     questionnaireId: item.questionnaire_id,
                     lookupOption: item.lookup_id,
                     lookupValue: item.lookup_value,
+                    lookupList: item.lookup_list,
                     options: item?.options,
                     postField: item?.postField,
                     preField: item?.preField,
@@ -180,8 +185,8 @@ const fieldSettingParamsSlice = createSlice({
                     service_record_lfp: item?.service_record_lfp,
                     attribute_data_lfp: item?.attribute_data_lfp,
                     questionnaire_name_lfp: item?.questionnaire_name_lfp,
-                    question_name_lfp:item?.question_name_lfp,
-                    question_id_lfp:item?.question_id_lfp,
+                    question_name_lfp: item?.question_name_lfp,
+                    question_id_lfp: item?.question_id_lfp,
                     ...processDisplayType(item, displayType),
                     ...processSource(item)
                 };
@@ -189,7 +194,13 @@ const fieldSettingParamsSlice = createSlice({
                 state.currentData[questionId] = customizedData;
                 state.savedData[questionId] = customizedData;
             });
-        }
+        },
+        setcurrentQuestionLabel: (state, action) => {
+            state.currentQuestionLabel = {}
+            const { id, label } = action.payload
+            state.currentQuestionLabel[id] = label;
+        },
+
     }
 });
 
@@ -228,7 +239,9 @@ export const {
     saveCurrentData,
     setInitialData,
     setComplianceLogicCondition,
-    clearConditions
+    clearConditions,
+    setcurrentQuestionLabel,
+    setCurrentData
 } = fieldSettingParamsSlice.actions;
 
 export default fieldSettingParamsSlice.reducer;
