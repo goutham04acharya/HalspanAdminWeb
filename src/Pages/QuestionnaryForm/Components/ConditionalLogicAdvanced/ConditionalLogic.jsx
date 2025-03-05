@@ -2098,9 +2098,23 @@ function ConditionalLogic({
     return condition_logic;
   }
 
+  const dateMethodsSwitch = [
+    "AddDays",
+    "SubtractDays",
+    "getFullYear()",
+    "getMonth()",
+    "getDate()",
+    "getDay()",
+  ];
+  // Default: Extract and parse the conditional logic from the selected question
+  const notRequiredConditionsSwitch = ["toUpperCase()", "toLowerCase()", "trim()"]
+    .concat(dateTimeMethods)
+    .concat(dateMethodsSwitch)
+    .concat(timeMethods);
+
   const handleTab = () => {
     if (
-      !notRequiredConditions.some((element) => inputValue.includes(element))
+      !notRequiredConditionsSwitch.some((element) => inputValue.includes(element))
     ) {
       let parsedLogic = parseLogicExpression(inputValue);
       setConditions(parsedLogic);
@@ -2333,10 +2347,18 @@ function ConditionalLogic({
           console.error("Page not found for the given pageConditionLogicId");
         }
       } else {
+        const dateMethodsAdvance = [
+          "AddDays",
+          "SubtractDays",
+          "getFullYear()",
+          "getMonth()",
+          "getDate()",
+          "getDay()",
+        ];
         // Default: Extract and parse the conditional logic from the selected question
         const notRequiredConditionsAdvanceEditor = ["toUpperCase()", "toLowerCase()", "trim()"]
           .concat(dateTimeMethods)
-          .concat(dateMethods)
+          .concat(dateMethodsAdvance)
           .concat(timeMethods);
         if (
           !notRequiredConditionsAdvanceEditor.some((element) => replaceUUIDs(
