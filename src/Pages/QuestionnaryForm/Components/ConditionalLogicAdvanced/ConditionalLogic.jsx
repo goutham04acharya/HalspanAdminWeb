@@ -1374,13 +1374,13 @@ function ConditionalLogic({
       if (evalInputValue.includes("getMinutes")) {
         // Match getMinutes() with a comparison operator and a two-digit number
         const timeMatches = evalInputValue.match(
-          /getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/g
+          /getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/g
         );
 
         if (timeMatches) {
           for (const timeMatch of timeMatches) {
             const [, operator, minutes] = timeMatch.match(
-              /getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{2})/
+              /getMinutes\(\)\s*(===|!==|>=|<=|>|<)\s*(\d{1,2})/
             );
 
             // Ensure the minutes value is a two-digit number between 00 and 59
