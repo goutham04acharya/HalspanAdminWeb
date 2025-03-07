@@ -338,10 +338,10 @@ function PreviewModal({
         while (processedContent.includes('formatDateWithOffset(')) {
           let match = processedContent.match(/formatDateWithOffset\(([^)]+)\)/);
           if (!match) break; // Exit if no more matches
-          
+
           let args = match[1].split(',');
           let formattedDate = formatDateWithOffset(args[0].trim(), args[1].trim(), args[2].trim());
-          
+
           // Replace only the current function call with its result
           processedContent = processedContent.replace(match[0], formattedDate);
         }
@@ -1392,9 +1392,15 @@ function PreviewModal({
                   );
                 }
 
-                const result = eval(logic);
+                let result = eval(logic);
 
                 if (component_type === "dateTimefield") {
+                  const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                  if (regex.test(result)) {
+                    const [, day, month, year] = result.match(regex);
+                    result = `${year}-${month}-${day}`;
+                  }
+
                   const splitDate = (dateStr) => {
                     if (!dateStr || typeof dateStr !== "string") {
                       return new Date().toISOString().split("T")[0];
@@ -1409,7 +1415,7 @@ function PreviewModal({
                   if (dateTimeType === "date") {
                     const dateMatch = result.match(/^(\d{4}-\d{2}-\d{2})/);
                     const dateValue = dateMatch?.[1] || '';
-                    
+
                     dispatch(
                       setQuestionValue({
                         question_id: question?.question_id,
@@ -1424,7 +1430,7 @@ function PreviewModal({
                     if (timeFormat === "12") {
                       // Check if result is already in 12-hour format or needs conversion from 24-hour
                       let timeValue = '';
-                      
+
                       if (result.includes(' AM') || result.includes(' PM')) {
                         const timeMatch = result.match(/(\d{2}:\d{2}:\d{2} [APM]{2})$/);
                         timeValue = timeMatch?.[1] || '';
@@ -1432,7 +1438,7 @@ function PreviewModal({
                         const timeMatch = result.match(/(\d{2}:\d{2}:\d{2})$/);
                         timeValue = timeMatch?.[1] ? convertTo12Hour(timeMatch[1]) : '';
                       }
-                      
+
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
@@ -1446,7 +1452,7 @@ function PreviewModal({
                     } else if (timeFormat === "24") {
                       // Check if result is already in 24-hour format or needs conversion from 12-hour
                       let timeValue = '';
-                      
+
                       if (!result.includes(' AM') && !result.includes(' PM')) {
                         const timeMatch = result.match(/(\d{2}:\d{2}:\d{2})$/);
                         timeValue = timeMatch?.[1] || '';
@@ -1454,7 +1460,7 @@ function PreviewModal({
                         const timeMatch = result.match(/(\d{2}:\d{2}:\d{2} [APM]{2})$/);
                         timeValue = timeMatch?.[1] ? convertTo24Hour(timeMatch[1]) : '';
                       }
-                      
+
                       dispatch(
                         setQuestionValue({
                           question_id: question?.question_id,
@@ -1470,10 +1476,10 @@ function PreviewModal({
                     // For datetime, extract the date part and the time part separately
                     const dateMatch = result.match(/^(\d{4}-\d{2}-\d{2})/);
                     const datePart = dateMatch?.[1] || '';
-                  
+
                     // Handle time part based on format
                     let timePart = '';
-                    
+
                     if (timeFormat === "12") {
                       // Check if time part is already in 12-hour format or needs conversion from 24-hour
                       if (result.includes(' AM') || result.includes(' PM')) {
@@ -1493,7 +1499,7 @@ function PreviewModal({
                         timePart = timeMatch?.[1] ? convertTo24Hour(timeMatch[1]) : '';
                       }
                     }
-                    
+
                     // Combine date and time parts
                     const formattedDateTime = datePart && timePart ? `${datePart} ${timePart}` : datePart || (timePart && `${new Date().toISOString().split('T')[0]} ${timePart}`);
 
