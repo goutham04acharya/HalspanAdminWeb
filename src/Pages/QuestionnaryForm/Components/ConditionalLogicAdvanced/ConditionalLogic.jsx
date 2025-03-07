@@ -2465,7 +2465,7 @@ function ConditionalLogic({
                         <button
                           onClick={() => {
                             setTab("basic");
-                            handleTab();
+                            !complianceState && handleTab();
                           }}
                           className={
                             tab === "advance"
