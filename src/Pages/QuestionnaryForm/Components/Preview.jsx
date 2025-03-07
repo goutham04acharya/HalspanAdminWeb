@@ -102,8 +102,8 @@ function PreviewModal({
   };
   function formatDateWithOffset(formatteDate, value, question_name) {
     let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
-    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0]; 
-    return conditionalValues[question_name.trim()] === date;
+    let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0];
+    return conditionalValues[question_name.trim()].split(' ')[0] === date;
   }
   useEffect(() => {
     const fetchSections = async () => {
@@ -245,12 +245,12 @@ function PreviewModal({
         if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
           if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
             if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-              if(functionName === "getTime") {
+              if (functionName === "getTime") {
                 return `(new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
               }
               return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
             } else {
-              if(functionName === "getTime") {
+              if (functionName === "getTime") {
                 return `(new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
               }
               return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
@@ -261,12 +261,12 @@ function PreviewModal({
         } else {
           if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
             if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-              if(functionName === "getTime") {
+              if (functionName === "getTime") {
                 return `new Date("1970-01-01 " + ${variable}).toTimeString().slice(0,8)`
               }
               return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
             } else {
-              if(functionName === "getTime") {
+              if (functionName === "getTime") {
                 return `new Date("1970-01-01T" + ${variable}).toTimeString().slice(0,8)`
               }
               return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
@@ -324,12 +324,27 @@ function PreviewModal({
         let REASON = "";
         let ACTIONS = [];
         let GRADE = "";
-        if(processedContent.includes('formatDateWithOffset(')) {
-          let splitValue = processedContent.split('?')[0].replaceAll('))', ')').trim().replace(/^\(/, '').replace(/\)$/, '').split('formatDateWithOffset(')[1].split(',')
-          splitValue = formatDateWithOffset(splitValue[0], splitValue[1], splitValue[2])
-          processedContent = `${splitValue} ? ${processedContent.split('?')[1]}`
-
+        if (processedContent.includes('formatDateWithOffset(')) {
+          let match = processedContent.match(/formatDateWithOffset\(([^)]+)\)/);
+          if (match) {
+            let args = match[1].split(',');
+            let formattedDate = formatDateWithOffset(args[0].trim(), args[1].trim(), args[2].trim());
+            // Replace only the function call with its result
+            processedContent = processedContent.replace(match[0], formattedDate);
+          }
         }
+
+        while (processedContent.includes('formatDateWithOffset(')) {
+          let match = processedContent.match(/formatDateWithOffset\(([^)]+)\)/);
+          if (!match) break; // Exit if no more matches
+          
+          let args = match[1].split(',');
+          let formattedDate = formatDateWithOffset(args[0].trim(), args[1].trim(), args[2].trim());
+          
+          // Replace only the current function call with its result
+          processedContent = processedContent.replace(match[0], formattedDate);
+        }
+
         // Evaluate the processed logic
         eval(processedContent);
 
@@ -446,7 +461,7 @@ function PreviewModal({
             `getDay() ${operator} ${daysMap[day] ?? '"${day}"'}`,
         );
         return eval(replacedLogic);
-      }else if(logic.includes('formatDateWithOffset')) {
+      } else if (logic.includes('formatDateWithOffset')) {
         const spitedValue = logic.split('(')[1].split(')')[0].split(',');
         return formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])
       } else {
@@ -1295,12 +1310,12 @@ function PreviewModal({
                     if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
                       if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
                         if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-                          if(functionName === "getTime") {
+                          if (functionName === "getTime") {
                             return `(new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
                           }
                           return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
                         } else {
-                          if(functionName === "getTime") {
+                          if (functionName === "getTime") {
                             return `(new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
                           }
                           return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
@@ -1311,12 +1326,12 @@ function PreviewModal({
                     } else {
                       if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
                         if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-                          if(functionName === "getTime") {
+                          if (functionName === "getTime") {
                             return `new Date("1970-01-01 " + ${variable}).toTimeString().slice(0,8)`
                           }
                           return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
                         } else {
-                          if(functionName === "getTime") {
+                          if (functionName === "getTime") {
                             return `new Date("1970-01-01T" + ${variable}).toTimeString().slice(0,8)`
                           }
                           return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
@@ -1671,10 +1686,10 @@ function PreviewModal({
                           console.error("Error evaluating expression:", error);
                           return null;
                         }
-                      }else if(list?.conditional_logic.includes('formatDateWithOffset')) {
+                      } else if (list?.conditional_logic.includes('formatDateWithOffset')) {
                         const spitedValue = list?.conditional_logic.split('(')[1].split(')')[0].split(',');
-                        if(!formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])) {
-                            return null;
+                        if (!formatDateWithOffset(spitedValue[0], spitedValue[1], spitedValue[2])) {
+                          return null;
                         }
                       } else if (list?.conditional_logic.includes('AddDays') || list?.conditional_logic.includes('SubtractDays')) {
 
@@ -1757,12 +1772,12 @@ function PreviewModal({
                           if (evaluatedVariable.includes(':') && (evaluatedVariable.includes('-') || evaluatedVariable.includes('/'))) {
                             if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
                               if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-                                if(functionName === "getTime") {
+                                if (functionName === "getTime") {
                                   return `(new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
                                 }
                                 return `new Date("1970-01-01 " + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
                               } else {
-                                if(functionName === "getTime") {
+                                if (functionName === "getTime") {
                                   return `(new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, ''))).toTimeString().slice(0,8)`
                                 }
                                 return `new Date("1970-01-01T" + ${variable}.replace(/^([\\d/.-]+)\\s+/, '')).${functionName}()`;
@@ -1773,12 +1788,12 @@ function PreviewModal({
                           } else {
                             if (["getHours", "getMinutes", "getSeconds", "getMilliseconds", "getTime"].includes(functionName)) {
                               if (evaluatedVariable.includes("AM") || evaluatedVariable.includes("PM")) {
-                                if(functionName === "getTime") {
+                                if (functionName === "getTime") {
                                   return `new Date("1970-01-01 " + ${variable}).toTimeString().slice(0,8)`
                                 }
                                 return `new Date("1970-01-01 " + ${variable}).${functionName}()`;
                               } else {
-                                if(functionName === "getTime") {
+                                if (functionName === "getTime") {
                                   return `new Date("1970-01-01T" + ${variable}).toTimeString().slice(0,8)`
                                 }
                                 return `new Date("1970-01-01T" + ${variable}).${functionName}()`;
