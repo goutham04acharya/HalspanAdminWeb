@@ -103,7 +103,7 @@ function PreviewModal({
   function formatDateWithOffset(formatteDate, value, question_name) {
     let [day, month, year] = formatteDate.split(`'`)[1].split('/').map(Number);
     let date = new Date(year, month - 1, day + 1 + Number(value)).toISOString().split('T')[0];
-    return conditionalValues[question_name.trim()] === date;
+    return conditionalValues[question_name.trim()].split(' ')[0] === date;
   }
   useEffect(() => {
     const fetchSections = async () => {
@@ -333,6 +333,18 @@ function PreviewModal({
             processedContent = processedContent.replace(match[0], formattedDate);
           }
         }
+
+        while (processedContent.includes('formatDateWithOffset(')) {
+          let match = processedContent.match(/formatDateWithOffset\(([^)]+)\)/);
+          if (!match) break; // Exit if no more matches
+          
+          let args = match[1].split(',');
+          let formattedDate = formatDateWithOffset(args[0].trim(), args[1].trim(), args[2].trim());
+          
+          // Replace only the current function call with its result
+          processedContent = processedContent.replace(match[0], formattedDate);
+        }
+
         // Evaluate the processed logic
         eval(processedContent);
 
