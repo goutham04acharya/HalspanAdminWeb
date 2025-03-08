@@ -16,3 +16,20 @@ export const findSectionAndPageName = (section, questionId) => {
     // Return null if question ID is not found
     return null;
 }
+
+export const getQuestionDataById = (sections, questionId, data) => {
+    // Iterate through each section
+    for (const section of sections) {
+        // Iterate through each page in the section
+        for (const page of section.pages) {
+            // Iterate through each question on the page
+            for (const question of page.questions) {
+                // Check if this is the question we're looking for
+                if (question.question_id === questionId) {
+                    return question[data] ?? null;
+                }
+            }
+        }
+    }
+    return null;
+}
