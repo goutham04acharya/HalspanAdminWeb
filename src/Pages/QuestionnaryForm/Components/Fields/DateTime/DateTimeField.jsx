@@ -88,7 +88,7 @@ function DateTimeField({
       parsedDate.getMonth(),
       parsedDate.getDate()
     );
-    
+
     // Update conditional values
     const dateTimeString = `${date} ${time}`;
     setConditionalValues((prevValues) => ({
@@ -116,6 +116,12 @@ function DateTimeField({
         [question?.question_id]: "", // Clear errors for this field
       },
     }));
+    dispatch(
+      setFieldEditable({
+        fieldId: question?.question_id,
+        isEditable: true,
+      })
+    );
   };
 
   function handleFunction(e) {
@@ -143,6 +149,12 @@ function DateTimeField({
         ...prevValues,
         [question?.question_id.replace(/-/g, "_")]: value,
       }));
+      dispatch(
+        setFieldEditable({
+          fieldId: question?.question_id,
+          isEditable: true,
+        })
+      );
     } else if (type === "date") {
       const value = e;
       const selectedDate = new Date(value);
@@ -183,11 +195,10 @@ function DateTimeField({
         data-testid="label-name"
         htmlFor={textId}
         title={preview ? question?.label : fieldSettingParameters?.label}
-        className={`font-medium text-base text-[#000000] overflow-hidden break-all  break-words block w-full max-w-[85%] ${
-          (preview ? question?.label : fieldSettingParameters?.label) === ""
-            ? "h-[20px]"
-            : "h-auto"
-        }`}
+        className={`font-medium text-base text-[#000000] overflow-hidden break-all  break-words block w-full max-w-[85%] ${(preview ? question?.label : fieldSettingParameters?.label) === ""
+          ? "h-[20px]"
+          : "h-auto"
+          }`}
       >
         {preview ? question?.label : fieldSettingParameters?.label}
         {!question?.options?.optional && preview && (
@@ -205,13 +216,11 @@ function DateTimeField({
                 ? questionValue?.[question?.question_id]
                 : ""
             }
-            className={`w-full h-[40px] break-words border ${
-              validationErrors?.preview_datetimefield?.[question.question_id]
-                ? "border-[#FFA318]"
-                : "border-[#AEB3B7]"
-            } rounded-md mt-2 ${
-              question?.options?.read_only ? "bg-gray-50" : "bg-white"
-            } py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+            className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[question.question_id]
+              ? "border-[#FFA318]"
+              : "border-[#AEB3B7]"
+              } rounded-md mt-2 ${question?.options?.read_only ? "bg-gray-50" : "bg-white"
+              } py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
             placeholder={question?.placeholder_content}
             onChange={(e) => handleFunction(e.target.value)}
             pattern="\d{4}-\d{2}-\d{2}"
@@ -248,15 +257,13 @@ function DateTimeField({
                     ? questionValue?.[question?.question_id]?.split(" ")[0]
                     : ""
                 } // Use state to manage date value
-                className={`w-full h-[40px] break-words border ${
-                  validationErrors?.preview_datetimefield?.[
-                    question.question_id
-                  ]
-                    ? "border-[#FFA318]"
-                    : "border-[#AEB3B7]"
-                } rounded-md mt-2 ${
-                  question?.options?.read_only ? "bg-gray-50" : "bg-white"
-                } py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+                className={`w-full h-[40px] break-words border ${validationErrors?.preview_datetimefield?.[
+                  question.question_id
+                ]
+                  ? "border-[#FFA318]"
+                  : "border-[#AEB3B7]"
+                  } rounded-md mt-2 ${question?.options?.read_only ? "bg-gray-50" : "bg-white"
+                  } py-3 px-4 outline-0 font-normal text-[14px] text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
                 placeholder={question?.placeholder_content}
                 onChange={(e) =>
                   handleDateTime(e.target.value, timeValue, "date")
@@ -290,18 +297,17 @@ function DateTimeField({
             type={type}
             id={textId}
             value={value}
-            className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${
-              preview ? "mt-1" : "mt-5"
-            } bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
+            className={`w-full h-auto break-words border border-[#AEB3B7] rounded-lg ${preview ? "mt-1" : "mt-5"
+              } bg-white py-3 px-4 outline-0 font-normal text-base text-[#2B333B] placeholder:text-base placeholder:font-base placeholder:text-[#9FACB9] ${className}`}
             placeholder={
               fieldSettingParameters?.placeholderContent ||
               ((preview ? question?.type : fieldSettingParameters?.type) ===
-              "date"
+                "date"
                 ? "dd/mm/yyyy"
                 : (preview ? question?.type : fieldSettingParameters?.type) ===
                   "time"
-                ? "hh:mm:ss"
-                : "dd/mm/yyyy hh:mm:ss")
+                  ? "hh:mm:ss"
+                  : "dd/mm/yyyy hh:mm:ss")
             }
             onClick={() => handleChange(fieldSettingParameters)}
           />
@@ -310,27 +316,24 @@ function DateTimeField({
           <img
             src="/Images/calendar.svg"
             alt="calender"
-            className={`absolute ${
-              preview ? "top-4" : "top-8"
-            } right-3 cursor-pointer`}
+            className={`absolute ${preview ? "top-4" : "top-8"
+              } right-3 cursor-pointer`}
           />
         )}
         {(preview ? false : fieldSettingParameters?.type) === "time" && (
           <img
             src="/Images/clock.svg"
             alt="clock"
-            className={`absolute ${
-              preview ? "top-4" : "top-8"
-            } right-3 cursor-pointer`}
+            className={`absolute ${preview ? "top-4" : "top-8"
+              } right-3 cursor-pointer`}
           />
         )}
         {(preview ? false : fieldSettingParameters?.type) === "datetime" && (
           <img
             src="/Images/calendar-clock.svg"
             alt="calender-clock"
-            className={`absolute ${
-              preview ? "top-4" : "top-8"
-            } right-3 cursor-pointer`}
+            className={`absolute ${preview ? "top-4" : "top-8"
+              } right-3 cursor-pointer`}
           />
         )}
       </div>
