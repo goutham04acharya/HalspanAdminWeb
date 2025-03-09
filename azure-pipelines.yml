@@ -5,6 +5,7 @@ trigger:
       - qa
       - pre-production
       - master
+      - qa-github
 pr:
   branches:
     include:
@@ -24,6 +25,10 @@ variables:
     - name: ENV
       value: 'Testing'
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/qa') }}:
+    - group: halspan-qa
+    - name: ENV
+      value: 'Testing'
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/qa-github') }}:
     - group: halspan-qa
     - name: ENV
       value: 'Testing'
@@ -450,21 +455,37 @@ stages:
         runOnce:
           deploy:
             steps:
-              - task: DownloadPipelineArtifact@2
-                name: bundle
-                inputs:
-                  artifact: bundle
-                  targetPath: '$(System.DefaultWorkingDirectory)'
-              - task: DownloadPipelineArtifact@2
-                name: environment
-                inputs:
-                  artifact: environment
-                  targetPath: '$(System.DefaultWorkingDirectory)'
+              - checkout: self
+                clean: true
+                fetchDepth: 0
+                persistCredentials: true
+              # - task: DownloadPipelineArtifact@2
+              #   name: bundle
+              #   inputs:
+              #     artifact: bundle
+              #     targetPath: '$(System.DefaultWorkingDirectory)'
+              # - task: DownloadPipelineArtifact@2
+              #   name: environment
+              #   inputs:
+              #     artifact: environment
+              #     targetPath: '$(System.DefaultWorkingDirectory)'
+              # - script: |
+              #     source .env
+              #     aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
+              #     aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
+              #     echo "deployed"
+              #   displayName: 'Deployment'
               - script: |
-                  source .env
-                  aws s3 sync dist s3://$ADMIN_S3_BUCKET --acl public-read
-                  aws cloudfront create-invalidation --distribution-id $ADMIN_DISTRIBUTION_ID --paths "/*" 
-                  echo "deployed"
+                  git fetch origin
+                  git checkout -b $AZURE_BRANCH origin/$AZURE_BRANCH || git checkout $AZURE_BRANCH
+                  git config pull.rebase false
+                  git pull origin $AZURE_BRANCH
+                  git remote set-url origin https://$(GITHUB_PAT)@github.com/goutham04acharya/HalspanAdminWeb.git
+                  git config --global user.email "goutham.lava@7edge.com"
+                  git config --global user.name "Pipeline"
+                  git config --global advice.detachedHead false
+                  git pull origin $AZURE_BRANCH --allow-unrelated-histories
+                  git push --set-upstream origin $AZURE_BRANCH
                 displayName: 'Deployment'
     - job: DAST
       displayName: "Dynamic Application Security Testing (DAST)"
